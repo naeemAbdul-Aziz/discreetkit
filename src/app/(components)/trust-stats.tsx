@@ -34,7 +34,7 @@ export function TrustStats() {
            >
             <div className="absolute right-0 top-0 w-3/4 max-w-[300px] md:w-2/3">
               <Image
-                src="https://placehold.co/400x500"
+                src="https://images.unsplash.com/photo-1584012961505-507d844cc7a0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxzdHVkZW50JTIwZ2hhbmF8ZW58MHx8fHwxNzU2MTQzNzg2fDA&ixlib=rb-4.1.0&q=80&w=1080"
                 alt="Happy student in Ghana"
                 width={400}
                 height={500}
@@ -44,7 +44,7 @@ export function TrustStats() {
             </div>
             <div className="absolute bottom-0 left-0 w-2/4 max-w-[250px] md:w-1/2">
                <Image
-                src="https://placehold.co/400x300"
+                src="https://images.unsplash.com/photo-1666886573553-6548db92db79?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxoZWFsdGglMjBwcm9mZXNzaW9uYWx8ZW58MHx8fHwxNzU2MTQzNzg2fDA&ixlib=rb-4.1.0&q=80&w=1080"
                 alt="Health professional"
                 width={400}
                 height={300}
