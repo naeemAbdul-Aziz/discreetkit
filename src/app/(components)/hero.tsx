@@ -13,25 +13,25 @@ const statCards = [
     icon: CheckCircle,
     title: '99% Accuracy',
     subtitle: 'WHO-Approved Tests',
-    position: 'top-12 -left-12',
+    position: 'top-12 -left-4 md:-left-12',
   },
   {
     icon: Package,
     title: '10,000+ Kits Delivered',
     subtitle: 'Across Ghana',
-    position: 'top-24 -right-16',
+    position: 'top-24 -right-4 md:-right-16',
   },
   {
     icon: Star,
     title: '4.9 Star Rating',
     subtitle: '1,600+ Reviews',
-    position: 'bottom-20 -left-20',
+    position: 'bottom-20 -left-4 md:-left-20',
   },
   {
     icon: TrendingUp,
     title: 'Discreet Packaging',
     subtitle: 'Guaranteed Privacy',
-    position: 'bottom-8 -right-12',
+    position: 'bottom-8 -right-4 md:-right-12',
   },
 ];
 
@@ -126,7 +126,7 @@ export function Hero() {
                 <motion.div
                     key={card.title}
                     className={cn(
-                        'absolute hidden md:block z-20 p-3 rounded-xl bg-white/60 backdrop-blur-sm shadow-lg border border-white/20',
+                        'absolute z-20 p-3 rounded-xl bg-white/60 backdrop-blur-sm shadow-lg border border-white/20',
                         card.position
                     )}
                     variants={itemVariants}
