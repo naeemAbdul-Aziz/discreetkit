@@ -7,6 +7,7 @@ import { ProductCarousel } from './(components)/product-carousel';
 import { Testimonials } from './(components)/testimonials';
 import { ProductBenefits } from './(components)/product-benefits';
 import { Faq } from './(components)/faq';
+import { ContactUs } from './(components)/contact-us';
 
 export default function Home() {
   return (
@@ -18,6 +19,7 @@ export default function Home() {
       <HowItWorks />
       <Testimonials />
       <Faq />
+      <ContactUs />
       <ClosingCta />
     </div>
   );
