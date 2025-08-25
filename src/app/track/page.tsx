@@ -80,6 +80,17 @@ function Tracker() {
         </Alert>
       )}
 
+      {isPending && !order && (
+        <Card className="mt-4">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-center space-x-2">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              <p className="text-muted-foreground">Searching for your order...</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {order && (
         <Card className="mt-4">
           <CardHeader>
