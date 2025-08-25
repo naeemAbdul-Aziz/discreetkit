@@ -10,7 +10,7 @@ export const products = [
     priceGHS: 75.00,
     is_student_bundle: false,
     active: true,
-    imageUrl: 'https://placehold.co/400x300',
+    imageUrl: 'https://images.unsplash.com/photo-1606295835050-e17a6a239ccf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxtZWRpY2FsJTIwdGVzdCUyMGtpdHxlbnwwfHx8fDE3NTYxNDczODd8MA&ixlib=rb-4.1.0&q=80&w=1080',
     reviews: 289
   },
   {
@@ -21,7 +21,7 @@ export const products = [
     priceGHS: 140.00,
     is_student_bundle: true,
     active: true,
-    imageUrl: 'https://placehold.co/400x300',
+    imageUrl: 'https://images.unsplash.com/photo-1606295834251-36d654991797?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtZWRpY2FsJTIwdGVzdCUyMGtpdHxlbnwwfHx8fDE3NTYxNDczODd8MA&ixlib=rb-4.1.0&q=80&w=1080',
     reviews: 412
   },
   {
@@ -32,7 +32,7 @@ export const products = [
     priceGHS: 40.00,
     is_student_bundle: false,
     active: true,
-    imageUrl: 'https://placehold.co/400x300',
+    imageUrl: 'https://images.unsplash.com/photo-1606295835050-e17a6a239ccf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxtZWRpY2FsJTIwdGVzdCUyMGtpdHxlbnwwfHx8fDE3NTYxNDczODd8MA&ixlib=rb-4.1.0&q=80&w=1080',
     reviews: 176
   },
   {
@@ -43,7 +43,7 @@ export const products = [
     priceGHS: 110.00,
     is_student_bundle: true,
     active: true,
-    imageUrl: 'https://placehold.co/400x300',
+    imageUrl: 'https://images.unsplash.com/photo-1591185157258-11aec5f039d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8bWVkaWNhbCUyMHRlc3QlMjBraXR8ZW58MHx8fHwxNzU2MTQ3Mzg3fDA&ixlib=rb-4.1.0&q=80&w=1080',
     reviews: 350
   },
 ]
