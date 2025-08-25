@@ -46,7 +46,7 @@ export function Hero() {
           </div>
           <div className="flex items-center justify-center">
             <Image
-              src="https://images.unsplash.com/photo-1686575131650-e02f84970212?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxOHx8Qk9YfGVufDB8fHx8MTc1NjE0NTI3OXww&ixlib=rb-4.1.0&q=80&w=1080"
+              src="https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwYWNrYWdlfGVufDB8fHx8MTc1NjE0NTQxNnww&ixlib=rb-4.1.0&q=80&w=1080"
               alt="Discreet package for self-test kit"
               width={600}
               height={400}
