@@ -15,6 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { AlertCircle, Loader2, ShieldCheck } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { RecentOrders } from '../(components)/recent-orders';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -52,6 +53,7 @@ export default function OrderPage() {
   }, [state, router, toast]);
 
   return (
+    <>
     <div className="container mx-auto max-w-4xl px-4 py-12 md:py-20">
       <div className="text-center">
         <h1 className="font-headline text-4xl font-bold">Order Your Test Kit</h1>
@@ -135,5 +137,7 @@ export default function OrderPage() {
         <SubmitButton />
       </form>
     </div>
+    <RecentOrders />
+    </>
   );
 }
