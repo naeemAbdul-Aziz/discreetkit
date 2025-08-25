@@ -6,13 +6,13 @@ import { Testimonials } from './(components)/testimonials';
 import { Faq } from './(components)/faq';
 import { ClosingCta } from './(components)/closing-cta';
 import { Separator } from '@/components/ui/separator';
-import { TrustStats } from './(components)/trust-stats';
+import { PartnerLogos } from './(components)/partner-logos';
 
 export default function Home() {
   return (
     <div className="flex flex-col">
       <Hero />
-      <TrustStats />
+      <PartnerLogos />
       <FeatureGrid />
       <HowItWorks />
       <Testimonials />
@@ -24,3 +24,4 @@ export default function Home() {
     </div>
   );
 }
+

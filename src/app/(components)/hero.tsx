@@ -4,7 +4,6 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { PartnerLogos } from './partner-logos';
 
 export function Hero() {
   return (
@@ -48,9 +47,6 @@ export function Hero() {
               data-ai-hint="discreet package health"
             />
           </div>
-        </div>
-        <div className="mt-20">
-          <PartnerLogos />
         </div>
       </div>
     </section>
