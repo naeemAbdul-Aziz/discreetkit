@@ -8,12 +8,13 @@ import { Testimonials } from './(components)/testimonials';
 import { ProductBenefits } from './(components)/product-benefits';
 import { Faq } from './(components)/faq';
 import { ContactUs } from './(components)/contact-us';
+import { PartnerLogos } from './(components)/partner-logos';
 
 export default function Home() {
   return (
     <div className="flex flex-col">
       <Hero />
-      <SocialProof />
+      <PartnerLogos />
       <ProductBenefits />
       <ProductCarousel />
       <HowItWorks />
