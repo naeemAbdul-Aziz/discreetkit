@@ -21,7 +21,7 @@ export const products = [
     priceGHS: 140.00,
     is_student_bundle: true,
     active: true,
-    imageUrl: 'https://images.unsplash.com/photo-1606295834251-36d654991797?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtZWRpY2FsJTIwdGVzdCUyMGtpdHxlbnwwfHx8fDE3NTYxNDczODd8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    imageUrl: 'https://images.unsplash.com/photo-1520038410233-7141be7e6f97?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxib3h8ZW58MHx8fHwxNzU2MTQ5MDkyfDA&ixlib=rb-4.1.0&q=80&w=1080',
     reviews: 412
   },
   {
@@ -162,7 +162,7 @@ export const faqItems = [
     },
     {
         question: "What happens if I test positive?",
-        answer: "A positive result is for information, not diagnosis. Included with your kit are instructions and a list of our trusted, confidential partner clinics (like Marie Stopes) where you can get a confirmatory test and professional counseling free of charge."
+        answer: "A positive self-test result is preliminary. We will connect you with our trusted partner hospitals for a confidential, discounted confirmatory test and professional counseling. Your well-being is our priority."
     },
     {
         question: "Can I get a refund?",
