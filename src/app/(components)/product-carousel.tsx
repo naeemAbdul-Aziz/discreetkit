@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import { ArrowRight, Star } from 'lucide-react';
+import { ArrowRight, Star, GraduationCap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 export function ProductCarousel() {
@@ -46,7 +46,10 @@ export function ProductCarousel() {
                        <CardContent className="p-0 flex-grow flex flex-col">
                             <div className="relative bg-muted p-4">
                                 {product.is_student_bundle && (
-                                    <Badge variant="secondary" className="absolute top-4 left-4 z-10">Student Bundle</Badge>
+                                    <Badge variant="secondary" className="absolute top-4 left-4 z-10 flex items-center gap-1.5">
+                                      <GraduationCap className="h-3.5 w-3.5" />
+                                      Student Bundle
+                                    </Badge>
                                 )}
                                 <Image
                                     src={product.imageUrl}
