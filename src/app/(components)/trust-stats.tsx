@@ -34,7 +34,7 @@ export function TrustStats() {
            >
             <div className="absolute right-0 top-0 w-3/4 max-w-[300px] md:w-2/3">
               <Image
-                src="https://images.unsplash.com/photo-1584012961505-507d844cc7a0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxzdHVkZW50JTIwZ2hhbmF8ZW58MHx8fHwxNzU2MTQzNzg2fDA&ixlib=rb-4.1.0&q=80&w=1080"
+                src="https://images.unsplash.com/photo-1584012961505-507d844cc8a0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxzdHVkZW50JTIwZ2hhbmF8ZW58MHx8fHwxNzU2MTQzNzg2fDA&ixlib=rb-4.1.0&q=80&w=1080"
                 alt="Happy student in Ghana"
                 width={400}
                 height={500}
@@ -59,7 +59,7 @@ export function TrustStats() {
                 Trusted by students and health professionals across Ghana
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                Our service is built on a foundation of trust, privacy, and strong community partnerships.
+                Our service is built on a foundation of <strong>trust, privacy, and strong community partnerships</strong>.
               </p>
             </div>
             <div className="space-y-6">

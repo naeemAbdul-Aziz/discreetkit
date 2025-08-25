@@ -29,7 +29,7 @@ export function OurVision() {
             The Vision Behind DiscreetKit
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
-            Built to tackle the challenge of health privacy and access in Ghana.
+            Built to tackle the challenge of <strong>health privacy and access</strong> in Ghana.
           </p>
         </div>
 

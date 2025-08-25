@@ -35,7 +35,7 @@ export function FeatureGrid() {
             A Service Designed for You
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
-            We've built every part of our service with your privacy, convenience, and well-being in mind.
+            We've built every part of our service with your <strong>privacy, convenience, and well-being</strong> in mind.
           </p>
         </div>
         <motion.div 

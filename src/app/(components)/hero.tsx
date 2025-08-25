@@ -22,10 +22,10 @@ export function Hero() {
             <p 
               className="max-w-xl text-lg text-muted-foreground"
             >
-              Order confidential self-test kits in Ghana without compromising your privacy. We offer anonymous ordering, unbranded packaging, and secure delivery or pharmacy pickup.
+              Order <strong>confidential self-test kits</strong> in Ghana <strong>without compromising your privacy</strong>. We offer <strong>anonymous ordering</strong>, <strong>unbranded packaging</strong>, and <strong>secure delivery</strong> or pharmacy pickup.
             </p>
             <p className="max-w-xl text-md text-muted-foreground">
-              We never store personal details. Your peace of mind is our promise.
+              We never store personal details. <strong>Your peace of mind is our promise.</strong>
             </p>
             <div 
               className="flex flex-col gap-4 sm:flex-row"

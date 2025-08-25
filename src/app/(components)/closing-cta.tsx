@@ -12,7 +12,7 @@ export function ClosingCta() {
             Take Control of Your Health Today
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-lg text-primary-foreground/80">
-            Ready to get started? Your peace of mind is just a few clicks away. Order your confidential self-test kit now.
+            Ready to get started? Your <strong>peace of mind</strong> is just a few clicks away. Order your <strong>confidential self-test kit</strong> now.
           </p>
           <div className="mt-8">
             <Button asChild size="lg" variant="secondary" className="bg-white text-primary hover:bg-white/90">

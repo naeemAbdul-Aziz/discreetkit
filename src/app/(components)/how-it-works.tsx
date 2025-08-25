@@ -26,7 +26,7 @@ export function HowItWorks() {
             How It Works: A Simple 4-Step Process
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
-            We've made getting a self-test kit straightforward and completely private. Follow these simple steps to take control of your health.
+            We've made getting a self-test kit <strong>straightforward and completely private</strong>. Follow these simple steps to take control of your health.
           </p>
         </div>
 
