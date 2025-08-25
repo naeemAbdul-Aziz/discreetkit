@@ -6,41 +6,45 @@ export const products = [
     id: 1,
     name: 'HIV/AIDS Self-Test Kit (Individual)',
     slug: 'hiv-test-individual',
-    description: 'A single-use, private HIV self-test kit. Results in 20 minutes.',
+    description: 'A single-use, private HIV self-test kit.',
     priceGHS: 75.00,
     is_student_bundle: false,
     active: true,
     imageUrl: 'https://placehold.co/400x300',
+    reviews: 289
   },
   {
     id: 2,
     name: 'HIV/AIDS Self-Test Kit (Couple Pack)',
     slug: 'hiv-test-couple',
-    description: 'Two private HIV self-test kits. Test together, support each other.',
+    description: 'Two private HIV self-test kits for partners.',
     priceGHS: 140.00,
     is_student_bundle: true,
     active: true,
     imageUrl: 'https://placehold.co/400x300',
+    reviews: 412
   },
   {
     id: 3,
     name: 'Pregnancy Test Kit',
     slug: 'pregnancy-test',
-    description: 'Early detection pregnancy test. Accurate and easy to use.',
+    description: 'Early detection pregnancy test. Accurate & easy.',
     priceGHS: 40.00,
     is_student_bundle: false,
     active: true,
     imageUrl: 'https://placehold.co/400x300',
+    reviews: 176
   },
   {
     id: 4,
     name: 'Student Health Bundle',
     slug: 'student-bundle',
-    description: 'Includes one HIV test and one pregnancy test. Stay informed.',
+    description: 'Includes one HIV test and one pregnancy test.',
     priceGHS: 110.00,
     is_student_bundle: true,
     active: true,
     imageUrl: 'https://placehold.co/400x300',
+    reviews: 350
   },
 ]
 

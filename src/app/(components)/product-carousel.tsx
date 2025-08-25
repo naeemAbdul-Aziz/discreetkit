@@ -1,0 +1,95 @@
+
+'use client';
+
+import { products } from '@/lib/data';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import Image from 'next/image';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { ArrowRight, Star } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+
+export function ProductCarousel() {
+  return (
+    <section className="bg-background py-12 md:py-24">
+      <div className="container mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+
+          {/* Left Introductory Card */}
+          <div className="lg:col-span-1 flex">
+            <Card className="bg-primary/10 border-0 flex flex-col justify-between p-8 rounded-2xl w-full">
+                <div>
+                    <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                        Our Science-Backed Products
+                    </h2>
+                    <p className="mt-4 text-lg text-muted-foreground">
+                        We've built every part of our service with your <strong>privacy, convenience, and well-being</strong> in mind.
+                    </p>
+                </div>
+                <Button asChild variant="link" className="mt-6 text-primary font-bold text-lg p-0 justify-start">
+                    <Link href="/order">
+                        Order Your Test Kit
+                        <ArrowRight />
+                    </Link>
+                </Button>
+            </Card>
+          </div>
+
+          {/* Right Product Carousel */}
+          <div className="lg:col-span-2">
+            <Carousel opts={{ align: 'start', loop: false }} className="w-full">
+              <CarouselContent className="-ml-4">
+                {products.map((product) => (
+                  <CarouselItem key={product.id} className="md:basis-1/2 basis-full pl-4">
+                    <Card className="h-full flex flex-col overflow-hidden rounded-2xl group">
+                       <CardContent className="p-0 flex-grow flex flex-col">
+                            <div className="relative bg-muted p-4">
+                                {product.is_student_bundle && (
+                                    <Badge variant="secondary" className="absolute top-4 left-4 z-10">Student Bundle</Badge>
+                                )}
+                                <Image
+                                    src={product.imageUrl}
+                                    alt={product.name}
+                                    width={400}
+                                    height={300}
+                                    className="aspect-video object-contain mx-auto transition-transform duration-300 group-hover:scale-105"
+                                    data-ai-hint="medical test kit"
+                                />
+                            </div>
+                            <div className="p-6 flex flex-col flex-grow">
+                                <h3 className="text-xl font-semibold flex-grow">{product.name}</h3>
+                                <p className="text-muted-foreground text-sm mt-1">{product.description}</p>
+                                
+                                <div className="flex items-center gap-1 mt-4">
+                                {[...Array(5)].map((_, i) => (
+                                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                                ))}
+                                <span className="text-xs text-muted-foreground ml-1">({product.reviews} reviews)</span>
+                                </div>
+
+                                <div className="flex justify-between items-end mt-4">
+                                  <div>
+                                    <p className="font-semibold text-lg">GHS {product.priceGHS.toFixed(2)}</p>
+                                    <Button variant="link" className="p-0 h-auto">
+                                        <Link href={`/order?product=${product.id}`}>
+                                            Learn More
+                                        </Link>
+                                    </Button>
+                                  </div>
+                                </div>
+                            </div>
+                       </CardContent>
+                    </Card>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="hidden sm:flex" />
+              <CarouselNext className="hidden sm:flex" />
+            </Carousel>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
