@@ -3,6 +3,7 @@
 
 import { features } from '@/lib/data';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -48,9 +49,17 @@ export function FeatureGrid() {
           {features.map((feature, index) => (
              <motion.div key={index} variants={itemVariants}>
                 <motion.div 
-                    className="h-full transform transition-transform duration-300 bg-background border p-6 rounded-xl flex flex-col items-start gap-4"
+                    className="h-full transform transition-transform duration-300 bg-background border p-6 rounded-xl flex flex-col items-start gap-4 overflow-hidden"
                     whileHover={{ scale: 1.05, y: -5, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)" }}
                 >
+                    <Image
+                        src={feature.image}
+                        alt={feature.title}
+                        width={400}
+                        height={250}
+                        className="w-full h-48 object-cover rounded-md -mt-6 -mx-6"
+                        data-ai-hint={feature.dataAiHint}
+                    />
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                         <feature.icon className="h-6 w-6 text-primary" />
                     </div>
