@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, ShieldCheck, ChevronRight } from 'lucide-react';
+import { Menu, ShieldCheck, ArrowRight } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
@@ -56,7 +56,7 @@ export function Header() {
              <Button asChild>
                 <Link href="/order">
                     Order a Kit
-                    <ChevronRight />
+                    <ArrowRight />
                 </Link>
             </Button>
           </div>

@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ChevronRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 export function Hero() {
   return (
@@ -33,13 +33,13 @@ export function Hero() {
               <Button asChild size="lg">
                 <Link href="/order">
                   Order Test Kit
-                  <ChevronRight />
+                  <ArrowRight />
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline">
                 <Link href="/order">
                   See Student Kits
-                  <ChevronRight />
+                  <ArrowRight />
                 </Link>
               </Button>
             </div>
