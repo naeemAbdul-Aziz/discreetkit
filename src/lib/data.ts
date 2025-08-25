@@ -64,8 +64,8 @@ export const features = [
   },
   {
     icon: Users,
-    title: 'Student Discounts',
-    description: 'Special delivery prices for students on major campuses. Your health shouldn\'t break the bank.',
+    title: 'Student Friendly Kits',
+    description: 'Special kits and bundles created for students. Your health shouldn\'t break the bank.',
   },
   {
     icon: Truck,

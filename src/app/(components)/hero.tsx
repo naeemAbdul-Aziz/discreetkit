@@ -33,7 +33,7 @@ export function Hero() {
                 <Link href="/order">Order Test Kit</Link>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <Link href="/discounts">See Student Discounts</Link>
+                <Link href="/order">See Student Kits</Link>
               </Button>
             </div>
           </div>
