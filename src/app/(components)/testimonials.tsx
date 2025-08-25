@@ -4,21 +4,13 @@
 import { Star } from 'lucide-react';
 import { testimonials } from '@/lib/data';
 import { cn } from '@/lib/utils';
+import { Card } from '@/components/ui/card';
 
 export function Testimonials() {
   const cardColors = [
     'bg-primary text-primary-foreground',
     'bg-accent text-accent-foreground',
     'bg-foreground text-background',
-    'bg-secondary text-secondary-foreground',
-  ];
-
-  const rotations = [
-    'rotate-3',
-    '-rotate-2',
-    'rotate-1',
-    '-rotate-3',
-    'rotate-2',
   ];
 
   return (
@@ -34,35 +26,34 @@ export function Testimonials() {
           </p>
         </div>
 
-        <div className="relative mt-16 flex h-[450px] flex-wrap justify-center gap-8">
-          {testimonials.map((testimonial, index) => (
-            <div
-              key={index}
-              className={cn(
-                'absolute w-72 rounded-xl p-6 shadow-lg transition-transform hover:scale-105',
-                cardColors[index % cardColors.length],
-                rotations[index % rotations.length]
-              )}
-              style={{
-                top: `${20 + (index * 25)}%`,
-                left: `${15 + (index * 18)}%`,
-                transform: `rotate(${rotations[index % rotations.length].replace('rotate-', '')}deg) translate(${index * 5}px, ${index * 10}px)`,
-              }}
-            >
-              <div className="flex items-center gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="h-5 w-5 fill-current" />
-                ))}
-              </div>
-              <blockquote className="mt-4 text-base">
-                "{testimonial.quote}"
-              </blockquote>
-              <div className="mt-4">
-                <p className="font-semibold">{testimonial.name}</p>
-                <p className="text-sm opacity-80">{testimonial.role}</p>
-              </div>
-            </div>
-          ))}
+        <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-4 lg:gap-8">
+            {testimonials.map((testimonial, index) => (
+                <Card 
+                    key={index}
+                    className={cn(
+                        'transform transition-transform duration-300 hover:scale-105 hover:z-10',
+                        cardColors[index % cardColors.length],
+                        index === 0 ? 'md:rotate-[-3deg]' : '',
+                        index === 1 ? 'md:translate-y-8' : '',
+                        index === 2 ? 'md:rotate-[3deg]' : '',
+                    )}
+                >
+                    <div className="p-6">
+                        <div className="flex items-center gap-1">
+                            {[...Array(5)].map((_, i) => (
+                            <Star key={i} className="h-5 w-5 fill-current" />
+                            ))}
+                        </div>
+                        <blockquote className="mt-4 text-base">
+                            "{testimonial.quote}"
+                        </blockquote>
+                        <div className="mt-4">
+                            <p className="font-semibold">{testimonial.name}</p>
+                            <p className="text-sm opacity-80">{testimonial.role}</p>
+                        </div>
+                    </div>
+                </Card>
+            ))}
         </div>
       </div>
     </section>
