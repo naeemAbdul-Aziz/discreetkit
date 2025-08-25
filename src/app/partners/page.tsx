@@ -37,9 +37,9 @@ export default function PartnersPage() {
                       <CardHeader className="p-0">
                          <div className="relative h-40 w-full bg-muted">
                            <Image 
-                              src={partner.logoUrl.replace('150x50', '400x200')} 
+                              src={partner.logoUrl.replace('130x40', '400x200')} 
                               alt={`${partner.name} background`} 
-                              layout="fill" 
+                              fill
                               objectFit="cover" 
                               className="grayscale opacity-30" 
                               data-ai-hint="organization building"

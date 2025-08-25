@@ -31,7 +31,7 @@ export default function AboutPage() {
             Making healthcare accessible and private for everyone.
           </h1>
           <p className="mt-6 text-lg text-muted-foreground">
-            We started DiscreetKit with a simple mission: to make health testing accessible, private, and stigma-free for everyone in Ghana, especially young people. Your health is personal, and seeking essential services shouldn't be a source of anxiety.
+            We started AnonTest with a simple mission: to make health testing accessible, private, and stigma-free for everyone in Ghana, especially young people. Your health is personal, and seeking essential services shouldn't be a source of anxiety.
           </p>
         </div>
 

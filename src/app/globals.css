@@ -1,27 +1,25 @@
 
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: 'Roboto', sans-serif;
-}
-
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 210 20% 98%;
     --foreground: 224 71.4% 4.1%;
     --card: 0 0% 100%;
     --card-foreground: 224 71.4% 4.1%;
     --popover: 0 0% 100%;
     --popover-foreground: 224 71.4% 4.1%;
-    --primary: 250 80% 65%; /* New Purple */
+    --primary: 262 84% 59%;
     --primary-foreground: 0 0% 98%;
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 222.2 47.4% 11.2%;
     --muted: 240 4.8% 95.9%;
     --muted-foreground: 240 3.8% 46.1%;
-    --accent: 75 70% 55%; /* Lime Green */
+    --accent: 75 92% 50%;
     --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
@@ -29,7 +27,7 @@ body {
     --success-foreground: 0 0% 98%;
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
-    --ring: 250 80% 65%;
+    --ring: 262 84% 59%;
     --radius: 0.8rem;
   }
 
@@ -40,13 +38,13 @@ body {
     --card-foreground: 210 20% 98%;
     --popover: 224 71.4% 4.1%;
     --popover-foreground: 210 20% 98%;
-    --primary: 250 80% 65%;
+    --primary: 262 84% 59%;
     --primary-foreground: 210 20% 98%;
     --secondary: 215 27.9% 16.9%;
     --secondary-foreground: 210 20% 98%;
     --muted: 215 27.9% 16.9%;
     --muted-foreground: 217.9 10.6% 64.9%;
-    --accent: 75 70% 55%;
+    --accent: 75 92% 50%;
     --accent-foreground: 210 20% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
@@ -54,7 +52,7 @@ body {
     --success-foreground: 0 0% 98%;
     --border: 215 27.9% 16.9%;
     --input: 215 27.9% 16.9%;
-    --ring: 250 80% 65%;
+    --ring: 262 84% 59%;
   }
 }
 
