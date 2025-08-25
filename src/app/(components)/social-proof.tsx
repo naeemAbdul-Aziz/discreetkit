@@ -17,7 +17,7 @@ export function SocialProof() {
             </blockquote>
             <div>
               <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-4">
-                As seen on
+                Trusted by leading health partners and student bodies
               </p>
               <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
                 {partners.slice(0, 4).map((partner) => (
