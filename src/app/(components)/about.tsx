@@ -43,10 +43,10 @@ export function About() {
                   data-ai-hint="friends talking community"
                 />
                  <Image
-                  src="https://placehold.co/400x300"
+                  src="https://placehold.co/400x200"
                   alt="Discreet package"
                   width={400}
-                  height={300}
+                  height={200}
                   className="rounded-lg shadow-lg object-cover w-full h-full"
                   data-ai-hint="discreet package health"
                 />
