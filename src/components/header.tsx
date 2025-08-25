@@ -11,7 +11,6 @@ import { useState, useEffect } from 'react';
 
 const navLinks = [
   { href: '/track', label: 'Track Order' },
-  { href: '/about', label: 'About Us' },
   { href: '/discounts', label: 'Discounts' },
   { href: '/partners', label: 'Partners' },
 ];
