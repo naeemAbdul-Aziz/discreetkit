@@ -35,7 +35,7 @@ export function HowItWorks() {
 
           <div className="group relative mt-16 w-full cursor-pointer">
             <Image
-              src="https://placehold.co/1200x600"
+              src="https://img.freepik.com/free-photo/happy-client-with-their-box-delivered_23-2149229243.jpg"
               alt="Lifestyle image showing product in use"
               width={1200}
               height={600}
