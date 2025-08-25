@@ -1,39 +1,67 @@
 
+'use client';
+
+import { Star } from 'lucide-react';
 import { testimonials } from '@/lib/data';
-import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { cn } from '@/lib/utils';
 
 export function Testimonials() {
+  const cardColors = [
+    'bg-primary text-primary-foreground',
+    'bg-accent text-accent-foreground',
+    'bg-foreground text-background',
+    'bg-secondary text-secondary-foreground',
+  ];
+
+  const rotations = [
+    'rotate-3',
+    '-rotate-2',
+    'rotate-1',
+    '-rotate-3',
+    'rotate-2',
+  ];
+
   return (
-    <section className="bg-muted py-12 md:py-20">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="mx-auto max-w-3xl text-center">
+    <section className="bg-background py-20 md:py-32">
+      <div className="container mx-auto max-w-5xl px-4 md:px-6">
+        <div className="text-center">
+          <p className="font-semibold text-primary">Reviews</p>
           <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            What users are saying about DiscreetKit
+            Trusted by People Like You
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
             We're proud to provide a service that people trust.
           </p>
         </div>
-        <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+
+        <div className="relative mt-16 flex h-[450px] flex-wrap justify-center gap-8">
           {testimonials.map((testimonial, index) => (
-            <Card key={index} className="flex flex-col bg-background shadow-md rounded-xl">
-              <CardContent className="flex-1 p-6">
-                <blockquote className="text-muted-foreground">
-                  "{testimonial.quote}"
-                </blockquote>
-              </CardContent>
-              <div className="flex items-center gap-4 border-t p-6">
-                 <Avatar>
-                    <AvatarImage src={testimonial.avatar} alt={testimonial.name} data-ai-hint="person avatar"/>
-                    <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="font-semibold text-foreground">{testimonial.name}</p>
-                  <p className="text-sm text-muted-foreground">{testimonial.role}</p>
-                </div>
+            <div
+              key={index}
+              className={cn(
+                'absolute w-72 rounded-xl p-6 shadow-lg transition-transform hover:scale-105',
+                cardColors[index % cardColors.length],
+                rotations[index % rotations.length]
+              )}
+              style={{
+                top: `${20 + (index * 25)}%`,
+                left: `${15 + (index * 18)}%`,
+                transform: `rotate(${rotations[index % rotations.length].replace('rotate-', '')}deg) translate(${index * 5}px, ${index * 10}px)`,
+              }}
+            >
+              <div className="flex items-center gap-1">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="h-5 w-5 fill-current" />
+                ))}
               </div>
-            </Card>
+              <blockquote className="mt-4 text-base">
+                "{testimonial.quote}"
+              </blockquote>
+              <div className="mt-4">
+                <p className="font-semibold">{testimonial.name}</p>
+                <p className="text-sm opacity-80">{testimonial.role}</p>
+              </div>
+            </div>
           ))}
         </div>
       </div>
