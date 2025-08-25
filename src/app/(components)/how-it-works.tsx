@@ -3,6 +3,7 @@
 
 import { howItWorksSteps } from '@/lib/data';
 import { motion } from 'framer-motion';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const containerVariants = {
   hidden: {},
@@ -13,8 +14,8 @@ const containerVariants = {
   },
 };
 
-const itemVariants = (fromLeft: boolean) => ({
-    hidden: { opacity: 0, x: fromLeft ? -50 : 50 },
+const itemVariants = (fromLeft: boolean, isMobile: boolean) => ({
+    hidden: { opacity: 0, x: isMobile ? -50 : (fromLeft ? -50 : 50) },
     visible: { 
         opacity: 1, 
         x: 0,
@@ -23,6 +24,7 @@ const itemVariants = (fromLeft: boolean) => ({
 });
 
 export function HowItWorks() {
+  const isMobile = useIsMobile();
   return (
     <section className="bg-muted py-12 md:py-20">
       <div className="container mx-auto px-4 md:px-6">
@@ -52,7 +54,7 @@ export function HowItWorks() {
                 <motion.div 
                     key={step.step} 
                     className="relative flex items-start gap-6 md:gap-8"
-                    variants={itemVariants(isEven)}
+                    variants={itemVariants(isEven, isMobile)}
                 >
                   <div className={`flex items-start gap-6 md:gap-8 w-full ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
                      {/* Step Circle */}
@@ -74,3 +76,4 @@ export function HowItWorks() {
     </section>
   );
 }
+
