@@ -43,17 +43,17 @@ function FeatureCard({ feature, index }: { feature: (typeof features)[0], index:
       )}
       style={{ animationDelay: `${index * 100}ms` }}
     >
-        <Card className="h-full transform transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl">
-        <CardHeader className="flex flex-row items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
-            <feature.icon className="h-6 w-6 text-primary-foreground" />
+      <Card className="h-full transform transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl bg-card border-none p-4 rounded-xl">
+        <CardHeader className="flex flex-row items-center gap-4 pb-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary">
+            <feature.icon className="h-6 w-6 text-primary" />
             </div>
-            <CardTitle>{feature.title}</CardTitle>
+            <CardTitle className="text-lg font-semibold">{feature.title}</CardTitle>
         </CardHeader>
         <CardContent>
             <p className="text-muted-foreground">{feature.description}</p>
         </CardContent>
-        </Card>
+      </Card>
     </div>
   );
 }

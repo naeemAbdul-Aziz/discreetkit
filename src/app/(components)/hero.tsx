@@ -16,7 +16,7 @@ export function Hero() {
           >
             Your Health, Your Privacy.
             <br />
-            <span className="text-green-600">Delivered Discreetly.</span>
+            <span className="text-primary">Delivered Discreetly.</span>
           </h1>
           <p 
             className="max-w-xl animate-fade-up text-lg text-muted-foreground"

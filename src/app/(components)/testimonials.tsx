@@ -2,15 +2,14 @@
 import { testimonials } from '@/lib/data';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import Image from 'next/image';
 
 export function Testimonials() {
   return (
-    <section className="bg-background py-12 md:py-20">
+    <section className="bg-muted py-12 md:py-20">
       <div className="container mx-auto px-4 md:px-6">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            Hear From Our Community
+            What users are saying about AnonTest
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
             We're proud to provide a service that people trust.
@@ -18,7 +17,7 @@ export function Testimonials() {
         </div>
         <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {testimonials.map((testimonial, index) => (
-            <Card key={index} className="flex flex-col">
+            <Card key={index} className="flex flex-col bg-background shadow-md rounded-xl">
               <CardContent className="flex-1 p-6">
                 <blockquote className="text-muted-foreground">
                   "{testimonial.quote}"
