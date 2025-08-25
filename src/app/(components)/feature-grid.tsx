@@ -28,7 +28,7 @@ const itemVariants = {
 
 export function FeatureGrid() {
   return (
-    <section className="bg-background py-12 md:py-20">
+    <section className="bg-muted py-12 md:py-20">
       <div className="container mx-auto px-4 md:px-6">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -47,15 +47,16 @@ export function FeatureGrid() {
         >
           {features.map((feature, index) => (
              <motion.div key={index} variants={itemVariants}>
-                <div className="h-full transform transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl bg-card border p-6 rounded-xl">
-                    <div className="flex flex-col items-start gap-4">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                          <feature.icon className="h-6 w-6 text-primary" />
-                        </div>
-                        <h3 className="text-xl font-semibold">{feature.title}</h3>
-                        <p className="text-muted-foreground">{feature.description}</p>
+                <motion.div 
+                    className="h-full transform transition-transform duration-300 bg-background border p-6 rounded-xl flex flex-col items-start gap-4"
+                    whileHover={{ scale: 1.05, y: -5, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)" }}
+                >
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                        <feature.icon className="h-6 w-6 text-primary" />
                     </div>
-                </div>
+                    <h3 className="text-xl font-semibold">{feature.title}</h3>
+                    <p className="text-muted-foreground">{feature.description}</p>
+                </motion.div>
             </motion.div>
           ))}
         </motion.div>

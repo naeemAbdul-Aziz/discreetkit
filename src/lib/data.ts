@@ -1,6 +1,6 @@
 
 
-import { CheckCircle, HeartHandshake, ShieldCheck, Truck, Users } from "lucide-react"
+import { BadgeCheck, GraduationCap, Hospital, MapPin, ShieldCheck, Truck } from "lucide-react"
 
 export const products = [
   {
@@ -73,7 +73,7 @@ export const features = [
     description: 'No names, no accounts. Your privacy is our top priority. We never store personal details.',
   },
   {
-    icon: Users,
+    icon: GraduationCap,
     title: 'Student Friendly Kits',
     description: 'Special kits and bundles created for students. Your health shouldn\'t break the bank.',
   },
@@ -83,27 +83,27 @@ export const features = [
     description: 'Get your order quickly in unbranded packaging. Or, choose anonymous pharmacy pickup.',
   },
   {
-    icon: HeartHandshake,
+    icon: Hospital,
     title: 'Partner Hospitals',
     description: 'We connect you with trusted health partners for follow-up care and support if needed.',
   },
   {
-    icon: CheckCircle,
+    icon: MapPin,
     title: 'Easy Tracking',
     description: 'Use your unique, anonymous code to track your order from our hub to your hands.',
   },
     {
-    icon: ShieldCheck,
-    title: 'Secure Pharmacy Pickup',
-    description: 'Opt to pick up your kit from a trusted partner pharmacy near you. Just show your code.',
+    icon: BadgeCheck,
+    title: 'Verified & Safe Tests',
+    description: 'All our self-test kits are WHO-approved and sourced from trusted manufacturers.',
   },
 ]
 
 export const howItWorksSteps = [
-    { step: 1, title: 'Order Your Kit', description: 'Select your test kit and provide a delivery or pickup location. No personal details needed.' },
-    { step: 2, title: 'Pay Securely', description: 'Complete your payment via Mobile Money or Card through Paystack. It\'s safe and private.' },
-    { step: 3, title: 'Get Your Code', description: 'Receive a unique, anonymous tracking code upon successful payment.' },
-    { step: 4, title: 'Delivery or Pickup', description: 'Your order is delivered in a plain package, or you can collect it from a partner pharmacy.' },
+    { step: 1, title: 'Order Your Kit', description: 'Select your test kit and provide a delivery or pickup location. No personal details needed.', image: 'https://placehold.co/300x200' },
+    { step: 2, title: 'Pay Securely', description: 'Complete your payment via Mobile Money or Card through Paystack. It\'s safe and private.', image: 'https://placehold.co/300x200' },
+    { step: 3, title: 'Get Your Code', description: 'Receive a unique, anonymous tracking code upon successful payment.', image: 'https://placehold.co/300x200' },
+    { step: 4, title: 'Delivery or Pickup', description: 'Your order is delivered in a plain package, or you can collect it from a partner pharmacy.', image: 'https://placehold.co/300x200' },
 ];
 
 export const testimonials = [
