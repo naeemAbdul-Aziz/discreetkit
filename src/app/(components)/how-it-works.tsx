@@ -2,19 +2,21 @@
 'use client';
 
 import { steps } from '@/lib/data';
-import Image from 'next/image';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
 import { Button } from '@/components/ui/button';
 import { useCallback, useEffect, useState } from 'react';
 import type { EmblaCarouselType } from 'embla-carousel-react';
-import { Pause, Play } from 'lucide-react';
+import { ArrowRight, Pause, Play } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
 
 export function HowItWorks() {
   const [emblaApi, setEmblaApi] = useState<EmblaCarouselType | null>(null);
   const [isPlaying, setIsPlaying] = useState(true);
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   const togglePlay = useCallback(() => {
     if (!emblaApi) return;
@@ -26,111 +28,114 @@ export function HowItWorks() {
     } else {
       autoplay.play();
     }
-    setIsPlaying(!isPlaying);
-  }, [emblaApi, isPlaying]);
+  }, [emblaApi]);
 
+  const onSelect = useCallback((emblaApi: EmblaCarouselType) => {
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+  }, []);
 
   useEffect(() => {
     if (!emblaApi) return;
+    
     const autoplay = emblaApi.plugins().autoplay;
     if (!autoplay) return;
 
     setIsPlaying(autoplay.isPlaying());
     emblaApi.on('autoplay:play', () => setIsPlaying(true));
-    emblaApi.on('autoplay:stop', () => setIsPlaying(false));
-    emblaApi.on('reInit', () => setIsPlaying(autoplay.isPlaying()));
+emblaApi.on('autoplay:stop', () => setIsPlaying(false));
+    emblaApi.on('reInit', () => {
+        setIsPlaying(autoplay.isPlaying());
+        onSelect(emblaApi);
+    });
+    emblaApi.on('select', onSelect);
+    onSelect(emblaApi);
 
-  }, [emblaApi]);
+  }, [emblaApi, onSelect]);
 
 
   return (
     <section id="how-it-works" className="bg-muted py-12 md:py-24">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto max-w-5xl px-4">
         <div className="text-center mb-12">
-          <p className="font-semibold text-primary uppercase">How It Works</p>
           <h2 className="mt-2 font-headline text-3xl font-bold text-foreground sm:text-4xl">
-            Confidential Testing, Simplified.
+            How DiscreetKit Works
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
-            A responsible and private path to your health answers.
+            A responsible and private path to your health answers in 4 simple steps.
           </p>
         </div>
 
-        {/* Mobile Carousel */}
-        <div className="md:hidden relative">
+        <div className="relative">
           <Carousel
             setApi={setEmblaApi}
             opts={{ align: 'start', loop: true }}
-            plugins={[Autoplay({ delay: 4000, stopOnInteraction: false })]}
+            plugins={[Autoplay({ delay: 5000, stopOnInteraction: true })]}
             className="w-full"
           >
-            <CarouselContent>
+            <CarouselContent className="-ml-4">
               {steps.map((step) => (
-                <CarouselItem key={step.number}>
-                  <Card className="overflow-hidden">
-                    <CardHeader className="p-0">
-                      <Image
-                        src={step.image}
-                        alt={step.title}
-                        width={500}
-                        height={300}
-                        className="w-full h-48 object-cover"
-                        data-ai-hint={step.dataAiHint}
-                      />
-                    </CardHeader>
-                    <CardContent className="p-6 text-left">
-                        <div className="flex items-start gap-4">
-                            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-primary bg-primary/10 text-xl font-bold text-primary">
-                                {step.number}
+                <CarouselItem key={step.number} className="pl-4">
+                    <Card className="overflow-hidden bg-background p-4 md:p-6">
+                        <CardContent className="p-0">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                                <div className="flex flex-col space-y-4 text-left">
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-primary bg-primary/10 text-xl font-bold text-primary">
+                                            {step.number}
+                                        </div>
+                                        <h3 className="text-2xl font-semibold">{step.title}</h3>
+                                    </div>
+                                    <p className="text-muted-foreground text-base">{step.description}</p>
+                                    
+                                    <div className="border-t pt-4">
+                                        <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground mb-3">Key Details</h4>
+                                        <ul className="space-y-2">
+                                            {step.details.map((detail, i) => (
+                                                <li key={i} className="flex items-start gap-3">
+                                                    <ArrowRight className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
+                                                    <span className="text-muted-foreground">{detail}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                    
+                                    <Button asChild variant="link" className="p-0 justify-start self-start mt-2">
+                                        <Link href="/order">
+                                            Learn More <ArrowRight />
+                                        </Link>
+                                    </Button>
+                                </div>
+                                <div className="flex items-center justify-center bg-primary/5 rounded-2xl h-64 md:h-80">
+                                    <step.icon className="h-24 w-24 md:h-32 md:w-32 text-primary" />
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="text-xl font-semibold">{step.title}</h3>
-                                <p className="mt-1 text-muted-foreground">{step.description}</p>
-                            </div>
-                        </div>
-                    </CardContent>
-                  </Card>
+                        </CardContent>
+                    </Card>
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 z-10" />
-            <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 z-10" />
+            <CarouselPrevious className="absolute -left-4 md:-left-16 top-1/2 -translate-y-1/2 z-10" />
+            <CarouselNext className="absolute -right-4 md:-right-16 top-1/2 -translate-y-1/2 z-10" />
           </Carousel>
-           <div className="absolute inset-0 flex items-center justify-center">
-              <Button variant="outline" size="icon" onClick={togglePlay} className="h-14 w-14 rounded-full bg-white/30 backdrop-blur-sm border-white/50 hover:bg-white/50">
-                {isPlaying ? <Pause className="h-6 w-6 text-white" /> : <Play className="h-6 w-6 text-white" />}
+           <div className="absolute bottom-[-40px] left-1/2 -translate-x-1/2 flex items-center justify-center gap-4 mt-8">
+              <Button variant="ghost" size="icon" onClick={togglePlay} className="h-10 w-10 rounded-full bg-background/50 backdrop-blur-sm border-border hover:bg-background/80">
+                {isPlaying ? <Pause className="h-5 w-5 text-foreground" /> : <Play className="h-5 w-5 text-foreground" />}
                 <span className="sr-only">{isPlaying ? 'Pause carousel' : 'Play carousel'}</span>
               </Button>
+              <div className="flex items-center gap-2">
+                  {steps.map((_, index) => (
+                      <button 
+                        key={index}
+                        onClick={() => emblaApi?.scrollTo(index)}
+                        className={cn(
+                            "h-2 w-2 rounded-full transition-all duration-300",
+                            selectedIndex === index ? "w-6 bg-primary" : "bg-primary/20"
+                        )}
+                        aria-label={`Go to slide ${index + 1}`}
+                      />
+                  ))}
+              </div>
             </div>
-        </div>
-
-        {/* Desktop Grid */}
-        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {steps.map((step) => (
-            <Card key={step.number} className="overflow-hidden flex flex-col">
-              <CardHeader className="p-0">
-                <Image
-                  src={step.image}
-                  alt={step.title}
-                  width={400}
-                  height={250}
-                  className="w-full h-48 object-cover"
-                  data-ai-hint={step.dataAiHint}
-                />
-              </CardHeader>
-              <CardContent className="p-6 text-left flex-grow flex flex-col">
-                 <div className="flex items-start gap-4">
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-primary bg-primary/10 text-xl font-bold text-primary">
-                        {step.number}
-                    </div>
-                    <div>
-                        <h3 className="text-xl font-semibold">{step.title}</h3>
-                        <p className="mt-1 text-muted-foreground">{step.description}</p>
-                    </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
         </div>
       </div>
     </section>

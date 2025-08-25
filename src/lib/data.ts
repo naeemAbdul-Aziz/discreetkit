@@ -1,5 +1,5 @@
 
-import { BadgeCheck, Lock, ShieldCheck, Truck, Users, GraduationCap, Hospital, MapPin } from "lucide-react"
+import { BadgeCheck, Lock, ShieldCheck, Truck, Users, GraduationCap, Hospital, MapPin, ShoppingBag, MessageCircle, HeartHandshake } from "lucide-react"
 
 export const products = [
   {
@@ -178,30 +178,46 @@ export const steps = [
   {
     number: '1',
     title: 'Order Your Kit',
-    description: 'Select the test kit you need. Your order is anonymous and secure.',
-    image: 'https://placehold.co/500x500',
-    dataAiHint: 'select product'
+    description: 'Select the test kit you need from our shop. The process is fully anonymous and secure, with no accounts needed.',
+    icon: ShoppingBag,
+    details: [
+      'Choose from individual or bundle packs.',
+      'Student discounts are applied automatically.',
+      'Pay securely with mobile money or card.'
+    ]
   },
   {
     number: '2',
     title: 'Private & Fast Delivery',
-    description: 'Receive your kit in a plain, unbranded package. No one will know the contents.',
-    image: 'https://placehold.co/500x500',
-    dataAiHint: 'discreet package'
+    description: 'Receive your kit in a plain, unbranded package. No one will know the contents. We deliver to your chosen location or a partner pharmacy.',
+    icon: Truck,
+    details: [
+        'Unmarked packaging ensures complete privacy.',
+        'Track your order with your anonymous code.',
+        'Pickup options available at trusted local pharmacies.'
+    ]
   },
   {
     number: '3',
     title: 'Get Your Results',
-    description: 'Follow the simple instructions to get your results in minutes, in complete privacy.',
-    image: 'https://placehold.co/500x500',
-    dataAiHint: 'person results'
+    description: 'Follow the simple, clear instructions to get your results in minutes, all in the comfort and privacy of your own space.',
+    icon: MessageCircle,
+    details: [
+        'WHO-approved tests for reliable results.',
+        'Easy-to-understand instruction manual included.',
+        'Get your results in under 20 minutes.'
+    ]
   },
   {
     number: '4',
     title: 'Get Support (If Needed)',
-    description: 'If you test positive, we confidentially connect you with our partner hospitals for discounted follow-up care.',
-    image: 'https://placehold.co/500x500',
-    dataAiHint: 'health support'
+    description: 'If you test positive, we confidentially connect you with our partner hospitals for professional, non-judgmental, and discounted follow-up care.',
+    icon: HeartHandshake,
+    details: [
+        'Access to professional counselors.',
+        'Discounted confirmatory testing at partner hospitals.',
+        'A responsible and supportive path to care.'
+    ]
   },
 ];
 
