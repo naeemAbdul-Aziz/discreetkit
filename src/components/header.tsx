@@ -4,15 +4,20 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Menu, ShieldCheck, ShoppingCart, User } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 
-const navLinks = [
-  { href: '/track', label: 'Track Order' },
-  { href: '/partners', label: 'Partners' },
+const navLinksLeft = [
+  { href: '/order', label: 'Shop' },
+  { href: '/#how-it-works', label: 'How It Works' },
 ];
+
+const navLinksRight = [
+  { href: '/partners', label: 'Our Partners' },
+  { href: '/track', label: 'Track Order' },
+]
 
 export function Header() {
   const pathname = usePathname();
@@ -27,18 +32,15 @@ export function Header() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 p-4">
-        <div className={cn(
-            "container mx-auto flex h-16 items-center justify-between rounded-xl border border-transparent transition-all duration-300",
-            isScrolled ? "bg-background/80 shadow-md backdrop-blur-sm border-border/20" : "bg-transparent",
-        )}>
-          <Link href="/" className="flex items-center space-x-2">
-            <ShieldCheck className="h-7 w-7 text-primary" />
-            <span className="font-bold text-lg">DiscreetKit</span>
-          </Link>
-
+    <>
+    <div className="bg-primary text-primary-foreground text-center text-sm p-2">
+      Free discreet delivery on all Ghana orders! <Link href="/order" className="underline font-semibold">Shop Now</Link>
+    </div>
+    <header className={cn("sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60", isScrolled ? "shadow-sm" : "")}>
+        <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between">
+          
           <nav className="hidden md:flex items-center gap-6 text-sm">
-            {navLinks.map((link) => (
+            {navLinksLeft.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -52,13 +54,34 @@ export function Header() {
             ))}
           </nav>
 
-          <div className="hidden md:flex items-center justify-end gap-4">
-             <Button asChild>
-                <Link href="/order">
-                    Order a Kit
-                    <ArrowRight />
-                </Link>
-            </Button>
+          <Link href="/" className="flex items-center space-x-2">
+            <ShieldCheck className="h-7 w-7 text-primary" />
+            <span className="font-bold text-lg">DiscreetKit</span>
+          </Link>
+
+          <div className="hidden md:flex items-center justify-end gap-6 text-sm">
+            {navLinksRight.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  'transition-colors hover:text-foreground/80',
+                  pathname === link.href ? 'text-foreground font-semibold' : 'text-foreground/60'
+                )}
+              >
+                {link.label}
+              </Link>
+            ))}
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" size="icon">
+                <User className="h-5 w-5" />
+                <span className="sr-only">Account</span>
+              </Button>
+              <Button variant="ghost" size="icon">
+                <ShoppingCart className="h-5 w-5" />
+                 <span className="sr-only">Cart</span>
+              </Button>
+            </div>
           </div>
 
           {/* Mobile Menu */}
@@ -76,8 +99,7 @@ export function Header() {
                   <span className="font-bold">DiscreetKit</span>
                 </Link>
                 <div className="mt-8 flex flex-col space-y-4">
-                  <Link href="/order" className="font-semibold text-lg text-primary">Order a Kit</Link>
-                  {navLinks.map((link) => (
+                  {[...navLinksLeft, ...navLinksRight].map((link) => (
                     <Link
                       key={link.href}
                       href={link.href}
@@ -95,5 +117,6 @@ export function Header() {
           </div>
       </div>
     </header>
+    </>
   );
 }

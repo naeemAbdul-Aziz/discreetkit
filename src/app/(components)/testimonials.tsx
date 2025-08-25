@@ -12,7 +12,7 @@ export function Testimonials() {
   const cardColors = [
     'bg-primary text-primary-foreground',
     'bg-accent text-accent-foreground',
-    'bg-foreground text-background',
+    'bg-card text-card-foreground',
   ];
 
   return (
@@ -41,7 +41,7 @@ export function Testimonials() {
                     )}
                 >
                     <div className="p-6 flex-grow">
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 text-yellow-400">
                             {[...Array(5)].map((_, i) => (
                             <Star key={i} className="h-5 w-5 fill-current" />
                             ))}

@@ -1,29 +1,21 @@
 
 import { Hero } from './(components)/hero';
-import { FeatureGrid } from './(components)/feature-grid';
+import { SocialProof } from './(components)/social-proof';
 import { HowItWorks } from './(components)/how-it-works';
-import { Testimonials } from './(components)/testimonials';
-import { Faq } from './(components)/faq';
 import { ClosingCta } from './(components)/closing-cta';
-import { PartnerLogos } from './(components)/partner-logos';
-import { TrustStats } from './(components)/trust-stats';
-import { Separator } from '@/components/ui/separator';
-import { OurVision } from './(components)/our-vision';
-import { CoverageMap } from './(components)/coverage-map';
+import { FeatureGrid } from './(components)/feature-grid';
+import { Testimonials } from './(components)/testimonials';
+import { ProductBenefits } from './(components)/product-benefits';
 
 export default function Home() {
   return (
     <div className="flex flex-col">
       <Hero />
-      <PartnerLogos />
-      <TrustStats />
+      <SocialProof />
+      <ProductBenefits />
       <FeatureGrid />
       <HowItWorks />
-      <CoverageMap />
       <Testimonials />
-      <OurVision />
-      <Separator className="my-12" />
-      <Faq />
       <ClosingCta />
     </div>
   );

@@ -1,6 +1,5 @@
 
-
-import { BadgeCheck, GraduationCap, Hospital, MapPin, ShieldCheck, Truck } from "lucide-react"
+import { BadgeCheck, Leaf, ShieldCheck, Truck, Vegan, WheatOff } from "lucide-react"
 
 export const products = [
   {
@@ -66,6 +65,15 @@ export const discounts = [
   { id: 4, audience: 'student', campus: 'Wisconsin International University College', discount: 10.00, notes: 'Special delivery rates available.' },
 ]
 
+export const productBenefits = [
+  { icon: ShieldCheck, title: 'Superior Formula' },
+  { icon: WheatOff, title: 'Gluten-Free' },
+  { icon: Vegan, title: 'Soy-Free' },
+  { icon: Leaf, title: 'Vegan' },
+  { icon: BadgeCheck, title: 'Made with Natural Ingredients' },
+];
+
+
 export const features = [
   {
     icon: ShieldCheck,
@@ -75,13 +83,6 @@ export const features = [
     dataAiHint: 'privacy lock'
   },
   {
-    icon: GraduationCap,
-    title: 'Student Friendly Kits',
-    description: 'Special kits and bundles created for students. Your health shouldn\'t break the bank.',
-    image: 'https://placehold.co/400x250',
-    dataAiHint: 'students smiling'
-  },
-  {
     icon: Truck,
     title: 'Fast & Discreet Delivery',
     description: 'Get your order quickly in unbranded packaging. Or, choose anonymous pharmacy pickup.',
@@ -89,20 +90,6 @@ export const features = [
     dataAiHint: 'delivery person'
   },
   {
-    icon: Hospital,
-    title: 'Partner Hospitals',
-    description: 'We connect you with trusted health partners for follow-up care and support if needed.',
-    image: 'https://placehold.co/400x250',
-    dataAiHint: 'hospital building'
-  },
-  {
-    icon: MapPin,
-    title: 'Easy Tracking',
-    description: 'Use your unique, anonymous code to track your order from our hub to your hands.',
-    image: 'https://placehold.co/400x250',
-    dataAiHint: 'map tracking'
-  },
-    {
     icon: BadgeCheck,
     title: 'Verified & Safe Tests',
     description: 'All our self-test kits are WHO-approved and sourced from trusted manufacturers.',
@@ -110,13 +97,6 @@ export const features = [
     dataAiHint: 'medical test'
   },
 ]
-
-export const howItWorksSteps = [
-    { step: 1, title: 'Order Your Kit', description: 'Select your test kit and provide a delivery or pickup location. No personal details needed.', image: 'https://placehold.co/300x200', dataAiHint: "select product" },
-    { step: 2, title: 'Pay Securely', description: 'Complete your payment via Mobile Money or Card through Paystack. It\'s safe and private.', image: 'https://placehold.co/300x200', dataAiHint: "secure payment" },
-    { step: 3, title: 'Get Your Code', description: 'Receive a unique, anonymous tracking code upon successful payment.', image: 'https://placehold.co/300x200', dataAiHint: "unique code" },
-    { step: 4, title: 'Delivery or Pickup', description: 'Your order is delivered in a plain package, or you can collect it from a partner pharmacy.', image: 'https://placehold.co/300x200', dataAiHint: "discreet package" },
-];
 
 export const testimonials = [
     {
