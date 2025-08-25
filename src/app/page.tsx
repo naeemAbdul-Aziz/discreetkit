@@ -1,6 +1,5 @@
 
 import { Hero } from './(components)/hero';
-import { About } from './(components)/about';
 import { TrustStats } from './(components)/trust-stats';
 import { FeatureGrid } from './(components)/feature-grid';
 import { HowItWorks } from './(components)/how-it-works';
@@ -13,10 +12,6 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       <Hero />
-      <div className="container mx-auto px-4 md:px-6">
-        <Separator className="my-12 md:my-20" />
-      </div>
-      <About />
       <TrustStats />
       <div className="container mx-auto px-4 md:px-6">
         <Separator className="my-12 md:my-20" />

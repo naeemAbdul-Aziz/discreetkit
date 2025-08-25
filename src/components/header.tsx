@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 const navLinks = [
   { href: '/order', label: 'Order a Kit' },
   { href: '/track', label: 'Track Order' },
+  { href: '/about', label: 'About Us' },
 ];
 
 const navLinksRight = [
