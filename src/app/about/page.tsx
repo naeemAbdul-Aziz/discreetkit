@@ -5,13 +5,13 @@ import { ShieldCheck, HeartHandshake, Users } from 'lucide-react';
 const stats = [
   {
     icon: Users,
-    value: '10,000+',
-    label: 'People Served',
+    value: 'Thousands',
+    label: 'Served Confidentially',
   },
   {
     icon: ShieldCheck,
     value: '100%',
-    label: 'Confidentiality',
+    label: 'Privacy Guarantee',
   },
   {
     icon: HeartHandshake,
@@ -23,79 +23,97 @@ const stats = [
 
 export default function AboutPage() {
   return (
-    <div className="bg-background">
-      <div className="container mx-auto px-4 py-16 md:py-24">
-        {/* Header Section */}
-        <div className="text-center max-w-3xl mx-auto">
-          <h1 className="font-headline text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-            Making healthcare accessible and private for everyone.
+    <div className="bg-background text-foreground">
+      {/* Hero Section */}
+      <section className="text-center py-16 md:py-24 bg-muted">
+        <div className="container mx-auto px-4">
+          <h1 className="font-headline text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+            Your Health, Your Terms.
           </h1>
-          <p className="mt-6 text-lg text-muted-foreground">
-            We started AnonTest with a simple mission: to make health testing accessible, private, and stigma-free for everyone in Ghana, especially young people. Your health is personal, and seeking essential services shouldn't be a source of anxiety.
+          <p className="mt-6 max-w-3xl mx-auto text-lg text-muted-foreground">
+            We started AnonTest with a simple but powerful mission: to make essential health testing accessible, private, and stigma-free for every young person in Ghana.
           </p>
         </div>
+      </section>
 
-        {/* Image Grid */}
-        <div className="mt-16 grid grid-cols-2 grid-rows-2 gap-4 md:gap-6">
-           <div className="col-span-1 row-span-2 rounded-xl overflow-hidden shadow-lg">
-                <Image
-                    src="https://placehold.co/600x800"
-                    alt="Discreet packaging"
-                    width={600}
-                    height={800}
-                    className="w-full h-full object-cover"
-                    data-ai-hint="discreet package health"
-                />
-            </div>
-            <div className="col-span-1 row-span-1 rounded-xl overflow-hidden shadow-lg">
-                 <Image
-                    src="https://placehold.co/600x400"
-                    alt="Friends talking"
-                    width={600}
-                    height={400}
-                    className="w-full h-full object-cover"
-                    data-ai-hint="friends talking community"
-                />
-            </div>
-            <div className="col-span-1 row-span-1 rounded-xl overflow-hidden shadow-lg">
-                 <Image
-                    src="https://placehold.co/600x400"
-                    alt="Pharmacist helping customer"
-                    width={600}
-                    height={400}
-                    className="w-full h-full object-cover"
-                    data-ai-hint="pharmacist customer healthcare"
-                />
+      {/* Image Grid Section */}
+      <section className="py-16 md:py-24">
+        <div className="container mx-auto px-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 h-96">
+                <div className="col-span-1 md:col-span-2 row-span-2 rounded-xl overflow-hidden shadow-lg group">
+                    <Image
+                        src="https://placehold.co/800x800"
+                        alt="A discreet package being handed over"
+                        width={800}
+                        height={800}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        data-ai-hint="discreet package health"
+                    />
+                </div>
+                <div className="col-span-1 rounded-xl overflow-hidden shadow-lg group">
+                    <Image
+                        src="https://placehold.co/600x400"
+                        alt="A group of supportive friends"
+                        width={600}
+                        height={400}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        data-ai-hint="friends community support"
+                    />
+                </div>
+                <div className="col-span-1 rounded-xl overflow-hidden shadow-lg group">
+                    <Image
+                        src="https://placehold.co/600x400"
+                        alt="A trusted pharmacist"
+                        width={600}
+                        height={400}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        data-ai-hint="pharmacist healthcare professional"
+                    />
+                </div>
+                <div className="col-span-1 md:col-span-2 rounded-xl overflow-hidden shadow-lg group">
+                    <Image
+                        src="https://placehold.co/800x400"
+                        alt="A university campus in Ghana"
+                        width={800}
+                        height={400}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        data-ai-hint="university campus ghana"
+                    />
+                </div>
             </div>
         </div>
-
-        {/* Mission & Vision Section */}
-        <div className="mt-24 grid md:grid-cols-2 gap-12 items-center">
-          <div className="space-y-6">
-            <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Our Mission is to Empower You</h2>
-            <p className="text-muted-foreground">
-              We saw that fear of judgment and lack of privacy were major barriers preventing people from getting the tests they needed. That's why we created a service that puts you in control. We're leveraging technology to provide a seamless and anonymous experience, from ordering to delivery.
-            </p>
-             <p className="text-muted-foreground">
-              We partner with trusted health organizations and student bodies to ensure our service is not only discreet but also reliable and supportive. We believe that by removing these barriers, we can empower you to take proactive steps towards a healthier life.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 gap-8">
-            {stats.map((stat) => (
-              <div key={stat.label} className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary">
-                  <stat.icon className="h-6 w-6 text-primary" />
+      </section>
+      
+      {/* Our Story Section */}
+      <section className="py-16 md:py-24">
+        <div className="container mx-auto px-4">
+          <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
+            <div>
+              <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Our Story: Closing the Gap</h2>
+              <p className="mt-6 text-lg text-muted-foreground">
+                We saw a critical gap. Too many young people in our communities were avoiding essential health tests because of fear—fear of judgment, lack of privacy, and the anxiety of walking into a clinic. Your health is personal, and seeking care should never be a source of stress.
+              </p>
+              <p className="mt-4 text-lg text-muted-foreground">
+                That's why we created AnonTest. We leverage technology to build a bridge of trust, providing a seamless, anonymous, and supportive experience from the privacy of your own space to the confirmation of your health status.
+              </p>
+            </div>
+            <div className="space-y-8">
+              {stats.map((stat) => (
+                <div key={stat.label} className="flex items-center gap-4">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <stat.icon className="h-8 w-8" />
+                  </div>
+                  <div>
+                    <p className="text-3xl font-bold text-foreground">{stat.value}</p>
+                    <p className="text-md text-muted-foreground">{stat.label}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-2xl font-bold text-foreground">{stat.value}</p>
-                  <p className="text-md text-muted-foreground">{stat.label}</p>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
+      </section>
 
-      </div>
     </div>
   );
 }
