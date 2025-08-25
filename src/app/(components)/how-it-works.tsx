@@ -57,7 +57,7 @@ export function HowItWorks() {
         </div>
 
         {/* Mobile Carousel */}
-        <div className="md:hidden">
+        <div className="md:hidden relative">
           <Carousel
             setApi={setEmblaApi}
             opts={{ align: 'start', loop: true }}
@@ -93,17 +93,15 @@ export function HowItWorks() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-             <div className="mt-4 flex justify-between items-center">
-              <div className="flex gap-2">
-                <CarouselPrevious />
-                <CarouselNext />
-              </div>
-              <Button variant="outline" size="icon" onClick={togglePlay}>
-                {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-                <span className="sr-only">{isPlaying ? 'Pause' : 'Play'}</span>
+            <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 z-10" />
+            <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 z-10" />
+          </Carousel>
+           <div className="absolute inset-0 flex items-center justify-center">
+              <Button variant="outline" size="icon" onClick={togglePlay} className="h-14 w-14 rounded-full bg-white/30 backdrop-blur-sm border-white/50 hover:bg-white/50">
+                {isPlaying ? <Pause className="h-6 w-6 text-white" /> : <Play className="h-6 w-6 text-white" />}
+                <span className="sr-only">{isPlaying ? 'Pause carousel' : 'Play carousel'}</span>
               </Button>
             </div>
-          </Carousel>
         </div>
 
         {/* Desktop Grid */}
