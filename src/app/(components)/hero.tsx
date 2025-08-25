@@ -111,7 +111,7 @@ export function Hero() {
                 transition={{ delay: 0.2, duration: 0.5 }}
             >
                 <Image
-                    src="https://images.unsplash.com/photo-1606295834251-36d654991797?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtZWRpY2FsJTIwdGVzdCUyMGtpdHxlbnwwfHx8fDE3NTYxNDczODd8MA&ixlib=rb-4.1.0&q=80&w=1080"
+                    src="https://images.unsplash.com/photo-1520038410233-7141be7e6f97?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxib3h8ZW58MHx8fHwxNzU2MTQ5MDkyfDA&ixlib=rb-4.1.0&q=80&w=1080"
                     alt="DiscreetKit test kit box"
                     width={400}
                     height={400}
