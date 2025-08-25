@@ -100,10 +100,10 @@ export const features = [
 ]
 
 export const howItWorksSteps = [
-    { step: 1, title: 'Order Your Kit', description: 'Select your test kit and provide a delivery or pickup location. No personal details needed.', image: 'https://placehold.co/300x200' },
-    { step: 2, title: 'Pay Securely', description: 'Complete your payment via Mobile Money or Card through Paystack. It\'s safe and private.', image: 'https://placehold.co/300x200' },
-    { step: 3, title: 'Get Your Code', description: 'Receive a unique, anonymous tracking code upon successful payment.', image: 'https://placehold.co/300x200' },
-    { step: 4, title: 'Delivery or Pickup', description: 'Your order is delivered in a plain package, or you can collect it from a partner pharmacy.', image: 'https://placehold.co/300x200' },
+    { step: 1, title: 'Order Your Kit', description: 'Select your test kit and provide a delivery or pickup location. No personal details needed.', image: 'https://placehold.co/300x200', dataAiHint: "select product" },
+    { step: 2, title: 'Pay Securely', description: 'Complete your payment via Mobile Money or Card through Paystack. It\'s safe and private.', image: 'https://placehold.co/300x200', dataAiHint: "secure payment" },
+    { step: 3, title: 'Get Your Code', description: 'Receive a unique, anonymous tracking code upon successful payment.', image: 'https://placehold.co/300x200', dataAiHint: "unique code" },
+    { step: 4, title: 'Delivery or Pickup', description: 'Your order is delivered in a plain package, or you can collect it from a partner pharmacy.', image: 'https://placehold.co/300x200', dataAiHint: "discreet package" },
 ];
 
 export const testimonials = [

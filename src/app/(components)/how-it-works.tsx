@@ -12,6 +12,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
+import Image from 'next/image';
 
 export function HowItWorks() {
   const plugin = useRef(
@@ -45,9 +46,17 @@ export function HowItWorks() {
               {howItWorksSteps.map((step, index) => (
                 <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
                   <div className="p-1 h-full">
-                    <Card className="h-full">
+                    <Card className="h-full overflow-hidden">
+                       <Image 
+                          src={step.image} 
+                          alt={step.title} 
+                          width={300} 
+                          height={200}
+                          className="w-full h-40 object-cover"
+                          data-ai-hint={step.dataAiHint}
+                        />
                       <CardContent className="flex flex-col items-center justify-center text-center p-6 gap-4">
-                        <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-primary bg-primary/10 text-primary font-bold text-2xl z-10 flex-shrink-0">
+                        <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-primary bg-primary/10 text-primary font-bold text-2xl z-10 flex-shrink-0 -mt-16 bg-background">
                           {step.step}
                         </div>
                         <h3 className="text-xl font-semibold text-foreground">{step.title}</h3>

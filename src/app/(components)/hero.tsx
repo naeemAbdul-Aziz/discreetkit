@@ -51,7 +51,7 @@ export function Hero() {
               width={600}
               height={400}
               className="rounded-xl shadow-2xl"
-              data-ai-hint="discreet package health"
+              data-ai-hint="discreet package medical"
             />
           </div>
         </div>

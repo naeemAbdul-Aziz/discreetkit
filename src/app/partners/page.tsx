@@ -41,8 +41,7 @@ export default function PartnersPage() {
                               src="https://placehold.co/400x200"
                               alt={`${partner.name} background`} 
                               fill
-                              objectFit="cover" 
-                              className="grayscale opacity-20" 
+                              className="object-cover grayscale group-hover:grayscale-0 transition-all" 
                               data-ai-hint="organization building"
                             />
                          </div>

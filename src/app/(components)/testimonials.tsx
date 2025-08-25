@@ -5,6 +5,8 @@ import { Star } from 'lucide-react';
 import { testimonials } from '@/lib/data';
 import { cn } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
+import Image from 'next/image';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export function Testimonials() {
   const cardColors = [
@@ -31,27 +33,33 @@ export function Testimonials() {
                 <Card 
                     key={index}
                     className={cn(
-                        'transform transition-transform duration-300 hover:scale-105 hover:z-10',
+                        'transform transition-transform duration-300 hover:scale-105 hover:z-10 flex flex-col',
                         cardColors[index % cardColors.length],
                         index === 0 ? 'md:rotate-[-3deg]' : '',
                         index === 1 ? 'md:translate-y-8' : '',
                         index === 2 ? 'md:rotate-[3deg]' : '',
                     )}
                 >
-                    <div className="p-6">
+                    <div className="p-6 flex-grow">
                         <div className="flex items-center gap-1">
                             {[...Array(5)].map((_, i) => (
                             <Star key={i} className="h-5 w-5 fill-current" />
                             ))}
                         </div>
-                        <blockquote className="mt-4 text-base">
+                        <blockquote className="mt-4 text-base flex-grow">
                             "{testimonial.quote}"
                         </blockquote>
-                        <div className="mt-4">
-                            <p className="font-semibold">{testimonial.name}</p>
-                            <p className="text-sm opacity-80">{testimonial.role}</p>
-                        </div>
                     </div>
+                     <div className="p-6 pt-0 mt-4 flex items-center gap-4">
+                            <Avatar>
+                                <AvatarImage src={testimonial.avatar} alt={testimonial.name} data-ai-hint="person portrait" />
+                                <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                                <p className="font-semibold">{testimonial.name}</p>
+                                <p className="text-sm opacity-80">{testimonial.role}</p>
+                            </div>
+                        </div>
                 </Card>
             ))}
         </div>
