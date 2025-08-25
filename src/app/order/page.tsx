@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState, useFormStatus } from 'react-dom';
 import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createOrderAction } from '@/lib/actions';
@@ -34,7 +34,7 @@ export default function OrderPage() {
   const formRef = useRef<HTMLFormElement>(null);
 
   const initialState = { message: null, errors: {}, success: false, code: null };
-  const [state, dispatch] = useFormState(createOrderAction, initialState);
+  const [state, dispatch] = useActionState(createOrderAction, initialState);
 
   useEffect(() => {
     if (state.success && state.code) {
