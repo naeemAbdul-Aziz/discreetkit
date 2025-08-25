@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { AlertCircle, Loader2, ShieldCheck } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { RecentOrders } from '../(components)/recent-orders';
+import { ChatTrigger } from '@/components/chat-trigger';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -60,7 +61,11 @@ export default function OrderPage() {
         <p className="mt-2 text-lg text-muted-foreground">A simple, private, and secure process.</p>
       </div>
 
-      <form ref={formRef} action={dispatch} className="mt-12 space-y-8">
+       <div className="mt-8">
+          <ChatTrigger />
+      </div>
+
+      <form ref={formRef} action={dispatch} className="mt-8 space-y-8">
         <Card>
           <CardHeader>
             <CardTitle>1. Select Your Product</CardTitle>

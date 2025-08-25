@@ -10,6 +10,7 @@ import { Bot, Loader, Send, User, X } from 'lucide-react';
 import { handleChat } from '@/lib/actions';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { cn } from '@/lib/utils';
+import { useChatbot } from '@/hooks/use-chatbot';
 
 type Message = {
   role: 'user' | 'model';
@@ -17,7 +18,7 @@ type Message = {
 };
 
 export function Chatbot() {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isOpen, setIsOpen } = useChatbot();
   const [history, setHistory] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isPending, startTransition] = useTransition();
@@ -32,7 +33,7 @@ export function Chatbot() {
     if (isOpen && history.length === 0) {
         setHistory([initialMessage]);
     }
-  }, [isOpen]);
+  }, [isOpen, history.length]);
 
   useEffect(() => {
     if (scrollAreaRef.current) {

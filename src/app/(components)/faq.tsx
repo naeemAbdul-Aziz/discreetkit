@@ -1,6 +1,7 @@
 
 import { faqItems } from '@/lib/data';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { ChatTrigger } from '@/components/chat-trigger';
 
 export function Faq() {
   return (
@@ -14,6 +15,11 @@ export function Faq() {
             Your questions, answered. If you need more info, our AI assistant is here to help.
           </p>
         </div>
+
+        <div className="mt-8">
+            <ChatTrigger />
+        </div>
+
         <div className="mt-12">
           <Accordion type="single" collapsible className="w-full">
             {faqItems.map((item, index) => (
