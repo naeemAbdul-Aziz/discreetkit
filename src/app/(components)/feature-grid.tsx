@@ -2,8 +2,8 @@
 'use client';
 
 import { features } from '@/lib/data';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
 const containerVariants = {
@@ -11,7 +11,7 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1,
+      staggerChildren: 0.3,
     },
   },
 };
@@ -49,17 +49,17 @@ export function FeatureGrid() {
         >
           {features.map((feature, index) => (
              <motion.div key={index} variants={itemVariants}>
-                <Card className="h-full transform transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl bg-card border-none p-4 rounded-xl">
-                    <CardHeader className="flex flex-row items-center gap-4 pb-4">
+                <div className="h-full transform transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl bg-card border p-4 rounded-xl">
+                    <div className="flex flex-row items-center gap-4 pb-4">
                         <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary">
                         <feature.icon className="h-6 w-6 text-primary" />
                         </div>
-                        <CardTitle className="text-lg font-semibold">{feature.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
+                        <h3 className="text-lg font-semibold">{feature.title}</h3>
+                    </div>
+                    <div>
                         <p className="text-muted-foreground">{feature.description}</p>
-                    </CardContent>
-                </Card>
+                    </div>
+                </div>
             </motion.div>
           ))}
         </motion.div>
