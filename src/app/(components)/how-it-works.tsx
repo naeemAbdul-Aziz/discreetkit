@@ -4,7 +4,7 @@
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, PlayCircle } from 'lucide-react';
 import { steps } from '@/lib/data';
 
 export function HowItWorks() {
@@ -39,15 +39,18 @@ export function HowItWorks() {
               </Link>
             </Button>
           </div>
-          <div className="flex items-center justify-center">
+          <div className="relative flex items-center justify-center group cursor-pointer">
             <Image
               src="https://placehold.co/600x700"
               alt="Lifestyle image showing product in use"
               width={600}
               height={700}
-              className="rounded-xl shadow-lg object-cover"
+              className="rounded-xl shadow-lg object-cover transition-opacity group-hover:opacity-80"
               data-ai-hint="person holding product"
             />
+            <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-xl transition-colors group-hover:bg-black/30">
+                <PlayCircle className="h-20 w-20 text-white/90 transform transition-transform group-hover:scale-110" />
+            </div>
           </div>
         </div>
       </div>
