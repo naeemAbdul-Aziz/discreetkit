@@ -9,7 +9,7 @@ export function Testimonials() {
       <div className="container mx-auto px-4 md:px-6">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            What users are saying about AnonTest
+            What users are saying about DiscreetKit
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
             We're proud to provide a service that people trust.

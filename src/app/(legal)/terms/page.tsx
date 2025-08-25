@@ -5,12 +5,12 @@ export default function TermsOfService() {
       <div className="prose prose-lg mx-auto">
         <h1 className="font-headline text-4xl font-bold">Terms of Service</h1>
         <p className="lead">
-          Welcome to AnonTest Ghana. By using our website and services, you agree to these terms. Please read them carefully.
+          Welcome to DiscreetKit Ghana. By using our website and services, you agree to these terms. Please read them carefully.
         </p>
         
         <h2 className="font-headline text-2xl font-bold mt-8">1. About Our Service</h2>
         <p>
-          AnonTest Ghana provides a platform for ordering self-test medical kits for private, informational use. Our service is designed to be anonymous and discreet. The tests provided are for screening purposes only and do not constitute a medical diagnosis.
+          DiscreetKit Ghana provides a platform for ordering self-test medical kits for private, informational use. Our service is designed to be anonymous and discreet. The tests provided are for screening purposes only and do not constitute a medical diagnosis.
         </p>
 
         <h2 className="font-headline text-2xl font-bold mt-8">2. User Responsibility</h2>
@@ -35,7 +35,7 @@ export default function TermsOfService() {
 
         <h2 className="font-headline text-2xl font-bold mt-8">5. Limitation of Liability</h2>
         <p>
-          AnonTest Ghana is a platform for distributing test kits. We are not a healthcare provider. We are not liable for any actions you take or do not take based on the results of a self-test. Our liability is limited to the purchase price of the product.
+          DiscreetKit Ghana is a platform for distributing test kits. We are not a healthcare provider. We are not liable for any actions you take or do not take based on the results of a self-test. Our liability is limited to the purchase price of the product.
         </p>
 
         <h2 className="font-headline text-2xl font-bold mt-8">6. Prohibited Use</h2>

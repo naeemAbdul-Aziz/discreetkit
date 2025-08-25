@@ -9,7 +9,7 @@ export function Footer() {
         <div className="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
           <ShieldCheck className="h-6 w-6 text-green-600" />
           <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
-            Built for privacy and peace of mind. &copy; {new Date().getFullYear()} AnonTest Ghana.
+            Built for privacy and peace of mind. &copy; {new Date().getFullYear()} DiscreetKit Ghana.
           </p>
         </div>
         <div className="flex items-center gap-4">

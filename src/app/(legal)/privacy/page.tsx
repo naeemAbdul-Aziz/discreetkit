@@ -5,7 +5,7 @@ export default function PrivacyPolicy() {
       <div className="prose prose-lg mx-auto">
         <h1 className="font-headline text-4xl font-bold">Privacy Policy</h1>
         <p className="lead">
-          Your privacy is the foundation of AnonTest Ghana. We are committed to ensuring your anonymity and peace of mind. This policy outlines our simple, privacy-first approach.
+          Your privacy is the foundation of DiscreetKit Ghana. We are committed to ensuring your anonymity and peace of mind. This policy outlines our simple, privacy-first approach.
         </p>
         
         <h2 className="font-headline text-2xl font-bold mt-8">Core Principles</h2>

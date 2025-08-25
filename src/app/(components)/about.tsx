@@ -10,7 +10,7 @@ export function About() {
             About Our Company
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
-            We started AnonTest with a simple mission: to make health testing accessible, private, and stigma-free for everyone in Ghana, especially young people.
+            We started DiscreetKit with a simple mission: to make health testing accessible, private, and stigma-free for everyone in Ghana, especially young people.
           </p>
         </div>
         <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
