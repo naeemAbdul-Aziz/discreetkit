@@ -9,6 +9,7 @@ import { PartnerLogos } from './(components)/partner-logos';
 import { TrustStats } from './(components)/trust-stats';
 import { Separator } from '@/components/ui/separator';
 import { OurVision } from './(components)/our-vision';
+import { CoverageMap } from './(components)/coverage-map';
 
 export default function Home() {
   return (
@@ -18,6 +19,7 @@ export default function Home() {
       <TrustStats />
       <FeatureGrid />
       <HowItWorks />
+      <CoverageMap />
       <Testimonials />
       <OurVision />
       <Separator className="my-12" />
