@@ -1,4 +1,5 @@
 
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { partners } from '@/lib/data';
 import { Badge } from '@/components/ui/badge';
@@ -37,11 +38,11 @@ export default function PartnersPage() {
                       <CardHeader className="p-0">
                          <div className="relative h-40 w-full bg-muted">
                            <Image 
-                              src={partner.logoUrl.replace('130x40', '400x200')} 
+                              src="https://placehold.co/400x200"
                               alt={`${partner.name} background`} 
                               fill
                               objectFit="cover" 
-                              className="grayscale opacity-30" 
+                              className="grayscale opacity-20" 
                               data-ai-hint="organization building"
                             />
                          </div>

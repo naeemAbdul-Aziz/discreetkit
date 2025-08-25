@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { motion } from 'framer-motion';
@@ -64,7 +65,7 @@ export function CoverageMap() {
               className="rounded-xl shadow-xl object-cover opacity-20"
               data-ai-hint="map Ghana"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-background/10" />
             <p className="absolute bottom-4 font-bold text-muted-foreground">Stylized Map of Ghana</p>
           </motion.div>
 

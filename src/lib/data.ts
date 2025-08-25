@@ -1,4 +1,5 @@
 
+
 import { CheckCircle, HeartHandshake, ShieldCheck, Truck, Users } from "lucide-react"
 
 export const products = [
@@ -10,6 +11,7 @@ export const products = [
     priceGHS: 75.00,
     is_student_bundle: false,
     active: true,
+    imageUrl: 'https://placehold.co/400x300',
   },
   {
     id: 2,
@@ -19,6 +21,7 @@ export const products = [
     priceGHS: 140.00,
     is_student_bundle: true,
     active: true,
+    imageUrl: 'https://placehold.co/400x300',
   },
   {
     id: 3,
@@ -28,6 +31,7 @@ export const products = [
     priceGHS: 40.00,
     is_student_bundle: false,
     active: true,
+    imageUrl: 'https://placehold.co/400x300',
   },
   {
     id: 4,
@@ -37,16 +41,22 @@ export const products = [
     priceGHS: 110.00,
     is_student_bundle: true,
     active: true,
+    imageUrl: 'https://placehold.co/400x300',
   },
 ]
 
 export const partners = [
-  { id: 1, name: 'Marie Stopes International', type: 'hospital', logoUrl: 'https://placehold.co/130x40', url: '#' },
-  { id: 2, name: 'Campus Pharmacy, Legon', type: 'pharmacy', logoUrl: 'https://placehold.co/130x40', url: '#' },
-  { id: 3, name: 'UPSA SRC', type: 'src', logoUrl: 'https://placehold.co/130x40', url: '#' },
-  { id: 4, name: 'GIMPA Clinic', type: 'hospital', logoUrl: 'https://placehold.co/130x40', url: '#' },
-  { id: 5, name: 'Wisconsin SRC', type: 'src', logoUrl: 'https://placehold.co/130x40', url: '#' },
-  { id: 6, name: 'Central Pharmacy', type: 'pharmacy', logoUrl: 'https://placehold.co/130x40', url: '#' },
+  { id: 1, name: 'University of Ghana Hospital', type: 'hospital', logoUrl: 'https://placehold.co/130x40', url: '#' },
+  { id: 2, name: '37 Military Hospital', type: 'hospital', logoUrl: 'https://placehold.co/130x40', url: '#' },
+  { id: 3, name: 'Korle-Bu Teaching Hospital', type: 'hospital', logoUrl: 'https://placehold.co/130x40', url: '#' },
+  { id: 4, name: 'UPSA Health Services', type: 'hospital', logoUrl: 'https://placehold.co/130x40', url: '#' },
+  { id: 5, name: 'GIMPA Hospital', type: 'hospital', logoUrl: 'https://placehold.co/130x40', url: '#' },
+  { id: 6, name: 'Campus Pharmacy, Legon', type: 'pharmacy', logoUrl: 'https://placehold.co/130x40', url: '#' },
+  { id: 7, name: 'Central Pharmacy', type: 'pharmacy', logoUrl: 'https://placehold.co/130x40', url: '#' },
+  { id: 8, name: 'University of Ghana SRC', type: 'src', logoUrl: 'https://placehold.co/130x40', url: '#' },
+  { id: 9, name: 'UPSA SRC', type: 'src', logoUrl: 'https://placehold.co/130x40', url: '#' },
+  { id: 10, name: 'GIMPA SRC', type: 'src', logoUrl: 'https://placehold.co/130x40', url: '#' },
+  { id: 11, name: 'Wisconsin SRC', type: 'src', logoUrl: 'https://placehold.co/130x40', url: '#' },
 ]
 
 export const discounts = [
