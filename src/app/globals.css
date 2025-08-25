@@ -4,7 +4,7 @@
 @tailwind utilities;
 
 body {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 @layer base {
