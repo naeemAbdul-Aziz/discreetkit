@@ -196,6 +196,13 @@ export const steps = [
     image: 'https://placehold.co/500x500',
     dataAiHint: 'person results'
   },
+  {
+    number: '4',
+    title: 'Get Support (If Needed)',
+    description: 'If you test positive, we confidentially connect you with our partner hospitals for discounted follow-up care.',
+    image: 'https://placehold.co/500x500',
+    dataAiHint: 'health support'
+  },
 ];
 
 
