@@ -34,7 +34,7 @@ export function Header() {
   return (
     <>
     <div className="bg-primary text-primary-foreground text-center text-sm p-2">
-      Free discreet delivery on all Ghana orders! <Link href="/order" className="underline font-semibold">Shop Now</Link>
+      Free Delivery on UG Campus! <Link href="/order" className="underline font-semibold">Shop Now</Link>
     </div>
     <header className={cn("sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60", isScrolled ? "shadow-sm" : "")}>
         <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between">
