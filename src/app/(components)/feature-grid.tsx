@@ -3,8 +3,30 @@
 
 import { features } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useInView } from 'react-intersection-observer';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      duration: 0.5,
+    },
+  },
+};
+
 
 export function FeatureGrid() {
   return (
@@ -18,42 +40,30 @@ export function FeatureGrid() {
             We've built every part of our service with your privacy, convenience, and well-being in mind.
           </p>
         </div>
-        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <motion.div 
+          className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+        >
           {features.map((feature, index) => (
-            <FeatureCard key={index} feature={feature} index={index} />
+             <motion.div key={index} variants={itemVariants}>
+                <Card className="h-full transform transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl bg-card border-none p-4 rounded-xl">
+                    <CardHeader className="flex flex-row items-center gap-4 pb-4">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary">
+                        <feature.icon className="h-6 w-6 text-primary" />
+                        </div>
+                        <CardTitle className="text-lg font-semibold">{feature.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-muted-foreground">{feature.description}</p>
+                    </CardContent>
+                </Card>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
-  );
-}
-
-function FeatureCard({ feature, index }: { feature: (typeof features)[0], index: number }) {
-  const { ref, inView } = useInView({
-    triggerOnce: true,
-    threshold: 0.1,
-  });
-
-  return (
-    <div
-      ref={ref}
-      className={cn(
-        'opacity-0 transition-all duration-500 ease-out',
-        inView ? 'animate-stagger-in' : 'translate-y-10'
-      )}
-      style={{ animationDelay: `${index * 100}ms` }}
-    >
-      <Card className="h-full transform transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl bg-card border-none p-4 rounded-xl">
-        <CardHeader className="flex flex-row items-center gap-4 pb-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary">
-            <feature.icon className="h-6 w-6 text-primary" />
-            </div>
-            <CardTitle className="text-lg font-semibold">{feature.title}</CardTitle>
-        </CardHeader>
-        <CardContent>
-            <p className="text-muted-foreground">{feature.description}</p>
-        </CardContent>
-      </Card>
-    </div>
   );
 }
