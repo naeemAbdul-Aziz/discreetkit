@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { motion } from 'framer-motion';
@@ -38,14 +37,14 @@ const itemVariants = {
 
 export function CoverageMap() {
   return (
-    <section className="bg-background py-12 md:py-20">
+    <section className="bg-muted py-12 md:py-20">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center">
           <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             Serving You Across Ghana
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
-            We're rapidly expanding our discreet delivery and pharmacy pickup services. Check out our current key service areas below.
+            Discreet delivery and trusted pharmacy pickups, right where you are. We’re growing fast — here’s where you’ll find us today.
           </p>
         </div>
 
@@ -62,11 +61,9 @@ export function CoverageMap() {
               alt="Map of Ghana showing delivery zones"
               width={500}
               height={500}
-              className="rounded-xl shadow-xl object-cover opacity-20"
+              className="rounded-xl shadow-xl object-cover"
               data-ai-hint="map Ghana"
             />
-            <div className="absolute inset-0 bg-background/10" />
-            <p className="absolute bottom-4 font-bold text-muted-foreground">Stylized Map of Ghana</p>
           </motion.div>
 
           <motion.div
