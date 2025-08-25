@@ -5,28 +5,11 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-
-const steps = [
-  {
-    number: '1',
-    title: 'Order Your Kit',
-    description: 'Select the test kit you need. No personal details required.',
-  },
-  {
-    number: '2',
-    title: 'Enjoy Your Night',
-    description: 'Our kits are designed for discretion and peace of mind.',
-  },
-  {
-    number: '3',
-    title: 'Wake Up Feeling Great',
-    description: 'Take control of your health on your own terms.',
-  },
-];
+import { steps } from '@/lib/data';
 
 export function HowItWorks() {
   return (
-    <section className="bg-background py-12 md:py-24">
+    <section id="how-it-works" className="bg-background py-12 md:py-24">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div className="space-y-8">

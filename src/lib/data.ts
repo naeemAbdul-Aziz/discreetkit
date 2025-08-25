@@ -1,5 +1,5 @@
 
-import { BadgeCheck, Leaf, ShieldCheck, Truck, Vegan, WheatOff } from "lucide-react"
+import { BadgeCheck, Lock, ShieldCheck, Truck, Users, GraduationCap, Hospital, MapPin } from "lucide-react"
 
 export const products = [
   {
@@ -66,11 +66,11 @@ export const discounts = [
 ]
 
 export const productBenefits = [
-  { icon: ShieldCheck, title: 'Superior Formula' },
-  { icon: WheatOff, title: 'Gluten-Free' },
-  { icon: Vegan, title: 'Soy-Free' },
-  { icon: Leaf, title: 'Vegan' },
-  { icon: BadgeCheck, title: 'Made with Natural Ingredients' },
+  { icon: ShieldCheck, title: '100% Confidential' },
+  { icon: Truck, title: 'Discreet Delivery' },
+  { icon: Lock, title: 'Anonymous Ordering' },
+  { icon: BadgeCheck, title: 'WHO-Approved Tests' },
+  { icon: Users, title: 'No Account Needed' },
 ];
 
 
@@ -82,12 +82,33 @@ export const features = [
     image: 'https://placehold.co/400x250',
     dataAiHint: 'privacy lock'
   },
+   {
+    icon: GraduationCap,
+    title: 'Student Friendly Kits',
+    description: 'Special kits and bundles created for students. Your health shouldn\'t break the bank.',
+    image: 'https://placehold.co/400x250',
+    dataAiHint: 'student health'
+  },
   {
     icon: Truck,
     title: 'Fast & Discreet Delivery',
     description: 'Get your order quickly in unbranded packaging. Or, choose anonymous pharmacy pickup.',
     image: 'https://placehold.co/400x250',
     dataAiHint: 'delivery person'
+  },
+  {
+    icon: Hospital,
+    title: 'Partner Hospitals',
+    description: 'We connect you with trusted health partners for follow-up care and support if needed.',
+    image: 'https://placehold.co/400x250',
+    dataAiHint: 'hospital building'
+  },
+  {
+    icon: MapPin,
+    title: 'Easy Tracking',
+    description: 'Use your unique, anonymous code to track your order from our hub to your hands.',
+    image: 'https://placehold.co/400x250',
+    dataAiHint: 'map tracking'
   },
   {
     icon: BadgeCheck,
@@ -148,6 +169,31 @@ export const faqItems = [
         answer: "Orders within Accra are typically delivered within 24-48 hours. Campus deliveries are often faster. You can follow the progress with your unique tracking code."
     }
 ];
+
+export const steps = [
+  {
+    number: '1',
+    title: 'Order Your Kit',
+    description: 'Select the test kit you need. Your order is anonymous and secure.',
+    image: 'https://placehold.co/500x500',
+    dataAiHint: 'select product'
+  },
+  {
+    number: '2',
+    title: 'Private & Fast Delivery',
+    description: 'Receive your kit in a plain, unbranded package. No one will know the contents.',
+    image: 'https://placehold.co/500x500',
+    dataAiHint: 'discreet package'
+  },
+  {
+    number: '3',
+    title: 'Get Your Results',
+    description: 'Follow the simple instructions to get your results in minutes, in complete privacy.',
+    image: 'https://placehold.co/500x500',
+    dataAiHint: 'person results'
+  },
+];
+
 
 export type Order = {
   id: string;
