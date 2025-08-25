@@ -49,7 +49,7 @@ export function FeatureGrid() {
              <motion.div key={index} variants={itemVariants}>
                 <div className="h-full transform transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl bg-card border p-6 rounded-xl">
                     <div className="flex flex-col items-start gap-4">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
                           <feature.icon className="h-6 w-6 text-primary" />
                         </div>
                         <h3 className="text-xl font-semibold">{feature.title}</h3>
