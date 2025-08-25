@@ -1,6 +1,6 @@
 
 import type { Metadata } from 'next';
-import { Roboto } from 'next/font/google';
+import { Manrope } from 'next/font/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { Header } from '@/components/header';
@@ -8,10 +8,10 @@ import { Footer } from '@/components/footer';
 import { Toaster } from "@/components/ui/toaster";
 import { Chatbot } from '@/components/chatbot';
 
-const roboto = Roboto({
+const manrope = Manrope({
   subsets: ['latin'],
   weight: ['300', '400', '500', '700'],
-  variable: '--font-roboto',
+  variable: '--font-manrope',
 });
 
 export const metadata: Metadata = {
@@ -29,7 +29,7 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth">
        <head>
       </head>
-      <body className={cn('min-h-screen bg-background font-body antialiased', roboto.variable)}>
+      <body className={cn('min-h-screen bg-background font-body antialiased', manrope.variable)}>
         <div className="relative flex min-h-dvh flex-col bg-background">
           <Header />
           <main className="flex-1">{children}</main>
