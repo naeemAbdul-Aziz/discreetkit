@@ -3,15 +3,13 @@
 
 import { features } from '@/lib/data';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
-import { cn } from '@/lib/utils';
 
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.3,
+      staggerChildren: 0.1,
     },
   },
 };
@@ -49,14 +47,12 @@ export function FeatureGrid() {
         >
           {features.map((feature, index) => (
              <motion.div key={index} variants={itemVariants}>
-                <div className="h-full transform transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl bg-card border p-4 rounded-xl">
-                    <div className="flex flex-row items-center gap-4 pb-4">
+                <div className="h-full transform transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl bg-card border p-6 rounded-xl">
+                    <div className="flex flex-col items-start gap-4">
                         <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary">
-                        <feature.icon className="h-6 w-6 text-primary" />
+                          <feature.icon className="h-6 w-6 text-primary" />
                         </div>
-                        <h3 className="text-lg font-semibold">{feature.title}</h3>
-                    </div>
-                    <div>
+                        <h3 className="text-xl font-semibold">{feature.title}</h3>
                         <p className="text-muted-foreground">{feature.description}</p>
                     </div>
                 </div>
