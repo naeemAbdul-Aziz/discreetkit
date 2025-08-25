@@ -1,6 +1,7 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { ChevronRight } from 'lucide-react';
 
 export function ClosingCta() {
   return (
@@ -15,7 +16,10 @@ export function ClosingCta() {
           </p>
           <div className="mt-8">
             <Button asChild size="lg" variant="secondary" className="bg-white text-primary hover:bg-white/90">
-              <Link href="/order">Order Your Test Kit Securely</Link>
+              <Link href="/order">
+                Order Your Test Kit Securely
+                <ChevronRight />
+              </Link>
             </Button>
           </div>
         </div>

@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, ShieldCheck } from 'lucide-react';
+import { Menu, ShieldCheck, ChevronRight } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
@@ -54,7 +54,10 @@ export function Header() {
 
           <div className="hidden md:flex items-center justify-end gap-4">
              <Button asChild>
-                <Link href="/order">Order a Kit</Link>
+                <Link href="/order">
+                    Order a Kit
+                    <ChevronRight />
+                </Link>
             </Button>
           </div>
 

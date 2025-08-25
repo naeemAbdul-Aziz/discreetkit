@@ -6,7 +6,7 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle2, Copy } from 'lucide-react';
+import { CheckCircle2, Copy, Truck, Home } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 function SuccessContent() {
@@ -64,10 +64,16 @@ function SuccessContent() {
         </div>
         <div className="space-y-4">
           <Button asChild className="w-full">
-            <Link href={`/track?code=${code}`}>Track Your Order Now</Link>
+            <Link href={`/track?code=${code}`}>
+              <Truck />
+              Track Your Order Now
+            </Link>
           </Button>
           <Button asChild variant="outline" className="w-full">
-            <Link href="/">Back to Homepage</Link>
+            <Link href="/">
+                <Home />
+                Back to Homepage
+            </Link>
           </Button>
         </div>
          <div className="text-sm text-muted-foreground pt-4">

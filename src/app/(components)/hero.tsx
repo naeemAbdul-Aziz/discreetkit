@@ -4,6 +4,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import { ChevronRight } from 'lucide-react';
 
 export function Hero() {
   return (
@@ -30,10 +31,16 @@ export function Hero() {
               className="flex flex-col gap-4 sm:flex-row"
             >
               <Button asChild size="lg">
-                <Link href="/order">Order Test Kit</Link>
+                <Link href="/order">
+                  Order Test Kit
+                  <ChevronRight />
+                </Link>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <Link href="/order">See Student Kits</Link>
+                <Link href="/order">
+                  See Student Kits
+                  <ChevronRight />
+                </Link>
               </Button>
             </div>
           </div>
