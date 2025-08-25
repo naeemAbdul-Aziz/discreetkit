@@ -94,8 +94,6 @@ export const howItWorksSteps = [
     { step: 2, title: 'Pay Securely', description: 'Complete your payment via Mobile Money or Card through Paystack. It\'s safe and private.' },
     { step: 3, title: 'Get Your Code', description: 'Receive a unique, anonymous tracking code upon successful payment.' },
     { step: 4, title: 'Delivery or Pickup', description: 'Your order is delivered in a plain package, or you can collect it from a partner pharmacy.' },
-    { step: 5, title: 'Run Your Test', description: 'Follow the simple, enclosed instructions to perform your test in private.' },
-    { step: 6, title: 'Need Support?', description: 'If your result is positive, we provide a list of trusted partners for confidential support and care.' }
 ];
 
 export const testimonials = [

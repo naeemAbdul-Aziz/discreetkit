@@ -1,5 +1,4 @@
 
-import Image from 'next/image';
 import { howItWorksSteps } from '@/lib/data';
 
 export function HowItWorks() {
@@ -14,16 +13,26 @@ export function HowItWorks() {
             We've made getting a self-test kit straightforward and completely private. Follow these simple steps to take control of your health.
           </p>
         </div>
-        <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-          {howItWorksSteps.slice(0,4).map((step) => (
-            <div key={step.step} className="flex flex-col items-center text-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-primary bg-primary/10 text-primary font-bold text-xl">
-                {step.step}
+        
+        <div className="relative mt-12 max-w-2xl mx-auto">
+          {/* Vertical line */}
+          <div className="absolute left-6 md:left-1/2 top-0 h-full w-0.5 bg-border -translate-x-1/2" aria-hidden="true"></div>
+
+          <div className="relative flex flex-col gap-12">
+            {howItWorksSteps.slice(0, 4).map((step, index) => (
+              <div key={step.step} className="relative flex items-start md:items-center gap-6">
+                 {/* Step Circle */}
+                <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-primary bg-primary/10 text-primary font-bold text-xl z-10 flex-shrink-0">
+                  {step.step}
+                </div>
+                {/* Content */}
+                <div className="bg-card p-6 rounded-xl border shadow-sm w-full">
+                  <h3 className="text-lg font-semibold text-foreground">{step.title}</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">{step.description}</p>
+                </div>
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-foreground">{step.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{step.description}</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </section>
