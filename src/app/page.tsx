@@ -13,15 +13,17 @@ import { OurVision } from './(components)/our-vision';
 import { TrustStats } from './(components)/trust-stats';
 import { CoverageMap } from './(components)/coverage-map';
 import { RecentOrders } from './(components)/recent-orders';
+import { WhatsInTheKit } from './(components)/whats-in-the-kit';
 
 export default function Home() {
   return (
     <div className="flex flex-col">
       <Hero />
       <PartnerLogos />
-      <TrustStats />
       <HowItWorks />
       <ProductCarousel />
+      <WhatsInTheKit />
+      <TrustStats />
       <OurVision />
       <Testimonials />
       <CoverageMap />
