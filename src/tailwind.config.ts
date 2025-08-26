@@ -59,6 +59,7 @@ export default {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
+        'button-hover': 'hsl(var(--accent))',
       },
       borderRadius: {
         lg: 'var(--radius)',
