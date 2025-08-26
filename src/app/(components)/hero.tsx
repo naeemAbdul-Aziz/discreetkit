@@ -75,7 +75,7 @@ export function Hero() {
                     Private Health Answers, <span className="text-primary/80">Delivered with Trust.</span>
                 </h1>
                 <p className="mt-6 text-lg max-w-prose text-muted-foreground">
-                    AnonTest empowers you to take control of your health with confidential, reliable, and easy-to-use self-test kits delivered anywhere in Ghana.
+                    DiscreetKit empowers you to take control of your health with confidential, reliable, and easy-to-use self-test kits delivered anywhere in Ghana.
                 </p>
                 <div className="mt-10 flex items-center gap-x-6">
                     <Button asChild size="lg">
