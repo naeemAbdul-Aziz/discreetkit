@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, ShieldCheck, ShoppingCart, User } from 'lucide-react';
+import { Menu, ShieldCheck, ShoppingCart } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
@@ -68,10 +68,6 @@ export function Header() {
             ))}
             <div className="flex items-center gap-2 pl-2">
               <Button variant="ghost" size="icon">
-                <User className="h-5 w-5" />
-                <span className="sr-only">Account</span>
-              </Button>
-              <Button variant="ghost" size="icon">
                 <ShoppingCart className="h-5 w-5" />
                  <span className="sr-only">Cart</span>
               </Button>
@@ -111,11 +107,8 @@ export function Header() {
                   ))}
                 </div>
                  <div className="mt-8 border-t pt-4 flex items-center gap-4">
-                  <Button variant="outline" className="flex-1">
-                    My Account
-                  </Button>
                   <Button className="flex-1">
-                    My Cart
+                    <ShoppingCart className="mr-2 h-4 w-4" /> My Cart
                   </Button>
                 </div>
               </SheetContent>

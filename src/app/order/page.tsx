@@ -16,8 +16,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { AlertCircle, Loader2, ShieldCheck } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { RecentOrders } from '../(components)/recent-orders';
 import { ChatTrigger } from '@/components/chat-trigger';
+import { RecentOrders } from '../(components)/recent-orders';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -70,7 +70,7 @@ export default function OrderPage() {
         <Card>
           <CardHeader>
             <CardTitle>1. Select Your Product</CardTitle>
-            <CardDescription>Choose the self-test kit you need.</CardDescription>
+            <CardDescription>Choose the self-test kit you need. Your selection is confidential.</CardDescription>
           </CardHeader>
           <CardContent>
             <RadioGroup name="productId" className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -78,14 +78,14 @@ export default function OrderPage() {
                 <Label
                   key={product.id}
                   htmlFor={`product-${product.id}`}
-                  className="flex flex-col items-start space-y-2 rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-ring"
+                  className="flex cursor-pointer flex-col rounded-lg border-2 border-muted bg-popover p-4 ring-offset-background transition-all hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 [&:has([data-state=checked])]:border-primary"
                 >
-                  <div className="flex w-full justify-between">
+                  <div className="flex w-full items-start justify-between">
                     <span className="font-bold">{product.name}</span>
-                    <RadioGroupItem value={String(product.id)} id={`product-${product.id}`} />
+                    <RadioGroupItem value={String(product.id)} id={`product-${product.id}`} className="mt-1" />
                   </div>
-                  <span className="text-sm text-muted-foreground">{product.description}</span>
-                  <span className="font-semibold">GHS {product.priceGHS.toFixed(2)}</span>
+                  <span className="text-sm text-muted-foreground mt-2">{product.description}</span>
+                  <span className="font-semibold mt-4">GHS {product.priceGHS.toFixed(2)}</span>
                 </Label>
               ))}
             </RadioGroup>
@@ -114,7 +114,10 @@ export default function OrderPage() {
               <Textarea id="deliveryAddressNote" name="deliveryAddressNote" placeholder="e.g., 'Call upon arrival at the main gate', 'Leave with the security.'" />
             </div>
              <div className="space-y-2">
-              <Label htmlFor="phone_masked">Contact Number (for delivery rider only)</Label>
+                <div className="flex items-center gap-2">
+                    <Label htmlFor="phone_masked">Contact Number (for delivery rider only)</Label>
+                    <ShieldCheck className="h-4 w-4 text-muted-foreground" />
+                </div>
               <Input id="phone_masked" name="phone_masked" type="tel" placeholder="e.g., 024xxxxxxx" required />
                <p className="text-[0.8rem] text-muted-foreground">
                 This will be masked and is only for the rider to contact you.

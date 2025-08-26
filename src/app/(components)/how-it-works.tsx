@@ -42,7 +42,7 @@ export function HowItWorks() {
 
     setIsPlaying(autoplay.isPlaying());
     emblaApi.on('autoplay:play', () => setIsPlaying(true));
-emblaApi.on('autoplay:stop', () => setIsPlaying(false));
+    emblaApi.on('autoplay:stop', () => setIsPlaying(false));
     emblaApi.on('reInit', () => {
         setIsPlaying(autoplay.isPlaying());
         onSelect(emblaApi);
@@ -65,7 +65,8 @@ emblaApi.on('autoplay:stop', () => setIsPlaying(false));
           </p>
         </div>
 
-        <div className="relative">
+        {/* Mobile Carousel */}
+        <div className="relative md:hidden">
           <Carousel
             setApi={setEmblaApi}
             opts={{ align: 'start', loop: true }}
@@ -75,19 +76,20 @@ emblaApi.on('autoplay:stop', () => setIsPlaying(false));
             <CarouselContent className="-ml-4">
               {steps.map((step) => (
                 <CarouselItem key={step.number} className="pl-4">
-                    <Card className="overflow-hidden bg-background p-4 md:p-6">
-                        <CardContent className="p-0">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                                <div className="flex flex-col space-y-4 text-left">
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-primary bg-primary/10 text-xl font-bold text-primary">
-                                            {step.number}
+                    <Card className="overflow-hidden bg-background p-4 md:p-6 h-full">
+                        <CardContent className="p-0 flex flex-col h-full">
+                            <div className="grid grid-cols-1 items-center flex-grow">
+                                <div className="flex flex-col space-y-4 text-left h-full justify-between">
+                                    <div>
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-primary bg-primary/10 text-xl font-bold text-primary">
+                                                {step.number}
+                                            </div>
+                                            <h3 className="text-2xl font-semibold">{step.title}</h3>
                                         </div>
-                                        <h3 className="text-2xl font-semibold">{step.title}</h3>
+                                        <p className="text-muted-foreground text-base mt-4">{step.description}</p>
                                     </div>
-                                    <p className="text-muted-foreground text-base">{step.description}</p>
-                                    
-                                    <div className="border-t pt-4">
+                                    <div className="border-t pt-4 mt-4">
                                         <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground mb-3">Key Details</h4>
                                         <ul className="space-y-2">
                                             {step.details.map((detail, i) => (
@@ -98,15 +100,6 @@ emblaApi.on('autoplay:stop', () => setIsPlaying(false));
                                             ))}
                                         </ul>
                                     </div>
-                                    
-                                    <Button asChild variant="link" className="p-0 justify-start self-start mt-2">
-                                        <Link href="/order">
-                                            Learn More <ArrowRight />
-                                        </Link>
-                                    </Button>
-                                </div>
-                                <div className="flex items-center justify-center bg-primary/5 rounded-2xl h-64 md:h-80">
-                                    <step.icon className="h-24 w-24 md:h-32 md:w-32 text-primary" />
                                 </div>
                             </div>
                         </CardContent>
@@ -114,8 +107,8 @@ emblaApi.on('autoplay:stop', () => setIsPlaying(false));
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="absolute -left-4 md:-left-16 top-1/2 -translate-y-1/2 z-10" />
-            <CarouselNext className="absolute -right-4 md:-right-16 top-1/2 -translate-y-1/2 z-10" />
+            <CarouselPrevious className="absolute -left-4 top-1/2 -translate-y-1/2 z-10" />
+            <CarouselNext className="absolute -right-4 top-1/2 -translate-y-1/2 z-10" />
           </Carousel>
            <div className="absolute bottom-[-40px] left-1/2 -translate-x-1/2 flex items-center justify-center gap-4 mt-8">
               <Button variant="ghost" size="icon" onClick={togglePlay} className="h-10 w-10 rounded-full bg-background/50 backdrop-blur-sm border-border hover:bg-background/80">
@@ -137,6 +130,39 @@ emblaApi.on('autoplay:stop', () => setIsPlaying(false));
               </div>
             </div>
         </div>
+
+        {/* Desktop Grid/Timeline */}
+        <div className="hidden md:grid md:grid-cols-2 gap-8 lg:gap-12">
+            {steps.map((step, index) => (
+                <Card key={step.number} className="overflow-hidden bg-background p-4 md:p-6 h-full flex flex-col">
+                    <CardContent className="p-0 flex flex-col h-full">
+                        <div className="flex flex-col space-y-4 text-left h-full justify-between">
+                            <div>
+                                <div className="flex items-center gap-4">
+                                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border-2 border-primary bg-primary/10 text-2xl font-bold text-primary">
+                                        {step.number}
+                                    </div>
+                                    <h3 className="text-2xl font-semibold">{step.title}</h3>
+                                </div>
+                                <p className="text-muted-foreground text-base mt-4">{step.description}</p>
+                            </div>
+                            <div className="border-t pt-4 mt-4">
+                                <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground mb-3">Key Details</h4>
+                                <ul className="space-y-2">
+                                    {step.details.map((detail, i) => (
+                                        <li key={i} className="flex items-start gap-3">
+                                            <ArrowRight className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
+                                            <span className="text-muted-foreground">{detail}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            ))}
+        </div>
+
       </div>
     </section>
   );
