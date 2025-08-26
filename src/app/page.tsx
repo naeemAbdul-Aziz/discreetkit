@@ -12,13 +12,13 @@ import { PartnerLogos } from './(components)/partner-logos';
 import { OurVision } from './(components)/our-vision';
 import { TrustStats } from './(components)/trust-stats';
 import { CoverageMap } from './(components)/coverage-map';
-import { RecentOrders } from './(components)/recent-orders';
 import { WhatsInTheKit } from './(components)/whats-in-the-kit';
 
 export default function Home() {
   return (
     <div className="flex flex-col">
       <Hero />
+      <ProductBenefits />
       <PartnerLogos />
       <HowItWorks />
       <ProductCarousel />
@@ -29,7 +29,6 @@ export default function Home() {
       <CoverageMap />
       <Faq />
       <ClosingCta />
-      <RecentOrders />
     </div>
   );
 }

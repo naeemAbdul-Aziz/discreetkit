@@ -17,7 +17,6 @@ import { useToast } from '@/hooks/use-toast';
 import { AlertCircle, Loader2, ShieldCheck } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ChatTrigger } from '@/components/chat-trigger';
-import { RecentOrders } from '../(components)/recent-orders';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -146,7 +145,6 @@ export default function OrderPage() {
         <SubmitButton />
       </form>
     </div>
-    <RecentOrders />
     </>
   );
 }
