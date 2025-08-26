@@ -78,12 +78,6 @@ export function ProductCarousel() {
                          <div className="flex-grow flex flex-col">
                             <CardContent className="p-0 flex-grow flex flex-col">
                                 <div className="relative bg-muted p-4 overflow-hidden">
-                                    {product.is_student_bundle && (
-                                        <Badge className="absolute top-4 left-4 z-10 flex items-center gap-1.5 bg-secondary text-secondary-foreground hover:bg-secondary/90">
-                                            <GraduationCap className="h-3.5 w-3.5" />
-                                            Student Bundle
-                                        </Badge>
-                                    )}
                                     <Image
                                         src={product.imageUrl}
                                         alt={product.name}
@@ -94,6 +88,12 @@ export function ProductCarousel() {
                                     />
                                 </div>
                                 <div className="p-6 flex flex-col flex-grow">
+                                    {product.is_student_bundle && (
+                                        <Badge variant="secondary" className="w-fit flex items-center gap-1.5 mb-2">
+                                            <GraduationCap className="h-3.5 w-3.5" />
+                                            Student Bundle
+                                        </Badge>
+                                    )}
                                     <h3 className="text-xl font-semibold flex-grow">{product.name}</h3>
                                     <p className="text-muted-foreground text-sm mt-1">{product.description}</p>
                                     
