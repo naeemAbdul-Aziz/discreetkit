@@ -74,7 +74,7 @@ export function ProductCarousel() {
                       "product-carousel-item"
                     )}
                   >
-                      <Card className="h-full flex flex-col overflow-hidden rounded-2xl group transition-all duration-300 hover:shadow-xl">
+                      <Card className="h-full flex flex-col overflow-hidden rounded-2xl shadow-xl">
                          <div className="flex-grow flex flex-col">
                             <CardContent className="p-0 flex-grow flex flex-col">
                                 <div className="relative bg-muted p-4 overflow-hidden">
