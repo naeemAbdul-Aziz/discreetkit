@@ -62,7 +62,7 @@ export function Hero() {
   return (
     <section className="w-full bg-background overflow-hidden">
       <div className="container mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center py-12 md:py-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center py-8 md:py-24">
           
           {/* Left Column: Text Content */}
           <div className="flex flex-col justify-center text-left">
@@ -71,13 +71,13 @@ export function Hero() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
              >
-                <h1 className="font-headline text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+                <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-5xl">
                     Private Health Answers, <span className="text-primary/80">Delivered with Trust.</span>
                 </h1>
-                <p className="mt-6 text-base max-w-prose text-muted-foreground md:text-lg">
+                <p className="mt-4 text-sm max-w-prose text-muted-foreground md:text-lg">
                     DiscreetKit empowers you to take control of your health with confidential, reliable, and easy-to-use self-test kits delivered anywhere in Ghana.
                 </p>
-                <div className="mt-10 flex items-center gap-x-6">
+                <div className="mt-8 flex items-center gap-x-6">
                     <Button asChild size="lg">
                         <Link href="/order">
                         Order Your Test Kit
@@ -95,7 +95,7 @@ export function Hero() {
 
           {/* Right Column: Image and Stats */}
           <motion.div 
-            className="relative flex items-center justify-center min-h-[400px] md:min-h-[500px]"
+            className="relative flex items-center justify-center min-h-[350px] md:min-h-[500px]"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
