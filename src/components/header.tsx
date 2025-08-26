@@ -31,48 +31,42 @@ export function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const NavLink = ({ href, label }: { href: string, label: string }) => (
+    <Link
+      href={href}
+      className={cn(
+        'transition-colors hover:text-foreground/80 px-3 py-1.5 rounded-full text-sm',
+        pathname === href ? 'bg-muted text-foreground font-semibold' : 'text-foreground/60'
+      )}
+    >
+      {label}
+    </Link>
+  );
+
   return (
     <>
     <div className="bg-primary text-primary-foreground text-center text-sm p-2">
       Free Delivery on UG Campus! <Link href="/order" className="underline font-semibold">Shop Now</Link>
     </div>
-    <header className={cn("sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60", isScrolled ? "shadow-sm" : "")}>
-        <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between">
+    <header className={cn("sticky top-0 z-50 w-full p-2")}>
+        <div className={cn("container mx-auto flex h-14 max-w-7xl items-center justify-between rounded-2xl border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60", isScrolled ? "shadow-md" : "")}>
           
-          <nav className="hidden md:flex items-center gap-6 text-sm">
+          <nav className="hidden md:flex items-center gap-1">
             {navLinksLeft.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  'transition-colors hover:text-foreground/80',
-                  pathname === link.href ? 'text-foreground font-semibold' : 'text-foreground/60'
-                )}
-              >
-                {link.label}
-              </Link>
+              <NavLink key={link.href} {...link} />
             ))}
           </nav>
 
-          <Link href="/" className="flex items-center space-x-2">
+          <Link href="/" className="flex items-center space-x-2 absolute left-1/2 -translate-x-1/2">
             <ShieldCheck className="h-7 w-7 text-primary" />
-            <span className="font-bold text-lg">DiscreetKit</span>
+            <span className="font-bold text-lg hidden sm:inline-block">DiscreetKit</span>
           </Link>
 
-          <div className="hidden md:flex items-center justify-end gap-6 text-sm">
+          <div className="hidden md:flex items-center justify-end gap-1">
             {navLinksRight.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  'transition-colors hover:text-foreground/80',
-                  pathname === link.href ? 'text-foreground font-semibold' : 'text-foreground/60'
-                )}
-              >
-                {link.label}
-              </Link>
+               <NavLink key={link.href} {...link} />
             ))}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 pl-2">
               <Button variant="ghost" size="icon">
                 <User className="h-5 w-5" />
                 <span className="sr-only">Account</span>
@@ -85,7 +79,11 @@ export function Header() {
           </div>
 
           {/* Mobile Menu */}
-          <div className="flex items-center md:hidden">
+          <div className="flex items-center md:hidden w-full justify-between">
+             <Link href="/" className="flex items-center space-x-2">
+                <ShieldCheck className="h-6 w-6 text-primary" />
+                <span className="font-bold">DiscreetKit</span>
+            </Link>
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon">
@@ -93,24 +91,32 @@ export function Header() {
                   <span className="sr-only">Toggle Menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-full max-w-sm">
+              <SheetContent side="right" className="w-full max-w-sm">
                 <Link href="/" className="flex items-center space-x-2">
                   <ShieldCheck className="h-6 w-6 text-primary" />
                   <span className="font-bold">DiscreetKit</span>
                 </Link>
-                <div className="mt-8 flex flex-col space-y-4">
+                <div className="mt-8 flex flex-col space-y-2">
                   {[...navLinksLeft, ...navLinksRight].map((link) => (
                     <Link
                       key={link.href}
                       href={link.href}
                       className={cn(
-                        'text-lg transition-colors hover:text-foreground/80',
-                        pathname === link.href ? 'text-foreground' : 'text-foreground/60'
+                        'text-lg p-3 rounded-lg transition-colors hover:bg-muted',
+                        pathname === link.href ? 'bg-muted text-foreground font-semibold' : 'text-foreground/70'
                       )}
                     >
                       {link.label}
                     </Link>
                   ))}
+                </div>
+                 <div className="mt-8 border-t pt-4 flex items-center gap-4">
+                  <Button variant="outline" className="flex-1">
+                    My Account
+                  </Button>
+                  <Button className="flex-1">
+                    My Cart
+                  </Button>
                 </div>
               </SheetContent>
             </Sheet>
