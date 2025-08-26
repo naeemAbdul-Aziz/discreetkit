@@ -49,16 +49,16 @@ export function ProductCarousel() {
 
           {/* Left Introductory Card */}
           <div className="lg:col-span-1 flex">
-            <Card className="bg-primary/10 border-0 flex flex-col justify-between p-8 rounded-2xl w-full">
+            <Card className="bg-primary/10 flex flex-col justify-between p-8 rounded-2xl w-full shadow-xl">
                 <div>
-                    <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                    <h2 className="font-headline text-3xl font-bold tracking-tight text-primary sm:text-4xl">
                         Browse All Kits
                     </h2>
-                    <p className="mt-4 text-lg text-muted-foreground">
-                        We've built every part of our service with your <strong>privacy, convenience, and well-being</strong> in mind.
+                    <p className="mt-4 text-lg text-foreground">
+                        We've built every part of our service with your <strong className="text-primary font-semibold">privacy, convenience, and well-being</strong> in mind.
                     </p>
                 </div>
-                <Button asChild variant="link" className="mt-6 text-primary font-bold text-lg p-0 justify-start">
+                <Button asChild variant="link" className="mt-6 text-primary font-bold text-lg p-0 justify-start hover:text-accent">
                     <Link href="/order">
                         Browse All Kits
                         <ArrowRight />
@@ -92,13 +92,13 @@ export function ProductCarousel() {
                                         alt={product.name}
                                         width={400}
                                         height={300}
-                                        className="aspect-video object-contain mx-auto transition-transform duration-300 group-hover:scale-105"
+                                        className="aspect-video object-contain mx-auto transition-transform duration-300 rounded-lg"
                                         data-ai-hint="medical test kit"
                                     />
                                 </div>
                                 <div className="p-6 flex flex-col flex-grow">
                                     {product.is_student_bundle && (
-                                        <Badge variant="secondary" className="w-fit flex items-center gap-1.5 mb-2">
+                                        <Badge variant="secondary" className="w-fit flex items-center gap-1.5 mb-2 bg-green-100 text-green-800">
                                             <GraduationCap className="h-3.5 w-3.5" />
                                             Student Bundle
                                         </Badge>
