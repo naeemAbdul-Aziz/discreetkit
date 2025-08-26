@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from '@/components/ui/carousel';
-import { ArrowRight, Star, GraduationCap } from 'lucide-react';
+import { ArrowRight, Star, GraduationCap, ShoppingCart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useCallback, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -51,7 +51,7 @@ export function ProductCarousel() {
                 </div>
                 <Button asChild variant="link" className="mt-6 text-primary font-bold text-lg p-0 justify-start">
                     <Link href="/order">
-                        Order Your Test Kit
+                        Browse All Kits
                         <ArrowRight />
                     </Link>
                 </Button>
@@ -75,7 +75,7 @@ export function ProductCarousel() {
                     )}
                   >
                       <Card className="h-full flex flex-col overflow-hidden rounded-2xl group transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
-                         <Link href={`/order?product=${product.id}`} className="flex-grow flex flex-col">
+                         <div className="flex-grow flex flex-col">
                             <CardContent className="p-0 flex-grow flex flex-col">
                                 <div className="relative bg-muted p-4 overflow-hidden">
                                     {product.is_student_bundle && (
@@ -97,24 +97,17 @@ export function ProductCarousel() {
                                     <h3 className="text-xl font-semibold flex-grow">{product.name}</h3>
                                     <p className="text-muted-foreground text-sm mt-1">{product.description}</p>
                                     
-                                    <div className="flex items-center gap-1 mt-4">
-                                    {[...Array(5)].map((_, i) => (
-                                        <Star key={i} className="h-4 w-4 fill-accent text-accent" />
-                                    ))}
-                                    <span className="text-xs text-muted-foreground ml-1">({product.reviews} reviews)</span>
-                                    </div>
-
-                                    <div className="flex justify-between items-end mt-4">
-                                        <div>
-                                            <p className="font-semibold text-lg">GHS {product.priceGHS.toFixed(2)}</p>
-                                            <div className="text-sm text-primary font-semibold group-hover:underline">
-                                                Learn More
-                                            </div>
-                                        </div>
+                                    <div className="flex justify-between items-end mt-4 pt-4 border-t">
+                                        <p className="font-semibold text-lg">GHS {product.priceGHS.toFixed(2)}</p>
+                                        <Button asChild>
+                                            <Link href={`/order?product=${product.id}`}>
+                                                Order Now
+                                            </Link>
+                                        </Button>
                                     </div>
                                 </div>
                             </CardContent>
-                         </Link>
+                         </div>
                       </Card>
                   </CarouselItem>
                 ))}
