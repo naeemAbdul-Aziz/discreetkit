@@ -3,8 +3,8 @@
 
 import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
-import { useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useRef, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createOrderAction } from '@/lib/actions';
 import { products } from '@/lib/data';
 import { Button } from '@/components/ui/button';
@@ -28,10 +28,13 @@ function SubmitButton() {
   );
 }
 
-export default function OrderPage() {
+function OrderForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
+  
+  const selectedProductId = searchParams.get('product');
 
   const initialState = { message: null, errors: {}, success: false, code: null };
   const [state, dispatch] = useActionState(createOrderAction, initialState);
@@ -54,8 +57,7 @@ export default function OrderPage() {
   }, [state, router, toast]);
 
   return (
-    <>
-    <div className="container mx-auto max-w-4xl px-4 py-12 md:py-20">
+     <>
       <div className="text-center">
         <h1 className="font-headline text-4xl font-bold">Order Your Test Kit</h1>
         <p className="mt-2 text-lg text-muted-foreground">A simple, private, and secure process.</p>
@@ -72,12 +74,12 @@ export default function OrderPage() {
             <CardDescription>Choose the self-test kit you need. Your selection is confidential.</CardDescription>
           </CardHeader>
           <CardContent>
-            <RadioGroup name="productId" className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <RadioGroup name="productId" className="grid grid-cols-1 gap-4 md:grid-cols-2" defaultValue={selectedProductId ?? undefined}>
               {products.map((product) => (
                 <Label
                   key={product.id}
                   htmlFor={`product-${product.id}`}
-                  className="flex cursor-pointer flex-col rounded-lg border-2 border-muted bg-popover p-4 ring-offset-background transition-all hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 [&:has([data-state=checked])]:border-primary"
+                  className="flex cursor-pointer flex-col rounded-lg border-2 border-muted bg-popover p-4 ring-offset-background transition-all hover:bg-accent/50 [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/10"
                 >
                   <div className="flex w-full items-start justify-between">
                     <span className="font-bold">{product.name}</span>
@@ -144,7 +146,16 @@ export default function OrderPage() {
 
         <SubmitButton />
       </form>
-    </div>
     </>
   );
+}
+
+export default function OrderPage() {
+  return (
+    <div className="container mx-auto max-w-4xl px-4 py-12 md:py-20">
+      <Suspense fallback={<div>Loading...</div>}>
+        <OrderForm />
+      </Suspense>
+    </div>
+  )
 }
