@@ -2,16 +2,17 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { MapPin, University, Building } from 'lucide-react';
+import { University, Building } from 'lucide-react';
 import Image from 'next/image';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const locations = [
-  { name: 'Accra', icon: Building },
-  { name: 'University of Ghana, Legon', icon: University },
-  { name: 'UPSA', icon: University },
-  { name: 'Kumasi', icon: Building },
-  { name: 'GIMPA', icon: University },
-  { name: 'Cape Coast', icon: Building },
+  { name: 'Accra', icon: Building, top: '57%', left: '50%' },
+  { name: 'University of Ghana, Legon', icon: University, top: '50%', left: '53%' },
+  { name: 'UPSA', icon: University, top: '44%', left: '48%' },
+  { name: 'Kumasi', icon: Building, top: '35%', left: '30%' },
+  { name: 'GIMPA', icon: University, top: '52%', left: '42%' },
+  { name: 'Cape Coast', icon: Building, top: '75%', left: '35%' },
 ];
 
 const containerVariants = {
@@ -20,18 +21,16 @@ const containerVariants = {
     opacity: 1,
     transition: {
       staggerChildren: 0.15,
+      delayChildren: 0.3,
     },
   },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, x: -20 },
+  hidden: { opacity: 0, scale: 0.5 },
   visible: {
     opacity: 1,
-    x: 0,
-    transition: {
-      duration: 0.5,
-    },
+    scale: 1,
   },
 };
 
@@ -48,42 +47,46 @@ export function CoverageMap() {
           </p>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-          <motion.div 
-            className="relative flex items-center justify-center rounded-xl"
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-          >
-             <Image
-              src="https://placehold.co/500x500"
-              alt="Map of Ghana showing delivery zones"
-              width={500}
-              height={500}
-              className="rounded-xl shadow-xl object-cover"
-              data-ai-hint="map Ghana"
-            />
-          </motion.div>
+        <div className="mt-12">
+          <TooltipProvider>
+            <motion.div
+              className="relative w-full max-w-4xl mx-auto aspect-[16/10]"
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.5 }}
+            >
+              <Image
+                src="https://images.unsplash.com/photo-1619454019329-8e629471f2cd?w=1200&h=800&fit=crop"
+                alt="Map of Ghana"
+                fill
+                className="object-contain opacity-20"
+                data-ai-hint="map ghana stylized"
+              />
 
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-            className="space-y-4"
-          >
-            {locations.map((location, index) => (
-              <motion.div key={index} variants={itemVariants}>
-                <div className="flex items-center gap-4 rounded-xl border bg-card p-4 transition-all hover:shadow-md hover:-translate-y-1">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                    <location.icon className="h-5 w-5 text-primary" />
-                  </div>
-                  <span className="font-semibold text-lg text-foreground">{location.name}</span>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
+              {locations.map((location) => (
+                <Tooltip key={location.name}>
+                  <TooltipTrigger asChild>
+                    <motion.div
+                      className="absolute transform -translate-x-1/2 -translate-y-1/2"
+                      style={{ top: location.top, left: location.left }}
+                      variants={itemVariants}
+                      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                    >
+                      <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center cursor-pointer">
+                          <div className="w-5 h-5 rounded-full bg-primary shadow-lg flex items-center justify-center">
+                             <location.icon className="h-3 w-3 text-primary-foreground" />
+                          </div>
+                      </div>
+                    </motion.div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{location.name}</p>
+                  </TooltipContent>
+                </Tooltip>
+              ))}
+            </motion.div>
+          </TooltipProvider>
         </div>
       </div>
     </section>
