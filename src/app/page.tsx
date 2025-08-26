@@ -18,7 +18,6 @@ export default function Home() {
     <div className="flex flex-col">
       <Hero />
       <TrustStats />
-      <PartnerLogos />
       <HowItWorks />
       <ProductCarousel />
       <OurVision />
