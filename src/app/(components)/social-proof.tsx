@@ -31,7 +31,7 @@ export function SocialProof() {
                     <Star key={i} className="h-6 w-6 fill-current text-yellow-400" />
                   ))}
                 </div>
-                <Button variant="secondary" className="bg-white text-primary hover:bg-white/90">
+                <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
                     Read our reviews
                 </Button>
               </CardContent>
