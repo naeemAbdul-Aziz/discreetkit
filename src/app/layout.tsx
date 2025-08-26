@@ -1,6 +1,6 @@
 
 import type { Metadata } from 'next';
-import { Poppins } from 'next/font/google';
+import { Figtree } from 'next/font/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { Header } from '@/components/header';
@@ -8,10 +8,10 @@ import { Footer } from '@/components/footer';
 import { Toaster } from "@/components/ui/toaster";
 import { Chatbot } from '@/components/chatbot';
 
-const poppins = Poppins({
+const figtree = Figtree({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-poppins',
+  weight: ['300', '400', '500', '600', '700', '800', '900'],
+  variable: '--font-figtree',
 });
 
 export const metadata: Metadata = {
@@ -29,7 +29,7 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth">
        <head>
       </head>
-      <body className={cn('min-h-screen bg-background font-body antialiased', poppins.variable)}>
+      <body className={cn('min-h-screen bg-background font-body antialiased', figtree.variable)}>
         <div className="relative flex min-h-dvh flex-col bg-background">
           <Header />
           <main className="flex-1">{children}</main>

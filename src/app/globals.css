@@ -1,5 +1,5 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,7 +7,7 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%; /* Soft Linen White */
+    --background: 30 10% 98%; /* Soft Linen White */
     --foreground: 210 20% 18%; /* Deep Sapphire Text */
 
     --card: 0 0% 100%; /* Pure White */
@@ -16,13 +16,13 @@
     --popover: 0 0% 100%; /* Pure White */
     --popover-foreground: 210 20% 18%;
 
-    --primary: 205 85% 45%; /* Vibrant Ocean Blue */
+    --primary: 200 85% 45%; /* Vibrant Ocean Blue */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 140 80% 40%; /* Lively Spring Green */
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 20% 93%; /* Whispering Sky Gray */
+    --muted: 200 15% 93%; /* Whispering Sky Gray */
     --muted-foreground: 210 10% 40%;
 
     --accent: 30 90% 55%; /* Energetic Sunset Orange */
@@ -36,7 +36,7 @@
 
     --border: 210 15% 88%;
     --input: 210 15% 88%;
-    --ring: 205 85% 45%;
+    --ring: 200 85% 45%;
 
     --radius: 0.8rem;
   }
