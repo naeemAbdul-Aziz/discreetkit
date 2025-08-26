@@ -1,6 +1,6 @@
 
 import type { Metadata } from 'next';
-import { Manrope } from 'next/font/google';
+import { Poppins } from 'next/font/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { Header } from '@/components/header';
@@ -8,10 +8,10 @@ import { Footer } from '@/components/footer';
 import { Toaster } from "@/components/ui/toaster";
 import { Chatbot } from '@/components/chatbot';
 
-const manrope = Manrope({
+const poppins = Poppins({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '700', '800'],
-  variable: '--font-manrope',
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-poppins',
 });
 
 export const metadata: Metadata = {
@@ -29,7 +29,7 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth">
        <head>
       </head>
-      <body className={cn('min-h-screen bg-background font-body antialiased', manrope.variable)}>
+      <body className={cn('min-h-screen bg-background font-body antialiased', poppins.variable)}>
         <div className="relative flex min-h-dvh flex-col bg-background">
           <Header />
           <main className="flex-1">{children}</main>
