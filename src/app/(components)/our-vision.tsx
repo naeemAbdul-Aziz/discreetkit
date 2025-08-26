@@ -25,10 +25,10 @@ export function OurVision() {
     <section className="bg-muted py-12 md:py-20">
       <div className="container mx-auto max-w-4xl px-4 md:px-6">
         <div className="text-center">
-          <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+          <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground sm:text-4xl">
             The Vision Behind DiscreetKit
           </h2>
-          <p className="mt-4 text-lg text-muted-foreground">
+          <p className="mt-4 text-base text-muted-foreground md:text-lg">
             Built to tackle the challenge of <strong>health privacy and access</strong> in Ghana.
           </p>
         </div>
@@ -42,8 +42,8 @@ export function OurVision() {
                     <point.icon className="h-6 w-6 text-primary" />
                   </div>
                   <div className="flex-grow">
-                    <h3 className="text-xl font-semibold">{point.title}</h3>
-                    <p className="mt-2 text-muted-foreground">{point.description}</p>
+                    <h3 className="text-lg font-semibold md:text-xl">{point.title}</h3>
+                    <p className="mt-2 text-muted-foreground text-sm md:text-base">{point.description}</p>
                   </div>
                 </div>
               </CardContent>

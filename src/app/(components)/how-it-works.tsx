@@ -57,10 +57,10 @@ export function HowItWorks() {
     <section id="how-it-works" className="bg-muted py-12 md:py-24">
       <div className="container mx-auto max-w-5xl px-4">
         <div className="text-center mb-12">
-          <h2 className="mt-2 font-headline text-3xl font-bold text-foreground sm:text-4xl">
+          <h2 className="mt-2 font-headline text-2xl font-bold text-foreground sm:text-4xl">
             How DiscreetKit Works
           </h2>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
+          <p className="mt-4 max-w-2xl mx-auto text-base text-muted-foreground md:text-lg">
             A responsible and private path to your health answers in 4 simple steps.
           </p>
         </div>
@@ -84,9 +84,9 @@ export function HowItWorks() {
                                             <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border-2 border-primary bg-primary/10 text-2xl font-bold text-primary">
                                                 {step.number}
                                             </div>
-                                            <h3 className="text-2xl font-semibold">{step.title}</h3>
+                                            <h3 className="text-xl font-semibold md:text-2xl">{step.title}</h3>
                                         </div>
-                                        <p className="text-muted-foreground text-base mt-4">{step.description}</p>
+                                        <p className="text-muted-foreground text-sm mt-4 md:text-base">{step.description}</p>
                                     </div>
                                     <div className="border-t pt-4 mt-4">
                                         <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground mb-3">Key Details</h4>
@@ -94,7 +94,7 @@ export function HowItWorks() {
                                             {step.details.map((detail, i) => (
                                                 <li key={i} className="flex items-start gap-3">
                                                     <ArrowRight className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
-                                                    <span className="text-muted-foreground">{detail}</span>
+                                                    <span className="text-sm text-muted-foreground md:text-base">{detail}</span>
                                                 </li>
                                             ))}
                                         </ul>

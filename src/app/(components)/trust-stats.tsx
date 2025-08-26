@@ -54,17 +54,17 @@ export function TrustStats() {
           </motion.div>
           <div className="space-y-8">
             <div>
-              <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+              <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground sm:text-4xl">
                 Trusted by students and health professionals across Ghana
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
+              <p className="mt-4 text-base text-muted-foreground md:text-lg">
                 Our service is built on a foundation of <span className="font-semibold text-primary">trust, privacy, and strong community partnerships</span>.
               </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
               {stats.map((stat) => (
                 <div key={stat.label} className="text-center">
-                    <p className="text-4xl font-bold text-primary">{stat.value}</p>
+                    <p className="text-3xl font-bold text-primary md:text-4xl">{stat.value}</p>
                     <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
                 </div>
               ))}
@@ -75,5 +75,3 @@ export function TrustStats() {
     </section>
   );
 }
-
-

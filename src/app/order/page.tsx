@@ -59,8 +59,8 @@ function OrderForm() {
   return (
      <>
       <div className="text-center">
-        <h1 className="font-headline text-4xl font-bold">Order Your Test Kit</h1>
-        <p className="mt-2 text-lg text-muted-foreground">A simple, private, and secure process.</p>
+        <h1 className="font-headline text-3xl font-bold md:text-4xl">Order Your Test Kit</h1>
+        <p className="mt-2 text-base text-muted-foreground md:text-lg">A simple, private, and secure process.</p>
       </div>
 
        <div className="mt-8">

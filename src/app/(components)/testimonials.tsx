@@ -20,10 +20,10 @@ export function Testimonials() {
       <div className="container mx-auto max-w-5xl px-4 md:px-6">
         <div className="text-center">
           <p className="font-semibold text-primary">Reviews</p>
-          <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+          <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground sm:text-4xl">
             Trusted by People Like You
           </h2>
-          <p className="mt-4 text-lg text-muted-foreground">
+          <p className="mt-4 text-base text-muted-foreground md:text-lg">
             We're proud to provide a service that people trust.
           </p>
         </div>
@@ -46,7 +46,7 @@ export function Testimonials() {
                             <Star key={i} className="h-5 w-5 fill-current" />
                             ))}
                         </div>
-                        <blockquote className="mt-4 text-base flex-grow">
+                        <blockquote className="mt-4 text-sm flex-grow md:text-base">
                             "{testimonial.quote}"
                         </blockquote>
                     </div>
@@ -56,8 +56,8 @@ export function Testimonials() {
                                 <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
                             </Avatar>
                             <div>
-                                <p className="font-semibold">{testimonial.name}</p>
-                                <p className="text-sm opacity-80">{testimonial.role}</p>
+                                <p className="font-semibold text-sm md:text-base">{testimonial.name}</p>
+                                <p className="text-xs opacity-80 md:text-sm">{testimonial.role}</p>
                             </div>
                         </div>
                 </Card>

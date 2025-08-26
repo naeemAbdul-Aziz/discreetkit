@@ -71,10 +71,10 @@ export function Hero() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
              >
-                <h1 className="font-headline text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+                <h1 className="font-headline text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
                     Private Health Answers, <span className="text-primary/80">Delivered with Trust.</span>
                 </h1>
-                <p className="mt-6 text-lg max-w-prose text-muted-foreground">
+                <p className="mt-6 text-base max-w-prose text-muted-foreground md:text-lg">
                     DiscreetKit empowers you to take control of your health with confidential, reliable, and easy-to-use self-test kits delivered anywhere in Ghana.
                 </p>
                 <div className="mt-10 flex items-center gap-x-6">
