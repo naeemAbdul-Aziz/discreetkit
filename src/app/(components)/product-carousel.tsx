@@ -43,7 +43,7 @@ export function ProductCarousel() {
             <Card className="bg-primary/10 border-0 flex flex-col justify-between p-8 rounded-2xl w-full">
                 <div>
                     <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                        Our Science-Backed Products
+                        Browse All Kits
                     </h2>
                     <p className="mt-4 text-lg text-muted-foreground">
                         We've built every part of our service with your <strong>privacy, convenience, and well-being</strong> in mind.
@@ -74,7 +74,7 @@ export function ProductCarousel() {
                       "product-carousel-item"
                     )}
                   >
-                      <Card className="h-full flex flex-col overflow-hidden rounded-2xl group transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
+                      <Card className="h-full flex flex-col overflow-hidden rounded-2xl group transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                          <div className="flex-grow flex flex-col">
                             <CardContent className="p-0 flex-grow flex flex-col">
                                 <div className="relative bg-muted p-4 overflow-hidden">
@@ -101,6 +101,7 @@ export function ProductCarousel() {
                                         <p className="font-semibold text-lg">GHS {product.priceGHS.toFixed(2)}</p>
                                         <Button asChild>
                                             <Link href={`/order?product=${product.id}`}>
+                                                <ShoppingCart />
                                                 Order Now
                                             </Link>
                                         </Button>
