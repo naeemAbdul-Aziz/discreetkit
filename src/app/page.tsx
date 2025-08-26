@@ -9,18 +9,22 @@ import { ProductBenefits } from './(components)/product-benefits';
 import { Faq } from './(components)/faq';
 import { ContactUs } from './(components)/contact-us';
 import { PartnerLogos } from './(components)/partner-logos';
+import { OurVision } from './(components)/our-vision';
+import { TrustStats } from './(components)/trust-stats';
+import { CoverageMap } from './(components)/coverage-map';
 
 export default function Home() {
   return (
     <div className="flex flex-col">
       <Hero />
+      <TrustStats />
       <PartnerLogos />
-      <ProductBenefits />
-      <ProductCarousel />
       <HowItWorks />
+      <ProductCarousel />
+      <OurVision />
       <Testimonials />
+      <CoverageMap />
       <Faq />
-      <ContactUs />
       <ClosingCta />
     </div>
   );

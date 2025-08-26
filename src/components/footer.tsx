@@ -7,7 +7,7 @@ export function Footer() {
     company: [
       { href: '/#how-it-works', label: 'How It Works' },
       { href: '/#faq', label: 'FAQ' },
-      { href: '/#contact', label: 'Contact Us' },
+      { href: '/partners', label: 'Partners' },
     ],
     legal: [
       { href: '/privacy', label: 'Privacy Policy' },
@@ -31,9 +31,9 @@ export function Footer() {
           </div>
 
           {/* Links Sections */}
-          <div className="grid grid-cols-2 gap-8 md:col-span-5 md:col-start-6">
+          <div className="grid grid-cols-2 gap-8 md:col-span-5 md:col-start-8">
             <div>
-              <h3 className="mb-4 font-semibold tracking-wider">Company</h3>
+              <h3 className="mb-4 font-semibold tracking-wider text-foreground">Company</h3>
               <ul className="space-y-3">
                 {footerLinks.company.map((link) => (
                   <li key={link.href}>
@@ -45,7 +45,7 @@ export function Footer() {
               </ul>
             </div>
             <div>
-              <h3 className="mb-4 font-semibold tracking-wider">Legal</h3>
+              <h3 className="mb-4 font-semibold tracking-wider text-foreground">Legal</h3>
               <ul className="space-y-3">
                 {footerLinks.legal.map((link) => (
                   <li key={link.href}>
