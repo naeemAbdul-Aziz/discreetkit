@@ -79,7 +79,7 @@ function OrderForm() {
                 <Label
                   key={product.id}
                   htmlFor={`product-${product.id}`}
-                  className="flex cursor-pointer flex-col rounded-lg border-2 border-muted bg-popover p-4 ring-offset-background transition-all hover:bg-accent/50 [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/10"
+                  className="flex cursor-pointer flex-col rounded-lg border-2 border-muted bg-popover p-4 ring-offset-background transition-all hover:bg-muted/50 [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/10"
                 >
                   <div className="flex w-full items-start justify-between">
                     <span className="font-bold">{product.name}</span>
