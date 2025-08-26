@@ -1,3 +1,4 @@
+
 'use client';
 
 import { products } from '@/lib/data';
@@ -18,6 +19,15 @@ export function ProductCarousel() {
   const updateCarousel = useCallback((api: CarouselApi) => {
     if (!api) return;
     setCurrent(api.selectedScrollSnap());
+
+    // Add/remove 'is-active' class
+    api.slideNodes().forEach((node, index) => {
+      if (index === api.selectedScrollSnap()) {
+        node.classList.add('is-active');
+      } else {
+        node.classList.remove('is-active');
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -69,7 +79,7 @@ export function ProductCarousel() {
                   <CarouselItem 
                     key={product.id} 
                     className={cn(
-                      "md:basis-1/2 basis-full pl-4 transition-transform-opacity",
+                      "md:basis-1/2 basis-full pl-4",
                       "product-carousel-item"
                     )}
                   >

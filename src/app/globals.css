@@ -59,13 +59,13 @@
   
   .product-carousel-item {
     transition: transform 0.4s ease, opacity 0.4s ease;
-    transform-origin: bottom center;
+    transform-origin: center center;
   }
   
   /* Styling for the slides that are not active */
   .product-carousel-container:not(:hover) .product-carousel-item:not(.is-active) {
-    transform: scale(0.9) translateY(20px);
-    opacity: 0.5;
+    transform: scale(0.9);
+    opacity: 0.6;
   }
   
   /* Active slide is always fully visible and scaled up */
@@ -75,25 +75,12 @@
     z-index: 10;
   }
 
-  @media (max-width: 767px) {
-    .embla__container {
-      /* This allows the stacked cards to overlap correctly */
-      transform-style: preserve-3d;
-    }
-    .product-carousel-item {
-      /* Give each item its own stacking context */
-      transform-style: preserve-3d;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-    }
-
-    .product-carousel-item:not(.is-active) {
-      z-index: 1;
-    }
-
-    .product-carousel-item.is-active {
-      z-index: 10;
-    }
+  /* On hover, bring all items to full opacity/scale */
+  .product-carousel-container:hover .product-carousel-item {
+    transform: scale(1);
+    opacity: 1;
   }
+
 }
+
 
