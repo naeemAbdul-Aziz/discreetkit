@@ -57,7 +57,7 @@ export function Header() {
             ))}
           </nav>
 
-          <Link href="/" className="flex items-center space-x-2 absolute left-1/2 -translate-x-1/2">
+          <Link href="/" className="hidden md:flex items-center space-x-2 absolute left-1/2 -translate-x-1/2">
             <ShieldCheck className="h-7 w-7 text-primary" />
             <span className="font-bold text-lg hidden sm:inline-block">DiscreetKit</span>
           </Link>
