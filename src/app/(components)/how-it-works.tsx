@@ -65,8 +65,7 @@ export function HowItWorks() {
           </p>
         </div>
 
-        {/* Mobile Carousel */}
-        <div className="relative md:hidden">
+        <div className="relative">
           <Carousel
             setApi={setEmblaApi}
             opts={{ align: 'start', loop: true }}
@@ -76,13 +75,13 @@ export function HowItWorks() {
             <CarouselContent className="-ml-4">
               {steps.map((step) => (
                 <CarouselItem key={step.number} className="pl-4">
-                    <Card className="overflow-hidden bg-background p-4 md:p-6 h-full">
+                    <Card className="overflow-hidden bg-background p-4 md:p-8 h-full shadow-lg">
                         <CardContent className="p-0 flex flex-col h-full">
-                            <div className="grid grid-cols-1 items-center flex-grow">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center flex-grow">
                                 <div className="flex flex-col space-y-4 text-left h-full justify-between">
                                     <div>
-                                        <div className="flex items-center gap-3">
-                                            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-primary bg-primary/10 text-xl font-bold text-primary">
+                                        <div className="flex items-center gap-4">
+                                            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border-2 border-primary bg-primary/10 text-2xl font-bold text-primary">
                                                 {step.number}
                                             </div>
                                             <h3 className="text-2xl font-semibold">{step.title}</h3>
@@ -101,16 +100,19 @@ export function HowItWorks() {
                                         </ul>
                                     </div>
                                 </div>
+                                <div className="hidden md:flex items-center justify-center bg-muted/50 rounded-xl h-64">
+                                  <step.icon className="h-32 w-32 text-primary/70" strokeWidth={1.5} />
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="absolute -left-4 top-1/2 -translate-y-1/2 z-10" />
-            <CarouselNext className="absolute -right-4 top-1/2 -translate-y-1/2 z-10" />
+            <CarouselPrevious className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 hidden md:flex" />
+            <CarouselNext className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 hidden md:flex" />
           </Carousel>
-           <div className="absolute bottom-[-40px] left-1/2 -translate-x-1/2 flex items-center justify-center gap-4 mt-8">
+           <div className="flex items-center justify-center gap-4 mt-8">
               <Button variant="ghost" size="icon" onClick={togglePlay} className="h-10 w-10 rounded-full bg-background/50 backdrop-blur-sm border-border hover:bg-background/80">
                 {isPlaying ? <Pause className="h-5 w-5 text-foreground" /> : <Play className="h-5 w-5 text-foreground" />}
                 <span className="sr-only">{isPlaying ? 'Pause carousel' : 'Play carousel'}</span>
@@ -130,39 +132,6 @@ export function HowItWorks() {
               </div>
             </div>
         </div>
-
-        {/* Desktop Grid/Timeline */}
-        <div className="hidden md:grid md:grid-cols-2 gap-8 lg:gap-12">
-            {steps.map((step, index) => (
-                <Card key={step.number} className="overflow-hidden bg-background p-4 md:p-6 h-full flex flex-col">
-                    <CardContent className="p-0 flex flex-col h-full">
-                        <div className="flex flex-col space-y-4 text-left h-full justify-between">
-                            <div>
-                                <div className="flex items-center gap-4">
-                                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border-2 border-primary bg-primary/10 text-2xl font-bold text-primary">
-                                        {step.number}
-                                    </div>
-                                    <h3 className="text-2xl font-semibold">{step.title}</h3>
-                                </div>
-                                <p className="text-muted-foreground text-base mt-4">{step.description}</p>
-                            </div>
-                            <div className="border-t pt-4 mt-4">
-                                <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground mb-3">Key Details</h4>
-                                <ul className="space-y-2">
-                                    {step.details.map((detail, i) => (
-                                        <li key={i} className="flex items-start gap-3">
-                                            <ArrowRight className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
-                                            <span className="text-muted-foreground">{detail}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-            ))}
-        </div>
-
       </div>
     </section>
   );
