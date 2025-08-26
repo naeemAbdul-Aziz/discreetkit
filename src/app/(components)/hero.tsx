@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle, Package, Star, TrendingUp } from 'lucide-react';
+import { ArrowRight, CheckCircle, Package, Star, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const statCards = [
@@ -17,8 +17,8 @@ const statCards = [
   },
   {
     icon: Package,
-    title: '10,000+ Kits Delivered',
-    subtitle: 'Across Ghana',
+    title: 'Discreet Packaging',
+    subtitle: 'Guaranteed Privacy',
     position: 'top-24 -right-4 md:-right-16',
   },
   {
@@ -28,9 +28,9 @@ const statCards = [
     position: 'bottom-20 -left-4 md:-left-20',
   },
   {
-    icon: TrendingUp,
-    title: 'Discreet Packaging',
-    subtitle: 'Guaranteed Privacy',
+    icon: ShieldCheck,
+    title: 'Secure & Anonymous',
+    subtitle: 'No Account Needed',
     position: 'bottom-8 -right-4 md:-right-12',
   },
 ];
@@ -72,10 +72,10 @@ export function Hero() {
                 transition={{ duration: 0.5 }}
              >
                 <h1 className="font-headline text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-                    Private Health Answers, Delivered with Trust.
+                    Private Health Answers, <span className="text-primary/80">Delivered with Trust.</span>
                 </h1>
-                <p className="mt-6 text-lg max-w-lg text-muted-foreground">
-                    DiscreetKit empowers you to take control of your health with confidential, reliable, and easy-to-use self-test kits delivered anywhere in Ghana.
+                <p className="mt-6 text-lg max-w-prose text-muted-foreground">
+                    AnonTest empowers you to take control of your health with confidential, reliable, and easy-to-use self-test kits delivered anywhere in Ghana.
                 </p>
                 <div className="mt-10 flex items-center gap-x-6">
                     <Button asChild size="lg">
@@ -105,19 +105,18 @@ export function Hero() {
             
             {/* Main Image */}
             <motion.div 
-                className="relative z-10 w-64 md:w-80"
+                className="relative z-10 w-64 h-64 md:w-80 md:h-80"
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
             >
                 <Image
-                    src="https://images.unsplash.com/photo-1520038410233-7141be7e6f97?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxib3h8ZW58MHx8fHwxNzU2MTQ5MDkyfDA&ixlib=rb-4.1.0&q=80&w=1080"
+                    src="https://img.freepik.com/free-photo/happy-woman-with-shopping-bags-near-door_23-2147672534.jpg"
                     alt="DiscreetKit test kit box"
-                    width={400}
-                    height={400}
-                    className="object-contain"
+                    fill
+                    className="object-cover rounded-xl shadow-2xl"
                     priority
-                    data-ai-hint="medical test kit"
+                    data-ai-hint="happy woman box"
                 />
             </motion.div>
             
@@ -126,7 +125,7 @@ export function Hero() {
                 <motion.div
                     key={card.title}
                     className={cn(
-                        'absolute z-20 p-3 rounded-xl bg-white/60 backdrop-blur-sm shadow-lg border border-white/20',
+                        'absolute z-20 p-3 rounded-xl bg-white/80 backdrop-blur-sm shadow-lg border border-white/20',
                         card.position
                     )}
                     variants={itemVariants}
