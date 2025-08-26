@@ -74,50 +74,48 @@ export function ProductCarousel() {
                       "product-carousel-item"
                     )}
                   >
-                    <div className="p-1">
-                      <Card className="h-full flex flex-col overflow-hidden rounded-2xl group">
-                         <CardContent className="p-0 flex-grow flex flex-col">
-                              <div className="relative bg-muted p-4">
-                                  {product.is_student_bundle && (
-                                      <Badge variant="secondary" className="absolute top-4 left-4 z-10 flex items-center gap-1.5">
-                                        <GraduationCap className="h-3.5 w-3.5" />
-                                        Student Bundle
-                                      </Badge>
-                                  )}
-                                  <Image
-                                      src={product.imageUrl}
-                                      alt={product.name}
-                                      width={400}
-                                      height={300}
-                                      className="aspect-video object-contain mx-auto transition-transform duration-300 group-hover:scale-105"
-                                      data-ai-hint="medical test kit"
-                                  />
-                              </div>
-                              <div className="p-6 flex flex-col flex-grow">
-                                  <h3 className="text-xl font-semibold flex-grow">{product.name}</h3>
-                                  <p className="text-muted-foreground text-sm mt-1">{product.description}</p>
-                                  
-                                  <div className="flex items-center gap-1 mt-4">
-                                  {[...Array(5)].map((_, i) => (
-                                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                                  ))}
-                                  <span className="text-xs text-muted-foreground ml-1">({product.reviews} reviews)</span>
-                                  </div>
-
-                                  <div className="flex justify-between items-end mt-4">
-                                    <div>
-                                      <p className="font-semibold text-lg">GHS {product.priceGHS.toFixed(2)}</p>
-                                      <Button variant="link" className="p-0 h-auto">
-                                          <Link href={`/order?product=${product.id}`}>
-                                              Learn More
-                                          </Link>
-                                      </Button>
+                      <Card className="h-full flex flex-col overflow-hidden rounded-2xl group transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
+                         <Link href={`/order?product=${product.id}`} className="flex-grow flex flex-col">
+                            <CardContent className="p-0 flex-grow flex flex-col">
+                                <div className="relative bg-muted p-4 overflow-hidden">
+                                    {product.is_student_bundle && (
+                                        <Badge className="absolute top-4 left-4 z-10 flex items-center gap-1.5 bg-secondary text-secondary-foreground hover:bg-secondary/90">
+                                            <GraduationCap className="h-3.5 w-3.5" />
+                                            Student Bundle
+                                        </Badge>
+                                    )}
+                                    <Image
+                                        src={product.imageUrl}
+                                        alt={product.name}
+                                        width={400}
+                                        height={300}
+                                        className="aspect-video object-contain mx-auto transition-transform duration-300 group-hover:scale-105"
+                                        data-ai-hint="medical test kit"
+                                    />
+                                </div>
+                                <div className="p-6 flex flex-col flex-grow">
+                                    <h3 className="text-xl font-semibold flex-grow">{product.name}</h3>
+                                    <p className="text-muted-foreground text-sm mt-1">{product.description}</p>
+                                    
+                                    <div className="flex items-center gap-1 mt-4">
+                                    {[...Array(5)].map((_, i) => (
+                                        <Star key={i} className="h-4 w-4 fill-accent text-accent" />
+                                    ))}
+                                    <span className="text-xs text-muted-foreground ml-1">({product.reviews} reviews)</span>
                                     </div>
-                                  </div>
-                              </div>
-                         </CardContent>
+
+                                    <div className="flex justify-between items-end mt-4">
+                                        <div>
+                                            <p className="font-semibold text-lg">GHS {product.priceGHS.toFixed(2)}</p>
+                                            <div className="text-sm text-primary font-semibold group-hover:underline">
+                                                Learn More
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </CardContent>
+                         </Link>
                       </Card>
-                    </div>
                   </CarouselItem>
                 ))}
               </CarouselContent>
