@@ -10,10 +10,29 @@ import { Badge } from '@/components/ui/badge';
 import { GraduationCap } from 'lucide-react';
 import { useCart } from '@/hooks/use-cart';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
 
 function AddToCartButton({ product }: { product: Product }) {
   const { addItem, updateQuantity, getItemQuantity } = useCart();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const quantity = getItemQuantity(product.id);
+
+  if (!isMounted) {
+    return (
+      <Button
+        variant="outline"
+        className="rounded-full"
+        onClick={() => addItem(product)}
+      >
+        <Plus className="mr-2 h-4 w-4" /> Add
+      </Button>
+    );
+  }
 
   if (quantity > 0) {
     return (
