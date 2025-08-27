@@ -79,7 +79,6 @@ export function Hero() {
                     width={500}
                     height={500}
                     className="object-contain rounded-3xl shadow-2xl z-10 w-full max-w-md h-auto"
-                    priority
                     data-ai-hint="happy woman box"
                 />
 
