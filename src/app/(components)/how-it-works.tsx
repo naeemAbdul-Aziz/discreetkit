@@ -32,29 +32,46 @@ export function HowItWorks() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
           {/* Left: Step Selector */}
-          <div className="flex flex-row md:flex-col justify-center md:justify-start gap-4">
-            {steps.map((step, index) => (
-              <button
-                key={step.number}
-                onClick={() => setActiveStep(index)}
-                className={cn(
-                  'flex-1 md:flex-none p-4 rounded-lg text-left transition-all duration-300 border-2',
-                  activeStep === index
-                    ? 'bg-primary/10 border-primary shadow-lg'
-                    : 'bg-muted/50 border-transparent hover:bg-primary/5'
-                )}
-              >
-                <div className="flex items-center gap-4">
-                    <div className={cn(
-                        "flex h-8 w-8 md:h-10 md:w-10 flex-shrink-0 items-center justify-center rounded-full text-lg md:text-xl font-bold transition-colors",
-                        activeStep === index ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
-                    )}>
-                        {step.number}
-                    </div>
-                    <span className="hidden sm:inline font-semibold text-sm md:text-base">{step.title}</span>
-                </div>
-              </button>
-            ))}
+          <div className="flex md:justify-center">
+            <div className="relative flex flex-row md:flex-col gap-x-8 md:gap-y-0">
+                {/* Connecting Line */}
+                <div className="absolute left-4 top-1/2 md:left-1/2 md:top-4 h-0.5 w-full md:h-full md:w-0.5 bg-border -translate-x-1/2 -translate-y-1/2" />
+                {/* Active Indicator */}
+                 <motion.div
+                    className="absolute left-0 top-1/2 md:left-1/2 md:top-0 h-8 w-8 rounded-full bg-primary -translate-x-1/2 -translate-y-1/2 transition-transform"
+                    animate={{ 
+                      x: activeStep * 48, // 32px width + 16px gap
+                      y: activeStep * 64,
+                    }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                    style={{
+                      ...(
+                        typeof window !== 'undefined' && window.innerWidth < 768
+                        ? {
+                            x: activeStep * 64, // 32px width + 32px gap on mobile
+                            y: '-50%'
+                          }
+                        : {
+                            x: '-50%',
+                            y: activeStep * 80 // Adjust this value based on your exact layout
+                        }
+                      )
+                    }}
+                 />
+
+                {steps.map((step, index) => (
+                    <button
+                        key={step.number}
+                        onClick={() => setActiveStep(index)}
+                        className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full text-lg font-bold transition-colors"
+                    >
+                        <span className={cn(
+                            "transition-colors",
+                            activeStep === index ? 'text-primary-foreground' : 'text-primary'
+                        )}>{step.number}</span>
+                    </button>
+                ))}
+            </div>
           </div>
 
           {/* Right: Step Content */}
