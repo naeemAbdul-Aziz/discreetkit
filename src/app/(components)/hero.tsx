@@ -87,7 +87,7 @@ export function Hero() {
                 {statCards.map((card) => (
                     <motion.div
                         key={card.title}
-                        className={`absolute z-20 ${card.position} hidden md:block`}
+                        className={`absolute z-20 ${card.position}`}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: card.delay }}
