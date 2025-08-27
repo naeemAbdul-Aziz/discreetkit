@@ -13,25 +13,25 @@ const statCards = [
     icon: CheckCircle,
     title: '99% Accuracy',
     subtitle: 'WHO-Approved Tests',
-    position: 'top-12 -left-4 md:-left-12',
+    position: 'md:top-12 md:-left-12',
   },
   {
     icon: Package,
     title: 'Discreet Packaging',
     subtitle: 'Guaranteed Privacy',
-    position: 'top-24 -right-4 md:-right-16',
+    position: 'md:top-24 md:-right-16',
   },
   {
     icon: Star,
     title: '4.9 Star Rating',
     subtitle: '1,600+ Reviews',
-    position: 'bottom-20 -left-4 md:-left-20',
+    position: 'md:bottom-20 md:-left-20',
   },
   {
     icon: ShieldCheck,
     title: 'Secure & Anonymous',
     subtitle: 'No Account Needed',
-    position: 'bottom-8 -right-4 md:-right-12',
+    position: 'md:bottom-8 md:-right-12',
   },
 ];
 
@@ -62,40 +62,11 @@ export function Hero() {
   return (
     <section className="w-full bg-background overflow-hidden">
       <div className="container mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center py-8 md:py-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center py-8 md:py-16">
           
-          {/* Left Column: Text Content */}
-          <div className="flex flex-col justify-center text-left">
-             <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-             >
-                <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-5xl">
-                    Private Health Answers, <span className="text-primary/80">Delivered with Trust.</span>
-                </h1>
-                <p className="mt-4 text-sm max-w-prose text-muted-foreground md:text-lg">
-                    DiscreetKit empowers you to take control of your health with confidential, reliable, and easy-to-use self-test kits delivered anywhere in Ghana.
-                </p>
-                <div className="mt-8 flex items-center gap-x-6">
-                    <Button asChild size="lg">
-                        <Link href="/order">
-                        Order Your Test Kit
-                        <ArrowRight />
-                        </Link>
-                    </Button>
-                    <Button asChild variant="link" size="lg">
-                        <Link href="#how-it-works">
-                            Learn More <span aria-hidden="true">→</span>
-                        </Link>
-                    </Button>
-                </div>
-             </motion.div>
-          </div>
-
-          {/* Right Column: Image and Stats */}
+          {/* Mobile Order: Image First */}
           <motion.div 
-            className="relative flex items-center justify-center min-h-[350px] md:min-h-[500px]"
+            className="relative flex items-center justify-center min-h-[300px] md:min-h-[500px] order-1 md:order-2"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -120,7 +91,7 @@ export function Hero() {
                 />
             </motion.div>
             
-            {/* Stat Cards */}
+            {/* Stat Cards for Desktop */}
             {statCards.map((card) => (
                 <motion.div
                     key={card.title}
@@ -141,8 +112,54 @@ export function Hero() {
                     </div>
                 </motion.div>
             ))}
-
           </motion.div>
+
+          {/* Stat Cards for Mobile */}
+          <div className="grid grid-cols-2 gap-4 md:hidden order-2">
+            {statCards.map((card) => (
+                 <div key={card.title} className="p-3 rounded-xl bg-muted/50">
+                    <div className="flex items-center gap-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary flex-shrink-0">
+                            <card.icon className="h-5 w-5" />
+                        </div>
+                        <div>
+                            <p className="text-sm font-semibold text-foreground">{card.title}</p>
+                            <p className="text-xs text-muted-foreground">{card.subtitle}</p>
+                        </div>
+                    </div>
+                </div>
+            ))}
+          </div>
+          
+          {/* Mobile Order: Text Content Last */}
+          <div className="flex flex-col justify-center text-center md:text-left order-3 md:order-1">
+             <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+             >
+                <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
+                    Private Health Answers, <span className="text-primary/80">Delivered with Trust.</span>
+                </h1>
+                <p className="mt-4 text-base max-w-prose text-muted-foreground md:text-lg mx-auto md:mx-0">
+                    DiscreetKit empowers you to take control of your health with confidential, reliable, and easy-to-use self-test kits delivered anywhere in Ghana.
+                </p>
+                <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
+                    <Button asChild size="lg" className="w-full sm:w-auto">
+                        <Link href="/order">
+                        Order Your Test Kit
+                        <ArrowRight />
+                        </Link>
+                    </Button>
+                    <Button asChild variant="link" size="lg">
+                        <Link href="#how-it-works">
+                            Learn More <span aria-hidden="true">→</span>
+                        </Link>
+                    </Button>
+                </div>
+             </motion.div>
+          </div>
+
         </div>
       </div>
     </section>
