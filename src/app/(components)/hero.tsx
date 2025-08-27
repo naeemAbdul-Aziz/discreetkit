@@ -13,25 +13,25 @@ const statCards = [
     icon: CheckCircle,
     title: '99% Accuracy',
     subtitle: 'WHO-Approved Tests',
-    position: 'md:top-12 md:-left-12',
+    position: 'top-4 -left-4',
   },
   {
     icon: Package,
     title: 'Discreet Packaging',
     subtitle: 'Guaranteed Privacy',
-    position: 'md:top-24 md:-right-16',
+    position: 'top-16 -right-4',
   },
   {
     icon: Star,
     title: '4.9 Star Rating',
     subtitle: '1,600+ Reviews',
-    position: 'md:bottom-20 md:-left-20',
+    position: 'bottom-16 -left-4',
   },
   {
     icon: ShieldCheck,
     title: 'Secure & Anonymous',
     subtitle: 'No Account Needed',
-    position: 'md:bottom-8 md:-right-12',
+    position: 'bottom-4 -right-4',
   },
 ];
 
@@ -91,12 +91,12 @@ export function Hero() {
                 />
             </motion.div>
             
-            {/* Stat Cards for Desktop */}
+            {/* Stat Cards for All Screens */}
             {statCards.map((card) => (
                 <motion.div
                     key={card.title}
                     className={cn(
-                        'absolute z-20 p-3 rounded-xl bg-white/80 backdrop-blur-sm shadow-lg border border-white/20 hidden md:flex',
+                        'absolute z-20 p-2.5 rounded-xl bg-white/80 backdrop-blur-sm shadow-lg border border-white/20 flex text-xs',
                         card.position
                     )}
                     variants={itemVariants}
@@ -106,33 +106,16 @@ export function Hero() {
                             <card.icon className="h-5 w-5" />
                         </div>
                         <div>
-                            <p className="text-sm font-semibold text-foreground">{card.title}</p>
-                            <p className="text-xs text-muted-foreground">{card.subtitle}</p>
+                            <p className="font-semibold text-foreground">{card.title}</p>
+                            <p className="text-muted-foreground">{card.subtitle}</p>
                         </div>
                     </div>
                 </motion.div>
             ))}
           </motion.div>
-
-          {/* Stat Cards for Mobile */}
-          <div className="grid grid-cols-2 gap-4 md:hidden order-2">
-            {statCards.map((card) => (
-                 <div key={card.title} className="p-3 rounded-xl bg-muted/50">
-                    <div className="flex items-center gap-3">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary flex-shrink-0">
-                            <card.icon className="h-5 w-5" />
-                        </div>
-                        <div>
-                            <p className="text-sm font-semibold text-foreground">{card.title}</p>
-                            <p className="text-xs text-muted-foreground">{card.subtitle}</p>
-                        </div>
-                    </div>
-                </div>
-            ))}
-          </div>
           
           {/* Mobile Order: Text Content Last */}
-          <div className="flex flex-col justify-center text-center md:text-left order-3 md:order-1">
+          <div className="flex flex-col justify-center text-center md:text-left order-2 md:order-1">
              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
