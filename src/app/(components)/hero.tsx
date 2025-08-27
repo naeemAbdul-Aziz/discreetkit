@@ -125,7 +125,7 @@ export function Hero() {
                 <motion.div
                     key={card.title}
                     className={cn(
-                        'absolute z-20 p-3 rounded-xl bg-white/80 backdrop-blur-sm shadow-lg border border-white/20',
+                        'absolute z-20 p-3 rounded-xl bg-white/80 backdrop-blur-sm shadow-lg border border-white/20 hidden md:flex',
                         card.position
                     )}
                     variants={itemVariants}
