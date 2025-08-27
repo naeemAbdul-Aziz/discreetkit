@@ -1,6 +1,7 @@
 
 import Link from 'next/link';
 import { ShieldCheck, Twitter, Instagram, Facebook } from 'lucide-react';
+import Image from 'next/image';
 
 export function Footer() {
   const footerLinks = {
@@ -22,8 +23,7 @@ export function Footer() {
           {/* Brand Section */}
           <div className="md:col-span-4">
             <Link href="/" className="mb-4 inline-flex items-center space-x-2">
-              <ShieldCheck className="h-8 w-8 text-primary" />
-              <span className="text-xl font-bold">DiscreetKit</span>
+              <Image src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1752715868/dk_logo_transparent_bigger_vsm4qe.png" alt="DiscreetKit Logo" width={140} height={35} />
             </Link>
             <p className="max-w-xs text-sm text-muted-foreground">
               Private health answers, delivered with trust. Confidential, reliable self-test kits in Ghana.

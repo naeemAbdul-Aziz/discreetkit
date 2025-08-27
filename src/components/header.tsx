@@ -8,6 +8,7 @@ import { Menu, ShieldCheck, ShoppingCart } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 const navLinksLeft = [
   { href: '/order', label: 'Shop' },
@@ -58,8 +59,7 @@ export function Header() {
           </nav>
 
           <Link href="/" className="hidden md:flex items-center space-x-2 absolute left-1/2 -translate-x-1/2">
-            <ShieldCheck className="h-7 w-7 text-primary" />
-            <span className="font-bold text-lg hidden sm:inline-block">DiscreetKit</span>
+            <Image src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1752715868/dk_logo_transparent_bigger_vsm4qe.png" alt="DiscreetKit Logo" width={120} height={30} />
           </Link>
 
           <div className="hidden md:flex items-center justify-end gap-1">
@@ -77,8 +77,7 @@ export function Header() {
           {/* Mobile Menu */}
           <div className="flex items-center md:hidden w-full justify-between">
              <Link href="/" className="flex items-center space-x-2">
-                <ShieldCheck className="h-6 w-6 text-primary" />
-                <span className="font-bold">DiscreetKit</span>
+                <Image src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1752715868/dk_logo_transparent_bigger_vsm4qe.png" alt="DiscreetKit Logo" width={100} height={25} />
             </Link>
             <Sheet>
               <SheetTrigger asChild>
@@ -89,8 +88,7 @@ export function Header() {
               </SheetTrigger>
               <SheetContent side="right" className="w-full max-w-sm">
                 <Link href="/" className="flex items-center space-x-2">
-                  <ShieldCheck className="h-6 w-6 text-primary" />
-                  <span className="font-bold">DiscreetKit</span>
+                   <Image src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1752715868/dk_logo_transparent_bigger_vsm4qe.png" alt="DiscreetKit Logo" width={100} height={25} />
                 </Link>
                 <div className="mt-8 flex flex-col space-y-2">
                   {[...navLinksLeft, ...navLinksRight].map((link) => (
