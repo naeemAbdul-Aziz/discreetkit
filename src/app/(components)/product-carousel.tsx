@@ -11,19 +11,13 @@ import { ArrowRight, ShoppingCart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { GraduationCap } from 'lucide-react';
 import { useCart } from '@/hooks/use-cart';
-import { useToast } from '@/hooks/use-toast';
 
 
 export function ProductCarousel() {
   const { addItem } = useCart();
-  const { toast } = useToast();
 
   const handleAddToCart = (product: Product) => {
     addItem(product);
-    toast({
-        title: "Added to cart",
-        description: `${product.name} has been added to your cart.`,
-    });
   }
 
   return (
