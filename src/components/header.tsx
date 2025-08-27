@@ -4,15 +4,11 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, ShieldCheck, ShoppingCart } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { useCart } from '@/hooks/use-cart';
-import { Cart } from '@/components/cart';
-import { Badge } from './ui/badge';
-
 
 const navLinksLeft = [
   { href: '/order', label: 'Shop' },
@@ -27,7 +23,6 @@ const navLinksRight = [
 export function Header() {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
-  const { totalItems } = useCart();
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -80,20 +75,6 @@ export function Header() {
             {navLinksRight.map((link) => (
                <NavLink key={link.href} {...link} />
             ))}
-            <div className="flex items-center gap-2 pl-2">
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="relative">
-                    {totalItems > 0 && (
-                      <Badge className="absolute -top-1 -right-1 h-5 w-5 justify-center p-0">{totalItems}</Badge>
-                    )}
-                    <ShoppingCart className="h-5 w-5" />
-                    <span className="sr-only">Cart</span>
-                  </Button>
-                </SheetTrigger>
-                <Cart />
-              </Sheet>
-            </div>
           </div>
 
           {/* Mobile Menu */}
@@ -103,19 +84,6 @@ export function Header() {
             </Link>
 
              <div className="flex items-center gap-2">
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="relative">
-                     {totalItems > 0 && (
-                      <Badge className="absolute -top-1 -right-1 h-5 w-5 justify-center p-0">{totalItems}</Badge>
-                    )}
-                    <ShoppingCart className="h-5 w-5" />
-                    <span className="sr-only">Cart</span>
-                  </Button>
-                </SheetTrigger>
-                <Cart />
-              </Sheet>
-
               <Sheet>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon">

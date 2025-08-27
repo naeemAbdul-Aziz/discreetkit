@@ -3,9 +3,7 @@
 
 import { useState } from 'react';
 import { Hero } from './(components)/hero';
-import { SocialProof } from './(components)/social-proof';
 import { ClosingCta } from './(components)/closing-cta';
-import { ProductCarousel } from './(components)/product-carousel';
 import { Testimonials } from './(components)/testimonials';
 import { Faq } from './(components)/faq';
 import { PartnerLogos } from './(components)/partner-logos';
@@ -16,6 +14,8 @@ import { FloatingProgress } from './(components)/floating-progress';
 import { StepSection } from './(components)/step-section';
 import { steps } from '@/lib/data';
 import { OurVision } from './(components)/our-vision';
+import { ProductSelector } from './(components)/product-selector';
+import { SummaryBar } from '@/components/summary-bar';
 
 export default function Home() {
   const [activeStep, setActiveStep] = useState(0);
@@ -49,7 +49,7 @@ export default function Home() {
         </div>
       </div>
 
-      <ProductCarousel />
+      <ProductSelector />
       <WhatsInTheKit />
       <TrustStats />
       <OurVision />
@@ -57,6 +57,7 @@ export default function Home() {
       <CoverageMap />
       <Faq />
       <ClosingCta />
+      <SummaryBar />
     </div>
   );
 }

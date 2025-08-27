@@ -18,9 +18,9 @@ export type Product = {
 export const products: Product[] = [
   {
     id: 1,
-    name: 'HIV/AIDS Self-Test Kit (Individual)',
-    slug: 'hiv-test-individual',
-    description: 'A single-use, private HIV self-test kit.',
+    name: 'Standard HIV Kit',
+    slug: 'standard-hiv-kit',
+    description: 'A single-use, private HIV self-test kit. WHO-approved for 99% accuracy.',
     priceGHS: 75.00,
     is_student_bundle: false,
     active: true,
@@ -29,36 +29,25 @@ export const products: Product[] = [
   },
   {
     id: 2,
-    name: 'HIV/AIDS Self-Test Kit (Couple Pack)',
-    slug: 'hiv-test-couple',
-    description: 'Two private HIV self-test kits for partners.',
-    priceGHS: 140.00,
-    is_student_bundle: true,
-    active: true,
-    imageUrl: 'https://images.unsplash.com/photo-1520038410233-7141be7e6f97?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxib3h8ZW58MHx8fHwxNzU2MTQ5MDkyfDA&ixlib=rb-4.1.0&q=80&w=1080',
-    reviews: 412
-  },
-  {
-    id: 3,
-    name: 'Pregnancy Test Kit',
-    slug: 'pregnancy-test',
-    description: 'Early detection pregnancy test. Accurate & easy.',
-    priceGHS: 40.00,
-    is_student_bundle: false,
-    active: true,
-    imageUrl: 'https://images.unsplash.com/photo-1606295835050-e17a6a239ccf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxtZWRpY2FsJTIwdGVzdCUyMGtpdHxlbnwwfHx8fDE3NTYxNDczODd8MA&ixlib=rb-4.1.0&q=80&w=1080',
-    reviews: 176
-  },
-  {
-    id: 4,
     name: 'Student Health Bundle',
     slug: 'student-bundle',
-    description: 'Includes one HIV test and one pregnancy test.',
+    description: 'Includes one HIV test and one pregnancy test. Special student pricing.',
     priceGHS: 110.00,
     is_student_bundle: true,
     active: true,
     imageUrl: 'https://images.unsplash.com/photo-1591185157258-11aec5f039d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8bWVkaWNhbCUyMHRlc3QlMjBraXR8ZW58MHx8fHwxNzU2MTQ3Mzg3fDA&ixlib=rb-4.1.0&q=80&w=1080',
     reviews: 350
+  },
+  {
+    id: 3,
+    name: 'Support Bundle (Couple)',
+    slug: 'couple-support-bundle',
+    description: 'Two private HIV self-test kits. Test together, support each other.',
+    priceGHS: 140.00,
+    is_student_bundle: false,
+    active: true,
+    imageUrl: 'https://images.unsplash.com/photo-1520038410233-7141be7e6f97?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxib3h8ZW58MHx8fHwxNzU2MTQ5MDkyfDA&ixlib=rb-4.1.0&q=80&w=1080',
+    reviews: 412
   },
 ]
 

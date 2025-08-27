@@ -21,6 +21,7 @@ interface CartState {
   removeItem: (productId: number) => void;
   updateQuantity: (productId: number, quantity: number) => void;
   clearCart: () => void;
+  getItemQuantity: (productId: number) => number;
 }
 
 const calculateTotals = (items: CartItem[]) => {
@@ -69,14 +70,14 @@ export const useCart = create<CartState>()(
       },
 
       updateQuantity: (productId, quantity) => {
+        let updatedItems;
         if (quantity < 1) {
-          get().removeItem(productId);
-          return;
+          updatedItems = get().items.filter((item) => item.id !== productId);
+        } else {
+            updatedItems = get().items.map((item) =>
+            item.id === productId ? { ...item, quantity } : item
+          );
         }
-
-        const updatedItems = get().items.map((item) =>
-          item.id === productId ? { ...item, quantity } : item
-        );
         const { totalItems, totalPrice } = calculateTotals(updatedItems);
         set({ items: updatedItems, totalItems, totalPrice });
       },
@@ -84,10 +85,14 @@ export const useCart = create<CartState>()(
       clearCart: () => {
         set({ items: [], totalItems: 0, totalPrice: 0 });
       },
+      
+      getItemQuantity: (productId) => {
+        return get().items.find(item => item.id === productId)?.quantity ?? 0;
+      }
     }),
     {
-      name: 'cart-storage', // name of the item in the storage (must be unique)
-      storage: createJSONStorage(() => localStorage), // (optional) by default, 'localStorage' is used
+      name: 'cart-storage',
+      storage: createJSONStorage(() => localStorage), 
       onRehydrateStorage: () => (state) => {
         if (state) {
           const { totalItems, totalPrice } = calculateTotals(state.items);
