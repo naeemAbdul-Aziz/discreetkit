@@ -11,7 +11,7 @@ export function Hero() {
   return (
     <section className="relative w-full h-[60vh] md:h-[70vh] text-white overflow-hidden">
       <Image
-        src="https://img.freepik.com/free-photo/happy-client-with-their-box-delivered_21540979.jpg"
+        src="https://img.freepik.com/free-photo/happy-client-with-their-box-delivered_23-2151323385.jpg"
         alt="A happy woman receiving a delivery box, representing discreet and satisfying service"
         fill
         className="object-cover"
