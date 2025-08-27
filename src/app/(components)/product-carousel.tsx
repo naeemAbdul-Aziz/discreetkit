@@ -7,41 +7,11 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from '@/components/ui/carousel';
-import { ArrowRight, Star, GraduationCap, ShoppingCart } from 'lucide-react';
+import { ArrowRight, ShoppingCart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { useCallback, useEffect, useState } from 'react';
-import { cn } from '@/lib/utils';
+import { GraduationCap } from 'lucide-react';
 
 export function ProductCarousel() {
-  const [api, setApi] = useState<CarouselApi>();
-  const [current, setCurrent] = useState(0);
-
-  const updateCarousel = useCallback((api: CarouselApi) => {
-    if (!api) return;
-    setCurrent(api.selectedScrollSnap());
-
-    // Add/remove 'is-active' class
-    api.slideNodes().forEach((node, index) => {
-      if (index === api.selectedScrollSnap()) {
-        node.classList.add('is-active');
-      } else {
-        node.classList.remove('is-active');
-      }
-    });
-  }, []);
-
-  useEffect(() => {
-    if (!api) return;
-    updateCarousel(api);
-    api.on('select', updateCarousel);
-    api.on('reInit', updateCarousel);
-    return () => {
-      api.off('select', updateCarousel);
-      api.off('reInit', updateCarousel);
-    };
-  }, [api, updateCarousel]);
-
-
   return (
     <section className="bg-background py-12 md:py-24">
       <div className="container mx-auto">
@@ -70,20 +40,16 @@ export function ProductCarousel() {
           {/* Right Product Carousel */}
           <div className="lg:col-span-2">
             <Carousel 
-              setApi={setApi}
               opts={{ align: 'start', loop: true }} 
-              className="w-full product-carousel-container"
+              className="w-full"
             >
               <CarouselContent className="-ml-4 md:-ml-4">
-                {products.map((product, index) => (
+                {products.map((product) => (
                   <CarouselItem 
                     key={product.id} 
-                    className={cn(
-                      "md:basis-1/2 basis-full pl-4",
-                      "product-carousel-item"
-                    )}
+                    className="md:basis-1/2 basis-full pl-4"
                   >
-                      <Card className="h-full flex flex-col overflow-hidden rounded-2xl shadow-xl">
+                      <Card className="h-full flex flex-col overflow-hidden rounded-2xl shadow-xl transition-shadow hover:shadow-2xl">
                          <div className="flex-grow flex flex-col">
                             <CardContent className="p-0 flex-grow flex flex-col">
                                 <div className="relative bg-muted p-4 overflow-hidden">

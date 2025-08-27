@@ -37,6 +37,7 @@
     --border: 210 15% 88%;
     --input: 210 15% 88%;
     --ring: 202 89% 74%;
+    --button-hover: 147 51% 41%;
 
     --radius: 0.8rem;
   }
@@ -50,35 +51,4 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
-}
-
-@layer utilities {
-  .product-carousel-container {
-    @apply overflow-visible;
-  }
-  
-  .product-carousel-item {
-    transition: transform 0.4s ease, opacity 0.4s ease;
-    transform-origin: center center;
-  }
-  
-  /* Styling for the slides that are not active */
-  .product-carousel-container:not(:hover) .product-carousel-item:not(.is-active) {
-    transform: scale(0.9);
-    opacity: 0.6;
-  }
-  
-  /* Active slide is always fully visible and scaled up */
-  .product-carousel-item.is-active {
-    transform: scale(1);
-    opacity: 1;
-    z-index: 10;
-  }
-
-  /* On hover, bring all items to full opacity/scale */
-  .product-carousel-container:hover .product-carousel-item {
-    transform: scale(1);
-    opacity: 1;
-  }
-
 }
