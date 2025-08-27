@@ -10,7 +10,7 @@ import { Testimonials } from './(components)/testimonials';
 import { Faq } from './(components)/faq';
 import { PartnerLogos } from './(components)/partner-logos';
 import { TrustStats } from './(components)/trust-stats';
-import { CoverageMap } from './(components/coverage-map';
+import { CoverageMap } from './(components)/coverage-map';
 import { WhatsInTheKit } from './(components)/whats-in-the-kit';
 import { FloatingProgress } from './(components)/floating-progress';
 import { StepSection } from './(components)/step-section';
