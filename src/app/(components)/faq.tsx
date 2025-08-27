@@ -8,7 +8,7 @@ export function Faq() {
     <section id="faq" className="bg-background py-12 md:py-20">
       <div className="container mx-auto max-w-4xl px-4 md:px-6">
         <div className="text-center">
-          <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+          <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
             Frequently Asked Questions
           </h2>
           <p className="mt-4 text-base text-muted-foreground">

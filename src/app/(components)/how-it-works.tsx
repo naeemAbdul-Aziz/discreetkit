@@ -57,7 +57,7 @@ export function HowItWorks() {
     <section id="how-it-works" className="bg-muted py-12 md:py-24">
       <div className="container mx-auto max-w-5xl px-4">
         <div className="text-center mb-12">
-          <h2 className="mt-2 font-headline text-2xl font-bold text-foreground sm:text-3xl">
+          <h2 className="mt-2 font-headline text-2xl font-bold text-foreground md:text-3xl">
             How DiscreetKit Works
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-base text-muted-foreground">
@@ -84,12 +84,12 @@ export function HowItWorks() {
                                             <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border-2 border-primary bg-primary/10 text-2xl font-bold text-primary">
                                                 {step.number}
                                             </div>
-                                            <h3 className="text-xl font-semibold">{step.title}</h3>
+                                            <h3 className="text-lg md:text-xl font-semibold">{step.title}</h3>
                                         </div>
                                         <p className="text-muted-foreground text-sm mt-4">{step.description}</p>
                                     </div>
                                     <div className="border-t pt-4 mt-4">
-                                        <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground mb-3">Key Details</h4>
+                                        <h4 className="font-semibold text-xs uppercase tracking-wider text-muted-foreground mb-3">Key Details</h4>
                                         <ul className="space-y-2">
                                             {step.details.map((detail, i) => (
                                                 <li key={i} className="flex items-start gap-3">

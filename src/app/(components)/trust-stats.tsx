@@ -54,7 +54,7 @@ export function TrustStats() {
           </motion.div>
           <div className="space-y-8">
             <div>
-              <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+              <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
                 Trusted by students and health professionals across Ghana
               </h2>
               <p className="mt-4 text-base text-muted-foreground">

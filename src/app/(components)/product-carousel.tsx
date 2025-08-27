@@ -19,9 +19,9 @@ export function ProductCarousel() {
 
           {/* Left Introductory Card */}
           <div className="lg:col-span-1 flex">
-            <Card className="bg-primary/10 flex flex-col justify-between p-8 rounded-2xl w-full shadow-xl">
+            <Card className="bg-primary/10 flex flex-col justify-between p-6 md:p-8 rounded-2xl w-full shadow-xl">
                 <div>
-                    <h2 className="font-headline text-2xl font-bold tracking-tight text-primary sm:text-3xl">
+                    <h2 className="font-headline text-2xl font-bold tracking-tight text-primary md:text-3xl">
                         Browse All Kits
                     </h2>
                     <p className="mt-4 text-base text-foreground">
@@ -69,7 +69,7 @@ export function ProductCarousel() {
                                             Student Bundle
                                         </Badge>
                                     )}
-                                    <h3 className="text-lg font-semibold flex-grow">{product.name}</h3>
+                                    <h3 className="text-base md:text-lg font-semibold flex-grow">{product.name}</h3>
                                     <p className="text-muted-foreground text-sm mt-1">{product.description}</p>
                                     
                                     <div className="flex justify-between items-end mt-4 pt-4 border-t">
