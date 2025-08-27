@@ -5,144 +5,49 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle, Package, Star, ShieldCheck } from 'lucide-react';
-import { cn } from '@/lib/utils';
-
-const statCards = [
-  {
-    icon: CheckCircle,
-    title: '99% Accuracy',
-    subtitle: 'WHO-Approved Tests',
-    position: 'top-4 -left-4',
-  },
-  {
-    icon: Package,
-    title: 'Discreet Packaging',
-    subtitle: 'Guaranteed Privacy',
-    position: 'top-16 -right-4',
-  },
-  {
-    icon: Star,
-    title: '4.9 Star Rating',
-    subtitle: '1,600+ Reviews',
-    position: 'bottom-16 -left-4',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Secure & Anonymous',
-    subtitle: 'No Account Needed',
-    position: 'bottom-4 -right-4',
-  },
-];
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.2,
-      delayChildren: 0.3,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      type: 'spring',
-      stiffness: 100,
-    },
-  },
-};
+import { ArrowRight } from 'lucide-react';
 
 export function Hero() {
   return (
-    <section className="w-full bg-background overflow-hidden">
-      <div className="container mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center py-8 md:py-16">
-          
-          {/* Mobile Order: Image First */}
-          <motion.div 
-            className="relative flex items-center justify-center min-h-[300px] md:min-h-[500px] order-1 md:order-2"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {/* Background Shape */}
-            <div className="absolute inset-0 bg-primary/5 rounded-3xl -rotate-6 transform-gpu"></div>
-            
-            {/* Main Image */}
-            <motion.div 
-                className="relative z-10 w-64 h-64 md:w-80 md:h-80"
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.2, duration: 0.5 }}
-            >
-                <Image
-                    src="https://img.freepik.com/free-photo/happy-woman-with-shopping-bags-near-door_23-2147672534.jpg"
-                    alt="DiscreetKit test kit box"
-                    fill
-                    className="object-cover rounded-xl shadow-2xl"
-                    priority
-                    data-ai-hint="happy woman box"
-                />
-            </motion.div>
-            
-            {/* Stat Cards for All Screens */}
-            {statCards.map((card) => (
-                <motion.div
-                    key={card.title}
-                    className={cn(
-                        'absolute z-20 p-2.5 rounded-xl bg-white/80 backdrop-blur-sm shadow-lg border border-white/20 flex text-xs',
-                        card.position
-                    )}
-                    variants={itemVariants}
-                >
-                    <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
-                            <card.icon className="h-5 w-5" />
-                        </div>
-                        <div>
-                            <p className="font-semibold text-foreground">{card.title}</p>
-                            <p className="text-muted-foreground">{card.subtitle}</p>
-                        </div>
-                    </div>
-                </motion.div>
-            ))}
-          </motion.div>
-          
-          {/* Mobile Order: Text Content Last */}
-          <div className="flex flex-col justify-center text-center md:text-left order-2 md:order-1">
+    <section className="relative w-full h-[60vh] md:h-[70vh] text-white overflow-hidden">
+      <Image
+        src="https://img.freepik.com/free-photo/happy-woman-with-shopping-bags-near-door_23-2147672534.jpg"
+        alt="A woman smiling, representing health and confidence"
+        fill
+        className="object-cover"
+        priority
+        data-ai-hint="happy woman box"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
+      
+      <div className="relative h-full flex flex-col justify-center items-start p-4 md:p-8">
+        <div className="container mx-auto">
              <motion.div
+                className="max-w-xl text-left"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
              >
-                <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
-                    Private Health Answers, <span className="text-primary/80">Delivered with Trust.</span>
+                <h1 className="font-headline text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
+                    Private Health Answers, <span className="opacity-80">Delivered with Trust.</span>
                 </h1>
-                <p className="mt-4 text-base max-w-prose text-muted-foreground md:text-lg mx-auto md:mx-0">
+                <p className="mt-4 text-base max-w-prose text-white/90 md:text-lg">
                     DiscreetKit empowers you to take control of your health with confidential, reliable, and easy-to-use self-test kits delivered anywhere in Ghana.
                 </p>
-                <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
-                    <Button asChild size="lg" className="w-full sm:w-auto">
+                <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 justify-start">
+                    <Button asChild size="lg" className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90">
                         <Link href="/order">
                         Order Your Test Kit
                         <ArrowRight />
                         </Link>
                     </Button>
-                    <Button asChild variant="link" size="lg">
+                    <Button asChild variant="link" size="lg" className="text-white hover:text-white/80">
                         <Link href="#how-it-works">
                             Learn More <span aria-hidden="true">→</span>
                         </Link>
                     </Button>
                 </div>
              </motion.div>
-          </div>
-
         </div>
       </div>
     </section>
