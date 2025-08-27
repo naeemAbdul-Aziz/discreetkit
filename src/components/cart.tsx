@@ -56,39 +56,36 @@ export function Cart() {
                     <p className="text-sm text-muted-foreground">
                       GHS {item.priceGHS.toFixed(2)}
                     </p>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-7 w-7"
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        disabled={item.quantity <= 1}
-                      >
-                        <Minus className="h-3.5 w-3.5" />
-                      </Button>
-                      <span>{item.quantity}</span>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-7 w-7"
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      >
-                        <Plus className="h-3.5 w-3.5" />
-                      </Button>
+                     <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-7 w-7"
+                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                disabled={item.quantity <= 1}
+                            >
+                                <Minus className="h-3.5 w-3.5" />
+                            </Button>
+                            <span className="w-5 text-center">{item.quantity}</span>
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-7 w-7"
+                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            >
+                                <Plus className="h-3.5 w-3.5" />
+                            </Button>
+                        </div>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-destructive"
+                            onClick={() => handleRemove(item.id)}
+                            >
+                            <Trash2 className="h-4 w-4" />
+                        </Button>
                     </div>
-                  </div>
-                  <div className="flex flex-col items-end gap-2">
-                    <p className="font-semibold">
-                      GHS {(item.priceGHS * item.quantity).toFixed(2)}
-                    </p>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                      onClick={() => handleRemove(item.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
                   </div>
                 </div>
               ))}
