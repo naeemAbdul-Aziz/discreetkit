@@ -17,7 +17,7 @@ export default function PartnersPage() {
 
   return (
     <div className="bg-background">
-      <div className="container mx-auto px-4 py-12 md:py-20">
+      <div className="container mx-auto px-4 py-12 md:py-20 md:px-6">
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="font-headline text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
             Our Trusted Partners

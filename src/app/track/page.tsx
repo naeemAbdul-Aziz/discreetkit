@@ -125,7 +125,7 @@ function Tracker() {
 
 export default function TrackPage() {
     return (
-        <div className="container mx-auto px-4 py-12 md:py-20 flex justify-center">
+        <div className="container mx-auto px-4 py-12 md:py-20 flex justify-center md:px-6">
             <Suspense fallback={<Loader2 className="h-8 w-8 animate-spin" />}>
                 <Tracker />
             </Suspense>

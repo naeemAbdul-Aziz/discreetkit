@@ -55,7 +55,7 @@ export function HowItWorks() {
 
   return (
     <section id="how-it-works" className="bg-muted py-12 md:py-24">
-      <div className="container mx-auto max-w-5xl px-4">
+      <div className="container mx-auto max-w-5xl px-4 md:px-6">
         <div className="text-center mb-12">
           <h2 className="mt-2 font-headline text-2xl font-bold text-foreground md:text-3xl">
             How DiscreetKit Works

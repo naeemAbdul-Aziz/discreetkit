@@ -9,7 +9,7 @@ import Autoplay from 'embla-carousel-autoplay';
 export function ProductBenefits() {
   return (
     <section className="bg-primary text-primary-foreground py-6">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 md:px-6">
         
         {/* Mobile: Carousel */}
         <div className="md:hidden">
