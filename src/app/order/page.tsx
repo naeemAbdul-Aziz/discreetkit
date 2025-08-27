@@ -14,9 +14,10 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { AlertCircle, Loader2, ShieldCheck } from 'lucide-react';
+import { AlertCircle, Loader2, ShieldCheck, ShoppingCart } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ChatTrigger } from '@/components/chat-trigger';
+import { useCart } from '@/hooks/use-cart';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -30,11 +31,10 @@ function SubmitButton() {
 
 function OrderForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   
-  const selectedProductId = searchParams.get('product');
+  const { items, clearCart } = useCart();
 
   const initialState = { message: null, errors: {}, success: false, code: null };
   const [state, dispatch] = useActionState(createOrderAction, initialState);
@@ -46,6 +46,7 @@ function OrderForm() {
         description: 'Redirecting to confirmation...',
         variant: 'default',
       });
+      clearCart();
       router.push(`/order/success?code=${state.code}`);
     } else if (state.message && !state.success) {
       toast({
@@ -54,12 +55,25 @@ function OrderForm() {
         variant: 'destructive',
       });
     }
-  }, [state, router, toast]);
+  }, [state, router, toast, clearCart]);
+
+  if (items.length === 0) {
+    return (
+        <div className="text-center space-y-4">
+            <ShoppingCart className="mx-auto h-24 w-24 text-muted-foreground/30" />
+            <h1 className="font-headline text-3xl font-bold md:text-4xl">Your Cart is Empty</h1>
+            <p className="mt-2 text-base text-muted-foreground md:text-lg">Looks like you haven't added any products yet.</p>
+            <Button asChild>
+                <a href="/#products">Start Shopping</a>
+            </Button>
+        </div>
+    )
+  }
 
   return (
      <>
       <div className="text-center">
-        <h1 className="font-headline text-3xl font-bold md:text-4xl">Order Your Test Kit</h1>
+        <h1 className="font-headline text-3xl font-bold md:text-4xl">Complete Your Order</h1>
         <p className="mt-2 text-base text-muted-foreground md:text-lg">A simple, private, and secure process.</p>
       </div>
 
@@ -68,30 +82,24 @@ function OrderForm() {
       </div>
 
       <form ref={formRef} action={dispatch} className="mt-8 space-y-8">
+        <input type="hidden" name="cartItems" value={JSON.stringify(items)} />
+
         <Card>
-          <CardHeader>
-            <CardTitle>1. Select Your Product</CardTitle>
-            <CardDescription>Choose the self-test kit you need. Your selection is confidential.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <RadioGroup name="productId" className="grid grid-cols-1 gap-4 md:grid-cols-2" defaultValue={selectedProductId ?? undefined}>
-              {products.map((product) => (
-                <Label
-                  key={product.id}
-                  htmlFor={`product-${product.id}`}
-                  className="flex cursor-pointer flex-col rounded-lg border-2 border-muted bg-popover p-4 ring-offset-background transition-all hover:bg-muted/50 [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/10"
-                >
-                  <div className="flex w-full items-start justify-between">
-                    <span className="font-bold">{product.name}</span>
-                    <RadioGroupItem value={String(product.id)} id={`product-${product.id}`} className="mt-1" />
-                  </div>
-                  <span className="text-sm text-muted-foreground mt-2">{product.description}</span>
-                  <span className="font-semibold mt-4">GHS {product.priceGHS.toFixed(2)}</span>
-                </Label>
-              ))}
-            </RadioGroup>
-             {state.errors?.productId && <p className="text-sm font-medium text-destructive mt-2">{state.errors.productId[0]}</p>}
-          </CardContent>
+            <CardHeader>
+                <CardTitle>1. Review Your Order</CardTitle>
+                <CardDescription>These are the items in your cart.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                {items.map(item => (
+                    <div key={item.id} className="flex justify-between items-center">
+                        <div>
+                            <p className="font-semibold">{item.name}</p>
+                            <p className="text-sm text-muted-foreground">Quantity: {item.quantity}</p>
+                        </div>
+                        <p className="font-semibold">GHS {(item.priceGHS * item.quantity).toFixed(2)}</p>
+                    </div>
+                ))}
+            </CardContent>
         </Card>
 
         <Card>

@@ -9,6 +9,10 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useCart } from '@/hooks/use-cart';
+import { Cart } from '@/components/cart';
+import { Badge } from './ui/badge';
+
 
 const navLinksLeft = [
   { href: '/order', label: 'Shop' },
@@ -23,6 +27,12 @@ const navLinksRight = [
 export function Header() {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
+  const { totalItems } = useCart();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -43,6 +53,10 @@ export function Header() {
       {label}
     </Link>
   );
+
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <>
@@ -67,10 +81,18 @@ export function Header() {
                <NavLink key={link.href} {...link} />
             ))}
             <div className="flex items-center gap-2 pl-2">
-              <Button variant="ghost" size="icon">
-                <ShoppingCart className="h-5 w-5" />
-                 <span className="sr-only">Cart</span>
-              </Button>
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" className="relative">
+                    {totalItems > 0 && (
+                      <Badge className="absolute -top-1 -right-1 h-5 w-5 justify-center p-0">{totalItems}</Badge>
+                    )}
+                    <ShoppingCart className="h-5 w-5" />
+                    <span className="sr-only">Cart</span>
+                  </Button>
+                </SheetTrigger>
+                <Cart />
+              </Sheet>
             </div>
           </div>
 
@@ -79,38 +101,49 @@ export function Header() {
              <Link href="/" className="flex items-center space-x-2">
                 <Image src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1752715868/dk_logo_transparent_bigger_vsm4qe.png" alt="DiscreetKit Logo" width={100} height={25} />
             </Link>
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-6 w-6" />
-                  <span className="sr-only">Toggle Menu</span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-full max-w-sm">
-                <Link href="/" className="flex items-center space-x-2">
-                   <Image src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1752715868/dk_logo_transparent_bigger_vsm4qe.png" alt="DiscreetKit Logo" width={100} height={25} />
-                </Link>
-                <div className="mt-8 flex flex-col space-y-2">
-                  {[...navLinksLeft, ...navLinksRight].map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className={cn(
-                        'text-lg p-3 rounded-lg transition-colors hover:bg-muted',
-                        pathname === link.href ? 'bg-muted text-foreground font-semibold' : 'text-foreground/70'
-                      )}
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
-                </div>
-                 <div className="mt-8 border-t pt-4 flex items-center gap-4">
-                  <Button className="flex-1">
-                    <ShoppingCart className="mr-2 h-4 w-4" /> My Cart
+
+             <div className="flex items-center gap-2">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" className="relative">
+                     {totalItems > 0 && (
+                      <Badge className="absolute -top-1 -right-1 h-5 w-5 justify-center p-0">{totalItems}</Badge>
+                    )}
+                    <ShoppingCart className="h-5 w-5" />
+                    <span className="sr-only">Cart</span>
                   </Button>
-                </div>
-              </SheetContent>
-            </Sheet>
+                </SheetTrigger>
+                <Cart />
+              </Sheet>
+
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Menu className="h-6 w-6" />
+                    <span className="sr-only">Toggle Menu</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-full max-w-sm">
+                  <Link href="/" className="flex items-center space-x-2">
+                    <Image src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1752715868/dk_logo_transparent_bigger_vsm4qe.png" alt="DiscreetKit Logo" width={100} height={25} />
+                  </Link>
+                  <div className="mt-8 flex flex-col space-y-2">
+                    {[...navLinksLeft, ...navLinksRight].map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className={cn(
+                          'text-lg p-3 rounded-lg transition-colors hover:bg-muted',
+                          pathname === link.href ? 'bg-muted text-foreground font-semibold' : 'text-foreground/70'
+                        )}
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
           </div>
       </div>
     </header>

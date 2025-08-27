@@ -1,7 +1,7 @@
 
 'use client';
 
-import { products } from '@/lib/data';
+import { products, type Product } from '@/lib/data';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -10,8 +10,22 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { ArrowRight, ShoppingCart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { GraduationCap } from 'lucide-react';
+import { useCart } from '@/hooks/use-cart';
+import { useToast } from '@/hooks/use-toast';
+
 
 export function ProductCarousel() {
+  const { addItem } = useCart();
+  const { toast } = useToast();
+
+  const handleAddToCart = (product: Product) => {
+    addItem(product);
+    toast({
+        title: "Added to cart",
+        description: `${product.name} has been added to your cart.`,
+    });
+  }
+
   return (
     <section className="bg-background py-12 md:py-24">
       <div className="container mx-auto px-4 md:px-6">
@@ -74,11 +88,9 @@ export function ProductCarousel() {
                                     
                                     <div className="flex justify-between items-end mt-4 pt-4 border-t">
                                         <p className="font-semibold text-base">GHS {product.priceGHS.toFixed(2)}</p>
-                                        <Button asChild>
-                                            <Link href={`/order?product=${product.id}`}>
-                                                <ShoppingCart />
-                                                Order Now
-                                            </Link>
+                                        <Button onClick={() => handleAddToCart(product)}>
+                                            <ShoppingCart />
+                                            Add to Cart
                                         </Button>
                                     </div>
                                 </div>

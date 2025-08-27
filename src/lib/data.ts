@@ -1,7 +1,19 @@
 
 import { BadgeCheck, Lock, ShieldCheck, Truck, Users, GraduationCap, Hospital, MapPin, ShoppingBag, MessageCircle, HeartHandshake } from "lucide-react"
 
-export const products = [
+export type Product = {
+    id: number;
+    name: string;
+    slug: string;
+    description: string;
+    priceGHS: number;
+    is_student_bundle: boolean;
+    active: boolean;
+    imageUrl: string;
+    reviews: number;
+}
+
+export const products: Product[] = [
   {
     id: 1,
     name: 'HIV/AIDS Self-Test Kit (Individual)',
@@ -227,7 +239,7 @@ export type Order = {
 // Mock database for orders
 const ordersDb: Map<string, Order> = new Map();
 
-export const createMockOrder = (productId: number): Order => {
+export const createMockOrder = (productId: number, quantity: number): Order => {
     const product = products.find(p => p.id === productId);
     if (!product) throw new Error('Product not found');
     
@@ -235,7 +247,7 @@ export const createMockOrder = (productId: number): Order => {
     const order: Order = {
         id: new Date().getTime().toString(),
         code,
-        productName: product.name,
+        productName: `${product.name} (x${quantity})`,
         status: 'received',
         events: [
             { status: 'Received', date: new Date().toISOString(), note: 'Your order has been received and is awaiting processing.' }
