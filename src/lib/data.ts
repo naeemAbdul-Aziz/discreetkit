@@ -1,5 +1,7 @@
 
+
 import { BadgeCheck, Lock, ShieldCheck, Truck, Users, GraduationCap, Hospital, MapPin, ShoppingBag, MessageCircle, HeartHandshake } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
 
 export type Product = {
     id: number;
@@ -180,7 +182,15 @@ export const faqItems = [
     }
 ];
 
-export const steps = [
+export type Step = {
+  number: string;
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  details: string[];
+};
+
+export const steps: Step[] = [
   {
     number: '1',
     title: 'Order Your Kit',
