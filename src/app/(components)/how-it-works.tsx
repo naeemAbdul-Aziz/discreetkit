@@ -54,7 +54,7 @@ export function HowItWorks() {
 
 
   return (
-    <section id="how-it-works" className="bg-muted py-12 md:py-24">
+    <section id="how-it-works" className="bg-background py-12 md:py-24">
       <div className="container mx-auto max-w-5xl px-4 md:px-6">
         <div className="text-center mb-12">
           <h2 className="mt-2 font-headline text-2xl font-bold text-foreground md:text-3xl">
@@ -75,7 +75,7 @@ export function HowItWorks() {
             <CarouselContent className="-ml-4">
               {steps.map((step) => (
                 <CarouselItem key={step.number} className="pl-4">
-                    <Card className="overflow-hidden bg-background p-4 md:p-8 h-full shadow-lg">
+                    <Card className="overflow-hidden bg-card p-4 md:p-8 h-full shadow-lg">
                         <CardContent className="p-0 flex flex-col h-full">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center flex-grow">
                                 <div className="flex flex-col space-y-4 text-left h-full justify-between">
@@ -113,7 +113,7 @@ export function HowItWorks() {
             <CarouselNext className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 hidden md:flex" />
           </Carousel>
            <div className="flex items-center justify-center gap-4 mt-8">
-              <Button variant="ghost" size="icon" onClick={togglePlay} className="h-10 w-10 rounded-full bg-background/50 backdrop-blur-sm border-border hover:bg-background/80">
+              <Button variant="ghost" size="icon" onClick={togglePlay} className="h-10 w-10 rounded-full bg-card/50 backdrop-blur-sm border-border hover:bg-card/80">
                 {isPlaying ? <Pause className="h-5 w-5 text-foreground" /> : <Play className="h-5 w-5 text-foreground" />}
                 <span className="sr-only">{isPlaying ? 'Pause carousel' : 'Play carousel'}</span>
               </Button>
