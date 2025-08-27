@@ -24,11 +24,11 @@ export function ProductCarousel() {
                     <h2 className="font-headline text-2xl font-bold tracking-tight text-primary sm:text-3xl">
                         Browse All Kits
                     </h2>
-                    <p className="mt-4 text-base text-foreground md:text-lg">
+                    <p className="mt-4 text-base text-foreground">
                         We've built every part of our service with your <strong className="text-primary font-semibold">privacy, convenience, and well-being</strong> in mind.
                     </p>
                 </div>
-                <Button asChild variant="link" className="mt-6 text-primary font-bold text-base p-0 justify-start hover:text-accent md:text-lg">
+                <Button asChild variant="link" className="mt-6 text-primary font-bold text-base p-0 justify-start hover:text-accent">
                     <Link href="/order">
                         Browse All Kits
                         <ArrowRight />
@@ -69,11 +69,11 @@ export function ProductCarousel() {
                                             Student Bundle
                                         </Badge>
                                     )}
-                                    <h3 className="text-lg font-semibold flex-grow md:text-xl">{product.name}</h3>
+                                    <h3 className="text-lg font-semibold flex-grow">{product.name}</h3>
                                     <p className="text-muted-foreground text-sm mt-1">{product.description}</p>
                                     
                                     <div className="flex justify-between items-end mt-4 pt-4 border-t">
-                                        <p className="font-semibold text-base md:text-lg">GHS {product.priceGHS.toFixed(2)}</p>
+                                        <p className="font-semibold text-base">GHS {product.priceGHS.toFixed(2)}</p>
                                         <Button asChild>
                                             <Link href={`/order?product=${product.id}`}>
                                                 <ShoppingCart />

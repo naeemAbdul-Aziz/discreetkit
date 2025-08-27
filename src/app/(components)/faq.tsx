@@ -8,10 +8,10 @@ export function Faq() {
     <section id="faq" className="bg-background py-12 md:py-20">
       <div className="container mx-auto max-w-4xl px-4 md:px-6">
         <div className="text-center">
-          <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground sm:text-4xl">
+          <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
             Frequently Asked Questions
           </h2>
-          <p className="mt-4 text-base text-muted-foreground md:text-lg">
+          <p className="mt-4 text-base text-muted-foreground">
             Your questions, answered. If you need more info, our AI assistant is here to help.
           </p>
         </div>
@@ -24,10 +24,10 @@ export function Faq() {
           <Accordion type="single" collapsible className="w-full">
             {faqItems.map((item, index) => (
               <AccordionItem key={index} value={`item-${index}`}>
-                <AccordionTrigger className="text-left text-base hover:no-underline md:text-lg">
+                <AccordionTrigger className="text-left text-base hover:no-underline">
                   {item.question}
                 </AccordionTrigger>
-                <AccordionContent className="text-sm text-muted-foreground md:text-base">
+                <AccordionContent className="text-sm text-muted-foreground">
                   {item.answer}
                 </AccordionContent>
               </AccordionItem>
