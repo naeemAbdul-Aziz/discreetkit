@@ -49,18 +49,12 @@ export const products = [
 ]
 
 export const partners = [
-  { id: 1, name: 'University of Ghana Hospital', type: 'hospital', logoUrl: 'https://placehold.co/130x40', url: '#' },
-  { id: 2, name: '37 Military Hospital', type: 'hospital', logoUrl: 'https://placehold.co/130x40', url: '#' },
-  { id: 3, name: 'Korle-Bu Teaching Hospital', type: 'hospital', logoUrl: 'https://placehold.co/130x40', url: '#' },
-  { id: 4, name: 'UPSA Health Services', type: 'hospital', logoUrl: 'https://placehold.co/130x40', url: '#' },
-  { id: 5, name: 'GIMPA Hospital', type: 'hospital', logoUrl: 'https://placehold.co/130x40', url: '#' },
-  { id: 6, name: 'Campus Pharmacy, Legon', type: 'pharmacy', logoUrl: 'https://placehold.co/130x40', url: '#' },
-  { id: 7, name: 'Central Pharmacy', type: 'pharmacy', logoUrl: 'https://placehold.co/130x40', url: '#' },
-  { id: 8, name: 'University of Ghana SRC', type: 'src', logoUrl: 'https://placehold.co/130x40', url: '#' },
-  { id: 9, name: 'UPSA SRC', type: 'src', logoUrl: 'https://placehold.co/130x40', url: '#' },
-  { id: 10, name: 'GIMPA SRC', type: 'src', logoUrl: 'https://placehold.co/130x40', url: '#' },
-  { id: 11, name: 'Wisconsin SRC', type: 'src', logoUrl: 'https://placehold.co/130x40', url: '#' },
-]
+  { id: 1, name: 'Ernest Chemists', type: 'pharmacy', logoUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/ernest_chemist_ebxjug.webp', url: '#' },
+  { id: 2, name: 'Beditah Pharmacy', type: 'pharmacy', logoUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/bedita_ekekhs.png', url: '#' },
+  { id: 3, name: 'Top-Up Pharmacy', type: 'pharmacy', logoUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318480/topup_x2q874.webp', url: '#' },
+  { id: 4, name: 'GIMPA', type: 'src', logoUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318480/gimpa_vz8ko5.jpg', url: '#' },
+  { id: 5, name: 'University of Ghana', type: 'src', logoUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318481/ug_ytf3bp.png', url: '#' },
+];
 
 export const discounts = [
   { id: 1, audience: 'student', campus: 'University of Ghana, Legon', discount: 10.00, notes: 'Free delivery for all on-campus orders.' },
