@@ -6,18 +6,17 @@ import { useFormStatus } from 'react-dom';
 import { useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createOrderAction } from '@/lib/actions';
-import { products } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { AlertCircle, Loader2, ShieldCheck, ShoppingCart } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ChatTrigger } from '@/components/chat-trigger';
 import { useCart } from '@/hooks/use-cart';
+import Link from 'next/link';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -34,7 +33,7 @@ function OrderForm() {
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   
-  const { items, clearCart } = useCart();
+  const { items, totalPrice, clearCart } = useCart();
 
   const initialState = { message: null, errors: {}, success: false, code: null };
   const [state, dispatch] = useActionState(createOrderAction, initialState);
@@ -64,7 +63,7 @@ function OrderForm() {
             <h1 className="font-headline text-3xl font-bold md:text-4xl">Your Cart is Empty</h1>
             <p className="mt-2 text-base text-muted-foreground md:text-lg">Looks like you haven't added any products yet.</p>
             <Button asChild>
-                <a href="/#products">Start Shopping</a>
+                <Link href="/#products">Start Shopping</Link>
             </Button>
         </div>
     )
@@ -99,6 +98,10 @@ function OrderForm() {
                         <p className="font-semibold">GHS {(item.priceGHS * item.quantity).toFixed(2)}</p>
                     </div>
                 ))}
+                 <div className="flex justify-between items-center border-t pt-4 mt-4 font-bold text-lg">
+                    <p>Total</p>
+                    <p>GHS {totalPrice.toFixed(2)}</p>
+                </div>
             </CardContent>
         </Card>
 
@@ -160,10 +163,12 @@ function OrderForm() {
 
 export default function OrderPage() {
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-12 md:py-20 md:px-6">
-      <Suspense fallback={<div>Loading...</div>}>
-        <OrderForm />
-      </Suspense>
+    <div className="bg-muted">
+        <div className="container mx-auto max-w-4xl px-4 py-12 md:py-20 md:px-6">
+            <Suspense fallback={<div>Loading...</div>}>
+                <OrderForm />
+            </Suspense>
+        </div>
     </div>
   )
 }

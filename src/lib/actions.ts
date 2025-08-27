@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { createMockOrder, getMockOrder } from './data';
 import { answerQuestions } from '@/ai/flows/answer-questions';
 import { revalidatePath } from 'next/cache';
-import { CartItem } from '@/hooks/use-cart';
+import { type CartItem } from '@/hooks/use-cart';
 
 const orderSchema = z.object({
   cartItems: z.string().min(1, 'Cart cannot be empty.'),
@@ -21,13 +21,14 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
       message: 'Error: Please check the form fields.',
+      success: false,
     };
   }
 
   try {
     const cartItems: CartItem[] = JSON.parse(validatedFields.data.cartItems);
     if (cartItems.length === 0) {
-      return { message: 'Your cart is empty.' };
+      return { message: 'Your cart is empty.', success: false };
     }
     
     // In a real app, you would process all items, calculate total, etc.
@@ -36,11 +37,12 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     
     const order = createMockOrder(firstItem.id, firstItem.quantity);
     revalidatePath('/order');
-    return { success: true, code: order.code };
+    return { success: true, code: order.code, message: null, errors: {} };
   } catch (error) {
     console.error(error);
     return {
       message: 'Failed to create order. Please try again.',
+      success: false,
     };
   }
 }
