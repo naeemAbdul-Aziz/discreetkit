@@ -16,9 +16,12 @@ import { AlertCircle, Loader2, ShieldCheck, ArrowRight, Plus, Minus, GraduationC
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ChatTrigger } from '@/components/chat-trigger';
 import { useCart } from '@/hooks/use-cart';
-import { products, type Product } from '@/lib/data';
+import { products, discounts, type Product } from '@/lib/data';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
+
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -40,6 +43,14 @@ function AddToCartButton({ product }: { product: Product }) {
   }, []);
 
   const quantity = isMounted ? getItemQuantity(product.id) : 0;
+
+  if (!isMounted) {
+    return (
+      <Button variant="outline" className="w-24 justify-center rounded-full" disabled>
+        <Plus className="mr-2 h-4 w-4" /> Add
+      </Button>
+    );
+  }
 
   if (quantity > 0) {
     return (
@@ -68,7 +79,7 @@ function AddToCartButton({ product }: { product: Product }) {
   return (
     <Button
       variant="outline"
-      className="rounded-full"
+      className="w-24 justify-center rounded-full"
       onClick={() => addItem(product)}
     >
       <Plus className="mr-2 h-4 w-4" /> Add
@@ -81,7 +92,10 @@ function OrderForm() {
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 
-  const { items, totalPrice, clearCart } = useCart();
+  const { items, totalPrice, clearCart, deliveryLocation, setDeliveryLocation } = useCart();
+  const [showOther, setShowOther] = useState(false);
+  
+  const isStudent = deliveryLocation && discounts.some(d => d.campus === deliveryLocation);
 
   const initialState = { message: null, errors: {}, success: false, code: null };
   const [state, dispatch] = useActionState(createOrderAction, initialState);
@@ -108,6 +122,17 @@ function OrderForm() {
     // When cart items change (e.g., last item is removed), this ensures the hidden input is updated.
   }, [items]);
 
+  const handleLocationChange = (value: string) => {
+    if (value === 'Other') {
+      setShowOther(true);
+      setDeliveryLocation(null);
+    } else {
+      setShowOther(false);
+      setDeliveryLocation(value);
+    }
+  }
+
+
   return (
     <>
       <div className="text-center">
@@ -127,7 +152,7 @@ function OrderForm() {
         <Card>
           <CardHeader>
             <CardTitle>1. Choose Your Products</CardTitle>
-            <CardDescription>Add or adjust items in your cart.</CardDescription>
+            <CardDescription>Add or adjust items in your cart. Student pricing is applied automatically for campus deliveries.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {products.map((product) => (
@@ -142,20 +167,21 @@ function OrderForm() {
                   />
                 </div>
                 <div className="flex-grow">
-                  {product.is_student_bundle && (
-                    <Badge
-                      variant="secondary"
-                      className="mb-1.5 flex w-fit items-center gap-1.5 bg-green-100 text-green-800"
-                    >
-                      <GraduationCap className="h-3.5 w-3.5" />
-                      Student Pricing
-                    </Badge>
-                  )}
                   <h3 className="font-semibold">{product.name}</h3>
                   <p className="text-sm text-muted-foreground">{product.description}</p>
+                   <div className="mt-1.5 flex items-baseline gap-2">
+                        <p className={cn(
+                            "font-semibold",
+                            isStudent && product.studentPriceGHS ? "text-muted-foreground line-through text-sm" : "text-base"
+                        )}>
+                            GHS {product.priceGHS.toFixed(2)}
+                        </p>
+                        {isStudent && product.studentPriceGHS && (
+                            <p className="font-semibold text-green-600 text-base">GHS {product.studentPriceGHS.toFixed(2)}</p>
+                        )}
+                    </div>
                 </div>
                 <div className="flex flex-col items-end gap-2">
-                  <p className="font-semibold">GHS {product.priceGHS.toFixed(2)}</p>
                   <AddToCartButton product={product} />
                 </div>
               </div>
@@ -175,12 +201,37 @@ function OrderForm() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="deliveryArea">Delivery Area / Campus</Label>
-                  <Input id="deliveryArea" name="deliveryArea" placeholder="e.g., UPSA Campus, East Legon" required />
-                  <p className="text-[0.8rem] text-muted-foreground">Please be as specific as possible.</p>
+                  <Select name="deliveryArea" onValueChange={handleLocationChange} required>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Select a location..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="Accra Central">Accra Central</SelectItem>
+                        <SelectItem value="East Legon">East Legon</SelectItem>
+                        <SelectItem value="Madina">Madina</SelectItem>
+                        <SelectItem value="Adenta">Adenta</SelectItem>
+                         <SelectItem value="University of Ghana, Legon">University of Ghana, Legon (Student Pricing)</SelectItem>
+                         <SelectItem value="UPSA">UPSA (Student Pricing)</SelectItem>
+                         <SelectItem value="GIMPA">GIMPA (Student Pricing)</SelectItem>
+                         <SelectItem value="Wisconsin International University College">Wisconsin Uni College (Student Pricing)</SelectItem>
+                         <SelectItem value="Other">Other...</SelectItem>
+                    </SelectContent>
+                  </Select>
                   {state.errors?.deliveryArea && (
                     <p className="text-sm font-medium text-destructive">{state.errors.deliveryArea[0]}</p>
                   )}
                 </div>
+
+                {showOther && (
+                    <div className="space-y-2">
+                         <Label htmlFor="otherDeliveryArea">Please Specify Other Location</Label>
+                        <Input id="otherDeliveryArea" name="otherDeliveryArea" placeholder="e.g., Osu, Airport Area" />
+                         {state.errors?.otherDeliveryArea && (
+                            <p className="text-sm font-medium text-destructive">{state.errors.otherDeliveryArea[0]}</p>
+                         )}
+                    </div>
+                )}
+                
                 <div className="space-y-2">
                   <Label htmlFor="deliveryAddressNote">Additional Notes for Delivery Agent</Label>
                   <Textarea
@@ -210,6 +261,12 @@ function OrderForm() {
                 <CardTitle>3. Order Summary</CardTitle>
               </CardHeader>
               <CardContent>
+                {isStudent && (
+                    <div className="mb-4 flex items-center gap-2 rounded-lg bg-green-50 p-3 text-green-700">
+                        <GraduationCap className="h-5 w-5" />
+                        <p className="text-sm font-medium">Student discount applied!</p>
+                    </div>
+                )}
                 <div className="flex items-center justify-between font-bold text-lg">
                   <p>Total</p>
                   <p>GHS {totalPrice.toFixed(2)}</p>

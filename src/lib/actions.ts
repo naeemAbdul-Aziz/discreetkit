@@ -12,6 +12,7 @@ const orderSchema = z.object({
   deliveryArea: z.string().min(3, 'Delivery area is required.'),
   deliveryAddressNote: z.string().optional(),
   phone_masked: z.string().min(10, 'A valid phone number is required.'),
+  otherDeliveryArea: z.string().optional(),
 });
 
 export async function createOrderAction(prevState: any, formData: FormData) {
@@ -24,6 +25,16 @@ export async function createOrderAction(prevState: any, formData: FormData) {
       success: false,
     };
   }
+
+  const { deliveryArea, otherDeliveryArea } = validatedFields.data;
+  if (deliveryArea === 'Other' && (!otherDeliveryArea || otherDeliveryArea.length < 3)) {
+      return {
+          errors: { otherDeliveryArea: ['Please specify your delivery area.'] },
+          message: 'Error: Please specify your delivery area.',
+          success: false,
+      }
+  }
+
 
   try {
     const cartItems: CartItem[] = JSON.parse(validatedFields.data.cartItems);

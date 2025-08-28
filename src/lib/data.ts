@@ -9,7 +9,7 @@ export type Product = {
     slug: string;
     description: string;
     priceGHS: number;
-    is_student_bundle: boolean;
+    studentPriceGHS?: number;
     active: boolean;
     imageUrl: string;
     reviews: number;
@@ -22,18 +22,18 @@ export const products: Product[] = [
     slug: 'standard-hiv-kit',
     description: 'A single-use, private HIV self-test kit. WHO-approved for 99% accuracy.',
     priceGHS: 75.00,
-    is_student_bundle: false,
+    studentPriceGHS: 65.00,
     active: true,
     imageUrl: 'https://images.unsplash.com/photo-1606295835050-e17a6a239ccf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxtZWRpY2FsJTIwdGVzdCUyMGtpdHxlbnwwfHx8fDE3NTYxNDczODd8MA&ixlib=rb-4.1.0&q=80&w=1080',
     reviews: 289
   },
   {
     id: 2,
-    name: 'Student Health Bundle',
-    slug: 'student-bundle',
-    description: 'Includes one HIV test and one pregnancy test. Special student pricing.',
-    priceGHS: 110.00,
-    is_student_bundle: true,
+    name: 'Pregnancy Test Kit',
+    slug: 'pregnancy-test-kit',
+    description: 'A reliable, easy-to-use pregnancy test for fast and private results.',
+    priceGHS: 45.00,
+    studentPriceGHS: 35.00,
     active: true,
     imageUrl: 'https://images.unsplash.com/photo-1591185157258-11aec5f039d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8bWVkaWNhbCUyMHRlc3QlMjBraXR8ZW58MHx8fHwxNzU2MTQ3Mzg3fDA&ixlib=rb-4.1.0&q=80&w=1080',
     reviews: 350
@@ -44,22 +44,20 @@ export const products: Product[] = [
     slug: 'couple-support-bundle',
     description: 'Two private HIV self-test kits. Test together, support each other.',
     priceGHS: 140.00,
-    is_student_bundle: false,
     active: true,
     imageUrl: 'https://images.unsplash.com/photo-1520038410233-7141be7e6f97?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxib3h8ZW58MHx8fHwxNzU2MTQ5MDkyfDA&ixlib=rb-4.1.0&q=80&w=1080',
     reviews: 412
   },
 ]
 
-export const partners = [
-  { id: 1, name: 'Ernest Chemists', type: 'pharmacy', logoUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/ernest_chemist_ebxjug.webp', url: '#' },
-  { id: 2, name: 'Beditah Pharmacy', type: 'pharmacy', logoUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/bedita_ekekhs.png', url: '#' },
-  { id: 3, name: 'Top-Up Pharmacy', type: 'pharmacy', logoUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318480/topup_x2q874.webp', url: '#' },
-  { id: 4, name: 'GIMPA', type: 'src', logoUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318480/gimpa_vz8ko5.jpg', url: '#' },
-  { id: 5, name: 'University of Ghana', type: 'src', logoUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318481/ug_ytf3bp.png', url: '#' },
-];
-
-export const discounts = [
+export type DiscountLocation = {
+  id: number;
+  audience: string;
+  campus: string;
+  discount: number;
+  notes: string;
+}
+export const discounts: DiscountLocation[] = [
   { id: 1, audience: 'student', campus: 'University of Ghana, Legon', discount: 10.00, notes: 'Free delivery for all on-campus orders.' },
   { id: 2, audience: 'student', campus: 'UPSA', discount: 10.00, notes: 'Discounted delivery in partnership with UPSA SRC.' },
   { id: 3, audience: 'student', campus: 'GIMPA', discount: 10.00, notes: 'Reduced delivery fees for GIMPA students.' },
@@ -159,7 +157,7 @@ export const faqItems = [
     },
     {
         question: "What happens if I test positive?",
-        answer: "A positive self-test result is preliminary. We will connect you with our trusted partner hospitals for a confidential, discounted confirmatory test and professional counseling. Your well-being is our priority."
+        answer: "A positive self-test result is preliminary. We will connect you with our partner hospitals for a confidential, discounted confirmatory test and professional counseling. Your well-being is our priority."
     },
     {
         question: "Can I get a refund?",
@@ -292,3 +290,10 @@ export const generateTrackingCode = () => {
     return result.replace(/(.{3})/, "$1-").replace(/(.{7})/, "$1-");
 }
 
+export const partners = [
+  { id: 1, name: 'Ernest Chemists', type: 'pharmacy', logoUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/ernest_chemist_ebxjug.webp', url: '#' },
+  { id: 2, name: 'Beditah Pharmacy', type: 'pharmacy', logoUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/bedita_ekekhs.png', url: '#' },
+  { id: 3, name: 'Top-Up Pharmacy', type: 'pharmacy', logoUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318480/topup_x2q874.webp', url: '#' },
+  { id: 4, name: 'GIMPA', type: 'src', logoUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318480/gimpa_vz8ko5.jpg', url: '#' },
+  { id: 5, name: 'University of Ghana', type: 'src', logoUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318481/ug_ytf3bp.png', url: '#' },
+];
