@@ -62,15 +62,6 @@ export function Chatbot() {
   return (
     <>
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetTrigger asChild>
-            <Button
-                className="fixed bottom-4 right-4 h-14 w-14 rounded-full shadow-lg"
-                size="icon"
-                aria-label="Open Chat"
-            >
-                <Bot className="h-7 w-7" />
-            </Button>
-        </SheetTrigger>
         <SheetContent className="flex w-full flex-col sm:max-w-md">
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2">
