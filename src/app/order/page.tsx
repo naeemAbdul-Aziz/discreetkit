@@ -4,7 +4,7 @@
 import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { useEffect, useRef, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { createOrderAction } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,11 +12,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { AlertCircle, Loader2, ShieldCheck, ShoppingCart, ShoppingBag, ArrowRight, Plus, Minus } from 'lucide-react';
+import { AlertCircle, Loader2, ShieldCheck, ArrowRight, Plus, Minus, GraduationCap } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ChatTrigger } from '@/components/chat-trigger';
 import { useCart } from '@/hooks/use-cart';
-import Link from 'next/link';
+import { products, type Product } from '@/lib/data';
+import Image from 'next/image';
+import { Badge } from '@/components/ui/badge';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -29,12 +31,51 @@ function SubmitButton() {
   );
 }
 
+function AddToCartButton({ product }: { product: Product }) {
+  const { addItem, updateQuantity, getItemQuantity } = useCart();
+  const quantity = getItemQuantity(product.id);
+
+  if (quantity > 0) {
+    return (
+      <div className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-8 w-8 rounded-full"
+          onClick={() => updateQuantity(product.id, quantity - 1)}
+        >
+          <Minus className="h-4 w-4" />
+        </Button>
+        <span className="w-6 text-center font-bold">{quantity}</span>
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-8 w-8 rounded-full"
+          onClick={() => updateQuantity(product.id, quantity + 1)}
+        >
+          <Plus className="h-4 w-4" />
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <Button
+      variant="outline"
+      className="rounded-full"
+      onClick={() => addItem(product)}
+    >
+      <Plus className="mr-2 h-4 w-4" /> Add
+    </Button>
+  );
+}
+
 function OrderForm() {
   const router = useRouter();
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
-  
-  const { items, totalPrice, clearCart, updateQuantity } = useCart();
+
+  const { items, totalPrice, clearCart } = useCart();
 
   const initialState = { message: null, errors: {}, success: false, code: null };
   const [state, dispatch] = useActionState(createOrderAction, initialState);
@@ -61,150 +102,156 @@ function OrderForm() {
     // When cart items change (e.g., last item is removed), this ensures the hidden input is updated.
   }, [items]);
 
-  if (items.length === 0) {
-    return (
-        <div className="text-center space-y-4">
-            <ShoppingCart className="mx-auto h-24 w-24 text-muted-foreground/30" />
-            <h1 className="font-headline text-3xl font-bold md:text-4xl">Your Cart is Empty</h1>
-            <p className="mt-2 text-base text-muted-foreground md:text-lg">Looks like you haven't added any products yet.</p>
-            <Button asChild>
-                <Link href="/#products">
-                    <ShoppingBag />
-                    Start Shopping
-                </Link>
-            </Button>
-        </div>
-    )
-  }
-
   return (
-     <>
+    <>
       <div className="text-center">
         <h1 className="font-headline text-3xl font-bold md:text-4xl">Complete Your Order</h1>
-        <p className="mt-2 text-base text-muted-foreground md:text-lg">A simple, private, and secure process.</p>
+        <p className="mt-2 text-base text-muted-foreground md:text-lg">
+          Add items to your cart and fill out the delivery details below.
+        </p>
       </div>
 
-       <div className="mt-8">
-          <ChatTrigger />
+      <div className="mt-8">
+        <ChatTrigger />
       </div>
 
       <form ref={formRef} action={dispatch} className="mt-8 space-y-8">
         <input type="hidden" name="cartItems" value={JSON.stringify(items)} />
 
         <Card>
-            <CardHeader>
-                <CardTitle>1. Review Your Order</CardTitle>
-                <CardDescription>Review and adjust your items below.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                {items.map(item => (
-                    <div key={item.id} className="flex justify-between items-center">
-                        <div>
-                            <p className="font-semibold">{item.name}</p>
-                            <p className="text-sm text-muted-foreground">GHS {item.priceGHS.toFixed(2)} each</p>
-                        </div>
-                         <div className="flex items-center gap-2">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8 rounded-full"
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          >
-                            <Minus className="h-4 w-4" />
-                          </Button>
-                          <span className="w-6 text-center font-bold">{item.quantity}</span>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8 rounded-full"
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          >
-                            <Plus className="h-4 w-4" />
-                          </Button>
-                        </div>
-                    </div>
-                ))}
-                 <div className="flex justify-between items-center border-t pt-4 mt-4 font-bold text-lg">
-                    <p>Total</p>
-                    <p>GHS {totalPrice.toFixed(2)}</p>
-                </div>
-            </CardContent>
-        </Card>
-
-        <Card>
           <CardHeader>
-            <CardTitle>2. Delivery Information</CardTitle>
-            <CardDescription>
-              We only need a location and contact for the delivery rider. Your details are deleted after delivery.
-            </CardDescription>
+            <CardTitle>1. Choose Your Products</CardTitle>
+            <CardDescription>Add or adjust items in your cart.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="deliveryArea">Delivery Area / Campus</Label>
-              <Input id="deliveryArea" name="deliveryArea" placeholder="e.g., UPSA Campus, East Legon" required />
-               <p className="text-[0.8rem] text-muted-foreground">
-                Please be as specific as possible.
-               </p>
-              {state.errors?.deliveryArea && <p className="text-sm font-medium text-destructive">{state.errors.deliveryArea[0]}</p>}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="deliveryAddressNote">Additional Notes for Delivery Agent</Label>
-              <Textarea id="deliveryAddressNote" name="deliveryAddressNote" placeholder="e.g., 'Call upon arrival at the main gate', 'Leave with the security.'" />
-            </div>
-             <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                    <Label htmlFor="phone_masked">Contact Number (for delivery rider only)</Label>
-                    <ShieldCheck className="h-4 w-4 text-muted-foreground" />
+          <CardContent className="space-y-6">
+            {products.map((product) => (
+              <div key={product.id} className="flex items-center gap-4">
+                <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-muted">
+                  <Image
+                    src={product.imageUrl}
+                    alt={product.name}
+                    fill
+                    className="object-contain"
+                    data-ai-hint="medical test kit"
+                  />
                 </div>
-              <Input id="phone_masked" name="phone_masked" type="tel" placeholder="e.g., 024xxxxxxx" required />
-               <p className="text-[0.8rem] text-muted-foreground">
-                This will be masked and is only for the rider to contact you.
-               </p>
-              {state.errors?.phone_masked && <p className="text-sm font-medium text-destructive">{state.errors.phone_masked[0]}</p>}
-            </div>
+                <div className="flex-grow">
+                  {product.is_student_bundle && (
+                    <Badge
+                      variant="secondary"
+                      className="mb-1.5 flex w-fit items-center gap-1.5 bg-green-100 text-green-800"
+                    >
+                      <GraduationCap className="h-3.5 w-3.5" />
+                      Student Pricing
+                    </Badge>
+                  )}
+                  <h3 className="font-semibold">{product.name}</h3>
+                  <p className="text-sm text-muted-foreground">{product.description}</p>
+                </div>
+                <div className="flex flex-col items-end gap-2">
+                  <p className="font-semibold">GHS {product.priceGHS.toFixed(2)}</p>
+                  <AddToCartButton product={product} />
+                </div>
+              </div>
+            ))}
           </CardContent>
         </Card>
-        
-        <Alert>
-          <ShieldCheck className="h-4 w-4" />
-          <AlertTitle>Your Privacy is Guaranteed</AlertTitle>
-          <AlertDescription>
-            Your payment will be processed securely by Paystack. We do not see or store your payment information. The next screen will redirect you to their payment page.
-          </AlertDescription>
-        </Alert>
 
-        {state.message && !state.success && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>{state.message}</AlertDescription>
-          </Alert>
+        {items.length > 0 && (
+          <>
+            <Card>
+              <CardHeader>
+                <CardTitle>2. Delivery Information</CardTitle>
+                <CardDescription>
+                  We only need a location and contact for the delivery rider. Your details are deleted after delivery.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="deliveryArea">Delivery Area / Campus</Label>
+                  <Input id="deliveryArea" name="deliveryArea" placeholder="e.g., UPSA Campus, East Legon" required />
+                  <p className="text-[0.8rem] text-muted-foreground">Please be as specific as possible.</p>
+                  {state.errors?.deliveryArea && (
+                    <p className="text-sm font-medium text-destructive">{state.errors.deliveryArea[0]}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="deliveryAddressNote">Additional Notes for Delivery Agent</Label>
+                  <Textarea
+                    id="deliveryAddressNote"
+                    name="deliveryAddressNote"
+                    placeholder="e.g., 'Call upon arrival at the main gate', 'Leave with the security.'"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="phone_masked">Contact Number (for delivery rider only)</Label>
+                    <ShieldCheck className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <Input id="phone_masked" name="phone_masked" type="tel" placeholder="e.g., 024xxxxxxx" required />
+                  <p className="text-[0.8rem] text-muted-foreground">
+                    This will be masked and is only for the rider to contact you.
+                  </p>
+                  {state.errors?.phone_masked && (
+                    <p className="text-sm font-medium text-destructive">{state.errors.phone_masked[0]}</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>3. Order Summary</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between font-bold text-lg">
+                  <p>Total</p>
+                  <p>GHS {totalPrice.toFixed(2)}</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Alert>
+              <ShieldCheck className="h-4 w-4" />
+              <AlertTitle>Your Privacy is Guaranteed</AlertTitle>
+              <AlertDescription>
+                Your payment will be processed securely by Paystack. We do not see or store your payment information.
+                The next screen will redirect you to their payment page.
+              </AlertDescription>
+            </Alert>
+
+            {state.message && !state.success && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>{state.message}</AlertDescription>
+              </Alert>
+            )}
+
+            <SubmitButton />
+          </>
         )}
-
-        <SubmitButton />
       </form>
     </>
   );
 }
 
 function OrderPageLoading() {
-    return (
-        <div className="flex justify-center items-center h-64">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
-    )
+  return (
+    <div className="flex h-64 items-center justify-center">
+      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+    </div>
+  );
 }
 
 export default function OrderPage() {
   return (
     <div className="bg-muted">
-        <div className="container mx-auto max-w-4xl px-4 py-12 md:py-20 md:px-6">
-            <Suspense fallback={<OrderPageLoading />}>
-                <OrderForm />
-            </Suspense>
-        </div>
+      <div className="container mx-auto max-w-4xl px-4 py-12 md:px-6 md:py-20">
+        <Suspense fallback={<OrderPageLoading />}>
+          <OrderForm />
+        </Suspense>
+      </div>
     </div>
-  )
+  );
 }

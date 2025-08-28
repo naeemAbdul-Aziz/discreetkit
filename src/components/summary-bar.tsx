@@ -5,7 +5,7 @@ import { useCart } from '@/hooks/use-cart';
 import { Button } from './ui/button';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, ShoppingCart, X } from 'lucide-react';
+import { ArrowRight, ShoppingCart } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 export function SummaryBar() {
@@ -22,11 +22,11 @@ export function SummaryBar() {
           className="fixed bottom-0 left-0 right-0 z-50 p-2 md:p-4"
         >
           <div className="container mx-auto max-w-4xl">
-            <div className="flex items-center justify-between gap-2 md:gap-4 rounded-xl md:rounded-2xl border bg-background p-2 md:p-4 shadow-2xl">
+            <div className="flex items-center justify-between gap-2 rounded-xl border bg-background p-2 shadow-2xl md:gap-4 md:rounded-2xl md:p-4">
               <div className="flex items-center gap-2 md:gap-4">
                  <Popover>
                   <PopoverTrigger asChild>
-                    <button className="flex items-center gap-2 text-xs md:text-sm font-medium hover:text-primary">
+                    <button className="flex items-center gap-2 text-xs font-medium hover:text-primary md:text-sm">
                         <ShoppingCart className="h-4 w-4 md:h-5 md:w-5" />
                         <span>{totalItems} item(s)</span>
                     </button>
@@ -57,7 +57,7 @@ export function SummaryBar() {
               </div>
               <div className="flex flex-shrink-0 items-center gap-2 md:gap-4">
                 <div className="text-right">
-                  <p className="text-base md:text-lg font-bold">GHS {totalPrice.toFixed(2)}</p>
+                  <p className="text-base font-bold md:text-lg">GHS {totalPrice.toFixed(2)}</p>
                   <p className="text-xs text-muted-foreground">Total</p>
                 </div>
                 <Button asChild size="sm" className="md:size-lg">

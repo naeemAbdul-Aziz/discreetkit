@@ -5,12 +5,12 @@ import { products, type Product } from '@/lib/data';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { Check, Minus, Plus } from 'lucide-react';
+import { Minus, Plus } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { GraduationCap } from 'lucide-react';
+import { GraduationCap, ArrowRight } from 'lucide-react';
 import { useCart } from '@/hooks/use-cart';
-import { AnimatePresence, motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 function AddToCartButton({ product }: { product: Product }) {
   const { addItem, updateQuantity, getItemQuantity } = useCart();
@@ -20,19 +20,7 @@ function AddToCartButton({ product }: { product: Product }) {
     setIsMounted(true);
   }, []);
 
-  const quantity = getItemQuantity(product.id);
-
-  if (!isMounted) {
-    return (
-      <Button
-        variant="outline"
-        className="rounded-full"
-        onClick={() => addItem(product)}
-      >
-        <Plus className="mr-2 h-4 w-4" /> Add
-      </Button>
-    );
-  }
+  const quantity = isMounted ? getItemQuantity(product.id) : 0;
 
   if (quantity > 0) {
     return (
@@ -73,47 +61,47 @@ export function ProductSelector() {
   return (
     <section id="products" className="bg-background py-12 md:py-24">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="text-center mb-12">
+        <div className="mb-12 text-center">
             <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
                 Choose Your Kit
             </h2>
-            <p className="mt-4 max-w-2xl mx-auto text-base text-muted-foreground">
+            <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground">
                 All our kits are WHO-approved, ensuring you get reliable results with complete privacy.
             </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           {products.map((product) => (
             <Card
               key={product.id}
-              className="h-full flex flex-col overflow-hidden rounded-2xl shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
+              className="group flex h-full flex-col overflow-hidden rounded-2xl shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl"
             >
-              <div className="flex-grow flex flex-col">
-                <CardContent className="p-0 flex-grow flex flex-col">
-                  <div className="relative bg-muted p-4 overflow-hidden aspect-square">
+              <div className="flex flex-grow flex-col">
+                <CardContent className="flex flex-grow flex-col p-0">
+                  <div className="relative aspect-square overflow-hidden bg-muted p-4">
                     <Image
                       src={product.imageUrl}
                       alt={product.name}
                       fill
-                      className="object-contain mx-auto transition-transform duration-300 group-hover:scale-105"
+                      className="object-contain transition-transform duration-300 group-hover:scale-105"
                       data-ai-hint="medical test kit"
                     />
                   </div>
-                  <div className="p-6 flex flex-col flex-grow">
+                  <div className="flex flex-grow flex-col p-6">
                     {product.is_student_bundle && (
                       <Badge
                         variant="secondary"
-                        className="w-fit flex items-center gap-1.5 mb-2 bg-green-100 text-green-800"
+                        className="mb-2 flex w-fit items-center gap-1.5 bg-green-100 text-green-800"
                       >
                         <GraduationCap className="h-3.5 w-3.5" />
                         Student Pricing
                       </Badge>
                     )}
-                    <h3 className="text-base md:text-lg font-semibold flex-grow">{product.name}</h3>
-                    <p className="text-muted-foreground text-sm mt-1 h-12">{product.description}</p>
+                    <h3 className="flex-grow text-base font-semibold md:text-lg">{product.name}</h3>
+                    <p className="mt-1 h-12 text-sm text-muted-foreground">{product.description}</p>
 
-                    <div className="flex justify-between items-center mt-4 pt-4 border-t">
-                      <p className="font-semibold text-lg">GHS {product.priceGHS.toFixed(2)}</p>
+                    <div className="mt-4 flex items-center justify-between border-t pt-4">
+                      <p className="text-lg font-semibold">GHS {product.priceGHS.toFixed(2)}</p>
                       <AddToCartButton product={product} />
                     </div>
                   </div>
@@ -121,6 +109,14 @@ export function ProductSelector() {
               </div>
             </Card>
           ))}
+        </div>
+        <div className="mt-12 text-center">
+            <Button asChild size="lg">
+                <Link href="/order">
+                    Go to Order Page
+                    <ArrowRight />
+                </Link>
+            </Button>
         </div>
       </div>
     </section>
