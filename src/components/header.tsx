@@ -68,7 +68,7 @@ export function Header() {
           </nav>
 
           <Link href="/" className="hidden md:flex items-center space-x-2 absolute left-1/2 -translate-x-1/2">
-            <Image src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756391917/discreetKit_tvvwkr.png" alt="DiscreetKit Logo" width={120} height={30} />
+            <Image src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756391917/discreetKit_tvvwkr.png" alt="DiscreetKit Logo" width={140} height={35} />
           </Link>
 
           <div className="hidden md:flex items-center justify-end gap-1">
@@ -80,7 +80,7 @@ export function Header() {
           {/* Mobile Menu */}
           <div className="flex items-center md:hidden w-full justify-between">
              <Link href="/" className="flex items-center space-x-2">
-                <Image src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756391917/discreetKit_tvvwkr.png" alt="DiscreetKit Logo" width={100} height={25} />
+                <Image src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756391917/discreetKit_tvvwkr.png" alt="DiscreetKit Logo" width={120} height={30} />
             </Link>
 
              <div className="flex items-center gap-2">
@@ -93,7 +93,7 @@ export function Header() {
                 </SheetTrigger>
                 <SheetContent side="right" className="w-full max-w-sm">
                   <Link href="/" className="flex items-center space-x-2">
-                    <Image src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756391917/discreetKit_tvvwkr.png" alt="DiscreetKit Logo" width={100} height={25} />
+                    <Image src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756391917/discreetKit_tvvwkr.png" alt="DiscreetKit Logo" width={120} height={30} />
                   </Link>
                   <div className="mt-8 flex flex-col space-y-2">
                     {[...navLinksLeft, ...navLinksRight].map((link) => (

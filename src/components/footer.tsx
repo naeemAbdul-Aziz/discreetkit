@@ -23,7 +23,7 @@ export function Footer() {
           {/* Brand Section */}
           <div className="md:col-span-4">
             <Link href="/" className="mb-4 inline-flex items-center space-x-2">
-              <Image src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756391917/discreetKit_tvvwkr.png" alt="DiscreetKit Logo" width={140} height={35} />
+              <Image src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756391917/discreetKit_tvvwkr.png" alt="DiscreetKit Logo" width={160} height={40} />
             </Link>
             <p className="max-w-xs text-sm text-muted-foreground">
               Private health answers, delivered with trust. Confidential, reliable self-test kits in Ghana.
