@@ -19,15 +19,15 @@ export function SummaryBar() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          className="fixed bottom-0 left-0 right-0 z-50 p-4"
+          className="fixed bottom-0 left-0 right-0 z-50 p-2 md:p-4"
         >
           <div className="container mx-auto max-w-4xl">
-            <div className="flex items-center justify-between gap-4 rounded-2xl border bg-background p-4 shadow-2xl">
-              <div className="flex items-center gap-4">
+            <div className="flex items-center justify-between gap-2 md:gap-4 rounded-xl md:rounded-2xl border bg-background p-2 md:p-4 shadow-2xl">
+              <div className="flex items-center gap-2 md:gap-4">
                  <Popover>
                   <PopoverTrigger asChild>
-                    <button className="flex items-center gap-2 text-sm font-medium hover:text-primary">
-                        <ShoppingCart className="h-5 w-5" />
+                    <button className="flex items-center gap-2 text-xs md:text-sm font-medium hover:text-primary">
+                        <ShoppingCart className="h-4 w-4 md:h-5 md:w-5" />
                         <span>{totalItems} item(s)</span>
                     </button>
                   </PopoverTrigger>
@@ -55,12 +55,12 @@ export function SummaryBar() {
                   </PopoverContent>
                 </Popover>
               </div>
-              <div className="flex flex-shrink-0 items-center gap-4">
+              <div className="flex flex-shrink-0 items-center gap-2 md:gap-4">
                 <div className="text-right">
-                  <p className="text-lg font-bold">GHS {totalPrice.toFixed(2)}</p>
-                  <p className="text-xs text-muted-foreground">Total Price</p>
+                  <p className="text-base md:text-lg font-bold">GHS {totalPrice.toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground">Total</p>
                 </div>
-                <Button asChild size="lg">
+                <Button asChild size="sm" className="md:size-lg">
                   <Link href="/order">
                     Continue
                     <ArrowRight />

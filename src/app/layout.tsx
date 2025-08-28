@@ -31,7 +31,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en">
        <head>
       </head>
       <body className={cn('min-h-screen bg-background font-body antialiased', figtree.variable)}>

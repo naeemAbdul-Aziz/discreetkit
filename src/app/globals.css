@@ -45,6 +45,10 @@
   * {
     @apply border-border;
   }
+  html {
+    @apply scroll-smooth;
+    zoom: 0.85;
+  }
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
