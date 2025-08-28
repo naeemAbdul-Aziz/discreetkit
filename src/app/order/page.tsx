@@ -3,7 +3,7 @@
 
 import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
-import { useEffect, useRef, Suspense } from 'react';
+import { useEffect, useRef, Suspense, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createOrderAction } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
@@ -33,7 +33,13 @@ function SubmitButton() {
 
 function AddToCartButton({ product }: { product: Product }) {
   const { addItem, updateQuantity, getItemQuantity } = useCart();
-  const quantity = getItemQuantity(product.id);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const quantity = isMounted ? getItemQuantity(product.id) : 0;
 
   if (quantity > 0) {
     return (
