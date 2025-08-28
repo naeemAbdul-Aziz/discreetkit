@@ -1,5 +1,5 @@
 
-import { Star } from 'lucide-react';
+import { MessageSquare, Star } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -33,6 +33,7 @@ export function SocialProof() {
                 </div>
                 <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
                     Read our reviews
+                    <MessageSquare />
                 </Button>
               </CardContent>
             </Card>

@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { getOrderAction } from '@/lib/actions';
 import { type Order } from '@/lib/data';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle, CheckCircle, Loader2, Package, Truck } from 'lucide-react';
+import { AlertCircle, CheckCircle, Loader2, Package, Search, Truck } from 'lucide-react';
 
 const statusIcons = {
   received: <Package className="h-6 w-6" />,
@@ -66,8 +66,8 @@ function Tracker() {
               disabled={isPending}
             />
             <Button type="submit" disabled={isPending || !code}>
-              {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              Track
+              {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Search />}
+              {isPending ? '' : 'Track'}
             </Button>
           </form>
         </CardContent>

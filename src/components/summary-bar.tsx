@@ -5,7 +5,7 @@ import { useCart } from '@/hooks/use-cart';
 import { Button } from './ui/button';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
-import { X } from 'lucide-react';
+import { ArrowRight, X } from 'lucide-react';
 
 export function SummaryBar() {
   const { items, totalItems, totalPrice, removeItem } = useCart();
@@ -38,7 +38,10 @@ export function SummaryBar() {
                   <p className="text-xs text-muted-foreground">{totalItems} item(s)</p>
                 </div>
                 <Button asChild size="lg">
-                  <Link href="/order">Continue</Link>
+                  <Link href="/order">
+                    Continue
+                    <ArrowRight />
+                  </Link>
                 </Button>
               </div>
             </div>

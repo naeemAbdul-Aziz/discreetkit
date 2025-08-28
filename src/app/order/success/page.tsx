@@ -6,7 +6,7 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle2, Copy, Truck, Home } from 'lucide-react';
+import { CheckCircle2, Copy, Truck, Home, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 function SuccessContent() {
@@ -25,7 +25,10 @@ function SuccessContent() {
         </CardHeader>
         <CardContent>
           <Button asChild>
-            <Link href="/order">Place a New Order</Link>
+            <Link href="/order">
+              <Plus />
+              Place a New Order
+            </Link>
           </Button>
         </CardContent>
       </Card>

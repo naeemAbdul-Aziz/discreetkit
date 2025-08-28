@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { AlertCircle, Loader2, ShieldCheck, ShoppingCart } from 'lucide-react';
+import { AlertCircle, Loader2, ShieldCheck, ShoppingCart, ShoppingBag, ArrowRight } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ChatTrigger } from '@/components/chat-trigger';
 import { useCart } from '@/hooks/use-cart';
@@ -24,6 +24,7 @@ function SubmitButton() {
     <Button type="submit" className="w-full" disabled={pending}>
       {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
       {pending ? 'Processing...' : 'Proceed to Payment'}
+      {!pending && <ArrowRight />}
     </Button>
   );
 }
@@ -63,7 +64,10 @@ function OrderForm() {
             <h1 className="font-headline text-3xl font-bold md:text-4xl">Your Cart is Empty</h1>
             <p className="mt-2 text-base text-muted-foreground md:text-lg">Looks like you haven't added any products yet.</p>
             <Button asChild>
-                <Link href="/#products">Start Shopping</Link>
+                <Link href="/#products">
+                    <ShoppingBag />
+                    Start Shopping
+                </Link>
             </Button>
         </div>
     )
