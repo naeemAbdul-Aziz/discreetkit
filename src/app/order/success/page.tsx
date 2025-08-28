@@ -6,7 +6,7 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle2, Copy, Truck, Home, Plus } from 'lucide-react';
+import { CheckCircle2, Copy, Truck, Home, Plus, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 function SuccessContent() {
@@ -92,10 +92,18 @@ function SuccessContent() {
   );
 }
 
+function SuccessPageLoading() {
+    return (
+        <div className="flex justify-center items-center h-64">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+    )
+}
+
 export default function OrderSuccessPage() {
     return (
         <div className="flex min-h-[calc(100vh-10rem)] items-center justify-center bg-muted p-4">
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<SuccessPageLoading />}>
                 <SuccessContent />
             </Suspense>
         </div>

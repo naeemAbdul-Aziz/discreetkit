@@ -5,9 +5,10 @@ import { partners } from '@/lib/data';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Loader2 } from 'lucide-react';
+import { Suspense } from 'react';
 
-export default function PartnersPage() {
+function PartnersContent() {
   const partnerTypes = ['hospital', 'pharmacy', 'src'];
   const categorizedPartners = partnerTypes.map(type => ({
     type,
@@ -16,8 +17,7 @@ export default function PartnersPage() {
   }));
 
   return (
-    <div className="bg-background">
-      <div className="container mx-auto px-4 py-12 md:py-20 md:px-6">
+    <>
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="font-headline text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
             Our Trusted Partners
@@ -62,6 +62,25 @@ export default function PartnersPage() {
             </div>
           ))}
         </div>
+    </>
+  )
+}
+
+function PartnersLoading() {
+    return (
+        <div className="flex justify-center items-center h-64">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+    )
+}
+
+export default function PartnersPage() {
+  return (
+    <div className="bg-background">
+      <div className="container mx-auto px-4 py-12 md:py-20 md:px-6">
+          <Suspense fallback={<PartnersLoading />}>
+            <PartnersContent />
+          </Suspense>
       </div>
     </div>
   );

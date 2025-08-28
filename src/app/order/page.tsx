@@ -165,11 +165,19 @@ function OrderForm() {
   );
 }
 
+function OrderPageLoading() {
+    return (
+        <div className="flex justify-center items-center h-64">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+    )
+}
+
 export default function OrderPage() {
   return (
     <div className="bg-muted">
         <div className="container mx-auto max-w-4xl px-4 py-12 md:py-20 md:px-6">
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<OrderPageLoading />}>
                 <OrderForm />
             </Suspense>
         </div>

@@ -1,9 +1,8 @@
 
 'use client';
 
-import { useState, useEffect, useTransition } from 'react';
+import { useState, useEffect, useTransition, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -122,11 +121,19 @@ function Tracker() {
   );
 }
 
+function TrackPageLoading() {
+    return (
+         <div className="flex justify-center items-center h-64">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+    )
+}
+
 
 export default function TrackPage() {
     return (
         <div className="container mx-auto px-4 py-12 md:py-20 flex justify-center md:px-6">
-            <Suspense fallback={<Loader2 className="h-8 w-8 animate-spin" />}>
+            <Suspense fallback={<TrackPageLoading />}>
                 <Tracker />
             </Suspense>
         </div>
