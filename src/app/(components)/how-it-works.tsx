@@ -111,8 +111,8 @@ export function HowItWorks() {
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious className="left-[-50px] hidden md:inline-flex" />
-          <CarouselNext className="right-[-50px] hidden md:inline-flex" />
+          <CarouselPrevious className="-left-4 sm:left-[-50px]" />
+          <CarouselNext className="-right-4 sm:right-[-50px]" />
           
            <div className="flex items-center justify-center gap-4 mt-8">
             <Button
