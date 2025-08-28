@@ -4,7 +4,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Product } from '@/lib/data';
-import { useToast } from './use-toast';
+import { toast } from './use-toast';
 
 export type CartItem = {
   id: number;
@@ -39,7 +39,6 @@ export const useCart = create<CartState>()(
       totalPrice: 0,
 
       addItem: (product) => {
-        const { toast } = useToast.getState();
         const currentItems = get().items;
         const existingItem = currentItems.find((item) => item.id === product.id);
 
