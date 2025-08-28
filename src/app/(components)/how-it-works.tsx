@@ -10,7 +10,7 @@ import { ArrowRight } from 'lucide-react';
 export function HowItWorks() {
   return (
     <section id="how-it-works" className="bg-muted py-12 md:py-24">
-      <div className="container mx-auto max-w-4xl px-4 md:px-6">
+      <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-12">
           <h2 className="mt-2 font-headline text-2xl font-bold text-foreground md:text-3xl">
             A Responsible Path to Your Health Answers
@@ -27,46 +27,50 @@ export function HowItWorks() {
           }}
           plugins={[
               Autoplay({
-                delay: 4000,
+                delay: 5000,
                 stopOnInteraction: true,
               }),
           ]}
-          className="w-full"
+          className="w-full max-w-4xl mx-auto"
         >
           <CarouselContent>
             {steps.map((step) => (
-              <CarouselItem key={step.number} className="md:basis-1/2 lg:basis-1/3">
-                <div className="p-1 h-full">
-                  <Card className="h-full flex flex-col p-6 shadow-lg">
-                    <CardContent className="p-0 flex flex-col flex-grow">
-                        <div className="flex items-center gap-4 mb-4">
-                          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                              <step.icon className="h-6 w-6 text-primary" strokeWidth={1.5} />
-                          </div>
-                           <span className="text-3xl font-bold text-primary/20">{step.number}</span>
+              <CarouselItem key={step.number}>
+                <div className="p-1">
+                  <Card className="overflow-hidden">
+                    <div className="grid grid-cols-1 md:grid-cols-2">
+                        <div className="p-8 md:p-10 flex flex-col justify-center">
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 flex-shrink-0">
+                                    <step.icon className="h-6 w-6 text-primary" />
+                                </div>
+                                <h3 className="text-xl md:text-2xl font-bold">{step.number}. {step.title}</h3>
+                            </div>
+                            <p className="text-sm md:text-base text-muted-foreground mb-6">{step.description}</p>
+                            
+                            <div>
+                                <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground mb-3">Key Actions:</h4>
+                                <ul className="space-y-2">
+                                  {step.details.map((detail, i) => (
+                                    <li key={i} className="flex items-start gap-3">
+                                      <ArrowRight className="mt-1 h-4 w-4 flex-shrink-0 text-primary" />
+                                      <span className="text-sm text-foreground">{detail}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                            </div>
                         </div>
-                      <h3 className="text-xl font-bold">{step.title}</h3>
-                      <p className="mt-2 text-sm text-muted-foreground flex-grow">{step.description}</p>
-                      <div className="mt-6 border-t pt-4">
-                        <ul className="space-y-2">
-                          {step.details.map((detail, i) => (
-                            <li key={i} className="flex items-start gap-3">
-                              <ArrowRight className="mt-1 h-4 w-4 flex-shrink-0 text-primary" />
-                              <span className="text-xs text-muted-foreground">{detail}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </CardContent>
+                        <div className="bg-background flex items-center justify-center p-8 min-h-[250px] md:min-h-0">
+                            <step.icon className="h-24 w-24 text-primary/80" strokeWidth={1.5} />
+                        </div>
+                    </div>
                   </Card>
                 </div>
               </CarouselItem>
             ))}
           </CarouselContent>
-           <div className="mt-4 flex justify-center gap-4">
-              <CarouselPrevious />
-              <CarouselNext />
-          </div>
+          <CarouselPrevious className="left-[-50px] hidden md:inline-flex" />
+          <CarouselNext className="right-[-50px] hidden md:inline-flex" />
         </Carousel>
       </div>
     </section>

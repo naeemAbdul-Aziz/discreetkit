@@ -187,7 +187,7 @@ export const steps: Step[] = [
     icon: ShoppingBag,
     details: [
       'Choose from individual or bundle packs.',
-      'Student discounts are applied automatically.',
+      'Student discounts are available.',
       'Pay securely with mobile money or card.'
     ]
   },
@@ -291,3 +291,4 @@ export const generateTrackingCode = () => {
     }
     return result.replace(/(.{3})/, "$1-").replace(/(.{7})/, "$1-");
 }
+
