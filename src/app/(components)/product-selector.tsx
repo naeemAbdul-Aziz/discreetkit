@@ -22,6 +22,14 @@ function AddToCartButton({ product }: { product: Product }) {
 
   const quantity = isMounted ? getItemQuantity(product.id) : 0;
 
+  if (!isMounted) {
+    return (
+        <Button variant="outline" className="rounded-full" disabled>
+            <Plus className="mr-2 h-4 w-4" /> Add
+        </Button>
+    )
+  }
+
   if (quantity > 0) {
     return (
       <div className="flex items-center gap-2">
@@ -109,14 +117,6 @@ export function ProductSelector() {
               </div>
             </Card>
           ))}
-        </div>
-        <div className="mt-12 text-center">
-            <Button asChild size="lg">
-                <Link href="/order">
-                    Go to Order Page
-                    <ArrowRight />
-                </Link>
-            </Button>
         </div>
       </div>
     </section>
