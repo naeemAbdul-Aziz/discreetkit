@@ -38,7 +38,7 @@ function PartnersContent() {
                       <CardHeader className="p-0">
                          <div className="relative h-40 w-full bg-muted">
                            <Image 
-                              src="https://placehold.co/400x200"
+                              src="https://picsum.photos/400/200"
                               alt={`${partner.name} background`} 
                               fill
                               className="object-cover grayscale group-hover:grayscale-0 transition-all" 

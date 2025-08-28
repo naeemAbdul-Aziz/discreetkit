@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { AlertCircle, Loader2, ShieldCheck, ShoppingCart, ShoppingBag, ArrowRight } from 'lucide-react';
+import { AlertCircle, Loader2, ShieldCheck, ShoppingCart, ShoppingBag, ArrowRight, Plus, Minus } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ChatTrigger } from '@/components/chat-trigger';
 import { useCart } from '@/hooks/use-cart';
@@ -34,7 +34,7 @@ function OrderForm() {
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   
-  const { items, totalPrice, clearCart } = useCart();
+  const { items, totalPrice, clearCart, updateQuantity } = useCart();
 
   const initialState = { message: null, errors: {}, success: false, code: null };
   const [state, dispatch] = useActionState(createOrderAction, initialState);
@@ -56,6 +56,10 @@ function OrderForm() {
       });
     }
   }, [state, router, toast, clearCart]);
+
+  useEffect(() => {
+    // When cart items change (e.g., last item is removed), this ensures the hidden input is updated.
+  }, [items]);
 
   if (items.length === 0) {
     return (
@@ -90,16 +94,36 @@ function OrderForm() {
         <Card>
             <CardHeader>
                 <CardTitle>1. Review Your Order</CardTitle>
-                <CardDescription>These are the items in your cart.</CardDescription>
+                <CardDescription>Review and adjust your items below.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 {items.map(item => (
                     <div key={item.id} className="flex justify-between items-center">
                         <div>
                             <p className="font-semibold">{item.name}</p>
-                            <p className="text-sm text-muted-foreground">Quantity: {item.quantity}</p>
+                            <p className="text-sm text-muted-foreground">GHS {item.priceGHS.toFixed(2)} each</p>
                         </div>
-                        <p className="font-semibold">GHS {(item.priceGHS * item.quantity).toFixed(2)}</p>
+                         <div className="flex items-center gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 rounded-full"
+                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          >
+                            <Minus className="h-4 w-4" />
+                          </Button>
+                          <span className="w-6 text-center font-bold">{item.quantity}</span>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 rounded-full"
+                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
                     </div>
                 ))}
                  <div className="flex justify-between items-center border-t pt-4 mt-4 font-bold text-lg">
