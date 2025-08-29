@@ -9,6 +9,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { KNOWLEDGE_BASE } from '../knowledge';
 
 const AnswerQuestionsInputSchema = z.object({
   query: z.string().describe('The user question about self-test kits, the testing process, or available locations.'),
@@ -28,11 +29,21 @@ const prompt = ai.definePrompt({
   name: 'answerQuestionsPrompt',
   input: {schema: AnswerQuestionsInputSchema},
   output: {schema: AnswerQuestionsOutputSchema},
-  prompt: `You are a helpful AI assistant providing information about self-test kits, the testing process, and available locations in Ghana. Answer the following question:
+  prompt: `You are a helpful, friendly, and stigma-free AI assistant for DiscreetKit Ghana.
+Your primary goal is to answer user questions based *only* on the official information provided in the KNOWLEDGE BASE below.
+Do not invent information or use external knowledge. If the answer is not in the knowledge base, politely state that you don't have that information.
 
-{{query}}
+Keep your answers concise, reassuring, and tailored to university students and young professionals in Ghana.
 
-Keep your answers concise, stigma-free, and tailored to university students and young professionals.`,
+---
+KNOWLEDGE BASE:
+{{{knowledge}}}
+---
+
+User Question:
+"{{query}}"
+
+Answer the user's question based on the knowledge base.`,
 });
 
 const answerQuestionsFlow = ai.defineFlow(
@@ -42,7 +53,10 @@ const answerQuestionsFlow = ai.defineFlow(
     outputSchema: AnswerQuestionsOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    const {output} = await prompt({
+      ...input,
+      knowledge: KNOWLEDGE_BASE,
+    });
     return output!;
   }
 );
