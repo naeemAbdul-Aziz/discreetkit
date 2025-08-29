@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, ShoppingCart } from 'lucide-react';
+import { ArrowRight, Menu, ShoppingCart } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
@@ -61,7 +61,10 @@ function CartPopover() {
               </div>
             </div>
             <Button asChild className="mt-4 w-full">
-              <Link href="/order">Proceed to Order</Link>
+              <Link href="/order">
+                Proceed to Order
+                <ArrowRight />
+              </Link>
             </Button>
           </>
         ) : (
