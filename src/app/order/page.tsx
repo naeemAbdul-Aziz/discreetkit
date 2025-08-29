@@ -168,7 +168,7 @@ function OrderForm() {
           </CardHeader>
           <CardContent className="space-y-6">
             {products.map((product) => (
-              <div key={product.id} className="flex items-center gap-4">
+              <div key={product.id} className="flex items-start gap-4">
                 <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-muted">
                   <Image
                     src={product.imageUrl}
@@ -180,7 +180,7 @@ function OrderForm() {
                 </div>
                 <div className="flex-grow">
                   <h3 className="font-semibold text-base">{product.name}</h3>
-                  <p className="text-sm text-muted-foreground">{product.description}</p>
+                  <p className="text-sm text-muted-foreground h-12">{product.description}</p>
                    <div className="mt-1.5 flex items-baseline gap-2">
                         <p className={cn(
                             "font-bold",
@@ -361,3 +361,5 @@ export default function OrderPage() {
     </div>
   );
 }
+
+    
