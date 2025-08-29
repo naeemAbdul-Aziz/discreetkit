@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { ShieldCheck, Twitter, Instagram, Facebook } from 'lucide-react';
 import Image from 'next/image';
+import { cn } from '@/lib/utils';
 
 export function Footer() {
   const footerLinks = {
@@ -17,15 +18,21 @@ export function Footer() {
   };
 
   return (
-    <footer className="border-t bg-background">
+    <footer className="border-t bg-primary text-primary-foreground">
       <div className="container mx-auto px-4 py-12 md:px-6">
         <div className="grid gap-8 md:grid-cols-12">
           {/* Brand Section */}
           <div className="md:col-span-4">
             <Link href="/" className="mb-4 inline-flex items-center space-x-2">
-              <Image src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756391917/discreetKit_tvvwkr.png" alt="DiscreetKit Logo" width={160} height={40} />
+              <Image 
+                src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756391917/discreetKit_tvvwkr.png" 
+                alt="DiscreetKit Logo" 
+                width={160} 
+                height={40} 
+                className="brightness-0 invert"
+              />
             </Link>
-            <p className="max-w-xs text-sm text-muted-foreground">
+            <p className="max-w-xs text-sm text-primary-foreground/80">
               Private health answers, delivered with trust. Confidential, reliable self-test kits in Ghana.
             </p>
           </div>
@@ -33,11 +40,11 @@ export function Footer() {
           {/* Links Sections */}
           <div className="grid grid-cols-2 gap-8 md:col-span-5 md:col-start-8">
             <div>
-              <h3 className="mb-4 font-semibold tracking-wider text-foreground">Company</h3>
+              <h3 className="mb-4 font-semibold tracking-wider text-primary-foreground">Company</h3>
               <ul className="space-y-3">
                 {footerLinks.company.map((link) => (
                   <li key={link.href}>
-                    <Link href={link.href} className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+                    <Link href={link.href} className="text-sm text-primary-foreground/80 transition-colors hover:text-primary-foreground">
                       {link.label}
                     </Link>
                   </li>
@@ -45,11 +52,11 @@ export function Footer() {
               </ul>
             </div>
             <div>
-              <h3 className="mb-4 font-semibold tracking-wider text-foreground">Legal</h3>
+              <h3 className="mb-4 font-semibold tracking-wider text-primary-foreground">Legal</h3>
               <ul className="space-y-3">
                 {footerLinks.legal.map((link) => (
                   <li key={link.href}>
-                    <Link href={link.href} className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+                    <Link href={link.href} className="text-sm text-primary-foreground/80 transition-colors hover:text-primary-foreground">
                       {link.label}
                     </Link>
                   </li>
@@ -60,20 +67,20 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 flex flex-col items-center justify-between border-t pt-8 sm:flex-row">
-          <p className="text-sm text-muted-foreground">
+        <div className="mt-12 flex flex-col items-center justify-between border-t border-primary-foreground/20 pt-8 sm:flex-row">
+          <p className="text-sm text-primary-foreground/80">
             &copy; {new Date().getFullYear()} DiscreetKit Ghana. All rights reserved.
           </p>
           <div className="mt-4 flex items-center space-x-4 sm:mt-0">
-            <Link href="#" className="text-muted-foreground transition-colors hover:text-foreground">
+            <Link href="#" className="text-primary-foreground/80 transition-colors hover:text-primary-foreground">
               <Twitter className="h-5 w-5" />
               <span className="sr-only">Twitter</span>
             </Link>
-            <Link href="#" className="text-muted-foreground transition-colors hover:text-foreground">
+            <Link href="#" className="text-primary-foreground/80 transition-colors hover:text-primary-foreground">
               <Instagram className="h-5 w-5" />
               <span className="sr-only">Instagram</span>
             </Link>
-            <Link href="#" className="text-muted-foreground transition-colors hover:text-foreground">
+            <Link href="#" className="text-primary-foreground/80 transition-colors hover:text-primary-foreground">
               <Facebook className="h-5 w-5" />
               <span className="sr-only">Facebook</span>
             </Link>
