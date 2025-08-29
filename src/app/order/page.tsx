@@ -58,7 +58,7 @@ function AddToCartButton({ product }: { product: Product }) {
             <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 rounded-full text-primary hover:bg-primary/10"
+            className="h-7 w-7 rounded-full text-primary hover:bg-primary/10"
             onClick={() => updateQuantity(product.id, quantity - 1)}
             >
             <Minus className="h-4 w-4" />
@@ -67,7 +67,7 @@ function AddToCartButton({ product }: { product: Product }) {
             <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 rounded-full text-primary hover:bg-primary/10"
+            className="h-7 w-7 rounded-full text-primary hover:bg-primary/10"
             onClick={() => updateQuantity(product.id, quantity + 1)}
             >
             <Plus className="h-4 w-4" />
@@ -82,7 +82,7 @@ function AddToCartButton({ product }: { product: Product }) {
       onClick={() => addItem(product)}
       variant="outline"
     >
-      <Plus className="mr-2 h-4 w-4" /> Add to Cart
+      Add to Cart <Plus />
     </Button>
   );
 }
@@ -217,7 +217,7 @@ function OrderForm() {
             <div className="space-y-2">
                 <Label htmlFor="deliveryArea">Delivery Area / Campus *</Label>
                 <Select name="deliveryArea" onValueChange={handleLocationChange} defaultValue={deliveryLocation || "Other"}>
-                <SelectTrigger className={cn(state.errors?.deliveryArea && "border-accent")}>
+                <SelectTrigger className={cn(state.errors?.deliveryArea && "border-destructive")}>
                     <SelectValue placeholder="Select a location..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -228,9 +228,12 @@ function OrderForm() {
                 </SelectContent>
                 </Select>
                  {state.errors?.deliveryArea?.[0] && (
-                    <Alert variant="warning" className="mt-2">
-                        <AlertDescription>{state.errors.deliveryArea[0]}</AlertDescription>
-                    </Alert>
+                    <div className="relative mt-2">
+                      <div className="absolute bottom-full left-3 mb-1 w-auto whitespace-nowrap rounded-md bg-destructive px-3 py-1.5 text-xs font-medium text-destructive-foreground">
+                        <div className="absolute bottom-[-4px] left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 bg-destructive" />
+                        {state.errors.deliveryArea[0]}
+                      </div>
+                    </div>
                 )}
             </div>
 
@@ -241,12 +244,15 @@ function OrderForm() {
                         id="otherDeliveryArea" 
                         name="otherDeliveryArea" 
                         placeholder="e.g., Osu, Airport Area" 
-                        className={cn(state.errors?.otherDeliveryArea && "border-accent")}
+                        className={cn(state.errors?.otherDeliveryArea && "border-destructive")}
                         />
                         {state.errors?.otherDeliveryArea?.[0] && (
-                            <Alert variant="warning" className="mt-2">
-                                <AlertDescription>{state.errors.otherDeliveryArea[0]}</AlertDescription>
-                            </Alert>
+                           <div className="relative mt-2">
+                             <div className="absolute bottom-full left-3 mb-1 w-auto whitespace-nowrap rounded-md bg-destructive px-3 py-1.5 text-xs font-medium text-destructive-foreground">
+                               <div className="absolute bottom-[-4px] left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 bg-destructive" />
+                               {state.errors.otherDeliveryArea[0]}
+                             </div>
+                           </div>
                         )}
                 </div>
             )}
@@ -271,16 +277,19 @@ function OrderForm() {
                 name="phone_masked" 
                 type="tel" 
                 placeholder="e.g., 024xxxxxxx" 
-                className={cn(state.errors?.phone_masked && "border-accent")}
+                className={cn(state.errors?.phone_masked && "border-destructive")}
                 />
                 <p className="text-[0.8rem] text-muted-foreground flex items-center gap-1.5">
                 <ShieldCheck className="h-3.5 w-3.5 text-primary" />
                 This will be masked and is only for the rider to contact you.
                 </p>
                 {state.errors?.phone_masked?.[0] && (
-                    <Alert variant="warning" className="mt-2">
-                        <AlertDescription>{state.errors.phone_masked[0]}</AlertDescription>
-                    </Alert>
+                    <div className="relative mt-2">
+                      <div className="absolute bottom-full left-3 mb-1 w-auto whitespace-nowrap rounded-md bg-destructive px-3 py-1.5 text-xs font-medium text-destructive-foreground">
+                        <div className="absolute bottom-[-4px] left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 bg-destructive" />
+                        {state.errors.phone_masked[0]}
+                      </div>
+                    </div>
                 )}
             </div>
             </CardContent>
