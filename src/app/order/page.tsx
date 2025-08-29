@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ShieldCheck, ArrowRight, Plus, Minus, GraduationCap, Check } from 'lucide-react';
+import { Loader2, ShieldCheck, ArrowRight, Plus, Minus, GraduationCap, Check, AlertTriangle } from 'lucide-react';
 import { ChatTrigger } from '@/components/chat-trigger';
 import { useCart } from '@/hooks/use-cart';
 import { products, discounts, type Product } from '@/lib/data';
@@ -20,6 +20,7 @@ import Image from 'next/image';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 
 function SubmitButton({ disabled }: { disabled: boolean }) {
@@ -53,25 +54,25 @@ function AddToCartButton({ product }: { product: Product }) {
 
   if (quantity > 0) {
     return (
-      <div className="flex h-10 items-center justify-between rounded-full border border-primary/50 p-1">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 rounded-full text-primary hover:bg-primary/10"
-          onClick={() => updateQuantity(product.id, quantity - 1)}
-        >
-          <Minus className="h-4 w-4" />
-        </Button>
-        <span className="w-5 text-center font-bold text-foreground">{quantity}</span>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 rounded-full text-primary hover:bg-primary/10"
-          onClick={() => updateQuantity(product.id, quantity + 1)}
-        >
-          <Plus className="h-4 w-4" />
-        </Button>
-      </div>
+        <div className="flex h-10 items-center justify-between rounded-full border border-primary/50 p-1">
+            <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 rounded-full text-primary hover:bg-primary/10"
+            onClick={() => updateQuantity(product.id, quantity - 1)}
+            >
+            <Minus className="h-4 w-4" />
+            </Button>
+            <span className="w-5 text-center font-bold text-foreground">{quantity}</span>
+            <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 rounded-full text-primary hover:bg-primary/10"
+            onClick={() => updateQuantity(product.id, quantity + 1)}
+            >
+            <Plus className="h-4 w-4" />
+            </Button>
+        </div>
     );
   }
 
@@ -79,6 +80,7 @@ function AddToCartButton({ product }: { product: Product }) {
     <Button
       className="w-full rounded-full"
       onClick={() => addItem(product)}
+      variant="outline"
     >
       <Plus className="mr-2 h-4 w-4" /> Add to Cart
     </Button>
@@ -158,45 +160,43 @@ function OrderForm() {
             <h2 className="text-2xl font-bold text-foreground">1. Choose Your Products</h2>
             <div className="space-y-4">
                 {products.map((product) => (
-                    <Card key={product.id} className="shadow-lg overflow-hidden">
+                     <Card key={product.id} className="shadow-lg overflow-hidden transition-all hover:shadow-xl">
                         <CardContent className="p-4 sm:p-6">
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-                                <div className="relative aspect-square sm:aspect-auto rounded-lg bg-muted overflow-hidden">
+                            <div className="grid grid-cols-1 sm:grid-cols-[80px_1fr_auto] gap-4 sm:gap-6 items-center">
+                                <div className="relative aspect-square w-full sm:w-[80px] rounded-lg bg-muted overflow-hidden">
                                     <Image
                                     src={product.imageUrl}
                                     alt={product.name}
                                     fill
-                                    className="object-contain p-4"
+                                    className="object-contain p-2"
                                     data-ai-hint="medical test kit"
                                     />
                                 </div>
-                                <div className="sm:col-span-2 flex flex-col justify-between">
-                                    <div>
-                                        <h3 className="text-lg font-bold text-foreground">{product.name}</h3>
-                                        <p className="text-sm text-muted-foreground mt-1">{product.description}</p>
-                                        <div className="flex items-center gap-1.5 mt-2 text-xs text-success">
-                                            <Check className="h-3.5 w-3.5" />
-                                            <p>WHO Approved</p>
-                                        </div>
+                                <div className="flex flex-col">
+                                    <h3 className="text-base font-bold text-foreground">{product.name}</h3>
+                                    <p className="text-sm text-muted-foreground mt-1">{product.description}</p>
+                                    <div className="flex items-center gap-1.5 mt-2 text-xs text-success">
+                                        <Check className="h-3.5 w-3.5" />
+                                        <p>WHO Approved</p>
                                     </div>
-                                    <div className="flex items-center justify-between mt-4">
-                                        <div>
-                                            {isStudent && product.studentPriceGHS ? (
-                                                <div className="flex items-baseline gap-2">
-                                                    <p className="font-bold text-success text-xl">GHS {product.studentPriceGHS.toFixed(2)}</p>
-                                                    <p className="text-muted-foreground/80 line-through text-sm font-normal">
-                                                        GHS {product.priceGHS.toFixed(2)}
-                                                    </p>
-                                                </div>
-                                            ) : (
-                                                <p className="font-bold text-xl text-foreground">
+                                </div>
+                                <div className="flex flex-col items-end justify-between self-stretch">
+                                    <div className="text-right">
+                                        {isStudent && product.studentPriceGHS ? (
+                                            <div className="flex flex-col items-end gap-0">
+                                                <p className="font-bold text-success text-base">GHS {product.studentPriceGHS.toFixed(2)}</p>
+                                                <p className="text-muted-foreground/80 line-through text-xs font-normal">
                                                     GHS {product.priceGHS.toFixed(2)}
                                                 </p>
-                                            )}
-                                        </div>
-                                        <div className="w-32">
-                                           <AddToCartButton product={product} />
-                                        </div>
+                                            </div>
+                                        ) : (
+                                            <p className="font-bold text-base text-foreground">
+                                                GHS {product.priceGHS.toFixed(2)}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="w-32 mt-2">
+                                       <AddToCartButton product={product} />
                                     </div>
                                 </div>
                             </div>
@@ -217,7 +217,7 @@ function OrderForm() {
             <div className="space-y-2">
                 <Label htmlFor="deliveryArea">Delivery Area / Campus *</Label>
                 <Select name="deliveryArea" onValueChange={handleLocationChange} defaultValue={deliveryLocation || "Other"}>
-                <SelectTrigger className={cn(state.errors?.deliveryArea && "border-destructive")}>
+                <SelectTrigger className={cn(state.errors?.deliveryArea && "border-accent")}>
                     <SelectValue placeholder="Select a location..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -227,13 +227,10 @@ function OrderForm() {
                         ))}
                 </SelectContent>
                 </Select>
-                {state.errors?.deliveryArea && (
-                    <div className="relative mt-2">
-                    <div className="bg-destructive text-destructive-foreground text-xs font-medium px-2 py-1 rounded-md relative">
-                        {state.errors.deliveryArea[0]}
-                        <div className="absolute bottom-full left-4 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-b-4 border-b-destructive"></div>
-                    </div>
-                    </div>
+                 {state.errors?.deliveryArea?.[0] && (
+                    <Alert variant="warning" className="mt-2">
+                        <AlertDescription>{state.errors.deliveryArea[0]}</AlertDescription>
+                    </Alert>
                 )}
             </div>
 
@@ -244,15 +241,12 @@ function OrderForm() {
                         id="otherDeliveryArea" 
                         name="otherDeliveryArea" 
                         placeholder="e.g., Osu, Airport Area" 
-                        className={cn(state.errors?.otherDeliveryArea && "border-destructive")}
+                        className={cn(state.errors?.otherDeliveryArea && "border-accent")}
                         />
-                        {state.errors?.otherDeliveryArea && (
-                                <div className="relative mt-2">
-                                <div className="bg-destructive text-destructive-foreground text-xs font-medium px-2 py-1 rounded-md relative">
-                                    {state.errors.otherDeliveryArea[0]}
-                                    <div className="absolute bottom-full left-4 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-b-4 border-b-destructive"></div>
-                                </div>
-                                </div>
+                        {state.errors?.otherDeliveryArea?.[0] && (
+                            <Alert variant="warning" className="mt-2">
+                                <AlertDescription>{state.errors.otherDeliveryArea[0]}</AlertDescription>
+                            </Alert>
                         )}
                 </div>
             )}
@@ -277,19 +271,16 @@ function OrderForm() {
                 name="phone_masked" 
                 type="tel" 
                 placeholder="e.g., 024xxxxxxx" 
-                className={cn(state.errors?.phone_masked && "border-destructive")}
+                className={cn(state.errors?.phone_masked && "border-accent")}
                 />
                 <p className="text-[0.8rem] text-muted-foreground flex items-center gap-1.5">
                 <ShieldCheck className="h-3.5 w-3.5 text-primary" />
                 This will be masked and is only for the rider to contact you.
                 </p>
-                {state.errors?.phone_masked && (
-                    <div className="relative mt-2">
-                    <div className="bg-destructive text-destructive-foreground text-xs font-medium px-2 py-1 rounded-md relative">
-                        {state.errors.phone_masked[0]}
-                        <div className="absolute bottom-full left-4 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-b-4 border-b-destructive"></div>
-                    </div>
-                    </div>
+                {state.errors?.phone_masked?.[0] && (
+                    <Alert variant="warning" className="mt-2">
+                        <AlertDescription>{state.errors.phone_masked[0]}</AlertDescription>
+                    </Alert>
                 )}
             </div>
             </CardContent>

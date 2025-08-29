@@ -1,5 +1,6 @@
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
+import { AlertTriangle } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -12,7 +13,7 @@ const alertVariants = cva(
         destructive:
           "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
         warning:
-            "border-accent/50 text-accent-foreground dark:border-accent [&>svg]:text-accent-foreground bg-accent/10",
+          "border-accent/50 text-accent-foreground dark:border-accent [&>svg]:text-accent-foreground bg-accent/10",
       },
     },
     defaultVariants: {
@@ -30,7 +31,10 @@ const Alert = React.forwardRef<
     role="alert"
     className={cn(alertVariants({ variant }), className)}
     {...props}
-  />
+  >
+    {variant === "warning" && <AlertTriangle className="h-4 w-4" />}
+    {props.children}
+  </div>
 ))
 Alert.displayName = "Alert"
 
