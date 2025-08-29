@@ -109,7 +109,7 @@ function OrderForm() {
       });
       clearCart();
       router.push(`/order/success?code=${state.code}`);
-    } else if (state.message && !state.success) {
+    } else if (state.message && !state.success && !state.errors) {
       toast({
         title: 'An error occurred',
         description: state.message,
@@ -215,7 +215,10 @@ function OrderForm() {
                     </SelectContent>
                   </Select>
                   {state.errors?.deliveryArea && (
-                    <p className="text-sm font-medium text-destructive">{state.errors.deliveryArea[0]}</p>
+                    <Alert variant="warning" className="mt-2">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription>{state.errors.deliveryArea[0]}</AlertDescription>
+                    </Alert>
                   )}
                 </div>
 
@@ -224,7 +227,10 @@ function OrderForm() {
                          <Label htmlFor="otherDeliveryArea">Please Specify Your Location</Label>
                         <Input id="otherDeliveryArea" name="otherDeliveryArea" placeholder="e.g., Osu, Airport Area" />
                          {state.errors?.otherDeliveryArea && (
-                            <p className="text-sm font-medium text-destructive">{state.errors.otherDeliveryArea[0]}</p>
+                            <Alert variant="warning" className="mt-2">
+                                <AlertCircle className="h-4 w-4" />
+                                <AlertDescription>{state.errors.otherDeliveryArea[0]}</AlertDescription>
+                            </Alert>
                          )}
                     </div>
                 )}
@@ -247,7 +253,10 @@ function OrderForm() {
                     This will be masked and is only for the rider to contact you.
                   </p>
                   {state.errors?.phone_masked && (
-                    <p className="text-sm font-medium text-destructive">{state.errors.phone_masked[0]}</p>
+                    <Alert variant="warning" className="mt-2">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription>{state.errors.phone_masked[0]}</AlertDescription>
+                    </Alert>
                   )}
                 </div>
               </CardContent>
@@ -286,7 +295,7 @@ function OrderForm() {
               </AlertDescription>
             </Alert>
 
-            {state.message && !state.success && (
+            {state.message && !state.success && !state.errors && (
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>Error</AlertTitle>
