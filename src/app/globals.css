@@ -5,7 +5,7 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%; /* Very Light Blue -> AliceBlue */
+    --background: 30 10% 98%; /* Soft Linen White */
     --foreground: 210 20% 18%; /* Deep Sapphire Text */
 
     --card: 0 0% 100%; /* Pure White */
@@ -14,16 +14,16 @@
     --popover: 0 0% 100%; /* Pure White */
     --popover-foreground: 210 20% 18%;
 
-    --primary: 202 89% 74%; /* Light Blue -> #BEE3F8 */
-    --primary-foreground: 210 20% 18%;
+    --primary: 200 85% 45%; /* Vibrant Ocean Blue */
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 140 80% 40%; /* Lively Spring Green */
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 95%; /* F0F8FF */
+    --muted: 200 15% 93%; /* Whispering Sky Gray */
     --muted-foreground: 210 10% 40%;
 
-    --accent: 147 51% 41%; /* Bright Green -> #38A169 */
+    --accent: 30 90% 55%; /* Energetic Sunset Orange */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 75% 50%; /* Bold Alert Red */
@@ -34,8 +34,8 @@
 
     --border: 210 15% 88%;
     --input: 210 15% 88%;
-    --ring: 202 89% 74%;
-    --button-hover: 147 51% 41%;
+    --ring: 200 85% 45%;
+    --button-hover: 30 90% 55%;
 
     --radius: 0.8rem;
   }
