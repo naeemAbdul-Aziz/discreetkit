@@ -20,7 +20,7 @@ import Image from 'next/image';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 
 function SubmitButton({ disabled }: { disabled: boolean }) {
@@ -162,7 +162,7 @@ function OrderForm() {
                 {products.map((product) => (
                      <Card key={product.id} className="shadow-lg overflow-hidden transition-all hover:shadow-xl">
                         <CardContent className="p-4 sm:p-6">
-                            <div className="grid grid-cols-1 sm:grid-cols-[80px_1fr_auto] gap-4 sm:gap-6 items-center">
+                            <div className="grid grid-cols-[80px_1fr_auto] gap-4 sm:gap-6 items-center">
                                 <div className="relative aspect-square w-full sm:w-[80px] rounded-lg bg-muted overflow-hidden">
                                     <Image
                                     src={product.imageUrl}
@@ -181,14 +181,14 @@ function OrderForm() {
                                     </div>
                                 </div>
                                 <div className="flex flex-col items-end justify-between self-stretch">
-                                    <div className="text-right">
+                                    <div className="text-right h-10 flex flex-col justify-center items-end">
                                         {isStudent && product.studentPriceGHS ? (
-                                            <div className="flex flex-col items-end gap-0">
+                                            <>
                                                 <p className="font-bold text-success text-base">GHS {product.studentPriceGHS.toFixed(2)}</p>
                                                 <p className="text-muted-foreground/80 line-through text-xs font-normal">
                                                     GHS {product.priceGHS.toFixed(2)}
                                                 </p>
-                                            </div>
+                                            </>
                                         ) : (
                                             <p className="font-bold text-base text-foreground">
                                                 GHS {product.priceGHS.toFixed(2)}
@@ -228,12 +228,12 @@ function OrderForm() {
                 </SelectContent>
                 </Select>
                  {state.errors?.deliveryArea?.[0] && (
-                    <div className="relative mt-2">
-                      <div className="absolute bottom-full left-3 mb-1 w-auto whitespace-nowrap rounded-md bg-destructive px-3 py-1.5 text-xs font-medium text-destructive-foreground">
-                        <div className="absolute bottom-[-4px] left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 bg-destructive" />
+                    <Alert variant="warning" className="mt-2">
+                      <AlertTriangle className="h-4 w-4" />
+                      <AlertDescription>
                         {state.errors.deliveryArea[0]}
-                      </div>
-                    </div>
+                      </AlertDescription>
+                    </Alert>
                 )}
             </div>
 
@@ -247,12 +247,12 @@ function OrderForm() {
                         className={cn(state.errors?.otherDeliveryArea && "border-destructive")}
                         />
                         {state.errors?.otherDeliveryArea?.[0] && (
-                           <div className="relative mt-2">
-                             <div className="absolute bottom-full left-3 mb-1 w-auto whitespace-nowrap rounded-md bg-destructive px-3 py-1.5 text-xs font-medium text-destructive-foreground">
-                               <div className="absolute bottom-[-4px] left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 bg-destructive" />
+                           <Alert variant="warning" className="mt-2">
+                             <AlertTriangle className="h-4 w-4" />
+                             <AlertDescription>
                                {state.errors.otherDeliveryArea[0]}
-                             </div>
-                           </div>
+                             </AlertDescription>
+                           </Alert>
                         )}
                 </div>
             )}
@@ -284,12 +284,12 @@ function OrderForm() {
                 This will be masked and is only for the rider to contact you.
                 </p>
                 {state.errors?.phone_masked?.[0] && (
-                    <div className="relative mt-2">
-                      <div className="absolute bottom-full left-3 mb-1 w-auto whitespace-nowrap rounded-md bg-destructive px-3 py-1.5 text-xs font-medium text-destructive-foreground">
-                        <div className="absolute bottom-[-4px] left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 bg-destructive" />
+                    <Alert variant="warning" className="mt-2">
+                      <AlertTriangle className="h-4 w-4" />
+                      <AlertDescription>
                         {state.errors.phone_masked[0]}
-                      </div>
-                    </div>
+                      </AlertDescription>
+                    </Alert>
                 )}
             </div>
             </CardContent>
