@@ -1,5 +1,4 @@
 
-
 import { BadgeCheck, Lock, ShieldCheck, Truck, Users, GraduationCap, Hospital, MapPin, ShoppingBag, MessageCircle, HeartHandshake } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
@@ -175,6 +174,8 @@ export type Step = {
   description: string;
   icon: LucideIcon;
   details: string[];
+  imageUrl: string;
+  imageHint: string;
 };
 
 export const steps: Step[] = [
@@ -187,7 +188,9 @@ export const steps: Step[] = [
       'Choose from individual or bundle packs.',
       'Student discounts are available.',
       'Pay securely with mobile money or card.'
-    ]
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxzb21lb25lJTIwJTIwb3JkZXJpbmclMjBvbmxpbmV8ZW58MHx8fHwxNzU2Mzk1NzgxfDA&ixlib=rb-4.1.0&q=80&w=1080',
+    imageHint: 'person ordering online'
   },
   {
     number: '2',
@@ -198,7 +201,9 @@ export const steps: Step[] = [
         'Unmarked packaging ensures complete privacy.',
         'Track your order with your anonymous code.',
         'Pickup options available at trusted local pharmacies.'
-    ]
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1606830733744-0ad77a44b931?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxkaXNjcmVldCUyMHBhY2thZ2V8ZW58MHx8fHwxNzU2Mzk1ODIwfDA&ixlib=rb-4.1.0&q=80&w=1080',
+    imageHint: 'discreet package'
   },
   {
     number: '3',
@@ -209,7 +214,9 @@ export const steps: Step[] = [
         'WHO-approved tests for reliable results.',
         'Easy-to-understand instruction manual included.',
         'Get your results in under 20 minutes.'
-    ]
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1583324113620-910f24a2571b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmbGF0JTIwbGF5JTIwbWVkaWNhbCUyMGtpdHxlbnwwfHx8fDE3NTYxNDg5OTV8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    imageHint: 'medical kit'
   },
   {
     number: '4',
@@ -220,7 +227,9 @@ export const steps: Step[] = [
         'Access to professional counselors.',
         'Discounted confirmatory testing at partner hospitals.',
         'A responsible and supportive path to care.'
-    ]
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxoZWFsdGhjYXJlJTIwcHJvZmVzc2lvbmFsJTIwY29uc3VsdGluZ3xlbnwwfHx8fDE3NTYzOTU4ODF8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    imageHint: 'healthcare professional'
   },
 ];
 

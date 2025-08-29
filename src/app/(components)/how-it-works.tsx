@@ -10,6 +10,7 @@ import Autoplay from 'embla-carousel-autoplay';
 import { ArrowRight, Pause, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 
 export function HowItWorks() {
   const [api, setApi] = useState<EmblaCarouselType | undefined>();
@@ -102,8 +103,14 @@ export function HowItWorks() {
                           </ul>
                         </div>
                       </div>
-                      <div className="bg-background flex items-center justify-center p-8 min-h-[250px] md:min-h-0">
-                        <step.icon className="h-24 w-24 text-primary/80" strokeWidth={1.5} />
+                      <div className="relative bg-background flex items-center justify-center p-8 min-h-[300px] md:min-h-0">
+                        <Image
+                            src={step.imageUrl}
+                            alt={step.title}
+                            fill
+                            className="object-cover"
+                            data-ai-hint={step.imageHint}
+                        />
                       </div>
                     </div>
                   </Card>

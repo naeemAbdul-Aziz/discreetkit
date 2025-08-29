@@ -13,6 +13,7 @@ import { OurVision } from './(components)/our-vision';
 import { SummaryBar } from '@/components/summary-bar';
 import { HowItWorks } from './(components)/how-it-works';
 import { ProductBenefits } from './(components)/product-benefits';
+import { ProductSelector } from './(components)/product-selector';
 
 export default function Home() {
   return (
@@ -20,6 +21,7 @@ export default function Home() {
       <Hero />
       <ProductBenefits />
       <HowItWorks />
+      <ProductSelector />
       <WhatsInTheKit />
       <TrustStats />
       <OurVision />

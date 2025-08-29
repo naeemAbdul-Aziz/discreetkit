@@ -1,69 +1,12 @@
 
 'use client';
 
-import { products, type Product } from '@/lib/data';
+import { products } from '@/lib/data';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { Minus, Plus } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { GraduationCap, ArrowRight } from 'lucide-react';
-import { useCart } from '@/hooks/use-cart';
-import { useState, useEffect } from 'react';
+import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-
-function AddToCartButton({ product }: { product: Product }) {
-  const { addItem, updateQuantity, getItemQuantity } = useCart();
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  const quantity = isMounted ? getItemQuantity(product.id) : 0;
-
-  if (!isMounted) {
-    return (
-        <Button variant="outline" className="rounded-full" disabled>
-            <Plus className="mr-2 h-4 w-4" /> Add
-        </Button>
-    )
-  }
-
-  if (quantity > 0) {
-    return (
-      <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="icon"
-          className="h-8 w-8 rounded-full"
-          onClick={() => updateQuantity(product.id, quantity - 1)}
-        >
-          <Minus className="h-4 w-4" />
-        </Button>
-        <span className="w-6 text-center font-bold">{quantity}</span>
-        <Button
-          variant="outline"
-          size="icon"
-          className="h-8 w-8 rounded-full"
-          onClick={() => updateQuantity(product.id, quantity + 1)}
-        >
-          <Plus className="h-4 w-4" />
-        </Button>
-      </div>
-    );
-  }
-
-  return (
-    <Button
-      variant="outline"
-      className="rounded-full"
-      onClick={() => addItem(product)}
-    >
-      <Plus className="mr-2 h-4 w-4" /> Add
-    </Button>
-  );
-}
 
 export function ProductSelector() {
   return (
@@ -84,7 +27,6 @@ export function ProductSelector() {
               key={product.id}
               className="group flex h-full flex-col overflow-hidden rounded-2xl shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl"
             >
-              <div className="flex flex-grow flex-col">
                 <CardContent className="flex flex-grow flex-col p-0">
                   <div className="relative aspect-square overflow-hidden bg-muted p-4">
                     <Image
@@ -96,25 +38,18 @@ export function ProductSelector() {
                     />
                   </div>
                   <div className="flex flex-grow flex-col p-6">
-                    {product.is_student_bundle && (
-                      <Badge
-                        variant="secondary"
-                        className="mb-2 flex w-fit items-center gap-1.5 bg-green-100 text-green-800"
-                      >
-                        <GraduationCap className="h-3.5 w-3.5" />
-                        Student Pricing
-                      </Badge>
-                    )}
                     <h3 className="flex-grow text-base font-semibold md:text-lg">{product.name}</h3>
                     <p className="mt-1 h-12 text-sm text-muted-foreground">{product.description}</p>
-
                     <div className="mt-4 flex items-center justify-between border-t pt-4">
                       <p className="text-lg font-semibold">GHS {product.priceGHS.toFixed(2)}</p>
-                      <AddToCartButton product={product} />
+                      <Button asChild variant="outline" className="rounded-full">
+                        <Link href="/order">
+                            Order Now <ArrowRight className="ml-2 h-4 w-4" />
+                        </Link>
+                      </Button>
                     </div>
                   </div>
                 </CardContent>
-              </div>
             </Card>
           ))}
         </div>
