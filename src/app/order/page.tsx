@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useActionState } from 'react';
@@ -47,31 +46,27 @@ function AddToCartButton({ product }: { product: Product }) {
   }, []);
 
   if (!isMounted) {
-    return (
-        <Button variant="outline" className="w-20 justify-center rounded-full" disabled>
-            <Plus className="mr-2 h-4 w-4" /> Add
-        </Button>
-    )
+    return <div className="h-10 w-full rounded-full bg-muted animate-pulse" />;
   }
 
   const quantity = getItemQuantity(product.id);
 
   if (quantity > 0) {
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex h-10 items-center justify-between rounded-full border border-primary/50 p-1">
         <Button
-          variant="outline"
+          variant="ghost"
           size="icon"
-          className="h-7 w-7 rounded-full border-primary/50 text-primary hover:bg-primary/10"
+          className="h-8 w-8 rounded-full text-primary hover:bg-primary/10"
           onClick={() => updateQuantity(product.id, quantity - 1)}
         >
           <Minus className="h-4 w-4" />
         </Button>
         <span className="w-5 text-center font-bold text-foreground">{quantity}</span>
         <Button
-          variant="outline"
+          variant="ghost"
           size="icon"
-          className="h-7 w-7 rounded-full border-primary/50 text-primary hover:bg-primary/10"
+          className="h-8 w-8 rounded-full text-primary hover:bg-primary/10"
           onClick={() => updateQuantity(product.id, quantity + 1)}
         >
           <Plus className="h-4 w-4" />
@@ -82,11 +77,10 @@ function AddToCartButton({ product }: { product: Product }) {
 
   return (
     <Button
-      variant="outline"
-      className="w-20 justify-center rounded-full border-primary text-primary hover:bg-primary/10 hover:text-primary"
+      className="w-full rounded-full"
       onClick={() => addItem(product)}
     >
-      <Plus className="mr-2 h-4 w-4" /> Add
+      <Plus className="mr-2 h-4 w-4" /> Add to Cart
     </Button>
   );
 }
@@ -160,219 +154,224 @@ function OrderForm() {
         <input type="hidden" name="totalPrice" value={totalPrice} />
 
 
-        <Card className="bg-card shadow-lg">
-          <CardHeader>
-            <CardTitle>1. Choose Your Products</CardTitle>
-            <CardDescription>Add or adjust items in your cart. Student pricing is applied automatically for campus deliveries.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-             {products.map((product, index) => (
-                <div key={product.id}>
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                    <div className="relative h-20 w-20 flex-shrink-0 self-center sm:self-start overflow-hidden rounded-lg bg-muted">
-                        <Image
-                        src={product.imageUrl}
-                        alt={product.name}
-                        fill
-                        className="object-contain p-2"
-                        data-ai-hint="medical test kit"
-                        />
-                    </div>
-                    <div className="flex-grow">
-                      <h3 className="font-semibold text-base">{product.name}</h3>
-                      <p className="text-sm text-muted-foreground mt-1 ">{product.description}</p>
-                    </div>
-                    <div className="flex w-full sm:w-auto items-center justify-between gap-4">
-                        <div className="flex flex-col items-start sm:items-end">
-                            {isStudent && product.studentPriceGHS ? (
-                                <div className="flex items-baseline gap-2">
-                                    <p className="text-muted-foreground/80 line-through text-sm font-normal">
-                                        GHS {product.priceGHS.toFixed(2)}
-                                    </p>
-                                    <p className="font-bold text-success text-base">GHS {product.studentPriceGHS.toFixed(2)}</p>
+        <div className="space-y-4">
+            <h2 className="text-2xl font-bold text-foreground">1. Choose Your Products</h2>
+            <div className="space-y-4">
+                {products.map((product) => (
+                    <Card key={product.id} className="shadow-lg overflow-hidden">
+                        <CardContent className="p-4 sm:p-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                                <div className="relative aspect-square sm:aspect-auto rounded-lg bg-muted overflow-hidden">
+                                    <Image
+                                    src={product.imageUrl}
+                                    alt={product.name}
+                                    fill
+                                    className="object-contain p-4"
+                                    data-ai-hint="medical test kit"
+                                    />
                                 </div>
-                            ) : (
-                                <p className="font-bold text-base text-foreground">
-                                    GHS {product.priceGHS.toFixed(2)}
-                                </p>
-                            )}
-                        </div>
-                        <AddToCartButton product={product} />
-                    </div>
-                  </div>
-                    {index < products.length - 1 && <Separator className="my-4" />}
-                </div>
-            ))}
-          </CardContent>
-        </Card>
-
+                                <div className="sm:col-span-2 flex flex-col justify-between">
+                                    <div>
+                                        <h3 className="text-lg font-bold text-foreground">{product.name}</h3>
+                                        <p className="text-sm text-muted-foreground mt-1">{product.description}</p>
+                                        <div className="flex items-center gap-1.5 mt-2 text-xs text-success">
+                                            <Check className="h-3.5 w-3.5" />
+                                            <p>WHO Approved</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center justify-between mt-4">
+                                        <div>
+                                            {isStudent && product.studentPriceGHS ? (
+                                                <div className="flex items-baseline gap-2">
+                                                    <p className="font-bold text-success text-xl">GHS {product.studentPriceGHS.toFixed(2)}</p>
+                                                    <p className="text-muted-foreground/80 line-through text-sm font-normal">
+                                                        GHS {product.priceGHS.toFixed(2)}
+                                                    </p>
+                                                </div>
+                                            ) : (
+                                                <p className="font-bold text-xl text-foreground">
+                                                    GHS {product.priceGHS.toFixed(2)}
+                                                </p>
+                                            )}
+                                        </div>
+                                        <div className="w-32">
+                                           <AddToCartButton product={product} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+        </div>
         
-            <Card className="bg-card shadow-lg">
-              <CardHeader>
-                <CardTitle>2. Delivery Information</CardTitle>
-                <CardDescription>
-                  We only need a location and contact for the delivery rider. Your details are deleted after delivery.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="deliveryArea">Delivery Area / Campus *</Label>
-                  <Select name="deliveryArea" onValueChange={handleLocationChange} defaultValue={deliveryLocation || "Other"}>
-                    <SelectTrigger className={cn(state.errors?.deliveryArea && "border-destructive")}>
-                        <SelectValue placeholder="Select a location..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                         <SelectItem value="Other">Other (Standard Delivery)</SelectItem>
-                         {discounts.map(loc => (
-                           <SelectItem key={loc.id} value={loc.campus}>{loc.campus} (Student Discount)</SelectItem>
-                         ))}
-                    </SelectContent>
-                  </Select>
-                   {state.errors?.deliveryArea && (
-                       <div className="relative mt-2">
-                        <div className="bg-destructive text-destructive-foreground text-xs font-medium px-2 py-1 rounded-md relative">
-                          {state.errors.deliveryArea[0]}
-                          <div className="absolute bottom-full left-4 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-b-4 border-b-destructive"></div>
-                        </div>
-                      </div>
-                    )}
-                </div>
-
-                {showOther && (
-                    <div className="space-y-2">
-                         <Label htmlFor="otherDeliveryArea">Please Specify Your Location *</Label>
-                        <Input 
-                            id="otherDeliveryArea" 
-                            name="otherDeliveryArea" 
-                            placeholder="e.g., Osu, Airport Area" 
-                            className={cn(state.errors?.otherDeliveryArea && "border-destructive")}
-                         />
-                         {state.errors?.otherDeliveryArea && (
-                              <div className="relative mt-2">
-                                <div className="bg-destructive text-destructive-foreground text-xs font-medium px-2 py-1 rounded-md relative">
-                                  {state.errors.otherDeliveryArea[0]}
-                                  <div className="absolute bottom-full left-4 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-b-4 border-b-destructive"></div>
-                                </div>
-                              </div>
-                         )}
+        <Card className="bg-card shadow-lg">
+            <CardHeader>
+            <CardTitle>2. Delivery Information</CardTitle>
+            <CardDescription>
+                We only need a location and contact for the delivery rider. Your details are deleted after delivery.
+            </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+            <div className="space-y-2">
+                <Label htmlFor="deliveryArea">Delivery Area / Campus *</Label>
+                <Select name="deliveryArea" onValueChange={handleLocationChange} defaultValue={deliveryLocation || "Other"}>
+                <SelectTrigger className={cn(state.errors?.deliveryArea && "border-destructive")}>
+                    <SelectValue placeholder="Select a location..." />
+                </SelectTrigger>
+                <SelectContent>
+                        <SelectItem value="Other">Other (Standard Delivery)</SelectItem>
+                        {discounts.map(loc => (
+                        <SelectItem key={loc.id} value={loc.campus}>{loc.campus} (Student Discount)</SelectItem>
+                        ))}
+                </SelectContent>
+                </Select>
+                {state.errors?.deliveryArea && (
+                    <div className="relative mt-2">
+                    <div className="bg-destructive text-destructive-foreground text-xs font-medium px-2 py-1 rounded-md relative">
+                        {state.errors.deliveryArea[0]}
+                        <div className="absolute bottom-full left-4 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-b-4 border-b-destructive"></div>
+                    </div>
                     </div>
                 )}
-                
-                <div className="space-y-2">
-                  <Label htmlFor="deliveryAddressNote">Additional Notes for Delivery Agent</Label>
-                  <Textarea
-                    id="deliveryAddressNote"
-                    name="deliveryAddressNote"
-                    placeholder="e.g., 'Call upon arrival at the main gate', 'Leave with the security.'"
-                  />
-                   <p className="text-[0.8rem] text-muted-foreground">
-                    Optional notes to help the rider find you.
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Label htmlFor="phone_masked">Contact Number (for delivery rider only) *</Label>
-                  </div>
-                  <Input 
-                    id="phone_masked" 
-                    name="phone_masked" 
-                    type="tel" 
-                    placeholder="e.g., 024xxxxxxx" 
-                    className={cn(state.errors?.phone_masked && "border-destructive")}
-                  />
-                  <p className="text-[0.8rem] text-muted-foreground flex items-center gap-1.5">
-                    <ShieldCheck className="h-3.5 w-3.5 text-primary" />
-                    This will be masked and is only for the rider to contact you.
-                  </p>
-                  {state.errors?.phone_masked && (
-                     <div className="relative mt-2">
-                        <div className="bg-destructive text-destructive-foreground text-xs font-medium px-2 py-1 rounded-md relative">
-                          {state.errors.phone_masked[0]}
-                          <div className="absolute bottom-full left-4 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-b-4 border-b-destructive"></div>
-                        </div>
-                      </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+            </div>
 
-            <Card className="bg-card shadow-lg">
-                <CardHeader>
-                    <CardTitle>3. Order Summary</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    {items.length === 0 ? (
-                    <p className="text-muted-foreground text-center py-4">Your cart is empty. Add a product to see a summary.</p>
-                    ) : (
-                    <div className="space-y-4">
-                        {isStudent && (
-                            <div className="flex items-center gap-2 rounded-lg bg-success/10 p-3 text-success">
-                                <GraduationCap className="h-5 w-5" />
-                                <p className="text-sm font-medium">Student discount applied!</p>
-                            </div>
+            {showOther && (
+                <div className="space-y-2">
+                        <Label htmlFor="otherDeliveryArea">Please Specify Your Location *</Label>
+                    <Input 
+                        id="otherDeliveryArea" 
+                        name="otherDeliveryArea" 
+                        placeholder="e.g., Osu, Airport Area" 
+                        className={cn(state.errors?.otherDeliveryArea && "border-destructive")}
+                        />
+                        {state.errors?.otherDeliveryArea && (
+                                <div className="relative mt-2">
+                                <div className="bg-destructive text-destructive-foreground text-xs font-medium px-2 py-1 rounded-md relative">
+                                    {state.errors.otherDeliveryArea[0]}
+                                    <div className="absolute bottom-full left-4 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-b-4 border-b-destructive"></div>
+                                </div>
+                                </div>
                         )}
-                        <div className="space-y-4 text-sm">
-                        {items.map(item => (
-                            <div key={item.id} className="flex justify-between items-center gap-4">
-                                <div className="flex items-center gap-4">
-                                    <div className="relative h-12 w-12 flex-shrink-0 rounded-md bg-muted overflow-hidden">
-                                        <Image src={item.imageUrl} alt={item.name} fill className="object-contain p-1" />
-                                    </div>
-                                    <div>
-                                        <p className="font-semibold text-foreground">{item.name}</p>
-                                        <p className="text-muted-foreground">Qty: {item.quantity}</p>
-                                    </div>
+                </div>
+            )}
+            
+            <div className="space-y-2">
+                <Label htmlFor="deliveryAddressNote">Additional Notes for Delivery Agent</Label>
+                <Textarea
+                id="deliveryAddressNote"
+                name="deliveryAddressNote"
+                placeholder="e.g., 'Call upon arrival at the main gate', 'Leave with the security.'"
+                />
+                <p className="text-[0.8rem] text-muted-foreground">
+                Optional notes to help the rider find you.
+                </p>
+            </div>
+            <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                <Label htmlFor="phone_masked">Contact Number (for delivery rider only) *</Label>
+                </div>
+                <Input 
+                id="phone_masked" 
+                name="phone_masked" 
+                type="tel" 
+                placeholder="e.g., 024xxxxxxx" 
+                className={cn(state.errors?.phone_masked && "border-destructive")}
+                />
+                <p className="text-[0.8rem] text-muted-foreground flex items-center gap-1.5">
+                <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+                This will be masked and is only for the rider to contact you.
+                </p>
+                {state.errors?.phone_masked && (
+                    <div className="relative mt-2">
+                    <div className="bg-destructive text-destructive-foreground text-xs font-medium px-2 py-1 rounded-md relative">
+                        {state.errors.phone_masked[0]}
+                        <div className="absolute bottom-full left-4 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-b-4 border-b-destructive"></div>
+                    </div>
+                    </div>
+                )}
+            </div>
+            </CardContent>
+        </Card>
+
+        <Card className="bg-card shadow-lg">
+            <CardHeader>
+                <CardTitle>3. Order Summary</CardTitle>
+            </CardHeader>
+            <CardContent>
+                {items.length === 0 ? (
+                <p className="text-muted-foreground text-center py-4">Your cart is empty. Add a product to see a summary.</p>
+                ) : (
+                <div className="space-y-4">
+                    {isStudent && (
+                        <div className="flex items-center gap-2 rounded-lg bg-success/10 p-3 text-success">
+                            <GraduationCap className="h-5 w-5" />
+                            <p className="text-sm font-medium">Student discount applied!</p>
+                        </div>
+                    )}
+                    <div className="space-y-4 text-sm">
+                    {items.map(item => (
+                        <div key={item.id} className="flex justify-between items-center gap-4">
+                            <div className="flex items-center gap-4">
+                                <div className="relative h-12 w-12 flex-shrink-0 rounded-md bg-muted overflow-hidden">
+                                    <Image src={item.imageUrl} alt={item.name} fill className="object-contain p-1" />
                                 </div>
-                                <div className="text-right">
-                                    {isStudent && item.studentPriceGHS ? (
-                                        <>
-                                            <p className="font-bold text-success">GHS {(item.studentPriceGHS * item.quantity).toFixed(2)}</p>
-                                            <p className="text-xs text-muted-foreground/80 line-through">GHS {(item.priceGHS * item.quantity).toFixed(2)}</p>
-                                        </>
-                                    ) : (
-                                        <p className="font-medium text-foreground">GHS {(item.priceGHS * item.quantity).toFixed(2)}</p>
-                                    )}
+                                <div>
+                                    <p className="font-semibold text-foreground">{item.name}</p>
+                                    <p className="text-muted-foreground">Qty: {item.quantity}</p>
                                 </div>
                             </div>
-                        ))}
-                        </div>
-
-                        <Separator />
-
-                        <div className="space-y-2 text-sm">
-                            <div className="flex justify-between">
-                                <p className="text-muted-foreground">Subtotal</p>
-                                <p className="font-medium text-foreground">GHS {subtotal.toFixed(2)}</p>
-                            </div>
-                        {studentDiscount > 0 && (
-                            <div className="flex justify-between text-success font-medium">
-                                <p>Student Discount</p>
-                                <p>- GHS {studentDiscount.toFixed(2)}</p>
-                            </div>
-                            )}
-                            <div className="flex justify-between">
-                                <p className="text-muted-foreground">Delivery Fee</p>
-                                <p className="font-medium text-foreground">GHS {deliveryFee.toFixed(2)}</p>
+                            <div className="text-right">
+                                {isStudent && item.studentPriceGHS ? (
+                                    <>
+                                        <p className="font-bold text-success">GHS {(item.studentPriceGHS * item.quantity).toFixed(2)}</p>
+                                        <p className="text-xs text-muted-foreground/80 line-through">GHS {(item.priceGHS * item.quantity).toFixed(2)}</p>
+                                    </>
+                                ) : (
+                                    <p className="font-medium text-foreground">GHS {(item.priceGHS * item.quantity).toFixed(2)}</p>
+                                )}
                             </div>
                         </div>
-                        
-                        <Separator />
+                    ))}
+                    </div>
 
-                        <div className="flex items-baseline justify-between font-bold text-lg">
-                            <p>Total</p>
-                            <p className="text-primary">GHS {totalPrice.toFixed(2)}</p>
+                    <Separator />
+
+                    <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                            <p className="text-muted-foreground">Subtotal</p>
+                            <p className="font-medium text-foreground">GHS {subtotal.toFixed(2)}</p>
                         </div>
-
-                        <div className="flex items-center gap-2 rounded-lg bg-muted p-3 text-muted-foreground">
-                            <Check className="h-5 w-5 text-success flex-shrink-0" />
-                            <p className="text-xs font-medium">Your privacy is guaranteed. All orders are sent in plain, discreet packaging.</p>
+                    {studentDiscount > 0 && (
+                        <div className="flex justify-between text-success font-medium">
+                            <p>Student Discount</p>
+                            <p>- GHS {studentDiscount.toFixed(2)}</p>
+                        </div>
+                        )}
+                        <div className="flex justify-between">
+                            <p className="text-muted-foreground">Delivery Fee</p>
+                            <p className="font-medium text-foreground">GHS {deliveryFee.toFixed(2)}</p>
                         </div>
                     </div>
-                    )}
-                </CardContent>
-            </Card>
-            
-            <SubmitButton disabled={items.length === 0} />
+                    
+                    <Separator />
+
+                    <div className="flex items-baseline justify-between font-bold text-lg">
+                        <p>Total</p>
+                        <p className="text-primary">GHS {totalPrice.toFixed(2)}</p>
+                    </div>
+
+                    <div className="flex items-center gap-2 rounded-lg bg-muted p-3 text-muted-foreground">
+                        <Check className="h-5 w-5 text-success flex-shrink-0" />
+                        <p className="text-xs font-medium">Your privacy is guaranteed. All orders are sent in plain, discreet packaging.</p>
+                    </div>
+                </div>
+                )}
+            </CardContent>
+        </Card>
+        
+        <SubmitButton disabled={items.length === 0} />
           
       </form>
     </>
@@ -398,8 +397,3 @@ export default function OrderPage() {
     </div>
   );
 }
-
-    
-
-    
-
