@@ -48,7 +48,7 @@ function AddToCartButton({ product }: { product: Product }) {
 
   if (!isMounted) {
     return (
-        <Button variant="outline" className="w-24 justify-center rounded-full" disabled>
+        <Button variant="outline" className="w-20 justify-center rounded-full" disabled>
             <Plus className="mr-2 h-4 w-4" /> Add
         </Button>
     )
@@ -62,7 +62,7 @@ function AddToCartButton({ product }: { product: Product }) {
         <Button
           variant="outline"
           size="icon"
-          className="h-8 w-8 rounded-full border-primary/50 text-primary hover:bg-primary/10"
+          className="h-7 w-7 rounded-full border-primary/50 text-primary hover:bg-primary/10"
           onClick={() => updateQuantity(product.id, quantity - 1)}
         >
           <Minus className="h-4 w-4" />
@@ -71,7 +71,7 @@ function AddToCartButton({ product }: { product: Product }) {
         <Button
           variant="outline"
           size="icon"
-          className="h-8 w-8 rounded-full border-primary/50 text-primary hover:bg-primary/10"
+          className="h-7 w-7 rounded-full border-primary/50 text-primary hover:bg-primary/10"
           onClick={() => updateQuantity(product.id, quantity + 1)}
         >
           <Plus className="h-4 w-4" />
@@ -83,7 +83,7 @@ function AddToCartButton({ product }: { product: Product }) {
   return (
     <Button
       variant="outline"
-      className="w-24 justify-center rounded-full border-primary text-primary hover:bg-primary/10 hover:text-primary"
+      className="w-20 justify-center rounded-full border-primary text-primary hover:bg-primary/10 hover:text-primary"
       onClick={() => addItem(product)}
     >
       <Plus className="mr-2 h-4 w-4" /> Add
@@ -168,7 +168,7 @@ function OrderForm() {
           <CardContent className="space-y-4">
              {products.map((product, index) => (
                 <div key={product.id}>
-                    <div className="flex items-center gap-4">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                     <div className="relative h-20 w-20 flex-shrink-0 self-center sm:self-start overflow-hidden rounded-lg bg-muted">
                         <Image
                         src={product.imageUrl}
@@ -178,30 +178,28 @@ function OrderForm() {
                         data-ai-hint="medical test kit"
                         />
                     </div>
-                    <div className="flex-grow flex flex-col sm:flex-row gap-4">
-                        <div className="flex-grow">
-                        <h3 className="font-semibold text-base">{product.name}</h3>
-                        <p className="text-sm text-muted-foreground mt-1 ">{product.description}</p>
-                        </div>
-                        <div className="flex items-center justify-between sm:justify-end gap-4">
-                            <div className="flex flex-col items-end">
-                                {isStudent && product.studentPriceGHS ? (
-                                    <div className="flex items-baseline gap-2">
-                                        <p className="text-muted-foreground/80 line-through text-sm font-normal">
-                                            GHS {product.priceGHS.toFixed(2)}
-                                        </p>
-                                        <p className="font-bold text-success text-lg">GHS {product.studentPriceGHS.toFixed(2)}</p>
-                                    </div>
-                                ) : (
-                                    <p className="font-bold text-lg text-foreground">
+                    <div className="flex-grow">
+                      <h3 className="font-semibold text-base">{product.name}</h3>
+                      <p className="text-sm text-muted-foreground mt-1 ">{product.description}</p>
+                    </div>
+                    <div className="flex w-full sm:w-auto items-center justify-between gap-4">
+                        <div className="flex flex-col items-start sm:items-end">
+                            {isStudent && product.studentPriceGHS ? (
+                                <div className="flex items-baseline gap-2">
+                                    <p className="text-muted-foreground/80 line-through text-sm font-normal">
                                         GHS {product.priceGHS.toFixed(2)}
                                     </p>
-                                )}
-                            </div>
-                            <AddToCartButton product={product} />
+                                    <p className="font-bold text-success text-base">GHS {product.studentPriceGHS.toFixed(2)}</p>
+                                </div>
+                            ) : (
+                                <p className="font-bold text-base text-foreground">
+                                    GHS {product.priceGHS.toFixed(2)}
+                                </p>
+                            )}
                         </div>
+                        <AddToCartButton product={product} />
                     </div>
-                    </div>
+                  </div>
                     {index < products.length - 1 && <Separator className="my-4" />}
                 </div>
             ))}
@@ -404,3 +402,4 @@ export default function OrderPage() {
     
 
     
+
