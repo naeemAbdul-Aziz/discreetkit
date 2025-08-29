@@ -10,7 +10,6 @@ import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useCart } from '@/hooks/use-cart';
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 
 const navLinksLeft = [
   { href: '/#products', label: 'Shop' },
@@ -22,12 +21,11 @@ const navLinksRight = [
   { href: '/track', label: 'Track Order' },
 ];
 
-function CartPopover() {
-  const { items, totalItems, totalPrice } = useCart();
+function CartLink() {
+  const { totalItems } = useCart();
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
+     <Button asChild variant="ghost" size="icon" className="relative">
+        <Link href="/order">
           <ShoppingCart />
           {totalItems > 0 && (
             <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
@@ -35,46 +33,8 @@ function CartPopover() {
             </span>
           )}
           <span className="sr-only">Open Cart</span>
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-80">
-        {totalItems > 0 ? (
-          <>
-            <div className="grid gap-4">
-              <div className="space-y-2">
-                <h4 className="font-medium leading-none">Your Cart</h4>
-                <p className="text-sm text-muted-foreground">Review the items you've selected.</p>
-              </div>
-              <div className="grid gap-2">
-                {items.map((item) => (
-                  <div key={item.id} className="grid grid-cols-[1fr_auto] items-center gap-4">
-                    <div className="truncate">
-                      <span className="font-semibold">{item.quantity}</span> x {item.name}
-                    </div>
-                    <div className="font-medium">GHS {(item.priceGHS * item.quantity).toFixed(2)}</div>
-                  </div>
-                ))}
-              </div>
-              <div className="flex justify-between border-t pt-4 font-bold">
-                <span>Total:</span>
-                <span>GHS {totalPrice.toFixed(2)}</span>
-              </div>
-            </div>
-            <Button asChild className="mt-4 w-full">
-              <Link href="/order">
-                Proceed to Order
-                <ArrowRight />
-              </Link>
-            </Button>
-          </>
-        ) : (
-          <div className="text-center">
-            <p className="font-medium">Your cart is empty</p>
-            <p className="text-sm text-muted-foreground">Add items to get started.</p>
-          </div>
-        )}
-      </PopoverContent>
-    </Popover>
+        </Link>
+      </Button>
   );
 }
 
@@ -148,7 +108,7 @@ export function Header() {
             {navLinksRight.map((link) => (
               <NavLink key={link.href} {...link} />
             ))}
-            <CartPopover />
+            <CartLink />
           </div>
 
           {/* Mobile Menu */}
@@ -163,7 +123,7 @@ export function Header() {
             </Link>
 
             <div className="flex items-center gap-2">
-              <CartPopover />
+              <CartLink />
               <Sheet>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon">
