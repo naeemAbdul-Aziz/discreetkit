@@ -47,7 +47,6 @@
   }
   html {
     @apply scroll-smooth;
-    zoom: 0.85;
   }
   body {
     @apply bg-background text-foreground;
