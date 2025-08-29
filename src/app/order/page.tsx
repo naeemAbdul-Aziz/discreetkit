@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useActionState } from 'react';
@@ -229,7 +230,12 @@ function OrderForm() {
                     </SelectContent>
                   </Select>
                    {state.errors?.deliveryArea && (
-                       <p className="text-sm font-medium text-destructive mt-2">{state.errors.deliveryArea[0]}</p>
+                       <div className="relative mt-2">
+                        <div className="bg-destructive text-destructive-foreground text-xs font-medium px-2 py-1 rounded-md relative">
+                          {state.errors.deliveryArea[0]}
+                          <div className="absolute bottom-full left-4 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-b-4 border-b-destructive"></div>
+                        </div>
+                      </div>
                     )}
                 </div>
 
@@ -243,7 +249,12 @@ function OrderForm() {
                             className={cn(state.errors?.otherDeliveryArea && "border-destructive")}
                          />
                          {state.errors?.otherDeliveryArea && (
-                             <p className="text-sm font-medium text-destructive mt-2">{state.errors.otherDeliveryArea[0]}</p>
+                              <div className="relative mt-2">
+                                <div className="bg-destructive text-destructive-foreground text-xs font-medium px-2 py-1 rounded-md relative">
+                                  {state.errors.otherDeliveryArea[0]}
+                                  <div className="absolute bottom-full left-4 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-b-4 border-b-destructive"></div>
+                                </div>
+                              </div>
                          )}
                     </div>
                 )}
@@ -275,7 +286,12 @@ function OrderForm() {
                     This will be masked and is only for the rider to contact you.
                   </p>
                   {state.errors?.phone_masked && (
-                    <p className="text-sm font-medium text-destructive mt-2">{state.errors.phone_masked[0]}</p>
+                     <div className="relative mt-2">
+                        <div className="bg-destructive text-destructive-foreground text-xs font-medium px-2 py-1 rounded-md relative">
+                          {state.errors.phone_masked[0]}
+                          <div className="absolute bottom-full left-4 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-b-4 border-b-destructive"></div>
+                        </div>
+                      </div>
                   )}
                 </div>
               </CardContent>
@@ -383,5 +399,7 @@ export default function OrderPage() {
     </div>
   );
 }
+
+    
 
     
