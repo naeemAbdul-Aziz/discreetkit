@@ -12,8 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { AlertCircle, Loader2, ShieldCheck, ArrowRight, Plus, Minus, GraduationCap } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Loader2, ShieldCheck, ArrowRight, Plus, Minus, GraduationCap } from 'lucide-react';
 import { ChatTrigger } from '@/components/chat-trigger';
 import { useCart } from '@/hooks/use-cart';
 import { products, discounts, type Product } from '@/lib/data';
@@ -94,7 +93,7 @@ function OrderForm() {
   const formRef = useRef<HTMLFormElement>(null);
 
   const { items, subtotal, studentDiscount, deliveryFee, totalPrice, clearCart, deliveryLocation, setDeliveryLocation } = useCart();
-  const [showOther, setShowOther] = useState(true);
+  const [showOther, setShowOther] = useState(!isStudentLocation(deliveryLocation));
   
   const isStudent = deliveryLocation && discounts.some(d => d.campus === deliveryLocation);
 
@@ -128,6 +127,12 @@ function OrderForm() {
       setShowOther(false);
       setDeliveryLocation(value);
     }
+  }
+
+  // A helper function to determine if a location is a student location
+  function isStudentLocation(location: string | null): boolean {
+    if (!location) return false;
+    return discounts.some(d => d.campus === location);
   }
 
 
@@ -202,9 +207,9 @@ function OrderForm() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="deliveryArea">Delivery Area / Campus</Label>
-                  <Select name="deliveryArea" onValueChange={handleLocationChange} defaultValue="Other">
-                    <SelectTrigger>
+                  <Label htmlFor="deliveryArea">Delivery Area / Campus *</Label>
+                  <Select name="deliveryArea" onValueChange={handleLocationChange} defaultValue={deliveryLocation || "Other"}>
+                    <SelectTrigger className={cn(state.errors?.deliveryArea && "border-destructive")}>
                         <SelectValue placeholder="Select a location..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -215,22 +220,21 @@ function OrderForm() {
                     </SelectContent>
                   </Select>
                   {state.errors?.deliveryArea && (
-                    <Alert variant="warning" className="mt-2">
-                        <AlertCircle className="h-4 w-4" />
-                        <AlertDescription>{state.errors.deliveryArea[0]}</AlertDescription>
-                    </Alert>
+                    <p className="text-sm font-medium text-destructive">{state.errors.deliveryArea[0]}</p>
                   )}
                 </div>
 
                 {showOther && (
                     <div className="space-y-2">
-                         <Label htmlFor="otherDeliveryArea">Please Specify Your Location</Label>
-                        <Input id="otherDeliveryArea" name="otherDeliveryArea" placeholder="e.g., Osu, Airport Area" />
+                         <Label htmlFor="otherDeliveryArea">Please Specify Your Location *</Label>
+                        <Input 
+                            id="otherDeliveryArea" 
+                            name="otherDeliveryArea" 
+                            placeholder="e.g., Osu, Airport Area" 
+                            className={cn(state.errors?.otherDeliveryArea && "border-destructive")}
+                         />
                          {state.errors?.otherDeliveryArea && (
-                            <Alert variant="warning" className="mt-2">
-                                <AlertCircle className="h-4 w-4" />
-                                <AlertDescription>{state.errors.otherDeliveryArea[0]}</AlertDescription>
-                            </Alert>
+                            <p className="text-sm font-medium text-destructive">{state.errors.otherDeliveryArea[0]}</p>
                          )}
                     </div>
                 )}
@@ -245,18 +249,21 @@ function OrderForm() {
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <Label htmlFor="phone_masked">Contact Number (for delivery rider only)</Label>
+                    <Label htmlFor="phone_masked">Contact Number (for delivery rider only) *</Label>
                     <ShieldCheck className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <Input id="phone_masked" name="phone_masked" type="tel" placeholder="e.g., 024xxxxxxx" />
+                  <Input 
+                    id="phone_masked" 
+                    name="phone_masked" 
+                    type="tel" 
+                    placeholder="e.g., 024xxxxxxx" 
+                    className={cn(state.errors?.phone_masked && "border-destructive")}
+                  />
                   <p className="text-[0.8rem] text-muted-foreground">
                     This will be masked and is only for the rider to contact you.
                   </p>
                   {state.errors?.phone_masked && (
-                    <Alert variant="warning" className="mt-2">
-                        <AlertCircle className="h-4 w-4" />
-                        <AlertDescription>{state.errors.phone_masked[0]}</AlertDescription>
-                    </Alert>
+                    <p className="text-sm font-medium text-destructive">{state.errors.phone_masked[0]}</p>
                   )}
                 </div>
               </CardContent>
@@ -315,24 +322,7 @@ function OrderForm() {
                 )}
               </CardContent>
             </Card>
-
-            <Alert>
-              <ShieldCheck className="h-4 w-4" />
-              <AlertTitle>Your Privacy is Guaranteed</AlertTitle>
-              <AlertDescription>
-                Your payment will be processed securely by Paystack. We do not see or store your payment information.
-                The next screen will redirect you to their payment page.
-              </AlertDescription>
-            </Alert>
-
-            {state.message && !state.success && !state.errors && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>{state.message}</AlertDescription>
-              </Alert>
-            )}
-
+            
             <SubmitButton disabled={items.length === 0} />
           
       </form>
