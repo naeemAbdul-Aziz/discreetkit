@@ -1,18 +1,30 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || '';
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 
-/*
+let supabase: ReturnType<typeof createClient>;
+
 if (
-  !supabaseUrl ||
-  supabaseUrl === 'YOUR_SUPABASE_URL_HERE' ||
-  !supabaseAnonKey ||
-  supabaseAnonKey === 'YOUR_SUPABASE_ANON_KEY_HERE'
+  supabaseUrl &&
+  supabaseUrl !== 'YOUR_SUPABASE_URL_HERE' &&
+  supabaseAnonKey &&
+  supabaseAnonKey !== 'YOUR_SUPABASE_ANON_KEY_HERE'
 ) {
-  throw new Error('Supabase URL and Anon Key must be provided and not be placeholders. Please update your .env file.');
+  supabase = createClient(supabaseUrl, supabaseAnonKey);
+} else {
+  // Provide a dummy client or handle the absence of credentials gracefully.
+  // This prevents the app from crashing if env vars are not set.
+  // Note: Any feature requiring Supabase will not work.
+  console.warn('Supabase credentials are not set. Database features will be unavailable.');
+  supabase = {
+    from: () => {
+      throw new Error('Supabase client is not configured. Please check your .env file.');
+    },
+    // Add mocks for other Supabase methods if needed to prevent runtime errors elsewhere
+  } as any;
 }
-*/
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+export { supabase };
