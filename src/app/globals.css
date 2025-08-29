@@ -29,7 +29,7 @@
     --destructive: 0 75% 50%; /* Bold Alert Red */
     --destructive-foreground: 0 0% 100%;
     
-    --success: 140 80% 40%; /* Lively Spring Green */
+    --success: 140 60% 40%; /* Lively Spring Green */
     --success-foreground: 0 0% 100%;
 
     --border: 210 15% 88%;

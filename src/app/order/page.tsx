@@ -13,16 +13,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ShieldCheck, ArrowRight, Plus, Minus, GraduationCap, Check, AlertCircle } from 'lucide-react';
+import { Loader2, ShieldCheck, ArrowRight, Plus, Minus, GraduationCap, Check } from 'lucide-react';
 import { ChatTrigger } from '@/components/chat-trigger';
 import { useCart } from '@/hooks/use-cart';
 import { products, discounts, type Product } from '@/lib/data';
 import Image from 'next/image';
-import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 
 function SubmitButton({ disabled }: { disabled: boolean }) {
@@ -169,40 +167,43 @@ function OrderForm() {
           </CardHeader>
           <CardContent className="space-y-4">
              {products.map((product, index) => (
-              <div key={product.id}>
-                <div className="flex items-center gap-4">
-                  <div className="relative h-20 w-20 flex-shrink-0 self-center sm:self-start overflow-hidden rounded-lg bg-muted">
-                    <Image
-                      src={product.imageUrl}
-                      alt={product.name}
-                      fill
-                      className="object-contain p-2"
-                      data-ai-hint="medical test kit"
-                    />
-                  </div>
-                  <div className="flex-grow flex flex-col sm:flex-row gap-4">
-                    <div className="flex-grow">
-                      <h3 className="font-semibold text-base">{product.name}</h3>
-                      <p className="text-sm text-muted-foreground mt-1 ">{product.description}</p>
+                <div key={product.id}>
+                    <div className="flex items-center gap-4">
+                    <div className="relative h-20 w-20 flex-shrink-0 self-center sm:self-start overflow-hidden rounded-lg bg-muted">
+                        <Image
+                        src={product.imageUrl}
+                        alt={product.name}
+                        fill
+                        className="object-contain p-2"
+                        data-ai-hint="medical test kit"
+                        />
                     </div>
-                     <div className="flex sm:flex-col items-end justify-between sm:justify-center gap-2">
-                        <div className="flex items-baseline gap-2">
-                              <p className={cn(
-                                  "font-bold",
-                                  isStudent && product.studentPriceGHS ? "text-muted-foreground/80 line-through text-sm font-normal" : "text-lg text-foreground"
-                              )}>
-                                  GHS {product.priceGHS.toFixed(2)}
-                              </p>
-                              {isStudent && product.studentPriceGHS && (
-                                  <p className="font-bold text-success text-lg">GHS {product.studentPriceGHS.toFixed(2)}</p>
-                              )}
-                          </div>
-                           <AddToCartButton product={product} />
-                      </div>
-                  </div>
+                    <div className="flex-grow flex flex-col sm:flex-row gap-4">
+                        <div className="flex-grow">
+                        <h3 className="font-semibold text-base">{product.name}</h3>
+                        <p className="text-sm text-muted-foreground mt-1 ">{product.description}</p>
+                        </div>
+                        <div className="flex items-center justify-between sm:justify-end gap-4">
+                            <div className="flex flex-col items-end">
+                                {isStudent && product.studentPriceGHS ? (
+                                    <div className="flex items-baseline gap-2">
+                                        <p className="text-muted-foreground/80 line-through text-sm font-normal">
+                                            GHS {product.priceGHS.toFixed(2)}
+                                        </p>
+                                        <p className="font-bold text-success text-lg">GHS {product.studentPriceGHS.toFixed(2)}</p>
+                                    </div>
+                                ) : (
+                                    <p className="font-bold text-lg text-foreground">
+                                        GHS {product.priceGHS.toFixed(2)}
+                                    </p>
+                                )}
+                            </div>
+                            <AddToCartButton product={product} />
+                        </div>
+                    </div>
+                    </div>
+                    {index < products.length - 1 && <Separator className="my-4" />}
                 </div>
-                {index < products.length - 1 && <Separator className="my-4" />}
-              </div>
             ))}
           </CardContent>
         </Card>
