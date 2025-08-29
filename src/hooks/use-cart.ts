@@ -82,7 +82,6 @@ export const useCart = create<CartState>()(
 
         const { totalItems, totalPrice } = calculateTotals(updatedItems, get().deliveryLocation);
         set({ items: updatedItems, totalItems, totalPrice });
-        toast({ title: 'Item added to cart', description: product.name });
       },
 
       removeItem: (productId) => {
