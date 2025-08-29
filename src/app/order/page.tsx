@@ -82,7 +82,8 @@ function AddToCartButton({ product }: { product: Product }) {
       onClick={() => addItem(product)}
       variant="outline"
     >
-      Add to Cart <Plus />
+      Add to Cart
+      <Plus />
     </Button>
   );
 }
@@ -92,7 +93,7 @@ function OrderForm() {
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 
-  const { items, subtotal, studentDiscount, deliveryFee, totalPrice, clearCart, deliveryLocation, setDeliveryLocation } = useCart();
+  const { items, subtotal, studentDiscount, deliveryFee, totalPrice, clearCart, deliveryLocation, setDeliveryLocation, getItemQuantity } = useCart();
   const [showOther, setShowOther] = useState(deliveryLocation ? !discounts.some(d => d.campus === deliveryLocation) : true);
   
   const isStudent = deliveryLocation && discounts.some(d => d.campus === deliveryLocation);
@@ -159,7 +160,10 @@ function OrderForm() {
         <div className="space-y-4">
             <h2 className="text-2xl font-bold text-foreground">1. Choose Your Products</h2>
             <div className="space-y-4">
-                {products.map((product) => (
+                {products.map((product) => {
+                    const quantity = getItemQuantity(product.id) || 1;
+                    const isProductInCart = getItemQuantity(product.id) > 0;
+                    return (
                      <Card key={product.id} className="shadow-lg overflow-hidden transition-all hover:shadow-xl">
                         <CardContent className="p-4 sm:p-6">
                             <div className="grid grid-cols-[80px_1fr_auto] gap-4 sm:gap-6 items-center">
@@ -184,14 +188,16 @@ function OrderForm() {
                                     <div className="text-right h-10 flex flex-col justify-center items-end">
                                         {isStudent && product.studentPriceGHS ? (
                                             <>
-                                                <p className="font-bold text-success text-base">GHS {product.studentPriceGHS.toFixed(2)}</p>
-                                                <p className="text-muted-foreground/80 line-through text-xs font-normal">
-                                                    GHS {product.priceGHS.toFixed(2)}
-                                                </p>
+                                                <p className="font-bold text-success text-base">GHS {(product.studentPriceGHS * quantity).toFixed(2)}</p>
+                                                {isProductInCart && (
+                                                    <p className="text-muted-foreground/80 line-through text-xs font-normal">
+                                                        GHS {(product.priceGHS * quantity).toFixed(2)}
+                                                    </p>
+                                                )}
                                             </>
                                         ) : (
                                             <p className="font-bold text-base text-foreground">
-                                                GHS {product.priceGHS.toFixed(2)}
+                                                GHS {(product.priceGHS * quantity).toFixed(2)}
                                             </p>
                                         )}
                                     </div>
@@ -202,7 +208,7 @@ function OrderForm() {
                             </div>
                         </CardContent>
                     </Card>
-                ))}
+                )})}
             </div>
         </div>
         
