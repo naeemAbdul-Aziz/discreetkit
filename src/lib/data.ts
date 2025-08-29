@@ -233,54 +233,6 @@ export type Order = {
   events: { status: string; date: string; note: string }[];
 };
 
-// Mock database for orders
-const ordersDb: Map<string, Order> = new Map();
-
-export const createMockOrder = (productId: number, quantity: number): Order => {
-    const product = products.find(p => p.id === productId);
-    if (!product) throw new Error('Product not found');
-    
-    const code = generateTrackingCode();
-    const order: Order = {
-        id: new Date().getTime().toString(),
-        code,
-        productName: `${product.name} (x${quantity})`,
-        status: 'received',
-        events: [
-            { status: 'Received', date: new Date().toISOString(), note: 'Your order has been received and is awaiting processing.' }
-        ]
-    };
-    ordersDb.set(code, order);
-    
-    // Simulate status updates
-    setTimeout(() => updateOrderStatus(code, 'processing'), 5000);
-    setTimeout(() => updateOrderStatus(code, 'out_for_delivery'), 15000);
-    setTimeout(() => updateOrderStatus(code, 'pickup_ready'), 30000);
-
-    return order;
-};
-
-export const getMockOrder = (code: string): Order | undefined => {
-    return ordersDb.get(code);
-};
-
-const updateOrderStatus = (code: string, newStatus: Order['status']) => {
-    const order = ordersDb.get(code);
-    if (order && order.status !== 'completed') {
-        order.status = newStatus;
-        const notes = {
-            processing: 'Your kit is being prepared for dispatch.',
-            out_for_delivery: 'Your order is with the delivery agent and on its way.',
-            pickup_ready: 'Your order is available for pickup at the designated pharmacy.',
-            completed: 'Your order has been successfully delivered/picked up.',
-            received: ''
-        };
-        order.events.push({ status: newStatus.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()), date: new Date().toISOString(), note: notes[newStatus] });
-        ordersDb.set(code, order);
-    }
-};
-
-
 export const generateTrackingCode = () => {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     let result = '';

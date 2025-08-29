@@ -42,15 +42,15 @@ function AddToCartButton({ product }: { product: Product }) {
     setIsMounted(true);
   }, []);
 
-  const quantity = isMounted ? getItemQuantity(product.id) : 0;
-
   if (!isMounted) {
     return (
-      <Button variant="outline" className="w-24 justify-center rounded-full" disabled>
-        <Plus className="mr-2 h-4 w-4" /> Add
-      </Button>
-    );
+        <Button variant="outline" className="w-24 justify-center rounded-full" disabled>
+            <Plus className="mr-2 h-4 w-4" /> Add
+        </Button>
+    )
   }
+
+  const quantity = getItemQuantity(product.id);
 
   if (quantity > 0) {
     return (
@@ -148,6 +148,8 @@ function OrderForm() {
 
       <form ref={formRef} action={dispatch} className="mt-8 space-y-8">
         <input type="hidden" name="cartItems" value={JSON.stringify(items)} />
+        <input type="hidden" name="totalPrice" value={totalPrice.toFixed(2)} />
+
 
         <Card>
           <CardHeader>

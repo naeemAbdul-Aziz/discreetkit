@@ -2,10 +2,11 @@
 'use server';
 
 import { z } from 'zod';
-import { createMockOrder, getMockOrder } from './data';
+import { generateTrackingCode, type Order } from './data';
 import { answerQuestions } from '@/ai/flows/answer-questions';
 import { revalidatePath } from 'next/cache';
 import { type CartItem } from '@/hooks/use-cart';
+import { supabase } from './supabase';
 
 const orderSchema = z.object({
   cartItems: z.string().min(1, 'Cart cannot be empty.'),
@@ -13,6 +14,7 @@ const orderSchema = z.object({
   deliveryAddressNote: z.string().optional(),
   phone_masked: z.string().min(10, 'A valid phone number is required.'),
   otherDeliveryArea: z.string().optional(),
+  totalPrice: z.string(),
 });
 
 export async function createOrderAction(prevState: any, formData: FormData) {
@@ -28,48 +30,108 @@ export async function createOrderAction(prevState: any, formData: FormData) {
 
   const { deliveryArea, otherDeliveryArea } = validatedFields.data;
   if (deliveryArea === 'Other' && (!otherDeliveryArea || otherDeliveryArea.length < 3)) {
-      return {
-          errors: { otherDeliveryArea: ['Please specify your delivery area.'] },
-          message: 'Error: Please specify your delivery area.',
-          success: false,
-      }
+    return {
+      errors: { otherDeliveryArea: ['Please specify your delivery area.'] },
+      message: 'Error: Please specify your delivery area.',
+      success: false,
+    };
   }
-
 
   try {
     const cartItems: CartItem[] = JSON.parse(validatedFields.data.cartItems);
     if (cartItems.length === 0) {
       return { message: 'Your cart is empty.', success: false };
     }
-    
-    // In a real app, you would process all items, calculate total, etc.
-    // For this mock, we'll just create an order based on the first item.
-    const firstItem = cartItems[0];
-    
-    const order = createMockOrder(firstItem.id, firstItem.quantity);
+
+    const code = generateTrackingCode();
+    const finalDeliveryArea = deliveryArea === 'Other' ? otherDeliveryArea : deliveryArea;
+
+    // 1. Insert into orders table
+    const { data: orderData, error: orderError } = await supabase
+      .from('orders')
+      .insert({
+        code,
+        items: cartItems,
+        status: 'received',
+        delivery_area: finalDeliveryArea,
+        delivery_address_note: validatedFields.data.deliveryAddressNote,
+        phone_masked: validatedFields.data.phone_masked,
+        total_price: parseFloat(validatedFields.data.totalPrice),
+      })
+      .select('id')
+      .single();
+
+    if (orderError) throw orderError;
+    if (!orderData) throw new Error('Failed to retrieve order ID after creation.');
+
+    // 2. Insert initial event into order_events
+    const { error: eventError } = await supabase.from('order_events').insert({
+      order_id: orderData.id,
+      status: 'Received',
+      note: 'Your order has been received and is awaiting processing.',
+    });
+
+    if (eventError) throw eventError;
+
     revalidatePath('/order');
-    return { success: true, code: order.code, message: null, errors: {} };
+    return { success: true, code, message: null, errors: {} };
   } catch (error) {
-    console.error(error);
+    console.error('Supabase Error:', error);
     return {
-      message: 'Failed to create order. Please try again.',
+      message: 'Failed to create order due to a database error. Please try again.',
       success: false,
     };
   }
 }
 
-export async function getOrderAction(code: string) {
-  return getMockOrder(code);
+export async function getOrderAction(code: string): Promise<Order | null> {
+  const { data: order, error } = await supabase
+    .from('orders')
+    .select(
+      `
+      id,
+      code,
+      items,
+      status,
+      created_at,
+      order_events (
+        status,
+        note,
+        created_at
+      )
+    `
+    )
+    .eq('code', code)
+    .single();
+
+  if (error || !order) {
+    console.error('Error fetching order:', error);
+    return null;
+  }
+  
+  // Flatten the structure to match the frontend's expected `Order` type
+  const firstItem = Array.isArray(order.items) && order.items.length > 0 ? order.items[0] : { name: 'N/A', quantity: 0 };
+
+  return {
+    id: order.id.toString(),
+    code: order.code,
+    productName: `${firstItem.name} (x${firstItem.quantity})${order.items.length > 1 ? ` and ${order.items.length - 1} other(s)` : ''}`,
+    status: order.status as Order['status'],
+    events: order.order_events.map(e => ({
+        status: e.status,
+        note: e.note ?? '',
+        date: e.created_at
+    })).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+  };
 }
 
-
-export async function handleChat(history: { role: 'user' | 'model', parts: string }[], message: string) {
+export async function handleChat(history: { role: 'user' | 'model'; parts: string }[], message: string) {
   'use server';
   try {
     const result = await answerQuestions({ query: message });
     return result.answer;
   } catch (error) {
-    console.error("AI Error:", error);
+    console.error('AI Error:', error);
     return "I'm sorry, I'm having trouble connecting right now. Please try again later.";
   }
 }
