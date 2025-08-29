@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { ArrowRight, Menu, ShoppingCart } from 'lucide-react';
+import { ArrowRight, Menu, ShoppingCart, Loader2 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
@@ -23,14 +23,33 @@ const navLinksRight = [
 
 function CartLink() {
   const { totalItems } = useCart();
+  const [isNavigating, setIsNavigating] = useState(false);
+
+  const handleClick = () => {
+    setIsNavigating(true);
+  };
+  
+  // Reset navigation state if the user navigates back
+  const pathname = usePathname();
+  useEffect(() => {
+    setIsNavigating(false);
+  }, [pathname]);
+
+
   return (
      <Button asChild variant="ghost" size="icon" className="relative">
-        <Link href="/order">
-          <ShoppingCart />
-          {totalItems > 0 && (
-            <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
-              {totalItems}
-            </span>
+        <Link href="/order" onClick={handleClick}>
+          {isNavigating ? (
+             <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+             <>
+                <ShoppingCart />
+                {totalItems > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                    {totalItems}
+                    </span>
+                )}
+             </>
           )}
           <span className="sr-only">Open Cart</span>
         </Link>
