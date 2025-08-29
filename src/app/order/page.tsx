@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ShieldCheck, ArrowRight, Plus, Minus, GraduationCap } from 'lucide-react';
+import { Loader2, ShieldCheck, ArrowRight, Plus, Minus, GraduationCap, Check } from 'lucide-react';
 import { ChatTrigger } from '@/components/chat-trigger';
 import { useCart } from '@/hooks/use-cart';
 import { products, discounts, type Product } from '@/lib/data';
@@ -26,7 +26,11 @@ import { Separator } from '@/components/ui/separator';
 function SubmitButton({ disabled }: { disabled: boolean }) {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" className="w-full" disabled={pending || disabled}>
+    <Button 
+        type="submit" 
+        className="w-full bg-accent text-accent-foreground hover:bg-accent/90" 
+        size="lg"
+        disabled={pending || disabled}>
       {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
       {pending ? 'Processing...' : 'Proceed to Payment'}
       {!pending && <ArrowRight />}
@@ -58,16 +62,16 @@ function AddToCartButton({ product }: { product: Product }) {
         <Button
           variant="outline"
           size="icon"
-          className="h-8 w-8 rounded-full"
+          className="h-9 w-9 rounded-full border-primary/50 text-primary hover:bg-primary/10"
           onClick={() => updateQuantity(product.id, quantity - 1)}
         >
           <Minus className="h-4 w-4" />
         </Button>
-        <span className="w-6 text-center font-bold">{quantity}</span>
+        <span className="w-6 text-center font-bold text-foreground">{quantity}</span>
         <Button
           variant="outline"
           size="icon"
-          className="h-8 w-8 rounded-full"
+          className="h-9 w-9 rounded-full border-primary/50 text-primary hover:bg-primary/10"
           onClick={() => updateQuantity(product.id, quantity + 1)}
         >
           <Plus className="h-4 w-4" />
@@ -79,7 +83,7 @@ function AddToCartButton({ product }: { product: Product }) {
   return (
     <Button
       variant="outline"
-      className="w-24 justify-center rounded-full"
+      className="w-24 justify-center rounded-full border-primary text-primary hover:bg-primary/10 hover:text-primary"
       onClick={() => addItem(product)}
     >
       <Plus className="mr-2 h-4 w-4" /> Add
@@ -129,7 +133,6 @@ function OrderForm() {
     }
   }
 
-  // A helper function to determine if a location is a student location
   function isStudentLocation(location: string | null): boolean {
     if (!location) return false;
     return discounts.some(d => d.campus === location);
@@ -157,7 +160,7 @@ function OrderForm() {
         <input type="hidden" name="totalPrice" value={totalPrice} />
 
 
-        <Card>
+        <Card className="bg-card shadow-lg">
           <CardHeader>
             <CardTitle>1. Choose Your Products</CardTitle>
             <CardDescription>Add or adjust items in your cart. Student pricing is applied automatically for campus deliveries.</CardDescription>
@@ -170,22 +173,22 @@ function OrderForm() {
                     src={product.imageUrl}
                     alt={product.name}
                     fill
-                    className="object-contain"
+                    className="object-contain p-2"
                     data-ai-hint="medical test kit"
                   />
                 </div>
                 <div className="flex-grow">
-                  <h3 className="font-semibold">{product.name}</h3>
+                  <h3 className="font-semibold text-base">{product.name}</h3>
                   <p className="text-sm text-muted-foreground">{product.description}</p>
                    <div className="mt-1.5 flex items-baseline gap-2">
                         <p className={cn(
-                            "font-semibold",
-                            isStudent && product.studentPriceGHS ? "text-muted-foreground line-through text-sm" : "text-base"
+                            "font-bold",
+                            isStudent && product.studentPriceGHS ? "text-muted-foreground/80 line-through text-sm font-normal" : "text-lg text-foreground"
                         )}>
                             GHS {product.priceGHS.toFixed(2)}
                         </p>
                         {isStudent && product.studentPriceGHS && (
-                            <p className="font-semibold text-green-600 text-base">GHS {product.studentPriceGHS.toFixed(2)}</p>
+                            <p className="font-bold text-success text-lg">GHS {product.studentPriceGHS.toFixed(2)}</p>
                         )}
                     </div>
                 </div>
@@ -198,7 +201,7 @@ function OrderForm() {
         </Card>
 
         
-            <Card>
+            <Card className="bg-card shadow-lg">
               <CardHeader>
                 <CardTitle>2. Delivery Information</CardTitle>
                 <CardDescription>
@@ -246,11 +249,13 @@ function OrderForm() {
                     name="deliveryAddressNote"
                     placeholder="e.g., 'Call upon arrival at the main gate', 'Leave with the security.'"
                   />
+                   <p className="text-[0.8rem] text-muted-foreground">
+                    Optional notes to help the rider find you.
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <Label htmlFor="phone_masked">Contact Number (for delivery rider only) *</Label>
-                    <ShieldCheck className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <Input 
                     id="phone_masked" 
@@ -259,7 +264,8 @@ function OrderForm() {
                     placeholder="e.g., 024xxxxxxx" 
                     className={cn(state.errors?.phone_masked && "border-destructive")}
                   />
-                  <p className="text-[0.8rem] text-muted-foreground">
+                  <p className="text-[0.8rem] text-muted-foreground flex items-center gap-1.5">
+                    <ShieldCheck className="h-3.5 w-3.5 text-primary" />
                     This will be masked and is only for the rider to contact you.
                   </p>
                   {state.errors?.phone_masked && (
@@ -269,26 +275,26 @@ function OrderForm() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-card shadow-lg">
               <CardHeader>
                 <CardTitle>3. Order Summary</CardTitle>
               </CardHeader>
               <CardContent>
                 {items.length === 0 ? (
-                  <p className="text-muted-foreground text-center">Your cart is empty. Add a product to see a summary.</p>
+                  <p className="text-muted-foreground text-center py-4">Your cart is empty. Add a product to see a summary.</p>
                 ) : (
                   <div className="space-y-4">
                     {isStudent && (
-                        <div className="flex items-center gap-2 rounded-lg bg-green-50 p-3 text-green-700">
+                        <div className="flex items-center gap-2 rounded-lg bg-success/10 p-3 text-success">
                             <GraduationCap className="h-5 w-5" />
                             <p className="text-sm font-medium">Student discount applied!</p>
                         </div>
                     )}
                     <div className="space-y-2 text-sm">
                       {items.map(item => (
-                        <div key={item.id} className="flex justify-between">
+                        <div key={item.id} className="flex justify-between items-center">
                           <p className="text-muted-foreground">{item.name} <span className="text-xs">x{item.quantity}</span></p>
-                          <p>GHS {(item.priceGHS * item.quantity).toFixed(2)}</p>
+                          <p className="font-medium text-foreground">GHS {(item.priceGHS * item.quantity).toFixed(2)}</p>
                         </div>
                       ))}
                     </div>
@@ -298,17 +304,17 @@ function OrderForm() {
                     <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <p className="text-muted-foreground">Subtotal</p>
-                          <p>GHS {subtotal.toFixed(2)}</p>
+                          <p className="font-medium text-foreground">GHS {subtotal.toFixed(2)}</p>
                         </div>
                        {studentDiscount > 0 && (
-                          <div className="flex justify-between text-green-600">
+                          <div className="flex justify-between text-success font-medium">
                             <p>Student Discount</p>
                             <p>- GHS {studentDiscount.toFixed(2)}</p>
                           </div>
                         )}
                          <div className="flex justify-between">
                           <p className="text-muted-foreground">Delivery Fee</p>
-                          <p>GHS {deliveryFee.toFixed(2)}</p>
+                          <p className="font-medium text-foreground">GHS {deliveryFee.toFixed(2)}</p>
                         </div>
                     </div>
                     
@@ -317,6 +323,11 @@ function OrderForm() {
                     <div className="flex items-center justify-between font-bold text-lg">
                       <p>Total</p>
                       <p>GHS {totalPrice.toFixed(2)}</p>
+                    </div>
+
+                    <div className="flex items-center gap-2 rounded-lg bg-muted p-3 text-muted-foreground">
+                        <Check className="h-5 w-5 text-success flex-shrink-0" />
+                        <p className="text-xs font-medium">Your privacy is guaranteed. All orders are sent in plain, discreet packaging.</p>
                     </div>
                   </div>
                 )}
@@ -340,8 +351,8 @@ function OrderPageLoading() {
 
 export default function OrderPage() {
   return (
-    <div className="bg-muted">
-      <div className="container mx-auto max-w-4xl px-4 py-12 md:px-6 md:py-20">
+    <div className="bg-background">
+      <div className="container mx-auto max-w-2xl px-4 py-12 md:px-6 md:py-20">
         <Suspense fallback={<OrderPageLoading />}>
           <OrderForm />
         </Suspense>
