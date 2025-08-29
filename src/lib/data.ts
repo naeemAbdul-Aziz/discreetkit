@@ -49,6 +49,11 @@ export const products: Product[] = [
   },
 ]
 
+export const DELIVERY_FEES = {
+  standard: 20.00,
+  campus: 10.00,
+}
+
 export type DiscountLocation = {
   id: number;
   audience: string;

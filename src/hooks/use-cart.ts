@@ -3,8 +3,7 @@
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { type Product, discounts, type DiscountLocation } from '@/lib/data';
-import { toast } from './use-toast';
+import { type Product, discounts, type DiscountLocation, DELIVERY_FEES } from '@/lib/data';
 
 export type CartItem = {
   id: number;
@@ -18,6 +17,9 @@ export type CartItem = {
 interface CartState {
   items: CartItem[];
   totalItems: number;
+  subtotal: number;
+  studentDiscount: number;
+  deliveryFee: number;
   totalPrice: number;
   deliveryLocation: string | null;
   setDeliveryLocation: (location: string | null) => void;
@@ -35,12 +37,26 @@ const isStudentLocation = (location: string | null): boolean => {
 
 const calculateTotals = (items: CartItem[], deliveryLocation: string | null) => {
   const isStudent = isStudentLocation(deliveryLocation);
+  
   const totalItems = items.reduce((total, item) => total + item.quantity, 0);
-  const totalPrice = items.reduce((total, item) => {
-    const price = isStudent && item.studentPriceGHS ? item.studentPriceGHS : item.priceGHS;
-    return total + price * item.quantity;
+
+  const subtotal = items.reduce((total, item) => {
+    return total + item.priceGHS * item.quantity;
   }, 0);
-  return { totalItems, totalPrice };
+
+  const studentDiscount = isStudent ? items.reduce((total, item) => {
+    if (item.studentPriceGHS) {
+        const discountForItem = item.priceGHS - item.studentPriceGHS;
+        return total + (discountForItem * item.quantity);
+    }
+    return total;
+  }, 0) : 0;
+  
+  const deliveryFee = isStudent ? DELIVERY_FEES.campus : DELIVERY_FEES.standard;
+
+  const totalPrice = subtotal - studentDiscount + deliveryFee;
+
+  return { totalItems, subtotal, studentDiscount, deliveryFee, totalPrice };
 };
 
 export const useCart = create<CartState>()(
@@ -48,13 +64,16 @@ export const useCart = create<CartState>()(
     (set, get) => ({
       items: [],
       totalItems: 0,
+      subtotal: 0,
+      studentDiscount: 0,
+      deliveryFee: DELIVERY_FEES.standard,
       totalPrice: 0,
       deliveryLocation: null,
 
       setDeliveryLocation: (location) => {
         const { items } = get();
-        const { totalItems, totalPrice } = calculateTotals(items, location);
-        set({ deliveryLocation: location, totalItems, totalPrice });
+        const { totalItems, subtotal, studentDiscount, deliveryFee, totalPrice } = calculateTotals(items, location);
+        set({ deliveryLocation: location, totalItems, subtotal, studentDiscount, deliveryFee, totalPrice });
       },
 
       addItem: (product) => {
@@ -80,14 +99,14 @@ export const useCart = create<CartState>()(
           updatedItems = [...currentItems, newItem];
         }
 
-        const { totalItems, totalPrice } = calculateTotals(updatedItems, get().deliveryLocation);
-        set({ items: updatedItems, totalItems, totalPrice });
+        const { totalItems, subtotal, studentDiscount, deliveryFee, totalPrice } = calculateTotals(updatedItems, get().deliveryLocation);
+        set({ items: updatedItems, totalItems, subtotal, studentDiscount, deliveryFee, totalPrice });
       },
 
       removeItem: (productId) => {
         const updatedItems = get().items.filter((item) => item.id !== productId);
-        const { totalItems, totalPrice } = calculateTotals(updatedItems, get().deliveryLocation);
-        set({ items: updatedItems, totalItems, totalPrice });
+        const { totalItems, subtotal, studentDiscount, deliveryFee, totalPrice } = calculateTotals(updatedItems, get().deliveryLocation);
+        set({ items: updatedItems, totalItems, subtotal, studentDiscount, deliveryFee, totalPrice });
       },
 
       updateQuantity: (productId, quantity) => {
@@ -99,12 +118,13 @@ export const useCart = create<CartState>()(
             item.id === productId ? { ...item, quantity } : item
           );
         }
-        const { totalItems, totalPrice } = calculateTotals(updatedItems, get().deliveryLocation);
-        set({ items: updatedItems, totalItems, totalPrice });
+        const { totalItems, subtotal, studentDiscount, deliveryFee, totalPrice } = calculateTotals(updatedItems, get().deliveryLocation);
+        set({ items: updatedItems, totalItems, subtotal, studentDiscount, deliveryFee, totalPrice });
       },
 
       clearCart: () => {
-        set({ items: [], totalItems: 0, totalPrice: 0, deliveryLocation: null });
+        const { subtotal, studentDiscount, deliveryFee, totalPrice } = calculateTotals([], null);
+        set({ items: [], totalItems: 0, deliveryLocation: null, subtotal, studentDiscount, deliveryFee, totalPrice });
       },
       
       getItemQuantity: (productId) => {
@@ -116,8 +136,11 @@ export const useCart = create<CartState>()(
       storage: createJSONStorage(() => localStorage), 
       onRehydrateStorage: () => (state) => {
         if (state) {
-          const { totalItems, totalPrice } = calculateTotals(state.items, state.deliveryLocation);
+           const { totalItems, subtotal, studentDiscount, deliveryFee, totalPrice } = calculateTotals(state.items, state.deliveryLocation);
           state.totalItems = totalItems;
+          state.subtotal = subtotal;
+          state.studentDiscount = studentDiscount;
+          state.deliveryFee = deliveryFee;
           state.totalPrice = totalPrice;
         }
       }

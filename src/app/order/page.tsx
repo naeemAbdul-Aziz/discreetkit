@@ -21,6 +21,7 @@ import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { Separator } from '@/components/ui/separator';
 
 
 function SubmitButton({ disabled }: { disabled: boolean }) {
@@ -92,7 +93,7 @@ function OrderForm() {
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 
-  const { items, totalPrice, clearCart, deliveryLocation, setDeliveryLocation } = useCart();
+  const { items, subtotal, studentDiscount, deliveryFee, totalPrice, clearCart, deliveryLocation, setDeliveryLocation } = useCart();
   const [showOther, setShowOther] = useState(true);
   
   const isStudent = deliveryLocation && discounts.some(d => d.campus === deliveryLocation);
@@ -118,9 +119,6 @@ function OrderForm() {
     }
   }, [state, router, toast, clearCart]);
 
-  useEffect(() => {
-    // When cart items change (e.g., last item is removed), this ensures the hidden input is updated.
-  }, [items]);
 
   const handleLocationChange = (value: string) => {
     if (value === 'Other') {
@@ -148,7 +146,10 @@ function OrderForm() {
 
       <form ref={formRef} action={dispatch} className="mt-8 space-y-8">
         <input type="hidden" name="cartItems" value={JSON.stringify(items)} />
-        <input type="hidden" name="totalPrice" value={totalPrice.toFixed(2)} />
+        <input type="hidden" name="subtotal" value={subtotal} />
+        <input type="hidden" name="studentDiscount" value={studentDiscount} />
+        <input type="hidden" name="deliveryFee" value={deliveryFee} />
+        <input type="hidden" name="totalPrice" value={totalPrice} />
 
 
         <Card>
@@ -207,11 +208,10 @@ function OrderForm() {
                         <SelectValue placeholder="Select a location..." />
                     </SelectTrigger>
                     <SelectContent>
-                         <SelectItem value="Other">Other (Standard Pricing)</SelectItem>
-                         <SelectItem value="University of Ghana, Legon">University of Ghana, Legon (Student Pricing)</SelectItem>
-                         <SelectItem value="UPSA">UPSA (Student Pricing)</SelectItem>
-                         <SelectItem value="GIMPA">GIMPA (Student Pricing)</SelectItem>
-                         <SelectItem value="Wisconsin International University College">Wisconsin Uni College (Student Pricing)</SelectItem>
+                         <SelectItem value="Other">Other (Standard Delivery)</SelectItem>
+                         {discounts.map(loc => (
+                           <SelectItem key={loc.id} value={loc.campus}>{loc.campus} (Student Discount)</SelectItem>
+                         ))}
                     </SelectContent>
                   </Select>
                   {state.errors?.deliveryArea && (
@@ -270,18 +270,48 @@ function OrderForm() {
                 {items.length === 0 ? (
                   <p className="text-muted-foreground text-center">Your cart is empty. Add a product to see a summary.</p>
                 ) : (
-                  <>
+                  <div className="space-y-4">
                     {isStudent && (
-                        <div className="mb-4 flex items-center gap-2 rounded-lg bg-green-50 p-3 text-green-700">
+                        <div className="flex items-center gap-2 rounded-lg bg-green-50 p-3 text-green-700">
                             <GraduationCap className="h-5 w-5" />
                             <p className="text-sm font-medium">Student discount applied!</p>
                         </div>
                     )}
+                    <div className="space-y-2 text-sm">
+                      {items.map(item => (
+                        <div key={item.id} className="flex justify-between">
+                          <p className="text-muted-foreground">{item.name} <span className="text-xs">x{item.quantity}</span></p>
+                          <p>GHS {(item.priceGHS * item.quantity).toFixed(2)}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    <Separator />
+
+                    <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <p className="text-muted-foreground">Subtotal</p>
+                          <p>GHS {subtotal.toFixed(2)}</p>
+                        </div>
+                       {studentDiscount > 0 && (
+                          <div className="flex justify-between text-green-600">
+                            <p>Student Discount</p>
+                            <p>- GHS {studentDiscount.toFixed(2)}</p>
+                          </div>
+                        )}
+                         <div className="flex justify-between">
+                          <p className="text-muted-foreground">Delivery Fee</p>
+                          <p>GHS {deliveryFee.toFixed(2)}</p>
+                        </div>
+                    </div>
+                    
+                    <Separator />
+
                     <div className="flex items-center justify-between font-bold text-lg">
                       <p>Total</p>
                       <p>GHS {totalPrice.toFixed(2)}</p>
                     </div>
-                  </>
+                  </div>
                 )}
               </CardContent>
             </Card>

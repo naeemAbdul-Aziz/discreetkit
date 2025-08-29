@@ -14,6 +14,9 @@ const orderSchema = z.object({
   deliveryAddressNote: z.string().optional(),
   phone_masked: z.string().min(10, 'A valid phone number is required.'),
   otherDeliveryArea: z.string().optional(),
+  subtotal: z.string(),
+  studentDiscount: z.string(),
+  deliveryFee: z.string(),
   totalPrice: z.string(),
 });
 
@@ -45,6 +48,13 @@ export async function createOrderAction(prevState: any, formData: FormData) {
 
     const code = generateTrackingCode();
     const finalDeliveryArea = deliveryArea === 'Other' ? otherDeliveryArea : deliveryArea;
+    
+    const priceDetails = {
+        subtotal: parseFloat(validatedFields.data.subtotal),
+        student_discount: parseFloat(validatedFields.data.studentDiscount),
+        delivery_fee: parseFloat(validatedFields.data.deliveryFee),
+        total_price: parseFloat(validatedFields.data.totalPrice),
+    };
 
     // 1. Insert into orders table
     const { data: orderData, error: orderError } = await supabase
@@ -56,7 +66,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
         delivery_area: finalDeliveryArea,
         delivery_address_note: validatedFields.data.deliveryAddressNote,
         phone_masked: validatedFields.data.phone_masked,
-        total_price: parseFloat(validatedFields.data.totalPrice),
+        ...priceDetails,
       })
       .select('id')
       .single();
