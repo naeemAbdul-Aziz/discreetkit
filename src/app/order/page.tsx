@@ -23,10 +23,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { cn } from '@/lib/utils';
 
 
-function SubmitButton() {
+function SubmitButton({ disabled }: { disabled: boolean }) {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" className="w-full" disabled={pending}>
+    <Button type="submit" className="w-full" disabled={pending || disabled}>
       {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
       {pending ? 'Processing...' : 'Proceed to Payment'}
       {!pending && <ArrowRight />}
@@ -191,8 +191,7 @@ function OrderForm() {
           </CardContent>
         </Card>
 
-        {items.length > 0 && (
-          <>
+        
             <Card>
               <CardHeader>
                 <CardTitle>2. Delivery Information</CardTitle>
@@ -259,16 +258,22 @@ function OrderForm() {
                 <CardTitle>3. Order Summary</CardTitle>
               </CardHeader>
               <CardContent>
-                {isStudent && (
-                    <div className="mb-4 flex items-center gap-2 rounded-lg bg-green-50 p-3 text-green-700">
-                        <GraduationCap className="h-5 w-5" />
-                        <p className="text-sm font-medium">Student discount applied!</p>
+                {items.length === 0 ? (
+                  <p className="text-muted-foreground text-center">Your cart is empty. Add a product to see a summary.</p>
+                ) : (
+                  <>
+                    {isStudent && (
+                        <div className="mb-4 flex items-center gap-2 rounded-lg bg-green-50 p-3 text-green-700">
+                            <GraduationCap className="h-5 w-5" />
+                            <p className="text-sm font-medium">Student discount applied!</p>
+                        </div>
+                    )}
+                    <div className="flex items-center justify-between font-bold text-lg">
+                      <p>Total</p>
+                      <p>GHS {totalPrice.toFixed(2)}</p>
                     </div>
+                  </>
                 )}
-                <div className="flex items-center justify-between font-bold text-lg">
-                  <p>Total</p>
-                  <p>GHS {totalPrice.toFixed(2)}</p>
-                </div>
               </CardContent>
             </Card>
 
@@ -289,9 +294,8 @@ function OrderForm() {
               </Alert>
             )}
 
-            <SubmitButton />
-          </>
-        )}
+            <SubmitButton disabled={items.length === 0} />
+          
       </form>
     </>
   );
