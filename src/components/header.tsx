@@ -25,11 +25,16 @@ function CartLink() {
   const { totalItems } = useCart();
   const [isNavigating, setIsNavigating] = useState(false);
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    // Prevent navigation if already navigating
+    if (isNavigating) {
+      e.preventDefault();
+      return;
+    }
     setIsNavigating(true);
   };
   
-  // Reset navigation state if the user navigates back
+  // Reset navigation state if the user navigates back or to a different page
   const pathname = usePathname();
   useEffect(() => {
     setIsNavigating(false);
@@ -37,19 +42,18 @@ function CartLink() {
 
 
   return (
-     <Button asChild variant="ghost" size="icon" className="relative">
-        <Link href="/order" onClick={handleClick}>
-          {isNavigating ? (
-             <Loader2 className="h-5 w-5 animate-spin" />
-          ) : (
-             <>
-                <ShoppingCart />
-                {totalItems > 0 && (
-                    <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
-                    {totalItems}
-                    </span>
-                )}
-             </>
+     <Button asChild variant="ghost" size="icon" className="relative" disabled={isNavigating}>
+        <Link href="/order" onClick={handleClick} aria-disabled={isNavigating}>
+          <ShoppingCart className={cn(isNavigating && "opacity-50")} />
+          {isNavigating && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Loader2 className="h-4 w-4 animate-spin" />
+            </div>
+          )}
+          {totalItems > 0 && !isNavigating && (
+              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+              {totalItems}
+              </span>
           )}
           <span className="sr-only">Open Cart</span>
         </Link>
