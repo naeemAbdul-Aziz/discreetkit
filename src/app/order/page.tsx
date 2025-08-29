@@ -202,7 +202,7 @@ function OrderForm() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="deliveryArea">Delivery Area / Campus</Label>
-                  <Select name="deliveryArea" onValueChange={handleLocationChange} defaultValue="Other" required>
+                  <Select name="deliveryArea" onValueChange={handleLocationChange} defaultValue="Other">
                     <SelectTrigger>
                         <SelectValue placeholder="Select a location..." />
                     </SelectTrigger>
@@ -242,7 +242,7 @@ function OrderForm() {
                     <Label htmlFor="phone_masked">Contact Number (for delivery rider only)</Label>
                     <ShieldCheck className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <Input id="phone_masked" name="phone_masked" type="tel" placeholder="e.g., 024xxxxxxx" required />
+                  <Input id="phone_masked" name="phone_masked" type="tel" placeholder="e.g., 024xxxxxxx" />
                   <p className="text-[0.8rem] text-muted-foreground">
                     This will be masked and is only for the rider to contact you.
                   </p>
