@@ -93,7 +93,7 @@ function OrderForm() {
   const formRef = useRef<HTMLFormElement>(null);
 
   const { items, totalPrice, clearCart, deliveryLocation, setDeliveryLocation } = useCart();
-  const [showOther, setShowOther] = useState(false);
+  const [showOther, setShowOther] = useState(true);
   
   const isStudent = deliveryLocation && discounts.some(d => d.campus === deliveryLocation);
 
@@ -203,20 +203,16 @@ function OrderForm() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="deliveryArea">Delivery Area / Campus</Label>
-                  <Select name="deliveryArea" onValueChange={handleLocationChange} required>
+                  <Select name="deliveryArea" onValueChange={handleLocationChange} defaultValue="Other" required>
                     <SelectTrigger>
                         <SelectValue placeholder="Select a location..." />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="Accra Central">Accra Central</SelectItem>
-                        <SelectItem value="East Legon">East Legon</SelectItem>
-                        <SelectItem value="Madina">Madina</SelectItem>
-                        <SelectItem value="Adenta">Adenta</SelectItem>
+                         <SelectItem value="Other">Other (Standard Pricing)</SelectItem>
                          <SelectItem value="University of Ghana, Legon">University of Ghana, Legon (Student Pricing)</SelectItem>
                          <SelectItem value="UPSA">UPSA (Student Pricing)</SelectItem>
                          <SelectItem value="GIMPA">GIMPA (Student Pricing)</SelectItem>
                          <SelectItem value="Wisconsin International University College">Wisconsin Uni College (Student Pricing)</SelectItem>
-                         <SelectItem value="Other">Other...</SelectItem>
                     </SelectContent>
                   </Select>
                   {state.errors?.deliveryArea && (
@@ -226,7 +222,7 @@ function OrderForm() {
 
                 {showOther && (
                     <div className="space-y-2">
-                         <Label htmlFor="otherDeliveryArea">Please Specify Other Location</Label>
+                         <Label htmlFor="otherDeliveryArea">Please Specify Your Location</Label>
                         <Input id="otherDeliveryArea" name="otherDeliveryArea" placeholder="e.g., Osu, Airport Area" />
                          {state.errors?.otherDeliveryArea && (
                             <p className="text-sm font-medium text-destructive">{state.errors.otherDeliveryArea[0]}</p>
