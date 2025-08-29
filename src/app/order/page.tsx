@@ -168,8 +168,8 @@ function OrderForm() {
           </CardHeader>
           <CardContent className="space-y-6">
             {products.map((product) => (
-              <div key={product.id} className="flex items-start gap-4">
-                <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-muted">
+              <div key={product.id} className="flex flex-col sm:flex-row items-start gap-4">
+                <div className="relative h-20 w-20 flex-shrink-0 self-center sm:self-start overflow-hidden rounded-lg bg-muted">
                   <Image
                     src={product.imageUrl}
                     alt={product.name}
@@ -193,7 +193,7 @@ function OrderForm() {
                         )}
                     </div>
                 </div>
-                <div className="flex flex-col items-end gap-2">
+                <div className="flex flex-col items-end gap-2 self-center sm:self-auto">
                   <AddToCartButton product={product} />
                 </div>
               </div>
@@ -277,62 +277,79 @@ function OrderForm() {
             </Card>
 
             <Card className="bg-card shadow-lg">
-              <CardHeader>
-                <CardTitle>3. Order Summary</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {items.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-4">Your cart is empty. Add a product to see a summary.</p>
-                ) : (
-                  <div className="space-y-4">
-                    {isStudent && (
-                        <div className="flex items-center gap-2 rounded-lg bg-success/10 p-3 text-success">
-                            <GraduationCap className="h-5 w-5" />
-                            <p className="text-sm font-medium">Student discount applied!</p>
-                        </div>
-                    )}
-                    <div className="space-y-2 text-sm">
-                      {items.map(item => (
-                        <div key={item.id} className="flex justify-between items-center">
-                          <p className="text-muted-foreground">{item.name} <span className="text-xs">x{item.quantity}</span></p>
-                          <p className="font-medium text-foreground">GHS {(item.priceGHS * item.quantity).toFixed(2)}</p>
-                        </div>
-                      ))}
-                    </div>
-
-                    <Separator />
-
-                    <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <p className="text-muted-foreground">Subtotal</p>
-                          <p className="font-medium text-foreground">GHS {subtotal.toFixed(2)}</p>
-                        </div>
-                       {studentDiscount > 0 && (
-                          <div className="flex justify-between text-success font-medium">
-                            <p>Student Discount</p>
-                            <p>- GHS {studentDiscount.toFixed(2)}</p>
-                          </div>
+                <CardHeader>
+                    <CardTitle>3. Order Summary</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    {items.length === 0 ? (
+                    <p className="text-muted-foreground text-center py-4">Your cart is empty. Add a product to see a summary.</p>
+                    ) : (
+                    <div className="space-y-4">
+                        {isStudent && (
+                            <div className="flex items-center gap-2 rounded-lg bg-success/10 p-3 text-success">
+                                <GraduationCap className="h-5 w-5" />
+                                <p className="text-sm font-medium">Student discount applied!</p>
+                            </div>
                         )}
-                         <div className="flex justify-between">
-                          <p className="text-muted-foreground">Delivery Fee</p>
-                          <p className="font-medium text-foreground">GHS {deliveryFee.toFixed(2)}</p>
+                        <div className="space-y-4 text-sm">
+                        {items.map(item => (
+                            <div key={item.id} className="flex justify-between items-center gap-4">
+                                <div className="flex items-center gap-4">
+                                    <div className="relative h-12 w-12 flex-shrink-0 rounded-md bg-muted overflow-hidden">
+                                        <Image src={item.imageUrl} alt={item.name} fill className="object-contain p-1" />
+                                    </div>
+                                    <div>
+                                        <p className="font-semibold text-foreground">{item.name}</p>
+                                        <p className="text-muted-foreground">Qty: {item.quantity}</p>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    {isStudent && item.studentPriceGHS ? (
+                                        <>
+                                            <p className="font-bold text-success">GHS {(item.studentPriceGHS * item.quantity).toFixed(2)}</p>
+                                            <p className="text-xs text-muted-foreground/80 line-through">GHS {(item.priceGHS * item.quantity).toFixed(2)}</p>
+                                        </>
+                                    ) : (
+                                        <p className="font-medium text-foreground">GHS {(item.priceGHS * item.quantity).toFixed(2)}</p>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                        </div>
+
+                        <Separator />
+
+                        <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                                <p className="text-muted-foreground">Subtotal</p>
+                                <p className="font-medium text-foreground">GHS {subtotal.toFixed(2)}</p>
+                            </div>
+                        {studentDiscount > 0 && (
+                            <div className="flex justify-between text-success font-medium">
+                                <p>Student Discount</p>
+                                <p>- GHS {studentDiscount.toFixed(2)}</p>
+                            </div>
+                            )}
+                            <div className="flex justify-between">
+                                <p className="text-muted-foreground">Delivery Fee</p>
+                                <p className="font-medium text-foreground">GHS {deliveryFee.toFixed(2)}</p>
+                            </div>
+                        </div>
+                        
+                        <Separator />
+
+                        <div className="flex items-baseline justify-between font-bold text-lg">
+                            <p>Total</p>
+                            <p className="text-primary">GHS {totalPrice.toFixed(2)}</p>
+                        </div>
+
+                        <div className="flex items-center gap-2 rounded-lg bg-muted p-3 text-muted-foreground">
+                            <Check className="h-5 w-5 text-success flex-shrink-0" />
+                            <p className="text-xs font-medium">Your privacy is guaranteed. All orders are sent in plain, discreet packaging.</p>
                         </div>
                     </div>
-                    
-                    <Separator />
-
-                    <div className="flex items-center justify-between font-bold text-lg">
-                      <p>Total</p>
-                      <p>GHS {totalPrice.toFixed(2)}</p>
-                    </div>
-
-                    <div className="flex items-center gap-2 rounded-lg bg-muted p-3 text-muted-foreground">
-                        <Check className="h-5 w-5 text-success flex-shrink-0" />
-                        <p className="text-xs font-medium">Your privacy is guaranteed. All orders are sent in plain, discreet packaging.</p>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
+                    )}
+                </CardContent>
             </Card>
             
             <SubmitButton disabled={items.length === 0} />
@@ -352,7 +369,7 @@ function OrderPageLoading() {
 
 export default function OrderPage() {
   return (
-    <div className="bg-background">
+    <div className="bg-muted">
       <div className="container mx-auto max-w-2xl px-4 py-12 md:px-6 md:py-20">
         <Suspense fallback={<OrderPageLoading />}>
           <OrderForm />
@@ -361,5 +378,3 @@ export default function OrderPage() {
     </div>
   );
 }
-
-    
