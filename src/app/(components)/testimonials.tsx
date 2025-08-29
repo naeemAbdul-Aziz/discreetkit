@@ -33,7 +33,7 @@ export function Testimonials() {
                 <Card 
                     key={index}
                     className={cn(
-                        'transform transition-transform duration-300 hover:z-10 md:hover:scale-105 flex flex-col',
+                        'transform transition-transform duration-300 hover:z-10 md:hover:scale-105 flex flex-col shadow-lg',
                         cardColors[index % cardColors.length],
                         index === 0 ? 'md:rotate-[-3deg]' : '',
                         index === 1 ? 'md:translate-y-8' : '',

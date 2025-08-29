@@ -35,7 +35,7 @@ export function OurVision() {
 
         <div className="mt-12 space-y-8">
           {visionPoints.map((point, index) => (
-            <Card key={index} className="bg-background">
+            <Card key={index} className="bg-background shadow-lg">
               <CardContent className="p-6">
                 <div className="flex flex-col sm:flex-row items-start gap-4">
                   <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 flex-shrink-0">

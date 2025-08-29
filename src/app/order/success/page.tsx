@@ -16,7 +16,7 @@ function SuccessContent() {
 
   if (!code) {
     return (
-      <Card className="w-full max-w-lg text-center">
+      <Card className="w-full max-w-lg text-center shadow-xl">
         <CardHeader>
           <CardTitle className="text-2xl text-destructive">Order Not Found</CardTitle>
           <CardDescription>
@@ -44,7 +44,7 @@ function SuccessContent() {
   };
 
   return (
-    <Card className="w-full max-w-lg text-center">
+    <Card className="w-full max-w-lg text-center shadow-xl">
       <CardHeader className="items-center">
         <CheckCircle2 className="h-16 w-16 text-green-500" />
         <CardTitle className="mt-4 text-3xl">Order Confirmed!</CardTitle>

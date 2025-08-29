@@ -1,8 +1,8 @@
 
 'use client';
 
-import { Card, CardContent } from '@/components/ui/card';
-import { TestTube, Droplet, FileText, Package, FlaskConical, Info, Plus } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { TestTube, Droplet, FileText, Package, FlaskConical, Plus } from 'lucide-react';
 import Image from 'next/image';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -60,7 +60,7 @@ export function WhatsInTheKit() {
 
         <div className="mt-12">
             <TooltipProvider delayDuration={100}>
-                 <Card className="relative aspect-video w-full max-w-4xl mx-auto overflow-hidden rounded-2xl shadow-lg">
+                 <Card className="relative aspect-video w-full max-w-4xl mx-auto overflow-hidden shadow-lg">
                     <Image
                         src="https://images.unsplash.com/photo-1583324113620-910f24a2571b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmbGF0JTIwbGF5JTIwbWVkaWNhbCUyMGtpdHxlbnwwfHx8fDE3NTYxNDg5OTV8MA&ixlib=rb-4.1.0&q=80&w=1080"
                         alt="DiscreetKit contents flat lay"

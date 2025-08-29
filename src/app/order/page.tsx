@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ShieldCheck, ArrowRight, Plus, Minus, GraduationCap, Check } from 'lucide-react';
+import { Loader2, ShieldCheck, ArrowRight, Plus, Minus, GraduationCap, Check, AlertCircle } from 'lucide-react';
 import { ChatTrigger } from '@/components/chat-trigger';
 import { useCart } from '@/hooks/use-cart';
 import { products, discounts, type Product } from '@/lib/data';
@@ -21,6 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 
 function SubmitButton({ disabled }: { disabled: boolean }) {
@@ -114,11 +115,11 @@ function OrderForm() {
       clearCart();
       router.push(`/order/success?code=${state.code}`);
     } else if (state.message && !state.success && !state.errors) {
-      toast({
-        title: 'An error occurred',
-        description: state.message,
-        variant: 'destructive',
-      });
+        toast({
+            title: 'An error occurred',
+            description: state.message,
+            variant: 'destructive',
+        });
     }
   }, [state, router, toast, clearCart]);
 
@@ -222,9 +223,9 @@ function OrderForm() {
                          ))}
                     </SelectContent>
                   </Select>
-                  {state.errors?.deliveryArea && (
-                    <p className="text-sm font-medium text-destructive">{state.errors.deliveryArea[0]}</p>
-                  )}
+                   {state.errors?.deliveryArea && (
+                        <p className="text-sm font-medium text-destructive">{state.errors.deliveryArea[0]}</p>
+                    )}
                 </div>
 
                 {showOther && (
