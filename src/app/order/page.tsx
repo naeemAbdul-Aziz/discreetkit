@@ -63,16 +63,16 @@ function AddToCartButton({ product }: { product: Product }) {
         <Button
           variant="outline"
           size="icon"
-          className="h-9 w-9 rounded-full border-primary/50 text-primary hover:bg-primary/10"
+          className="h-8 w-8 rounded-full border-primary/50 text-primary hover:bg-primary/10"
           onClick={() => updateQuantity(product.id, quantity - 1)}
         >
           <Minus className="h-4 w-4" />
         </Button>
-        <span className="w-6 text-center font-bold text-foreground">{quantity}</span>
+        <span className="w-5 text-center font-bold text-foreground">{quantity}</span>
         <Button
           variant="outline"
           size="icon"
-          className="h-9 w-9 rounded-full border-primary/50 text-primary hover:bg-primary/10"
+          className="h-8 w-8 rounded-full border-primary/50 text-primary hover:bg-primary/10"
           onClick={() => updateQuantity(product.id, quantity + 1)}
         >
           <Plus className="h-4 w-4" />
@@ -166,36 +166,39 @@ function OrderForm() {
             <CardTitle>1. Choose Your Products</CardTitle>
             <CardDescription>Add or adjust items in your cart. Student pricing is applied automatically for campus deliveries.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            {products.map((product) => (
-              <div key={product.id} className="flex flex-col sm:flex-row items-start gap-4">
-                <div className="relative h-20 w-20 flex-shrink-0 self-center sm:self-start overflow-hidden rounded-lg bg-muted">
-                  <Image
-                    src={product.imageUrl}
-                    alt={product.name}
-                    fill
-                    className="object-contain p-2"
-                    data-ai-hint="medical test kit"
-                  />
-                </div>
-                <div className="flex-grow">
-                  <h3 className="font-semibold text-base">{product.name}</h3>
-                  <p className="text-sm text-muted-foreground h-12">{product.description}</p>
-                   <div className="mt-1.5 flex items-baseline gap-2">
-                        <p className={cn(
-                            "font-bold",
-                            isStudent && product.studentPriceGHS ? "text-muted-foreground/80 line-through text-sm font-normal" : "text-lg text-foreground"
-                        )}>
-                            GHS {product.priceGHS.toFixed(2)}
-                        </p>
-                        {isStudent && product.studentPriceGHS && (
-                            <p className="font-bold text-success text-lg">GHS {product.studentPriceGHS.toFixed(2)}</p>
-                        )}
+          <CardContent className="space-y-4">
+             {products.map((product, index) => (
+              <div key={product.id}>
+                <div className="flex items-start gap-4">
+                  <div className="relative h-20 w-20 flex-shrink-0 self-center sm:self-start overflow-hidden rounded-lg bg-muted">
+                    <Image
+                      src={product.imageUrl}
+                      alt={product.name}
+                      fill
+                      className="object-contain p-2"
+                      data-ai-hint="medical test kit"
+                    />
+                  </div>
+                  <div className="flex-grow">
+                    <h3 className="font-semibold text-base">{product.name}</h3>
+                    <p className="text-sm text-muted-foreground mt-1 min-h-[40px]">{product.description}</p>
+                    <div className="mt-2 flex items-center justify-between">
+                         <div className="flex items-baseline gap-2">
+                              <p className={cn(
+                                  "font-bold",
+                                  isStudent && product.studentPriceGHS ? "text-muted-foreground/80 line-through text-sm font-normal" : "text-lg text-foreground"
+                              )}>
+                                  GHS {product.priceGHS.toFixed(2)}
+                              </p>
+                              {isStudent && product.studentPriceGHS && (
+                                  <p className="font-bold text-success text-lg">GHS {product.studentPriceGHS.toFixed(2)}</p>
+                              )}
+                          </div>
+                           <AddToCartButton product={product} />
                     </div>
+                  </div>
                 </div>
-                <div className="flex flex-col items-end gap-2 self-center sm:self-auto">
-                  <AddToCartButton product={product} />
-                </div>
+                {index < products.length - 1 && <Separator className="my-4" />}
               </div>
             ))}
           </CardContent>
@@ -224,7 +227,11 @@ function OrderForm() {
                     </SelectContent>
                   </Select>
                    {state.errors?.deliveryArea && (
-                        <p className="text-sm font-medium text-destructive">{state.errors.deliveryArea[0]}</p>
+                       <Alert variant="destructive" className="mt-2">
+                          <AlertCircle className="h-4 w-4" />
+                          <AlertTitle>Required Field</AlertTitle>
+                          <AlertDescription>{state.errors.deliveryArea[0]}</AlertDescription>
+                        </Alert>
                     )}
                 </div>
 
@@ -238,7 +245,11 @@ function OrderForm() {
                             className={cn(state.errors?.otherDeliveryArea && "border-destructive")}
                          />
                          {state.errors?.otherDeliveryArea && (
-                            <p className="text-sm font-medium text-destructive">{state.errors.otherDeliveryArea[0]}</p>
+                             <Alert variant="destructive" className="mt-2">
+                              <AlertCircle className="h-4 w-4" />
+                              <AlertTitle>Required Field</AlertTitle>
+                              <AlertDescription>{state.errors.otherDeliveryArea[0]}</AlertDescription>
+                            </Alert>
                          )}
                     </div>
                 )}
@@ -270,7 +281,11 @@ function OrderForm() {
                     This will be masked and is only for the rider to contact you.
                   </p>
                   {state.errors?.phone_masked && (
-                    <p className="text-sm font-medium text-destructive">{state.errors.phone_masked[0]}</p>
+                    <Alert variant="destructive" className="mt-2">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>Required Field</AlertTitle>
+                      <AlertDescription>{state.errors.phone_masked[0]}</AlertDescription>
+                    </Alert>
                   )}
                 </div>
               </CardContent>
@@ -378,3 +393,5 @@ export default function OrderPage() {
     </div>
   );
 }
+
+    
