@@ -10,7 +10,6 @@ import { TrustStats } from './(components)/trust-stats';
 import { CoverageMap } from './(components)/coverage-map';
 import { WhatsInTheKit } from './(components)/whats-in-the-kit';
 import { OurVision } from './(components)/our-vision';
-import { SummaryBar } from '@/components/summary-bar';
 import { HowItWorks } from './(components)/how-it-works';
 import { ProductBenefits } from './(components)/product-benefits';
 import { ProductSelector } from './(components)/product-selector';
@@ -29,7 +28,6 @@ export default function Home() {
       <CoverageMap />
       <Faq />
       <ClosingCta />
-      <SummaryBar />
     </div>
   );
 }
