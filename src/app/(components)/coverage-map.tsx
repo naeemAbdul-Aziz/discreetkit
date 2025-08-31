@@ -29,8 +29,8 @@ const buildMapUrl = () => {
     
     // Center the map over Ghana
     const centerLon = -1.0232;
-    const centerLat = 7.9465;
-    const zoom = 5.5;
+    const centerLat = 7.5;
+    const zoom = 5.8;
     const width = 1280;
     const height = 720;
     
