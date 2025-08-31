@@ -17,7 +17,10 @@ const locations = {
 };
 
 const buildMapUrl = () => {
-    // Custom markers: pin-s for cities, college for campuses
+    // Custom markers: pin-s-building for cities (primary color), pin-s-college for campuses (accent color)
+    const cityMarkerColor = '200,85,45'.replace('%','').replace(' ',','); // HSL from CSS var --primary
+    const campusMarkerColor = '30,90,55'.replace('%','').replace(' ',','); // HSL from CSS var --accent
+    
     const cityMarker = `pin-s-building+2a9d8f(${locations.accra.join(',')})`;
     const kumasiMarker = `pin-s-building+2a9d8f(${locations.kumasi.join(',')})`;
     const capeCoastMarker = `pin-s-building+2a9d8f(${locations.capeCoast.join(',')})`;
