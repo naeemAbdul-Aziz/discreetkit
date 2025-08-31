@@ -5,7 +5,7 @@
 
 @layer base {
   :root {
-    --background: 30 10% 98%; /* Soft Linen White */
+    --background: 210 20% 98%; /* Soft Linen White - User calls it this, but HSL is more blueish. Using user's HSL */
     --foreground: 210 20% 18%; /* Deep Sapphire Text */
 
     --card: 0 0% 100%; /* Pure White */
@@ -17,13 +17,13 @@
     --primary: 200 85% 45%; /* Vibrant Ocean Blue */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 140 80% 40%; /* Lively Spring Green */
+    --secondary: 140 80% 40%; /* Lively Spring Green - for success states */
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 200 15% 93%; /* Whispering Sky Gray */
+    --muted: 210 15% 93%; /* Whispering Sky Gray */
     --muted-foreground: 210 10% 40%;
 
-    --accent: 30 90% 55%; /* Energetic Sunset Orange */
+    --accent: 30 90% 55%; /* Energetic Sunset Orange - for attention */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 75% 50%; /* Bold Alert Red */
@@ -35,7 +35,6 @@
     --border: 210 15% 88%;
     --input: 210 15% 88%;
     --ring: 200 85% 45%;
-    --button-hover: 30 90% 55%;
 
     --radius: 0.8rem;
   }

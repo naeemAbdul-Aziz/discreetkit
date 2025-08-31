@@ -18,15 +18,15 @@ const locations = {
 
 const buildMapUrl = () => {
     // Custom markers: pin-s-building for cities (primary color), pin-s-college for campuses (accent color)
-    const cityMarkerColor = '200,85,45'.replace('%','').replace(' ',','); // HSL from CSS var --primary
-    const campusMarkerColor = '30,90,55'.replace('%','').replace(' ',','); // HSL from CSS var --accent
+    const primaryColor = '200,85,45'.replace('%','').replace(' ',','); 
+    const accentColor = '30,90,55'.replace('%','').replace(' ',','); 
     
-    const cityMarker = `pin-s-building+2a9d8f(${locations.accra.join(',')})`;
-    const kumasiMarker = `pin-s-building+2a9d8f(${locations.kumasi.join(',')})`;
-    const capeCoastMarker = `pin-s-building+2a9d8f(${locations.capeCoast.join(',')})`;
-    const legonMarker = `pin-s-college+f5a623(${locations.legon.join(',')})`;
-    const upsaMarker = `pin-s-college+f5a623(${locations.upsa.join(',')})`;
-    const gimpaMarker = `pin-s-college+f5a623(${locations.gimpa.join(',')})`;
+    const cityMarker = `pin-s-building+hsl(${primaryColor})(${locations.accra.join(',')})`;
+    const kumasiMarker = `pin-s-building+hsl(${primaryColor})(${locations.kumasi.join(',')})`;
+    const capeCoastMarker = `pin-s-building+hsl(${primaryColor})(${locations.capeCoast.join(',')})`;
+    const legonMarker = `pin-s-college+hsl(${accentColor})(${locations.legon.join(',')})`;
+    const upsaMarker = `pin-s-college+hsl(${accentColor})(${locations.upsa.join(',')})`;
+    const gimpaMarker = `pin-s-college+hsl(${accentColor})(${locations.gimpa.join(',')})`;
 
     const overlays = [cityMarker, kumasiMarker, capeCoastMarker, legonMarker, upsaMarker, gimpaMarker].join(',');
     

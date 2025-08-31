@@ -28,7 +28,7 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
   return (
     <Button 
         type="submit" 
-        className="w-full bg-accent text-accent-foreground hover:bg-accent/90" 
+        className="w-full" 
         size="lg"
         disabled={pending || disabled}>
       {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}

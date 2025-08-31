@@ -12,7 +12,7 @@ export function Testimonials() {
   const cardColors = [
     'bg-primary text-primary-foreground',
     'bg-accent text-accent-foreground',
-    'bg-card text-card-foreground',
+    'bg-card text-card-foreground border-2 border-primary',
   ];
 
   return (

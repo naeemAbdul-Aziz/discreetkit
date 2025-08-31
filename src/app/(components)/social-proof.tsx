@@ -20,7 +20,7 @@ export function SocialProof() {
           </div>
           
           <div className="flex justify-center">
-            <Card className="bg-primary text-primary-foreground w-full max-w-sm p-8 text-center shadow-xl">
+            <Card className="bg-accent text-accent-foreground w-full max-w-sm p-8 text-center shadow-xl">
               <CardContent className="p-0">
                 <h3 className="text-4xl font-bold">
                   Over 1,600
@@ -31,7 +31,7 @@ export function SocialProof() {
                     <Star key={i} className="h-6 w-6 fill-current text-yellow-400" />
                   ))}
                 </div>
-                <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
+                <Button variant="secondary">
                     Read our reviews
                     <MessageSquare />
                 </Button>
