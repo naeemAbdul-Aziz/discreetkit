@@ -53,8 +53,11 @@ export function Hero() {
                 transition={{ duration: 0.7, delay: 0.2 }}
             >
                 <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
-                    Private Health Answers, <span className="font-light italic">Delivered Discreetly.</span>
+                    Private Health Answers, <span className="font-light italic text-primary">Delivered Discreetly.</span>
                 </h1>
+                <p className="mt-4 max-w-md mx-auto md:mx-0 text-base text-muted-foreground">
+                    DiscreetKit empowers you to take control of your health with confidential, WHO-approved self-test kits delivered right to your door.
+                </p>
                 
                 <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
                     <Button asChild size="lg" className="w-full sm:w-auto">
