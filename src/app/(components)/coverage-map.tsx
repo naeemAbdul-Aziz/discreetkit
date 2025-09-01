@@ -1,6 +1,7 @@
 
 'use client';
 
+import { CheckCircle } from 'lucide-react';
 import Image from 'next/image';
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
@@ -18,8 +19,8 @@ const locations = {
 
 const buildMapUrl = () => {
     // Custom markers: pin-s-building for cities (primary color), pin-s-college for campuses (accent color)
-    const primaryColor = '200,85,45'.replace('%','').replace(' ',','); 
-    const accentColor = '30,90,55'.replace('%','').replace(' ',','); 
+    const primaryColor = '200,85,45'.replace(/%/g, '').replace(/ /g, ','); // Vibrant Ocean Blue
+    const accentColor = '30,90,55'.replace(/%/g, '').replace(/ /g, ','); // Energetic Sunset Orange
     
     const cityMarker = `pin-s-building+hsl(${primaryColor})(${locations.accra.join(',')})`;
     const kumasiMarker = `pin-s-building+hsl(${primaryColor})(${locations.kumasi.join(',')})`;
@@ -37,6 +38,10 @@ const buildMapUrl = () => {
     const width = 1280;
     const height = 720;
     
+    if (!MAPBOX_TOKEN || MAPBOX_TOKEN === 'YOUR_MAPBOX_API_KEY') {
+        return "https://picsum.photos/1280/720";
+    }
+
     return `https://api.mapbox.com/styles/v1/mapbox/${MAP_STYLE}/static/${overlays}/${centerLon},${centerLat},${zoom}/${width}x${height}@2x?access_token=${MAPBOX_TOKEN}`;
 }
 
@@ -64,6 +69,12 @@ export function CoverageMap() {
                 className="object-cover"
                 data-ai-hint="ghana map"
              />
+             <div className="absolute inset-x-0 bottom-4 flex justify-center">
+                 <div className="flex items-center gap-2 rounded-full bg-background/80 p-2 pl-3 pr-4 text-sm font-medium text-foreground shadow-lg backdrop-blur-sm">
+                    <CheckCircle className="h-5 w-5 text-success" />
+                    <p>Now delivering across Ghana</p>
+                 </div>
+             </div>
            </div>
         </div>
       </div>
