@@ -19,6 +19,25 @@ const stats = [
   },
 ];
 
+const shimmer = (w: number, h: number) => `
+<svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <linearGradient id="g">
+      <stop stop-color="#f0f0f0" offset="20%" />
+      <stop stop-color="#e0e0e0" offset="50%" />
+      <stop stop-color="#f0f0f0" offset="70%" />
+    </linearGradient>
+  </defs>
+  <rect width="${w}" height="${h}" fill="#f0f0f0" />
+  <rect id="r" width="${w}" height="${h}" fill="url(#g)" />
+  <animate xlink:href="#r" attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite"  />
+</svg>`;
+
+const toBase64 = (str: string) =>
+  typeof window === 'undefined'
+    ? Buffer.from(str).toString('base64')
+    : window.btoa(str);
+
 export function TrustStats() {
   return (
     <section className="bg-background py-12 md:py-24">
@@ -39,6 +58,7 @@ export function TrustStats() {
                 height={500}
                 className="rounded-xl object-cover shadow-lg"
                 data-ai-hint="student ghana"
+                placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 500))}`}
               />
             </div>
             <div className="absolute bottom-0 left-0 w-2/4 max-w-[250px] md:w-1/2 transform -rotate-6">
@@ -49,6 +69,7 @@ export function TrustStats() {
                 height={300}
                 className="rounded-xl object-cover shadow-2xl border-4 border-background"
                 data-ai-hint="health professional"
+                placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
               />
             </div>
           </motion.div>

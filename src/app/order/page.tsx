@@ -38,6 +38,26 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
   );
 }
 
+const shimmer = (w: number, h: number) => `
+<svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <linearGradient id="g">
+      <stop stop-color="#f0f0f0" offset="20%" />
+      <stop stop-color="#e0e0e0" offset="50%" />
+      <stop stop-color="#f0f0f0" offset="70%" />
+    </linearGradient>
+  </defs>
+  <rect width="${w}" height="${h}" fill="#f0f0f0" />
+  <rect id="r" width="${w}" height="${h}" fill="url(#g)" />
+  <animate xlink:href="#r" attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite"  />
+</svg>`;
+
+const toBase64 = (str: string) =>
+  typeof window === 'undefined'
+    ? Buffer.from(str).toString('base64')
+    : window.btoa(str);
+
+
 function AddToCartButton({ product }: { product: Product }) {
   const { addItem, updateQuantity, getItemQuantity } = useCart();
   const [isMounted, setIsMounted] = useState(false);
@@ -186,6 +206,7 @@ function OrderForm() {
                                     fill
                                     className="object-contain p-2"
                                     data-ai-hint="medical test kit"
+                                    placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(80, 80))}`}
                                     />
                                 </div>
                                 <div className="flex flex-col">
@@ -340,7 +361,7 @@ function OrderForm() {
                         <div key={item.id} className="flex justify-between items-center gap-4">
                             <div className="flex items-center gap-4">
                                 <div className="relative h-12 w-12 flex-shrink-0 rounded-md bg-muted overflow-hidden">
-                                    <Image src={item.imageUrl} alt={item.name} fill className="object-contain p-1" />
+                                    <Image src={item.imageUrl} alt={item.name} fill className="object-contain p-1" placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(48, 48))}`} />
                                 </div>
                                 <div>
                                     <p className="font-semibold text-foreground">{item.name}</p>
