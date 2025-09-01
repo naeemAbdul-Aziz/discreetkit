@@ -12,7 +12,7 @@ export function Faq() {
             Frequently Asked Questions
           </h2>
           <p className="mt-4 text-base text-muted-foreground">
-            Your questions, answered. If you need more info, our AI assistant is here to help.
+            Your questions, answered. If you need more info, Pacely is here to help.
           </p>
         </div>
 

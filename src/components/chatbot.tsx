@@ -26,7 +26,7 @@ export function Chatbot() {
 
   const initialMessage: Message = {
       role: 'model',
-      parts: "Hello! I'm your friendly assistant. How can I help you today? You can ask about our test kits, the ordering process, or delivery locations."
+      parts: "Hello! I'm Pacely, your friendly assistant. How can I help you today? You can ask about our test kits, the ordering process, or delivery locations."
   };
 
   useEffect(() => {
@@ -65,7 +65,7 @@ export function Chatbot() {
         <SheetContent className="flex w-full flex-col sm:max-w-md">
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2">
-                <Bot /> AI Assistant
+                <Bot /> Pacely
             </SheetTitle>
           </SheetHeader>
           <div className="flex-1 overflow-hidden">
@@ -106,7 +106,7 @@ export function Chatbot() {
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask about our tests..."
+                placeholder="Ask Pacely about our tests..."
                 disabled={isPending}
               />
               <Button type="submit" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8" disabled={isPending || !input.trim()}>

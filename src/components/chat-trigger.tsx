@@ -13,11 +13,11 @@ export function ChatTrigger() {
       <div className="flex flex-col items-center gap-2">
         <h3 className="font-semibold">Have Questions?</h3>
         <p className="text-sm text-muted-foreground">
-          Our AI Assistant can help you with questions about our products, delivery, and privacy.
+          Pacely, our AI assistant, can help with questions about products, delivery, and privacy.
         </p>
         <Button onClick={() => setIsOpen(true)} className="mt-2">
           <MessageCircle className="mr-2 h-4 w-4" />
-          Ask our AI
+          Ask Pacely
         </Button>
       </div>
     </div>
