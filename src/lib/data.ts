@@ -82,42 +82,42 @@ export const features = [
     icon: ShieldCheck,
     title: 'Anonymous Ordering',
     description: 'No names, no accounts. Your privacy is our top priority. We never store personal details.',
-    image: 'https://placehold.co/400x250',
+    image: 'https://picsum.photos/400/250',
     dataAiHint: 'privacy lock'
   },
    {
     icon: GraduationCap,
     title: 'Student Friendly Kits',
     description: 'Special kits and bundles created for students. Your health shouldn\'t break the bank.',
-    image: 'https://placehold.co/400x250',
+    image: 'https://picsum.photos/400/250',
     dataAiHint: 'student health'
   },
   {
     icon: Truck,
     title: 'Fast & Discreet Delivery',
     description: 'Get your order quickly in unbranded packaging. Or, choose anonymous pharmacy pickup.',
-    image: 'https://placehold.co/400x250',
+    image: 'https://picsum.photos/400/250',
     dataAiHint: 'delivery person'
   },
   {
     icon: Hospital,
     title: 'Partner Hospitals',
     description: 'We connect you with trusted health partners for follow-up care and support if needed.',
-    image: 'https://placehold.co/400x250',
+    image: 'https://picsum.photos/400/250',
     dataAiHint: 'hospital building'
   },
   {
     icon: MapPin,
     title: 'Easy Tracking',
     description: 'Use your unique, anonymous code to track your order from our hub to your hands.',
-    image: 'https://placehold.co/400x250',
+    image: 'https://picsum.photos/400/250',
     dataAiHint: 'map tracking'
   },
   {
     icon: BadgeCheck,
     title: 'Verified & Safe Tests',
     description: 'All our self-test kits are WHO-approved and sourced from trusted manufacturers.',
-    image: 'https://placehold.co/400x250',
+    image: 'https://picsum.photos/400/250',
     dataAiHint: 'medical test'
   },
 ]
@@ -127,21 +127,21 @@ export const testimonials = [
         quote: "The process was so simple and private. I didn't have to worry about anyone knowing. Got my package the next day at my hostel.",
         name: 'A. Mensah',
         role: 'Student, University of Ghana',
-        avatar: 'https://placehold.co/100x100',
+        avatar: 'https://picsum.photos/100/100',
         dataAiHint: 'person portrait'
     },
     {
         quote: "As a young professional, my schedule is tight. Ordering online was convenient, and the pharmacy pickup option was perfect for me.",
         name: 'K. Owusu',
         role: 'Young Professional, Accra',
-        avatar: 'https://placehold.co/100x100',
+        avatar: 'https://picsum.photos/101/101',
         dataAiHint: 'person portrait'
     },
     {
         quote: "The student discount really helped. It's great to see a service that actually considers our budget. The packaging was completely plain as promised.",
         name: 'F. Annan',
         role: 'Student, UPSA',
-        avatar: 'https://placehold.co/100x100',
+        avatar: 'https://picsum.photos/102/102',
         dataAiHint: 'person portrait'
     }
 ];

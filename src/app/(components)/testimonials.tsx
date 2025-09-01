@@ -1,67 +1,92 @@
 
 'use client';
 
-import { Star } from 'lucide-react';
 import { testimonials } from '@/lib/data';
 import { cn } from '@/lib/utils';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import Image from 'next/image';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Quote } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+const cardColors = [
+  'bg-card text-card-foreground',
+  'bg-card text-card-foreground border-l-4 border-primary',
+  'bg-card text-card-foreground',
+];
+
+const shimmer = (w: number, h: number) => `
+<svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <linearGradient id="g">
+      <stop stop-color="#f0f0f0" offset="20%" />
+      <stop stop-color="#e0e0e0" offset="50%" />
+      <stop stop-color="#f0f0f0" offset="70%" />
+    </linearGradient>
+  </defs>
+  <rect width="${w}" height="${h}" fill="#f0f0f0" />
+  <rect id="r" width="${w}" height="${h}" fill="url(#g)" />
+  <animate xlink:href="#r" attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite"  />
+</svg>`;
+
+const toBase64 = (str: string) =>
+  typeof window === 'undefined'
+    ? Buffer.from(str).toString('base64')
+    : window.btoa(str);
+
 
 export function Testimonials() {
-  const cardColors = [
-    'bg-primary text-primary-foreground',
-    'bg-accent text-accent-foreground',
-    'bg-card text-card-foreground border-2 border-primary',
-  ];
-
   return (
-    <section className="bg-background py-20 md:py-32">
-      <div className="container mx-auto max-w-5xl px-4 md:px-6">
-        <div className="text-center">
-          <p className="font-semibold text-primary">Reviews</p>
-          <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-            Trusted by People Like You
-          </h2>
-          <p className="mt-4 text-base text-muted-foreground">
-            We're proud to provide a service that people trust.
-          </p>
-        </div>
+    <section className="bg-background py-12 md:py-24">
+      <div className="container mx-auto max-w-6xl px-4 md:px-6">
+        <div className="grid gap-12 md:grid-cols-2 md:gap-16 items-center">
+            
+          <div className="space-y-6 text-center md:text-left">
+            <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground sm:text-4xl">
+              What Our Customers Say
+            </h2>
+            <p className="max-w-md mx-auto md:mx-0 text-base text-muted-foreground">
+              We're proud to provide a service that hundreds of young people and students trust for their confidential health needs. Here's what they have to say.
+            </p>
+            <Button variant="accent">View More</Button>
+          </div>
 
-        <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-4 lg:gap-8">
+          <div className="relative space-y-6">
             {testimonials.map((testimonial, index) => (
-                <Card 
+                <motion.div
                     key={index}
-                    className={cn(
-                        'transform transition-transform duration-300 hover:z-10 md:hover:scale-105 flex flex-col shadow-lg',
-                        cardColors[index % cardColors.length],
-                        index === 0 ? 'md:rotate-[-3deg]' : '',
-                        index === 1 ? 'md:translate-y-8' : '',
-                        index === 2 ? 'md:rotate-[3deg]' : '',
-                    )}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.15 }}
+                    viewport={{ once: true }}
                 >
-                    <div className="p-6 flex-grow">
-                        <div className="flex items-center gap-1 text-yellow-400">
-                            {[...Array(5)].map((_, i) => (
-                            <Star key={i} className="h-5 w-5 fill-current" />
-                            ))}
-                        </div>
-                        <blockquote className="mt-4 text-sm flex-grow">
-                            "{testimonial.quote}"
-                        </blockquote>
-                    </div>
-                     <div className="p-6 pt-0 mt-4 flex items-center gap-4">
-                            <Avatar>
-                                <AvatarImage src={testimonial.avatar} alt={testimonial.name} data-ai-hint="person portrait" />
-                                <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                                <p className="font-semibold text-sm">{testimonial.name}</p>
-                                <p className="text-xs opacity-80">{testimonial.role}</p>
+                    <Card
+                        className={cn(
+                            'p-6 shadow-lg transition-shadow hover:shadow-xl',
+                            cardColors[index % cardColors.length],
+                        )}
+                    >
+                        <CardContent className="p-0 space-y-4">
+                            <Quote className="h-8 w-8 text-primary/30" />
+                            <blockquote className="text-base text-muted-foreground">
+                                "{testimonial.quote}"
+                            </blockquote>
+                            <div className="pt-4 flex items-center gap-4">
+                                <Avatar className="border-2 border-primary/10">
+                                    <AvatarImage src={testimonial.avatar} alt={testimonial.name} data-ai-hint="person portrait" />
+                                    <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                                <div>
+                                    <p className="font-semibold text-sm text-foreground">{testimonial.name}</p>
+                                    <p className="text-xs text-muted-foreground">{testimonial.role}</p>
+                                </div>
                             </div>
-                        </div>
-                </Card>
+                        </CardContent>
+                    </Card>
+                </motion.div>
             ))}
+          </div>
         </div>
       </div>
     </section>
