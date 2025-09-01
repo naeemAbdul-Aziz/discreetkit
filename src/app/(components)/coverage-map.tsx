@@ -38,7 +38,7 @@ const buildMapUrl = () => {
     const width = 1280;
     const height = 720;
     
-    if (!MAPBOX_TOKEN || MAPBOX_TOKEN === 'YOUR_MAPBOX_API_KEY') {
+    if (!MAPBOX_TOKEN) {
         return "https://picsum.photos/1280/720";
     }
 
