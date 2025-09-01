@@ -12,6 +12,7 @@ export type CartItem = {
   studentPriceGHS?: number;
   imageUrl: string;
   quantity: number;
+  description: string;
 };
 
 interface CartState {
@@ -95,6 +96,7 @@ export const useCart = create<CartState>()(
             studentPriceGHS: product.studentPriceGHS,
             imageUrl: product.imageUrl,
             quantity: 1,
+            description: product.description,
           };
           updatedItems = [...currentItems, newItem];
         }
@@ -147,3 +149,5 @@ export const useCart = create<CartState>()(
     }
   )
 );
+
+    

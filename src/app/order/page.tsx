@@ -94,7 +94,19 @@ function OrderForm() {
   const formRef = useRef<HTMLFormElement>(null);
 
   const { items, subtotal, studentDiscount, deliveryFee, totalPrice, clearCart, deliveryLocation, setDeliveryLocation, getItemQuantity } = useCart();
-  const [showOther, setShowOther] = useState(deliveryLocation ? !discounts.some(d => d.campus === deliveryLocation) : true);
+  const [showOther, setShowOther] = useState(true);
+  
+  const [isMounted, setIsMounted] = useState(false);
+  
+  useEffect(() => {
+    setIsMounted(true);
+    // Initialize showOther based on hydrated cart state
+    if (deliveryLocation && discounts.some(d => d.campus === deliveryLocation)) {
+      setShowOther(false);
+    } else {
+      setShowOther(true);
+    }
+  }, [deliveryLocation]);
   
   const isStudent = deliveryLocation && discounts.some(d => d.campus === deliveryLocation);
 
@@ -135,7 +147,6 @@ function OrderForm() {
     return discounts.some(d => d.campus === location);
   }
 
-
   return (
     <>
       <div className="text-center">
@@ -161,8 +172,9 @@ function OrderForm() {
             <h2 className="text-2xl font-bold text-foreground">1. Choose Your Products</h2>
             <div className="space-y-4">
                 {products.map((product) => {
-                    const quantity = getItemQuantity(product.id) || 1;
-                    const isProductInCart = getItemQuantity(product.id) > 0;
+                    const quantity = isMounted ? getItemQuantity(product.id) || 1 : 1;
+                    const isProductInCart = isMounted ? getItemQuantity(product.id) > 0 : false;
+                    
                     return (
                      <Card key={product.id} className="shadow-lg overflow-hidden transition-all hover:shadow-xl">
                         <CardContent className="p-4 sm:p-6">
@@ -186,7 +198,9 @@ function OrderForm() {
                                 </div>
                                 <div className="flex flex-col items-end justify-between self-stretch">
                                     <div className="text-right h-10 flex flex-col justify-center items-end">
-                                        {isStudent && product.studentPriceGHS ? (
+                                      {!isMounted ? (
+                                        <div className="h-5 w-20 bg-muted rounded-md animate-pulse" />
+                                      ) : isStudent && product.studentPriceGHS ? (
                                             <>
                                                 <p className="font-bold text-success text-base">GHS {(product.studentPriceGHS * quantity).toFixed(2)}</p>
                                                 {isProductInCart && (
@@ -222,7 +236,7 @@ function OrderForm() {
             <CardContent className="space-y-4">
             <div className="space-y-2">
                 <Label htmlFor="deliveryArea">Delivery Area / Campus *</Label>
-                <Select name="deliveryArea" onValueChange={handleLocationChange} defaultValue={deliveryLocation || "Other"}>
+                <Select name="deliveryArea" onValueChange={handleLocationChange} defaultValue={deliveryLocation || "Other"} disabled={!isMounted}>
                 <SelectTrigger className={cn(state.errors?.deliveryArea && "border-destructive")}>
                     <SelectValue placeholder="Select a location..." />
                 </SelectTrigger>
@@ -306,7 +320,11 @@ function OrderForm() {
                 <CardTitle>3. Order Summary</CardTitle>
             </CardHeader>
             <CardContent>
-                {items.length === 0 ? (
+              {!isMounted ? (
+                 <div className="flex items-center justify-center py-4">
+                   <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                 </div>
+              ) : items.length === 0 ? (
                 <p className="text-muted-foreground text-center py-4">Your cart is empty. Add a product to see a summary.</p>
                 ) : (
                 <div className="space-y-4">
@@ -377,7 +395,7 @@ function OrderForm() {
             </CardContent>
         </Card>
         
-        <SubmitButton disabled={items.length === 0} />
+        <SubmitButton disabled={!isMounted || items.length === 0} />
           
       </form>
     </>
@@ -403,3 +421,5 @@ export default function OrderPage() {
     </div>
   );
 }
+
+    
