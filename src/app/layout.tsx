@@ -7,6 +7,7 @@ import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Toaster } from "@/components/ui/toaster";
 import { Chatbot } from '@/components/chatbot';
+import NextTopLoader from 'nextjs-toploader';
 
 const figtree = Figtree({
   subsets: ['latin'],
@@ -34,6 +35,17 @@ export default function RootLayout({
        <head>
       </head>
       <body className={cn('min-h-screen bg-background font-body antialiased', figtree.variable)}>
+        <NextTopLoader
+          color="hsl(var(--primary))"
+          initialPosition={0.08}
+          crawlSpeed={200}
+          height={3}
+          crawl={true}
+          showSpinner={false}
+          easing="ease"
+          speed={200}
+          shadow="0 0 10px hsl(var(--primary)),0 0 5px hsl(var(--primary))"
+        />
         <div className="relative flex min-h-dvh flex-col bg-background">
           <Header />
           <main className="flex-1">{children}</main>

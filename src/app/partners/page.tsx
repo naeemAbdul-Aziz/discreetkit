@@ -68,7 +68,7 @@ function PartnersContent() {
 
 function PartnersLoading() {
     return (
-        <div className="flex justify-center items-center h-64">
+        <div className="flex h-64 items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
     )
