@@ -53,7 +53,7 @@ export function Hero() {
                 transition={{ duration: 0.7, delay: 0.2 }}
             >
                 <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
-                    Private Health Answers, <span className="opacity-80">Delivered with Trust.</span>
+                    Private Health Answers, <span className="font-light italic">Delivered with Trust.</span>
                 </h1>
                 
                 <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
