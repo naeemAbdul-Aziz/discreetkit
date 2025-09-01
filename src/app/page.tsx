@@ -13,6 +13,7 @@ import { OurVision } from './(components)/our-vision';
 import { HowItWorks } from './(components)/how-it-works';
 import { ProductBenefits } from './(components)/product-benefits';
 import { ProductSelector } from './(components)/product-selector';
+import { ContactUs } from './(components)/contact-us';
 
 export default function Home() {
   return (
@@ -28,6 +29,7 @@ export default function Home() {
       <Testimonials />
       <CoverageMap />
       <Faq />
+      <ContactUs />
       <ClosingCta />
     </div>
   );
