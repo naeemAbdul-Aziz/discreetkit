@@ -15,7 +15,7 @@ export function ClosingCta() {
             Ready to get started? Your <strong>peace of mind</strong> is just a few clicks away. Order your <strong>confidential self-test kit</strong> now.
           </p>
           <div className="mt-8">
-            <Button asChild size="lg" variant="secondary">
+            <Button asChild size="lg" variant="accent">
               <Link href="/order">
                 Order Your Test Kit Securely
                 <ArrowRight />
