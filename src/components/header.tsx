@@ -17,7 +17,7 @@ const navLinksLeft = [
 ];
 
 const navLinksRight = [
-  { href: '/partners', label: 'Our Partners' },
+  { href: '/#faq', label: 'FAQ' },
   { href: '/track', label: 'Track Order' },
 ];
 

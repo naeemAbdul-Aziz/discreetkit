@@ -9,7 +9,6 @@ export function Footer() {
     company: [
       { href: '/#how-it-works', label: 'How It Works' },
       { href: '/#faq', label: 'FAQ' },
-      { href: '/partners', label: 'Partners' },
     ],
     legal: [
       { href: '/privacy', label: 'Privacy Policy' },
