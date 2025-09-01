@@ -1,5 +1,4 @@
 
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { partners } from '@/lib/data';
 import { Badge } from '@/components/ui/badge';
@@ -9,12 +8,18 @@ import { ArrowUpRight, Loader2 } from 'lucide-react';
 import { Suspense } from 'react';
 
 function PartnersContent() {
-  const partnerTypes = ['hospital', 'pharmacy', 'src'];
-  const categorizedPartners = partnerTypes.map(type => ({
-    type,
-    title: `${type.charAt(0).toUpperCase() + type.slice(1)}s`,
-    list: partners.filter(p => p.type === type),
-  }));
+  const partnerTypes = ['pharmacy', 'src'];
+  const categorizedPartners = partnerTypes.map(type => {
+      let title = '';
+      if (type === 'pharmacy') title = 'Partner Pharmacies';
+      if (type === 'src') title = 'Student Body Partners';
+
+      return {
+        type,
+        title: title,
+        list: partners.filter(p => p.type === type),
+      }
+  }).filter(c => c.list.length > 0);
 
   return (
     <>
@@ -23,7 +28,7 @@ function PartnersContent() {
             Our Trusted Partners
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            We collaborate with reputable health institutions, pharmacies, and student bodies to provide a seamless and trustworthy service.
+            We collaborate with reputable health institutions, pharmacies, and student bodies to provide a seamless and trustworthy service for pickups and follow-up care.
           </p>
         </div>
 
@@ -33,16 +38,17 @@ function PartnersContent() {
               <h2 className="mb-8 text-center font-headline text-3xl font-bold">{category.title}</h2>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {category.list.map((partner) => (
-                  <Link href={partner.url} key={partner.id} target="_blank" rel="noopener noreferrer">
-                    <Card className="group h-full overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1">
+                  <Link href={partner.url} key={partner.id} target="_blank" rel="noopener noreferrer" className="block h-full">
+                    <Card className="group h-full overflow-hidden transition-all hover:shadow-xl hover:-translate-y-1">
                       <CardHeader className="p-0">
-                         <div className="relative h-40 w-full bg-muted">
+                         <div className="relative h-40 w-full bg-muted flex items-center justify-center p-4">
                            <Image 
-                              src="https://picsum.photos/400/200"
-                              alt={`${partner.name} background`} 
-                              fill
-                              className="object-cover grayscale group-hover:grayscale-0 transition-all" 
-                              data-ai-hint="organization building"
+                              src={partner.logoUrl}
+                              alt={`${partner.name} Logo`}
+                              width={150}
+                              height={60}
+                              className="object-contain"
+                              data-ai-hint="logo"
                             />
                          </div>
                       </CardHeader>
@@ -50,7 +56,7 @@ function PartnersContent() {
                         <div className="flex justify-between items-start">
                           <div>
                             <CardTitle className="text-xl">{partner.name}</CardTitle>
-                            <Badge variant="outline" className="mt-2 capitalize">{partner.type}</Badge>
+                            <Badge variant="outline" className="mt-2 capitalize">{partner.type === 'src' ? 'SRC Partner' : partner.type}</Badge>
                           </div>
                           <ArrowUpRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:rotate-45" />
                         </div>
