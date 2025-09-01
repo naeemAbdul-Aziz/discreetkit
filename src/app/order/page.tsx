@@ -243,10 +243,11 @@ function OrderForm() {
                 <SelectContent>
                         <SelectItem value="Other">Other (Standard Delivery)</SelectItem>
                         {discounts.map(loc => (
-                        <SelectItem key={loc.id} value={loc.campus}>{loc.campus} (Student Discount)</SelectItem>
+                        <SelectItem key={loc.id} value={loc.campus}>{loc.campus}</SelectItem>
                         ))}
                 </SelectContent>
                 </Select>
+                <p className="text-[0.8rem] text-muted-foreground">Select a campus to apply student discounts.</p>
                  {state.errors?.deliveryArea?.[0] && (
                     <Alert variant="warning" className="mt-2">
                       <AlertTriangle className="h-4 w-4" />
@@ -421,5 +422,7 @@ export default function OrderPage() {
     </div>
   );
 }
+
+    
 
     
