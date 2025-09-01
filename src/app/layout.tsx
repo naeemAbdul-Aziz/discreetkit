@@ -15,13 +15,38 @@ const figtree = Figtree({
   variable: '--font-figtree',
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://discreetkit.com';
+const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756391917/discreetKit_tvvwkr.png';
+
 export const metadata: Metadata = {
-  title: 'AnonTest Ghana - Confidential Self-Test Kits',
-  description: 'Anonymous self-test kit ordering and delivery in Ghana. Private, fast, and reliable service for students and young professionals.',
-  keywords: ['self-test kit', 'HIV test', 'pregnancy test', 'Ghana', 'anonymous testing', 'discreet delivery', 'AnonTest'],
+  metadataBase: new URL(siteUrl),
+  title: 'DiscreetKit Ghana - Confidential Self-Test Kits',
+  description: 'Order confidential, WHO-approved self-test kits for HIV and pregnancy in Ghana. Anonymous, private, and discreet delivery for students and young professionals.',
+  keywords: ['self-test kit', 'HIV test Ghana', 'pregnancy test Ghana', 'confidential testing', 'anonymous testing', 'private health test', 'discreet delivery', 'DiscreetKit'],
   viewport: {
     width: 'device-width',
     initialScale: 1,
+  },
+  openGraph: {
+    type: 'website',
+    url: siteUrl,
+    title: 'DiscreetKit Ghana - Confidential Self-Test Kits',
+    description: 'Anonymous, private, and discreet self-test kit delivery in Ghana.',
+    images: [
+      {
+        url: logoUrl,
+        width: 1200,
+        height: 630,
+        alt: 'DiscreetKit Ghana Logo',
+      },
+    ],
+    siteName: 'DiscreetKit Ghana',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'DiscreetKit Ghana - Confidential Self-Test Kits',
+    description: 'Anonymous, private, and discreet self-test kit delivery in Ghana.',
+    images: [logoUrl],
   },
 };
 
