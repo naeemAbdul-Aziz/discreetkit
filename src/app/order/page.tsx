@@ -130,7 +130,16 @@ function OrderForm() {
   
   const isStudent = deliveryLocation && discounts.some(d => d.campus === deliveryLocation);
 
-  const initialState = { message: null, errors: {}, success: false, code: null };
+  const initialState: {
+    message: string | null;
+    errors?: {
+      deliveryArea?: string[] | undefined;
+      otherDeliveryArea?: string[] | undefined;
+      phone_masked?: string[] | undefined;
+    };
+    success: boolean;
+    code: string | null;
+  } = { message: null, errors: {}, success: false, code: null };
   const [state, dispatch] = useActionState(createOrderAction, initialState);
 
   useEffect(() => {
@@ -447,3 +456,4 @@ export default function OrderPage() {
     
 
     
+

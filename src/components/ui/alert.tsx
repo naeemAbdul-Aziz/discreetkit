@@ -13,7 +13,7 @@ const alertVariants = cva(
         destructive:
           "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
         warning:
-          "border-accent/50 text-accent-foreground dark:border-accent [&>svg]:text-accent-foreground bg-accent/10",
+          "border-yellow-500/50 text-yellow-700 bg-yellow-50 [&>svg]:text-yellow-600",
       },
     },
     defaultVariants: {
@@ -31,10 +31,7 @@ const Alert = React.forwardRef<
     role="alert"
     className={cn(alertVariants({ variant }), className)}
     {...props}
-  >
-    {variant === "warning" && <AlertTriangle className="h-4 w-4" />}
-    {props.children}
-  </div>
+  />
 ))
 Alert.displayName = "Alert"
 
