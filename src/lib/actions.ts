@@ -6,7 +6,7 @@ import { generateTrackingCode, type Order } from './data';
 import { answerQuestions } from '@/ai/flows/answer-questions';
 import { revalidatePath } from 'next/cache';
 import { type CartItem } from '@/hooks/use-cart';
-import { supabase } from './supabase';
+import { supabaseAdmin } from './supabase';
 
 const orderSchema = z.object({
   cartItems: z.string().min(1, 'Cart cannot be empty.'),
@@ -57,7 +57,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     };
 
     // 1. Insert into orders table
-    const { data: orderData, error: orderError } = await supabase
+    const { data: orderData, error: orderError } = await supabaseAdmin
       .from('orders')
       .insert({
         code,
@@ -75,7 +75,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     if (!orderData) throw new Error('Failed to retrieve order ID after creation.');
 
     // 2. Insert initial event into order_events
-    const { error: eventError } = await supabase.from('order_events').insert({
+    const { error: eventError } = await supabaseAdmin.from('order_events').insert({
       order_id: orderData.id,
       status: 'Received',
       note: 'Your order has been received and is awaiting processing.',
@@ -95,7 +95,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
 }
 
 export async function getOrderAction(code: string): Promise<Order | null> {
-  const { data: order, error } = await supabase
+  const { data: order, error } = await supabaseAdmin
     .from('orders')
     .select(
       `
