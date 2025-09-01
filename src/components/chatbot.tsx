@@ -3,7 +3,7 @@
 
 import { useState, useRef, useEffect, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Bot, Loader, Send, User } from 'lucide-react';
@@ -67,6 +67,9 @@ export function Chatbot() {
             <SheetTitle className="flex items-center gap-2">
                 <Bot /> Pacely
             </SheetTitle>
+            <SheetDescription>
+              Your friendly AI assistant for questions about DiscreetKit.
+            </SheetDescription>
           </SheetHeader>
           <div className="flex-1 overflow-hidden">
             <ScrollArea className="h-full" ref={scrollAreaRef}>
