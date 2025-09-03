@@ -50,7 +50,7 @@ export function Testimonials() {
             <p className="max-w-md mx-auto md:mx-0 text-base text-muted-foreground">
               We're proud to provide a service that hundreds of young people and students trust for their confidential health needs. Here's what they have to say.
             </p>
-            <Button asChild>
+            <Button asChild variant="accent">
                 <Link href="/order">Order Now</Link>
             </Button>
           </div>
@@ -101,4 +101,5 @@ export function Testimonials() {
     </section>
   );
 }
+
 
