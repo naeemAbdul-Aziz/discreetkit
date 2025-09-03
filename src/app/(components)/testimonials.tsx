@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Quote } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 const cardColors = [
   'bg-card text-card-foreground',
@@ -49,7 +50,9 @@ export function Testimonials() {
             <p className="max-w-md mx-auto md:mx-0 text-base text-muted-foreground">
               We're proud to provide a service that hundreds of young people and students trust for their confidential health needs. Here's what they have to say.
             </p>
-            <Button variant="accent">View More</Button>
+            <Button asChild>
+                <Link href="/order">Order Now</Link>
+            </Button>
           </div>
 
           <div className="relative space-y-6">
