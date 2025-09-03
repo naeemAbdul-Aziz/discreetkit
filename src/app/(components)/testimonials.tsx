@@ -13,8 +13,8 @@ import Link from 'next/link';
 
 const cardColors = [
   'bg-card text-card-foreground',
-  'bg-card text-card-foreground',
   'bg-card text-card-foreground border-l-4 border-primary',
+  'bg-card text-card-foreground',
 ];
 
 const shimmer = (w: number, h: number) => `
@@ -76,7 +76,7 @@ export function Testimonials() {
                     <Card
                         className={cn(
                             'p-6 shadow-lg transition-shadow hover:shadow-xl mb-8',
-                             cardColors[index % cardColors.length],
+                             index === 1 ? cardColors[1] : cardColors[0],
                         )}
                     >
                         <CardContent className="p-0 space-y-4">

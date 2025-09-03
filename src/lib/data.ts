@@ -131,17 +131,17 @@ export const testimonials = [
         dataAiHint: 'person portrait'
     },
     {
-        quote: "As a young professional, my schedule is tight. Ordering online was convenient, and the pharmacy pickup option was perfect for me.",
-        name: 'K. Owusu',
-        role: 'Young Professional, Accra',
-        avatar: 'https://picsum.photos/101/101',
-        dataAiHint: 'person portrait'
-    },
-    {
         quote: "The student discount really helped. It's great to see a service that actually considers our budget. The packaging was completely plain as promised.",
         name: 'F. Annan',
         role: 'Student, UPSA',
         avatar: 'https://picsum.photos/102/102',
+        dataAiHint: 'person portrait'
+    },
+    {
+        quote: "As a young professional, my schedule is tight. Ordering online was convenient, and the pharmacy pickup option was perfect for me.",
+        name: 'K. Owusu',
+        role: 'Young Professional, Accra',
+        avatar: 'https://picsum.photos/101/101',
         dataAiHint: 'person portrait'
     }
 ];
