@@ -13,8 +13,8 @@ import Link from 'next/link';
 
 const cardColors = [
   'bg-card text-card-foreground',
-  'bg-card text-card-foreground border-l-4 border-primary',
   'bg-card text-card-foreground',
+  'bg-card text-card-foreground border-l-4 border-primary',
 ];
 
 const shimmer = (w: number, h: number) => `
