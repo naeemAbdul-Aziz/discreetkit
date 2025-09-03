@@ -55,7 +55,7 @@ export function Testimonials() {
             </Button>
           </div>
 
-          <div className="relative space-y-6">
+          <div className="relative">
             {testimonials.map((testimonial, index) => (
                 <motion.div
                     key={index}
@@ -63,11 +63,17 @@ export function Testimonials() {
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: index * 0.15 }}
                     viewport={{ once: true }}
+                    className={cn(
+                        'relative',
+                        index === 1 && 'md:ml-8',
+                        index === 2 && 'md:ml-4'
+                    )}
+                     style={{ marginTop: index > 0 ? '-1rem' : '0' }}
                 >
                     <Card
                         className={cn(
-                            'p-6 shadow-lg transition-shadow hover:shadow-xl',
-                            cardColors[index % cardColors.length],
+                            'p-6 shadow-lg transition-shadow hover:shadow-xl mb-8',
+                             cardColors[index % cardColors.length],
                         )}
                     >
                         <CardContent className="p-0 space-y-4">
@@ -95,3 +101,4 @@ export function Testimonials() {
     </section>
   );
 }
+
