@@ -1,483 +1,66 @@
 
 'use client';
 
-import { useActionState } from 'react';
-import { useFormStatus } from 'react-dom';
-import { useEffect, useRef, Suspense, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { createOrderAction } from '@/lib/actions';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
-import { Loader2, ShieldCheck, ArrowRight, Plus, Minus, GraduationCap, Check, AlertTriangle, Lock } from 'lucide-react';
-import { ChatTrigger } from '@/components/chat-trigger';
-import { useCart } from '@/hooks/use-cart';
-import { products, discounts, type Product } from '@/lib/data';
-import Image from 'next/image';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Suspense } from 'react';
+import { Loader2, FileText, ShoppingCart, CheckCircle } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { OrderForm } from './(components)/order-form';
 import { cn } from '@/lib/utils';
-import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
-
-function SubmitButton({ disabled }: { disabled: boolean }) {
-  const { pending } = useFormStatus();
-  return (
-    <Button 
-        type="submit" 
-        className="w-full" 
-        size="lg"
-        disabled={pending || disabled}>
-      {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-      {pending ? 'Processing...' : 'Proceed to Payment'}
-      {!pending && <ArrowRight />}
-    </Button>
-  );
-}
-
-const shimmer = (w: number, h: number) => `
-<svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <defs>
-    <linearGradient id="g">
-      <stop stop-color="#f0f0f0" offset="20%" />
-      <stop stop-color="#e0e0e0" offset="50%" />
-      <stop stop-color="#f0f0f0" offset="70%" />
-    </linearGradient>
-  </defs>
-  <rect width="${w}" height="${h}" fill="#f0f0f0" />
-  <rect id="r" width="${w}" height="${h}" fill="url(#g)" />
-  <animate xlink:href="#r" attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite"  />
-</svg>`;
-
-const toBase64 = (str: string) =>
-  typeof window === 'undefined'
-    ? Buffer.from(str).toString('base64')
-    : window.btoa(str);
-
-
-function AddToCartButton({ product }: { product: Product }) {
-  const { addItem, updateQuantity, getItemQuantity } = useCart();
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  if (!isMounted) {
-    return <div className="h-10 w-full rounded-full bg-muted animate-pulse" />;
-  }
-
-  const quantity = getItemQuantity(product.id);
-
-  if (quantity > 0) {
-    return (
-        <div className="flex h-10 items-center justify-between rounded-full border border-primary/50 bg-background p-1 shadow-sm">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 rounded-full text-primary transition-colors hover:bg-primary/10"
-              onClick={() => updateQuantity(product.id, quantity - 1)}
-              aria-label={`Decrease quantity of ${product.name}`}
-            >
-            <Minus className="h-4 w-4" />
-            </Button>
-            <span className="w-5 text-center font-bold text-foreground">{quantity}</span>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 rounded-full text-primary transition-colors hover:bg-primary/10"
-              onClick={() => updateQuantity(product.id, quantity + 1)}
-              aria-label={`Increase quantity of ${product.name}`}
-            >
-            <Plus className="h-4 w-4" />
-            </Button>
-        </div>
-    );
-  }
-
-  return (
-    <Button
-      className="w-full rounded-full"
-      onClick={() => addItem(product)}
-      variant="outline"
-    >
-      Add to Cart
-      <Plus />
-    </Button>
-  );
-}
-
-function OrderForm() {
-  const router = useRouter();
-  const { toast } = useToast();
-  const formRef = useRef<HTMLFormElement>(null);
-
-  const { items, subtotal, studentDiscount, deliveryFee, totalPrice, clearCart, deliveryLocation, setDeliveryLocation, getItemQuantity } = useCart();
-  const [showOther, setShowOther] = useState(true);
-  
-  const [isMounted, setIsMounted] = useState(false);
-  
-  useEffect(() => {
-    setIsMounted(true);
-    // Initialize showOther based on hydrated cart state
-    if (deliveryLocation && discounts.some(d => d.campus === deliveryLocation)) {
-      setShowOther(false);
-    } else {
-      setShowOther(true);
-    }
-  }, [deliveryLocation]);
-  
-  const isStudent = deliveryLocation && discounts.some(d => d.campus === deliveryLocation);
-
-  const initialState: {
-    message: string | null;
-    errors?: {
-      deliveryArea?: string[] | undefined;
-      otherDeliveryArea?: string[] | undefined;
-      phone_masked?: string[] | undefined;
-    };
-    success: boolean;
-    code: string | null;
-  } = { message: null, errors: {}, success: false, code: null };
-  const [state, dispatch] = useActionState(createOrderAction, initialState);
-
-  useEffect(() => {
-    if (state.success && state.code) {
-      toast({
-        title: 'Order Received!',
-        description: 'Redirecting to confirmation...',
-        variant: 'default',
-      });
-      clearCart();
-      router.push(`/order/success?code=${state.code}`);
-    } else if (state.message && !state.success && !state.errors) {
-        toast({
-            title: 'An error occurred',
-            description: state.message,
-            variant: 'destructive',
-        });
-    }
-  }, [state, router, toast, clearCart]);
-
-
-  const handleLocationChange = (value: string) => {
-    if (value === 'Other') {
-      setShowOther(true);
-      setDeliveryLocation(null);
-    } else {
-      setShowOther(false);
-      setDeliveryLocation(value);
-    }
-  }
-
-  function isStudentLocation(location: string | null): boolean {
-    if (!location) return false;
-    return discounts.some(d => d.campus === location);
-  }
-
-  return (
-    <>
-      <div className="text-center">
-        <h1 className="font-headline text-3xl font-bold md:text-4xl">Complete Your Order</h1>
-        <p className="mt-2 text-base text-muted-foreground md:text-lg">
-          Add items to your cart and fill out the delivery details below.
-        </p>
-      </div>
-
-      <div className="mt-8">
-        <ChatTrigger />
-      </div>
-
-      <form ref={formRef} action={dispatch} className="mt-8 space-y-8">
-        <input type="hidden" name="cartItems" value={JSON.stringify(items)} />
-        <input type="hidden" name="subtotal" value={subtotal} />
-        <input type="hidden" name="studentDiscount" value={studentDiscount} />
-        <input type="hidden" name="deliveryFee" value={deliveryFee} />
-        <input type="hidden" name="totalPrice" value={totalPrice} />
-
-
-        <div className="space-y-4">
-            <h2 className="text-2xl font-bold text-foreground">1. Choose Your Products</h2>
-            <Card className="shadow-sm overflow-hidden rounded-2xl">
-                <CardContent className="p-0">
-                    <div className="divide-y divide-border">
-                        {products.map((product) => {
-                            const quantity = isMounted ? getItemQuantity(product.id) : 1;
-                            const isProductInCart = isMounted ? getItemQuantity(product.id) > 0 : false;
-                            
-                            return (
-                             <div key={product.id} className="p-4 sm:p-6">
-                                <div className="grid grid-cols-1 sm:grid-cols-[80px_1fr_auto] gap-4 sm:gap-6">
-                                    {/* Mobile layout */}
-                                    <div className="flex items-start gap-4 sm:hidden">
-                                        <div className="relative aspect-square w-20 flex-shrink-0 rounded-lg bg-muted overflow-hidden">
-                                            <Image
-                                                src={product.imageUrl}
-                                                alt={product.name}
-                                                fill
-                                                className="object-contain p-2"
-                                                data-ai-hint="medical test kit"
-                                                placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(80, 80))}`}
-                                            />
-                                        </div>
-                                        <div className="flex-grow">
-                                            <h3 className="text-base font-bold text-foreground">{product.name}</h3>
-                                            <p className="text-sm text-muted-foreground mt-1">{product.description}</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center justify-between sm:hidden">
-                                        <div className="flex items-center gap-1.5 text-xs text-success">
-                                            <Check className="h-3.5 w-3.5" />
-                                            <p>WHO Approved</p>
-                                        </div>
-                                        <div className="flex flex-col items-end">
-                                            {isStudent && product.studentPriceGHS ? (
-                                                <>
-                                                    <p className="font-bold text-success text-base">GHS {(product.studentPriceGHS * quantity).toFixed(2)}</p>
-                                                    {isProductInCart && (
-                                                        <p className="text-muted-foreground/80 line-through text-xs font-normal">
-                                                            GHS {(product.priceGHS * quantity).toFixed(2)}
-                                                        </p>
-                                                    )}
-                                                </>
-                                            ) : (
-                                                <p className="font-bold text-base text-foreground">
-                                                    GHS {(product.priceGHS * quantity).toFixed(2)}
-                                                </p>
-                                            )}
-                                        </div>
-                                    </div>
-                                     <div className="sm:hidden w-full">
-                                       <AddToCartButton product={product} />
-                                    </div>
-
-                                    {/* Desktop layout */}
-                                    <div className="relative aspect-square w-[80px] hidden sm:block rounded-lg bg-muted overflow-hidden">
-                                        <Image
-                                            src={product.imageUrl}
-                                            alt={product.name}
-                                            fill
-                                            className="object-contain p-2"
-                                            data-ai-hint="medical test kit"
-                                            placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(80, 80))}`}
-                                        />
-                                    </div>
-                                    <div className="hidden sm:flex sm:flex-col">
-                                        <h3 className="text-base font-bold text-foreground">{product.name}</h3>
-                                        <p className="text-sm text-muted-foreground mt-1">{product.description}</p>
-                                        <div className="flex items-center gap-1.5 mt-2 text-xs text-success">
-                                            <Check className="h-3.5 w-3.5" />
-                                            <p>WHO Approved</p>
-                                        </div>
-                                    </div>
-                                    <div className="hidden sm:flex sm:flex-col items-end justify-between self-stretch">
-                                        <div className="text-right h-10 flex flex-col justify-center items-end">
-                                          {!isMounted ? (
-                                            <div className="h-5 w-20 bg-muted rounded-md animate-pulse" />
-                                          ) : isStudent && product.studentPriceGHS ? (
-                                                <>
-                                                    <p className="font-bold text-success text-base">GHS {(product.studentPriceGHS * quantity).toFixed(2)}</p>
-                                                    {isProductInCart && (
-                                                        <p className="text-muted-foreground/80 line-through text-xs font-normal">
-                                                            GHS {(product.priceGHS * quantity).toFixed(2)}
-                                                        </p>
-                                                    )}
-                                                </>
-                                            ) : (
-                                                <p className="font-bold text-base text-foreground">
-                                                    GHS {(product.priceGHS * quantity).toFixed(2)}
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="w-32 mt-2">
-                                           <AddToCartButton product={product} />
-                                        </div>
-                                    </div>
-                                </div>
-                             </div>
-                        )})}
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
-        
-        <Card className="bg-card shadow-sm rounded-2xl">
-             <CardHeader>
-                <CardTitle>2. Delivery & Payment</CardTitle>
-                <CardDescription>
-                    We only need a location and contact for the delivery rider. Your details are deleted after delivery.
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-                <div className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="deliveryArea">Delivery Area / Campus *</Label>
-                        <Select name="deliveryArea" onValueChange={handleLocationChange} defaultValue={deliveryLocation || "Other"} disabled={!isMounted}>
-                        <SelectTrigger className={cn(state.errors?.deliveryArea && "border-destructive")}>
-                            <SelectValue placeholder="Select a location..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                                <SelectItem value="Other">Other (Standard Delivery)</SelectItem>
-                                {discounts.map(loc => (
-                                <SelectItem key={loc.id} value={loc.campus}>{loc.campus}</SelectItem>
-                                ))}
-                        </SelectContent>
-                        </Select>
-                        <p className="text-[0.8rem] text-muted-foreground">Select a campus to apply student discounts.</p>
-                        {state.errors?.deliveryArea?.[0] && (
-                            <Alert variant="warning" className="mt-2">
-                            <AlertTriangle className="h-4 w-4" />
-                            <AlertDescription>
-                                {state.errors.deliveryArea[0]}
-                            </AlertDescription>
-                            </Alert>
-                        )}
-                    </div>
-
-                    {showOther && (
-                        <div className="space-y-2">
-                                <Label htmlFor="otherDeliveryArea">Please Specify Your Location *</Label>
-                            <Input 
-                                id="otherDeliveryArea" 
-                                name="otherDeliveryArea" 
-                                placeholder="e.g., Osu, Airport Area" 
-                                className={cn(state.errors?.otherDeliveryArea && "border-destructive")}
-                                />
-                                {state.errors?.otherDeliveryArea?.[0] && (
-                                <Alert variant="warning" className="mt-2">
-                                    <AlertTriangle className="h-4 w-4" />
-                                    <AlertDescription>
-                                    {state.errors.otherDeliveryArea[0]}
-                                    </AlertDescription>
-                                </Alert>
-                                )}
-                        </div>
-                    )}
-                    
-                    <div className="space-y-2">
-                        <Label htmlFor="deliveryAddressNote">Additional Notes for Delivery Agent</Label>
-                        <Textarea
-                        id="deliveryAddressNote"
-                        name="deliveryAddressNote"
-                        placeholder="e.g., 'Call upon arrival at the main gate', 'Leave with the security.'"
-                        />
-                        <p className="text-[0.8rem] text-muted-foreground">
-                        Optional notes to help the rider find you.
-                        </p>
-                    </div>
-                    <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                        <Label htmlFor="phone_masked">Contact Number (for delivery rider only) *</Label>
-                        </div>
-                        <Input 
-                        id="phone_masked" 
-                        name="phone_masked" 
-                        type="tel" 
-                        placeholder="e.g., 024xxxxxxx" 
-                        className={cn(state.errors?.phone_masked && "border-destructive")}
-                        />
-                        <p className="text-[0.8rem] text-muted-foreground flex items-center gap-1.5">
-                        <ShieldCheck className="h-3.5 w-3.5 text-primary" />
-                        This will be masked and is only for the rider to contact you.
-                        </p>
-                        {state.errors?.phone_masked?.[0] && (
-                            <Alert variant="warning" className="mt-2">
-                            <AlertTriangle className="h-4 w-4" />
-                            <AlertDescription>
-                                {state.errors.phone_masked[0]}
-                            </AlertDescription>
-                            </Alert>
-                        )}
-                    </div>
-                </div>
-
-                <Separator />
-                
-                {isMounted && items.length > 0 && (
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-semibold">Order Summary</h3>
-                        {isStudent && (
-                            <div className="flex items-center gap-2 rounded-lg bg-success/10 p-3 text-success">
-                                <GraduationCap className="h-5 w-5" />
-                                <p className="text-sm font-medium">Student discount applied!</p>
-                            </div>
-                        )}
-                        <div className="space-y-4 text-sm">
-                        {items.map(item => (
-                            <div key={item.id} className="flex justify-between items-center gap-4">
-                                <div className="flex items-center gap-4">
-                                    <div className="relative h-12 w-12 flex-shrink-0 rounded-md bg-muted overflow-hidden">
-                                        <Image src={item.imageUrl} alt={item.name} fill className="object-contain p-1" placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(48, 48))}`} />
-                                    </div>
-                                    <div>
-                                        <p className="font-semibold text-foreground">{item.name}</p>
-                                        <p className="text-muted-foreground">Qty: {item.quantity}</p>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    {isStudent && item.studentPriceGHS ? (
-                                        <>
-                                            <p className="font-bold text-success">GHS {(item.studentPriceGHS * item.quantity).toFixed(2)}</p>
-                                            <p className="text-xs text-muted-foreground/80 line-through">GHS {(item.priceGHS * item.quantity).toFixed(2)}</p>
-                                        </>
-                                    ) : (
-                                        <p className="font-medium text-foreground">GHS {(item.priceGHS * item.quantity).toFixed(2)}</p>
-                                    )}
-                                </div>
-                            </div>
-                        ))}
-                        </div>
-
-                        <Separator />
-
-                        <div className="space-y-2 text-sm">
-                            <div className="flex justify-between">
-                                <p className="text-muted-foreground">Subtotal</p>
-                                <p className="font-medium text-foreground">GHS {subtotal.toFixed(2)}</p>
-                            </div>
-                        {studentDiscount > 0 && (
-                            <div className="flex justify-between text-success font-medium">
-                                <p>Student Discount</p>
-                                <p>- GHS {studentDiscount.toFixed(2)}</p>
-                            </div>
-                            )}
-                            <div className="flex justify-between">
-                                <p className="text-muted-foreground">Delivery Fee</p>
-                                <p className="font-medium text-foreground">GHS {deliveryFee.toFixed(2)}</p>
-                            </div>
-                        </div>
-                        
-                        <Separator />
-
-                        <div className="flex items-baseline justify-between font-bold text-lg">
-                            <p>Total</p>
-                            <p className="text-primary">GHS {totalPrice.toFixed(2)}</p>
-                        </div>
-                    </div>
-                )}
-
-                 <div className="flex items-center gap-2 rounded-lg bg-muted p-3 text-muted-foreground">
-                    <Lock className="h-5 w-5 text-success flex-shrink-0" />
-                    <p className="text-xs font-medium">Secured via Paystack. Your privacy is guaranteed.</p>
-                </div>
-            </CardContent>
-        </Card>
-
-        
-        <SubmitButton disabled={!isMounted || items.length === 0} />
-          
-      </form>
-    </>
-  );
-}
+const steps = [
+  { name: 'Your Cart', status: 'complete' },
+  { name: 'Delivery & Payment', status: 'current' },
+  { name: 'Confirmation', status: 'upcoming' },
+];
 
 function OrderPageLoading() {
   return (
-    <div className="flex h-64 items-center justify-center">
-      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+    <div className="space-y-8">
+      {/* Product Skeleton */}
+      <div className="space-y-4">
+        <div className="h-8 w-48 bg-muted rounded animate-pulse" />
+        <Card className="shadow-sm overflow-hidden rounded-2xl">
+          <CardContent className="p-0">
+            <div className="divide-y divide-border">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="p-4 sm:p-6">
+                  <div className="grid grid-cols-[80px_1fr_auto] gap-4 sm:gap-6">
+                    <div className="aspect-square w-[80px] rounded-lg bg-muted animate-pulse" />
+                    <div className="flex flex-col space-y-2">
+                      <div className="h-5 w-3/4 bg-muted rounded animate-pulse" />
+                      <div className="h-4 w-full bg-muted rounded animate-pulse" />
+                      <div className="h-4 w-1/2 bg-muted rounded animate-pulse" />
+                    </div>
+                    <div className="flex flex-col items-end justify-between self-stretch">
+                      <div className="h-5 w-20 bg-muted rounded-md animate-pulse" />
+                      <div className="w-32 h-10 bg-muted rounded-full animate-pulse" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Form Skeleton */}
+      <Card className="shadow-sm rounded-2xl">
+        <CardContent className="p-6 space-y-6">
+           <div className="h-8 w-56 bg-muted rounded animate-pulse" />
+           <div className="space-y-2">
+             <div className="h-4 w-24 bg-muted rounded animate-pulse" />
+             <div className="h-10 w-full bg-muted rounded-md animate-pulse" />
+           </div>
+           <div className="space-y-2">
+             <div className="h-4 w-32 bg-muted rounded animate-pulse" />
+             <div className="h-20 w-full bg-muted rounded-md animate-pulse" />
+           </div>
+           <div className="space-y-2">
+             <div className="h-4 w-48 bg-muted rounded animate-pulse" />
+             <div className="h-10 w-full bg-muted rounded-md animate-pulse" />
+           </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
@@ -486,6 +69,55 @@ export default function OrderPage() {
   return (
     <div className="bg-muted">
       <div className="container mx-auto max-w-2xl px-4 py-12 md:px-6 md:py-24">
+        <div className="text-center">
+            <h1 className="font-headline text-3xl font-bold md:text-4xl">Complete Your Order</h1>
+            <p className="mt-2 text-base text-muted-foreground md:text-lg">
+                Secure, private, and straightforward.
+            </p>
+        </div>
+
+        {/* Stepper */}
+        <nav aria-label="Progress" className="my-12">
+            <ol role="list" className="flex items-center">
+                {steps.map((step, stepIdx) => (
+                <li key={step.name} className={cn("relative", stepIdx !== steps.length - 1 ? "pr-8 sm:pr-20 flex-1" : "")}>
+                    {step.status === 'complete' ? (
+                    <>
+                        <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                            <div className="h-0.5 w-full bg-primary" />
+                        </div>
+                        <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                            <CheckCircle className="h-5 w-5" />
+                            <span className="sr-only">{step.name}</span>
+                        </div>
+                    </>
+                    ) : step.status === 'current' ? (
+                    <>
+                        <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                            <div className="h-0.5 w-full bg-border" />
+                        </div>
+                        <div className="relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary bg-background">
+                            <span className="h-2.5 w-2.5 rounded-full bg-primary" aria-hidden="true" />
+                            <span className="sr-only">{step.name}</span>
+                        </div>
+                    </>
+                    ) : (
+                    <>
+                        <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                            <div className="h-0.5 w-full bg-border" />
+                        </div>
+                        <div className="relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-border bg-background" />
+                        <span className="sr-only">{step.name}</span>
+                    </>
+                    )}
+                     <div className="absolute top-10 w-max text-center -translate-x-1/2 left-1/2 max-w-20">
+                        <p className={cn("text-xs font-medium", step.status === 'current' ? 'text-primary' : 'text-muted-foreground')}>{step.name}</p>
+                    </div>
+                </li>
+                ))}
+            </ol>
+        </nav>
+
         <Suspense fallback={<OrderPageLoading />}>
           <OrderForm />
         </Suspense>
