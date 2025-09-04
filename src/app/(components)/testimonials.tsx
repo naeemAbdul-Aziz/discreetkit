@@ -100,8 +100,8 @@ export function Testimonials() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
+            <CarouselPrevious className="left-[-50px]" />
+            <CarouselNext className="right-[-50px]" />
             
             <div className="flex items-center justify-center gap-4 mt-8">
                 <Button
