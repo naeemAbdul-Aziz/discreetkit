@@ -8,6 +8,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, ShoppingCart } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import Image from 'next/image';
+import { Separator } from './ui/separator';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -57,30 +58,52 @@ export function SummaryBar() {
                         <div className="space-y-2">
                             <h4 className="font-medium leading-none">Your Cart</h4>
                             <p className="text-sm text-muted-foreground">
-                                Review the items you've selected.
+                                Review your order summary.
                             </p>
                         </div>
                         <div className="grid gap-2">
-                        {items.map(item => (
-                            <div key={item.id} className="grid grid-cols-[auto_1fr_auto] items-center gap-4 text-sm">
-                               <div className="relative h-10 w-10 flex-shrink-0 rounded-md bg-muted overflow-hidden">
-                                  <Image src={item.imageUrl} alt={item.name} fill className="object-contain p-1" placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(40, 40))}`} />
-                                </div>
-                                <div className="truncate">
-                                    <span className="font-semibold">{item.quantity}</span> x {item.name}
-                                </div>
-                                <div className="font-medium text-right">
-                                  {isStudent && item.studentPriceGHS ? (
-                                    <>
-                                      <p className="text-success">GHS {(item.studentPriceGHS * item.quantity).toFixed(2)}</p>
-                                      <p className="text-xs text-muted-foreground/80 line-through">GHS {(item.priceGHS * item.quantity).toFixed(2)}</p>
-                                    </>
-                                  ) : (
-                                    <p>GHS {(item.priceGHS * item.quantity).toFixed(2)}</p>
-                                  )}
-                                </div>
+                          {items.map(item => (
+                              <div key={item.id} className="grid grid-cols-[auto_1fr_auto] items-center gap-4 text-sm">
+                                <div className="relative h-10 w-10 flex-shrink-0 rounded-md bg-muted overflow-hidden">
+                                    <Image src={item.imageUrl} alt={item.name} fill className="object-contain p-1" placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(40, 40))}`} />
+                                  </div>
+                                  <div className="truncate">
+                                      <span className="font-semibold">{item.quantity}</span> x {item.name}
+                                  </div>
+                                  <div className="font-medium text-right">
+                                    {isStudent && item.studentPriceGHS ? (
+                                      <>
+                                        <p className="text-success">GHS {(item.studentPriceGHS * item.quantity).toFixed(2)}</p>
+                                        <p className="text-xs text-muted-foreground/80 line-through">GHS {(item.priceGHS * item.quantity).toFixed(2)}</p>
+                                      </>
+                                    ) : (
+                                      <p>GHS {(item.priceGHS * item.quantity).toFixed(2)}</p>
+                                    )}
+                                  </div>
+                              </div>
+                          ))}
+                        </div>
+                        <Separator />
+                         <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                                <p className="text-muted-foreground">Subtotal</p>
+                                <p className="font-medium text-foreground">GHS {subtotal.toFixed(2)}</p>
                             </div>
-                        ))}
+                        {studentDiscount > 0 && (
+                            <div className="flex justify-between text-success font-medium">
+                                <p>Student Discount</p>
+                                <p>- GHS {studentDiscount.toFixed(2)}</p>
+                            </div>
+                            )}
+                            <div className="flex justify-between">
+                                <p className="text-muted-foreground">Delivery</p>
+                                <p className="font-medium text-foreground">GHS {deliveryFee.toFixed(2)}</p>
+                            </div>
+                        </div>
+                         <Separator />
+                        <div className="flex justify-between font-bold text-base">
+                            <p>Total</p>
+                            <p>GHS {totalPrice.toFixed(2)}</p>
                         </div>
                     </div>
                   </PopoverContent>
