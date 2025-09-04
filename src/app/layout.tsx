@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   keywords: ['self-test kit', 'HIV test Ghana', 'pregnancy test Ghana', 'confidential testing', 'anonymous testing', 'private health test', 'discreet delivery', 'DiscreetKit'],
   viewport: {
     width: 'device-width',
-    initialScale: 1,
+    initialScale: 0.85,
   },
   openGraph: {
     type: 'website',
