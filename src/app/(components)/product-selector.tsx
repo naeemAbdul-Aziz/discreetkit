@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { ArrowRight, Plus, Minus } from 'lucide-react';
 import { useCart } from '@/hooks/use-cart';
+import { useState, useEffect } from 'react';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -30,6 +31,11 @@ const toBase64 = (str: string) =>
 
 export function ProductSelector() {
     const { addItem, updateQuantity, getItemQuantity } = useCart();
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
   return (
     <section id="products" className="bg-background py-12 md:py-24">
@@ -79,7 +85,7 @@ export function ProductSelector() {
                                 )}
                             </div>
                            
-                            {quantity > 0 ? (
+                            {isMounted && quantity > 0 ? (
                                  <div className="flex h-10 items-center justify-between rounded-full border border-primary/50 bg-background p-1 shadow-sm">
                                     <Button
                                     variant="ghost"
