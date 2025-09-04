@@ -113,7 +113,7 @@ export const useCart = create<CartState>()(
         set({ items: updatedItems, totalItems, subtotal, studentDiscount, deliveryFee, totalPrice, isStudent });
       },
 
-      updateQuantity: (productId, quantity) => {
+      updateQuantity: (productId, number, quantity) => {
         let updatedItems;
         if (quantity < 1) {
           updatedItems = get().items.filter((item) => item.id !== productId);
@@ -127,8 +127,10 @@ export const useCart = create<CartState>()(
       },
 
       clearCart: () => {
-        const { subtotal, studentDiscount, deliveryFee, totalPrice, isStudent } = calculateTotals([], null);
-        set({ items: [], totalItems: 0, deliveryLocation: null, subtotal, studentDiscount, deliveryFee, totalPrice, isStudent });
+        set(state => {
+          const { subtotal, studentDiscount, deliveryFee, totalPrice, isStudent } = calculateTotals([], state.deliveryLocation);
+          return { items: [], totalItems: 0, subtotal, studentDiscount, deliveryFee, totalPrice, isStudent };
+        });
       },
       
       getItemQuantity: (productId) => {
