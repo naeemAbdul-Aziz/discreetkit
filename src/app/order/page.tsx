@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useActionState } from 'react';
@@ -210,18 +211,62 @@ function OrderForm() {
                             
                             return (
                              <div key={product.id} className="p-4 sm:p-6">
-                                <div className="grid grid-cols-[80px_1fr_auto] gap-4 sm:gap-6 items-center">
-                                    <div className="relative aspect-square w-full sm:w-[80px] rounded-lg bg-muted overflow-hidden">
+                                <div className="grid grid-cols-1 sm:grid-cols-[80px_1fr_auto] gap-4 sm:gap-6">
+                                    {/* Mobile layout */}
+                                    <div className="flex items-start gap-4 sm:hidden">
+                                        <div className="relative aspect-square w-20 flex-shrink-0 rounded-lg bg-muted overflow-hidden">
+                                            <Image
+                                                src={product.imageUrl}
+                                                alt={product.name}
+                                                fill
+                                                className="object-contain p-2"
+                                                data-ai-hint="medical test kit"
+                                                placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(80, 80))}`}
+                                            />
+                                        </div>
+                                        <div className="flex-grow">
+                                            <h3 className="text-base font-bold text-foreground">{product.name}</h3>
+                                            <p className="text-sm text-muted-foreground mt-1">{product.description}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center justify-between sm:hidden">
+                                        <div className="flex items-center gap-1.5 text-xs text-success">
+                                            <Check className="h-3.5 w-3.5" />
+                                            <p>WHO Approved</p>
+                                        </div>
+                                        <div className="flex flex-col items-end">
+                                            {isStudent && product.studentPriceGHS ? (
+                                                <>
+                                                    <p className="font-bold text-success text-base">GHS {(product.studentPriceGHS * quantity).toFixed(2)}</p>
+                                                    {isProductInCart && (
+                                                        <p className="text-muted-foreground/80 line-through text-xs font-normal">
+                                                            GHS {(product.priceGHS * quantity).toFixed(2)}
+                                                        </p>
+                                                    )}
+                                                </>
+                                            ) : (
+                                                <p className="font-bold text-base text-foreground">
+                                                    GHS {(product.priceGHS * quantity).toFixed(2)}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                     <div className="sm:hidden w-full">
+                                       <AddToCartButton product={product} />
+                                    </div>
+
+                                    {/* Desktop layout */}
+                                    <div className="relative aspect-square w-[80px] hidden sm:block rounded-lg bg-muted overflow-hidden">
                                         <Image
-                                        src={product.imageUrl}
-                                        alt={product.name}
-                                        fill
-                                        className="object-contain p-2"
-                                        data-ai-hint="medical test kit"
-                                        placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(80, 80))}`}
+                                            src={product.imageUrl}
+                                            alt={product.name}
+                                            fill
+                                            className="object-contain p-2"
+                                            data-ai-hint="medical test kit"
+                                            placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(80, 80))}`}
                                         />
                                     </div>
-                                    <div className="flex flex-col">
+                                    <div className="hidden sm:flex sm:flex-col">
                                         <h3 className="text-base font-bold text-foreground">{product.name}</h3>
                                         <p className="text-sm text-muted-foreground mt-1">{product.description}</p>
                                         <div className="flex items-center gap-1.5 mt-2 text-xs text-success">
@@ -229,7 +274,7 @@ function OrderForm() {
                                             <p>WHO Approved</p>
                                         </div>
                                     </div>
-                                    <div className="flex flex-col items-end justify-between self-stretch">
+                                    <div className="hidden sm:flex sm:flex-col items-end justify-between self-stretch">
                                         <div className="text-right h-10 flex flex-col justify-center items-end">
                                           {!isMounted ? (
                                             <div className="h-5 w-20 bg-muted rounded-md animate-pulse" />
