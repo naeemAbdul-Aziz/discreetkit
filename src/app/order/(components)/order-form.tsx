@@ -12,15 +12,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ShieldCheck, ArrowRight, Plus, Minus, GraduationCap, Check, AlertTriangle, Lock } from 'lucide-react';
+import { Loader2, ShieldCheck, ArrowRight, GraduationCap, AlertTriangle, Lock } from 'lucide-react';
 import { ChatTrigger } from '@/components/chat-trigger';
 import { useCart } from '@/hooks/use-cart';
-import { products, discounts, type Product } from '@/lib/data';
+import { discounts } from '@/lib/data';
 import Image from 'next/image';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 function SubmitButton({ disabled }: { disabled: boolean }) {
   const { pending } = useFormStatus();
@@ -56,54 +56,12 @@ const toBase64 = (str: string) =>
     ? Buffer.from(str).toString('base64')
     : window.btoa(str);
 
-function AddToCartButton({ product, isStudent }: { product: Product, isStudent: boolean }) {
-  const { addItem, updateQuantity, getItemQuantity } = useCart();
-  const quantity = getItemQuantity(product.id);
-
-  if (quantity > 0) {
-    return (
-        <div className="flex h-10 items-center justify-between rounded-full border border-primary/50 bg-background p-1 shadow-sm">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 rounded-full text-primary transition-colors hover:bg-primary/10"
-              onClick={() => updateQuantity(product.id, quantity - 1)}
-              aria-label={`Decrease quantity of ${product.name}`}
-            >
-            <Minus className="h-4 w-4" />
-            </Button>
-            <span className="w-5 text-center font-bold text-foreground">{quantity}</span>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 rounded-full text-primary transition-colors hover:bg-primary/10"
-              onClick={() => updateQuantity(product.id, quantity + 1)}
-              aria-label={`Increase quantity of ${product.name}`}
-            >
-            <Plus className="h-4 w-4" />
-            </Button>
-        </div>
-    );
-  }
-
-  return (
-    <Button
-      className="w-full rounded-full"
-      onClick={() => addItem(product)}
-      variant="outline"
-    >
-      Add to Cart
-      <Plus />
-    </Button>
-  );
-}
-
 export function OrderForm() {
   const router = useRouter();
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 
-  const { items, subtotal, studentDiscount, deliveryFee, totalPrice, clearCart, deliveryLocation, setDeliveryLocation, getItemQuantity } = useCart(
+  const { items, subtotal, studentDiscount, deliveryFee, totalPrice, clearCart, deliveryLocation, setDeliveryLocation, isStudent } = useCart(
     (state) => ({
       items: state.items,
       subtotal: state.subtotal,
@@ -113,7 +71,7 @@ export function OrderForm() {
       clearCart: state.clearCart,
       deliveryLocation: state.deliveryLocation,
       setDeliveryLocation: state.setDeliveryLocation,
-      getItemQuantity: state.getItemQuantity,
+      isStudent: state.isStudent,
     })
   );
 
@@ -128,8 +86,6 @@ export function OrderForm() {
       setShowOther(true);
     }
   }, [deliveryLocation]);
-  
-  const isStudent = isMounted && deliveryLocation && discounts.some(d => d.campus === deliveryLocation);
 
   const initialState: {
     message: string | null;
@@ -187,68 +143,10 @@ export function OrderForm() {
         <input type="hidden" name="studentDiscount" value={studentDiscount} />
         <input type="hidden" name="deliveryFee" value={deliveryFee} />
         <input type="hidden" name="totalPrice" value={totalPrice} />
-
-
-        <div className="space-y-4">
-            <h2 className="text-2xl font-bold text-foreground">1. Choose Your Products</h2>
-            <Card className="shadow-sm overflow-hidden rounded-2xl">
-                <CardContent className="p-0">
-                    <div className="divide-y divide-border">
-                        {products.map((product) => {
-                            const quantity = getItemQuantity(product.id);
-                            const isProductInCart = quantity > 0;
-                            
-                            return (
-                             <div key={product.id} className="p-4 sm:p-6">
-                                <div className="grid grid-cols-1 sm:grid-cols-[80px_1fr_auto] gap-4 sm:gap-6">
-                                    <div className="relative aspect-square w-[80px] rounded-lg bg-muted overflow-hidden">
-                                        <Image
-                                            src={product.imageUrl}
-                                            alt={product.name}
-                                            fill
-                                            className="object-contain p-2"
-                                            data-ai-hint="medical test kit"
-                                            placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(80, 80))}`}
-                                        />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <h3 className="text-base font-bold text-foreground">{product.name}</h3>
-                                        <p className="text-sm text-muted-foreground mt-1 flex-grow">{product.description}</p>
-                                        <div className="flex items-center gap-1.5 mt-2 text-xs text-success">
-                                            <Check className="h-3.5 w-3.5" />
-                                            <p>WHO Approved</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex flex-col items-end justify-between self-stretch">
-                                        <div className="text-right h-10 flex flex-col justify-center items-end">
-                                          {isStudent && product.studentPriceGHS ? (
-                                                <>
-                                                    <p className="font-bold text-success text-base">GHS {(product.studentPriceGHS).toFixed(2)}</p>
-                                                    <p className="text-muted-foreground/80 line-through text-xs font-normal">
-                                                        GHS {(product.priceGHS).toFixed(2)}
-                                                    </p>
-                                                </>
-                                            ) : (
-                                                <p className="font-bold text-base text-foreground">
-                                                    GHS {(product.priceGHS).toFixed(2)}
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="w-32 mt-2">
-                                           <AddToCartButton product={product} isStudent={!!isStudent} />
-                                        </div>
-                                    </div>
-                                </div>
-                             </div>
-                        )})}
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
         
         <Card className="bg-card shadow-sm rounded-2xl">
              <CardHeader>
-                <CardTitle>2. Delivery & Payment Details</CardTitle>
+                <CardTitle>Delivery & Payment Details</CardTitle>
                 <CardDescription>
                     We only need a location and contact for the delivery rider. Your details are deleted after delivery.
                 </CardDescription>
@@ -425,32 +323,6 @@ function OrderFormSkeleton() {
       </div>
      
       <form className="mt-8 space-y-8 animate-pulse">
-        <div className="space-y-4">
-            <div className="h-8 w-48 bg-muted rounded" />
-            <Card className="shadow-sm overflow-hidden rounded-2xl">
-                <CardContent className="p-0">
-                    <div className="divide-y divide-border">
-                        {[...Array(3)].map((_, i) => (
-                         <div key={i} className="p-4 sm:p-6">
-                            <div className="grid grid-cols-1 sm:grid-cols-[80px_1fr_auto] gap-4 sm:gap-6">
-                                <div className="relative aspect-square w-[80px] rounded-lg bg-muted" />
-                                <div className="flex flex-col space-y-2">
-                                    <div className="h-5 w-3/4 bg-muted rounded" />
-                                    <div className="h-4 w-full bg-muted rounded" />
-                                     <div className="h-4 w-1/2 bg-muted rounded" />
-                                </div>
-                                <div className="hidden sm:flex sm:flex-col items-end justify-between self-stretch">
-                                    <div className="h-5 w-20 bg-muted rounded-md" />
-                                    <div className="w-32 h-10 bg-muted rounded-full" />
-                                </div>
-                            </div>
-                         </div>
-                        ))}
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
-        
         <Card className="bg-card shadow-sm rounded-2xl">
              <CardHeader>
                 <div className="h-7 w-1/2 bg-muted rounded" />

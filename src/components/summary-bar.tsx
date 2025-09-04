@@ -115,7 +115,7 @@ export function SummaryBar() {
                   <p className="text-xs text-muted-foreground">Total</p>
                 </div>
                 <Button asChild size="sm" className="md:size-lg">
-                  <Link href="/order">
+                  <Link href="/cart">
                     Continue
                     <ArrowRight />
                   </Link>

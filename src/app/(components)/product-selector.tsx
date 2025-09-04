@@ -1,10 +1,12 @@
 
+'use client';
+
 import { products } from '@/lib/data';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ArrowRight } from 'lucide-react';
-import Link from 'next/link';
+import { ArrowRight, Plus, Minus } from 'lucide-react';
+import { useCart } from '@/hooks/use-cart';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -27,6 +29,8 @@ const toBase64 = (str: string) =>
 
 
 export function ProductSelector() {
+    const { addItem, updateQuantity, getItemQuantity } = useCart();
+
   return (
     <section id="products" className="bg-background py-12 md:py-24">
       <div className="container mx-auto px-4 md:px-6">
@@ -40,37 +44,74 @@ export function ProductSelector() {
         </div>
 
         <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {products.map((product) => (
-            <Card
-              key={product.id}
-              className="flex h-full flex-col overflow-hidden rounded-2xl shadow-sm"
-            >
-                <CardContent className="flex flex-grow flex-col p-0">
-                  <div className="relative aspect-square overflow-hidden bg-muted p-4">
-                    <Image
-                      src={product.imageUrl}
-                      alt={product.name}
-                      fill
-                      className="object-contain transition-transform duration-300"
-                      data-ai-hint="medical test kit"
-                      placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 400))}`}
-                    />
-                  </div>
-                  <div className="flex flex-grow flex-col p-6">
-                    <h3 className="flex-grow text-base font-semibold md:text-lg">{product.name}</h3>
-                    <p className="mt-1 h-12 text-sm text-muted-foreground">{product.description}</p>
-                    <div className="mt-4 flex items-center justify-between border-t pt-4">
-                      <p className="text-lg font-semibold">GHS {product.priceGHS.toFixed(2)}</p>
-                      <Button asChild variant="outline" className="rounded-full">
-                        <Link href="/order">
-                            Order Now <ArrowRight className="ml-2 h-4 w-4" />
-                        </Link>
-                      </Button>
+          {products.map((product) => {
+            const quantity = getItemQuantity(product.id);
+            return (
+                <Card
+                key={product.id}
+                className="flex h-full flex-col overflow-hidden rounded-2xl shadow-sm"
+                >
+                    <CardContent className="flex flex-grow flex-col p-0">
+                    <div className="relative aspect-square overflow-hidden bg-muted p-4">
+                        <Image
+                        src={product.imageUrl}
+                        alt={product.name}
+                        fill
+                        className="object-contain transition-transform duration-300"
+                        data-ai-hint="medical test kit"
+                        placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 400))}`}
+                        />
                     </div>
-                  </div>
-                </CardContent>
-            </Card>
-          ))}
+                    <div className="flex flex-grow flex-col p-6">
+                        <h3 className="flex-grow text-base font-semibold md:text-lg">{product.name}</h3>
+                        <p className="mt-1 h-12 text-sm text-muted-foreground">{product.description}</p>
+                        <div className="mt-4 flex items-center justify-between border-t pt-4">
+                            <div>
+                                {product.studentPriceGHS && (
+                                    <>
+                                        <p className="font-bold text-success text-lg">GHS {product.studentPriceGHS.toFixed(2)}</p>
+                                        <p className="text-muted-foreground/80 line-through text-xs">
+                                            GHS {product.priceGHS.toFixed(2)}
+                                        </p>
+                                    </>
+                                ) || (
+                                    <p className="text-lg font-semibold">GHS {product.priceGHS.toFixed(2)}</p>
+                                )}
+                            </div>
+                           
+                            {quantity > 0 ? (
+                                 <div className="flex h-10 items-center justify-between rounded-full border border-primary/50 bg-background p-1 shadow-sm">
+                                    <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 rounded-full text-primary transition-colors hover:bg-primary/10"
+                                    onClick={() => updateQuantity(product.id, quantity - 1)}
+                                    aria-label={`Decrease quantity of ${product.name}`}
+                                    >
+                                    <Minus className="h-4 w-4" />
+                                    </Button>
+                                    <span className="w-5 text-center font-bold text-foreground">{quantity}</span>
+                                    <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 rounded-full text-primary transition-colors hover:bg-primary/10"
+                                    onClick={() => updateQuantity(product.id, quantity + 1)}
+                                    aria-label={`Increase quantity of ${product.name}`}
+                                    >
+                                    <Plus className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            ) : (
+                                <Button onClick={() => addItem(product)} variant="outline" className="rounded-full">
+                                    Add to Cart <Plus className="ml-2 h-4 w-4" />
+                                </Button>
+                            )}
+                        </div>
+                    </div>
+                    </CardContent>
+                </Card>
+            )
+          })}
         </div>
       </div>
     </section>

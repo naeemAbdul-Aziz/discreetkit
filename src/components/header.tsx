@@ -35,7 +35,7 @@ function CartLink() {
 
   return (
      <Button asChild variant="ghost" size="icon" className="relative">
-        <Link href="/order">
+        <Link href="/cart">
           <ShoppingCart />
           {totalItems > 0 && (
               <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
@@ -85,7 +85,7 @@ export function Header() {
     <>
       <div className="bg-primary p-2 text-center text-sm text-primary-foreground">
         Free Delivery on UG Campus!{' '}
-        <Link href="/order" className="font-semibold underline">
+        <Link href="/cart" className="font-semibold underline">
           Shop Now
         </Link>
       </div>

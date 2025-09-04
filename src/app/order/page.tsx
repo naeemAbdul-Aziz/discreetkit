@@ -1,9 +1,11 @@
 
+'use client';
+
 import { Suspense } from 'react';
-import { Loader2, FileText, ShoppingCart, CheckCircle } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { CheckCircle } from 'lucide-react';
 import { OrderForm } from './(components)/order-form';
 import { cn } from '@/lib/utils';
+import { Card, CardContent, CardHeader, Separator } from '@/components/ui';
 
 const steps = [
   { name: 'Your Cart', status: 'complete' },
@@ -13,52 +15,35 @@ const steps = [
 
 function OrderPageLoading() {
   return (
-    <div className="space-y-8">
-      {/* Product Skeleton */}
-      <div className="space-y-4">
-        <div className="h-8 w-48 bg-muted rounded animate-pulse" />
-        <Card className="shadow-sm overflow-hidden rounded-2xl">
-          <CardContent className="p-0">
-            <div className="divide-y divide-border">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="p-4 sm:p-6">
-                  <div className="grid grid-cols-[80px_1fr_auto] gap-4 sm:gap-6">
-                    <div className="aspect-square w-[80px] rounded-lg bg-muted animate-pulse" />
-                    <div className="flex flex-col space-y-2">
-                      <div className="h-5 w-3/4 bg-muted rounded animate-pulse" />
-                      <div className="h-4 w-full bg-muted rounded animate-pulse" />
-                      <div className="h-4 w-1/2 bg-muted rounded animate-pulse" />
-                    </div>
-                    <div className="flex flex-col items-end justify-between self-stretch">
-                      <div className="h-5 w-20 bg-muted rounded-md animate-pulse" />
-                      <div className="w-32 h-10 bg-muted rounded-full animate-pulse" />
-                    </div>
-                  </div>
-                </div>
-              ))}
+    <div className="space-y-8 animate-pulse">
+      <Card className="bg-card shadow-sm rounded-2xl">
+        <CardHeader>
+          <div className="h-7 w-1/2 bg-muted rounded" />
+          <div className="h-4 w-3/4 bg-muted rounded" />
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <div className="h-4 w-1/4 bg-muted rounded" />
+              <div className="h-10 w-full bg-muted rounded-md" />
             </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Form Skeleton */}
-      <Card className="shadow-sm rounded-2xl">
-        <CardContent className="p-6 space-y-6">
-           <div className="h-8 w-56 bg-muted rounded animate-pulse" />
-           <div className="space-y-2">
-             <div className="h-4 w-24 bg-muted rounded animate-pulse" />
-             <div className="h-10 w-full bg-muted rounded-md animate-pulse" />
-           </div>
-           <div className="space-y-2">
-             <div className="h-4 w-32 bg-muted rounded animate-pulse" />
-             <div className="h-20 w-full bg-muted rounded-md animate-pulse" />
-           </div>
-           <div className="space-y-2">
-             <div className="h-4 w-48 bg-muted rounded animate-pulse" />
-             <div className="h-10 w-full bg-muted rounded-md animate-pulse" />
-           </div>
+            <div className="space-y-2">
+              <div className="h-4 w-1/3 bg-muted rounded" />
+              <div className="h-20 w-full bg-muted rounded-md" />
+            </div>
+            <div className="space-y-2">
+              <div className="h-4 w-1/2 bg-muted rounded" />
+              <div className="h-10 w-full bg-muted rounded-md" />
+            </div>
+          </div>
+          <Separator />
+          <div className="space-y-4">
+            <div className="h-6 w-1/3 bg-muted rounded" />
+            <div className="h-10 w-full bg-muted rounded-md" />
+          </div>
         </CardContent>
       </Card>
+      <div className="h-11 w-full bg-primary/50 rounded-md" />
     </div>
   );
 }
@@ -92,7 +77,7 @@ export default function OrderPage() {
                     ) : step.status === 'current' ? (
                     <>
                         <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                            <div className="h-0.5 w-full bg-border" />
+                             <div className="h-0.5 w-full bg-primary" />
                         </div>
                         <div className="relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary bg-background">
                             <span className="h-2.5 w-2.5 rounded-full bg-primary" aria-hidden="true" />

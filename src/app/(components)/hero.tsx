@@ -81,7 +81,7 @@ export function Hero() {
                 
                 <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
                     <Button asChild size="lg" className="w-full sm:w-auto">
-                        <Link href="/order">
+                        <Link href="/#products">
                         Order Your Test Kit
                         <ArrowRight />
                         </Link>
