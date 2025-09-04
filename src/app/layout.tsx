@@ -8,6 +8,7 @@ import { Footer } from '@/components/footer';
 import { Toaster } from "@/components/ui/toaster";
 import { Chatbot } from '@/components/chatbot';
 import NextTopLoader from 'nextjs-toploader';
+import { SummaryBar } from '@/components/summary-bar';
 
 const figtree = Figtree({
   subsets: ['latin'],
@@ -76,6 +77,7 @@ export default function RootLayout({
           <main className="flex-1">{children}</main>
           <Footer />
           <Chatbot />
+          <SummaryBar />
         </div>
         <Toaster />
       </body>

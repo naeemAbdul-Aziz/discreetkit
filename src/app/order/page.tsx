@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ShieldCheck, ArrowRight, Plus, Minus, GraduationCap, Check, AlertTriangle } from 'lucide-react';
+import { Loader2, ShieldCheck, ArrowRight, Plus, Minus, GraduationCap, Check, AlertTriangle, Lock } from 'lucide-react';
 import { ChatTrigger } from '@/components/chat-trigger';
 import { useCart } from '@/hooks/use-cart';
 import { products, discounts, type Product } from '@/lib/data';
@@ -77,21 +77,21 @@ function AddToCartButton({ product }: { product: Product }) {
     return (
         <div className="flex h-10 items-center justify-between rounded-full border border-primary/50 bg-background p-1 shadow-sm">
             <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-full text-primary transition-colors hover:bg-primary/10"
-            onClick={() => updateQuantity(product.id, quantity - 1)}
-            aria-label={`Decrease quantity of ${product.name}`}
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-full text-primary transition-colors hover:bg-primary/10"
+              onClick={() => updateQuantity(product.id, quantity - 1)}
+              aria-label={`Decrease quantity of ${product.name}`}
             >
             <Minus className="h-4 w-4" />
             </Button>
             <span className="w-5 text-center font-bold text-foreground">{quantity}</span>
             <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-full text-primary transition-colors hover:bg-primary/10"
-            onClick={() => updateQuantity(product.id, quantity + 1)}
-            aria-label={`Increase quantity of ${product.name}`}
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-full text-primary transition-colors hover:bg-primary/10"
+              onClick={() => updateQuantity(product.id, quantity + 1)}
+              aria-label={`Increase quantity of ${product.name}`}
             >
             <Plus className="h-4 w-4" />
             </Button>
@@ -395,85 +395,79 @@ function OrderForm() {
             </CardContent>
         </Card>
 
-        <Card className="bg-card shadow-lg">
-            <CardHeader>
-                <CardTitle>3. Order Summary</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {!isMounted ? (
-                 <div className="flex items-center justify-center py-4">
-                   <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                 </div>
-              ) : items.length === 0 ? (
-                <p className="text-muted-foreground text-center py-4">Your cart is empty. Add a product to see a summary.</p>
-                ) : (
-                <div className="space-y-4">
-                    {isStudent && (
-                        <div className="flex items-center gap-2 rounded-lg bg-success/10 p-3 text-success">
-                            <GraduationCap className="h-5 w-5" />
-                            <p className="text-sm font-medium">Student discount applied!</p>
-                        </div>
-                    )}
-                    <div className="space-y-4 text-sm">
-                    {items.map(item => (
-                        <div key={item.id} className="flex justify-between items-center gap-4">
-                            <div className="flex items-center gap-4">
-                                <div className="relative h-12 w-12 flex-shrink-0 rounded-md bg-muted overflow-hidden">
-                                    <Image src={item.imageUrl} alt={item.name} fill className="object-contain p-1" placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(48, 48))}`} />
-                                </div>
-                                <div>
-                                    <p className="font-semibold text-foreground">{item.name}</p>
-                                    <p className="text-muted-foreground">Qty: {item.quantity}</p>
-                                </div>
-                            </div>
-                            <div className="text-right">
-                                {isStudent && item.studentPriceGHS ? (
-                                    <>
-                                        <p className="font-bold text-success">GHS {(item.studentPriceGHS * item.quantity).toFixed(2)}</p>
-                                        <p className="text-xs text-muted-foreground/80 line-through">GHS {(item.priceGHS * item.quantity).toFixed(2)}</p>
-                                    </>
-                                ) : (
-                                    <p className="font-medium text-foreground">GHS {(item.priceGHS * item.quantity).toFixed(2)}</p>
-                                )}
-                            </div>
-                        </div>
-                    ))}
-                    </div>
+        {isMounted && items.length > 0 && (
+          <Card className="bg-card shadow-lg">
+              <CardHeader>
+                  <CardTitle>3. Order Summary</CardTitle>
+              </CardHeader>
+              <CardContent>
+                  <div className="space-y-4">
+                      {isStudent && (
+                          <div className="flex items-center gap-2 rounded-lg bg-success/10 p-3 text-success">
+                              <GraduationCap className="h-5 w-5" />
+                              <p className="text-sm font-medium">Student discount applied!</p>
+                          </div>
+                      )}
+                      <div className="space-y-4 text-sm">
+                      {items.map(item => (
+                          <div key={item.id} className="flex justify-between items-center gap-4">
+                              <div className="flex items-center gap-4">
+                                  <div className="relative h-12 w-12 flex-shrink-0 rounded-md bg-muted overflow-hidden">
+                                      <Image src={item.imageUrl} alt={item.name} fill className="object-contain p-1" placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(48, 48))}`} />
+                                  </div>
+                                  <div>
+                                      <p className="font-semibold text-foreground">{item.name}</p>
+                                      <p className="text-muted-foreground">Qty: {item.quantity}</p>
+                                  </div>
+                              </div>
+                              <div className="text-right">
+                                  {isStudent && item.studentPriceGHS ? (
+                                      <>
+                                          <p className="font-bold text-success">GHS {(item.studentPriceGHS * item.quantity).toFixed(2)}</p>
+                                          <p className="text-xs text-muted-foreground/80 line-through">GHS {(item.priceGHS * item.quantity).toFixed(2)}</p>
+                                      </>
+                                  ) : (
+                                      <p className="font-medium text-foreground">GHS {(item.priceGHS * item.quantity).toFixed(2)}</p>
+                                  )}
+                              </div>
+                          </div>
+                      ))}
+                      </div>
 
-                    <Separator />
+                      <Separator />
 
-                    <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                            <p className="text-muted-foreground">Subtotal</p>
-                            <p className="font-medium text-foreground">GHS {subtotal.toFixed(2)}</p>
-                        </div>
-                    {studentDiscount > 0 && (
-                        <div className="flex justify-between text-success font-medium">
-                            <p>Student Discount</p>
-                            <p>- GHS {studentDiscount.toFixed(2)}</p>
-                        </div>
-                        )}
-                        <div className="flex justify-between">
-                            <p className="text-muted-foreground">Delivery Fee</p>
-                            <p className="font-medium text-foreground">GHS {deliveryFee.toFixed(2)}</p>
-                        </div>
-                    </div>
-                    
-                    <Separator />
+                      <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                              <p className="text-muted-foreground">Subtotal</p>
+                              <p className="font-medium text-foreground">GHS {subtotal.toFixed(2)}</p>
+                          </div>
+                      {studentDiscount > 0 && (
+                          <div className="flex justify-between text-success font-medium">
+                              <p>Student Discount</p>
+                              <p>- GHS {studentDiscount.toFixed(2)}</p>
+                          </div>
+                          )}
+                          <div className="flex justify-between">
+                              <p className="text-muted-foreground">Delivery Fee</p>
+                              <p className="font-medium text-foreground">GHS {deliveryFee.toFixed(2)}</p>
+                          </div>
+                      </div>
+                      
+                      <Separator />
 
-                    <div className="flex items-baseline justify-between font-bold text-lg">
-                        <p>Total</p>
-                        <p className="text-primary">GHS {totalPrice.toFixed(2)}</p>
-                    </div>
+                      <div className="flex items-baseline justify-between font-bold text-lg">
+                          <p>Total</p>
+                          <p className="text-primary">GHS {totalPrice.toFixed(2)}</p>
+                      </div>
 
-                    <div className="flex items-center gap-2 rounded-lg bg-muted p-3 text-muted-foreground">
-                        <Check className="h-5 w-5 text-success flex-shrink-0" />
-                        <p className="text-xs font-medium">Your privacy is guaranteed. All orders are sent in plain, discreet packaging.</p>
-                    </div>
-                </div>
-                )}
-            </CardContent>
-        </Card>
+                      <div className="flex items-center gap-2 rounded-lg bg-muted p-3 text-muted-foreground">
+                          <Lock className="h-5 w-5 text-success flex-shrink-0" />
+                          <p className="text-xs font-medium">Secured via Paystack. Your privacy is guaranteed.</p>
+                      </div>
+                  </div>
+              </CardContent>
+          </Card>
+        )}
         
         <SubmitButton disabled={!isMounted || items.length === 0} />
           

@@ -7,9 +7,30 @@ import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, ShoppingCart } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import Image from 'next/image';
+
+const shimmer = (w: number, h: number) => `
+<svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <linearGradient id="g">
+      <stop stop-color="#f0f0f0" offset="20%" />
+      <stop stop-color="#e0e0e0" offset="50%" />
+      <stop stop-color="#f0f0f0" offset="70%" />
+    </linearGradient>
+  </defs>
+  <rect width="${w}" height="${h}" fill="#f0f0f0" />
+  <rect id="r" width="${w}" height="${h}" fill="url(#g)" />
+  <animate xlink:href="#r" attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite"  />
+</svg>`;
+
+const toBase64 = (str: string) =>
+  typeof window === 'undefined'
+    ? Buffer.from(str).toString('base64')
+    : window.btoa(str);
+
 
 export function SummaryBar() {
-  const { items, totalItems, totalPrice } = useCart();
+  const { items, totalItems, totalPrice, isStudent, subtotal, deliveryFee, studentDiscount } = useCart();
 
   return (
     <AnimatePresence>
@@ -41,12 +62,22 @@ export function SummaryBar() {
                         </div>
                         <div className="grid gap-2">
                         {items.map(item => (
-                            <div key={item.id} className="grid grid-cols-[1fr_auto] items-center gap-4">
+                            <div key={item.id} className="grid grid-cols-[auto_1fr_auto] items-center gap-4 text-sm">
+                               <div className="relative h-10 w-10 flex-shrink-0 rounded-md bg-muted overflow-hidden">
+                                  <Image src={item.imageUrl} alt={item.name} fill className="object-contain p-1" placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(40, 40))}`} />
+                                </div>
                                 <div className="truncate">
                                     <span className="font-semibold">{item.quantity}</span> x {item.name}
                                 </div>
-                                <div className="font-medium">
-                                    GHS {(item.priceGHS * item.quantity).toFixed(2)}
+                                <div className="font-medium text-right">
+                                  {isStudent && item.studentPriceGHS ? (
+                                    <>
+                                      <p className="text-success">GHS {(item.studentPriceGHS * item.quantity).toFixed(2)}</p>
+                                      <p className="text-xs text-muted-foreground/80 line-through">GHS {(item.priceGHS * item.quantity).toFixed(2)}</p>
+                                    </>
+                                  ) : (
+                                    <p>GHS {(item.priceGHS * item.quantity).toFixed(2)}</p>
+                                  )}
                                 </div>
                             </div>
                         ))}
