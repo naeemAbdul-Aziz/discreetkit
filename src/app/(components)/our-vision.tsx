@@ -1,4 +1,6 @@
 
+'use client';
+
 import Image from 'next/image';
 import { Target, ShieldCheck, HeartHandshake } from 'lucide-react';
 import { motion } from 'framer-motion';
