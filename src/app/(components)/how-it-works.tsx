@@ -11,6 +11,7 @@ import { ArrowRight, Pause, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import { motion } from 'framer-motion';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -79,95 +80,147 @@ export function HowItWorks() {
           </p>
         </div>
 
-        <Carousel
-          setApi={setApi}
-          opts={{
-            align: 'start',
-            loop: true,
-          }}
-          plugins={[
-            Autoplay({
-              delay: 5000,
-              stopOnInteraction: false,
-              stopOnMouseEnter: true,
-            }),
-          ]}
-          className="w-full max-w-4xl mx-auto"
-        >
-          <CarouselContent>
-            {steps.map((step) => (
-              <CarouselItem key={step.number}>
-                <div className="p-1">
-                  <Card className="overflow-hidden">
-                    <div className="grid grid-cols-1 md:grid-cols-2">
-                      <div className="p-8 md:p-10 flex flex-col justify-center">
-                        <div className="flex items-center gap-4 mb-4">
-                          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 flex-shrink-0">
-                            <step.icon className="h-6 w-6 text-primary" />
-                          </div>
-                          <h3 className="text-xl md:text-2xl font-bold">
-                            {step.number}. {step.title}
-                          </h3>
-                        </div>
-                        <p className="text-sm md:text-base text-muted-foreground mb-6">{step.description}</p>
-
-                        <div>
-                          <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground mb-3">Key Actions:</h4>
-                          <ul className="space-y-2">
-                            {step.details.map((detail, i) => (
-                              <li key={i} className="flex items-start gap-3">
-                                <ArrowRight className="mt-1 h-4 w-4 flex-shrink-0 text-primary" />
-                                <span className="text-sm text-foreground">{detail}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                      <div className="relative bg-background flex items-center justify-center p-8 min-h-[300px] md:min-h-0">
-                        <Image
-                            src={step.imageUrl}
-                            alt={step.title}
-                            fill
-                            className="object-cover"
-                            data-ai-hint={step.imageHint}
-                            placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
-                        />
-                      </div>
-                    </div>
-                  </Card>
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious className="-left-4 sm:left-[-50px]" />
-          <CarouselNext className="-right-4 sm:right-[-50px]" />
-          
-           <div className="flex items-center justify-center gap-4 mt-8">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={togglePlay}
-              className="rounded-full h-10 w-10 text-muted-foreground hover:text-foreground"
+        {/* Carousel for Mobile */}
+        <div className="md:hidden">
+            <Carousel
+            setApi={setApi}
+            opts={{
+                align: 'start',
+                loop: true,
+            }}
+            plugins={[
+                Autoplay({
+                delay: 5000,
+                stopOnInteraction: false,
+                stopOnMouseEnter: true,
+                }),
+            ]}
+            className="w-full max-w-4xl mx-auto"
             >
-              {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-              <span className="sr-only">{isPlaying ? 'Pause' : 'Play'}</span>
-            </Button>
-            <div className="flex items-center justify-center gap-2">
-              {steps.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => api?.scrollTo(index)}
-                  className={cn(
-                    'h-2 w-2 rounded-full bg-border transition-all',
-                    index === selectedIndex ? 'w-4 bg-primary' : 'hover:bg-primary/50'
-                  )}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
-            </div>
-          </div>
+            <CarouselContent>
+                {steps.map((step) => (
+                <CarouselItem key={step.number}>
+                    <div className="p-1">
+                    <Card className="overflow-hidden">
+                        <div className="grid grid-cols-1 md:grid-cols-2">
+                        <div className="p-8 md:p-10 flex flex-col justify-center">
+                            <div className="flex items-center gap-4 mb-4">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 flex-shrink-0">
+                                <step.icon className="h-6 w-6 text-primary" />
+                            </div>
+                            <h3 className="text-xl md:text-2xl font-bold">
+                                {step.number}. {step.title}
+                            </h3>
+                            </div>
+                            <p className="text-sm md:text-base text-muted-foreground mb-6">{step.description}</p>
 
-        </Carousel>
+                            <div>
+                            <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground mb-3">Key Actions:</h4>
+                            <ul className="space-y-2">
+                                {step.details.map((detail, i) => (
+                                <li key={i} className="flex items-start gap-3">
+                                    <ArrowRight className="mt-1 h-4 w-4 flex-shrink-0 text-primary" />
+                                    <span className="text-sm text-foreground">{detail}</span>
+                                </li>
+                                ))}
+                            </ul>
+                            </div>
+                        </div>
+                        <div className="relative bg-background flex items-center justify-center p-8 min-h-[300px] md:min-h-0">
+                            <Image
+                                src={step.imageUrl}
+                                alt={step.title}
+                                fill
+                                className="object-cover"
+                                data-ai-hint={step.imageHint}
+                                placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
+                            />
+                        </div>
+                        </div>
+                    </Card>
+                    </div>
+                </CarouselItem>
+                ))}
+            </CarouselContent>
+            <CarouselPrevious className="-left-4 sm:left-[-50px]" />
+            <CarouselNext className="-right-4 sm:right-[-50px]" />
+            
+            <div className="flex items-center justify-center gap-4 mt-8">
+                <Button
+                variant="ghost"
+                size="icon"
+                onClick={togglePlay}
+                className="rounded-full h-10 w-10 text-muted-foreground hover:text-foreground"
+                >
+                {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+                <span className="sr-only">{isPlaying ? 'Pause' : 'Play'}</span>
+                </Button>
+                <div className="flex items-center justify-center gap-2">
+                {steps.map((_, index) => (
+                    <button
+                    key={index}
+                    onClick={() => api?.scrollTo(index)}
+                    className={cn(
+                        'h-2 w-2 rounded-full bg-border transition-all',
+                        index === selectedIndex ? 'w-4 bg-primary' : 'hover:bg-primary/50'
+                    )}
+                    aria-label={`Go to slide ${index + 1}`}
+                    />
+                ))}
+                </div>
+            </div>
+            </Carousel>
+        </div>
+
+        {/* Grid for Desktop */}
+        <div className="hidden md:grid md:grid-cols-1 gap-16 max-w-5xl mx-auto">
+            {steps.map((step, index) => (
+                 <motion.div
+                    key={step.number}
+                    initial={{ opacity: 0, y: 50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                 >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <div className={cn("relative aspect-[4/3] w-full rounded-2xl overflow-hidden shadow-xl", index % 2 === 1 && "md:order-last")}>
+                            <Image
+                                src={step.imageUrl}
+                                alt={step.title}
+                                fill
+                                className="object-cover"
+                                data-ai-hint={step.imageHint}
+                                placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
+                            />
+                        </div>
+
+                         <div className={cn("p-8 flex flex-col justify-center", index % 2 === 1 && "md:order-first")}>
+                            <div className="flex items-center gap-4 mb-4">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 flex-shrink-0">
+                                <step.icon className="h-6 w-6 text-primary" />
+                            </div>
+                            <h3 className="text-xl md:text-2xl font-bold">
+                                {step.number}. {step.title}
+                            </h3>
+                            </div>
+                            <p className="text-sm md:text-base text-muted-foreground mb-6">{step.description}</p>
+
+                            <div>
+                            <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground mb-3">Key Actions:</h4>
+                            <ul className="space-y-2">
+                                {step.details.map((detail, i) => (
+                                <li key={i} className="flex items-start gap-3">
+                                    <ArrowRight className="mt-1 h-4 w-4 flex-shrink-0 text-primary" />
+                                    <span className="text-sm text-foreground">{detail}</span>
+                                </li>
+                                ))}
+                            </ul>
+                            </div>
+                        </div>
+                    </div>
+                </motion.div>
+            ))}
+        </div>
       </div>
     </section>
   );
