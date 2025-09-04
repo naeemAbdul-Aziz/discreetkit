@@ -45,7 +45,7 @@ export function ProductSelector() {
           {products.map((product) => (
             <Card
               key={product.id}
-              className="group flex h-full flex-col overflow-hidden rounded-2xl shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl"
+              className="group flex h-full flex-col overflow-hidden rounded-2xl shadow-sm transition-shadow hover:shadow-xl"
             >
                 <CardContent className="flex flex-grow flex-col p-0">
                   <div className="relative aspect-square overflow-hidden bg-muted p-4">
