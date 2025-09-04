@@ -50,7 +50,7 @@ function Tracker() {
 
   return (
     <div className="w-full max-w-2xl">
-      <Card className="shadow-lg">
+      <Card className="shadow-sm">
         <CardHeader>
           <CardTitle>Track Your Order</CardTitle>
           <CardDescription>Enter your unique tracking code to see the status of your delivery.</CardDescription>
@@ -81,7 +81,7 @@ function Tracker() {
       )}
 
       {isPending && !order && (
-        <Card className="mt-4 shadow-lg">
+        <Card className="mt-4 shadow-sm">
           <CardContent className="pt-6">
             <div className="flex items-center justify-center space-x-2">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -92,7 +92,7 @@ function Tracker() {
       )}
 
       {order && (
-        <Card className="mt-4 shadow-lg">
+        <Card className="mt-4 shadow-sm">
           <CardHeader>
             <div className="flex items-center gap-4">
                 <div className="text-green-600">{statusIcons[order.status]}</div>
@@ -132,7 +132,7 @@ function TrackPageLoading() {
 
 export default function TrackPage() {
     return (
-        <div className="container mx-auto px-4 py-12 md:py-20 flex justify-center md:px-6 bg-muted">
+        <div className="container mx-auto px-4 py-12 md:py-24 flex justify-center md:px-6 bg-muted">
             <Suspense fallback={<TrackPageLoading />}>
                 <Tracker />
             </Suspense>

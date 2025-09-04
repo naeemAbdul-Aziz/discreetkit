@@ -4,101 +4,111 @@
 import { testimonials } from '@/lib/data';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
-import Image from 'next/image';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Quote, ArrowRight } from 'lucide-react';
+import { Quote } from 'lucide-react';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
-
-const cardColors = [
-  'bg-card text-card-foreground',
-  'bg-card text-card-foreground border-l-4 border-primary',
-  'bg-card text-card-foreground',
-];
-
-const shimmer = (w: number, h: number) => `
-<svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <defs>
-    <linearGradient id="g">
-      <stop stop-color="#f0f0f0" offset="20%" />
-      <stop stop-color="#e0e0e0" offset="50%" />
-      <stop stop-color="#f0f0f0" offset="70%" />
-    </linearGradient>
-  </defs>
-  <rect width="${w}" height="${h}" fill="#f0f0f0" />
-  <rect id="r" width="${w}" height="${h}" fill="url(#g)" />
-  <animate xlink:href="#r" attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite"  />
-</svg>`;
-
-const toBase64 = (str: string) =>
-  typeof window === 'undefined'
-    ? Buffer.from(str).toString('base64')
-    : window.btoa(str);
-
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import Autoplay from 'embla-carousel-autoplay';
 
 export function Testimonials() {
+  const containerVariants = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+      },
+    },
+  };
+
   return (
     <section className="bg-background py-12 md:py-24">
       <div className="container mx-auto max-w-6xl px-4 md:px-6">
-        <div className="grid gap-12 md:grid-cols-2 md:gap-16 items-center">
-            
-          <div className="space-y-6 text-center md:text-left">
-            <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground sm:text-4xl">
-              What Our Customers Say
-            </h2>
-            <p className="max-w-md mx-auto md:mx-0 text-base text-muted-foreground">
-              We're proud to provide a service that hundreds of young people and students trust for their confidential health needs. Here's what they have to say.
-            </p>
-            <Button asChild variant="accent">
-                <Link href="/order">
-                  Order Now
-                  <ArrowRight />
-                </Link>
-            </Button>
-          </div>
+        <div className="text-center">
+          <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground sm:text-4xl">
+            Real People, Real Stories
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground">
+            We're proud to provide a service that hundreds of young people and students trust for their confidential health needs.
+          </p>
+        </div>
 
-          <div className="relative">
-            {testimonials.map((testimonial, index) => (
-                <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.15 }}
-                    viewport={{ once: true }}
-                    className={cn(
-                        'relative',
-                        index === 1 && 'md:ml-8',
-                        index === 2 && 'md:ml-4'
-                    )}
-                     style={{ marginTop: index > 0 ? '-1rem' : '0' }}
-                >
-                    <Card
-                        className={cn(
-                            'p-6 shadow-lg transition-shadow hover:shadow-xl mb-8',
-                             index === 1 ? cardColors[1] : cardColors[0],
-                        )}
-                    >
-                        <CardContent className="p-0 space-y-4">
+        {/* Desktop Grid */}
+        <motion.div
+          className="hidden md:grid md:grid-cols-3 gap-8 mt-12"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+        >
+          {testimonials.map((testimonial, index) => (
+            <motion.div key={index} variants={itemVariants}>
+              <Card className="h-full flex flex-col shadow-sm hover:shadow-md transition-shadow duration-300">
+                <CardContent className="flex-grow flex flex-col p-6 space-y-4">
+                  <Quote className="h-8 w-8 text-primary/30" />
+                  <blockquote className="flex-grow text-base text-muted-foreground">
+                    "{testimonial.quote}"
+                  </blockquote>
+                  <div className="pt-4 flex items-center gap-4 border-t">
+                    <Avatar className="border-2 border-primary/10 h-12 w-12">
+                      <AvatarImage src={testimonial.avatar} alt={testimonial.name} data-ai-hint="person portrait" />
+                      <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-semibold text-sm text-foreground">{testimonial.name}</p>
+                      <p className="text-xs text-muted-foreground">{testimonial.role}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Mobile Carousel */}
+        <div className="md:hidden mt-12">
+          <Carousel
+            opts={{ align: 'start', loop: true }}
+            plugins={[Autoplay({ delay: 5000, stopOnInteraction: true })]}
+            className="w-full"
+          >
+            <CarouselContent>
+              {testimonials.map((testimonial, index) => (
+                <CarouselItem key={index} className="basis-full">
+                  <div className="p-1">
+                     <Card className="h-full flex flex-col shadow-sm">
+                        <CardContent className="flex-grow flex flex-col p-6 space-y-4">
                             <Quote className="h-8 w-8 text-primary/30" />
-                            <blockquote className="text-base text-muted-foreground">
+                            <blockquote className="flex-grow text-base text-muted-foreground">
                                 "{testimonial.quote}"
                             </blockquote>
-                            <div className="pt-4 flex items-center gap-4">
-                                <Avatar className="border-2 border-primary/10">
-                                    <AvatarImage src={testimonial.avatar} alt={testimonial.name} data-ai-hint="person portrait" />
-                                    <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
+                            <div className="pt-4 flex items-center gap-4 border-t">
+                                <Avatar className="border-2 border-primary/10 h-12 w-12">
+                                <AvatarImage src={testimonial.avatar} alt={testimonial.name} data-ai-hint="person portrait" />
+                                <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
                                 </Avatar>
                                 <div>
-                                    <p className="font-semibold text-sm text-foreground">{testimonial.name}</p>
-                                    <p className="text-xs text-muted-foreground">{testimonial.role}</p>
+                                <p className="font-semibold text-sm text-foreground">{testimonial.name}</p>
+                                <p className="text-xs text-muted-foreground">{testimonial.role}</p>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
-                </motion.div>
-            ))}
-          </div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
         </div>
       </div>
     </section>

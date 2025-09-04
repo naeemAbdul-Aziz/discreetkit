@@ -7,7 +7,7 @@ export function ClosingCta() {
   return (
     <section className="py-12 md:py-24 bg-muted">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="rounded-lg bg-primary p-8 text-center shadow-lg md:p-12">
+        <div className="rounded-2xl bg-primary p-8 text-center shadow-lg md:p-12">
           <h2 className="font-headline text-2xl font-bold tracking-tight text-primary-foreground sm:text-3xl">
             Take Control of Your Health Today
           </h2>

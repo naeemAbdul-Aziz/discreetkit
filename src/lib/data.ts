@@ -131,6 +131,13 @@ export const testimonials = [
         dataAiHint: 'person portrait'
     },
     {
+        quote: "As a young professional, my schedule is tight. Ordering online was convenient, and the pharmacy pickup option was perfect for me.",
+        name: 'K. Owusu',
+        role: 'Young Professional, Accra',
+        avatar: 'https://picsum.photos/101/101',
+        dataAiHint: 'person portrait'
+    },
+    {
         quote: "The student discount really helped. It's great to see a service that actually considers our budget. The packaging was completely plain as promised.",
         name: 'F. Annan',
         role: 'Student, UPSA',
@@ -138,11 +145,25 @@ export const testimonials = [
         dataAiHint: 'person portrait'
     },
     {
-        quote: "As a young professional, my schedule is tight. Ordering online was convenient, and the pharmacy pickup option was perfect for me.",
-        name: 'K. Owusu',
-        role: 'Young Professional, Accra',
-        avatar: 'https://picsum.photos/101/101',
+        quote: "DiscreetKit is a lifesaver. I felt completely in control of the process, and the anonymous tracking gave me peace of mind.",
+        name: 'E. Tetteh',
+        role: 'Student, GIMPA',
+        avatar: 'https://picsum.photos/103/103',
         dataAiHint: 'person portrait'
+    },
+    {
+        quote: "I was hesitant at first, but the positive reviews convinced me. The service is exactly as advertised: fast, professional, and completely private. Highly recommend.",
+        name: 'S. Lamptey',
+        role: 'Graduate Student',
+        avatar: 'https://picsum.photos/104/104',
+        dataAiHint: 'person portrait'
+    },
+    {
+        quote: "The 'Support Bundle' is a great idea. It made it easier to have a conversation with my partner and test together. It's less intimidating that way.",
+        name: 'M. & D. Asante',
+        role: 'Partners, Accra',
+        avatar: 'https://picsum.photos/105/105',
+        dataAiHint: 'couple portrait'
     }
 ];
 

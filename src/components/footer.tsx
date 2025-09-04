@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ShieldCheck, Twitter, Instagram, Facebook } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import { Button } from './ui/button';
 
 export function Footer() {
   const footerLinks = {
@@ -16,6 +17,12 @@ export function Footer() {
       { href: '/terms', label: 'Terms of Service' },
     ],
   };
+
+  const socialLinks = [
+      { href: '#', icon: Twitter, label: 'Twitter' },
+      { href: '#', icon: Instagram, label: 'Instagram' },
+      { href: '#', icon: Facebook, label: 'Facebook' },
+  ]
 
   return (
     <footer className="border-t bg-primary text-primary-foreground">
@@ -71,19 +78,15 @@ export function Footer() {
           <p className="text-sm text-primary-foreground/80">
             &copy; {new Date().getFullYear()} DiscreetKit Ghana. All rights reserved.
           </p>
-          <div className="mt-4 flex items-center space-x-4 sm:mt-0">
-            <Link href="#" className="text-primary-foreground/80 transition-colors hover:text-primary-foreground">
-              <Twitter className="h-5 w-5" />
-              <span className="sr-only">Twitter</span>
-            </Link>
-            <Link href="#" className="text-primary-foreground/80 transition-colors hover:text-primary-foreground">
-              <Instagram className="h-5 w-5" />
-              <span className="sr-only">Instagram</span>
-            </Link>
-            <Link href="#" className="text-primary-foreground/80 transition-colors hover:text-primary-foreground">
-              <Facebook className="h-5 w-5" />
-              <span className="sr-only">Facebook</span>
-            </Link>
+          <div className="mt-4 flex items-center space-x-2 sm:mt-0">
+             {socialLinks.map((link) => (
+                <Button key={link.label} asChild variant="ghost" size="icon" className="text-primary-foreground/80 hover:bg-primary-foreground/10 hover:text-primary-foreground">
+                    <Link href={link.href}>
+                        <link.icon className="h-5 w-5" />
+                        <span className="sr-only">{link.label}</span>
+                    </Link>
+                </Button>
+            ))}
           </div>
         </div>
       </div>

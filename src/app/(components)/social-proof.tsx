@@ -20,7 +20,7 @@ export function SocialProof() {
           </div>
           
           <div className="flex justify-center">
-            <Card className="bg-accent text-accent-foreground w-full max-w-sm p-8 text-center shadow-xl">
+            <Card className="bg-accent text-accent-foreground w-full max-w-sm p-8 text-center shadow-xl rounded-2xl">
               <CardContent className="p-0">
                 <h3 className="text-4xl font-bold">
                   Over 1,600

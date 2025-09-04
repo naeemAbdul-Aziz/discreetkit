@@ -10,8 +10,8 @@ export default function TermsOfService() {
 
   return (
     <div className="bg-muted">
-      <div className="container mx-auto max-w-4xl px-4 py-12 md:py-20">
-         <Card className="p-4 md:p-8 shadow-lg">
+      <div className="container mx-auto max-w-4xl px-4 py-12 md:py-24">
+         <Card className="p-4 md:p-8 shadow-sm">
           <CardHeader className="text-center px-0">
             <CardTitle className="font-headline text-4xl font-bold">Terms of Service</CardTitle>
             <CardDescription className="text-lg">

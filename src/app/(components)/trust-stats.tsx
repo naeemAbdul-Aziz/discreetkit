@@ -54,7 +54,7 @@ export function TrustStats() {
                 alt="Happy student in Ghana"
                 width={400}
                 height={500}
-                className="rounded-xl object-cover shadow-lg"
+                className="rounded-2xl object-cover shadow-lg"
                 data-ai-hint="student ghana"
                 placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 500))}`}
               />
@@ -65,7 +65,7 @@ export function TrustStats() {
                 alt="Health professional"
                 width={400}
                 height={300}
-                className="rounded-xl object-cover shadow-2xl border-4 border-background"
+                className="rounded-2xl object-cover shadow-2xl border-4 border-background"
                 data-ai-hint="health professional"
                 placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
               />

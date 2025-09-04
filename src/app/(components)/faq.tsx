@@ -5,7 +5,7 @@ import { ChatTrigger } from '@/components/chat-trigger';
 
 export function Faq() {
   return (
-    <section id="faq" className="bg-background py-12 md:py-20">
+    <section id="faq" className="bg-background py-12 md:py-24">
       <div className="container mx-auto max-w-4xl px-4 md:px-6">
         <div className="text-center">
           <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
