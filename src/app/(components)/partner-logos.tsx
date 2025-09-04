@@ -1,6 +1,4 @@
 
-'use client';
-
 import Image from 'next/image';
 import { partners } from '@/lib/data';
 

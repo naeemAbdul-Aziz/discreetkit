@@ -1,6 +1,4 @@
 
-'use client';
-
 import { Card } from '@/components/ui/card';
 import { TestTube, Droplet, FileText, Package, FlaskConical, Plus } from 'lucide-react';
 import Image from 'next/image';

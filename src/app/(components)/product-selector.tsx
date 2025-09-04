@@ -1,6 +1,4 @@
 
-'use client';
-
 import { products } from '@/lib/data';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
