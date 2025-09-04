@@ -50,7 +50,7 @@ function Tracker() {
 
   return (
     <div className="w-full max-w-2xl">
-      <Card className="shadow-sm">
+      <Card className="shadow-sm rounded-2xl">
         <CardHeader>
           <CardTitle>Track Your Order</CardTitle>
           <CardDescription>Enter your unique tracking code to see the status of your delivery.</CardDescription>
@@ -81,7 +81,7 @@ function Tracker() {
       )}
 
       {isPending && !order && (
-        <Card className="mt-4 shadow-sm">
+        <Card className="mt-4 shadow-sm rounded-2xl">
           <CardContent className="pt-6">
             <div className="flex items-center justify-center space-x-2">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -92,7 +92,7 @@ function Tracker() {
       )}
 
       {order && (
-        <Card className="mt-4 shadow-sm">
+        <Card className="mt-4 shadow-sm rounded-2xl">
           <CardHeader>
             <div className="flex items-center gap-4">
                 <div className="text-green-600">{statusIcons[order.status]}</div>

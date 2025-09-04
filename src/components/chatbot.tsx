@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Bot, Loader, Send, User } from 'lucide-react';
+import { Bot, Loader2, Send, User } from 'lucide-react';
 import { handleChat } from '@/lib/actions';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { cn } from '@/lib/utils';
@@ -97,7 +97,7 @@ export function Chatbot() {
                             <AvatarFallback><Bot size={20} /></AvatarFallback>
                         </Avatar>
                         <div className="max-w-[80%] rounded-lg p-3 text-sm bg-muted flex items-center">
-                            <Loader className="mr-2 h-4 w-4 animate-spin" /> Thinking...
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Thinking...
                         </div>
                     </div>
                 )}

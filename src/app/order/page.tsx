@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useActionState } from 'react';
@@ -202,7 +201,7 @@ function OrderForm() {
 
         <div className="space-y-4">
             <h2 className="text-2xl font-bold text-foreground">1. Choose Your Products</h2>
-            <Card className="shadow-sm overflow-hidden">
+            <Card className="shadow-sm overflow-hidden rounded-2xl">
                 <CardContent className="p-0">
                     <div className="divide-y divide-border">
                         {products.map((product) => {
@@ -305,7 +304,7 @@ function OrderForm() {
             </Card>
         </div>
         
-        <Card className="bg-card shadow-sm">
+        <Card className="bg-card shadow-sm rounded-2xl">
              <CardHeader>
                 <CardTitle>2. Delivery & Payment</CardTitle>
                 <CardDescription>
