@@ -113,7 +113,7 @@ export const useCart = create<CartState>()(
         set({ items: updatedItems, totalItems, subtotal, studentDiscount, deliveryFee, totalPrice, isStudent });
       },
 
-      updateQuantity: (productId, number, quantity) => {
+      updateQuantity: (productId, quantity) => {
         let updatedItems;
         if (quantity < 1) {
           updatedItems = get().items.filter((item) => item.id !== productId);
