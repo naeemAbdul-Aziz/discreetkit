@@ -419,12 +419,12 @@ export function OrderForm() {
 
 function OrderFormSkeleton() {
   return (
-     <div className="space-y-8 animate-pulse">
+    <>
       <div className="mt-8">
         <div className="flex items-center justify-center rounded-lg border-2 border-dashed bg-muted p-6 text-center h-[125px]" />
       </div>
      
-      <form className="mt-8 space-y-8">
+      <form className="mt-8 space-y-8 animate-pulse">
         <div className="space-y-4">
             <div className="h-8 w-48 bg-muted rounded" />
             <Card className="shadow-sm overflow-hidden rounded-2xl">
