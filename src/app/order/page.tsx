@@ -5,7 +5,8 @@ import { Suspense } from 'react';
 import { CheckCircle } from 'lucide-react';
 import { OrderForm } from './(components)/order-form';
 import { cn } from '@/lib/utils';
-import { Card, CardContent, CardHeader, Separator } from '@/components/ui';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 
 const steps = [
   { name: 'Your Cart', status: 'complete' },
