@@ -74,12 +74,13 @@ function AddToCartButton({ product }: { product: Product }) {
 
   if (quantity > 0) {
     return (
-        <div className="flex h-10 items-center justify-between rounded-full border border-primary/50 p-1">
+        <div className="flex h-10 items-center justify-between rounded-full border border-primary/50 bg-background p-1 shadow-sm">
             <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7 rounded-full text-primary hover:bg-primary/10"
+            className="h-8 w-8 rounded-full text-primary transition-colors hover:bg-primary/10"
             onClick={() => updateQuantity(product.id, quantity - 1)}
+            aria-label={`Decrease quantity of ${product.name}`}
             >
             <Minus className="h-4 w-4" />
             </Button>
@@ -87,8 +88,9 @@ function AddToCartButton({ product }: { product: Product }) {
             <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7 rounded-full text-primary hover:bg-primary/10"
+            className="h-8 w-8 rounded-full text-primary transition-colors hover:bg-primary/10"
             onClick={() => updateQuantity(product.id, quantity + 1)}
+            aria-label={`Increase quantity of ${product.name}`}
             >
             <Plus className="h-4 w-4" />
             </Button>
@@ -201,59 +203,56 @@ function OrderForm() {
             <h2 className="text-2xl font-bold text-foreground">1. Choose Your Products</h2>
             <Card className="shadow-lg overflow-hidden">
                 <CardContent className="p-0">
-                    <div className="space-y-2">
-                        {products.map((product, index) => {
-                            const quantity = isMounted ? getItemQuantity(product.id) || 1 : 1;
+                    <div className="divide-y divide-border">
+                        {products.map((product) => {
+                            const quantity = isMounted ? getItemQuantity(product.id) : 1;
                             const isProductInCart = isMounted ? getItemQuantity(product.id) > 0 : false;
                             
                             return (
-                             <div key={product.id}>
-                                <div className="p-4 sm:p-6">
-                                    <div className="grid grid-cols-[80px_1fr_auto] gap-4 sm:gap-6 items-center">
-                                        <div className="relative aspect-square w-full sm:w-[80px] rounded-lg bg-muted overflow-hidden">
-                                            <Image
-                                            src={product.imageUrl}
-                                            alt={product.name}
-                                            fill
-                                            className="object-contain p-2"
-                                            data-ai-hint="medical test kit"
-                                            placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(80, 80))}`}
-                                            />
+                             <div key={product.id} className="p-4 sm:p-6">
+                                <div className="grid grid-cols-[80px_1fr_auto] gap-4 sm:gap-6 items-center">
+                                    <div className="relative aspect-square w-full sm:w-[80px] rounded-lg bg-muted overflow-hidden">
+                                        <Image
+                                        src={product.imageUrl}
+                                        alt={product.name}
+                                        fill
+                                        className="object-contain p-2"
+                                        data-ai-hint="medical test kit"
+                                        placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(80, 80))}`}
+                                        />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <h3 className="text-base font-bold text-foreground">{product.name}</h3>
+                                        <p className="text-sm text-muted-foreground mt-1">{product.description}</p>
+                                        <div className="flex items-center gap-1.5 mt-2 text-xs text-success">
+                                            <Check className="h-3.5 w-3.5" />
+                                            <p>WHO Approved</p>
                                         </div>
-                                        <div className="flex flex-col">
-                                            <h3 className="text-base font-bold text-foreground">{product.name}</h3>
-                                            <p className="text-sm text-muted-foreground mt-1">{product.description}</p>
-                                            <div className="flex items-center gap-1.5 mt-2 text-xs text-success">
-                                                <Check className="h-3.5 w-3.5" />
-                                                <p>WHO Approved</p>
-                                            </div>
+                                    </div>
+                                    <div className="flex flex-col items-end justify-between self-stretch">
+                                        <div className="text-right h-10 flex flex-col justify-center items-end">
+                                          {!isMounted ? (
+                                            <div className="h-5 w-20 bg-muted rounded-md animate-pulse" />
+                                          ) : isStudent && product.studentPriceGHS ? (
+                                                <>
+                                                    <p className="font-bold text-success text-base">GHS {(product.studentPriceGHS * quantity).toFixed(2)}</p>
+                                                    {isProductInCart && (
+                                                        <p className="text-muted-foreground/80 line-through text-xs font-normal">
+                                                            GHS {(product.priceGHS * quantity).toFixed(2)}
+                                                        </p>
+                                                    )}
+                                                </>
+                                            ) : (
+                                                <p className="font-bold text-base text-foreground">
+                                                    GHS {(product.priceGHS * quantity).toFixed(2)}
+                                                </p>
+                                            )}
                                         </div>
-                                        <div className="flex flex-col items-end justify-between self-stretch">
-                                            <div className="text-right h-10 flex flex-col justify-center items-end">
-                                              {!isMounted ? (
-                                                <div className="h-5 w-20 bg-muted rounded-md animate-pulse" />
-                                              ) : isStudent && product.studentPriceGHS ? (
-                                                    <>
-                                                        <p className="font-bold text-success text-base">GHS {(product.studentPriceGHS * quantity).toFixed(2)}</p>
-                                                        {isProductInCart && (
-                                                            <p className="text-muted-foreground/80 line-through text-xs font-normal">
-                                                                GHS {(product.priceGHS * quantity).toFixed(2)}
-                                                            </p>
-                                                        )}
-                                                    </>
-                                                ) : (
-                                                    <p className="font-bold text-base text-foreground">
-                                                        GHS {(product.priceGHS * quantity).toFixed(2)}
-                                                    </p>
-                                                )}
-                                            </div>
-                                            <div className="w-32 mt-2">
-                                               <AddToCartButton product={product} />
-                                            </div>
+                                        <div className="w-32 mt-2">
+                                           <AddToCartButton product={product} />
                                         </div>
                                     </div>
                                 </div>
-                                {index < products.length - 1 && <Separator />}
                              </div>
                         )})}
                     </div>

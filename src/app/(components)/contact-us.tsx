@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Mail, MapPin, Send } from 'lucide-react';
+import { Mail, MapPin } from 'lucide-react';
 
 const contactInfo = [
   {
@@ -46,7 +46,7 @@ export function ContactUs() {
                   <Textarea id="message" placeholder="Enter your message here..." rows={4} />
                 </div>
                 <Button type="submit" className="w-full">
-                  <Send />
+                  <Mail />
                   Send Message
                 </Button>
               </form>

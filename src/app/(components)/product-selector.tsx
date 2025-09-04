@@ -45,7 +45,7 @@ export function ProductSelector() {
           {products.map((product) => (
             <Card
               key={product.id}
-              className="group flex h-full flex-col overflow-hidden rounded-2xl shadow-sm"
+              className="flex h-full flex-col overflow-hidden rounded-2xl shadow-sm"
             >
                 <CardContent className="flex flex-grow flex-col p-0">
                   <div className="relative aspect-square overflow-hidden bg-muted p-4">
@@ -53,7 +53,7 @@ export function ProductSelector() {
                       src={product.imageUrl}
                       alt={product.name}
                       fill
-                      className="object-contain transition-transform duration-300 group-hover:scale-105"
+                      className="object-contain transition-transform duration-300"
                       data-ai-hint="medical test kit"
                       placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 400))}`}
                     />
