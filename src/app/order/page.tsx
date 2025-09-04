@@ -1,6 +1,4 @@
 
-'use client';
-
 import { Suspense } from 'react';
 import { Loader2, FileText, ShoppingCart, CheckCircle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
