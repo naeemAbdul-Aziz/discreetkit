@@ -61,10 +61,10 @@ export default function OrderPage() {
         </div>
 
         {/* Stepper */}
-        <nav aria-label="Progress" className="my-12">
+        <nav aria-label="Progress" className="my-12 max-w-md mx-auto">
             <ol role="list" className="flex items-center">
                 {steps.map((step, stepIdx) => (
-                <li key={step.name} className={cn("relative", stepIdx !== steps.length - 1 ? "pr-8 sm:pr-20 flex-1" : "")}>
+                <li key={step.name} className={cn("relative flex-1", stepIdx !== steps.length - 1 ? "pr-4" : "")}>
                     {step.status === 'complete' ? (
                     <>
                         <div className="absolute inset-0 flex items-center" aria-hidden="true">
@@ -72,17 +72,15 @@ export default function OrderPage() {
                         </div>
                         <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
                             <CheckCircle className="h-5 w-5" />
-                            <span className="sr-only">{step.name}</span>
                         </div>
                     </>
                     ) : step.status === 'current' ? (
                     <>
                         <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                             <div className="h-0.5 w-full bg-primary" />
+                             <div className="h-0.5 w-full bg-border" />
                         </div>
                         <div className="relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary bg-background">
                             <span className="h-2.5 w-2.5 rounded-full bg-primary" aria-hidden="true" />
-                            <span className="sr-only">{step.name}</span>
                         </div>
                     </>
                     ) : (
@@ -91,11 +89,10 @@ export default function OrderPage() {
                             <div className="h-0.5 w-full bg-border" />
                         </div>
                         <div className="relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-border bg-background" />
-                        <span className="sr-only">{step.name}</span>
                     </>
                     )}
-                     <div className="absolute top-10 w-max text-center -translate-x-1/2 left-1/2 max-w-20">
-                        <p className={cn("text-xs font-medium", step.status === 'current' ? 'text-primary' : 'text-muted-foreground')}>{step.name}</p>
+                     <div className="absolute top-10 w-max text-center left-1/2 -translate-x-1/2">
+                        <p className={cn("text-xs font-medium", step.status === 'current' ? 'text-primary' : 'text-muted-foreground', step.status === 'complete' ? 'text-foreground' : '')}>{step.name}</p>
                     </div>
                 </li>
                 ))}
