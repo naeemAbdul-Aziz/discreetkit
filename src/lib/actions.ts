@@ -6,12 +6,12 @@
  */
 'use server';
 
-import { z } from 'zod';
-import { generateTrackingCode, type Order } from './data';
-import { answerQuestions } from '@/ai/flows/answer-questions';
-import { revalidatePath } from 'next/cache';
-import { type CartItem } from '@/hooks/use-cart';
-import { getSupabaseAdminClient } from './supabase';
+import {z} from 'zod';
+import {generateTrackingCode, type Order} from './data';
+import {answerQuestions} from '@/ai/flows/answer-questions';
+import {revalidatePath} from 'next/cache';
+import {type CartItem} from '@/hooks/use-cart';
+import {getSupabaseAdminClient} from './supabase';
 
 const orderSchema = z.object({
   cartItems: z.string().min(1, 'Cart cannot be empty.'),
@@ -36,7 +36,9 @@ const orderSchema = z.object({
  */
 export async function createOrderAction(prevState: any, formData: FormData) {
   const supabaseAdmin = getSupabaseAdminClient();
-  const validatedFields = orderSchema.safeParse(Object.fromEntries(formData.entries()));
+  const validatedFields = orderSchema.safeParse(
+    Object.fromEntries(formData.entries())
+  );
 
   if (!validatedFields.success) {
     return {
@@ -47,10 +49,10 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     };
   }
 
-  const { deliveryArea, otherDeliveryArea } = validatedFields.data;
+  const {deliveryArea, otherDeliveryArea} = validatedFields.data;
   if (deliveryArea === 'Other' && (!otherDeliveryArea || otherDeliveryArea.length < 3)) {
     return {
-      errors: { otherDeliveryArea: ['Please specify your delivery area.'] },
+      errors: {otherDeliveryArea: ['Please specify your delivery area.']},
       message: 'Error: Please specify your delivery area.',
       success: false,
       code: null,
@@ -60,21 +62,22 @@ export async function createOrderAction(prevState: any, formData: FormData) {
   try {
     const cartItems: CartItem[] = JSON.parse(validatedFields.data.cartItems);
     if (cartItems.length === 0) {
-      return { message: 'Your cart is empty.', success: false, code: null };
+      return {message: 'Your cart is empty.', success: false, code: null};
     }
 
     const code = generateTrackingCode();
-    const finalDeliveryArea = deliveryArea === 'Other' ? otherDeliveryArea : deliveryArea;
-    
+    const finalDeliveryArea =
+      deliveryArea === 'Other' ? otherDeliveryArea : deliveryArea;
+
     const priceDetails = {
-        subtotal: parseFloat(validatedFields.data.subtotal),
-        student_discount: parseFloat(validatedFields.data.studentDiscount),
-        delivery_fee: parseFloat(validatedFields.data.deliveryFee),
-        total_price: parseFloat(validatedFields.data.totalPrice),
+      subtotal: parseFloat(validatedFields.data.subtotal),
+      student_discount: parseFloat(validatedFields.data.studentDiscount),
+      delivery_fee: parseFloat(validatedFields.data.deliveryFee),
+      total_price: parseFloat(validatedFields.data.totalPrice),
     };
 
     // 1. Insert into orders table
-    const { data: orderData, error: orderError } = await supabaseAdmin
+    const {data: orderData, error: orderError} = await supabaseAdmin
       .from('orders')
       .insert({
         code,
@@ -89,10 +92,11 @@ export async function createOrderAction(prevState: any, formData: FormData) {
       .single();
 
     if (orderError) throw orderError;
-    if (!orderData) throw new Error('Failed to retrieve order ID after creation.');
+    if (!orderData)
+      throw new Error('Failed to retrieve order ID after creation.');
 
     // 2. Insert initial event into order_events
-    const { error: eventError } = await supabaseAdmin.from('order_events').insert({
+    const {error: eventError} = await supabaseAdmin.from('order_events').insert({
       order_id: orderData.id,
       status: 'Received',
       note: 'Your order has been received and is awaiting processing.',
@@ -101,12 +105,12 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     if (eventError) throw eventError;
 
     revalidatePath('/order');
-    return { success: true, code, message: null, errors: {} };
+    return {success: true, code, message: null, errors: {}};
   } catch (error) {
     console.error('Supabase Error:', error);
     return {
       message: 'Failed to create order due to a database error. Please try again.',
-      success: false,
+      success: false_color,
       code: null,
     };
   }
@@ -120,7 +124,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
  */
 export async function getOrderAction(code: string): Promise<Order | null> {
   const supabaseAdmin = getSupabaseAdminClient();
-  const { data: order, error } = await supabaseAdmin
+  const {data: order, error} = await supabaseAdmin
     .from('orders')
     .select(
       `
@@ -143,20 +147,25 @@ export async function getOrderAction(code: string): Promise<Order | null> {
     console.error('Error fetching order:', error);
     return null;
   }
-  
-  const items = order.items as CartItem[]
-  const firstItem = items.length > 0 ? items[0] : { name: 'N/A', quantity: 0 };
+
+  const items = order.items as CartItem[];
+  const firstItem =
+    items.length > 0 ? items[0] : {name: 'N/A', quantity: 0};
 
   return {
     id: order.id.toString(),
     code: order.code,
-    productName: `${firstItem.name} (x${firstItem.quantity})${items.length > 1 ? ` and ${items.length - 1} other(s)` : ''}`,
-    status: order.status as Order['status'],
-    events: order.order_events.map(e => ({
+    productName: `${firstItem.name} (x${firstItem.quantity})${
+      items.length > 1 ? ` and ${items.length - 1} other(s)` : ''
+    }`,
+    status: order.status,
+    events: order.order_events
+      .map(e => ({
         status: e.status,
         note: e.note ?? '',
-        date: e.created_at
-    })).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+        date: e.created_at,
+      }))
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
   };
 }
 
@@ -167,10 +176,13 @@ export async function getOrderAction(code: string): Promise<Order | null> {
  * @param message - The new message from the user.
  * @returns The AI's response as a string.
  */
-export async function handleChat(history: { role: 'user' | 'model'; parts: string }[], message: string) {
+export async function handleChat(
+  history: {role: 'user' | 'model'; parts: string}[],
+  message: string
+) {
   'use server';
   try {
-    const result = await answerQuestions({ query: message });
+    const result = await answerQuestions({query: message});
     return result.answer;
   } catch (error) {
     console.error('AI Error:', error);
