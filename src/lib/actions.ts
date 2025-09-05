@@ -28,6 +28,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
       errors: validatedFields.error.flatten().fieldErrors,
       message: 'Error: Please check the form fields.',
       success: false,
+      code: null,
     };
   }
 
@@ -37,13 +38,14 @@ export async function createOrderAction(prevState: any, formData: FormData) {
       errors: { otherDeliveryArea: ['Please specify your delivery area.'] },
       message: 'Error: Please specify your delivery area.',
       success: false,
+      code: null,
     };
   }
 
   try {
     const cartItems: CartItem[] = JSON.parse(validatedFields.data.cartItems);
     if (cartItems.length === 0) {
-      return { message: 'Your cart is empty.', success: false };
+      return { message: 'Your cart is empty.', success: false, code: null };
     }
 
     const code = generateTrackingCode();
@@ -90,6 +92,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     return {
       message: 'Failed to create order due to a database error. Please try again.',
       success: false,
+      code: null,
     };
   }
 }
@@ -119,13 +122,13 @@ export async function getOrderAction(code: string): Promise<Order | null> {
     return null;
   }
   
-  // Flatten the structure to match the frontend's expected `Order` type
-  const firstItem = Array.isArray(order.items) && order.items.length > 0 ? order.items[0] : { name: 'N/A', quantity: 0 };
+  const items = order.items as CartItem[]
+  const firstItem = items.length > 0 ? items[0] : { name: 'N/A', quantity: 0 };
 
   return {
     id: order.id.toString(),
     code: order.code,
-    productName: `${firstItem.name} (x${firstItem.quantity})${order.items.length > 1 ? ` and ${order.items.length - 1} other(s)` : ''}`,
+    productName: `${firstItem.name} (x${firstItem.quantity})${items.length > 1 ? ` and ${items.length - 1} other(s)` : ''}`,
     status: order.status as Order['status'],
     events: order.order_events.map(e => ({
         status: e.status,
