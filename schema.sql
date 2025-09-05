@@ -1,6 +1,3 @@
-
--- schema.sql
-
 -- 1. Create an ENUM type for the order status
 -- ENUMs provide data integrity, ensuring only allowed values are used for status.
 DROP TYPE IF EXISTS order_status;
@@ -58,7 +55,6 @@ COMMENT ON COLUMN order_events.note IS 'A descriptive note for this event (e.g.,
 
 -- 4. Enable Row Level Security (RLS) on tables
 -- This is a crucial security step. By default, it denies all access.
--- We will define specific policies for access later if needed.
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE order_events ENABLE ROW LEVEL SECURITY;
 
