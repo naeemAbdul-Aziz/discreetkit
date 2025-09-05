@@ -164,10 +164,12 @@ function TrackPageLoading() {
 
 export default function TrackPage() {
   return (
-    <div className="container mx-auto px-4 py-12 md:py-24 flex justify-center md:px-6 bg-muted">
-      <Suspense fallback={<TrackPageLoading />}>
-        <Tracker />
-      </Suspense>
+    <div className="bg-muted">
+      <div className="container mx-auto flex justify-center px-4 py-12 md:px-6 md:py-24">
+        <Suspense fallback={<TrackPageLoading />}>
+          <Tracker />
+        </Suspense>
+      </div>
     </div>
   );
 }
