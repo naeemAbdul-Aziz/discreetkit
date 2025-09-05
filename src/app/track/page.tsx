@@ -28,6 +28,8 @@ import {
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 
+export const dynamic = 'force-dynamic';
+
 const statusMap = {
   received: {
     icon: Package,
@@ -275,7 +277,7 @@ function TrackPageLoading() {
 
 export default function TrackPage() {
   return (
-    <div className="bg-background">
+    <div className="bg-muted">
       <div className="container mx-auto flex min-h-[calc(100dvh-10rem)] justify-center px-4 py-12 md:px-6 md:py-24">
         <Suspense fallback={<TrackPageLoading />}>
           <Tracker />
