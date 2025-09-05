@@ -5,7 +5,7 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%; /* Soft Linen White - User calls it this, but HSL is more blueish. Using user's HSL */
+    --background: 210 40% 98%; /* Alice Blue */
     --foreground: 210 20% 18%; /* Deep Sapphire Text */
 
     --card: 0 0% 100%; /* Pure White */
@@ -20,7 +20,7 @@
     --secondary: 140 80% 40%; /* Lively Spring Green - for success states */
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 15% 93%; /* Whispering Sky Gray */
+    --muted: 210 40% 94%; /* Powder Blue */
     --muted-foreground: 210 10% 40%;
 
     --accent: 30 90% 55%; /* Energetic Sunset Orange - for attention */

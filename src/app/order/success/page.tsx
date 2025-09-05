@@ -17,7 +17,7 @@ function SuccessContent() {
 
   if (!code) {
     return (
-      <Card className="w-full max-w-lg text-center shadow-xl">
+      <Card className="w-full max-w-lg text-center shadow-lg">
         <CardHeader>
           <CardTitle className="text-2xl text-destructive">Order Not Found</CardTitle>
           <CardDescription>
@@ -47,7 +47,7 @@ function SuccessContent() {
   };
 
   return (
-    <Card className="w-full max-w-lg text-center shadow-xl">
+    <Card className="w-full max-w-lg text-center shadow-lg">
       <CardHeader className="items-center">
         <CheckCircle2 className="h-16 w-16 text-green-500" />
         <CardTitle className="mt-4 text-3xl">Order Confirmed!</CardTitle>
@@ -106,7 +106,7 @@ function SuccessPageLoading() {
 
 export default function OrderSuccessPage() {
     return (
-        <div className="flex min-h-[calc(100vh-10rem)] items-center justify-center bg-muted p-4">
+        <div className="flex min-h-[calc(100dvh-10rem)] items-center justify-center bg-background p-4">
             <Suspense fallback={<SuccessPageLoading />}>
                 <SuccessContent />
             </Suspense>

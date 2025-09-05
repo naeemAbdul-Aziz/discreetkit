@@ -1,6 +1,7 @@
 
 import { Package, ShoppingCart, Truck, CheckCircle, ShieldCheck, HeartHandshake, Zap, Award, Users, TestTube, Droplet, FileText, FlaskConical, Plus } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import type { CartItem } from "@/hooks/use-cart";
 
 export type Product = {
     id: number;
@@ -14,8 +15,15 @@ export type Product = {
 export type Order = {
     id: string;
     code: string;
-    productName: string;
     status: 'received' | 'processing' | 'out_for_delivery' | 'completed';
+    items: CartItem[];
+    deliveryArea: string;
+    deliveryAddressNote: string | null;
+    isStudent: boolean;
+    subtotal: number;
+    studentDiscount: number;
+    deliveryFee: number;
+    totalPrice: number;
     events: {
         status: string;
         note: string;

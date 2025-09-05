@@ -28,7 +28,7 @@ const toBase64 = (str: string) =>
 
 export default function NotFound() {
   return (
-    <div className="flex min-h-[calc(100vh-10rem)] items-center justify-center bg-muted p-4 text-center">
+    <div className="flex min-h-[calc(100dvh-10rem)] items-center justify-center bg-background p-4 text-center">
       <div className="flex flex-col items-center">
         <Image
           src="https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxlbXB0eSUyMGJveHxlbnwwfHx8fDE3NTY1NDg1MzJ8MA&ixlib=rb-4.1.0&q=80&w=1080"

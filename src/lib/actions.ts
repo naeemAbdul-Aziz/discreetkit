@@ -12,6 +12,7 @@ import {answerQuestions} from '@/ai/flows/answer-questions';
 import {revalidatePath} from 'next/cache';
 import {type CartItem} from '@/hooks/use-cart';
 import {getSupabaseAdminClient} from './supabase';
+import { discounts } from './data';
 
 const orderSchema = z.object({
   cartItems: z.string().min(1, 'Cart cannot be empty.'),
@@ -68,6 +69,8 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     const code = generateTrackingCode();
     const finalDeliveryArea =
       deliveryArea === 'Other' ? otherDeliveryArea : deliveryArea;
+    
+    const isStudent = discounts.some(d => d.campus === finalDeliveryArea);
 
     const priceDetails = {
       subtotal: parseFloat(validatedFields.data.subtotal),
@@ -86,6 +89,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
         delivery_area: finalDeliveryArea,
         delivery_address_note: validatedFields.data.deliveryAddressNote,
         phone_masked: validatedFields.data.phone_masked,
+        is_student: isStudent,
         ...priceDetails,
       })
       .select('id')
@@ -110,7 +114,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     console.error('Supabase Error:', error);
     return {
       message: 'Failed to create order due to a database error. Please try again.',
-      success: false_color,
+      success: false,
       code: null,
     };
   }
@@ -128,11 +132,7 @@ export async function getOrderAction(code: string): Promise<Order | null> {
     .from('orders')
     .select(
       `
-      id,
-      code,
-      items,
-      status,
-      created_at,
+      *,
       order_events (
         status,
         note,
@@ -149,16 +149,19 @@ export async function getOrderAction(code: string): Promise<Order | null> {
   }
 
   const items = order.items as CartItem[];
-  const firstItem =
-    items.length > 0 ? items[0] : {name: 'N/A', quantity: 0};
-
+  
   return {
     id: order.id.toString(),
     code: order.code,
-    productName: `${firstItem.name} (x${firstItem.quantity})${
-      items.length > 1 ? ` and ${items.length - 1} other(s)` : ''
-    }`,
     status: order.status,
+    items: items,
+    deliveryArea: order.delivery_area,
+    deliveryAddressNote: order.delivery_address_note,
+    isStudent: order.is_student,
+    subtotal: order.subtotal,
+    studentDiscount: order.student_discount,
+    deliveryFee: order.delivery_fee,
+    totalPrice: order.total_price,
     events: order.order_events
       .map(e => ({
         status: e.status,

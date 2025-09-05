@@ -1,9 +1,10 @@
+
 'use client';
 
-import {useState, useEffect, useTransition, Suspense} from 'react';
-import {useSearchParams} from 'next/navigation';
-import {Button} from '@/components/ui/button';
-import {Input} from '@/components/ui/input';
+import { useState, useEffect, useTransition, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Card,
   CardContent,
@@ -11,9 +12,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {getOrderAction} from '@/lib/actions';
-import {type Order} from '@/lib/data';
-import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
+import { getOrderAction } from '@/lib/actions';
+import { type Order } from '@/lib/data';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   AlertCircle,
   CheckCircle,
@@ -22,14 +23,40 @@ import {
   Search,
   Truck,
   Server,
+  PackageCheck,
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Separator } from '@/components/ui/separator';
 
-const statusIcons = {
-  received: <Package className="h-6 w-6" />,
-  processing: <Server className="h-6 w-6" />,
-  out_for_delivery: <Truck className="h-6 w-6" />,
-  completed: <CheckCircle className="h-6 w-6" />,
+const statusMap = {
+  received: {
+    icon: Package,
+    label: 'Received',
+    description: 'We have your order and are preparing it for processing.',
+  },
+  processing: {
+    icon: Server,
+    label: 'Processing',
+    description: 'Your order is being processed at our facility.',
+  },
+  out_for_delivery: {
+    icon: Truck,
+    label: 'Out for Delivery',
+    description: 'Your package is on its way to you.',
+  },
+  completed: {
+    icon: PackageCheck,
+    label: 'Completed',
+    description: 'Your order has been successfully delivered.',
+  },
 };
+
+const allStatuses: (keyof typeof statusMap)[] = [
+  'received',
+  'processing',
+  'out_for_delivery',
+  'completed',
+];
 
 function Tracker() {
   const searchParams = useSearchParams();
@@ -60,9 +87,13 @@ function Tracker() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const currentStatusIndex = order
+    ? allStatuses.indexOf(order.status)
+    : -1;
+
   return (
     <div className="w-full max-w-2xl">
-      <Card className="shadow-sm rounded-2xl">
+      <Card className="rounded-2xl shadow-lg">
         <CardHeader>
           <CardTitle>Track Your Order</CardTitle>
           <CardDescription>
@@ -73,10 +104,11 @@ function Tracker() {
           <form onSubmit={handleSearch} className="flex items-center gap-2">
             <Input
               value={code}
-              onChange={e => setCode(e.target.value)}
+              onChange={(e) => setCode(e.target.value)}
               placeholder="e.g., A9K-X3P-7Q"
               className="flex-1"
               disabled={isPending}
+              aria-label="Tracking Code"
             />
             <Button type="submit" disabled={isPending || !code}>
               {isPending ? (
@@ -99,7 +131,7 @@ function Tracker() {
       )}
 
       {isPending && !order && (
-        <Card className="mt-4 shadow-sm rounded-2xl">
+        <Card className="mt-4 rounded-2xl shadow-lg">
           <CardContent className="pt-6">
             <div className="flex items-center justify-center space-x-2">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -110,45 +142,124 @@ function Tracker() {
       )}
 
       {order && (
-        <Card className="mt-4 shadow-sm rounded-2xl">
-          <CardHeader>
-            <div className="flex items-center gap-4">
-              <div className="text-green-600">
-                {statusIcons[order.status]}
-              </div>
-              <div>
-                <CardTitle>
-                  Order Status:{' '}
-                  <span className="capitalize">
-                    {order.status.replace(/_/g, ' ')}
-                  </span>
-                </CardTitle>
-                <CardDescription>Product: {order.productName}</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="relative pl-6">
-              <div
-                className="absolute left-0 top-0 h-full w-0.5 bg-border -translate-x-1/2"
-                aria-hidden="true"
-              />
-              {order.events
-                .slice()
-                .reverse()
-                .map((event, index) => (
-                  <div key={index} className="relative mb-8">
-                    <div className="absolute -left-6 top-1.5 h-3 w-3 rounded-full bg-green-500 -translate-x-1/2" />
-                    <p className="font-semibold">{event.status}</p>
-                    <p className="text-sm text-muted-foreground">{event.note}</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {new Date(event.date).toLocaleString()}
+        <div className="mt-4 space-y-4">
+          <Card className="rounded-2xl shadow-lg">
+            <CardHeader>
+              <CardTitle>Order Status</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                {allStatuses.map((status, index) => (
+                  <div key={status} className="relative flex flex-col items-center justify-center w-full">
+                    <div
+                      className={cn(
+                        "relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2",
+                        index <= currentStatusIndex
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border bg-background text-muted-foreground"
+                      )}
+                    >
+                      {React.createElement(statusMap[status].icon, { className: 'h-5 w-5' })}
+                    </div>
+                     <p className={cn("mt-2 text-xs text-center font-medium", index <= currentStatusIndex ? "text-foreground" : "text-muted-foreground")}>
+                        {statusMap[status].label}
                     </p>
+                    {index < allStatuses.length - 1 && (
+                      <div className="absolute left-1/2 top-5 h-0.5 w-full bg-border">
+                        <div
+                          className={cn(
+                            "absolute left-0 top-0 h-full bg-primary transition-all duration-500",
+                            index < currentStatusIndex ? 'w-full' : 'w-0'
+                          )}
+                        />
+                      </div>
+                    )}
                   </div>
                 ))}
-            </div>
-          </CardContent>
-        </Card>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-2xl shadow-lg">
+            <CardHeader>
+                <CardTitle>Order Summary</CardTitle>
+                <CardDescription>
+                    Details of your confidential order.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="space-y-4">
+                  {order.items.map(item => (
+                    <div key={item.id} className="flex justify-between items-start">
+                      <div>
+                        <p className="font-semibold">{item.name}</p>
+                        <p className="text-sm text-muted-foreground">Quantity: {item.quantity}</p>
+                      </div>
+                       <p className="font-medium">
+                          GHS {(order.isStudent && item.studentPriceGHS ? item.studentPriceGHS : item.priceGHS).toFixed(2)}
+                       </p>
+                    </div>
+                  ))}
+                  <Separator />
+                   <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                            <p className="text-muted-foreground">Subtotal</p>
+                            <p className="font-medium text-foreground">GHS {order.subtotal.toFixed(2)}</p>
+                        </div>
+                    {order.studentDiscount > 0 && (
+                        <div className="flex justify-between text-success">
+                            <p>Student Discount</p>
+                            <p className="font-medium">- GHS {order.studentDiscount.toFixed(2)}</p>
+                        </div>
+                        )}
+                        <div className="flex justify-between">
+                            <p className="text-muted-foreground">Delivery Fee</p>
+                            <p className="font-medium text-foreground">GHS {order.deliveryFee.toFixed(2)}</p>
+                        </div>
+                    </div>
+                  <Separator />
+                   <div className="flex items-baseline justify-between font-bold text-base">
+                        <p>Total</p>
+                        <p>GHS {order.totalPrice.toFixed(2)}</p>
+                    </div>
+                </div>
+            </CardContent>
+          </Card>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card className="rounded-2xl shadow-lg">
+                <CardHeader>
+                    <CardTitle>Delivery Details</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-2 text-sm">
+                        <p className="font-semibold text-foreground">{order.deliveryArea}</p>
+                        {order.deliveryAddressNote && (
+                            <p className="text-muted-foreground italic">Note: "{order.deliveryAddressNote}"</p>
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
+            <Card className="rounded-2xl shadow-lg">
+                <CardHeader>
+                    <CardTitle>Event History</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-4">
+                        {order.events.map((event, index) => (
+                        <div key={index} className="relative text-sm">
+                            <p className="font-semibold">{event.status}</p>
+                            <p className="text-muted-foreground">{event.note}</p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                            {new Date(event.date).toLocaleString()}
+                            </p>
+                        </div>
+                        ))}
+                    </div>
+                </CardContent>
+            </Card>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -164,8 +275,8 @@ function TrackPageLoading() {
 
 export default function TrackPage() {
   return (
-    <div className="bg-muted">
-      <div className="container mx-auto flex justify-center px-4 py-12 md:px-6 md:py-24">
+    <div className="bg-background">
+      <div className="container mx-auto flex min-h-[calc(100dvh-10rem)] justify-center px-4 py-12 md:px-6 md:py-24">
         <Suspense fallback={<TrackPageLoading />}>
           <Tracker />
         </Suspense>
