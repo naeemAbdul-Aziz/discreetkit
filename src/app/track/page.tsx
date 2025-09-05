@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useTransition, Suspense } from 'react';
+import React, { useState, useEffect, useTransition, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
