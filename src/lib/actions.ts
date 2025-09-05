@@ -11,7 +11,7 @@ import { generateTrackingCode, type Order } from './data';
 import { answerQuestions } from '@/ai/flows/answer-questions';
 import { revalidatePath } from 'next/cache';
 import { type CartItem } from '@/hooks/use-cart';
-import { supabaseAdmin } from './supabase';
+import { getSupabaseAdminClient } from './supabase';
 
 const orderSchema = z.object({
   cartItems: z.string().min(1, 'Cart cannot be empty.'),
@@ -35,6 +35,7 @@ const orderSchema = z.object({
  * @returns An object containing the success status, a message, any validation errors, and the new order code.
  */
 export async function createOrderAction(prevState: any, formData: FormData) {
+  const supabaseAdmin = getSupabaseAdminClient();
   const validatedFields = orderSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (!validatedFields.success) {
@@ -51,7 +52,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     return {
       errors: { otherDeliveryArea: ['Please specify your delivery area.'] },
       message: 'Error: Please specify your delivery area.',
-      success: false,
+      success: false_color,
       code: null,
     };
   }
@@ -118,6 +119,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
  * @returns The order object if found, otherwise null.
  */
 export async function getOrderAction(code: string): Promise<Order | null> {
+  const supabaseAdmin = getSupabaseAdminClient();
   const { data: order, error } = await supabaseAdmin
     .from('orders')
     .select(
