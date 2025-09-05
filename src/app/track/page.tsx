@@ -33,7 +33,7 @@ export const dynamic = 'force-dynamic';
 const statusMap = {
   received: {
     icon: Package,
-    label: 'Received',
+    label: 'Order Received',
     description: 'We have your order and are preparing it for processing.',
   },
   processing: {
@@ -150,34 +150,41 @@ function Tracker() {
               <CardTitle>Order Status</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center justify-between">
-                {allStatuses.map((status, index) => (
-                  <div key={status} className="relative flex flex-col items-center justify-center w-full">
-                    <div
-                      className={cn(
-                        "relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2",
-                        index <= currentStatusIndex
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-border bg-background text-muted-foreground"
-                      )}
-                    >
-                      {React.createElement(statusMap[status].icon, { className: 'h-5 w-5' })}
-                    </div>
-                     <p className={cn("mt-2 text-xs text-center font-medium", index <= currentStatusIndex ? "text-foreground" : "text-muted-foreground")}>
-                        {statusMap[status].label}
-                    </p>
-                    {index < allStatuses.length - 1 && (
-                      <div className="absolute left-1/2 top-5 h-0.5 w-full bg-border">
+              <div className="relative space-y-8 pl-12">
+                {allStatuses.map((status, index) => {
+                  const isCompleted = index <= currentStatusIndex;
+                  const isCurrent = index === currentStatusIndex;
+                  return (
+                    <div key={status} className="relative flex items-start">
+                      <div
+                        className={cn(
+                          'absolute -left-12 -top-1 flex h-10 w-10 items-center justify-center rounded-full',
+                          isCompleted ? 'bg-success text-success-foreground' : 'bg-muted text-muted-foreground'
+                        )}
+                      >
+                        {isCompleted ? (
+                          <CheckCircle className="h-5 w-5" />
+                        ) : (
+                          React.createElement(statusMap[status].icon, { className: 'h-5 w-5' })
+                        )}
+                      </div>
+                      {index < allStatuses.length - 1 && (
                         <div
                           className={cn(
-                            "absolute left-0 top-0 h-full bg-primary transition-all duration-500",
-                            index < currentStatusIndex ? 'w-full' : 'w-0'
+                            'absolute -left-[5px] top-10 h-full w-0.5',
+                            index < currentStatusIndex ? 'bg-success' : 'bg-border'
                           )}
                         />
+                      )}
+                      <div>
+                        <p className={cn('font-semibold', isCurrent ? 'text-primary' : 'text-foreground')}>
+                          {statusMap[status].label}
+                        </p>
+                        <p className="text-sm text-muted-foreground">{statusMap[status].description}</p>
                       </div>
-                    )}
-                  </div>
-                ))}
+                    </div>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
