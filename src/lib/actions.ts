@@ -1,4 +1,9 @@
 
+/**
+ * @file This file contains all the server actions for the application, which handle
+ * database operations and other server-side logic. These actions are designed to be
+ * securely called from client-side components.
+ */
 'use server';
 
 import { z } from 'zod';
@@ -20,6 +25,15 @@ const orderSchema = z.object({
   totalPrice: z.string(),
 });
 
+/**
+ * Creates a new order in the database.
+ * This action is called from the order form and handles validation,
+ * data insertion, and initial order event creation.
+ *
+ * @param prevState - The previous state of the form, used by `useActionState`.
+ * @param formData - The data submitted from the order form.
+ * @returns An object containing the success status, a message, any validation errors, and the new order code.
+ */
 export async function createOrderAction(prevState: any, formData: FormData) {
   const validatedFields = orderSchema.safeParse(Object.fromEntries(formData.entries()));
 
@@ -97,6 +111,12 @@ export async function createOrderAction(prevState: any, formData: FormData) {
   }
 }
 
+/**
+ * Retrieves an order and its associated events from the database using a tracking code.
+ *
+ * @param code - The unique tracking code for the order.
+ * @returns The order object if found, otherwise null.
+ */
 export async function getOrderAction(code: string): Promise<Order | null> {
   const { data: order, error } = await supabaseAdmin
     .from('orders')
@@ -138,6 +158,13 @@ export async function getOrderAction(code: string): Promise<Order | null> {
   };
 }
 
+/**
+ * Handles the AI chat interaction by calling the Genkit flow.
+ *
+ * @param history - The current chat history.
+ * @param message - The new message from the user.
+ * @returns The AI's response as a string.
+ */
 export async function handleChat(history: { role: 'user' | 'model'; parts: string }[], message: string) {
   'use server';
   try {
