@@ -153,7 +153,6 @@ function Tracker() {
               <div className="relative space-y-8 pl-12">
                 {allStatuses.map((status, index) => {
                   const isCompleted = index <= currentStatusIndex;
-                  const isCurrent = index === currentStatusIndex;
                   return (
                     <div key={status} className="relative flex items-start">
                       <div
@@ -177,7 +176,7 @@ function Tracker() {
                         />
                       )}
                       <div className='pl-12'>
-                        <p className={cn('font-semibold', isCurrent ? 'text-primary' : 'text-foreground')}>
+                        <p className={cn('font-semibold', index === currentStatusIndex ? 'text-primary' : 'text-foreground')}>
                           {statusMap[status].label}
                         </p>
                         <p className="text-sm text-muted-foreground">{statusMap[status].description}</p>
