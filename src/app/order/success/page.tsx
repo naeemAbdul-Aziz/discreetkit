@@ -2,17 +2,18 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle2, Copy, Truck, Home, Plus, Loader2 } from 'lucide-react';
+import { CheckCircle2, Copy, Truck, Home, Plus, Loader2, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 function SuccessContent() {
   const searchParams = useSearchParams();
   const code = searchParams.get('code');
   const { toast } = useToast();
+  const [isCopied, setIsCopied] = useState(false);
 
   if (!code) {
     return (
@@ -37,10 +38,12 @@ function SuccessContent() {
 
   const handleCopy = () => {
     navigator.clipboard.writeText(code);
+    setIsCopied(true);
     toast({
       title: 'Copied to clipboard!',
       description: 'Your tracking code has been copied.',
     });
+    setTimeout(() => setIsCopied(false), 2000);
   };
 
   return (
@@ -58,7 +61,8 @@ function SuccessContent() {
           <div className="mt-2 flex items-center justify-center rounded-lg border bg-muted p-3">
             <p className="text-2xl font-bold tracking-widest text-foreground">{code}</p>
             <Button variant="ghost" size="icon" onClick={handleCopy} className="ml-4">
-              <Copy className="h-5 w-5" />
+              {isCopied ? <Check className="h-5 w-5 text-green-500" /> : <Copy className="h-5 w-5" />}
+              <span className="sr-only">Copy tracking code</span>
             </Button>
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
