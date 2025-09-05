@@ -254,7 +254,7 @@ export const steps: Step[] = [
         'Discounted confirmatory testing at partner hospitals.',
         'A responsible and supportive path to care.'
     ],
-    imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxoZWFsdGhjYXJlJTIwcHJvZmVzc2lvbmFsJTIwY29uc3VsdGluZ3xlbnwwfHx8fDE3NTYzOTU4ODF8MA&ixlib=rb-4.1.0&q=80&w=1080',
+imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxoZWFsdGhjYXJlJTIwcHJvZmVzc2lvbmFsJTIwY29uc3VsdGluZ3xlbnwwfHx8fDE3NTYzOTU4ODF8MA&ixlib=rb-4.1.0&q=80&w=1080',
     imageHint: 'healthcare professional'
   },
 ];
@@ -264,7 +264,7 @@ export type Order = {
   id: string;
   code: string;
   productName: string;
-  status: 'received' | 'processing' | 'out_for_delivery' | 'pickup_ready' | 'completed';
+  status: 'received' | 'processing' | 'out_for_delivery' | 'completed';
   events: { status: string; date: string; note: string }[];
 };
 

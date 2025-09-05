@@ -9,13 +9,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { getOrderAction } from '@/lib/actions';
 import { type Order } from '@/lib/data';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle, CheckCircle, Loader2, Package, Search, Truck } from 'lucide-react';
+import { AlertCircle, CheckCircle, Loader2, Package, Search, Truck, Server } from 'lucide-react';
 
 const statusIcons = {
   received: <Package className="h-6 w-6" />,
-  processing: <Loader2 className="h-6 w-6 animate-spin" />,
+  processing: <Server className="h-6 w-6" />,
   out_for_delivery: <Truck className="h-6 w-6" />,
-  pickup_ready: <Package className="h-6 w-6" />,
   completed: <CheckCircle className="h-6 w-6" />,
 };
 

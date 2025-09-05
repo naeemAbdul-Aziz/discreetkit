@@ -52,7 +52,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     return {
       errors: { otherDeliveryArea: ['Please specify your delivery area.'] },
       message: 'Error: Please specify your delivery area.',
-      success: false_color,
+      success: false,
       code: null,
     };
   }
