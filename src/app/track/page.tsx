@@ -33,7 +33,7 @@ export const dynamic = 'force-dynamic';
 const statusMap = {
   received: {
     icon: Package,
-    label: 'Order Received',
+    label: 'Received',
     description: 'We have your order and are preparing it for processing.',
   },
   processing: {
@@ -99,7 +99,7 @@ function Tracker() {
         <CardHeader>
           <CardTitle>Track Your Order</CardTitle>
           <CardDescription>
-            Enter your unique tracking code to see the status of your delivery.
+            Enter your unique tracking code to view your order status.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -158,7 +158,7 @@ function Tracker() {
                     <div key={status} className="relative flex items-start">
                       <div
                         className={cn(
-                          'absolute -left-12 -top-1 flex h-10 w-10 items-center justify-center rounded-full',
+                          'absolute -left-[5px] top-1 flex h-10 w-10 items-center justify-center rounded-full',
                           isCompleted ? 'bg-success text-success-foreground' : 'bg-muted text-muted-foreground'
                         )}
                       >
@@ -171,12 +171,12 @@ function Tracker() {
                       {index < allStatuses.length - 1 && (
                         <div
                           className={cn(
-                            'absolute -left-[5px] top-10 h-full w-0.5',
+                            'absolute -left-[5px] top-12 h-full w-0.5',
                             index < currentStatusIndex ? 'bg-success' : 'bg-border'
                           )}
                         />
                       )}
-                      <div>
+                      <div className='pl-12'>
                         <p className={cn('font-semibold', isCurrent ? 'text-primary' : 'text-foreground')}>
                           {statusMap[status].label}
                         </p>
@@ -242,9 +242,13 @@ function Tracker() {
                 </CardHeader>
                 <CardContent>
                     <div className="space-y-2 text-sm">
+                        <p className="font-medium text-muted-foreground">Delivery Location</p>
                         <p className="font-semibold text-foreground">{order.deliveryArea}</p>
                         {order.deliveryAddressNote && (
-                            <p className="text-muted-foreground italic">Note: "{order.deliveryAddressNote}"</p>
+                            <>
+                                <p className="font-medium text-muted-foreground pt-2">Note for Rider</p>
+                                <p className="text-foreground italic">"{order.deliveryAddressNote}"</p>
+                            </>
                         )}
                     </div>
                 </CardContent>
