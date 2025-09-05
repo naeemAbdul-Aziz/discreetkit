@@ -51,4 +51,9 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+  
+  /* Ensure form elements and buttons inherit the body font */
+  input, button, textarea, select {
+    @apply font-body;
+  }
 }
