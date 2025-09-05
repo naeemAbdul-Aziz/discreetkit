@@ -1,4 +1,3 @@
-
 /**
  * @file This file sets up the Supabase clients for server-side and client-side use.
  *
@@ -10,12 +9,14 @@
  * are set, throwing an error during initialization if any are missing. This prevents
  * runtime errors from invalid client configurations.
  */
+import { config } from 'dotenv';
+config(); // Load environment variables from .env file
 
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.SUPABASE_URL!;
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY!;
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
 
 // Check for missing environment variables
 if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceKey) {
