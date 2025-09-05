@@ -67,7 +67,7 @@ export function CoverageMap() {
   const mapUrl = buildMapUrl();
 
   return (
-    <section className="bg-background py-12 md:py-24">
+    <section className="bg-muted py-12 md:py-24">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center">
           <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground sm:text-4xl">
