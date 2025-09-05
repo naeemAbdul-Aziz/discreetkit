@@ -34,7 +34,7 @@ const statusMap = {
   received: {
     icon: Package,
     label: 'Received',
-    description: 'We have your order and are preparing it for processing.',
+    description: 'We have your order and are preparing it.',
   },
   processing: {
     icon: Server,
@@ -150,33 +150,30 @@ function Tracker() {
               <CardTitle>Order Status</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="relative space-y-8 pl-12">
+              <div className="space-y-0">
                 {allStatuses.map((status, index) => {
                   const isCompleted = index <= currentStatusIndex;
+                  const isCurrent = index === currentStatusIndex;
+
                   return (
-                    <div key={status} className="relative flex items-start">
-                      <div
-                        className={cn(
-                          'absolute -left-[5px] top-1 flex h-10 w-10 items-center justify-center rounded-full',
-                          isCompleted ? 'bg-success text-success-foreground' : 'bg-muted text-muted-foreground'
-                        )}
-                      >
-                        {isCompleted ? (
-                          <CheckCircle className="h-5 w-5" />
-                        ) : (
-                          React.createElement(statusMap[status].icon, { className: 'h-5 w-5' })
-                        )}
-                      </div>
-                      {index < allStatuses.length - 1 && (
+                    <div key={status} className="flex gap-4">
+                      {/* Timeline column */}
+                      <div className="flex flex-col items-center">
                         <div
                           className={cn(
-                            'absolute -left-[5px] top-12 h-full w-0.5',
-                            index < currentStatusIndex ? 'bg-success' : 'bg-border'
+                            'flex h-10 w-10 items-center justify-center rounded-full border-2',
+                            isCompleted ? 'border-success bg-success text-success-foreground' : 'border-border bg-muted text-muted-foreground'
                           )}
-                        />
-                      )}
-                      <div className='pl-12'>
-                        <p className={cn('font-semibold', index === currentStatusIndex ? 'text-primary' : 'text-foreground')}>
+                        >
+                          {React.createElement(statusMap[status].icon, { className: 'h-5 w-5' })}
+                        </div>
+                        {index < allStatuses.length - 1 && (
+                          <div className={cn('w-0.5 flex-1', isCompleted ? 'bg-success' : 'bg-border')} />
+                        )}
+                      </div>
+                      {/* Content column */}
+                      <div className={cn("pb-8 pt-2", index === allStatuses.length -1 && "pb-2")}>
+                        <p className={cn('font-semibold', isCurrent ? 'text-primary' : 'text-foreground')}>
                           {statusMap[status].label}
                         </p>
                         <p className="text-sm text-muted-foreground">{statusMap[status].description}</p>
@@ -215,9 +212,9 @@ function Tracker() {
                             <p className="font-medium text-foreground">GHS {order.subtotal.toFixed(2)}</p>
                         </div>
                     {order.studentDiscount > 0 && (
-                        <div className="flex justify-between text-success">
+                        <div className="flex justify-between text-success font-medium">
                             <p>Student Discount</p>
-                            <p className="font-medium">- GHS {order.studentDiscount.toFixed(2)}</p>
+                            <p>- GHS {order.studentDiscount.toFixed(2)}</p>
                         </div>
                         )}
                         <div className="flex justify-between">
