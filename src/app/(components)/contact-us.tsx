@@ -1,11 +1,10 @@
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
-import { Mail, MapPin } from 'lucide-react';
+import { Mail, MapPin, ArrowRight } from 'lucide-react';
 
 const contactInfo = [
   {
@@ -23,50 +22,63 @@ const contactInfo = [
 export function ContactUs() {
   return (
     <section id="contact" className="bg-muted py-12 md:py-24">
-      <div className="container mx-auto max-w-2xl px-4 md:px-6">
-        <div className="grid gap-12 md:grid-cols-1">
-          <Card className="rounded-2xl shadow-sm">
-            <CardHeader>
-                <CardTitle className="font-headline text-3xl font-bold">Get in Touch</CardTitle>
-                 <CardDescription>
-                    Have questions or want to learn more? Send us a message!
-                 </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Your Name</Label>
-                  <Input id="name" placeholder="e.g., John Smith" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Your Email</Label>
-                  <Input id="email" type="email" placeholder="e.g., john.smith@example.com" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="message">Your Message</Label>
-                  <Textarea id="message" placeholder="Enter your message here..." rows={4} />
-                </div>
-                <Button type="submit" className="w-full">
-                  <Mail />
-                  Send Message
-                </Button>
-              </form>
-              <Separator className="my-6" />
-              <div className="space-y-4">
+      <div className="container mx-auto max-w-6xl px-4 md:px-6">
+        <div className="grid gap-12 md:grid-cols-2 md:gap-16 items-center">
+          
+          {/* Left Column: Information */}
+          <div className="space-y-8">
+            <div>
+                <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-primary">
+                    We're Here to Help
+                </p>
+                <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+                    Get in Touch
+                </h2>
+                <p className="mt-4 text-base text-muted-foreground md:text-lg">
+                    Have questions about our products, delivery, or how it works? We're here to provide answers and support.
+                </p>
+            </div>
+            <div className="space-y-6">
                 {contactInfo.map((info) => (
                     <div key={info.title} className="flex items-start gap-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                        <info.icon className="h-5 w-5 text-primary" />
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                        <info.icon className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                        <h4 className="font-semibold">{info.title}</h4>
-                        <p className="text-sm text-muted-foreground">{info.value}</p>
+                        <h4 className="font-semibold text-foreground">{info.title}</h4>
+                        <p className="text-base text-muted-foreground">{info.value}</p>
                     </div>
                     </div>
                 ))}
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
+
+          {/* Right Column: Form */}
+          <div>
+            <Card className="rounded-2xl shadow-lg p-4 sm:p-8 bg-card">
+              <CardContent className="p-0">
+                <form className="space-y-6">
+                    <div className="space-y-2">
+                    <Label htmlFor="name">Your Name</Label>
+                    <Input id="name" placeholder="e.g., Jane Doe" />
+                    </div>
+                    <div className="space-y-2">
+                    <Label htmlFor="email">Your Email</Label>
+                    <Input id="email" type="email" placeholder="e.g., jane.doe@example.com" />
+                    </div>
+                    <div className="space-y-2">
+                    <Label htmlFor="message">Your Message</Label>
+                    <Textarea id="message" placeholder="Enter your message here..." rows={5} />
+                    </div>
+                    <Button type="submit" className="w-full" size="lg">
+                        Send Message
+                        <ArrowRight />
+                    </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+
         </div>
       </div>
     </section>
