@@ -35,7 +35,7 @@ export function ContactUs() {
                     Get in Touch
                 </h2>
                 <p className="mt-4 text-base text-muted-foreground md:text-lg">
-                    Have questions about our products, delivery, or how it works? We're here to provide answers and support.
+                    Have questions about our products, delivery, or how it works? Interested in partnership opportunities? We're here to provide answers and support.
                 </p>
             </div>
             <div className="space-y-6">
