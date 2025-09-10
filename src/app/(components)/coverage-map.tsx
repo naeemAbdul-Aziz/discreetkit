@@ -37,7 +37,7 @@ const buildMapUrl = () => {
     const height = 720;
     
     if (!MAPBOX_TOKEN) {
-        return "https://picsum.photos/1280/720";
+        return "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756534570/ghana-map-placeholder_qzcvf3.png";
     }
 
     return `https://api.mapbox.com/styles/v1/mapbox/${MAP_STYLE}/static/${overlays}/${centerLon},${centerLat},${zoom}/${width}x${height}@2x?access_token=${MAPBOX_TOKEN}`;
