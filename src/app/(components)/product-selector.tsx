@@ -45,7 +45,7 @@ export function ProductSelector() {
             <div className="lg:col-span-1">
                  <div className="text-center lg:text-left">
                     <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-                        Choose Your Kit
+                        WHO-Approved Kits You Can Trust
                     </h2>
                     <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground">
                         All our kits are WHO-approved, ensuring you get reliable results with complete privacy.
