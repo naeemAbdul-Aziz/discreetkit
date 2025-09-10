@@ -17,7 +17,6 @@ import { type Order } from '@/lib/data';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   AlertCircle,
-  CheckCircle,
   Loader2,
   Package,
   Search,
@@ -27,6 +26,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
+import { getSupabaseClient } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
 
@@ -88,6 +88,39 @@ function Tracker() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Set up Supabase real-time subscription
+  useEffect(() => {
+    if (!order) return;
+
+    const supabase = getSupabaseClient();
+    const channel = supabase
+      .channel(`orders:code=eq.${order.code}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'orders',
+          filter: `code=eq.${order.code}`,
+        },
+        (payload) => {
+          // When an update is received, re-fetch the order data to get events
+          startTransition(async () => {
+              const result = await getOrderAction(order.code);
+              if (result) {
+                  setOrder(result);
+              }
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [order]);
+
 
   const currentStatusIndex = order
     ? allStatuses.indexOf(order.status)
@@ -153,8 +186,7 @@ function Tracker() {
               <div className="space-y-0">
                 {allStatuses.map((status, index) => {
                   const isCompleted = index <= currentStatusIndex;
-                  const isCurrent = index === currentStatusIndex;
-
+                  
                   return (
                     <div key={status} className="flex gap-4">
                       {/* Timeline column */}
@@ -173,7 +205,7 @@ function Tracker() {
                       </div>
                       {/* Content column */}
                       <div className={cn("pb-8 pt-2", index === allStatuses.length -1 && "pb-2")}>
-                        <p className={cn('font-semibold', isCurrent ? 'text-primary' : 'text-foreground')}>
+                        <p className={cn('font-semibold', index === currentStatusIndex ? 'text-primary' : 'text-foreground')}>
                           {statusMap[status].label}
                         </p>
                         <p className="text-sm text-muted-foreground">{statusMap[status].description}</p>
@@ -293,3 +325,5 @@ export default function TrackPage() {
     </div>
   );
 }
+
+    
