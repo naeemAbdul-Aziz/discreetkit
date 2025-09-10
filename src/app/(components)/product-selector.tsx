@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { ArrowRight, Plus, Minus } from 'lucide-react';
 import { useCart } from '@/hooks/use-cart';
 import { useState, useEffect } from 'react';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -40,84 +41,101 @@ export function ProductSelector() {
   return (
     <section id="products" className="bg-background py-12 md:py-24">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="mb-12 text-center">
-            <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-                Choose Your Kit
-            </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground">
-                All our kits are WHO-approved, ensuring you get reliable results with complete privacy.
-            </p>
-        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="md:pr-8">
+                <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+                    Choose Your Kit
+                </h2>
+                <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground">
+                    All our kits are WHO-approved, ensuring you get reliable results with complete privacy.
+                </p>
+            </div>
 
-        <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {products.map((product) => {
-            const quantity = getItemQuantity(product.id);
-            return (
-                <Card
-                key={product.id}
-                className="flex h-full flex-col overflow-hidden rounded-2xl shadow-sm"
+            <div className="w-full">
+                <Carousel
+                    opts={{
+                        align: 'start',
+                        loop: true,
+                    }}
+                    className="w-full"
                 >
-                    <CardContent className="flex flex-grow flex-col p-0">
-                    <div className="relative aspect-square overflow-hidden bg-muted p-4">
-                        <Image
-                        src={product.imageUrl}
-                        alt={product.name}
-                        fill
-                        className="object-contain transition-transform duration-300"
-                        data-ai-hint="medical test kit"
-                        placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 400))}`}
-                        />
-                    </div>
-                    <div className="flex flex-grow flex-col p-6">
-                        <h3 className="flex-grow text-base font-semibold md:text-lg">{product.name}</h3>
-                        <p className="mt-1 h-12 text-sm text-muted-foreground">{product.description}</p>
-                        <div className="mt-4 flex items-center justify-between border-t pt-4">
-                            <div>
-                                {product.studentPriceGHS && (
-                                    <>
-                                        <p className="font-bold text-success text-lg">GHS {product.studentPriceGHS.toFixed(2)}</p>
-                                        <p className="text-muted-foreground/80 line-through text-xs">
-                                            GHS {product.priceGHS.toFixed(2)}
-                                        </p>
-                                    </>
-                                ) || (
-                                    <p className="text-lg font-semibold">GHS {product.priceGHS.toFixed(2)}</p>
-                                )}
-                            </div>
-                           
-                            {isMounted && quantity > 0 ? (
-                                 <div className="flex h-10 items-center justify-between rounded-full border border-primary/50 bg-background p-1 shadow-sm">
-                                    <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8 rounded-full text-primary transition-colors hover:bg-primary/10"
-                                    onClick={() => updateQuantity(product.id, quantity - 1)}
-                                    aria-label={`Decrease quantity of ${product.name}`}
+                    <CarouselContent className="-ml-4">
+                        {products.map((product) => {
+                        const quantity = getItemQuantity(product.id);
+                        return (
+                             <CarouselItem key={product.id} className="pl-4 md:basis-1/2 lg:basis-2/3">
+                                <div className="p-1">
+                                    <Card
+                                    className="flex h-full flex-col overflow-hidden rounded-2xl shadow-sm"
                                     >
-                                    <Minus className="h-4 w-4" />
-                                    </Button>
-                                    <span className="w-5 text-center font-bold text-foreground">{quantity}</span>
-                                    <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8 rounded-full text-primary transition-colors hover:bg-primary/10"
-                                    onClick={() => updateQuantity(product.id, quantity + 1)}
-                                    aria-label={`Increase quantity of ${product.name}`}
-                                    >
-                                    <Plus className="h-4 w-4" />
-                                    </Button>
+                                        <CardContent className="flex flex-grow flex-col p-0">
+                                        <div className="relative aspect-square overflow-hidden bg-muted p-4">
+                                            <Image
+                                            src={product.imageUrl}
+                                            alt={product.name}
+                                            fill
+                                            className="object-contain transition-transform duration-300"
+                                            data-ai-hint="medical test kit"
+                                            placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 400))}`}
+                                            />
+                                        </div>
+                                        <div className="flex flex-grow flex-col p-6">
+                                            <h3 className="flex-grow text-base font-semibold md:text-lg">{product.name}</h3>
+                                            <p className="mt-1 h-12 text-sm text-muted-foreground">{product.description}</p>
+                                            <div className="mt-4 flex items-center justify-between border-t pt-4">
+                                                <div>
+                                                    {product.studentPriceGHS && (
+                                                        <>
+                                                            <p className="font-bold text-success text-lg">GHS {product.studentPriceGHS.toFixed(2)}</p>
+                                                            <p className="text-muted-foreground/80 line-through text-xs">
+                                                                GHS {product.priceGHS.toFixed(2)}
+                                                            </p>
+                                                        </>
+                                                    ) || (
+                                                        <p className="text-lg font-semibold">GHS {product.priceGHS.toFixed(2)}</p>
+                                                    )}
+                                                </div>
+                                            
+                                                {isMounted && quantity > 0 ? (
+                                                    <div className="flex h-10 items-center justify-between rounded-full border border-primary/50 bg-background p-1 shadow-sm">
+                                                        <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8 rounded-full text-primary transition-colors hover:bg-primary/10"
+                                                        onClick={() => updateQuantity(product.id, quantity - 1)}
+                                                        aria-label={`Decrease quantity of ${product.name}`}
+                                                        >
+                                                        <Minus className="h-4 w-4" />
+                                                        </Button>
+                                                        <span className="w-5 text-center font-bold text-foreground">{quantity}</span>
+                                                        <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8 rounded-full text-primary transition-colors hover:bg-primary/10"
+                                                        onClick={() => updateQuantity(product.id, quantity + 1)}
+                                                        aria-label={`Increase quantity of ${product.name}`}
+                                                        >
+                                                        <Plus className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                ) : (
+                                                    <Button onClick={() => addItem(product)} variant="outline" className="rounded-full">
+                                                        Add to Cart <Plus className="ml-2 h-4 w-4" />
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        </div>
+                                        </CardContent>
+                                    </Card>
                                 </div>
-                            ) : (
-                                <Button onClick={() => addItem(product)} variant="outline" className="rounded-full">
-                                    Add to Cart <Plus className="ml-2 h-4 w-4" />
-                                </Button>
-                            )}
-                        </div>
-                    </div>
-                    </CardContent>
-                </Card>
-            )
-          })}
+                            </CarouselItem>
+                        )
+                        })}
+                    </CarouselContent>
+                    <CarouselPrevious className="hidden sm:flex -left-4" />
+                    <CarouselNext className="hidden sm:flex -right-4" />
+                </Carousel>
+            </div>
         </div>
       </div>
     </section>
