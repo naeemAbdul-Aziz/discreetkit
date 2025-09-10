@@ -2,47 +2,6 @@
 import { CheckCircle } from 'lucide-react';
 import Image from 'next/image';
 
-const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
-const MAP_STYLE = 'light-v11'; 
-
-// Lng,Lat for key locations
-const locations = {
-  accra: [-0.1870, 5.6037],
-  kumasi: [-1.6244, 6.6886],
-  capeCoast: [-1.2466, 5.1053],
-  legon: [-0.1876, 5.6507],
-  upsa: [-0.1850, 5.6400],
-  gimpa: [-0.2458, 5.6264],
-};
-
-const buildMapUrl = () => {
-    // Custom markers: pin-s-building for cities (primary color), pin-s-college for campuses (accent color)
-    const primaryColor = '200,85,45'.replace(/%/g, '').replace(/ /g, ','); // Vibrant Ocean Blue
-    const accentColor = '30,90,55'.replace(/%/g, '').replace(/ /g, ','); // Energetic Sunset Orange
-    
-    const cityMarker = `pin-s-building+hsl(${primaryColor})(${locations.accra.join(',')})`;
-    const kumasiMarker = `pin-s-building+hsl(${primaryColor})(${locations.kumasi.join(',')})`;
-    const capeCoastMarker = `pin-s-building+hsl(${primaryColor})(${locations.capeCoast.join(',')})`;
-    const legonMarker = `pin-s-college+hsl(${accentColor})(${locations.legon.join(',')})`;
-    const upsaMarker = `pin-s-college+hsl(${accentColor})(${locations.upsa.join(',')})`;
-    const gimpaMarker = `pin-s-college+hsl(${accentColor})(${locations.gimpa.join(',')})`;
-
-    const overlays = [cityMarker, kumasiMarker, capeCoastMarker, legonMarker, upsaMarker, gimpaMarker].join(',');
-    
-    // Center the map over Ghana
-    const centerLon = -1.0232;
-    const centerLat = 7.5;
-    const zoom = 5.8;
-    const width = 1280;
-    const height = 720;
-    
-    if (!MAPBOX_TOKEN) {
-        return "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756534570/ghana-map-placeholder_qzcvf3.png";
-    }
-
-    return `https://api.mapbox.com/styles/v1/mapbox/${MAP_STYLE}/static/${overlays}/${centerLon},${centerLat},${zoom}/${width}x${height}@2x?access_token=${MAPBOX_TOKEN}`;
-}
-
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <defs>
@@ -64,7 +23,7 @@ const toBase64 = (str: string) =>
 
 
 export function CoverageMap() {
-  const mapUrl = buildMapUrl();
+  const mapUrl = "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756555567/stylized-ghana-map_f2s6xl.png";
 
   return (
     <section className="bg-muted py-12 md:py-24">
@@ -82,10 +41,10 @@ export function CoverageMap() {
            <div className="relative w-full max-w-5xl mx-auto aspect-video overflow-hidden rounded-2xl shadow-xl border">
              <Image 
                 src={mapUrl}
-                alt="Map of Ghana showing DiscreetKit delivery locations including Accra, Kumasi, and Cape Coast"
+                alt="Stylized map of Ghana showing DiscreetKit delivery locations including Accra, Kumasi, and Cape Coast"
                 fill
-                className="object-cover"
-                data-ai-hint="ghana map"
+                className="object-contain p-4 md:p-8"
+                data-ai-hint="ghana map stylized"
                 placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(1280, 720))}`}
              />
              <div className="absolute inset-x-0 bottom-4 flex justify-center">
