@@ -69,7 +69,7 @@ export function Testimonials() {
             plugins={[
                 Autoplay({
                     delay: 5000,
-                    stopOnInteraction: true,
+                    stopOnInteraction: false,
                 })
             ]}
             className="w-full"
