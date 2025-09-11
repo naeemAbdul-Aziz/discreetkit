@@ -65,7 +65,7 @@ export function ProductSelector() {
                         {products.map((product) => {
                         const quantity = getItemQuantity(product.id);
                         return (
-                            <CarouselItem key={product.id} className="pl-4 basis-full sm:basis-1/2">
+                            <CarouselItem key={product.id} className="pl-4 basis-4/5 sm:basis-1/2">
                                 <div className="p-1 h-full">
                                     <Card
                                     className="flex h-full flex-col overflow-hidden rounded-2xl shadow-sm transition-shadow hover:shadow-lg"
