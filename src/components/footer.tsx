@@ -24,6 +24,8 @@ export function Footer() {
       { href: '#', icon: Facebook, label: 'Facebook' },
   ]
 
+  const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757603301/discreetkit_logo_transparent_ihgdsf.png';
+
   return (
     <footer className="border-t bg-primary text-primary-foreground">
       <div className="container mx-auto px-4 py-12 md:px-6">
@@ -32,7 +34,7 @@ export function Footer() {
           <div className="md:col-span-4">
             <Link href="/" className="mb-4 inline-flex items-center space-x-2">
               <Image 
-                src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756391917/discreetKit_tvvwkr.png" 
+                src={logoUrl} 
                 alt="DiscreetKit Logo" 
                 width={160} 
                 height={40} 

@@ -52,6 +52,7 @@ export function Header() {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757603301/discreetkit_logo_transparent_ihgdsf.png';
 
   useEffect(() => {
     setIsMounted(true);
@@ -107,10 +108,11 @@ export function Header() {
             className="absolute left-1/2 hidden -translate-x-1/2 items-center space-x-2 md:flex"
           >
             <Image
-              src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756391917/discreetKit_tvvwkr.png"
+              src={logoUrl}
               alt="DiscreetKit Logo"
               width={160}
               height={40}
+              priority
             />
           </Link>
 
@@ -125,10 +127,11 @@ export function Header() {
           <div className="flex w-full items-center justify-between md:hidden">
             <Link href="/" className="flex items-center space-x-2">
               <Image
-                src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756391917/discreetKit_tvvwkr.png"
+                src={logoUrl}
                 alt="DiscreetKit Logo"
                 width={140}
                 height={35}
+                priority
               />
             </Link>
 
@@ -144,7 +147,7 @@ export function Header() {
                 <SheetContent side="right" className="w-full max-w-sm">
                   <Link href="/" className="flex items-center space-x-2">
                     <Image
-                      src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756391917/discreetKit_tvvwkr.png"
+                      src={logoUrl}
                       alt="DiscreetKit Logo"
                       width={140}
                       height={35}
