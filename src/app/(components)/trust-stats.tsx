@@ -1,8 +1,5 @@
 
-'use client';
-
 import Image from 'next/image';
-import { motion } from 'framer-motion';
 
 const stats = [
   {
@@ -43,12 +40,8 @@ export function TrustStats() {
     <section className="bg-muted py-12 md:py-24">
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid items-center gap-12 md:grid-cols-2 lg:gap-16">
-           <motion.div 
+           <div 
              className="relative flex h-[350px] min-h-[300px] items-center justify-center md:h-[450px]"
-             initial={{ opacity: 0, scale: 0.9 }}
-             whileInView={{ opacity: 1, scale: 1 }}
-             viewport={{ once: true }}
-             transition={{ duration: 0.7 }}
            >
             <div className="absolute right-0 top-0 w-3/4 max-w-[320px] md:w-2/3">
               <Image
@@ -72,7 +65,7 @@ export function TrustStats() {
                 placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
               />
             </div>
-          </motion.div>
+          </div>
           <div className="space-y-8">
             <div>
               <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">

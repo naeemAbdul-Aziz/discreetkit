@@ -11,7 +11,6 @@ import { ArrowRight, Pause, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -175,12 +174,8 @@ export function HowItWorks() {
         {/* Grid for Desktop */}
         <div className="hidden md:grid md:grid-cols-1 gap-16 max-w-5xl mx-auto">
             {steps.map((step, index) => (
-                 <motion.div
+                 <div
                     key={step.number}
-                    initial={{ opacity: 0, y: 50 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.6, delay: index * 0.1 }}
                  >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                         <div className={cn("relative aspect-[4/3] w-full rounded-2xl overflow-hidden shadow-xl", index % 2 === 1 && "md:order-last")}>
@@ -218,7 +213,7 @@ export function HowItWorks() {
                             </div>
                         </div>
                     </div>
-                </motion.div>
+                </div>
             ))}
         </div>
       </div>

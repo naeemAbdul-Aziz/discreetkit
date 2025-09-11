@@ -1,9 +1,6 @@
 
-'use client';
-
 import Image from 'next/image';
 import { Target, ShieldCheck, HeartHandshake } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 const visionPoints = [
   {
@@ -67,13 +64,9 @@ export function OurVision() {
 
         <div className="mt-16 space-y-16 md:space-y-24">
           {visionPoints.map((point, index) => (
-            <motion.div
+            <div
               key={index}
               className="grid items-center gap-8 md:grid-cols-2 md:gap-12"
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.6 }}
             >
               <div className={`relative aspect-square h-full w-full max-w-md justify-self-center md:aspect-[4/3] ${index % 2 === 1 ? 'md:order-2' : ''}`}>
                 <Image
@@ -98,7 +91,7 @@ export function OurVision() {
                     {point.details}
                 </p>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

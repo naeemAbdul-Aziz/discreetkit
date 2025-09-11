@@ -1,8 +1,5 @@
 
-'use client';
-
-import dynamic from 'next/dynamic';
-import { HeroStatic } from './(components)/hero-static';
+import { Hero } from './(components)/hero';
 import { ClosingCta } from './(components)/closing-cta';
 import { Testimonials } from './(components)/testimonials';
 import { Faq } from './(components)/faq';
@@ -15,12 +12,6 @@ import { HowItWorks } from './(components)/how-it-works';
 import { ProductBenefits } from './(components)/product-benefits';
 import { ProductSelector } from './(components)/product-selector';
 import { ContactUs } from './(components)/contact-us';
-
-const Hero = dynamic(() => import('./(components)/hero').then(mod => mod.Hero), {
-    ssr: false,
-    loading: () => <HeroStatic />
-});
-
 
 export default function Home() {
   return (

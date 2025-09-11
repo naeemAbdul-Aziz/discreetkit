@@ -1,44 +1,56 @@
 
-'use client';
-
-import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, BadgeCheck, Star, ShieldCheck, Truck } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { HeroStatic } from './hero-static';
 
 const statCards = [
     {
         icon: BadgeCheck,
         title: '99% Accuracy',
         description: 'WHO-Approved Kits',
-        position: 'top-4 left-4',
-        delay: 0.5,
+        position: 'top-4 left-4 hidden md:block',
     },
     {
         icon: Star,
         title: '4.9 Stars',
         description: 'From 1,600+ Reviews',
-        position: 'bottom-4 -left-8',
-        delay: 0.6,
+        position: 'bottom-4 -left-8 hidden md:block',
     },
     {
         icon: ShieldCheck,
         title: '100% Private',
         description: 'No Names, No Accounts',
-        position: 'top-1/4 -right-10',
-        delay: 0.7,
+        position: 'top-1/4 -right-10 hidden md:block',
     },
     {
         icon: Truck,
         title: 'Fast Delivery',
         description: '24-48 Hours in Accra',
-        position: 'bottom-12 -right-4',
-        delay: 0.8,
+        position: 'bottom-12 -right-4 hidden md:block',
     },
 ];
+
+const shimmer = (w: number, h: number) => `
+<svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <linearGradient id="g">
+      <stop stop-color="#f0f0f0" offset="20%" />
+      <stop stop-color="#e0e0e0" offset="50%" />
+      <stop stop-color="#f0f0f0" offset="70%" />
+    </linearGradient>
+  </defs>
+  <rect width="${w}" height="${h}" fill="#f0f0f0" />
+  <rect id="r" width="${w}" height="${h}" fill="url(#g)" />
+  <animate xlink:href="#r" attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite"  />
+</svg>`;
+
+const toBase64 = (str: string) =>
+  typeof window === 'undefined'
+    ? Buffer.from(str).toString('base64')
+    : window.btoa(str);
+
 
 export function Hero() {
   return (
@@ -47,11 +59,8 @@ export function Hero() {
         <div className="relative">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                 {/* Left Content Column */}
-                <motion.div
+                <div
                     className="text-center md:text-left"
-                    initial={{ opacity: 0, x: -50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.7, delay: 0.2 }}
                 >
                     <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
                         Private Health Answers, <span className="font-light italic text-primary">Delivered Discreetly.</span>
@@ -68,14 +77,11 @@ export function Hero() {
                             </Link>
                         </Button>
                     </div>
-                </motion.div>
+                </div>
 
                 {/* Right Image Column */}
-                <motion.div 
+                <div 
                     className="relative flex items-center justify-center min-h-[350px] md:min-h-[450px]"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.7, delay: 0.4 }}
                 >
                     <Image
                         src="https://res.cloudinary.com/dzfa6wqb8/image/upload/w_500,h_500,c_fill,q_auto,f_auto/v1756313856/woman_smiling_package_g5rnqh.jpg"
@@ -85,16 +91,14 @@ export function Hero() {
                         priority
                         className="object-contain rounded-3xl shadow-2xl z-10 w-full max-w-md h-auto"
                         data-ai-hint="happy woman box"
+                        placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(500, 500))}`}
                     />
 
                     {/* Floating Stat Cards */}
                     {statCards.map((card) => (
-                        <motion.div
+                        <div
                             key={card.title}
                             className={`absolute z-20 ${card.position}`}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: card.delay }}
                         >
                             <Card className="p-3 bg-background/80 backdrop-blur-sm shadow-lg w-40">
                                 <div className="flex items-center gap-2">
@@ -103,9 +107,9 @@ export function Hero() {
                                 </div>
                                 <p className="text-xs text-muted-foreground mt-1">{card.description}</p>
                             </Card>
-                        </motion.div>
+                        </div>
                     ))}
-                </motion.div>
+                </div>
             </div>
         </div>
       </div>
