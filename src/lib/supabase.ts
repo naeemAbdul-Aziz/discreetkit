@@ -31,6 +31,9 @@ let supabaseAdminInstance: SupabaseClient | null = null;
  */
 export function getSupabaseClient(): SupabaseClient {
   if (!supabaseInstance) {
+    if (!supabaseUrl || !supabaseAnonKey) {
+        throw new Error('Missing Supabase URL or Anon Key for public client.');
+    }
     supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
   }
   return supabaseInstance;
@@ -42,10 +45,14 @@ export function getSupabaseClient(): SupabaseClient {
  */
 export function getSupabaseAdminClient(): SupabaseClient {
   if (!supabaseAdminInstance) {
-    if (!supabaseUrl || !supabaseServiceKey) {
+    // These variables are read from the server-side environment.
+    const serverSupabaseUrl = process.env.SUPABASE_URL!;
+    const serverSupabaseServiceKey = process.env.SUPABASE_SERVICE_KEY!;
+    
+    if (!serverSupabaseUrl || !serverSupabaseServiceKey) {
         throw new Error('Missing Supabase URL or Service Key for admin client.');
     }
-    supabaseAdminInstance = createClient(supabaseUrl, supabaseServiceKey, {
+    supabaseAdminInstance = createClient(serverSupabaseUrl, serverSupabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
         persistSession: false,
