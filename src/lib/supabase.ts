@@ -18,9 +18,6 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-// This is the server-side only service key. It should NOT be prefixed.
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY!;
-
 // Singleton instances
 let supabaseInstance: SupabaseClient | null = null;
 let supabaseAdminInstance: SupabaseClient | null = null;
@@ -50,7 +47,7 @@ export function getSupabaseAdminClient(): SupabaseClient {
     const serverSupabaseServiceKey = process.env.SUPABASE_SERVICE_KEY!;
     
     if (!serverSupabaseUrl || !serverSupabaseServiceKey) {
-        throw new Error('Missing Supabase URL or Service Key for admin client.');
+        throw new Error('Missing Supabase URL or Service Key for admin client. Ensure SUPABASE_URL and SUPABASE_SERVICE_KEY are set in your environment variables.');
     }
     supabaseAdminInstance = createClient(serverSupabaseUrl, serverSupabaseServiceKey, {
       auth: {
