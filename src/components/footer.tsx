@@ -24,7 +24,7 @@ export function Footer() {
       { href: '#', icon: Facebook, label: 'Facebook' },
   ]
 
-  const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757603301/discreetkit_logo_transparent_ihgdsf.png';
+  const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757605306/discreetKIT-logo_pgf7vt.png';
 
   return (
     <footer className="border-t bg-primary text-primary-foreground">

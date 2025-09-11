@@ -17,7 +17,7 @@ const figtree = Figtree({
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://discreetkit.com';
-const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757603301/discreetkit_logo_transparent_ihgdsf.png';
+const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757605306/discreetKIT-logo_pgf7vt.png';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
