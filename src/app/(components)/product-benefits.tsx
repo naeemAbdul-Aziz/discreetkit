@@ -1,4 +1,6 @@
 
+'use client';
+
 import { productBenefits } from '@/lib/data';
 import { Card } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
