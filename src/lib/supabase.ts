@@ -43,8 +43,8 @@ export function getSupabaseClient(): SupabaseClient {
 export function getSupabaseAdminClient(): SupabaseClient {
   if (!supabaseAdminInstance) {
     // These variables are read from the server-side environment.
-    const serverSupabaseUrl = process.env.SUPABASE_URL!;
-    const serverSupabaseServiceKey = process.env.SUPABASE_SERVICE_KEY!;
+    const serverSupabaseUrl = process.env.SUPABASE_URL;
+    const serverSupabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
     
     if (!serverSupabaseUrl || !serverSupabaseServiceKey) {
         throw new Error('Missing Supabase URL or Service Key for admin client. Ensure SUPABASE_URL and SUPABASE_SERVICE_KEY are set in your environment variables.');
