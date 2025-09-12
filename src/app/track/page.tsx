@@ -149,9 +149,9 @@ function Tracker() {
               {isPending ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
-                <Search />
+                <Search className="mr-2 h-4 w-4" />
               )}
-              {isPending ? '' : 'Track'}
+              {isPending ? 'Tracking...' : 'Track'}
             </Button>
           </form>
         </CardContent>
@@ -325,5 +325,3 @@ export default function TrackPage() {
     </div>
   );
 }
-
-    

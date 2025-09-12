@@ -49,7 +49,7 @@ function SuccessContent() {
   return (
     <Card className="w-full max-w-lg text-center shadow-lg">
       <CardHeader className="items-center">
-        <CheckCircle2 className="h-16 w-16 text-green-500" />
+        <CheckCircle2 className="h-16 w-16 text-success" />
         <CardTitle className="mt-4 text-3xl">Order Confirmed!</CardTitle>
         <CardDescription className="max-w-md">
           Your order has been successfully placed. Your privacy is our priority, and your details are secure.
