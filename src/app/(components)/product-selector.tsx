@@ -13,6 +13,7 @@ import Link from 'next/link';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { useCart } from '@/hooks/use-cart';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -152,14 +153,16 @@ export function ProductSelector() {
                                         <div className="flex flex-grow flex-col p-4 md:p-6">
                                             <h3 className="flex-grow text-base font-semibold md:text-lg">{product.name}</h3>
                                             <p className="mt-1 min-h-[3rem] text-sm text-muted-foreground">{product.description}</p>
-                                            <div className="mt-4 flex items-center gap-1 text-yellow-500">
-                                                <Star className="h-4 w-4 fill-current" />
-                                                <Star className="h-4 w-4 fill-current" />
-                                                <Star className="h-4 w-4 fill-current" />
-                                                <Star className="h-4 w-4 fill-current" />
-                                                <Star className="h-4 w-4 fill-current" />
-                                                <span className="ml-2 text-xs text-muted-foreground">({product.id === 2 ? 150 : 300} reviews)</span>
+                                            
+                                            {product.id !== 2 && (
+                                            <div className="mt-4 flex items-center gap-2">
+                                                <Badge variant="outline" className="border-green-600/50 bg-green-50/50 text-green-700 font-medium">
+                                                    <Award className="mr-1.5 h-3.5 w-3.5" />
+                                                    WHO-Approved
+                                                </Badge>
                                             </div>
+                                            )}
+
                                             <div className="mt-4 border-t pt-4 flex justify-between items-center">
                                                 <div className="text-right">
                                                 {isStudent && product.studentPriceGHS ? (
