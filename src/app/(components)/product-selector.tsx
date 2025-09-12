@@ -5,7 +5,7 @@ import { products } from '@/lib/data';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ArrowRight, Plus, Minus } from 'lucide-react';
+import { ArrowRight, Plus, Minus, ShieldCheck, Award, Package } from 'lucide-react';
 import { useCart } from '@/hooks/use-cart';
 import { useState, useEffect } from 'react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
@@ -38,18 +38,37 @@ export function ProductSelector() {
         setIsMounted(true);
     }, []);
 
+  const keyFeatures = [
+    { icon: ShieldCheck, text: "100% Private & Anonymous" },
+    { icon: Award, text: "WHO-Approved for 99% Accuracy" },
+    { icon: Package, text: "Discreet, Unbranded Packaging" },
+  ];
+
   return (
     <section id="products" className="bg-background py-12 md:py-24">
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center">
             <div className="lg:col-span-1">
                  <div className="text-center lg:text-left">
+                    <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-primary">
+                        Our Products
+                    </p>
                     <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-                        WHO-Approved Kits You Can Trust
+                        Kits You Can Trust
                     </h2>
                     <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground">
-                        All our kits are WHO-approved, ensuring you get reliable results with complete privacy.
+                        Every self-test kit we provide is selected for its reliability, ease of use, and alignment with our core principles of privacy and trust.
                     </p>
+                    <div className="mt-8 space-y-4">
+                        {keyFeatures.map((feature, index) => (
+                            <div key={index} className="flex items-start gap-3">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 flex-shrink-0">
+                                    <feature.icon className="h-5 w-5 text-primary" />
+                                </div>
+                                <p className="font-medium text-foreground">{feature.text}</p>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
 
