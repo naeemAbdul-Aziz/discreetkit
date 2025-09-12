@@ -30,7 +30,12 @@ function CartLink() {
   }, []);
   
   if (!isMounted) {
-    return <div className="h-10 w-10" />
+    return (
+      <Button variant="ghost" size="icon" className="relative" disabled>
+          <Loader2 className="h-5 w-5 animate-spin" />
+          <span className="sr-only">Loading Cart</span>
+      </Button>
+    )
   }
 
   return (
