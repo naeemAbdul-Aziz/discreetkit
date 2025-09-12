@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -91,7 +92,7 @@ export function ProductSelector() {
                             Private & Reliable
                         </p>
                         <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-                            WHO-Approved Kits You Can Trust
+                            WHO-Approved Test Kits
                         </h2>
                         <p className="mt-4 text-base text-muted-foreground">
                             We've built every part of our service with your <Link href="/privacy" className="text-primary font-medium hover:underline">privacy</Link>, convenience, and well-being in mind.
