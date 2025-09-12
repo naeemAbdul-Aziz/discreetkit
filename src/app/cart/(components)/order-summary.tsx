@@ -6,14 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export function OrderSummary() {
     const { totalItems, subtotal } = useCart(state => ({
         totalItems: state.totalItems,
         subtotal: state.subtotal,
     }));
-    const router = useRouter();
 
     
     return (
@@ -35,9 +34,11 @@ export function OrderSummary() {
                         </div>
                     </div>
                     <Separator />
-                    <Button size="lg" className="w-full" onClick={() => router.push('/order')}>
+                    <Button size="lg" className="w-full" asChild>
+                      <Link href="/order">
                         Proceed to Checkout
                         <ArrowRight />
+                      </Link>
                     </Button>
                 </div>
             </CardContent>
