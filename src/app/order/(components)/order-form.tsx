@@ -30,9 +30,17 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
         className="w-full" 
         size="lg"
         disabled={pending || disabled}>
-      {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-      {pending ? 'Processing...' : 'Proceed to Payment'}
-      {!pending && <ArrowRight />}
+      {pending ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Processing...
+        </>
+      ) : (
+        <>
+          Proceed to Payment
+          <ArrowRight />
+        </>
+      )}
     </Button>
   );
 }
