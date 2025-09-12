@@ -107,7 +107,7 @@ export const products: Product[] = [
     {
         id: 3,
         name: 'Support Bundle (Couple)',
-        description: 'Contains two private HIV self-test kits. Encourages testing together for mutual support.',
+        description: 'Contains two HIV self-test kits. Encourages testing together for mutual support.',
         priceGHS: 140.00,
         imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756312643/couple-kit_h3h1gc.png',
     },
@@ -240,3 +240,4 @@ export const testimonials: Testimonial[] = [
     avatar: "https://i.pravatar.cc/150?img=11"
   },
 ];
+

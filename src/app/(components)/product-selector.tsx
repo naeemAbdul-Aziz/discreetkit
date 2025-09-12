@@ -8,7 +8,7 @@ import { products } from '@/lib/data';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ArrowRight, Plus, Minus, Trash2, ShieldCheck, Award, Truck, Play, Pause, GraduationCap } from 'lucide-react';
+import { ArrowRight, Plus, Minus, Trash2, ShieldCheck, Award, Truck, Play, Pause, GraduationCap, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { useCart } from '@/hooks/use-cart';
@@ -119,18 +119,21 @@ export function ProductSelector() {
                      <Carousel
                         setApi={setApi}
                         opts={{ align: 'start', loop: true }}
-                        plugins={[Autoplay({ delay: 5000, stopOnInteraction: false, stopOnMouseEnter: true })]}
+                        plugins={[Autoplay({ delay: 5000, stopOnInteraction: true, stopOnMouseEnter: true })]}
                         className="w-full"
                     >
                         <CarouselContent>
                         {products.map((product) => {
                             const quantity = isMounted ? getItemQuantity(product.id) : 0;
+                            const isBundle = product.id === 3;
+                            const hasStudentDeal = isStudent && product.studentPriceGHS;
+
                             return (
                             <CarouselItem key={product.id} className="basis-4/5 sm:basis-1/2">
                                 <div className="p-1 h-full">
-                                <Card key={product.id} className="flex h-full flex-col overflow-hidden rounded-2xl shadow-sm transition-shadow hover:shadow-lg">
+                                <Card key={product.id} className={cn("flex h-full flex-col overflow-hidden rounded-2xl shadow-sm transition-shadow hover:shadow-lg", isBundle && "bg-muted", hasStudentDeal && "border-primary border-2")}>
                                     <CardContent className="flex flex-grow flex-col p-0">
-                                        <div className="relative flex aspect-square items-center justify-center overflow-hidden bg-muted">
+                                        <div className="relative flex aspect-square items-center justify-center overflow-hidden">
                                             <Image
                                                 src={product.imageUrl}
                                                 alt={product.name}
@@ -139,43 +142,46 @@ export function ProductSelector() {
                                                 data-ai-hint="medical test kit"
                                                 placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(300, 300))}`}
                                             />
-                                            {isStudent && product.studentPriceGHS && (
-                                                <div className="absolute top-0 right-0 h-16 w-16">
-                                                    <div className="absolute transform rotate-45 bg-success text-center text-success-foreground font-semibold py-1 right-[-34px] top-[32px] w-[170px] shadow-lg">
-                                                        <div className="flex items-center justify-center">
-                                                            <GraduationCap className="h-4 w-4 mr-1" />
-                                                            Student Deal
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            )}
                                         </div>
                                         <div className="flex flex-grow flex-col p-4 md:p-6">
                                             <h3 className="flex-grow text-base font-semibold md:text-lg">{product.name}</h3>
                                             <p className="mt-1 min-h-[3rem] text-sm text-muted-foreground">{product.description}</p>
                                             
-                                            {product.id !== 2 && (
-                                            <div className="mt-4 flex items-center gap-2">
+                                            <div className="mt-4 flex items-center gap-4">
+                                                {!isBundle && (
                                                 <Badge variant="outline" className="border-green-600/50 bg-green-50/50 text-green-700 font-medium">
                                                     <Award className="mr-1.5 h-3.5 w-3.5" />
                                                     WHO-Approved
                                                 </Badge>
+                                                )}
+                                                <div className="flex items-center gap-1.5 text-xs text-green-600 font-medium">
+                                                    <CheckCircle className="h-3.5 w-3.5" />
+                                                    <span>In Stock - Ready to ship</span>
+                                                </div>
                                             </div>
-                                            )}
 
                                             <div className="mt-4 border-t pt-4 flex justify-between items-center">
-                                                <div className="text-right">
-                                                {isStudent && product.studentPriceGHS ? (
+                                                <div className="text-left">
+                                                {hasStudentDeal ? (
                                                         <>
-                                                            <p className="font-bold text-success text-lg">GHS {product.studentPriceGHS.toFixed(2)}</p>
+                                                            <p className="font-bold text-success text-lg">GHS {product.studentPriceGHS?.toFixed(2)}</p>
                                                             <p className="text-muted-foreground/80 line-through text-xs font-normal">
                                                                 GHS {product.priceGHS.toFixed(2)}
                                                             </p>
+                                                            <div className="mt-1 flex items-center gap-1.5 text-xs font-medium text-primary">
+                                                                <GraduationCap className="h-3.5 w-3.5" />
+                                                                <span>Student Discount Applied</span>
+                                                            </div>
                                                         </>
                                                     ) : (
-                                                        <p className="font-bold text-lg text-foreground">
-                                                            GHS {product.priceGHS.toFixed(2)}
-                                                        </p>
+                                                        <>
+                                                            <p className="font-bold text-lg text-foreground">
+                                                                GHS {product.priceGHS.toFixed(2)}
+                                                            </p>
+                                                            {isBundle && (
+                                                                <p className="mt-1 text-xs font-medium text-green-600">Save GHS 10.00 vs. buying two kits separately.</p>
+                                                            )}
+                                                        </>
                                                     )}
                                                 </div>
                                                 <div className="flex items-center gap-2">
@@ -191,7 +197,7 @@ export function ProductSelector() {
                                                         </div>
                                                     ) : (
                                                         <Button onClick={() => addItem(product)} variant="outline" className="rounded-full">
-                                                            Add <Plus className="ml-2 h-4 w-4" />
+                                                            Add to Cart <Plus className="ml-2 h-4 w-4" />
                                                         </Button>
                                                     ))}
                                                 </div>
@@ -204,8 +210,8 @@ export function ProductSelector() {
                             );
                         })}
                         </CarouselContent>
-                         <CarouselPrevious className="left-[-12px] sm:left-[-16px]" />
-                        <CarouselNext className="right-[-12px] sm:right-[-16px]" />
+                         <CarouselPrevious className="left-[-12px] sm:left-[-16px] h-10 w-10" />
+                        <CarouselNext className="right-[-12px] sm:right-[-16px] h-10 w-10" />
                     </Carousel>
                     <div className="flex items-center justify-center gap-4 mt-8">
                         <Button
