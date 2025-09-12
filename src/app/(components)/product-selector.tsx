@@ -8,7 +8,7 @@ import { products } from '@/lib/data';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ArrowRight, Star, Plus, Minus, Trash2, ShieldCheck, Award, Truck, Play, Pause } from 'lucide-react';
+import { ArrowRight, Star, Plus, Minus, Trash2, ShieldCheck, Award, Truck, Play, Pause, GraduationCap } from 'lucide-react';
 import Link from 'next/link';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { useCart } from '@/hooks/use-cart';
@@ -125,7 +125,7 @@ export function ProductSelector() {
                         {products.map((product) => {
                             const quantity = isMounted ? getItemQuantity(product.id) : 0;
                             return (
-                            <CarouselItem key={product.id} className="sm:basis-1/2">
+                            <CarouselItem key={product.id} className="basis-4/5 sm:basis-1/2">
                                 <div className="p-1 h-full">
                                 <Card key={product.id} className="flex h-full flex-col overflow-hidden rounded-2xl shadow-sm transition-shadow hover:shadow-lg">
                                     <CardContent className="flex flex-grow flex-col p-0">
@@ -139,14 +139,19 @@ export function ProductSelector() {
                                                 placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(300, 300))}`}
                                             />
                                             {isStudent && product.studentPriceGHS && (
-                                                <div className="absolute left-3 top-3 rounded-full bg-success px-3 py-1 text-xs font-bold text-success-foreground">
-                                                    Student Deal
+                                                <div className="absolute top-0 right-0 h-16 w-16">
+                                                    <div className="absolute transform rotate-45 bg-success text-center text-success-foreground font-semibold py-1 right-[-34px] top-[32px] w-[170px] shadow-lg">
+                                                        <div className="flex items-center justify-center">
+                                                            <GraduationCap className="h-4 w-4 mr-1" />
+                                                            Student Deal
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             )}
                                         </div>
                                         <div className="flex flex-grow flex-col p-4 md:p-6">
                                             <h3 className="flex-grow text-base font-semibold md:text-lg">{product.name}</h3>
-                                            <p className="mt-1 h-12 text-sm text-muted-foreground">{product.description}</p>
+                                            <p className="mt-1 min-h-[3rem] text-sm text-muted-foreground">{product.description}</p>
                                             <div className="mt-4 flex items-center gap-1 text-yellow-500">
                                                 <Star className="h-4 w-4 fill-current" />
                                                 <Star className="h-4 w-4 fill-current" />
@@ -196,8 +201,8 @@ export function ProductSelector() {
                             );
                         })}
                         </CarouselContent>
-                         <CarouselPrevious className="-left-4" />
-                        <CarouselNext className="-right-4" />
+                         <CarouselPrevious className="left-[-12px] sm:left-[-16px]" />
+                        <CarouselNext className="right-[-12px] sm:right-[-16px]" />
                     </Carousel>
                     <div className="flex items-center justify-center gap-4 mt-8">
                         <Button
