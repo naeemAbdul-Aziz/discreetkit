@@ -8,7 +8,7 @@ import { products } from '@/lib/data';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ArrowRight, Star, Plus, Minus, Trash2, ShieldCheck, Award, Truck, Play, Pause, GraduationCap } from 'lucide-react';
+import { ArrowRight, Plus, Minus, Trash2, ShieldCheck, Award, Truck, Play, Pause, GraduationCap } from 'lucide-react';
 import Link from 'next/link';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { useCart } from '@/hooks/use-cart';
@@ -93,7 +93,7 @@ export function ProductSelector() {
                             Private & Reliable
                         </p>
                         <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-                            WHO-Approved Test Kits
+                           WHO-Approved Test Kits
                         </h2>
                         <p className="mt-4 text-base text-muted-foreground">
                             We've built every part of our service with your <Link href="/privacy" className="text-primary font-medium hover:underline">privacy</Link>, convenience, and well-being in mind.
@@ -237,3 +237,5 @@ export function ProductSelector() {
         </section>
     );
 }
+
+    
