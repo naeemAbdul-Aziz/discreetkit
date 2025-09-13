@@ -23,7 +23,6 @@ const orderSchema = z.object({
   studentDiscount: z.string(),
   deliveryFee: z.string(),
   totalPrice: z.string(),
-  // Add a new field for email
   email: z.string().email({ message: "A valid email is required for payment." }),
 });
 
@@ -103,7 +102,8 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     // 2. Initialize Paystack Transaction
     const paystackSecretKey = process.env.PAYSTACK_SECRET_KEY;
     if (!paystackSecretKey) {
-        throw new Error('Paystack secret key is not configured.');
+        console.error('Paystack secret key is not configured in .env.local');
+        throw new Error('Payment processing is not configured.');
     }
     
     const amountInKobo = Math.round(priceDetails.total_price * 100);
@@ -123,6 +123,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
               order_id: orderData.id,
               tracking_code: code,
             },
+            // The callback_url will be handled by our /verify-payment route
             callback_url: `${process.env.NEXT_PUBLIC_SITE_URL}/verify-payment`
         })
     });
@@ -131,7 +132,9 @@ export async function createOrderAction(prevState: any, formData: FormData) {
 
     if (!paystackResponse.ok || !paystackData.status) {
         console.error('Paystack Error:', paystackData);
-        throw new Error(paystackData.message || 'Failed to initialize Paystack transaction.');
+        // Attempt to delete the pending order if Paystack fails
+        await supabaseAdmin.from('orders').delete().eq('id', orderData.id);
+        throw new Error(paystackData.message || 'Failed to initialize payment transaction.');
     }
 
     revalidatePath('/order');

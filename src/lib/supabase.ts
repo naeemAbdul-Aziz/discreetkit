@@ -29,7 +29,7 @@ let supabaseAdminInstance: SupabaseClient | null = null;
 export function getSupabaseClient(): SupabaseClient {
   if (!supabaseInstance) {
     if (!supabaseUrl || !supabaseAnonKey) {
-        throw new Error('Missing Supabase URL or Anon Key for public client.');
+        throw new Error('Missing Supabase URL or Anon Key for public client. Check your .env.local file.');
     }
     supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
   }
@@ -42,14 +42,13 @@ export function getSupabaseClient(): SupabaseClient {
  */
 export function getSupabaseAdminClient(): SupabaseClient {
   if (!supabaseAdminInstance) {
-    // SECURITY WARNING: Hardcoding keys is not recommended for production.
-    // Replace these with environment variables as soon as possible.
-    const serverSupabaseUrl = "https://xffvvxdtfsxfnkowgdzu.supabase.co";
+    // SECURITY: This key should be loaded from environment variables and never be hardcoded.
+    // It is stored in .env.local which is NOT checked into source control.
+    const serverSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serverSupabaseServiceKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmZnZ2eGR0ZnN4Zm5rb3dnZHp1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjQ2MTM3NywiZXhwIjoyMDcyMDM3Mzc3fQ.YnmKw7BIjl-oKDCbpQVZ60ZvzgNE4nj4EOh2lyGDf4A";
     
     if (!serverSupabaseUrl || !serverSupabaseServiceKey) {
-        // This check is kept in case the hardcoded values are removed later.
-        throw new Error('Missing Supabase URL or Service Key for admin client. Ensure SUPABASE_URL and SUPABASE_SERVICE_KEY are set in your environment variables.');
+        throw new Error('Missing Supabase URL or Service Key for admin client. Ensure NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_KEY are set in your environment.');
     }
     supabaseAdminInstance = createClient(serverSupabaseUrl, serverSupabaseServiceKey, {
       auth: {
