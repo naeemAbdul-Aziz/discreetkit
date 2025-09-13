@@ -36,6 +36,12 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
       {
+        protocol: 'httpss',
+        hostname: 'api.paystack.co',
+        port: '',
+        pathname: '/**',
+      },
+      {
         protocol: 'https',
         hostname: 'api.mapbox.com',
         port: '',

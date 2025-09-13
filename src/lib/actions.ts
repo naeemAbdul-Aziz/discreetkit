@@ -1,4 +1,3 @@
-
 /**
  * @file This file contains all the server actions for the application, which handle
  * database operations and other server-side logic. These actions are designed to be
@@ -12,7 +11,7 @@ import {answerQuestions} from '@/ai/flows/answer-questions';
 import {revalidatePath} from 'next/cache';
 import {type CartItem} from '@/hooks/use-cart';
 import {getSupabaseAdminClient} from './supabase';
-import { discounts } from './data';
+import {discounts} from './data';
 
 const orderSchema = z.object({
   cartItems: z.string().min(1, 'Cart cannot be empty.'),
@@ -24,16 +23,17 @@ const orderSchema = z.object({
   studentDiscount: z.string(),
   deliveryFee: z.string(),
   totalPrice: z.string(),
+  // Add a new field for email
+  email: z.string().email({ message: "A valid email is required for payment." }),
 });
 
 /**
- * Creates a new order in the database.
- * This action is called from the order form and handles validation,
- * data insertion, and initial order event creation.
+ * Creates a new order in the database and initializes a Paystack transaction.
+ * This action is called from the order form.
  *
  * @param prevState - The previous state of the form, used by `useActionState`.
  * @param formData - The data submitted from the order form.
- * @returns An object containing the success status, a message, any validation errors, and the new order code.
+ * @returns An object containing success status, a message, any validation errors, and the Paystack authorization URL.
  */
 export async function createOrderAction(prevState: any, formData: FormData) {
   const supabaseAdmin = getSupabaseAdminClient();
@@ -46,7 +46,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
       errors: validatedFields.error.flatten().fieldErrors,
       message: 'Error: Please check the form fields.',
       success: false,
-      code: null,
+      authorization_url: null,
     };
   }
 
@@ -56,14 +56,14 @@ export async function createOrderAction(prevState: any, formData: FormData) {
       errors: {otherDeliveryArea: ['Please specify your delivery area.']},
       message: 'Error: Please specify your delivery area.',
       success: false,
-      code: null,
+      authorization_url: null,
     };
   }
 
   try {
     const cartItems: CartItem[] = JSON.parse(validatedFields.data.cartItems);
     if (cartItems.length === 0) {
-      return {message: 'Your cart is empty.', success: false, code: null};
+      return {message: 'Your cart is empty.', success: false, authorization_url: null};
     }
 
     const code = generateTrackingCode();
@@ -79,16 +79,17 @@ export async function createOrderAction(prevState: any, formData: FormData) {
       total_price: parseFloat(validatedFields.data.totalPrice),
     };
 
-    // 1. Insert into orders table
+    // 1. Insert into orders table (with a pending status initially)
     const {data: orderData, error: orderError} = await supabaseAdmin
       .from('orders')
       .insert({
         code,
         items: cartItems,
-        status: 'received',
+        status: 'pending_payment', // New initial status
         delivery_area: finalDeliveryArea,
         delivery_address_note: validatedFields.data.deliveryAddressNote,
         phone_masked: validatedFields.data.phone_masked,
+        email: validatedFields.data.email, // Save email
         is_student: isStudent,
         ...priceDetails,
       })
@@ -99,23 +100,54 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     if (!orderData)
       throw new Error('Failed to retrieve order ID after creation.');
 
-    // 2. Insert initial event into order_events
-    const {error: eventError} = await supabaseAdmin.from('order_events').insert({
-      order_id: orderData.id,
-      status: 'Received',
-      note: 'Your order has been received and is awaiting processing.',
+    // 2. Initialize Paystack Transaction
+    const paystackSecretKey = process.env.PAYSTACK_SECRET_KEY;
+    if (!paystackSecretKey) {
+        throw new Error('Paystack secret key is not configured.');
+    }
+    
+    const amountInKobo = Math.round(priceDetails.total_price * 100);
+
+    const paystackResponse = await fetch('https://api.paystack.co/transaction/initialize', {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${paystackSecretKey}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            email: validatedFields.data.email,
+            amount: amountInKobo,
+            currency: 'GHS',
+            reference: code, // Use our unique order code as the reference
+            metadata: {
+              order_id: orderData.id,
+              tracking_code: code,
+            },
+            callback_url: `${process.env.NEXT_PUBLIC_SITE_URL}/verify-payment`
+        })
     });
 
-    if (eventError) throw eventError;
+    const paystackData = await paystackResponse.json();
+
+    if (!paystackResponse.ok || !paystackData.status) {
+        console.error('Paystack Error:', paystackData);
+        throw new Error(paystackData.message || 'Failed to initialize Paystack transaction.');
+    }
 
     revalidatePath('/order');
-    return {success: true, code, message: null, errors: {}};
-  } catch (error) {
-    console.error('Supabase Error:', error);
     return {
-      message: 'Failed to create order due to a database error. Please try again.',
+        success: true, 
+        authorization_url: paystackData.data.authorization_url, 
+        message: null, 
+        errors: {}
+    };
+
+  } catch (error: any) {
+    console.error('Action Error:', error);
+    return {
+      message: error.message || 'An unexpected error occurred. Please try again.',
       success: false,
-      code: null,
+      authorization_url: null,
     };
   }
 }
@@ -166,7 +198,7 @@ export async function getOrderAction(code: string): Promise<Order | null> {
       .map(e => ({
         status: e.status,
         note: e.note ?? '',
-        date: e.created_at,
+        date: new Date(e.created_at),
       }))
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
   };

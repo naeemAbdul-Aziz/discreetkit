@@ -23,6 +23,7 @@ import {
   Truck,
   Server,
   PackageCheck,
+  CreditCard,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
@@ -31,6 +32,11 @@ import { getSupabaseClient } from '@/lib/supabase';
 export const dynamic = 'force-dynamic';
 
 const statusMap = {
+  pending_payment: {
+    icon: CreditCard,
+    label: 'Pending Payment',
+    description: 'Awaiting payment confirmation.',
+  },
   received: {
     icon: Package,
     label: 'Received',
@@ -123,7 +129,7 @@ function Tracker() {
 
 
   const currentStatusIndex = order
-    ? allStatuses.indexOf(order.status)
+    ? allStatuses.indexOf(order.status as any) // Cast because status can be 'pending_payment'
     : -1;
 
   return (
@@ -184,35 +190,56 @@ function Tracker() {
             </CardHeader>
             <CardContent>
               <div className="space-y-0">
-                {allStatuses.map((status, index) => {
-                  const isCompleted = index <= currentStatusIndex;
-                  
-                  return (
-                    <div key={status} className="flex gap-4">
-                      {/* Timeline column */}
-                      <div className="flex flex-col items-center">
+                {order.status === 'pending_payment' ? (
+                  <div className="flex gap-4">
+                     <div className="flex flex-col items-center">
                         <div
                           className={cn(
                             'flex h-10 w-10 items-center justify-center rounded-full border-2',
-                            isCompleted ? 'border-success bg-success text-success-foreground' : 'border-border bg-muted text-muted-foreground'
+                            'border-yellow-500 bg-yellow-100 text-yellow-700'
                           )}
                         >
-                          {React.createElement(statusMap[status].icon, { className: 'h-5 w-5' })}
+                          {React.createElement(statusMap['pending_payment'].icon, { className: 'h-5 w-5' })}
                         </div>
-                        {index < allStatuses.length - 1 && (
-                          <div className={cn('w-0.5 flex-1', isCompleted ? 'bg-success' : 'bg-border')} />
-                        )}
                       </div>
-                      {/* Content column */}
-                      <div className={cn("pb-8 pt-2", index === allStatuses.length -1 && "pb-2")}>
-                        <p className={cn('font-semibold', index === currentStatusIndex ? 'text-primary' : 'text-foreground')}>
-                          {statusMap[status].label}
+                      <div className="pb-2 pt-2">
+                        <p className="font-semibold text-yellow-700">
+                          {statusMap['pending_payment'].label}
                         </p>
-                        <p className="text-sm text-muted-foreground">{statusMap[status].description}</p>
+                        <p className="text-sm text-muted-foreground">{statusMap['pending_payment'].description}</p>
                       </div>
-                    </div>
-                  );
-                })}
+                  </div>
+                ) : (
+                  allStatuses.map((status, index) => {
+                    const isCompleted = index <= currentStatusIndex;
+                    
+                    return (
+                      <div key={status} className="flex gap-4">
+                        {/* Timeline column */}
+                        <div className="flex flex-col items-center">
+                          <div
+                            className={cn(
+                              'flex h-10 w-10 items-center justify-center rounded-full border-2',
+                              isCompleted ? 'border-success bg-success text-success-foreground' : 'border-border bg-muted text-muted-foreground'
+                            )}
+                          >
+                            {React.createElement(statusMap[status].icon, { className: 'h-5 w-5' })}
+                          </div>
+                          {index < allStatuses.length - 1 && (
+                            <div className={cn('w-0.5 flex-1', index < currentStatusIndex ? 'bg-success' : 'bg-border')} />
+                          )}
+                        </div>
+                        {/* Content column */}
+                        <div className={cn("pb-8 pt-2", index === allStatuses.length -1 && "pb-2")}>
+                          <p className={cn('font-semibold', index === currentStatusIndex ? 'text-primary' : 'text-foreground')}>
+                            {statusMap[status].label}
+                          </p>
+                          <p className="text-sm text-muted-foreground">{statusMap[status].description}</p>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </CardContent>
           </Card>

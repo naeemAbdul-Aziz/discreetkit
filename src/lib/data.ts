@@ -15,7 +15,7 @@ export type Product = {
 export type Order = {
     id: string;
     code: string;
-    status: 'received' | 'processing' | 'out_for_delivery' | 'completed';
+    status: 'pending_payment' | 'received' | 'processing' | 'out_for_delivery' | 'completed';
     items: CartItem[];
     deliveryArea: string;
     deliveryAddressNote: string | null;
@@ -27,7 +27,7 @@ export type Order = {
     events: {
         status: string;
         note: string;
-        date: string;
+        date: Date;
     }[];
 }
 
@@ -240,3 +240,4 @@ export const testimonials: Testimonial[] = [
     avatar: "https://i.pravatar.cc/150?img=11"
   },
 ];
+

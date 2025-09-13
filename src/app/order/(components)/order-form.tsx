@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ShieldCheck, ArrowRight, GraduationCap, AlertTriangle, Lock } from 'lucide-react';
+import { Loader2, ShieldCheck, ArrowRight, GraduationCap, AlertTriangle, Lock, Mail } from 'lucide-react';
 import { ChatTrigger } from '@/components/chat-trigger';
 import { useCart } from '@/hooks/use-cart';
 import { discounts } from '@/lib/data';
@@ -101,21 +101,22 @@ export function OrderForm() {
       deliveryArea?: string[] | undefined;
       otherDeliveryArea?: string[] | undefined;
       phone_masked?: string[] | undefined;
+      email?: string[] | undefined;
     };
     success: boolean;
-    code: string | null;
-  } = { message: null, errors: {}, success: false, code: null };
+    authorization_url: string | null;
+  } = { message: null, errors: {}, success: false, authorization_url: null };
   const [state, dispatch] = useActionState(createOrderAction, initialState);
 
   useEffect(() => {
-    if (state.success && state.code) {
+    if (state.success && state.authorization_url) {
       toast({
-        title: 'Order Received!',
-        description: 'Redirecting to confirmation...',
+        title: 'Order Details Confirmed!',
+        description: 'Redirecting to secure payment...',
         variant: 'default',
       });
-      clearCart();
-      router.push(`/order/success?code=${state.code}`);
+      // Redirect to Paystack for payment
+      window.location.href = state.authorization_url;
     } else if (state.message && !state.success && !state.errors) {
         toast({
             title: 'An error occurred',
@@ -123,7 +124,7 @@ export function OrderForm() {
             variant: 'destructive',
         });
     }
-  }, [state, router, toast, clearCart]);
+  }, [state, toast]);
 
   const handleLocationChange = (value: string) => {
     if (value === 'Other') {
@@ -161,6 +162,30 @@ export function OrderForm() {
             </CardHeader>
             <CardContent className="space-y-6">
                 <div className="space-y-4">
+                     <div className="space-y-2">
+                        <Label htmlFor="email">Email Address *</Label>
+                         <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input 
+                                id="email" 
+                                name="email" 
+                                type="email" 
+                                placeholder="e.g., yourname@email.com" 
+                                className={cn("pl-10", state.errors?.email && "border-destructive")}
+                            />
+                        </div>
+                        <p className="text-[0.8rem] text-muted-foreground">
+                        For payment confirmation from Paystack. We don't store it.
+                        </p>
+                        {state.errors?.email?.[0] && (
+                            <Alert variant="warning" className="mt-2">
+                            <AlertTriangle className="h-4 w-4" />
+                            <AlertDescription>
+                                {state.errors.email[0]}
+                            </AlertDescription>
+                            </Alert>
+                        )}
+                    </div>
                     <div className="space-y-2">
                         <Label htmlFor="deliveryArea">Delivery Area / Campus *</Label>
                         <Select name="deliveryArea" onValueChange={handleLocationChange} defaultValue={deliveryLocation || "Other"} disabled={!isMounted}>
@@ -338,6 +363,10 @@ function OrderFormSkeleton() {
             </CardHeader>
             <CardContent className="space-y-6">
                 <div className="space-y-4">
+                    <div className="space-y-2">
+                        <div className="h-4 w-1/3 bg-muted rounded" />
+                        <div className="h-10 w-full bg-muted rounded-md" />
+                    </div>
                     <div className="space-y-2">
                         <div className="h-4 w-1/4 bg-muted rounded" />
                         <div className="h-10 w-full bg-muted rounded-md" />
