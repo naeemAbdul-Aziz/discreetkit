@@ -168,11 +168,11 @@ export const productBenefits: ProductBenefit[] = [
 ];
 
 export const partners: Partner[] = [
-    { id: 1, name: "Partner 1", logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756314867/ug-logo_v1b7lq.png" },
-    { id: 2, name: "Partner 2", logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756314867/gimpa-logo_y91pnd.png" },
-    { id: 3, name: "Partner 3", logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756314867/upsa-logo_z0x0jz.png" },
-    { id: 4, name: "Partner 4", logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756314867/nyarkotey-logo_f3cyvw.png" },
-    { id: 5, name: "Partner 5", logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756314867/nugs-logo_dfrfag.png" },
+    { id: 1, name: "University of Ghana SRC", logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318481/ug_ytf3bp.png" },
+    { id: 2, name: "GIMPA SRC", logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318480/gimpa_vz8ko5.jpg" },
+    { id: 3, name: "TopUp SRC", logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318480/topup_x2q874.webp" },
+    { id: 4, name: "Bedita Pharmacy", logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/bedita_ekekhs.png" },
+    { id: 5, name: "Ernest Chemist", logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/ernest_chemist_ebxjug.webp" },
 ];
 
 export const faqItems: FaqItem[] = [
@@ -240,4 +240,3 @@ export const testimonials: Testimonial[] = [
     avatar: "https://i.pravatar.cc/150?img=11"
   },
 ];
-
