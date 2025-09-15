@@ -32,7 +32,7 @@ export default function NotFound() {
       <div className="flex flex-col items-center">
         <Image
           src="https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600&h=450&fit=crop&q=75"
-          alt="An empty delivery box, representing a page not found"
+          alt="An empty delivery box, symbolizing a page not found."
           width={400}
           height={300}
           className="max-w-xs object-contain"

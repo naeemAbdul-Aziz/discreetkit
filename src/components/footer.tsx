@@ -83,7 +83,7 @@ export function Footer() {
           <div className="mt-4 flex items-center space-x-2 sm:mt-0">
              {socialLinks.map((link) => (
                 <Button key={link.label} asChild variant="ghost" size="icon" className="text-primary-foreground/80 hover:bg-primary-foreground/10 hover:text-primary-foreground">
-                    <Link href={link.href}>
+                    <Link href={link.href} target="_blank" rel="noopener noreferrer">
                         <link.icon className="h-5 w-5" />
                         <span className="sr-only">{link.label}</span>
                     </Link>

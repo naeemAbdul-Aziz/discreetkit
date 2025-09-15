@@ -81,10 +81,10 @@ export function WhatsInTheKit() {
                  <Card className="relative aspect-video w-full max-w-4xl mx-auto overflow-hidden shadow-lg">
                     <Image
                         src="https://images.unsplash.com/photo-1583324113620-910f24a2571b?w=1080&h=608&fit=crop&q=75"
-                        alt="DiscreetKit contents flat lay"
+                        alt="DiscreetKit contents flat lay including test cassette, buffer solution, lancet and alcohol pad."
                         fill
                         className="object-cover"
-                        sizes="100vw"
+                        sizes="(max-width: 768px) 100vw, 80vw"
                         data-ai-hint="medical kit flatlay"
                         placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(1080, 608))}`}
                     />
@@ -96,6 +96,7 @@ export function WhatsInTheKit() {
                                 <button 
                                     className="absolute transform -translate-x-1/2 -translate-y-1/2"
                                     style={{ top: item.position.top, left: item.position.left }}
+                                    aria-label={`Info about ${item.name}`}
                                 >
                                     <span className="relative flex h-5 w-5">
                                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>

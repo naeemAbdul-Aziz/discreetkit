@@ -45,6 +45,7 @@ export function CoverageMap() {
                 alt="Map of Ghana showing DiscreetKit delivery locations including Accra, Kumasi, and Cape Coast"
                 fill
                 className="object-cover"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1280px"
                 data-ai-hint="ghana map location"
                 placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(1280, 720))}`}
              />

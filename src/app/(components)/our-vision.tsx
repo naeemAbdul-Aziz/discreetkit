@@ -72,8 +72,8 @@ export function OurVision() {
                 <Image
                   src={point.imageUrl}
                   alt={point.title}
-                  width={600}
-                  height={800}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   className="rounded-2xl object-cover shadow-xl"
                   data-ai-hint={point.imageHint}
                   placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(600, 800))}`}

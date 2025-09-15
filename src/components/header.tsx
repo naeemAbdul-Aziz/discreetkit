@@ -31,23 +31,21 @@ function CartLink() {
   
   if (!isMounted) {
     return (
-      <Button variant="ghost" size="icon" className="relative" disabled>
+      <Button variant="ghost" size="icon" className="relative" disabled aria-label="Loading Cart">
           <Loader2 className="h-5 w-5 animate-spin" />
-          <span className="sr-only">Loading Cart</span>
       </Button>
     )
   }
 
   return (
      <Button asChild variant="ghost" size="icon" className="relative">
-        <Link href="/cart">
+        <Link href="/cart" aria-label={`Open Cart with ${totalItems} items`}>
           <ShoppingCart />
           {totalItems > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground" aria-hidden="true">
               {totalItems}
               </span>
           )}
-          <span className="sr-only">Open Cart</span>
         </Link>
       </Button>
   );
@@ -84,7 +82,14 @@ export function Header() {
   );
 
   if (!isMounted) {
-    return null;
+    return (
+        <>
+         <div className="bg-primary p-2 text-center text-sm text-primary-foreground h-[40px]"></div>
+         <header className={cn('sticky top-0 z-50 w-full p-2')}>
+             <div className="container mx-auto flex h-14 max-w-7xl items-center justify-between rounded-2xl border-border/40 bg-background/95"></div>
+         </header>
+        </>
+    );
   }
 
   return (
@@ -111,13 +116,14 @@ export function Header() {
           <Link
             href="/"
             className="absolute left-1/2 hidden -translate-x-1/2 items-center space-x-2 md:flex"
+            aria-label="DiscreetKit Homepage"
           >
             <Image
               src={logoUrl}
               alt="DiscreetKit Logo"
               width={160}
               height={40}
-              className="h-auto w-auto"
+              className="h-auto w-[160px]"
               priority
             />
           </Link>
@@ -131,13 +137,13 @@ export function Header() {
 
           {/* Mobile Menu */}
           <div className="flex w-full items-center justify-between md:hidden">
-            <Link href="/" className="flex items-center space-x-2">
+            <Link href="/" className="flex items-center space-x-2" aria-label="DiscreetKit Homepage">
               <Image
                 src={logoUrl}
                 alt="DiscreetKit Logo"
                 width={140}
                 height={35}
-                className="h-auto w-auto"
+                className="h-auto w-[140px]"
                 priority
               />
             </Link>
@@ -152,13 +158,13 @@ export function Header() {
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-full max-w-sm">
-                  <Link href="/" className="flex items-center space-x-2">
+                  <Link href="/" aria-label="DiscreetKit Homepage">
                     <Image
                       src={logoUrl}
                       alt="DiscreetKit Logo"
                       width={140}
                       height={35}
-                      className="h-auto w-auto"
+                      className="h-auto w-[140px]"
                     />
                   </Link>
                   <div className="mt-8 flex flex-col space-y-2">

@@ -67,17 +67,6 @@ export function HowItWorks() {
     };
   }, [api, onSelect]);
 
-  const updatedSteps = steps.map(step => {
-    if (step.number === 1) {
-      return {
-        ...step,
-        imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757952399/medium-shot-woman-laying-couch_ojrtnp.jpg",
-        imageHint: "woman couch relaxing"
-      };
-    }
-    return step;
-  });
-
   return (
     <section id="how-it-works" className="bg-muted py-12 md:py-24">
       <div className="container mx-auto px-4 md:px-6">
@@ -108,7 +97,7 @@ export function HowItWorks() {
             className="w-full max-w-4xl mx-auto"
             >
             <CarouselContent>
-                {updatedSteps.map((step) => (
+                {steps.map((step) => (
                 <CarouselItem key={step.number}>
                     <div className="p-1">
                     <Card className="overflow-hidden">
@@ -141,6 +130,7 @@ export function HowItWorks() {
                                 src={step.imageUrl}
                                 alt={step.title}
                                 fill
+                                sizes="(max-width: 768px) 100vw, 50vw"
                                 className="object-cover"
                                 data-ai-hint={step.imageHint}
                                 placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 450))}`}
@@ -166,7 +156,7 @@ export function HowItWorks() {
                 {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
                 </Button>
                 <div className="flex items-center justify-center gap-2">
-                {updatedSteps.map((_, index) => (
+                {steps.map((_, index) => (
                     <button
                     key={index}
                     onClick={() => api?.scrollTo(index)}
@@ -184,7 +174,7 @@ export function HowItWorks() {
 
         {/* Grid for Desktop */}
         <div className="hidden md:grid md:grid-cols-1 gap-16 max-w-5xl mx-auto">
-            {updatedSteps.map((step, index) => (
+            {steps.map((step, index) => (
                  <div
                     key={step.number}
                  >
@@ -194,6 +184,7 @@ export function HowItWorks() {
                                 src={step.imageUrl}
                                 alt={step.title}
                                 fill
+                                sizes="50vw"
                                 className="object-cover"
                                 data-ai-hint={step.imageHint}
                                 placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 600))}`}

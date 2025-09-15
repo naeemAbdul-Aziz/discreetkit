@@ -46,7 +46,7 @@ export function TrustStats() {
             <div className="absolute right-0 top-0 w-3/4 max-w-[320px] md:w-2/3">
               <Image
                 src="https://images.unsplash.com/photo-1584012961505-507d844cc8a0?w=600&h=800&fit=crop&q=75"
-                alt="Happy student in Ghana"
+                alt="A smiling university student from Ghana, looking confident and happy."
                 width={400}
                 height={500}
                 className="rounded-2xl object-cover shadow-lg"
@@ -57,7 +57,7 @@ export function TrustStats() {
             <div className="absolute bottom-0 left-0 w-2/4 max-w-[250px] md:w-1/2 transform -rotate-6">
                <Image
                 src="https://images.unsplash.com/photo-1666886573553-6548db92db79?w=600&h=450&fit=crop&q=75"
-                alt="Health professional"
+                alt="A friendly health professional in a clinical setting, representing trust and care."
                 width={400}
                 height={300}
                 className="rounded-2xl object-cover shadow-2xl border-4 border-background"
