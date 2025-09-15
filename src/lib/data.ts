@@ -154,8 +154,8 @@ export const steps: Step[] = [
     icon: HeartHandshake,
     description: 'A self-test is a first step, not a final diagnosis. If you get a positive result, we provide a confidential bridge to our trusted hospital partners for professional, discounted follow-up care.',
     details: ['Confidential connections to care', 'Partner hospitals & counselors', 'Support for confirmatory testing'],
-    imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba9996a?w=800&h=600&fit=crop&q=75',
-    imageHint: 'healthcare professional consulting',
+    imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757955894/counselling_old_lady_modern_xbthvs.jpg',
+    imageHint: 'professional counseling support',
   },
 ];
 
