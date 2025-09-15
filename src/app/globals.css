@@ -46,6 +46,7 @@
   }
   html {
     @apply scroll-smooth;
+    font-size: 14px;
   }
   body {
     @apply bg-background text-foreground;
@@ -58,4 +59,5 @@
     @apply font-body;
   }
 }
+
 
