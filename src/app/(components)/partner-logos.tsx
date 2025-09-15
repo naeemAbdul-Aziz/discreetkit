@@ -18,7 +18,7 @@ export function PartnerLogos() {
                     alt={`${partner.name} Logo`}
                     width={100}
                     height={35}
-                    className="aspect-[3/1] object-contain grayscale transition-all hover:grayscale-0 w-auto"
+                    className="h-auto w-auto aspect-[3/1] object-contain grayscale transition-all hover:grayscale-0"
                     data-ai-hint="logo health"
                     />
                 </div>
