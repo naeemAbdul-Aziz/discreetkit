@@ -60,10 +60,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
   }
 
   try {
-    const supabaseAdmin = getSupabaseAdminClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_KEY!
-    );
+    const supabaseAdmin = getSupabaseAdminClient();
     const cartItems: CartItem[] = JSON.parse(validatedFields.data.cartItems);
     if (cartItems.length === 0) {
       return {message: 'Your cart is empty.', success: false, authorization_url: null};
@@ -170,52 +167,54 @@ export async function createOrderAction(prevState: any, formData: FormData) {
  * @returns The order object if found, otherwise null.
  */
 export async function getOrderAction(code: string): Promise<Order | null> {
-  const supabaseAdmin = getSupabaseAdminClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_KEY!
-  );
-  const {data: order, error} = await supabaseAdmin
-    .from('orders')
-    .select(
+  try {
+    const supabaseAdmin = getSupabaseAdminClient();
+    const {data: order, error} = await supabaseAdmin
+      .from('orders')
+      .select(
+        `
+        *,
+        order_events (
+          status,
+          note,
+          created_at
+        )
       `
-      *,
-      order_events (
-        status,
-        note,
-        created_at
       )
-    `
-    )
-    .eq('code', code)
-    .single();
+      .eq('code', code)
+      .single();
 
-  if (error || !order) {
-    console.error('Error fetching order:', error);
+    if (error || !order) {
+      console.error('Error fetching order:', error);
+      return null;
+    }
+
+    const items = order.items as CartItem[];
+    
+    return {
+      id: order.id.toString(),
+      code: order.code,
+      status: order.status,
+      items: items,
+      deliveryArea: order.delivery_area,
+      deliveryAddressNote: order.delivery_address_note,
+      isStudent: !!order.student_discount && order.student_discount > 0, // Infer from discount
+      subtotal: order.subtotal,
+      studentDiscount: order.student_discount,
+      deliveryFee: order.delivery_fee,
+      totalPrice: order.total_price,
+      events: order.order_events
+        .map(e => ({
+          status: e.status,
+          note: e.note ?? '',
+          date: new Date(e.created_at),
+        }))
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    };
+  } catch (error) {
+    console.error('Action Error in getOrderAction:', error);
     return null;
   }
-
-  const items = order.items as CartItem[];
-  
-  return {
-    id: order.id.toString(),
-    code: order.code,
-    status: order.status,
-    items: items,
-    deliveryArea: order.delivery_area,
-    deliveryAddressNote: order.delivery_address_note,
-    isStudent: !!order.student_discount && order.student_discount > 0, // Infer from discount
-    subtotal: order.subtotal,
-    studentDiscount: order.student_discount,
-    deliveryFee: order.delivery_fee,
-    totalPrice: order.total_price,
-    events: order.order_events
-      .map(e => ({
-        status: e.status,
-        note: e.note ?? '',
-        date: new Date(e.created_at),
-      }))
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
-  };
 }
 
 /**

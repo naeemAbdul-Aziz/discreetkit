@@ -1,25 +1,18 @@
 /**
  * @file This file sets up the Supabase clients for server-side and client-side use.
  *
- * It uses a singleton pattern to ensure that the Supabase client is initialized
- * only once and only when it's first needed. This "lazy initialization" strategy
- * is crucial in serverless environments like Next.js to prevent issues with
- * environment variable loading order.
- *
- * It provides two exports:
- * 1. `getSupabaseClient`: A function to get the client-safe, public client instance.
- * 2. `getSupabaseAdminClient`: A function to get the server-only admin client instance.
+ * It provides two key functions:
+ * 1. `getSupabaseClient`: Returns a singleton instance of the public, client-safe Supabase client.
+ * 2. `getSupabaseAdminClient`: Creates a new server-only admin client. This should only be called within server actions or API routes.
  */
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 // These are the public-facing variables, safe to be exposed in the browser.
-// They MUST be prefixed with NEXT_PUBLIC_ in your .env.local file.
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-// Singleton instances
+// Singleton instance for the public client
 let supabaseInstance: SupabaseClient | null = null;
-let supabaseAdminInstance: SupabaseClient | null = null;
 
 /**
  * Returns a singleton instance of the public Supabase client.
@@ -36,17 +29,20 @@ export function getSupabaseClient(): SupabaseClient {
 }
 
 /**
- * Returns a singleton instance of the admin Supabase client.
- * For server-side use ONLY.
+ * Creates and returns a new instance of the admin Supabase client.
+ * This function should only be called from server-side code (Server Actions, API Routes).
+ * It reads environment variables at the time of the call to ensure they are available.
  */
-export function getSupabaseAdminClient(url: string, serviceKey: string): SupabaseClient {
-    if (!url || !serviceKey) {
+export function getSupabaseAdminClient(): SupabaseClient {
+    const adminUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceKey = process.env.SUPABASE_SERVICE_KEY;
+
+    if (!adminUrl || !serviceKey) {
         throw new Error('Missing Supabase URL or Service Key for admin client. Ensure NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_KEY are set in your environment.');
     }
     
-    // We don't use a singleton here to ensure keys are always fresh if they were to change.
-    // Serverless environments can be tricky with singletons and env vars.
-    return createClient(url, serviceKey, {
+    // Create a new client each time to ensure it's used in a secure server context.
+    return createClient(adminUrl, serviceKey, {
       auth: {
         autoRefreshToken: false,
         persistSession: false,
@@ -54,6 +50,5 @@ export function getSupabaseAdminClient(url: string, serviceKey: string): Supabas
     });
 }
 
-// For convenience, you can export a pre-instantiated version for the client-side if needed,
-// but server actions should always use the getter function.
+// For convenience, export a pre-instantiated version for the client-side.
 export const supabase = getSupabaseClient();

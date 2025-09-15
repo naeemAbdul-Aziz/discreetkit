@@ -9,10 +9,6 @@ import crypto from 'crypto';
 import {getSupabaseAdminClient} from '@/lib/supabase';
 
 export async function POST(req: Request) {
-  const supabaseAdmin = getSupabaseAdminClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_KEY!
-  );
   const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
 
   if (!paystackSecret) {
@@ -43,6 +39,7 @@ export async function POST(req: Request) {
 
     if (status === 'success') {
       try {
+        const supabaseAdmin = getSupabaseAdminClient();
         // Find the order using the reference code
         const {data: order, error: findError} = await supabaseAdmin
           .from('orders')
