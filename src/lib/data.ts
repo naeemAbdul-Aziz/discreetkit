@@ -127,8 +127,8 @@ export const steps: Step[] = [
     icon: ShoppingCart,
     description: 'Choose the test kit that meets your needs. We offer standard and student pricing, with discounts applied automatically for campus deliveries.',
     details: ['Select products from our shop', 'No account or name needed', 'Pay securely with Mobile Money or Card'],
-    imageUrl: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800&h=600&fit=crop&q=75',
-    imageHint: 'choosing products online',
+    imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757952399/medium-shot-woman-laying-couch_ojrtnp.jpg',
+    imageHint: 'woman couch relaxing',
   },
   {
     number: 2,
@@ -136,7 +136,7 @@ export const steps: Step[] = [
     icon: Truck,
     description: 'Your order is packaged in plain, unbranded materials and delivered by a professional rider. We only use your number to coordinate the drop-off.',
     details: ['Plain, unbranded packaging', '24-48 hour delivery in Accra', 'Track your order with an anonymous code'],
-    imageUrl: 'https://images.unsplash.com/photo-1606554863223-3a5345515437?w=800&h=600&fit=crop&q=75',
+    imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757953240/close-up-delivery-person-giving-parcel-client_al5mjd.jpg',
     imageHint: 'discreet package delivery',
   },
   {
