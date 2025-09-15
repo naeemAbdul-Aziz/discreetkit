@@ -8,7 +8,7 @@ const visionPoints = [
     title: "A Service Born from Understanding",
     description: "DiscreetKit isn't just a business; it's a direct response to a real-world problem we saw affecting young people across Ghana. We listened to the quiet concerns and understood the powerful barriers—the fear of being judged, the anxiety of bumping into someone you know, the lack of a truly private option for essential health testing.",
     details: "That's why we built this service from the ground up, with your privacy as our unbreakable foundation. We believe everyone deserves a safe space to take control of their health, and our mission is to provide that space, no questions asked.",
-    imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/w_600,h_800,c_fill,q_auto,f_auto/v1757944590/medium-shot-women-holding-each-other_yqjad1.jpg",
+    imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757944590/medium-shot-women-holding-each-other_yqjad1.jpg",
     imageHint: "empathy support friends",
   },
   {
@@ -16,7 +16,7 @@ const visionPoints = [
     title: "Technology as Your Shield",
     description: "In a world where data is everything, we use technology not to collect, but to protect. Our entire system is engineered for anonymity. We intentionally designed it without user accounts, name requirements, or email sign-ups. Your order is tied to a unique, anonymous code—not your identity.",
     details: "This isn't just a feature; it's our promise. By stripping away the need for personal data, we eliminate the risk and anxiety. You can focus entirely on your health, confident that your privacy is shielded by a system built to forget you.",
-    imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/w_600,h_800,c_fill,q_auto,f_auto/v1757944636/hug_soldier_empathy_oxnes6.jpg",
+    imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757944636/hug_soldier_empathy_oxnes6.jpg",
     imageHint: "person using laptop privately",
   },
   {
@@ -24,7 +24,7 @@ const visionPoints = [
     title: "More Than a Kit—A Bridge to Care",
     description: "A self-test is just the first step. True peace of mind comes from knowing what to do next. We see ourselves as a responsible bridge, not just a delivery service. That's why we've built strong partnerships with trusted hospitals, clinics, and professional counselors.",
     details: "If your result is positive, we don't leave you stranded. We provide a warm, confidential connection to our partners who offer discounted, non-judgmental follow-up care. Your well-being is our ultimate goal, and we are committed to supporting you on every step of your health journey.",
-    imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/w_800,h_600,c_fill,q_auto,f_auto/v1757945982/group-people-sitting-facility-waiting-area-reading-health-insurance-fliers-waiting-physician-patients-health-center-having-checkup-appointments-cure-disease_fivf0l.jpg",
+    imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757945982/group-people-sitting-facility-waiting-area-reading-health-insurance-fliers-waiting-physician-patients-health-center-having-checkup-appointments-cure-disease_fivf0l.jpg",
     imageHint: "healthcare professional consulting",
   }
 ];
