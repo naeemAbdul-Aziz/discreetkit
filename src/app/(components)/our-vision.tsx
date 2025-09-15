@@ -8,8 +8,8 @@ const visionPoints = [
     title: "A Service Born from Understanding",
     description: "DiscreetKit isn't just a business; it's a direct response to a real-world problem we saw affecting young people across Ghana. We listened to the quiet concerns and understood the powerful barriers—the fear of being judged, the anxiety of bumping into someone you know, the lack of a truly private option for essential health testing.",
     details: "That's why we built this service from the ground up, with your privacy as our unbreakable foundation. We believe everyone deserves a safe space to take control of their health, and our mission is to provide that space, no questions asked.",
-    imageUrl: "https://images.unsplash.com/photo-1543269865-cbf427effbad?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxyZWxhdGFibGUlMjB5b3VuZyUyMHBlb3BsZSUyMGNoYXR0aW5nfGVufDB8fHx8MTc1NjM5OTAxMXww&ixlib=rb-4.1.0&q=80&w=1080",
-    imageHint: "friends talking",
+    imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757944636/hug_soldier_empathy_oxnes6.jpg",
+    imageHint: "empathy support hug",
   },
   {
     icon: ShieldCheck,
