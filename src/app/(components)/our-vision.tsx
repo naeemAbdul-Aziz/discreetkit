@@ -24,7 +24,7 @@ const visionPoints = [
     title: "More Than a Kit—A Bridge to Care",
     description: "A self-test is just the first step. True peace of mind comes from knowing what to do next. We see ourselves as a responsible bridge, not just a delivery service. That's why we've built strong partnerships with trusted hospitals, clinics, and professional counselors.",
     details: "If your result is positive, we don't leave you stranded. We provide a warm, confidential connection to our partners who offer discounted, non-judgmental follow-up care. Your well-being is our ultimate goal, and we are committed to supporting you on every step of your health journey.",
-    imageUrl: "https://images.unsplash.com/photo-1576091160550-2173dba9996a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxoZWFsdGhjYXJlJTIwcHJvZmVzc2lvbmFsJTIwY29uc3VsdGluZ3xlbnwwfHx8fDE3NTYzOTU4ODF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+    imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757945982/group-people-sitting-facility-waiting-area-reading-health-insurance-fliers-waiting-physician-patients-health-center-having-checkup-appointments-cure-disease_fivf0l.jpg",
     imageHint: "healthcare professional consulting",
   }
 ];
