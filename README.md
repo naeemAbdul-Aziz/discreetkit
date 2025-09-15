@@ -46,8 +46,8 @@ PAYSTACK_SECRET_KEY="your-paystack-secret-key"
 # Genkit (Google AI)
 GEMINI_API_KEY="your-google-ai-api-key"
 
-# Site URL
-NEXT_PUBLIC_SITE_URL="http://localhost:3000"
+# Site URL (IMPORTANT: Use the port from your dev script)
+NEXT_PUBLIC_SITE_URL="http://localhost:9002"
 ```
 
 ### 4. Run the Development Server
@@ -58,7 +58,7 @@ Once the dependencies are installed and the environment variables are set, you c
 npm run dev
 ```
 
-The application will be available at `http://localhost:3000`.
+The application will be available at `http://localhost:9002`.
 
 ## 🛠 Tech Stack
 
