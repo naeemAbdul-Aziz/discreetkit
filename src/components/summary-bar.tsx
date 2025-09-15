@@ -9,7 +9,7 @@ import { ArrowRight, ShoppingCart, Loader2 } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import Image from 'next/image';
 import { Separator } from './ui/separator';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 
 const shimmer = (w: number, h: number) => `
@@ -37,9 +37,12 @@ export function SummaryBar() {
   const [isLoading, setIsLoading] = useState(false);
   const pathname = usePathname();
 
+  useEffect(() => {
+    // Reset loading state when navigation completes
+    setIsLoading(false);
+  }, [pathname]);
+
   const handleClick = () => {
-    // We only want the loading state if we are navigating away.
-    // The cart page is where this component links to.
     if (pathname !== '/cart') {
       setIsLoading(true);
     }

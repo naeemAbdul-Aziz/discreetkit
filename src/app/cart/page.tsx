@@ -51,10 +51,12 @@ function CartPageLoading() {
 export default function CartPage() {
   return (
     <div className="bg-muted">
-      <div className="container mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-24">
-        <Suspense fallback={<CartPageLoading />}>
-            <CartPageContents />
-        </Suspense>
+      <div className="container mx-auto px-4 py-12 md:px-6 md:py-24">
+        <div className="mx-auto max-w-7xl">
+            <Suspense fallback={<CartPageLoading />}>
+                <CartPageContents />
+            </Suspense>
+        </div>
       </div>
     </div>
   );
