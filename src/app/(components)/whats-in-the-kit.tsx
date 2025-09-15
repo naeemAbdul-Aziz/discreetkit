@@ -84,6 +84,7 @@ export function WhatsInTheKit() {
                         alt="DiscreetKit contents flat lay"
                         fill
                         className="object-cover"
+                        sizes="100vw"
                         data-ai-hint="medical kit flatlay"
                         placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(1080, 608))}`}
                     />

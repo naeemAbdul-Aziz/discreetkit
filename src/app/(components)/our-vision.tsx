@@ -74,6 +74,7 @@ export function OurVision() {
                   alt={point.title}
                   fill
                   className="rounded-2xl object-cover shadow-xl"
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   data-ai-hint={point.imageHint}
                   placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
                 />

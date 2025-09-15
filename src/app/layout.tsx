@@ -1,5 +1,5 @@
 
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Figtree } from 'next/font/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
@@ -24,10 +24,6 @@ export const metadata: Metadata = {
   title: 'DiscreetKit Ghana - Confidential Self-Test Kits',
   description: 'Order confidential, WHO-approved self-test kits for HIV and pregnancy in Ghana. Anonymous, private, and discreet delivery for students and young professionals.',
   keywords: ['self-test kit', 'HIV test Ghana', 'pregnancy test Ghana', 'confidential testing', 'anonymous testing', 'private health test', 'discreet delivery', 'DiscreetKit'],
-  viewport: {
-    width: 'device-width',
-    initialScale: 1.0,
-  },
   openGraph: {
     type: 'website',
     url: siteUrl,
@@ -49,6 +45,11 @@ export const metadata: Metadata = {
     description: 'Anonymous, private, and discreet self-test kit delivery in Ghana.',
     images: [logoUrl],
   },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1.0,
 };
 
 export default function RootLayout({

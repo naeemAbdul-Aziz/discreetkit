@@ -101,7 +101,7 @@ export function HowItWorks() {
                 <CarouselItem key={step.number}>
                     <div className="p-1">
                     <Card className="overflow-hidden">
-                        <div className="grid grid-cols-1 md:grid-cols-2">
+                        <div className="grid grid-cols-1">
                         <div className="p-8 md:p-10 flex flex-col justify-center">
                             <div className="flex items-center gap-4 mb-4">
                             <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 flex-shrink-0">
@@ -125,12 +125,13 @@ export function HowItWorks() {
                             </ul>
                             </div>
                         </div>
-                        <div className="relative bg-background flex items-center justify-center p-8 min-h-[300px] md:min-h-0">
+                        <div className="relative bg-background flex items-center justify-center p-8 aspect-video">
                             <Image
                                 src={step.imageUrl}
                                 alt={step.title}
                                 fill
                                 className="object-cover"
+                                sizes="(max-width: 768px) 100vw, 50vw"
                                 data-ai-hint={step.imageHint}
                                 placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
                             />
@@ -184,6 +185,7 @@ export function HowItWorks() {
                                 alt={step.title}
                                 fill
                                 className="object-cover"
+                                sizes="(max-width: 768px) 100vw, 50vw"
                                 data-ai-hint={step.imageHint}
                                 placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
                             />

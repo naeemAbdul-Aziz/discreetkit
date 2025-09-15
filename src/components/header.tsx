@@ -117,6 +117,7 @@ export function Header() {
               alt="DiscreetKit Logo"
               width={160}
               height={40}
+              className="h-auto"
               priority
             />
           </Link>
@@ -136,6 +137,7 @@ export function Header() {
                 alt="DiscreetKit Logo"
                 width={140}
                 height={35}
+                className="h-auto"
                 priority
               />
             </Link>
@@ -156,6 +158,7 @@ export function Header() {
                       alt="DiscreetKit Logo"
                       width={140}
                       height={35}
+                      className="h-auto"
                     />
                   </Link>
                   <div className="mt-8 flex flex-col space-y-2">
