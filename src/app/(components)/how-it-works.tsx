@@ -67,6 +67,17 @@ export function HowItWorks() {
     };
   }, [api, onSelect]);
 
+  const updatedSteps = steps.map(step => {
+    if (step.number === 1) {
+      return {
+        ...step,
+        imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757952399/medium-shot-woman-laying-couch_ojrtnp.jpg",
+        imageHint: "woman couch relaxing"
+      };
+    }
+    return step;
+  });
+
   return (
     <section id="how-it-works" className="bg-muted py-12 md:py-24">
       <div className="container mx-auto px-4 md:px-6">
@@ -97,7 +108,7 @@ export function HowItWorks() {
             className="w-full max-w-4xl mx-auto"
             >
             <CarouselContent>
-                {steps.map((step) => (
+                {updatedSteps.map((step) => (
                 <CarouselItem key={step.number}>
                     <div className="p-1">
                     <Card className="overflow-hidden">
@@ -156,7 +167,7 @@ export function HowItWorks() {
                 {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
                 </Button>
                 <div className="flex items-center justify-center gap-2">
-                {steps.map((_, index) => (
+                {updatedSteps.map((_, index) => (
                     <button
                     key={index}
                     onClick={() => api?.scrollTo(index)}
@@ -174,7 +185,7 @@ export function HowItWorks() {
 
         {/* Grid for Desktop */}
         <div className="hidden md:grid md:grid-cols-1 gap-16 max-w-5xl mx-auto">
-            {steps.map((step, index) => (
+            {updatedSteps.map((step, index) => (
                  <div
                     key={step.number}
                  >
