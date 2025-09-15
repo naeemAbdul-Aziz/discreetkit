@@ -5,10 +5,12 @@ import { useCart } from '@/hooks/use-cart';
 import { Button } from './ui/button';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, ShoppingCart } from 'lucide-react';
+import { ArrowRight, ShoppingCart, Loader2 } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import Image from 'next/image';
 import { Separator } from './ui/separator';
+import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -32,6 +34,17 @@ const toBase64 = (str: string) =>
 
 export function SummaryBar() {
   const { items, totalItems, totalPrice, isStudent, subtotal, deliveryFee, studentDiscount } = useCart();
+  const [isLoading, setIsLoading] = useState(false);
+  const pathname = usePathname();
+
+  const handleClick = () => {
+    // We only want the loading state if we are navigating away.
+    // The cart page is where this component links to.
+    if (pathname !== '/cart') {
+      setIsLoading(true);
+    }
+  };
+
 
   return (
     <AnimatePresence>
@@ -65,7 +78,14 @@ export function SummaryBar() {
                           {items.map(item => (
                               <div key={item.id} className="grid grid-cols-[auto_1fr_auto] items-center gap-4 text-sm">
                                 <div className="relative h-10 w-10 flex-shrink-0 rounded-md bg-muted overflow-hidden">
-                                    <Image src={item.imageUrl} alt={item.name} fill className="object-contain p-1" placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(40, 40))}`} />
+                                    <Image
+                                      src={item.imageUrl}
+                                      alt={item.name}
+                                      fill
+                                      className="object-contain p-1"
+                                      placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(40, 40))}`}
+                                      sizes="40px"
+                                     />
                                   </div>
                                   <div className="truncate">
                                       <span className="font-semibold">{item.quantity}</span> x {item.name}
@@ -114,10 +134,16 @@ export function SummaryBar() {
                   <p className="text-base font-bold md:text-lg">GHS {totalPrice.toFixed(2)}</p>
                   <p className="text-xs text-muted-foreground">Total</p>
                 </div>
-                <Button asChild size="sm" className="md:size-lg">
+                <Button asChild size="sm" className="md:size-lg" disabled={isLoading} onClick={handleClick}>
                   <Link href="/cart">
-                    Continue
-                    <ArrowRight />
+                    {isLoading ? (
+                      <Loader2 className="animate-spin" />
+                    ) : (
+                      <>
+                        Continue
+                        <ArrowRight />
+                      </>
+                    )}
                   </Link>
                 </Button>
               </div>
