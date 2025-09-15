@@ -139,6 +139,7 @@ export function ProductSelector() {
                                                 alt={product.name}
                                                 fill
                                                 className="object-contain p-4"
+                                                sizes="(max-width: 640px) 80vw, 40vw"
                                                 data-ai-hint="medical test kit"
                                                 placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(300, 300))}`}
                                             />

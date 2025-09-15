@@ -38,7 +38,7 @@ export function Footer() {
                 alt="DiscreetKit Logo" 
                 width={160} 
                 height={40} 
-                className="brightness-0 invert h-auto"
+                className="brightness-0 invert h-auto w-auto"
               />
             </Link>
             <p className="max-w-xs text-sm text-primary-foreground/80">
