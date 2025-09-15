@@ -145,8 +145,8 @@ export const steps: Step[] = [
     icon: CheckCircle,
     description: 'Each kit comes with a simple, visual instruction manual. You can get a clear result in the comfort of your own space in under 20 minutes.',
     details: ['Easy-to-follow visual instructions', 'Results in under 20 minutes', 'WHO-approved for 99% accuracy'],
-    imageUrl: 'https://images.unsplash.com/photo-1579165466949-558158434135?w=800&h=600&fit=crop&q=75',
-    imageHint: 'person reading test result',
+    imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757952387/man-being-happy-after-getting-negative-covid-test-result_udxny5.jpg',
+    imageHint: 'man happy result',
   },
   {
     number: 4,
