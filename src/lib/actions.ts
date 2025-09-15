@@ -36,7 +36,6 @@ const orderSchema = z.object({
  * @returns An object containing success status, a message, any validation errors, and the Paystack authorization URL.
  */
 export async function createOrderAction(prevState: any, formData: FormData) {
-  const supabaseAdmin = getSupabaseAdminClient();
   const validatedFields = orderSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -61,6 +60,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
   }
 
   try {
+    const supabaseAdmin = getSupabaseAdminClient();
     const cartItems: CartItem[] = JSON.parse(validatedFields.data.cartItems);
     if (cartItems.length === 0) {
       return {message: 'Your cart is empty.', success: false, authorization_url: null};
