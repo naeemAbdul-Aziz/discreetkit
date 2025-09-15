@@ -136,15 +136,14 @@ export function HowItWorks() {
                             </ul>
                             </div>
                         </div>
-                        <div className="relative bg-background flex items-center justify-center p-8 aspect-video">
+                        <div className="relative bg-background aspect-video">
                             <Image
                                 src={step.imageUrl}
                                 alt={step.title}
-                                width={800}
-                                height={600}
+                                fill
                                 className="object-cover"
                                 data-ai-hint={step.imageHint}
-                                placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 600))}`}
+                                placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 450))}`}
                             />
                         </div>
                         </div>
@@ -194,8 +193,7 @@ export function HowItWorks() {
                             <Image
                                 src={step.imageUrl}
                                 alt={step.title}
-                                width={800}
-                                height={600}
+                                fill
                                 className="object-cover"
                                 data-ai-hint={step.imageHint}
                                 placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 600))}`}
