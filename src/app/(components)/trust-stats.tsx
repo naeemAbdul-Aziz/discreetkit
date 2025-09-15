@@ -1,4 +1,3 @@
-
 import Image from 'next/image';
 
 const stats = [
@@ -41,7 +40,7 @@ export function TrustStats() {
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid items-center gap-12 md:grid-cols-2 lg:gap-16">
            <div 
-             className="relative flex h-[350px] min-h-[300px] items-center justify-center md:h-[450px]"
+             className="relative mx-auto w-full max-w-md h-[350px] min-h-[300px] md:h-[450px]"
            >
             <div className="absolute right-0 top-0 w-3/4 max-w-[320px] md:w-2/3">
               <Image
