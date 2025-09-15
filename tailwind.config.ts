@@ -18,8 +18,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        body: ['var(--font-figtree)', 'sans-serif'],
-        headline: ['var(--font-figtree)', 'sans-serif'],
+        body: ['Poppins', 'sans-serif'],
+        headline: ['Poppins', 'sans-serif'],
       },
       colors: {
         background: 'hsl(var(--background))',
@@ -105,3 +105,4 @@ export default {
   },
   plugins: [require('tailwindcss-animate')],
 } satisfies Config;
+
