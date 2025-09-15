@@ -12,6 +12,7 @@ import {revalidatePath} from 'next/cache';
 import {type CartItem} from '@/hooks/use-cart';
 import {getSupabaseAdminClient} from './supabase';
 import {discounts} from './data';
+import {redirect} from 'next/navigation';
 
 const orderSchema = z.object({
   cartItems: z.string().min(1, 'Cart cannot be empty.'),
@@ -69,8 +70,6 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     const finalDeliveryArea =
       deliveryArea === 'Other' ? otherDeliveryArea : deliveryArea;
     
-    const isStudent = discounts.some(d => d.campus === finalDeliveryArea);
-
     const priceDetails = {
       subtotal: parseFloat(validatedFields.data.subtotal),
       student_discount: parseFloat(validatedFields.data.studentDiscount),
@@ -78,13 +77,13 @@ export async function createOrderAction(prevState: any, formData: FormData) {
       total_price: parseFloat(validatedFields.data.totalPrice),
     };
 
-    // 1. Insert into orders table (with a pending status initially)
+    // 1. Insert into orders table with status 'received'
     const {data: orderData, error: orderError} = await supabaseAdmin
       .from('orders')
       .insert({
         code,
         items: cartItems,
-        status: 'pending_payment', // New initial status
+        status: 'received',
         delivery_area: finalDeliveryArea,
         delivery_address_note: validatedFields.data.deliveryAddressNote,
         phone_masked: validatedFields.data.phone_masked,
@@ -97,7 +96,14 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     if (!orderData)
       throw new Error('Failed to retrieve order ID after creation.');
 
-    // 2. Initialize Paystack Transaction
+    // 2. Add an initial "Order Received" event
+     await supabaseAdmin.from('order_events').insert({
+        order_id: orderData.id,
+        status: 'Order Received',
+        note: 'Order placed, awaiting payment confirmation.',
+     });
+
+    // 3. Initialize Paystack Transaction
     const paystackSecretKey = process.env.PAYSTACK_SECRET_KEY;
     if (!paystackSecretKey) {
         console.error('Paystack secret key is not configured in .env.local');
@@ -120,9 +126,10 @@ export async function createOrderAction(prevState: any, formData: FormData) {
             metadata: {
               order_id: orderData.id,
               tracking_code: code,
+              customer_email: validatedFields.data.email,
             },
-            // The callback_url will be handled by our /verify-payment route
-            callback_url: `${process.env.NEXT_PUBLIC_SITE_URL}/verify-payment`
+            // Paystack will redirect to this URL after payment attempt
+            callback_url: `${process.env.NEXT_PUBLIC_SITE_URL}/order/success?code=${code}`
         })
     });
 

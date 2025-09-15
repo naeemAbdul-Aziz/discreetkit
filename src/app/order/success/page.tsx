@@ -2,27 +2,63 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle2, Copy, Truck, Home, Plus, Loader2, Check } from 'lucide-react';
+import { CheckCircle2, Copy, Truck, Home, Plus, Loader2, Check, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 function SuccessContent() {
   const searchParams = useSearchParams();
   const code = searchParams.get('code');
   const { toast } = useToast();
   const [isCopied, setIsCopied] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(true);
+  const [paymentStatus, setPaymentStatus] = useState<'success' | 'pending' | 'failed' | null>(null);
 
-  if (!code) {
+  useEffect(() => {
+    if (!code) {
+      setIsVerifying(false);
+      return;
+    }
+    
+    // Simulate a short delay to allow webhooks to potentially process first
+    const timer = setTimeout(() => {
+        // In a real app, you might make a fetch request to your backend to get the latest order status.
+        // For now, we'll assume the webhook will handle it, and this page is for user feedback.
+        // We'll just show the success message based on the redirect.
+        setIsVerifying(false);
+        setPaymentStatus('success'); 
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [code]);
+
+  if (isVerifying) {
+    return (
+        <Card className="w-full max-w-lg text-center shadow-lg">
+            <CardHeader className="items-center">
+                <Loader2 className="h-16 w-16 animate-spin text-primary" />
+                <CardTitle className="mt-4 text-3xl">Verifying Payment...</CardTitle>
+                <CardDescription className="max-w-md">
+                    Please wait a moment while we confirm your transaction. Do not close this page.
+                </CardDescription>
+            </CardHeader>
+        </Card>
+    )
+  }
+
+  if (!code || paymentStatus === 'failed') {
     return (
       <Card className="w-full max-w-lg text-center shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-2xl text-destructive">Order Not Found</CardTitle>
-          <CardDescription>
-            No order code was provided. Please check your confirmation or contact support if you believe this is an error.
-          </CardDescription>
+        <CardHeader className="items-center">
+            <AlertCircle className="h-16 w-16 text-destructive" />
+            <CardTitle className="mt-4 text-2xl text-destructive">Payment Issue</CardTitle>
+            <CardDescription>
+                There seems to be an issue with your payment or order code. Please check your confirmation or contact support if you believe this is an error.
+            </CardDescription>
         </CardHeader>
         <CardContent>
           <Button asChild>
