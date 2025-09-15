@@ -88,7 +88,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
         delivery_area: finalDeliveryArea,
         delivery_address_note: validatedFields.data.deliveryAddressNote,
         phone_masked: validatedFields.data.phone_masked,
-        email: validatedFields.data.email, // Save email
+        // email: validatedFields.data.email, // This column doesn't exist in the DB schema
         is_student: isStudent,
         ...priceDetails,
       })
