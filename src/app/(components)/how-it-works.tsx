@@ -151,9 +151,9 @@ export function HowItWorks() {
                 size="icon"
                 onClick={togglePlay}
                 className="rounded-full h-10 w-10 text-muted-foreground hover:text-foreground"
+                aria-label={isPlaying ? 'Pause carousel' : 'Play carousel'}
                 >
                 {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-                <span className="sr-only">{isPlaying ? 'Pause' : 'Play'}</span>
                 </Button>
                 <div className="flex items-center justify-center gap-2">
                 {steps.map((_, index) => (

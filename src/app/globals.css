@@ -14,7 +14,7 @@
     --popover: 0 0% 100%; /* Pure White */
     --popover-foreground: 210 20% 18%;
 
-    --primary: 200 85% 45%; /* Vibrant Ocean Blue */
+    --primary: 200 85% 40%; /* Vibrant Ocean Blue - Darkened for contrast */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 140 80% 40%; /* Lively Spring Green - for success states */
