@@ -23,7 +23,8 @@ const toBase64 = (str: string) =>
 
 
 export function CoverageMap() {
-  const mapUrl = "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756555567/stylized-ghana-map_f2s6xl.png";
+  const accessToken = "pk.eyJ1IjoibmFlZW0yMzMiLCJhIjoiY21lenZxbmlsMDdrYjJsc2JzdmsxM2tpeSJ9.2eK-E8ybr9qdfGrUQs6HsQ";
+  const mapUrl = `https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-s+2074D2(-0.1870,5.6037),pin-s+2074D2(-1.6244,6.6886),pin-s+2074D2(-1.2466,5.1053)/-1.0,6.5/5.5/1280x720?access_token=${accessToken}`;
 
   return (
     <section className="bg-muted py-12 md:py-24">
@@ -41,16 +42,16 @@ export function CoverageMap() {
            <div className="relative w-full max-w-5xl mx-auto aspect-video overflow-hidden rounded-2xl shadow-xl border">
              <Image 
                 src={mapUrl}
-                alt="Stylized map of Ghana showing DiscreetKit delivery locations including Accra, Kumasi, and Cape Coast"
+                alt="Map of Ghana showing DiscreetKit delivery locations including Accra, Kumasi, and Cape Coast"
                 fill
-                className="object-contain p-4 md:p-8"
-                data-ai-hint="ghana map stylized"
+                className="object-cover"
+                data-ai-hint="ghana map location"
                 placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(1280, 720))}`}
              />
              <div className="absolute inset-x-0 bottom-4 flex justify-center">
                  <div className="flex items-center gap-2 rounded-full bg-background/80 p-2 pl-3 pr-4 text-sm font-medium text-foreground shadow-lg backdrop-blur-sm">
                     <CheckCircle className="h-5 w-5 text-success" />
-                    <p>Now delivering across Ghana</p>
+                    <p>Accra, Kumasi & Cape Coast covered</p>
                  </div>
              </div>
            </div>

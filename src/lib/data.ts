@@ -127,7 +127,7 @@ export const steps: Step[] = [
     icon: ShoppingCart,
     description: 'Choose the test kit that meets your needs. We offer standard and student pricing, with discounts applied automatically for campus deliveries.',
     details: ['Select products from our shop', 'No account or name needed', 'Pay securely with Mobile Money or Card'],
-    imageUrl: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxjaG9vc2luZyUyMHByb2R1Y3RzJTIwb25saW5lfGVufDB8fHx8MTc1NjM5NTYyMnww&ixlib=rb-4.1.0&q=80&w=1080',
+    imageUrl: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800&h=600&fit=crop&q=75',
     imageHint: 'choosing products online',
   },
   {
@@ -136,7 +136,7 @@ export const steps: Step[] = [
     icon: Truck,
     description: 'Your order is packaged in plain, unbranded materials and delivered by a professional rider. We only use your number to coordinate the drop-off.',
     details: ['Plain, unbranded packaging', '24-48 hour delivery in Accra', 'Track your order with an anonymous code'],
-    imageUrl: 'https://images.unsplash.com/photo-1606554863223-3a5345515437?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHxEaXNjcmVldCUyMHBhY2thZ2UlMjBkZWxpdmVyeXxlbnwwfHx8fDE3NTYzOTU2NjR8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    imageUrl: 'https://images.unsplash.com/photo-1606554863223-3a5345515437?w=800&h=600&fit=crop&q=75',
     imageHint: 'discreet package delivery',
   },
   {
@@ -145,7 +145,7 @@ export const steps: Step[] = [
     icon: CheckCircle,
     description: 'Each kit comes with a simple, visual instruction manual. You can get a clear result in the comfort of your own space in under 20 minutes.',
     details: ['Easy-to-follow visual instructions', 'Results in under 20 minutes', 'WHO-approved for 99% accuracy'],
-    imageUrl: 'https://images.unsplash.com/photo-1579165466949-558158434135?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwZXJzb24lMjBsb29raW5nJTIwYXQlMjBhJTIwdGVzdCUyMHJlc3VsdCUyMHByaXZhdGVseXxlbnwwfHx8fDE3NTYzOTU4NDR8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    imageUrl: 'https://images.unsplash.com/photo-1579165466949-558158434135?w=800&h=600&fit=crop&q=75',
     imageHint: 'person reading test result',
   },
   {
@@ -154,7 +154,7 @@ export const steps: Step[] = [
     icon: HeartHandshake,
     description: 'A self-test is a first step, not a final diagnosis. If you get a positive result, we provide a confidential bridge to our trusted hospital partners for professional, discounted follow-up care.',
     details: ['Confidential connections to care', 'Partner hospitals & counselors', 'Support for confirmatory testing'],
-    imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba9996a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxoZWFsdGhjYXJlJTIwcHJvZmVzc2lvbmFsJTIwY29uc3VsdGluZ3xlbnwwfHx8fDE3NTYzOTU4ODF8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba9996a?w=800&h=600&fit=crop&q=75',
     imageHint: 'healthcare professional consulting',
   },
 ];
@@ -240,5 +240,3 @@ export const testimonials: Testimonial[] = [
     avatar: "https://i.pravatar.cc/150?img=11"
   },
 ];
-
-

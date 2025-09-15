@@ -80,7 +80,7 @@ export function WhatsInTheKit() {
             <TooltipProvider delayDuration={100}>
                  <Card className="relative aspect-video w-full max-w-4xl mx-auto overflow-hidden shadow-lg">
                     <Image
-                        src="https://images.unsplash.com/photo-1583324113620-910f24a2571b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmbGF0JTIwbGF5JTIwbWVkaWNhbCUyMGtpdHxlbnwwfHx8fDE3NTYxNDg5OTV8MA&ixlib=rb-4.1.0&q=80&w=1080"
+                        src="https://images.unsplash.com/photo-1583324113620-910f24a2571b?w=1080&h=608&fit=crop&q=75"
                         alt="DiscreetKit contents flat lay"
                         fill
                         className="object-cover"

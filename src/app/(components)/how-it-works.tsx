@@ -129,11 +129,11 @@ export function HowItWorks() {
                             <Image
                                 src={step.imageUrl}
                                 alt={step.title}
-                                fill
+                                width={800}
+                                height={600}
                                 className="object-cover"
-                                sizes="(max-width: 768px) 100vw, 50vw"
                                 data-ai-hint={step.imageHint}
-                                placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
+                                placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 600))}`}
                             />
                         </div>
                         </div>
@@ -183,11 +183,11 @@ export function HowItWorks() {
                             <Image
                                 src={step.imageUrl}
                                 alt={step.title}
-                                fill
+                                width={800}
+                                height={600}
                                 className="object-cover"
-                                sizes="(max-width: 768px) 100vw, 50vw"
                                 data-ai-hint={step.imageHint}
-                                placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
+                                placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 600))}`}
                             />
                         </div>
 
