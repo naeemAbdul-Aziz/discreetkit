@@ -32,18 +32,18 @@ npm install
 
 ### 3. Set Up Environment Variables
 
-Create a `.env.local` file in the root of your project and add the following environment variables. You will need to get these values from your own Supabase and Paystack dashboards.
+Create a `.env.local` file in the root of your project and add the following environment variables.
 
 ```
 # Supabase
-NEXT_PUBLIC_SUPABASE_URL="your-supabase-url"
-NEXT_PUBLIC_SUPABASE_ANON_KEY="your-supabase-public-anon-key"
-SUPABASE_SERVICE_KEY="your-supabase-service-role-key"
+NEXT_PUBLIC_SUPABASE_URL="https://xffvvxdtfsxfnkowgdz.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmZnZ2eGR0ZnN4Zm5rb3dnZHp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0NjEzNzcsImV4cCI6MjA3MjAzNzM3N30.YJafTn5uFrfVpaZWpa2OwS2AZsI_ul7bmm6lMTKsJ9A"
+SUPABASE_SERVICE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmZnZ2eGR0ZnN4Zm5rb3dnZHp1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjQ2MTM3NywiZXhwIjoyMDcyMDM3Mzc3fQ.YnmKw7BIjl-oKDCbpQVZ60ZvzgNE4nj4EOh2lyGDf4A"
 
-# Paystack
+# Paystack (Replace with your own keys)
 PAYSTACK_SECRET_KEY="your-paystack-secret-key"
 
-# Genkit (Google AI)
+# Genkit (Google AI - Replace with your own key)
 GEMINI_API_KEY="your-google-ai-api-key"
 
 # Site URL (IMPORTANT: Use the port from your dev script)
@@ -72,3 +72,4 @@ The application will be available at `http://localhost:9002`.
 ## 📦 Deployment
 
 This project is optimized for deployment on Vercel or Firebase App Hosting. Simply connect your Git repository and configure the environment variables in the hosting provider's dashboard.
+```
