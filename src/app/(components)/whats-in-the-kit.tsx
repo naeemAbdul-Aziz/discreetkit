@@ -69,7 +69,7 @@ export function WhatsInTheKit() {
       <div className="container mx-auto max-w-5xl px-4 md:px-6">
         <div className="text-center">
           <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground sm:text-4xl">
-            Clarity in a Box: <span className="text-primary">What's Inside</span>
+            What's Inside the Box?
           </h2>
           <p className="mt-4 text-base text-muted-foreground md:text-lg">
             Each DiscreetKit is equipped with everything you need for a simple and reliable self-test experience.
