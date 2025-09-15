@@ -1,10 +1,14 @@
 
+'use client';
+
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Mail, MapPin, ArrowRight } from 'lucide-react';
+import { Mail, MapPin, ArrowRight, Loader2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const contactInfo = [
   {
@@ -20,6 +24,22 @@ const contactInfo = [
 ];
 
 export function ContactUs() {
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    // Simulate API call
+    setTimeout(() => {
+        setIsLoading(false);
+        toast({
+            title: "Message Sent!",
+            description: "Thanks for reaching out. We'll get back to you shortly.",
+        });
+    }, 1500);
+  }
+
   return (
     <section id="contact" className="bg-muted py-12 md:py-24">
       <div className="container mx-auto max-w-6xl px-4 md:px-6">
@@ -57,22 +77,31 @@ export function ContactUs() {
           <div>
             <Card className="rounded-2xl shadow-lg p-4 sm:p-8 bg-card">
               <CardContent className="p-0">
-                <form className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-2">
                     <Label htmlFor="name">Your Name</Label>
-                    <Input id="name" placeholder="e.g., Jane Doe" />
+                    <Input id="name" placeholder="e.g., Jane Doe" required />
                     </div>
                     <div className="space-y-2">
                     <Label htmlFor="email">Your Email</Label>
-                    <Input id="email" type="email" placeholder="e.g., jane.doe@example.com" />
+                    <Input id="email" type="email" placeholder="e.g., jane.doe@example.com" required />
                     </div>
                     <div className="space-y-2">
                     <Label htmlFor="message">Your Message</Label>
-                    <Textarea id="message" placeholder="Enter your message here..." rows={5} />
+                    <Textarea id="message" placeholder="Enter your message here..." rows={5} required />
                     </div>
-                    <Button type="submit" className="w-full" size="lg">
-                        Send Message
-                        <ArrowRight />
+                    <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
+                        {isLoading ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Sending...
+                            </>
+                        ) : (
+                            <>
+                                Send Message
+                                <ArrowRight />
+                            </>
+                        )}
                     </Button>
                 </form>
               </CardContent>

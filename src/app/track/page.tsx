@@ -153,11 +153,16 @@ function Tracker() {
             />
             <Button type="submit" disabled={isPending || !code}>
               {isPending ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Tracking...
+                </>
               ) : (
-                <Search className="mr-2 h-4 w-4" />
+                <>
+                    <Search className="mr-2 h-4 w-4" />
+                    Track
+                </>
               )}
-              {isPending ? 'Tracking...' : 'Track'}
             </Button>
           </form>
         </CardContent>

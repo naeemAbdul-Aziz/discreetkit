@@ -113,7 +113,8 @@ export function Chatbot() {
                 disabled={isPending}
               />
               <Button type="submit" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8" disabled={isPending || !input.trim()}>
-                <Send className="h-4 w-4" />
+                {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                <span className="sr-only">Send Message</span>
               </Button>
             </div>
           </form>
