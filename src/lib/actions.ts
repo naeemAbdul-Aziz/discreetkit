@@ -60,7 +60,10 @@ export async function createOrderAction(prevState: any, formData: FormData) {
   }
 
   try {
-    const supabaseAdmin = getSupabaseAdminClient();
+    const supabaseAdmin = getSupabaseAdminClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_KEY!
+    );
     const cartItems: CartItem[] = JSON.parse(validatedFields.data.cartItems);
     if (cartItems.length === 0) {
       return {message: 'Your cart is empty.', success: false, authorization_url: null};
@@ -167,7 +170,10 @@ export async function createOrderAction(prevState: any, formData: FormData) {
  * @returns The order object if found, otherwise null.
  */
 export async function getOrderAction(code: string): Promise<Order | null> {
-  const supabaseAdmin = getSupabaseAdminClient();
+  const supabaseAdmin = getSupabaseAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_KEY!
+  );
   const {data: order, error} = await supabaseAdmin
     .from('orders')
     .select(

@@ -39,24 +39,19 @@ export function getSupabaseClient(): SupabaseClient {
  * Returns a singleton instance of the admin Supabase client.
  * For server-side use ONLY.
  */
-export function getSupabaseAdminClient(): SupabaseClient {
-  if (!supabaseAdminInstance) {
-    // SECURITY: This key should be loaded from environment variables and never be hardcoded.
-    // It is stored in .env.local which is NOT checked into source control.
-    const serverSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const serverSupabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
-    
-    if (!serverSupabaseUrl || !serverSupabaseServiceKey) {
+export function getSupabaseAdminClient(url: string, serviceKey: string): SupabaseClient {
+    if (!url || !serviceKey) {
         throw new Error('Missing Supabase URL or Service Key for admin client. Ensure NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_KEY are set in your environment.');
     }
-    supabaseAdminInstance = createClient(serverSupabaseUrl, serverSupabaseServiceKey, {
+    
+    // We don't use a singleton here to ensure keys are always fresh if they were to change.
+    // Serverless environments can be tricky with singletons and env vars.
+    return createClient(url, serviceKey, {
       auth: {
         autoRefreshToken: false,
         persistSession: false,
       },
     });
-  }
-  return supabaseAdminInstance;
 }
 
 // For convenience, you can export a pre-instantiated version for the client-side if needed,
