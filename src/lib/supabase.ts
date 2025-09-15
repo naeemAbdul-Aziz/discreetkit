@@ -8,8 +8,8 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 // These are the public-facing variables, safe to be exposed in the browser.
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseUrl = "https://xffvvxdtfsxfnkowgdzu.supabase.co";
+const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmZnZ2eGR0ZnN4Zm5rb3dnZHp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0NjEzNzcsImV4cCI6MjA3MjAzNzM3N30.YJafTn5uFrfVpaZWpa2OwS2AZsI_ul7bmm6lMTKsJ9A";
 
 // Singleton instance for the public client
 let supabaseInstance: SupabaseClient | null = null;
@@ -20,9 +20,6 @@ let supabaseInstance: SupabaseClient | null = null;
  */
 export function getSupabaseClient(): SupabaseClient {
   if (!supabaseInstance) {
-    if (!supabaseUrl || !supabaseAnonKey) {
-        throw new Error('Missing Supabase URL or Anon Key for public client. Check your .env.local file.');
-    }
     supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
   }
   return supabaseInstance;
@@ -31,18 +28,12 @@ export function getSupabaseClient(): SupabaseClient {
 /**
  * Creates and returns a new instance of the admin Supabase client.
  * This function should only be called from server-side code (Server Actions, API Routes).
- * It reads environment variables at the time of the call to ensure they are available.
  */
 export function getSupabaseAdminClient(): SupabaseClient {
-    const adminUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const serviceKey = process.env.SUPABASE_SERVICE_KEY;
-
-    if (!adminUrl || !serviceKey) {
-        throw new Error('Missing Supabase URL or Service Key for admin client. Ensure NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_KEY are set in your environment.');
-    }
+    const serviceKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmZnZ2eGR0ZnN4Zm5rb3dnZHp1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjQ2MTM3NywiZXhwIjoyMDcyMDM3Mzc3fQ.YnmKw7BIjl-oKDCbpQVZ60ZvzgNE4nj4EOh2lyGDf4A";
     
     // Create a new client each time to ensure it's used in a secure server context.
-    return createClient(adminUrl, serviceKey, {
+    return createClient(supabaseUrl, serviceKey, {
       auth: {
         autoRefreshToken: false,
         persistSession: false,
