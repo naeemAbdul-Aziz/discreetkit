@@ -129,9 +129,9 @@ export function ProductSelector() {
                             const hasStudentDeal = isStudent && product.studentPriceGHS;
 
                             return (
-                            <CarouselItem key={product.id} className="basis-4/5 sm:basis-1/2">
+                            <CarouselItem key={product.id} className="md:basis-1/2">
                                 <div className="p-1 h-full">
-                                <Card key={product.id} className={cn("flex h-full flex-col overflow-hidden rounded-2xl shadow-sm transition-shadow hover:shadow-lg", isBundle && "bg-muted", hasStudentDeal && "border-primary border-2")}>
+                                <Card key={product.id} className={cn("flex h-full flex-col overflow-hidden rounded-2xl shadow-sm transition-shadow hover:shadow-lg", hasStudentDeal && "border-primary border-2")}>
                                     <CardContent className="flex flex-grow flex-col p-0">
                                         <div className="relative flex aspect-square items-center justify-center overflow-hidden">
                                             <Image
@@ -139,7 +139,7 @@ export function ProductSelector() {
                                                 alt={product.name}
                                                 fill
                                                 className="object-contain p-4"
-                                                sizes="(max-width: 640px) 80vw, 40vw"
+                                                sizes="(max-width: 768px) 80vw, 40vw"
                                                 data-ai-hint="medical test kit"
                                                 placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(300, 300))}`}
                                             />
@@ -148,7 +148,7 @@ export function ProductSelector() {
                                             <h3 className="flex-grow text-base font-semibold md:text-lg">{product.name}</h3>
                                             <p className="mt-1 min-h-[3rem] text-sm text-muted-foreground">{product.description}</p>
                                             
-                                            <div className="mt-4 flex items-center gap-4">
+                                            <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
                                                 {!isBundle && (
                                                 <Badge variant="outline" className="border-green-600/50 bg-green-50/50 text-green-700 font-medium">
                                                     <Award className="mr-1.5 h-3.5 w-3.5" />
@@ -244,5 +244,3 @@ export function ProductSelector() {
         </section>
     );
 }
-
-    
