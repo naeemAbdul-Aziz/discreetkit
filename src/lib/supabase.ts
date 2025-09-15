@@ -1,4 +1,3 @@
-
 /**
  * @file This file sets up the Supabase clients for server-side and client-side use.
  *
@@ -45,7 +44,7 @@ export function getSupabaseAdminClient(): SupabaseClient {
     // SECURITY: This key should be loaded from environment variables and never be hardcoded.
     // It is stored in .env.local which is NOT checked into source control.
     const serverSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const serverSupabaseServiceKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmZnZ2eGR0ZnN4Zm5rb3dnZHp1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjQ2MTM3NywiZXhwIjoyMDcyMDM3Mzc3fQ.YnmKw7BIjl-oKDCbpQVZ60ZvzgNE4nj4EOh2lyGDf4A";
+    const serverSupabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
     
     if (!serverSupabaseUrl || !serverSupabaseServiceKey) {
         throw new Error('Missing Supabase URL or Service Key for admin client. Ensure NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_KEY are set in your environment.');
