@@ -88,8 +88,6 @@ export async function createOrderAction(prevState: any, formData: FormData) {
         delivery_area: finalDeliveryArea,
         delivery_address_note: validatedFields.data.deliveryAddressNote,
         phone_masked: validatedFields.data.phone_masked,
-        // email: validatedFields.data.email, // This column doesn't exist in the DB schema
-        is_student: isStudent,
         ...priceDetails,
       })
       .select('id')
@@ -192,7 +190,7 @@ export async function getOrderAction(code: string): Promise<Order | null> {
     items: items,
     deliveryArea: order.delivery_area,
     deliveryAddressNote: order.delivery_address_note,
-    isStudent: order.is_student,
+    isStudent: !!order.student_discount && order.student_discount > 0, // Infer from discount
     subtotal: order.subtotal,
     studentDiscount: order.student_discount,
     deliveryFee: order.delivery_fee,
