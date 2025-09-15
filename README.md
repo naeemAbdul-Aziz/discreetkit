@@ -1,3 +1,4 @@
+
 # DiscreetKit Ghana - Confidential Self-Test Kits
 
 This repository contains the source code for the DiscreetKit Ghana web application, a service designed to provide private, anonymous, and confidential self-test kits for HIV and pregnancy to young people and students in Ghana.
@@ -36,7 +37,7 @@ Create a `.env.local` file in the root of your project and add the following env
 
 ```
 # Supabase
-NEXT_PUBLIC_SUPABASE_URL="https://xffvvxdtfsxfnkowgdz.supabase.co"
+NEXT_PUBLIC_SUPABASE_URL="https://xffvvxdtfsxfnkowgdzu.supabase.co"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmZnZ2eGR0ZnN4Zm5rb3dnZHp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0NjEzNzcsImV4cCI6MjA3MjAzNzM3N30.YJafTn5uFrfVpaZWpa2OwS2AZsI_ul7bmm6lMTKsJ9A"
 SUPABASE_SERVICE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmZnZ2eGR0ZnN4Zm5rb3dnZHp1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjQ2MTM3NywiZXhwIjoyMDcyMDM3Mzc3fQ.YnmKw7BIjl-oKDCbpQVZ60ZvzgNE4nj4EOh2lyGDf4A"
 
