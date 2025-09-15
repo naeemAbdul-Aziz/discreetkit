@@ -36,7 +36,7 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
       {
-        protocol: 'httpss',
+        protocol: 'https',
         hostname: 'api.paystack.co',
         port: '',
         pathname: '/**',
