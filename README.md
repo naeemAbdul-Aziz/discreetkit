@@ -72,4 +72,3 @@ The application will be available at `http://localhost:9002`.
 ## 📦 Deployment
 
 This project is optimized for deployment on Vercel or Firebase App Hosting. Simply connect your Git repository and configure the environment variables in the hosting provider's dashboard.
-```
