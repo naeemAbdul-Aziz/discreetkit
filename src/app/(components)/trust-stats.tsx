@@ -4,7 +4,7 @@ import Image from 'next/image';
 const stats = [
   {
     value: 'Thousands',
-    label: 'Served Confidentially',
+    label: 'Kits Delivered',
   },
   {
     value: '4+',
@@ -52,6 +52,7 @@ export function TrustStats() {
                 className="rounded-2xl object-cover shadow-lg"
                 data-ai-hint="student ghana"
                 placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 500))}`}
+                sizes="(max-width: 768px) 50vw, 33vw"
               />
             </div>
             <div className="absolute bottom-0 left-0 w-2/4 max-w-[250px] md:w-1/2 transform -rotate-6">
@@ -63,6 +64,7 @@ export function TrustStats() {
                 className="rounded-2xl object-cover shadow-2xl border-4 border-background"
                 data-ai-hint="health professional"
                 placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
+                sizes="(max-width: 768px) 50vw, 33vw"
               />
             </div>
           </div>
