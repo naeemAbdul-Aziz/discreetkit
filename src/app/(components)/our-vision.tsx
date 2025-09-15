@@ -16,7 +16,7 @@ const visionPoints = [
     title: "Technology as Your Shield",
     description: "In a world where data is everything, we use technology not to collect, but to protect. Our entire system is engineered for anonymity. We intentionally designed it without user accounts, name requirements, or email sign-ups. Your order is tied to a unique, anonymous code—not your identity.",
     details: "This isn't just a feature; it's our promise. By stripping away the need for personal data, we eliminate the risk and anxiety. You can focus entirely on your health, confident that your privacy is shielded by a system built to forget you.",
-    imageUrl: "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxzb21lb25lJTIwdXNpbmclMjBsYXB0b3AlMjBwcml2YXRlbHl8ZW58MHx8fHwxNzU2Mzk5MDQwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+    imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757944636/hug_soldier_empathy_oxnes6.jpg",
     imageHint: "person using laptop privately",
   },
   {
