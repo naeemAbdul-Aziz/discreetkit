@@ -34,7 +34,7 @@ export function Hero() {
                 className="text-center md:text-left"
             >
                 <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
-                    Private Health Answers, <span className="font-light italic text-primary">Delivered Discreetly.</span>
+                    Your Health, <span className="font-light italic text-primary">Your Terms.</span>
                 </h1>
                 <p className="mt-4 max-w-md mx-auto md:mx-0 text-base text-muted-foreground">
                     DiscreetKit empowers you to take control of your health with confidential, WHO-approved self-test kits delivered right to your door.
