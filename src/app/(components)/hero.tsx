@@ -34,7 +34,7 @@ export function Hero() {
                 className="md:col-span-2 text-center md:text-left"
             >
                 <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
-                    Get <span className="font-light italic text-primary">Sorted</span> Quietly.
+                    Get Sorted <span className="font-light italic text-primary">Quietly</span>.
                     <br />
                     Stay Supported Fully.
                 </h1>
@@ -72,4 +72,3 @@ export function Hero() {
     </section>
   );
 }
-
