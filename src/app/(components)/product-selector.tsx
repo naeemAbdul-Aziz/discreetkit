@@ -1,18 +1,17 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import type { EmblaCarouselType } from 'embla-carousel';
-import Autoplay from 'embla-carousel-autoplay';
+import { useState, useEffect } from 'react';
 import { products } from '@/lib/data';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ArrowRight, Plus, Minus, Trash2, ShieldCheck, Award, Truck, Check } from 'lucide-react';
+import { Plus, Minus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useCart } from '@/hooks/use-cart';
-import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+import { ArrowRight } from 'lucide-react';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -33,15 +32,8 @@ const toBase64 = (str: string) =>
     ? Buffer.from(str).toString('base64')
     : window.btoa(str);
 
-
-const benefits = [
-    { icon: ShieldCheck, text: '100% Private & Anonymous' },
-    { icon: Award, text: 'WHO-Approved Accuracy' },
-    { icon: Truck, text: 'Discreet, Unbranded Packaging' },
-];
-
 export function ProductSelector() {
-    const { addItem, getItemQuantity, isStudent } = useCart();
+    const { addItem, updateQuantity, getItemQuantity, isStudent } = useCart();
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
@@ -68,10 +60,9 @@ export function ProductSelector() {
                     const quantity = isMounted ? getItemQuantity(product.id) : 0;
                     const hasStudentDeal = isStudent && product.studentPriceGHS;
                     const price = hasStudentDeal ? product.studentPriceGHS : product.priceGHS;
-                    const isInCart = quantity > 0;
-
+                    
                     return (
-                        <Card key={product.id} className="flex flex-col overflow-hidden rounded-xl shadow-sm transition-shadow hover:shadow-lg">
+                        <Card key={product.id} className="group flex flex-col overflow-hidden rounded-xl shadow-sm transition-shadow hover:shadow-lg">
                             <div className="relative flex aspect-square items-center justify-center overflow-hidden bg-muted p-4">
                                 <Image
                                     src={product.imageUrl}
@@ -83,6 +74,11 @@ export function ProductSelector() {
                                     data-ai-hint="medical test kit"
                                     placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(250, 250))}`}
                                 />
+                                {hasStudentDeal && (
+                                     <Badge variant="secondary" className="absolute left-3 top-3 bg-success text-success-foreground">
+                                        Student Deal
+                                    </Badge>
+                                )}
                             </div>
                             <div className="flex flex-grow flex-col p-4 md:p-6 bg-card">
                                 <h3 className="flex-grow text-base font-bold md:text-lg">{product.name}</h3>
@@ -103,31 +99,30 @@ export function ProductSelector() {
                                                 </p>
                                             )}
                                     </div>
-                                    <Button 
-                                        onClick={() => !isInCart && addItem(product)} 
-                                        variant={isInCart ? 'secondary' : 'default'}
-                                        className="rounded-full w-[120px]"
-                                        disabled={!isMounted || isInCart}
-                                    >
-                                        {isMounted ? (
-                                            isInCart ? (
-                                                <>
-                                                    <Check className="mr-2 h-4 w-4" />
-                                                    Added
-                                                </>
-                                            ) : (
-                                                <>
+                                    
+                                    <div className="w-[140px] text-right">
+                                        {!isMounted ? (
+                                                <Button className="w-full" disabled>
                                                     <Plus className="mr-2 h-4 w-4" />
                                                     Add to cart
-                                                </>
-                                            )
+                                                </Button>
+                                        ) : quantity > 0 ? (
+                                             <div className="flex h-10 items-center justify-center rounded-full border border-primary/50 bg-background p-1 shadow-sm w-full">
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-primary" onClick={() => updateQuantity(product.id, quantity - 1)}>
+                                                    {quantity === 1 ? <Trash2 className="h-4 w-4" /> : <Minus className="h-4 w-4" />}
+                                                </Button>
+                                                <span className="w-8 flex-1 text-center font-bold text-foreground">{quantity}</span>
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-primary" onClick={() => updateQuantity(product.id, quantity + 1)}>
+                                                    <Plus className="h-4 w-4" />
+                                                </Button>
+                                            </div>
                                         ) : (
-                                            <>
+                                            <Button onClick={() => addItem(product)} className="w-full">
                                                 <Plus className="mr-2 h-4 w-4" />
                                                 Add to cart
-                                            </>
+                                            </Button>
                                         )}
-                                    </Button>
+                                    </div>
                                 </div>
                             </div>
                         </Card>
