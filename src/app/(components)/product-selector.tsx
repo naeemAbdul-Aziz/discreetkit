@@ -8,9 +8,8 @@ import { products } from '@/lib/data';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ArrowRight, Plus, Minus, Trash2, ShieldCheck, Award, Truck, Play, Pause, GraduationCap, CheckCircle } from 'lucide-react';
+import { ArrowRight, Plus, Minus, Trash2, ShieldCheck, Award, Truck, Check } from 'lucide-react';
 import Link from 'next/link';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { useCart } from '@/hooks/use-cart';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
@@ -42,203 +41,106 @@ const benefits = [
 ];
 
 export function ProductSelector() {
-    const { addItem, updateQuantity, getItemQuantity, isStudent } = useCart();
+    const { addItem, getItemQuantity, isStudent } = useCart();
     const [isMounted, setIsMounted] = useState(false);
-    const [api, setApi] = useState<EmblaCarouselType | undefined>();
-    const [isPlaying, setIsPlaying] = useState(true);
-    const [selectedIndex, setSelectedIndex] = useState(0);
 
     useEffect(() => {
         setIsMounted(true);
     }, []);
 
-    const togglePlay = useCallback(() => {
-        const autoplay = api?.plugins()?.autoplay;
-        if (!autoplay) return;
-
-        if (autoplay.isPlaying()) {
-        autoplay.stop();
-        } else {
-        autoplay.play();
-        }
-        setIsPlaying((prev) => !prev);
-    }, [api]);
-
-    const onSelect = useCallback((emblaApi: EmblaCarouselType) => {
-        setSelectedIndex(emblaApi.selectedScrollSnap());
-    }, []);
-
-    useEffect(() => {
-        if (!api) return;
-
-        onSelect(api);
-        api.on('select', onSelect);
-        api.on('reInit', onSelect);
-        api.on('autoplay:play', () => setIsPlaying(true));
-        api.on('autoplay:stop', () => setIsPlaying(false));
-
-        return () => {
-        api?.off('select', onSelect);
-        };
-    }, [api, onSelect]);
-
-
     return (
         <section id="products" className="bg-background py-12 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                <div className="lg:col-span-1 lg:sticky lg:top-24">
-                    <div className="text-left">
-                        <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-primary">
-                            Private & Reliable
-                        </p>
-                        <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-                           WHO-Approved Test Kits
-                        </h2>
-                        <p className="mt-4 text-base text-muted-foreground">
-                            We've built every part of our service with your <Link href="/privacy" className="text-primary font-medium hover:underline">privacy</Link>, convenience, and well-being in mind.
-                        </p>
-                        <ul className="mt-6 space-y-4">
-                            {benefits.map(benefit => (
-                                <li key={benefit.text} className="flex items-center gap-3">
-                                    <benefit.icon className="h-5 w-5 text-primary" />
-                                    <span className="text-foreground font-medium">{benefit.text}</span>
-                                </li>
-                            ))}
-                        </ul>
-                        <Button asChild variant="outline" className="mt-8">
-                            <Link href="/cart">
-                                Browse All Kits
-                                <ArrowRight />
-                            </Link>
-                        </Button>
-                    </div>
-                </div>
+            <div className="text-center mb-12">
+                <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-primary">
+                    Our Products
+                </p>
+                <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+                   Confidential Self-Test Kits
+                </h2>
+                <p className="mt-4 max-w-2xl mx-auto text-base text-muted-foreground">
+                    Choose from our selection of WHO-approved, private self-test kits. Delivered discreetly to you.
+                </p>
+            </div>
 
-                <div className="lg:col-span-2">
-                     <Carousel
-                        setApi={setApi}
-                        opts={{ align: 'start', loop: true }}
-                        plugins={[Autoplay({ delay: 5000, stopOnInteraction: true, stopOnMouseEnter: true })]}
-                        className="w-full"
-                    >
-                        <CarouselContent>
-                        {products.map((product) => {
-                            const quantity = isMounted ? getItemQuantity(product.id) : 0;
-                            const isBundle = product.id === 3;
-                            const hasStudentDeal = isStudent && product.studentPriceGHS;
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {products.map((product) => {
+                    const quantity = isMounted ? getItemQuantity(product.id) : 0;
+                    const hasStudentDeal = isStudent && product.studentPriceGHS;
+                    const price = hasStudentDeal ? product.studentPriceGHS : product.priceGHS;
+                    const isInCart = quantity > 0;
 
-                            return (
-                            <CarouselItem key={product.id} className="md:basis-1/2">
-                                <div className="p-1 h-full">
-                                <Card key={product.id} className={cn("flex h-full flex-col overflow-hidden rounded-2xl shadow-sm transition-shadow hover:shadow-lg", hasStudentDeal && "border-primary border-2")}>
-                                    <CardContent className="flex flex-grow flex-col p-0">
-                                        <div className="relative flex aspect-square items-center justify-center overflow-hidden">
-                                            <Image
-                                                src={product.imageUrl}
-                                                alt={product.name}
-                                                fill
-                                                className="object-contain p-4"
-                                                sizes="(max-width: 768px) 80vw, 40vw"
-                                                data-ai-hint="medical test kit"
-                                                placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(300, 300))}`}
-                                            />
-                                        </div>
-                                        <div className="flex flex-grow flex-col p-4 md:p-6">
-                                            <h3 className="flex-grow text-base font-semibold md:text-lg">{product.name}</h3>
-                                            <p className="mt-1 min-h-[3rem] text-sm text-muted-foreground">{product.description}</p>
-                                            
-                                            <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
-                                                {!isBundle && (
-                                                <Badge variant="outline" className="border-green-600/50 bg-green-50/50 text-green-700 font-medium">
-                                                    <Award className="mr-1.5 h-3.5 w-3.5" />
-                                                    WHO-Approved
-                                                </Badge>
-                                                )}
-                                                <div className="flex items-center gap-1.5 text-xs text-green-600 font-medium">
-                                                    <CheckCircle className="h-3.5 w-3.5" />
-                                                    <span>In Stock - Ready to ship</span>
-                                                </div>
-                                            </div>
-
-                                            <div className="mt-4 border-t pt-4 flex justify-between items-center">
-                                                <div className="text-left">
-                                                {hasStudentDeal ? (
-                                                        <>
-                                                            <p className="font-bold text-success text-lg">GHS {product.studentPriceGHS?.toFixed(2)}</p>
-                                                            <p className="text-muted-foreground/80 line-through text-xs font-normal">
-                                                                GHS {product.priceGHS.toFixed(2)}
-                                                            </p>
-                                                            <div className="mt-1 flex items-center gap-1.5 text-xs font-medium text-primary">
-                                                                <GraduationCap className="h-3.5 w-3.5" />
-                                                                <span>Student Discount Applied</span>
-                                                            </div>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <p className="font-bold text-lg text-foreground">
-                                                                GHS {product.priceGHS.toFixed(2)}
-                                                            </p>
-                                                            {isBundle && (
-                                                                <p className="mt-1 text-xs font-medium text-green-600">Save GHS 10.00 vs. buying two kits separately.</p>
-                                                            )}
-                                                        </>
-                                                    )}
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    {isMounted && (quantity > 0 ? (
-                                                        <div className="flex h-10 items-center justify-between rounded-full border border-primary/50 bg-background p-1 shadow-sm">
-                                                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-primary" onClick={() => updateQuantity(product.id, quantity - 1)}>
-                                                                {quantity === 1 ? <Trash2 className="h-4 w-4" /> : <Minus className="h-4 w-4" />}
-                                                            </Button>
-                                                            <span className="w-5 text-center font-bold text-foreground">{quantity}</span>
-                                                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-primary" onClick={() => updateQuantity(product.id, quantity + 1)}>
-                                                                <Plus className="h-4 w-4" />
-                                                            </Button>
-                                                        </div>
-                                                    ) : (
-                                                        <Button onClick={() => addItem(product)} variant="outline" className="rounded-full">
-                                                            Add to Cart <Plus className="ml-2 h-4 w-4" />
-                                                        </Button>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
+                    return (
+                        <Card key={product.id} className="flex flex-col overflow-hidden rounded-xl shadow-sm transition-shadow hover:shadow-lg">
+                            <div className="relative flex aspect-square items-center justify-center overflow-hidden bg-muted p-4">
+                                <Image
+                                    src={product.imageUrl}
+                                    alt={product.name}
+                                    width={250}
+                                    height={250}
+                                    className="object-contain transition-transform duration-300 group-hover:scale-105"
+                                    sizes="(max-width: 768px) 80vw, 30vw"
+                                    data-ai-hint="medical test kit"
+                                    placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(250, 250))}`}
+                                />
+                            </div>
+                            <div className="flex flex-grow flex-col p-4 md:p-6 bg-card">
+                                <h3 className="flex-grow text-base font-bold md:text-lg">{product.name}</h3>
+                                <p className="mt-1 min-h-[3rem] text-sm text-muted-foreground">{product.description}</p>
+                                
+                                <div className="mt-6 flex items-center justify-between">
+                                    <div className="text-left">
+                                        {hasStudentDeal ? (
+                                                <>
+                                                    <p className="font-bold text-success text-xl">GHS {price.toFixed(2)}</p>
+                                                    <p className="text-muted-foreground/80 line-through text-xs font-normal">
+                                                        GHS {product.priceGHS.toFixed(2)}
+                                                    </p>
+                                                </>
+                                            ) : (
+                                                <p className="font-bold text-xl text-foreground">
+                                                    GHS {price.toFixed(2)}
+                                                </p>
+                                            )}
+                                    </div>
+                                    <Button 
+                                        onClick={() => !isInCart && addItem(product)} 
+                                        variant={isInCart ? 'secondary' : 'default'}
+                                        className="rounded-full w-[120px]"
+                                        disabled={!isMounted || isInCart}
+                                    >
+                                        {isMounted ? (
+                                            isInCart ? (
+                                                <>
+                                                    <Check className="mr-2 h-4 w-4" />
+                                                    Added
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Plus className="mr-2 h-4 w-4" />
+                                                    Add to cart
+                                                </>
+                                            )
+                                        ) : (
+                                            <>
+                                                <Plus className="mr-2 h-4 w-4" />
+                                                Add to cart
+                                            </>
+                                        )}
+                                    </Button>
                                 </div>
-                            </CarouselItem>
-                            );
-                        })}
-                        </CarouselContent>
-                         <CarouselPrevious className="left-[-12px] sm:left-[-16px] h-10 w-10" />
-                        <CarouselNext className="right-[-12px] sm:right-[-16px] h-10 w-10" />
-                    </Carousel>
-                    <div className="flex items-center justify-center gap-4 mt-8">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={togglePlay}
-                            className="rounded-full h-10 w-10 text-muted-foreground hover:text-foreground"
-                            aria-label={isPlaying ? 'Pause carousel' : 'Play carousel'}
-                        >
-                            {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-                        </Button>
-                        <div className="flex items-center justify-center gap-2">
-                        {products.map((_, index) => (
-                            <button
-                            key={index}
-                            onClick={() => api?.scrollTo(index)}
-                            className={cn(
-                                'h-2 w-2 rounded-full bg-border transition-all',
-                                index === selectedIndex ? 'w-4 bg-primary' : 'hover:bg-primary/50'
-                            )}
-                            aria-label={`Go to slide ${index + 1}`}
-                            />
-                        ))}
-                        </div>
-                    </div>
-                </div>
+                            </div>
+                        </Card>
+                    );
+                })}
+            </div>
+             <div className="text-center mt-12">
+                <Button asChild variant="outline">
+                    <Link href="/cart">
+                        Review Your Cart and Proceed
+                        <ArrowRight />
+                    </Link>
+                </Button>
             </div>
         </div>
         </section>
