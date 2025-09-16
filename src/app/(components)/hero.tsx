@@ -34,10 +34,10 @@ export function Hero() {
                 className="text-center md:text-left"
             >
                 <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
-                    Your Health, <span className="font-light italic text-primary">Your Terms.</span>
+                    From <span className="font-light italic text-primary">Wondering</span> to Knowing.
                 </h1>
                 <p className="mt-4 max-w-md mx-auto md:mx-0 text-base text-muted-foreground">
-                    DiscreetKit empowers you to take control of your health with confidential, WHO-approved self-test kits delivered right to your door.
+                    Get confidential, WHO-approved self-test kits delivered to your door. We're here for what's next.
                 </p>
                 
                 <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
