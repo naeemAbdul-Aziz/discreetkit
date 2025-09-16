@@ -26,12 +26,12 @@ const toBase64 = (str: string) =>
 
 export function Hero() {
   return (
-    <section className="bg-muted py-12 md:py-20 overflow-hidden">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+    <section className="bg-muted overflow-hidden">
+      <div className="container mx-auto px-4 md:px-6 py-12 md:py-20">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8 items-center">
             {/* Left Content Column */}
             <div
-                className="text-center md:text-left"
+                className="md:col-span-2 text-center md:text-left"
             >
                 <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
                     Get <span className="font-light italic text-primary">Sorted</span> Quietly.
@@ -54,17 +54,17 @@ export function Hero() {
 
             {/* Right Image Column */}
             <div 
-                className="relative flex items-center justify-center min-h-[350px] md:min-h-[450px]"
+                className="relative md:col-span-3 h-[300px] md:h-[450px] w-full"
             >
                 <Image
-                    src="https://res.cloudinary.com/dzfa6wqb8/image/upload/w_500,h_500,c_fill,q_auto,f_auto/v1756313856/woman_smiling_package_g5rnqh.jpg"
-                    alt="A happy woman receiving a delivery box, representing discreet and satisfying service"
-                    width={500}
-                    height={500}
+                    src="https://res.cloudinary.com/dzfa6wqb8/image/upload/w_800,h_600,c_fill,q_auto,f_auto/v1756313856/woman_smiling_package_g5rnqh.jpg"
+                    alt="A woman viewed from above, sitting on a couch and holding a discreet delivery box and her phone."
+                    fill
                     priority
-                    className="object-contain rounded-3xl shadow-2xl z-10 w-full max-w-md h-auto"
+                    className="object-cover rounded-3xl shadow-2xl"
+                    sizes="(max-width: 768px) 100vw, 50vw"
                     data-ai-hint="happy woman box"
-                    placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(500, 500))}`}
+                    placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 600))}`}
                 />
             </div>
         </div>
@@ -72,3 +72,4 @@ export function Hero() {
     </section>
   );
 }
+
