@@ -34,7 +34,9 @@ export function Hero() {
                 className="text-center md:text-left"
             >
                 <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
-                    From <span className="font-light italic text-primary">Wondering</span> to Knowing.
+                    Get <span className="font-light italic text-primary">Sorted</span> Quietly.
+                    <br />
+                    Stay Supported Fully.
                 </h1>
                 <p className="mt-4 max-w-md mx-auto md:mx-0 text-base text-muted-foreground">
                     Get confidential, WHO-approved self-test kits delivered to your door. We're here for what's next.
