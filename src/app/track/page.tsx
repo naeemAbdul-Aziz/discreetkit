@@ -24,10 +24,13 @@ import {
   Server,
   PackageCheck,
   CreditCard,
+  MapPin,
+  ClipboardList,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 import { getSupabaseClient } from '@/lib/supabase';
+import Image from 'next/image';
 
 export const dynamic = 'force-dynamic';
 
@@ -133,7 +136,7 @@ function Tracker() {
     : -1;
 
   return (
-    <div className="w-full max-w-2xl">
+    <div className="w-full max-w-3xl">
       <Card className="rounded-2xl shadow-lg">
         <CardHeader>
           <CardTitle>Track Your Order</CardTitle>
@@ -188,12 +191,12 @@ function Tracker() {
       )}
 
       {order && (
-        <div className="mt-4 space-y-4">
-          <Card className="rounded-2xl shadow-lg">
-            <CardHeader>
-              <CardTitle>Order Status</CardTitle>
-            </CardHeader>
-            <CardContent>
+        <Card className="mt-4 rounded-2xl shadow-lg">
+          <CardContent className="p-4 sm:p-6 grid gap-6">
+
+             {/* Order Status Section */}
+            <div>
+              <h3 className="text-lg font-bold text-foreground mb-4">Order Status</h3>
               <div className="space-y-0">
                 {order.status === 'pending_payment' ? (
                   <div className="flex gap-4">
@@ -246,97 +249,99 @@ function Tracker() {
                   })
                 )}
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          <Card className="rounded-2xl shadow-lg">
-            <CardHeader>
-                <CardTitle>Order Summary</CardTitle>
-                <CardDescription>
-                    Details of your confidential order.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
+            <Separator />
+
+            {/* Order Summary & Delivery Details Grid */}
+            <div className="grid md:grid-cols-2 gap-6">
+               {/* Order Summary */}
                 <div className="space-y-4">
-                  {order.items.map(item => (
-                    <div key={item.id} className="flex justify-between items-start">
-                      <div>
-                        <p className="font-semibold">{item.name}</p>
-                        <p className="text-sm text-muted-foreground">Quantity: {item.quantity}</p>
-                      </div>
-                       <p className="font-medium">
-                          GHS {(order.isStudent && item.studentPriceGHS ? item.studentPriceGHS : item.priceGHS).toFixed(2)}
-                       </p>
-                    </div>
-                  ))}
-                  <Separator />
-                   <div className="space-y-2 text-sm">
+                    <h3 className="text-lg font-bold text-foreground">Order Summary</h3>
+                    {order.items.map(item => (
+                        <div key={item.id} className="flex justify-between items-center gap-2">
+                            <div className="flex items-center gap-3">
+                                <div className="relative h-12 w-12 flex-shrink-0 rounded-md bg-muted overflow-hidden">
+                                     <Image src={item.imageUrl} alt={item.name} fill className="object-contain p-1" />
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-sm">{item.name}</p>
+                                    <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
+                                </div>
+                            </div>
+                        <p className="font-medium text-sm text-right">
+                            GHS {(order.isStudent && item.studentPriceGHS ? item.studentPriceGHS : item.priceGHS).toFixed(2)}
+                        </p>
+                        </div>
+                    ))}
+                    <Separator />
+                    <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                             <p className="text-muted-foreground">Subtotal</p>
                             <p className="font-medium text-foreground">GHS {order.subtotal.toFixed(2)}</p>
                         </div>
-                    {order.studentDiscount > 0 && (
-                        <div className="flex justify-between text-success font-medium">
-                            <p>Student Discount</p>
-                            <p>- GHS {order.studentDiscount.toFixed(2)}</p>
-                        </div>
+                        {order.studentDiscount > 0 && (
+                            <div className="flex justify-between text-success font-medium">
+                                <p>Student Discount</p>
+                                <p>- GHS {order.studentDiscount.toFixed(2)}</p>
+                            </div>
                         )}
                         <div className="flex justify-between">
                             <p className="text-muted-foreground">Delivery Fee</p>
                             <p className="font-medium text-foreground">GHS {order.deliveryFee.toFixed(2)}</p>
                         </div>
                     </div>
-                  <Separator />
-                   <div className="flex items-baseline justify-between font-bold text-base">
+                    <Separator />
+                    <div className="flex items-baseline justify-between font-bold text-base">
                         <p>Total</p>
                         <p>GHS {order.totalPrice.toFixed(2)}</p>
                     </div>
                 </div>
-            </CardContent>
-          </Card>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card className="rounded-2xl shadow-lg">
-                <CardHeader>
-                    <CardTitle>Delivery Details</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="space-y-2 text-sm">
-                        <p className="font-medium text-muted-foreground">Delivery Location</p>
-                        <p className="font-semibold text-foreground">{order.deliveryArea}</p>
-                        {order.deliveryAddressNote && (
-                            <>
-                                <p className="font-medium text-muted-foreground pt-2">Note for Rider</p>
-                                <p className="text-foreground italic">"{order.deliveryAddressNote}"</p>
-                            </>
-                        )}
-                    </div>
-                </CardContent>
-            </Card>
-            <Card className="rounded-2xl shadow-lg">
-                <CardHeader>
-                    <CardTitle>Event History</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="space-y-4">
-                        {order.events.map((event, index) => (
-                        <div key={index} className="relative text-sm">
-                            <p className="font-semibold">{event.status}</p>
-                            <p className="text-muted-foreground">{event.note}</p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                            {new Date(event.date).toLocaleString()}
-                            </p>
+                 {/* Delivery & History */}
+                <div className="space-y-6">
+                     <div>
+                        <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
+                           <MapPin className="h-5 w-5 text-primary" /> Delivery Details
+                        </h3>
+                        <div className="space-y-2 text-sm pl-8">
+                            <p className="font-medium text-muted-foreground">Location</p>
+                            <p className="font-semibold text-foreground">{order.deliveryArea}</p>
+                            {order.deliveryAddressNote && (
+                                <>
+                                    <p className="font-medium text-muted-foreground pt-2">Note for Rider</p>
+                                    <p className="text-foreground italic">"{order.deliveryAddressNote}"</p>
+                                </>
+                            )}
                         </div>
-                        ))}
                     </div>
-                </CardContent>
-            </Card>
-          </div>
-        </div>
+                    
+                    <div>
+                         <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
+                             <ClipboardList className="h-5 w-5 text-primary" /> Event History
+                        </h3>
+                        <div className="space-y-4 pl-8">
+                            {order.events.map((event, index) => (
+                            <div key={index} className="relative text-sm">
+                                <p className="font-semibold">{event.status}</p>
+                                <p className="text-muted-foreground">{event.note}</p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                {new Date(event.date).toLocaleString()}
+                                </p>
+                            </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );
 }
+
 
 function TrackPageLoading() {
   return (

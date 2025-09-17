@@ -7,7 +7,7 @@ export function PartnerLogos() {
   const extendedPartners = [...partners, ...partners];
 
   return (
-    <section className="py-12 md:py-24 bg-muted">
+    <section className="py-12 md:py-16 bg-muted">
       <div className="container mx-auto px-4 md:px-6">
         <h2 className="mb-8 text-center text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           Our Network of Health & Student Partners
