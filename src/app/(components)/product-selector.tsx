@@ -61,8 +61,10 @@ function ProductCard({ product }: { product: typeof products[0] }) {
                 />
             </div>
             <div className="flex flex-grow flex-col pt-4 text-left">
-                <h3 className="flex-grow text-lg font-bold text-foreground leading-tight">{product.name}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{product.description}</p>
+                <div className="flex-grow">
+                    <h3 className="text-lg font-bold text-foreground leading-tight">{product.name}</h3>
+                    <p className="mt-2 text-sm text-muted-foreground">{product.description}</p>
+                </div>
                 
                 <div className="mt-6 flex items-center justify-between">
                     <div className="text-left">
@@ -127,7 +129,7 @@ export function ProductSelector() {
     }, [api, onSelect]);
 
     return (
-        <section id="products" className="pt-4 pb-12 md:pb-24">
+        <section id="products" className="pb-12 md:pb-24">
             <div className="container mx-auto px-4 md:px-6">
                 <div className="text-center mb-12">
                     <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-primary">
@@ -147,7 +149,7 @@ export function ProductSelector() {
                         <CarouselContent>
                             {featuredProducts.map((product) => (
                                 <CarouselItem key={product.id} className="basis-4/5">
-                                    <div className="p-1">
+                                    <div className="p-1 h-full">
                                         <ProductCard product={product} />
                                     </div>
                                 </CarouselItem>

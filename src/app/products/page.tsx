@@ -57,8 +57,10 @@ function ProductCard({ product }: { product: typeof products[0] }) {
                 />
             </div>
             <div className="flex flex-grow flex-col pt-4 text-left">
-                <h3 className="flex-grow text-lg font-bold text-foreground leading-tight">{product.name}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{product.description}</p>
+                <div className="flex-grow">
+                    <h3 className="text-lg font-bold text-foreground leading-tight">{product.name}</h3>
+                    <p className="mt-2 text-sm text-muted-foreground">{product.description}</p>
+                </div>
                 
                 <div className="mt-6 flex items-center justify-between">
                     <div className="text-left">
