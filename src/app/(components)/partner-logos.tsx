@@ -25,7 +25,7 @@ export function PartnerLogos() {
     <section className="py-12 md:py-16">
       <div className="container mx-auto px-4 md:px-6">
         <h2 className="mb-8 text-center text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-          Trusted by leading health partners and student bodies
+          Our Network of Health & Student Partners
         </h2>
         
         <div className="relative w-full overflow-hidden" style={{ maskImage: 'linear-gradient(to right, transparent, white 10%, white 90%, transparent)' }}>
