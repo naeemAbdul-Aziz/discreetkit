@@ -21,6 +21,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Checkbox } from '@/components/ui/checkbox';
+import Link from 'next/link';
 
 function SubmitButton({ disabled }: { disabled: boolean }) {
   const { pending } = useFormStatus();
@@ -85,6 +87,7 @@ export function OrderForm() {
 
   const [showOther, setShowOther] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -331,6 +334,28 @@ export function OrderForm() {
                         </div>
                     </div>
                 )}
+                 
+                 <Separator />
+
+                <div className="items-top flex space-x-2 pt-2">
+                    <Checkbox id="terms" checked={termsAccepted} onCheckedChange={(checked) => setTermsAccepted(checked as boolean)} />
+                    <div className="grid gap-1.5 leading-none">
+                        <label
+                        htmlFor="terms"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                        By checking this box, you agree to our{' '}
+                        <Link href="/terms" className="underline text-primary hover:text-primary/80" target="_blank">
+                            Terms and Conditions
+                        </Link>{' '}
+                        and{' '}
+                        <Link href="/privacy" className="underline text-primary hover:text-primary/80" target="_blank">
+                            Privacy Notice
+                        </Link>
+                        .
+                        </label>
+                    </div>
+                </div>
 
                  <div className="flex items-center gap-2 rounded-lg bg-muted p-3 text-muted-foreground">
                     <Lock className="h-5 w-5 text-success flex-shrink-0" />
@@ -340,7 +365,7 @@ export function OrderForm() {
         </Card>
 
         
-        <SubmitButton disabled={items.length === 0} />
+        <SubmitButton disabled={items.length === 0 || !termsAccepted} />
           
       </form>
     </>
