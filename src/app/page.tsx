@@ -4,6 +4,7 @@ import { Hero } from './(components)/hero';
 import { ClosingCta } from './(components)/closing-cta';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import { Card } from '@/components/ui/card';
 
 const componentMap = {
   ProductSelector: { height: '700px' },
@@ -87,40 +88,58 @@ export default function Home() {
       <SectionWrapper className="bg-background">
         <Hero />
       </SectionWrapper>
+      
       <SectionWrapper className="bg-background">
         <ProductSelector />
       </SectionWrapper>
-      <SectionWrapper className="bg-muted">
-        <PartnerLogos />
-      </SectionWrapper>
-      <SectionWrapper className="bg-background border-y">
+
+      <SectionWrapper className="bg-primary">
         <ProductBenefits />
       </SectionWrapper>
+
       <SectionWrapper className="bg-muted">
         <HowItWorks />
       </SectionWrapper>
+
       <SectionWrapper className="bg-background">
         <WhatsInTheKit />
       </SectionWrapper>
+
       <SectionWrapper className="bg-muted">
         <TrustStats />
       </SectionWrapper>
-       <SectionWrapper className="bg-background">
+
+      <SectionWrapper className="bg-muted">
+        <PartnerLogos />
+      </SectionWrapper>
+      
+      <SectionWrapper className="bg-background">
         <OurVision />
       </SectionWrapper>
+      
       <SectionWrapper className="bg-muted">
         <Testimonials />
       </SectionWrapper>
-      <SectionWrapper className="bg-background">
-        <ClosingCta />
-      </SectionWrapper>
+      
       <SectionWrapper className="bg-muted">
+        <div className="py-12 md:py-24">
+            <div className="container mx-auto px-4 md:px-6">
+                <Card className="p-0 overflow-hidden">
+                    <ClosingCta />
+                </Card>
+            </div>
+        </div>
+      </SectionWrapper>
+
+      <SectionWrapper className="bg-background">
         <CoverageMap />
       </SectionWrapper>
-      <SectionWrapper className="bg-background">
+      
+      <SectionWrapper className="bg-muted">
         <Faq />
       </SectionWrapper>
-      <SectionWrapper className="bg-muted">
+      
+      <SectionWrapper className="bg-background">
         <ContactUs />
       </SectionWrapper>
     </div>
