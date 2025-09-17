@@ -5,36 +5,36 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%; /* Alice Blue */
-    --foreground: 210 20% 18%; /* Deep Sapphire Text */
+    --background: 35 33% 97%; /* Soft Cream */
+    --foreground: 20 14% 20%; /* Dark Charcoal */
 
     --card: 0 0% 100%; /* Pure White */
-    --card-foreground: 210 20% 18%;
+    --card-foreground: 20 14% 20%;
 
-    --popover: 0 0% 100%; /* Pure White */
-    --popover-foreground: 210 20% 18%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 14% 20%;
 
-    --primary: 200 85% 40%; /* Vibrant Ocean Blue - Darkened for contrast */
+    --primary: 175 65% 30%; /* Deep Teal Green */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 140 80% 40%; /* Lively Spring Green - for success states */
+    --secondary: 175 50% 45%; /* Lighter Teal for secondary elements */
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 94%; /* Powder Blue */
-    --muted-foreground: 210 10% 40%;
+    --muted: 35 33% 94%; /* Slightly darker cream for muted backgrounds */
+    --muted-foreground: 20 10% 40%;
 
-    --accent: 30 90% 55%; /* Energetic Sunset Orange - for attention */
+    --accent: 25 80% 65%; /* Muted Peach/Orange */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 75% 50%; /* Bold Alert Red */
     --destructive-foreground: 0 0% 100%;
     
-    --success: 140 60% 40%; /* Lively Spring Green */
+    --success: 140 60% 40%; /* Keep the existing clear green for success states */
     --success-foreground: 0 0% 100%;
 
-    --border: 210 15% 88%;
-    --input: 210 15% 88%;
-    --ring: 200 85% 45%;
+    --border: 35 20% 88%;
+    --input: 35 20% 88%;
+    --ring: 175 65% 35%;
 
     --radius: 0.8rem;
   }
