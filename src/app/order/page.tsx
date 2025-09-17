@@ -64,7 +64,7 @@ export default function OrderPage() {
         <nav aria-label="Progress" className="my-12 max-w-md mx-auto">
             <ol role="list" className="flex items-center">
                 {steps.map((step, stepIdx) => (
-                <li key={step.name} className={cn("relative flex-1", stepIdx !== steps.length - 1 ? "pr-4" : "")}>
+                <li key={step.name} className={cn("relative flex-1", stepIdx !== steps.length - 1 ? "pr-8" : "")}>
                     {step.status === 'complete' ? (
                     <>
                         <div className="absolute inset-0 flex items-center" aria-hidden="true">
