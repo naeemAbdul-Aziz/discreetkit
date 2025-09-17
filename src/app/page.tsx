@@ -7,8 +7,8 @@ import { ProductBenefits } from './(components)/product-benefits';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const componentMap = {
-  HowItWorks: { height: '800px' },
   ProductSelector: { height: '700px' },
+  HowItWorks: { height: '800px' },
   WhatsInTheKit: { height: '500px' },
   TrustStats: { height: '400px' },
   OurVision: { height: '800px' },
@@ -24,13 +24,13 @@ const LoadingSkeleton = ({ height }: { height: string }) => (
   </div>
 );
 
-const HowItWorks = dynamic(
-  () => import('./(components)/how-it-works').then((mod) => mod.HowItWorks),
-  { loading: () => <LoadingSkeleton height={componentMap.HowItWorks.height} /> }
-);
 const ProductSelector = dynamic(
   () => import('./(components)/product-selector').then((mod) => mod.ProductSelector),
   { loading: () => <LoadingSkeleton height={componentMap.ProductSelector.height} /> }
+);
+const HowItWorks = dynamic(
+  () => import('./(components)/how-it-works').then((mod) => mod.HowItWorks),
+  { loading: () => <LoadingSkeleton height={componentMap.HowItWorks.height} /> }
 );
 const WhatsInTheKit = dynamic(
   () => import('./(components)/whats-in-the-kit').then((mod) => mod.WhatsInTheKit),
@@ -66,10 +66,10 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       <Hero />
+      <ProductSelector />
       <PartnerLogos />
       <ProductBenefits />
       <HowItWorks />
-      <ProductSelector />
       <WhatsInTheKit />
       <TrustStats />
       <OurVision />
