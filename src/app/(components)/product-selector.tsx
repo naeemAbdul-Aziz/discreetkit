@@ -47,14 +47,14 @@ function ProductCard({ product }: { product: typeof products[0] }) {
     const price = hasStudentDeal ? product.studentPriceGHS : product.priceGHS;
 
     return (
-        <Card className="flex h-full flex-col overflow-hidden rounded-2xl shadow-sm">
-            <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-muted">
+        <Card className="flex h-full flex-col overflow-hidden rounded-2xl shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+            <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-muted p-4">
                 <Image
                     src={product.imageUrl}
                     alt={product.name}
                     width={200}
                     height={200}
-                    className="object-contain p-4"
+                    className="object-contain"
                     sizes="(max-width: 768px) 80vw, 30vw"
                     data-ai-hint="medical test kit"
                     placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(200, 200))}`}
@@ -148,32 +148,11 @@ export function ProductSelector() {
                     </p>
                 </div>
                 
-                {/* Mobile Carousel */}
-                <div className="md:hidden">
-                    <Carousel setApi={setApi} opts={{ align: 'start' }} className="w-full">
-                        <CarouselContent>
-                            {featuredProducts.map((product) => (
-                                <CarouselItem key={product.id} className="basis-[85%] sm:basis-1/2">
-                                    <div className="p-1 h-full">
-                                        <ProductCard product={product} />
-                                    </div>
-                                </CarouselItem>
-                            ))}
-                        </CarouselContent>
-                    </Carousel>
-                    <div className="flex items-center justify-center gap-2 mt-8">
-                        {featuredProducts.map((_, index) => (
-                            <button
-                                key={index}
-                                onClick={() => api?.scrollTo(index)}
-                                className={cn(
-                                    'h-2 w-2 rounded-full bg-border transition-all',
-                                    index === selectedIndex ? 'w-4 bg-primary' : 'hover:bg-primary/50'
-                                )}
-                                aria-label={`Go to slide ${index + 1}`}
-                            />
-                        ))}
-                    </div>
+                {/* Mobile & Tablet Grid */}
+                <div className="grid grid-cols-2 gap-4 md:hidden">
+                    {featuredProducts.map((product) => (
+                        <ProductCard key={product.id} product={product} />
+                    ))}
                 </div>
 
                 {/* Desktop Grid */}

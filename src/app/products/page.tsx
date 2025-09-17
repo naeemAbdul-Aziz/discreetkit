@@ -43,14 +43,14 @@ function ProductCard({ product }: { product: typeof products[0] }) {
     const price = hasStudentDeal ? product.studentPriceGHS : product.priceGHS;
 
     return (
-        <Card className="flex h-full flex-col overflow-hidden rounded-2xl shadow-sm">
-            <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-muted">
+        <Card className="flex h-full flex-col overflow-hidden rounded-2xl shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+            <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-muted p-4">
                 <Image
                     src={product.imageUrl}
                     alt={product.name}
                     width={200}
                     height={200}
-                    className="object-contain p-4"
+                    className="object-contain"
                     sizes="(max-width: 768px) 80vw, 30vw"
                     data-ai-hint="medical test kit"
                     placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(200, 200))}`}

@@ -5,10 +5,10 @@
 
 @layer base {
   :root {
-    --background: 35 33% 97%; /* Soft Cream */
+    --background: 0 0% 100%; /* Pure White */
     --foreground: 20 14% 20%; /* Dark Charcoal */
 
-    --card: 0 0% 100%; /* Pure White */
+    --card: 35 33% 97%; /* Soft Cream */
     --card-foreground: 20 14% 20%;
 
     --popover: 0 0% 100%;
