@@ -9,7 +9,7 @@ import { Chatbot } from '@/components/chatbot';
 import NextTopLoader from 'nextjs-toploader';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://discreetkit.com';
-const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758105183/discreetkit_logo_1_dc765q.png';
+const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758107661/discreetkit_logo_3_zkdho6.png';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
