@@ -3,12 +3,13 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
+import { Card } from '@/components/ui/card';
 
 export function ClosingCta() {
   return (
     <section className="py-12 md:py-24">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="rounded-2xl bg-primary p-8 text-center shadow-lg md:p-16">
+        <Card className="rounded-2xl bg-primary p-8 text-center shadow-lg md:p-16">
           <h2 className="font-headline text-2xl font-bold tracking-tight text-primary-foreground sm:text-3xl">
             Your Health, Your Terms.
           </h2>
@@ -23,7 +24,7 @@ export function ClosingCta() {
               </Link>
             </Button>
           </div>
-        </div>
+        </Card>
       </div>
     </section>
   );
