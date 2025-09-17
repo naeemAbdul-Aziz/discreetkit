@@ -1,12 +1,12 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { products } from '@/lib/data';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { Plus, Minus, Trash2 } from 'lucide-react';
+import { Plus, Check } from 'lucide-react';
 import { useCart } from '@/hooks/use-cart';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -33,7 +33,7 @@ const toBase64 = (str: string) =>
     : window.btoa(str);
 
 function ProductCard({ product }: { product: typeof products[0] }) {
-    const { addItem, updateQuantity, getItemQuantity, isStudent } = useCart();
+    const { addItem, getItemQuantity, isStudent } = useCart();
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
@@ -41,64 +41,60 @@ function ProductCard({ product }: { product: typeof products[0] }) {
     }, []);
 
     const quantity = isMounted ? getItemQuantity(product.id) : 0;
+    const isInCart = quantity > 0;
     const hasStudentDeal = isStudent && product.studentPriceGHS;
     const price = hasStudentDeal ? product.studentPriceGHS : product.priceGHS;
 
     return (
         <Card className="group flex h-full flex-col overflow-hidden rounded-2xl shadow-sm transition-shadow hover:shadow-lg">
-            <div className="relative flex aspect-square items-center justify-center overflow-hidden bg-muted p-4">
+            <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-muted p-4">
                 <Image
                     src={product.imageUrl}
                     alt={product.name}
-                    width={250}
-                    height={250}
+                    width={200}
+                    height={200}
                     className="object-contain transition-transform duration-300 group-hover:scale-105"
                     sizes="(max-width: 768px) 80vw, 30vw"
                     data-ai-hint="medical test kit"
-                    placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(250, 250))}`}
+                    placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(200, 200))}`}
                 />
                 {hasStudentDeal && (
-                    <Badge variant="secondary" className="absolute left-3 top-3 bg-success text-success-foreground">
+                    <Badge variant="secondary" className="absolute left-3 top-3 bg-primary/20 text-primary border border-primary/30">
                         Student Deal
                     </Badge>
                 )}
             </div>
-            <div className="flex flex-grow flex-col p-4 md:p-6 bg-card">
-                <h3 className="flex-grow text-base font-bold text-foreground">{product.name}</h3>
-                <p className="mt-1 min-h-[3rem] text-sm text-muted-foreground">{product.description}</p>
+            <div className="flex flex-grow flex-col p-4 md:p-6 bg-card text-left">
+                <h3 className="flex-grow text-base font-bold text-foreground leading-tight">{product.name}</h3>
+                <p className="mt-2 min-h-[3rem] text-sm text-muted-foreground">{product.description}</p>
                 
                 <div className="mt-6 flex items-center justify-between">
                     <div className="text-left">
                         {hasStudentDeal ? (
                             <>
-                                <p className="font-bold text-success text-lg">GHS {price.toFixed(2)}</p>
+                                <p className="font-bold text-success text-xl">GHS {price.toFixed(2)}</p>
                                 <p className="text-muted-foreground/80 line-through text-xs font-normal">
                                     GHS {product.priceGHS.toFixed(2)}
                                 </p>
                             </>
                         ) : (
-                            <p className="font-bold text-lg text-foreground">
+                            <p className="font-bold text-xl text-foreground">
                                 GHS {price.toFixed(2)}
                             </p>
                         )}
                     </div>
                     
-                    <div className="w-[140px] text-right">
+                    <div className="w-auto text-right">
                         {!isMounted ? (
-                            <Button className="w-full" disabled>
+                            <Button disabled className="w-full">
                                 <Plus className="mr-2 h-4 w-4" />
                                 Add to cart
                             </Button>
-                        ) : quantity > 0 ? (
-                            <div className="flex h-10 items-center justify-center rounded-full border border-primary/50 bg-background p-1 shadow-sm w-full">
-                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-primary" onClick={() => updateQuantity(product.id, quantity - 1)}>
-                                    {quantity === 1 ? <Trash2 className="h-4 w-4" /> : <Minus className="h-4 w-4" />}
-                                </Button>
-                                <span className="w-8 flex-1 text-center font-bold text-foreground">{quantity}</span>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-primary" onClick={() => updateQuantity(product.id, quantity + 1)}>
-                                    <Plus className="h-4 w-4" />
-                                </Button>
-                            </div>
+                        ) : isInCart ? (
+                            <Button variant="outline" disabled className="border-green-500 text-green-600 w-full">
+                                <Check className="mr-2 h-4 w-4" />
+                                Added
+                            </Button>
                         ) : (
                             <Button onClick={() => addItem(product)} className="w-full">
                                 <Plus className="mr-2 h-4 w-4" />
@@ -130,7 +126,7 @@ export function ProductSelector() {
                     </p>
                 </div>
                 
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                     {featuredProducts.map((product) => (
                         <ProductCard key={product.id} product={product} />
                     ))}
