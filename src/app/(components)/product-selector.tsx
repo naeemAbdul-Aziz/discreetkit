@@ -6,12 +6,13 @@ import { products } from '@/lib/data';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { Plus, Check } from 'lucide-react';
+import { Plus, Check, Minus, Trash2 } from 'lucide-react';
 import { useCart } from '@/hooks/use-cart';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -33,7 +34,7 @@ const toBase64 = (str: string) =>
     : window.btoa(str);
 
 function ProductCard({ product }: { product: typeof products[0] }) {
-    const { addItem, getItemQuantity, isStudent } = useCart();
+    const { addItem, getItemQuantity, updateQuantity, isStudent } = useCart();
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
@@ -86,17 +87,22 @@ function ProductCard({ product }: { product: typeof products[0] }) {
                     
                     <div className="w-auto text-right">
                         {!isMounted ? (
-                            <Button disabled className="w-full">
+                            <Button disabled className="w-[140px]">
                                 <Plus className="mr-2 h-4 w-4" />
                                 Add to cart
                             </Button>
                         ) : isInCart ? (
-                            <Button variant="outline" disabled className="border-green-500 text-green-600 w-full">
-                                <Check className="mr-2 h-4 w-4" />
-                                Added
-                            </Button>
+                            <div className="flex h-10 items-center justify-between rounded-full border border-primary/50 bg-background p-1 shadow-sm w-[140px]">
+                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-primary" onClick={() => updateQuantity(product.id, quantity - 1)}>
+                                    {quantity === 1 ? <Trash2 className="h-4 w-4" /> : <Minus className="h-4 w-4" />}
+                                </Button>
+                                <span className="w-8 text-center font-bold text-foreground">{quantity}</span>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-primary" onClick={() => updateQuantity(product.id, quantity + 1)}>
+                                    <Plus className="h-4 w-4" />
+                                </Button>
+                            </div>
                         ) : (
-                            <Button onClick={() => addItem(product)} className="w-full">
+                            <Button onClick={() => addItem(product)} className="w-[140px]">
                                 <Plus className="mr-2 h-4 w-4" />
                                 Add to cart
                             </Button>
@@ -110,6 +116,19 @@ function ProductCard({ product }: { product: typeof products[0] }) {
 
 export function ProductSelector() {
     const featuredProducts = products.filter(p => p.featured);
+    const [api, setApi] = useState<any>();
+    const [current, setCurrent] = useState(0);
+
+    useEffect(() => {
+        if (!api) {
+            return;
+        }
+
+        setCurrent(api.selectedScrollSnap() + 1);
+        api.on("select", () => {
+            setCurrent(api.selectedScrollSnap() + 1);
+        });
+    }, [api]);
 
     return (
         <section id="products" className="bg-background py-12 md:py-24">
@@ -126,7 +145,26 @@ export function ProductSelector() {
                     </p>
                 </div>
                 
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                {/* Mobile Carousel */}
+                <div className="md:hidden">
+                    <Carousel setApi={setApi} className="w-full" opts={{ loop: true }}>
+                        <CarouselContent>
+                            {featuredProducts.map((product) => (
+                                <CarouselItem key={product.id} className="basis-[85%]">
+                                    <div className="p-1">
+                                        <ProductCard product={product} />
+                                    </div>
+                                </CarouselItem>
+                            ))}
+                        </CarouselContent>
+                        <div className="py-2 text-center text-sm text-muted-foreground">
+                            {current} of {featuredProducts.length}
+                        </div>
+                    </Carousel>
+                </div>
+
+                {/* Desktop Grid */}
+                <div className="hidden md:grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                     {featuredProducts.map((product) => (
                         <ProductCard key={product.id} product={product} />
                     ))}
