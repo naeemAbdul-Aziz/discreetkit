@@ -1,7 +1,6 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import { products } from '@/lib/data';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,9 +8,7 @@ import Image from 'next/image';
 import { Plus, Minus, Trash2 } from 'lucide-react';
 import { useCart } from '@/hooks/use-cart';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
-import { ArrowRight } from 'lucide-react';
-import Link from 'next/link';
+import { useState, useEffect } from 'react';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -112,39 +109,27 @@ function ProductCard({ product }: { product: typeof products[0] }) {
     );
 }
 
-export function ProductSelector() {
-    const featuredProducts = products.filter(p => p.featured);
-
-    return (
-        <section id="products" className="bg-background py-12 md:py-24">
-            <div className="container mx-auto px-4 md:px-6">
-                <div className="text-center mb-12">
-                    <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-primary">
-                        Our Products
-                    </p>
-                    <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-                       Confidential Self-Test Kits
-                    </h2>
-                    <p className="mt-4 max-w-2xl mx-auto text-base text-muted-foreground">
-                        Choose from our selection of WHO-approved, private self-test kits. Delivered discreetly to you.
-                    </p>
-                </div>
-                
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    {featuredProducts.map((product) => (
-                        <ProductCard key={product.id} product={product} />
-                    ))}
-                </div>
-
-                <div className="text-center mt-12">
-                    <Button asChild variant="outline" size="lg">
-                        <Link href="/products">
-                            Shop All Products
-                            <ArrowRight />
-                        </Link>
-                    </Button>
-                </div>
+export default function ProductsPage() {
+  return (
+    <div className="bg-muted">
+      <div className="container mx-auto px-4 py-12 md:px-6 md:py-24">
+        <div className="mx-auto max-w-7xl">
+            <div className="text-center mb-12">
+                <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+                    Shop All Products
+                </h1>
+                <p className="mt-4 max-w-2xl mx-auto text-base text-muted-foreground">
+                    Your complete source for confidential health and wellness products.
+                </p>
             </div>
-        </section>
-    );
+
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {products.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                ))}
+            </div>
+        </div>
+      </div>
+    </div>
+  );
 }

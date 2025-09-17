@@ -10,6 +10,7 @@ export type Product = {
     priceGHS: number;
     studentPriceGHS?: number;
     imageUrl: string;
+    featured?: boolean;
 }
 
 export type Order = {
@@ -95,6 +96,7 @@ export const products: Product[] = [
         priceGHS: 75.00,
         studentPriceGHS: 65.00,
         imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756312643/hiv-kit_p18jif.png',
+        featured: true,
     },
     {
         id: 2,
@@ -103,6 +105,7 @@ export const products: Product[] = [
         priceGHS: 45.00,
         studentPriceGHS: 35.00,
         imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756312643/preg-kit_d5xpyb.png',
+        featured: true,
     },
     {
         id: 3,
@@ -110,6 +113,7 @@ export const products: Product[] = [
         description: 'Contains two HIV self-test kits. Encourages testing together for mutual support.',
         priceGHS: 140.00,
         imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756312643/couple-kit_h3h1gc.png',
+        featured: true,
     },
     {
         id: 4,
@@ -117,7 +121,38 @@ export const products: Product[] = [
         description: 'A single dose of emergency contraception to be taken after unprotected intercourse.',
         priceGHS: 90.00,
         studentPriceGHS: 80.00,
-        imageUrl: "https://picsum.photos/seed/postpill/250/250"
+        imageUrl: "https://picsum.photos/seed/postpill/250/250",
+        featured: true,
+    },
+    {
+        id: 5,
+        name: 'Premium Condom Pack',
+        description: 'A 12-pack of ultra-thin, lubricated latex condoms for safety and comfort.',
+        priceGHS: 50.00,
+        studentPriceGHS: 40.00,
+        imageUrl: 'https://picsum.photos/seed/condoms/250/250',
+    },
+    {
+        id: 6,
+        name: 'Aqua-based Personal Lubricant',
+        description: 'A gentle, water-based lubricant for enhanced comfort. Safe to use with condoms.',
+        priceGHS: 60.00,
+        imageUrl: 'https://picsum.photos/seed/lubricant/250/250',
+    },
+    {
+        id: 7,
+        name: 'Weekend Ready Bundle',
+        description: 'Includes a 12-pack of condoms and a personal lubricant for complete preparation.',
+        priceGHS: 100.00,
+        imageUrl: 'https://picsum.photos/seed/weekendBundle/250/250',
+    },
+    {
+        id: 8,
+        name: 'Complete Peace of Mind Bundle',
+        description: 'Contains 1 HIV Kit, 1 Pregnancy Test, and 1 Postpill. Your all-in-one pack.',
+        priceGHS: 200.00,
+        studentPriceGHS: 170.00,
+        imageUrl: 'https://picsum.photos/seed/peaceOfMindBundle/250/250',
     }
 ];
 
@@ -248,5 +283,3 @@ export const testimonials: Testimonial[] = [
     avatar: "https://i.pravatar.cc/150?img=11"
   },
 ];
-
-    

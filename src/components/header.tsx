@@ -12,7 +12,7 @@ import Image from 'next/image';
 import { useCart } from '@/hooks/use-cart';
 
 const navLinksLeft = [
-  { href: '/#products', label: 'Shop' },
+  { href: '/products', label: 'Shop' },
   { href: '/#how-it-works', label: 'How It Works' },
 ];
 

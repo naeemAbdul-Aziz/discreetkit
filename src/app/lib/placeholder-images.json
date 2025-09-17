@@ -4,7 +4,25 @@
         "width": 250,
         "height": 250,
         "hint": "emergency contraception"
+    },
+    "condoms": {
+        "width": 250,
+        "height": 250,
+        "hint": "condom pack"
+    },
+    "lubricant": {
+        "width": 250,
+        "height": 250,
+        "hint": "personal lubricant"
+    },
+    "weekendBundle": {
+        "width": 250,
+        "height": 250,
+        "hint": "wellness kit"
+    },
+    "peaceOfMindBundle": {
+        "width": 250,
+        "height": 250,
+        "hint": "health bundle"
     }
 }
-
-    
