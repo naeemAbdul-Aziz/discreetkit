@@ -1,3 +1,4 @@
+
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -33,7 +34,7 @@ export function Hero() {
                 className="md:col-span-2 text-center md:text-left"
             >
                 <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
-                    Get Sorted <span className="font-light italic text-primary">Quietly</span>.
+                    Get Sorted <span className="font-light italic text-primary">Discreetly</span>.
                     <br />
                     Stay Supported Fully.
                 </h1>
