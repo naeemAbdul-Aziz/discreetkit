@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -106,26 +107,25 @@ export function Header() {
             isScrolled ? 'shadow-md' : ''
           )}
         >
+          {/* Desktop Navigation */}
           <nav className="hidden items-center gap-1 md:flex">
             {navLinksLeft.map((link) => (
               <NavLink key={link.href} {...link} />
             ))}
           </nav>
 
-          <Link
-            href="/"
-            className="absolute left-1/2 hidden -translate-x-1/2 items-center space-x-2 md:flex"
-            aria-label="DiscreetKit Homepage"
-          >
-            <Image
-              src={logoUrl}
-              alt="DiscreetKit Logo"
-              width={160}
-              height={40}
-              className="h-auto w-[160px]"
-              priority
-            />
-          </Link>
+          <div className="hidden md:flex flex-1 justify-center">
+            <Link href="/" aria-label="DiscreetKit Homepage">
+              <Image
+                src={logoUrl}
+                alt="DiscreetKit Logo"
+                width={160}
+                height={40}
+                className="h-auto w-[160px]"
+                priority
+              />
+            </Link>
+          </div>
 
           <div className="hidden items-center justify-end gap-1 md:flex">
             {navLinksRight.map((link) => (
@@ -136,7 +136,7 @@ export function Header() {
 
           {/* Mobile Menu */}
           <div className="flex w-full items-center justify-between md:hidden">
-            <Link href="/" className="flex items-center space-x-2" aria-label="DiscreetKit Homepage">
+            <Link href="/" className="flex items-center" aria-label="DiscreetKit Homepage">
               <Image
                 src={logoUrl}
                 alt="DiscreetKit Logo"
