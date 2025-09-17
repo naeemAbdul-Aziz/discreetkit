@@ -8,11 +8,10 @@ import { Card } from '@/components/ui/card';
 
 const componentMap = {
   ProductSelector: { height: '700px' },
-  PartnerLogos: { height: '150px' },
   ProductBenefits: { height: '100px' },
   HowItWorks: { height: '800px' },
   WhatsInTheKit: { height: '500px' },
-  TrustStats: { height: '400px' },
+  TrustStats: { height: '600px' },
   OurVision: { height: '800px' },
   Testimonials: { height: '500px' },
   CoverageMap: { height: '600px' },
@@ -29,10 +28,6 @@ const LoadingSkeleton = ({ height }: { height: string }) => (
 const ProductSelector = dynamic(
   () => import('./(components)/product-selector').then((mod) => mod.ProductSelector),
   { loading: () => <LoadingSkeleton height={componentMap.ProductSelector.height} /> }
-);
-const PartnerLogos = dynamic(
-  () => import('./(components)/partner-logos').then((mod) => mod.PartnerLogos),
-  { loading: () => <LoadingSkeleton height={componentMap.PartnerLogos.height} /> }
 );
 const ProductBenefits = dynamic(
   () => import('./(components)/product-benefits').then((mod) => mod.ProductBenefits),
@@ -108,10 +103,6 @@ export default function Home() {
       <SectionWrapper className="bg-muted">
         <TrustStats />
       </SectionWrapper>
-
-      <SectionWrapper className="bg-muted">
-        <PartnerLogos />
-      </SectionWrapper>
       
       <SectionWrapper className="bg-background">
         <OurVision />
@@ -121,7 +112,7 @@ export default function Home() {
         <Testimonials />
       </SectionWrapper>
       
-      <SectionWrapper className="bg-muted">
+      <SectionWrapper className="bg-background">
         <div className="py-12 md:py-24">
             <div className="container mx-auto px-4 md:px-6">
                 <Card className="p-0 overflow-hidden">
@@ -131,15 +122,15 @@ export default function Home() {
         </div>
       </SectionWrapper>
 
-      <SectionWrapper className="bg-background">
+      <SectionWrapper className="bg-muted">
         <CoverageMap />
       </SectionWrapper>
       
-      <SectionWrapper className="bg-muted">
+      <SectionWrapper className="bg-background">
         <Faq />
       </SectionWrapper>
       
-      <SectionWrapper className="bg-background">
+      <SectionWrapper className="bg-muted">
         <ContactUs />
       </SectionWrapper>
     </div>

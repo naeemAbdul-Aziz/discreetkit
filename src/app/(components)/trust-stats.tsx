@@ -1,19 +1,6 @@
-import Image from 'next/image';
 
-const stats = [
-  {
-    value: 'Thousands',
-    label: 'Kits Delivered',
-  },
-  {
-    value: '4+',
-    label: 'Major Campuses Covered',
-  },
-  {
-    value: '10+',
-    label: 'Health Partners',
-  },
-];
+import Image from 'next/image';
+import { partners } from '@/lib/data';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -33,6 +20,14 @@ const toBase64 = (str: string) =>
   typeof window === 'undefined'
     ? Buffer.from(str).toString('base64')
     : window.btoa(str);
+
+// This data is now self-contained within the component.
+const stats = [
+    { value: 'Thousands', label: 'Kits Delivered' },
+    { value: '4+', label: 'Major Campuses Covered' },
+    { value: '10+', label: 'Health Partners' },
+];
+
 
 export function TrustStats() {
   return (
@@ -86,6 +81,32 @@ export function TrustStats() {
             </div>
           </div>
         </div>
+
+        <div className="mt-16 md:mt-24">
+          <h2 className="mb-8 text-center text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            Our Network of Health & Student Partners
+          </h2>
+          
+          <div className="relative w-full max-w-4xl mx-auto">
+            <div
+              className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 md:gap-x-12"
+            >
+              {partners.map((partner) => (
+                  <div key={partner.id} className="flex-shrink-0 p-2">
+                      <Image
+                      src={partner.logoUrl}
+                      alt={`${partner.name} Logo`}
+                      width={100}
+                      height={35}
+                      className="h-auto w-24 object-contain grayscale"
+                      data-ai-hint="logo health"
+                      />
+                  </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
       </div>
     </section>
   );
