@@ -4,9 +4,12 @@
 import { useCart } from '@/hooks/use-cart';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Minus, Plus, Trash2, ArrowRight } from 'lucide-react';
+import { Minus, Plus, Trash2, ArrowRight, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Separator } from '@/components/ui/separator';
+import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -29,14 +32,23 @@ const toBase64 = (str: string) =>
 
 
 export function CartView() {
-    const { items, updateQuantity, isStudent } = useCart();
+    const { items, updateQuantity, isStudent, totalItems, subtotal, studentDiscount, deliveryFee, totalPrice } = useCart();
+    const [isLoading, setIsLoading] = useState(false);
+    const pathname = usePathname();
+
+    const handleClick = () => {
+        if (pathname !== '/order') {
+            setIsLoading(true);
+        }
+    };
+
 
     return (
         <Card className="shadow-sm overflow-hidden rounded-2xl">
             <CardHeader>
                 <CardTitle className="font-headline text-3xl font-bold md:text-4xl">Review Your Cart</CardTitle>
                 <CardDescription>
-                    Adjust quantities or proceed to checkout.
+                    Adjust quantities before proceeding to checkout.
                 </CardDescription>
             </CardHeader>
             <CardContent className="p-0">
@@ -93,9 +105,50 @@ export function CartView() {
                         )
                     })}
                 </div>
-                 <div className="p-6 text-center text-sm text-muted-foreground">
+                 <div className="p-6 text-center text-sm text-muted-foreground border-t">
                     <p>Want to add more? <Link href="/products" className="font-semibold text-primary hover:underline">Browse all products <ArrowRight className="inline h-3 w-3" /></Link></p>
                 </div>
+                
+                 <div className="p-6 bg-muted/50 border-t space-y-4">
+                    <h3 className="text-lg font-semibold">Order Summary</h3>
+                     <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                            <p className="text-muted-foreground">Subtotal ({totalItems} items)</p>
+                            <p className="font-medium text-foreground">GHS {subtotal.toFixed(2)}</p>
+                        </div>
+                        {studentDiscount > 0 && (
+                            <div className="flex justify-between text-success font-medium">
+                                <p>Student Discount</p>
+                                <p>- GHS {studentDiscount.toFixed(2)}</p>
+                            </div>
+                        )}
+                        <div className="flex justify-between">
+                            <p className="text-muted-foreground">Delivery Fee</p>
+                            <p className="font-medium text-foreground">GHS {deliveryFee.toFixed(2)}</p>
+                        </div>
+                    </div>
+                    <Separator />
+                     <div className="flex items-baseline justify-between font-bold text-lg">
+                        <p>Total</p>
+                        <p>GHS {totalPrice.toFixed(2)}</p>
+                    </div>
+                    <Button size="lg" className="w-full" asChild disabled={isLoading} onClick={handleClick}>
+                      <Link href="/order">
+                        {isLoading ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Proceeding...
+                            </>
+                        ) : (
+                            <>
+                                Proceed to Checkout
+                                <ArrowRight />
+                            </>
+                        )}
+                      </Link>
+                    </Button>
+                </div>
+
             </CardContent>
         </Card>
     )

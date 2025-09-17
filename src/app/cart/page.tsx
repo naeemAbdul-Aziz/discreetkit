@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { useCart } from '@/hooks/use-cart';
 import { Suspense } from 'react';
 import { CartView } from './(components)/cart-view';
-import { OrderSummary } from './(components)/order-summary';
 import { Loader2 } from 'lucide-react';
 
 function CartPageContents() {
@@ -29,13 +28,8 @@ function CartPageContents() {
     }
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-12">
-            <div className="lg:col-span-2">
-                <CartView />
-            </div>
-            <div className="mt-8 lg:mt-0">
-                <OrderSummary />
-            </div>
+        <div className="max-w-3xl mx-auto">
+            <CartView />
         </div>
     )
 }
