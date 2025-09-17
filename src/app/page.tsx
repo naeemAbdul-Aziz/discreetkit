@@ -1,13 +1,13 @@
-
 import dynamic from 'next/dynamic';
 import { Hero } from './(components)/hero';
 import { ClosingCta } from './(components)/closing-cta';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ProductBenefits } from './(components)/product-benefits';
+import { cn } from '@/lib/utils';
 
 const componentMap = {
   ProductSelector: { height: '700px' },
   PartnerLogos: { height: '150px' },
-  ProductBenefits: { height: '80px' },
   HowItWorks: { height: '800px' },
   WhatsInTheKit: { height: '500px' },
   TrustStats: { height: '400px' },
@@ -31,10 +31,6 @@ const ProductSelector = dynamic(
 const PartnerLogos = dynamic(
   () => import('./(components)/partner-logos').then((mod) => mod.PartnerLogos),
   { loading: () => <LoadingSkeleton height={componentMap.PartnerLogos.height} /> }
-);
-const ProductBenefits = dynamic(
-  () => import('./(components)/product-benefits').then((mod) => mod.ProductBenefits),
-  { loading: () => <LoadingSkeleton height={componentMap.ProductBenefits.height} /> }
 );
 const HowItWorks = dynamic(
   () => import('./(components)/how-it-works').then((mod) => mod.HowItWorks),
@@ -69,23 +65,59 @@ const ContactUs = dynamic(
   { loading: () => <LoadingSkeleton height={componentMap.ContactUs.height} /> }
 );
 
+interface SectionWrapperProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+const SectionWrapper: React.FC<SectionWrapperProps> = ({ children, className }) => (
+  <div className={cn(className)}>
+    {children}
+  </div>
+);
 
 export default function Home() {
   return (
     <div className="flex flex-col">
-      <Hero />
-      <ProductSelector />
-      <PartnerLogos />
-      <ProductBenefits />
-      <HowItWorks />
-      <WhatsInTheKit />
-      <TrustStats />
-      <OurVision />
-      <Testimonials />
-      <CoverageMap />
-      <Faq />
-      <ContactUs />
-      <ClosingCta />
+      <SectionWrapper className="bg-background">
+        <Hero />
+      </SectionWrapper>
+      <SectionWrapper className="bg-background">
+        <ProductSelector />
+      </SectionWrapper>
+      <SectionWrapper className="bg-muted">
+        <PartnerLogos />
+      </SectionWrapper>
+      <SectionWrapper className="bg-primary">
+        <ProductBenefits />
+      </SectionWrapper>
+      <SectionWrapper className="bg-background">
+        <HowItWorks />
+      </SectionWrapper>
+      <SectionWrapper className="bg-muted">
+        <WhatsInTheKit />
+      </SectionWrapper>
+      <SectionWrapper className="bg-background">
+        <TrustStats />
+      </SectionWrapper>
+      <SectionWrapper className="bg-muted">
+        <OurVision />
+      </SectionWrapper>
+      <SectionWrapper className="bg-background">
+        <Testimonials />
+      </SectionWrapper>
+      <SectionWrapper className="bg-muted">
+        <CoverageMap />
+      </SectionWrapper>
+      <SectionWrapper className="bg-background">
+        <Faq />
+      </SectionWrapper>
+      <SectionWrapper className="bg-muted">
+        <ContactUs />
+      </SectionWrapper>
+      <SectionWrapper className="bg-muted">
+        <ClosingCta />
+      </SectionWrapper>
     </div>
   );
 }

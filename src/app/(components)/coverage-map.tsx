@@ -1,4 +1,3 @@
-
 import { CheckCircle } from 'lucide-react';
 import Image from 'next/image';
 
@@ -27,7 +26,7 @@ export function CoverageMap() {
   const mapUrl = `https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-s+2074D2(-0.1870,5.6037),pin-s+2074D2(-1.6244,6.6886),pin-s+2074D2(-1.2466,5.1053)/-1.0,6.5/5.5/1280x720?access_token=${accessToken}`;
 
   return (
-    <section className="bg-muted py-12 md:py-24">
+    <section className="py-12 md:py-24">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center">
           <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground sm:text-4xl">

@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -47,7 +46,7 @@ function ProductCard({ product }: { product: typeof products[0] }) {
     const price = hasStudentDeal ? product.studentPriceGHS : product.priceGHS;
 
     return (
-        <Card className="flex h-full flex-col overflow-hidden rounded-2xl">
+        <Card className="flex h-full flex-col overflow-hidden rounded-2xl shadow-md border">
             <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-muted p-4">
                 <Image
                     src={product.imageUrl}
@@ -134,7 +133,7 @@ export function ProductSelector() {
     }, [api, onSelect]);
 
     return (
-        <section id="products" className="bg-background py-12 md:py-24">
+        <section id="products" className="py-12 md:py-24">
             <div className="container mx-auto px-4 md:px-6">
                 <div className="text-center mb-12">
                     <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-primary">

@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -26,7 +25,7 @@ const toBase64 = (str: string) =>
 
 export function Hero() {
   return (
-    <section className="bg-muted overflow-hidden">
+    <section className="overflow-hidden">
       <div className="container mx-auto px-4 md:px-6 py-12 md:py-20">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8 items-center">
             {/* Left Content Column */}

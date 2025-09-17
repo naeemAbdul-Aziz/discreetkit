@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -68,7 +67,7 @@ export function HowItWorks() {
   }, [api, onSelect]);
 
   return (
-    <section id="how-it-works" className="bg-muted py-12 md:py-24">
+    <section id="how-it-works" className="py-12 md:py-24">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-12">
           <h2 className="mt-2 font-headline text-2xl font-bold text-foreground md:text-3xl">

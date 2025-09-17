@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -41,7 +40,7 @@ export function ContactUs() {
   }
 
   return (
-    <section id="contact" className="bg-muted py-12 md:py-24">
+    <section id="contact" className="py-12 md:py-24">
       <div className="container mx-auto max-w-6xl px-4 md:px-6">
         <div className="grid gap-12 md:grid-cols-2 md:gap-16 items-center">
           
