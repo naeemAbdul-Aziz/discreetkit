@@ -3,12 +3,12 @@ import dynamic from 'next/dynamic';
 import { Hero } from './(components)/hero';
 import { ClosingCta } from './(components)/closing-cta';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ProductBenefits } from './(components)/product-benefits';
 import { cn } from '@/lib/utils';
 
 const componentMap = {
   ProductSelector: { height: '700px' },
   PartnerLogos: { height: '150px' },
+  ProductBenefits: { height: '100px' },
   HowItWorks: { height: '800px' },
   WhatsInTheKit: { height: '500px' },
   TrustStats: { height: '400px' },
@@ -32,6 +32,10 @@ const ProductSelector = dynamic(
 const PartnerLogos = dynamic(
   () => import('./(components)/partner-logos').then((mod) => mod.PartnerLogos),
   { loading: () => <LoadingSkeleton height={componentMap.PartnerLogos.height} /> }
+);
+const ProductBenefits = dynamic(
+  () => import('./(components)/product-benefits').then((mod) => mod.ProductBenefits),
+  { loading: () => <LoadingSkeleton height={componentMap.ProductBenefits.height} /> }
 );
 const HowItWorks = dynamic(
   () => import('./(components)/how-it-works').then((mod) => mod.HowItWorks),
@@ -89,7 +93,7 @@ export default function Home() {
       <SectionWrapper className="bg-muted">
         <PartnerLogos />
       </SectionWrapper>
-      <SectionWrapper className="bg-primary">
+      <SectionWrapper className="bg-background border-y">
         <ProductBenefits />
       </SectionWrapper>
       <SectionWrapper className="bg-muted">
