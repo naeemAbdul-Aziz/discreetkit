@@ -37,6 +37,10 @@ export const metadata: Metadata = {
     description: 'Anonymous, private, and discreet delivery of health essentials in Ghana.',
     images: [logoUrl],
   },
+  icons: {
+    icon: logoUrl,
+    shortcut: logoUrl,
+  },
 };
 
 export const viewport: Viewport = {
