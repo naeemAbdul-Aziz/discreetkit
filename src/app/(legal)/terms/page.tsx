@@ -28,7 +28,7 @@ export default function TermsOfService() {
                 </CardHeader>
                 <CardContent>
                     <p className="text-muted-foreground">
-                    DiscreetKit provides a platform for ordering self-test medical kits for private, informational use. Our service is designed to be anonymous and discreet. The tests provided are for screening purposes only and do not constitute a medical diagnosis.
+                    DiscreetKit provides a platform for ordering self-test medical kits and other health products for private, informational use. Our service is designed to be anonymous and discreet. The tests provided are for screening purposes only and do not constitute a medical diagnosis.
                     </p>
                 </CardContent>
               </Card>
@@ -63,7 +63,7 @@ export default function TermsOfService() {
                 </CardHeader>
                 <CardContent>
                     <p className="text-muted-foreground">
-                    We will make every effort to deliver your order within the estimated timeframe. However, we are not liable for delays outside of our control. Due to the nature of the products, all sales are final. We cannot accept returns or issue refunds unless the product arrives damaged or defective. If you receive a damaged item, contact us within 24 hours with your order code to arrange a replacement.
+                    We will make every effort to deliver your order within the estimated timeframe. However, we are not liable for delays outside of our control. Due to the medical nature of the products, all sales are final. We cannot accept returns or issue refunds unless the product arrives damaged or defective. If you receive a damaged item, contact us within 24 hours with your order code to arrange a replacement.
                     </p>
                 </CardContent>
               </Card>
@@ -74,7 +74,7 @@ export default function TermsOfService() {
                 </CardHeader>
                 <CardContent>
                    <p className="text-muted-foreground">
-                    DiscreetKit is a platform for distributing test kits. We are not a healthcare provider. We are not liable for any actions you take or do not take based on the results of a self-test. Our liability is limited to the purchase price of the product.
+                    DiscreetKit is a platform for distributing test kits and health products. We are not a healthcare provider. We are not liable for any actions you take or do not take based on the results of a self-test. Our liability is limited to the purchase price of the product.
                    </p>
                 </CardContent>
               </Card>

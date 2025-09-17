@@ -61,9 +61,12 @@ export default function PrivacyPolicy() {
                       <strong>Contact Number:</strong> A phone number for the delivery agent to coordinate drop-off. This
                       number is masked in our system and only visible to the assigned agent during delivery.
                     </li>
+                    <li>
+                      <strong>Email Address:</strong> Your email is required by our payment processor (Paystack) to send you a receipt. We do not use it for marketing or store it after the order is fulfilled.
+                    </li>
                   </ul>
                   <p className="mt-4 font-semibold">
-                    We explicitly DO NOT collect your name, email address, or any other personal identifiers.
+                    We explicitly DO NOT collect your name or any other personal identifiers.
                   </p>
                 </CardContent>
               </Card>
