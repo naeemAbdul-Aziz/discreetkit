@@ -47,7 +47,7 @@ function ProductCard({ product }: { product: typeof products[0] }) {
     const price = hasStudentDeal ? product.studentPriceGHS : product.priceGHS;
 
     return (
-        <Card className="flex h-full flex-col overflow-hidden rounded-2xl shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+        <Card className="flex h-full flex-col overflow-hidden rounded-2xl">
             <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-muted p-4">
                 <Image
                     src={product.imageUrl}
@@ -148,7 +148,7 @@ export function ProductSelector() {
                     </p>
                 </div>
                 
-                {/* Mobile & Tablet Grid */}
+                {/* Mobile Grid */}
                 <div className="grid grid-cols-2 gap-4 md:hidden">
                     {featuredProducts.map((product) => (
                         <ProductCard key={product.id} product={product} />

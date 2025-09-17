@@ -43,7 +43,7 @@ function ProductCard({ product }: { product: typeof products[0] }) {
     const price = hasStudentDeal ? product.studentPriceGHS : product.priceGHS;
 
     return (
-        <Card className="flex h-full flex-col overflow-hidden rounded-2xl shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+        <Card className="flex h-full flex-col overflow-hidden rounded-2xl">
             <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-muted p-4">
                 <Image
                     src={product.imageUrl}
@@ -112,7 +112,7 @@ function ProductCard({ product }: { product: typeof products[0] }) {
 
 export default function ProductsPage() {
   return (
-    <div className="bg-muted">
+    <div className="bg-background">
       <div className="container mx-auto px-4 py-12 md:px-6 md:py-24">
         <div className="mx-auto max-w-7xl">
             <div className="text-center mb-12">

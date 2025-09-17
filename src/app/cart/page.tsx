@@ -50,7 +50,7 @@ function CartPageLoading() {
 
 export default function CartPage() {
   return (
-    <div className="bg-muted">
+    <div className="bg-background">
       <div className="container mx-auto px-4 py-12 md:px-6 md:py-24">
         <div className="mx-auto max-w-7xl">
             <Suspense fallback={<CartPageLoading />}>
