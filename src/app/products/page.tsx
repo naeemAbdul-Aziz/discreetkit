@@ -43,8 +43,8 @@ function ProductCard({ product }: { product: typeof products[0] }) {
     const price = hasStudentDeal ? product.studentPriceGHS : product.priceGHS;
 
     return (
-        <Card className="flex h-full flex-col overflow-hidden rounded-2xl border bg-card">
-            <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-muted/50 p-4">
+        <Card className="flex h-full flex-col overflow-hidden rounded-2xl border bg-card p-4">
+            <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-muted/50 p-4 rounded-lg">
                 <Image
                     src={product.imageUrl}
                     alt={product.name}
@@ -61,7 +61,7 @@ function ProductCard({ product }: { product: typeof products[0] }) {
                     </Badge>
                 )}
             </div>
-            <div className="flex flex-grow flex-col p-4 md:p-6 text-left">
+            <div className="flex flex-grow flex-col pt-4 text-left">
                 <h3 className="flex-grow text-lg font-bold text-foreground leading-tight">{product.name}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{product.description}</p>
                 
@@ -69,13 +69,13 @@ function ProductCard({ product }: { product: typeof products[0] }) {
                     <div className="text-left">
                         {hasStudentDeal ? (
                             <>
-                                <p className="font-bold text-success text-xl">GHS {price.toFixed(2)}</p>
+                                <p className="font-bold text-success text-lg">GHS {price.toFixed(2)}</p>
                                 <p className="text-muted-foreground/80 line-through text-xs font-normal">
                                     GHS {product.priceGHS.toFixed(2)}
                                 </p>
                             </>
                         ) : (
-                            <p className="font-bold text-xl text-foreground">
+                            <p className="font-bold text-lg text-foreground">
                                 GHS {price.toFixed(2)}
                             </p>
                         )}
@@ -83,12 +83,11 @@ function ProductCard({ product }: { product: typeof products[0] }) {
                     
                     <div className="w-auto text-right">
                         {!isMounted ? (
-                            <Button disabled className="w-[140px]">
-                                <Plus className="mr-2 h-4 w-4" />
+                            <Button disabled className="w-[120px]">
                                 Add to cart
                             </Button>
                         ) : isInCart ? (
-                            <div className="flex h-10 items-center justify-between rounded-full border border-primary/50 bg-background p-1 shadow-sm w-[140px]">
+                            <div className="flex h-10 items-center justify-between rounded-full border bg-background p-1 shadow-sm w-[120px]">
                                 <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-primary" onClick={() => updateQuantity(product.id, quantity - 1)}>
                                     {quantity === 1 ? <Trash2 className="h-4 w-4" /> : <Minus className="h-4 w-4" />}
                                 </Button>
@@ -98,8 +97,7 @@ function ProductCard({ product }: { product: typeof products[0] }) {
                                 </Button>
                             </div>
                         ) : (
-                            <Button onClick={() => addItem(product)} className="w-[140px]">
-                                <Plus className="mr-2 h-4 w-4" />
+                            <Button onClick={() => addItem(product)} className="w-[120px]">
                                 Add to cart
                             </Button>
                         )}
