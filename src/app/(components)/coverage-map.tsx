@@ -1,30 +1,26 @@
-import { CheckCircle } from 'lucide-react';
-import Image from 'next/image';
 
-const shimmer = (w: number, h: number) => `
-<svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <defs>
-    <linearGradient id="g">
-      <stop stop-color="#f0f0f0" offset="20%" />
-      <stop stop-color="#e0e0e0" offset="50%" />
-      <stop stop-color="#f0f0f0" offset="70%" />
-    </linearGradient>
-  </defs>
-  <rect width="${w}" height="${h}" fill="#f0f0f0" />
-  <rect id="r" width="${w}" height="${h}" fill="url(#g)" />
-  <animate xlink:href="#r" attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite"  />
-</svg>`;
+import { MapPin, Building, Anchor } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
-const toBase64 = (str: string) =>
-  typeof window === 'undefined'
-    ? Buffer.from(str).toString('base64')
-    : window.btoa(str);
-
+const coverageAreas = [
+  {
+    name: 'Greater Accra',
+    description: 'Full coverage including all major suburbs and university campuses (UG, UPSA, GIMPA, etc).',
+    icon: MapPin,
+  },
+  {
+    name: 'Kumasi',
+    description: 'Delivery available within the city and to KNUST campus.',
+    icon: Building,
+  },
+  {
+    name: 'Cape Coast',
+    description: 'Serving the city and students at the University of Cape Coast (UCC).',
+    icon: Anchor,
+  },
+];
 
 export function CoverageMap() {
-  const accessToken = "pk.eyJ1IjoibmFlZW0yMzMiLCJhIjoiY21lenZxbmlsMDdrYjJsc2JzdmsxM2tpeSJ9.2eK-E8ybr9qdfGrUQs6HsQ";
-  const mapUrl = `https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-s+2074D2(-0.1870,5.6037),pin-s+2074D2(-1.6244,6.6886),pin-s+2074D2(-1.2466,5.1053)/-1.0,6.5/5.5/1280x720?access_token=${accessToken}`;
-
   return (
     <section className="py-12 md:py-24">
       <div className="container mx-auto px-4 md:px-6">
@@ -37,24 +33,20 @@ export function CoverageMap() {
           </p>
         </div>
 
-        <div className="mt-12">
-           <div className="relative w-full max-w-5xl mx-auto aspect-video overflow-hidden rounded-2xl shadow-xl border">
-             <Image 
-                src={mapUrl}
-                alt="Map of Ghana showing DiscreetKit delivery locations including Accra, Kumasi, and Cape Coast"
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1280px"
-                data-ai-hint="ghana map location"
-                placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(1280, 720))}`}
-             />
-             <div className="absolute inset-x-0 bottom-4 flex justify-center">
-                 <div className="flex items-center gap-2 rounded-full bg-background/80 p-2 pl-3 pr-4 text-sm font-medium text-foreground shadow-lg backdrop-blur-sm">
-                    <CheckCircle className="h-5 w-5 text-success" />
-                    <p>Accra, Kumasi & Cape Coast covered</p>
-                 </div>
-             </div>
-           </div>
+        <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8 max-w-5xl mx-auto">
+          {coverageAreas.map((area) => (
+            <Card key={area.name} className="flex flex-col items-center text-center p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
+                <area.icon className="h-8 w-8 text-primary" />
+              </div>
+              <CardHeader className="p-0">
+                <CardTitle>{area.name}</CardTitle>
+              </CardHeader>
+              <CardDescription className="mt-2 text-sm">
+                {area.description}
+              </CardDescription>
+            </Card>
+          ))}
         </div>
       </div>
     </section>
