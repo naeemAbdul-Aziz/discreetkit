@@ -2,12 +2,12 @@
 import dynamic from 'next/dynamic';
 import { Hero } from './(components)/hero';
 import { ClosingCta } from './(components)/closing-cta';
-import { PartnerLogos } from './(components)/partner-logos';
-import { ProductBenefits } from './(components)/product-benefits';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const componentMap = {
   ProductSelector: { height: '700px' },
+  PartnerLogos: { height: '150px' },
+  ProductBenefits: { height: '80px' },
   HowItWorks: { height: '800px' },
   WhatsInTheKit: { height: '500px' },
   TrustStats: { height: '400px' },
@@ -27,6 +27,14 @@ const LoadingSkeleton = ({ height }: { height: string }) => (
 const ProductSelector = dynamic(
   () => import('./(components)/product-selector').then((mod) => mod.ProductSelector),
   { loading: () => <LoadingSkeleton height={componentMap.ProductSelector.height} /> }
+);
+const PartnerLogos = dynamic(
+  () => import('./(components)/partner-logos').then((mod) => mod.PartnerLogos),
+  { loading: () => <LoadingSkeleton height={componentMap.PartnerLogos.height} /> }
+);
+const ProductBenefits = dynamic(
+  () => import('./(components)/product-benefits').then((mod) => mod.ProductBenefits),
+  { loading: () => <LoadingSkeleton height={componentMap.ProductBenefits.height} /> }
 );
 const HowItWorks = dynamic(
   () => import('./(components)/how-it-works').then((mod) => mod.HowItWorks),
