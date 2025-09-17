@@ -71,7 +71,6 @@ export function CartView() {
                                     </div>
                                     <div className="flex flex-col justify-center">
                                         <h3 className="text-base font-bold text-foreground">{item.name}</h3>
-                                        <p className="text-sm text-muted-foreground mt-1">{item.description}</p>
                                     </div>
                                     <div className="flex flex-col items-end justify-between space-y-2 self-stretch">
                                          <div className="text-right">
@@ -104,9 +103,6 @@ export function CartView() {
                             </div>
                         )
                     })}
-                </div>
-                 <div className="p-6 text-center text-sm text-muted-foreground border-t">
-                    <p>Want to add more? <Link href="/products" className="font-semibold text-primary hover:underline">Browse all products <ArrowRight className="inline h-3 w-3" /></Link></p>
                 </div>
                 
                  <div className="p-6 bg-muted/50 border-t space-y-4">

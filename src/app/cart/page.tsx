@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useCart } from '@/hooks/use-cart';
 import { Suspense } from 'react';
 import { CartView } from './(components)/cart-view';
-import { Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 
 function CartPageContents() {
     const { totalItems } = useCart();
@@ -30,6 +30,13 @@ function CartPageContents() {
     return (
         <div className="max-w-3xl mx-auto">
             <CartView />
+            <div className="mt-6 text-center text-sm text-muted-foreground">
+                <p>
+                    <Link href="/products" className="font-semibold text-primary hover:underline">
+                        Want to add more? Browse all products <ArrowRight className="inline h-3 w-3" />
+                    </Link>
+                </p>
+            </div>
         </div>
     )
 }
