@@ -3,13 +3,14 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, ShoppingCart, Loader2 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useCart } from '@/hooks/use-cart';
+import { Separator } from './ui/separator';
 
 const navLinksLeft = [
   { href: '/products', label: 'Shop' },
@@ -154,15 +155,20 @@ export function Header() {
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-full max-w-sm">
-                  <Link href="/" aria-label="DiscreetKit Homepage">
-                    <Image
-                      src={logoUrl}
-                      alt="DiscreetKit Logo"
-                      width={140}
-                      height={35}
-                      className="h-auto w-auto"
-                    />
-                  </Link>
+                   <SheetHeader>
+                     <SheetTitle className="text-left">
+                       <Link href="/" aria-label="DiscreetKit Homepage">
+                        <Image
+                          src={logoUrl}
+                          alt="DiscreetKit Logo"
+                          width={140}
+                          height={35}
+                          className="h-auto w-auto"
+                        />
+                      </Link>
+                     </SheetTitle>
+                   </SheetHeader>
+                   <Separator className="my-4" />
                   <div className="mt-8 flex flex-col space-y-2">
                     {[...navLinksLeft, ...navLinksRight].map((link) => (
                       <Link
