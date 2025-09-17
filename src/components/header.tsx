@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { ArrowRight, Menu, ShoppingCart, Loader2 } from 'lucide-react';
+import { Menu, ShoppingCart, Loader2 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
@@ -59,9 +59,6 @@ export function Header() {
 
   useEffect(() => {
     setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
@@ -103,36 +100,36 @@ export function Header() {
       <header className={cn('sticky top-0 z-50 w-full p-2')}>
         <div
           className={cn(
-            'container mx-auto flex h-14 max-w-7xl items-center justify-between rounded-2xl border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60',
+            'container mx-auto flex h-14 max-w-7xl items-center justify-between rounded-2xl border-border/40 bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60',
             isScrolled ? 'shadow-md' : ''
           )}
         >
           {/* Desktop Navigation */}
-          <nav className="hidden items-center gap-1 md:flex">
+          <nav className="hidden md:flex md:w-1/3 justify-start items-center gap-1">
             {navLinksLeft.map((link) => (
               <NavLink key={link.href} {...link} />
             ))}
           </nav>
 
-          <div className="hidden md:flex flex-1 justify-center">
+          <div className="hidden md:flex md:w-1/3 justify-center">
             <Link href="/" aria-label="DiscreetKit Homepage">
               <Image
                 src={logoUrl}
                 alt="DiscreetKit Logo"
                 width={160}
                 height={40}
-                className="h-auto w-[160px]"
+                className="h-auto"
                 priority
               />
             </Link>
           </div>
-
-          <div className="hidden items-center justify-end gap-1 md:flex">
+          
+          <nav className="hidden md:flex md:w-1/3 justify-end items-center gap-1">
             {navLinksRight.map((link) => (
               <NavLink key={link.href} {...link} />
             ))}
             <CartLink />
-          </div>
+          </nav>
 
           {/* Mobile Menu */}
           <div className="flex w-full items-center justify-between md:hidden">
@@ -142,7 +139,7 @@ export function Header() {
                 alt="DiscreetKit Logo"
                 width={140}
                 height={35}
-                className="h-auto w-[140px]"
+                className="h-auto w-auto"
                 priority
               />
             </Link>
@@ -163,7 +160,7 @@ export function Header() {
                       alt="DiscreetKit Logo"
                       width={140}
                       height={35}
-                      className="h-auto w-[140px]"
+                      className="h-auto w-auto"
                     />
                   </Link>
                   <div className="mt-8 flex flex-col space-y-2">
