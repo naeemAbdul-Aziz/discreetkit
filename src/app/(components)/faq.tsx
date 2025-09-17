@@ -1,3 +1,4 @@
+
 import { faqItems } from '@/lib/data';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ChatTrigger } from '@/components/chat-trigger';

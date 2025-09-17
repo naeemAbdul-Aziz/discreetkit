@@ -1,3 +1,4 @@
+
 // This file is a fallback to ensure critical meta tags are present for crawlers.
 // Next.js App Router's metadata API in layout.tsx is the primary method.
 
@@ -9,7 +10,7 @@ export default function Document() {
       <Head>
         <meta 
           name="description" 
-          content="Order confidential, WHO-approved self-test kits for HIV and pregnancy in Ghana. Anonymous, private, and discreet delivery for students and young professionals." 
+          content="Order confidential health products like self-test kits, emergency contraception, and more in Ghana. Anonymous, private, and discreet delivery for students and young professionals." 
         />
       </Head>
       <body>

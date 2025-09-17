@@ -1,12 +1,12 @@
 
-# DiscreetKit Ghana - Confidential Self-Test Kits
+# DiscreetKit Ghana - Confidential Health Products
 
-This repository contains the source code for the DiscreetKit Ghana web application, a service designed to provide private, anonymous, and confidential self-test kits for HIV and pregnancy to young people and students in Ghana.
+This repository contains the source code for the DiscreetKit Ghana web application, a service designed to provide private, anonymous, and confidential health products (including self-test kits for HIV and pregnancy) to young people and students in Ghana.
 
 ## ✨ Key Features
 
 *   **100% Anonymous Ordering:** No user accounts, names, or stored personal data.
-*   **Private & Discreet Delivery:** All kits are delivered in plain, unbranded packaging.
+*   **Private & Discreet Delivery:** All products are delivered in plain, unbranded packaging.
 *   **Student Discount Program:** Automatic discounts for students when a valid campus location is selected.
 *   **Secure Payments:** Integrated with Paystack for reliable and secure mobile money and card payments.
 *   **AI-Powered Assistant:** An integrated chatbot ("Pacely") powered by Google's Gemini to answer user questions about products, privacy, and the process.

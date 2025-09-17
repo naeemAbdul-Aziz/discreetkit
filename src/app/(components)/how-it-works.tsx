@@ -69,7 +69,7 @@ export function HowItWorks() {
                       />
                   </div>
                   <div>
-                      <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground mb-3">Key Actions:</h4>
+                      <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground mb-3">What You'll Do:</h4>
                       <ul className="space-y-2">
                           {step.details.map((detail, i) => (
                           <li key={i} className="flex items-start gap-3">
@@ -116,7 +116,7 @@ export function HowItWorks() {
                             <p className="text-sm md:text-base text-muted-foreground mb-6">{step.description}</p>
 
                             <div>
-                            <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground mb-3">Key Actions:</h4>
+                            <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground mb-3">What You'll Do:</h4>
                             <ul className="space-y-2">
                                 {step.details.map((detail, i) => (
                                 <li key={i} className="flex items-start gap-3">

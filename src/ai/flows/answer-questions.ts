@@ -1,6 +1,7 @@
+
 'use server';
 /**
- * @fileOverview An AI chatbot assistant for answering user questions about self-test kits, the testing process, and available locations.
+ * @fileOverview An AI chatbot assistant for answering user questions about our products, the ordering process, and available locations.
  *
  * - answerQuestions - A function that handles the question answering process.
  * - AnswerQuestionsInput - The input type for the answerQuestions function.
@@ -12,7 +13,7 @@ import {z} from 'genkit';
 import { KNOWLEDGE_BASE } from '../knowledge';
 
 const AnswerQuestionsInputSchema = z.object({
-  query: z.string().describe('The user question about self-test kits, the testing process, or available locations.'),
+  query: z.string().describe('The user question about our health products, the ordering process, or available locations.'),
 });
 export type AnswerQuestionsInput = z.infer<typeof AnswerQuestionsInputSchema>;
 
