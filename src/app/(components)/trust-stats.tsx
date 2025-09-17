@@ -21,15 +21,15 @@ const toBase64 = (str: string) =>
     ? Buffer.from(str).toString('base64')
     : window.btoa(str);
 
-// This data is now self-contained within the component.
 const stats = [
     { value: 'Thousands', label: 'Kits Delivered' },
     { value: '4+', label: 'Major Campuses Covered' },
     { value: '10+', label: 'Health Partners' },
 ];
 
-
 export function TrustStats() {
+  const extendedPartners = [...partners, ...partners];
+
   return (
     <section className="py-12 md:py-24">
       <div className="container mx-auto px-4 md:px-6">
@@ -87,26 +87,29 @@ export function TrustStats() {
             Our Network of Health & Student Partners
           </h2>
           
-          <div className="relative w-full max-w-4xl mx-auto">
-            <div
-              className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 md:gap-x-12"
-            >
-              {partners.map((partner) => (
-                  <div key={partner.id} className="flex-shrink-0 p-2">
-                      <Image
-                      src={partner.logoUrl}
-                      alt={`${partner.name} Logo`}
-                      width={100}
-                      height={35}
-                      className="h-auto w-24 object-contain grayscale"
-                      data-ai-hint="logo health"
-                      />
-                  </div>
+          <div
+            className="group relative w-full max-w-4xl mx-auto overflow-hidden"
+            style={{
+              maskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)',
+              WebkitMaskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)',
+            }}
+          >
+            <div className="flex animate-marquee group-hover:[animation-play-state:paused]">
+              {extendedPartners.map((partner, index) => (
+                <div key={`${partner.id}-${index}`} className="flex-shrink-0 p-4 mx-4">
+                  <Image
+                    src={partner.logoUrl}
+                    alt={`${partner.name} Logo`}
+                    width={120}
+                    height={40}
+                    className="h-10 w-auto object-contain grayscale"
+                    data-ai-hint="logo health"
+                  />
+                </div>
               ))}
             </div>
           </div>
         </div>
-
       </div>
     </section>
   );

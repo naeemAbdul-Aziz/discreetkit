@@ -18,8 +18,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        body: ['var(--font-figtree)', 'sans-serif'],
-        headline: ['var(--font-figtree)', 'sans-serif'],
+        body: ['Satoshi', 'sans-serif'],
+        headline: ['Satoshi', 'sans-serif'],
       },
       colors: {
         background: 'hsl(var(--background))',
@@ -59,7 +59,6 @@ export default {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
-        'button-hover': 'hsl(var(--primary))',
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -94,13 +93,18 @@ export default {
             opacity: '1',
             transform: 'translateY(0)'
           }
-        }
+        },
+        marquee: {
+          '0%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         'fade-up': 'fade-up 0.5s ease-out forwards',
         'stagger-in': 'stagger-in 0.5s ease-out forwards',
+        'marquee': 'marquee 30s linear infinite',
       },
     },
   },

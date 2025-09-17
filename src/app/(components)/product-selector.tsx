@@ -59,11 +59,6 @@ function ProductCard({ product }: { product: typeof products[0] }) {
                     data-ai-hint="medical test kit"
                     placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(250, 188))}`}
                 />
-                {hasStudentDeal && (
-                    <Badge variant="destructive" className="absolute left-3 top-3 -rotate-12 text-base shadow-lg">
-                        DEAL
-                    </Badge>
-                )}
             </div>
             <div className="flex flex-grow flex-col pt-4 text-left">
                 <h3 className="flex-grow text-lg font-bold text-foreground leading-tight">{product.name}</h3>
