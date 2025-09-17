@@ -5,7 +5,7 @@ import { products } from '@/lib/data';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { Plus, Check, Minus, Trash2 } from 'lucide-react';
+import { Plus, Minus, Trash2 } from 'lucide-react';
 import { useCart } from '@/hooks/use-cart';
 import { Badge } from '@/components/ui/badge';
 import { useState, useEffect } from 'react';
@@ -117,7 +117,7 @@ export default function ProductsPage() {
         <div className="mx-auto max-w-7xl">
             <div className="text-center mb-12">
                 <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-                    Shop All Products
+                    All Health Essentials
                 </h1>
                 <p className="mt-4 max-w-2xl mx-auto text-base text-muted-foreground">
                     Your complete source for confidential health and wellness products.

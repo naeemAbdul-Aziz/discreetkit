@@ -6,13 +6,12 @@ import { products } from '@/lib/data';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { Plus, Check, Minus, Trash2 } from 'lucide-react';
+import { Plus, Minus, Trash2 } from 'lucide-react';
 import { useCart } from '@/hooks/use-cart';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -138,10 +137,10 @@ export function ProductSelector() {
                         Our Products
                     </p>
                     <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-                       Confidential Self-Test Kits
+                       Private Health Essentials
                     </h2>
                     <p className="mt-4 max-w-2xl mx-auto text-base text-muted-foreground">
-                        Choose from our selection of WHO-approved, private self-test kits. Delivered discreetly to you.
+                        Choose from our selection of WHO-approved tests, wellness products, and more. Delivered discreetly to you.
                     </p>
                 </div>
                 

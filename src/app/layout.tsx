@@ -1,3 +1,4 @@
+
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { cn } from '@/lib/utils';
@@ -8,18 +9,18 @@ import { Chatbot } from '@/components/chatbot';
 import NextTopLoader from 'nextjs-toploader';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://discreetkit.com';
-const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757605306/discreetKIT-logo_pgf7vt.png';
+const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757960399/discreetkit-logo_j4vj4m.png';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: 'DiscreetKit Ghana - Confidential Self-Test Kits',
-  description: 'Order confidential, WHO-approved self-test kits for HIV and pregnancy in Ghana. Anonymous, private, and discreet delivery for students and young professionals.',
-  keywords: ['self-test kit', 'HIV test Ghana', 'pregnancy test Ghana', 'confidential testing', 'anonymous testing', 'private health test', 'discreet delivery', 'DiscreetKit'],
+  title: 'DiscreetKit Ghana - Confidential Health Products',
+  description: 'Order confidential health products like self-test kits, emergency contraception, and more in Ghana. Anonymous, private, and discreet delivery for students and young professionals.',
+  keywords: ['self-test kit', 'HIV test Ghana', 'pregnancy test Ghana', 'postpill', 'confidential testing', 'anonymous testing', 'private health test', 'discreet delivery', 'DiscreetKit'],
   openGraph: {
     type: 'website',
     url: siteUrl,
-    title: 'DiscreetKit Ghana - Confidential Self-Test Kits',
-    description: 'Anonymous, private, and discreet self-test kit delivery in Ghana.',
+    title: 'DiscreetKit Ghana - Confidential Health Products',
+    description: 'Anonymous, private, and discreet delivery of health essentials in Ghana.',
     images: [
       {
         url: logoUrl,
@@ -32,8 +33,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'DiscreetKit Ghana - Confidential Self-Test Kits',
-    description: 'Anonymous, private, and discreet self-test kit delivery in Ghana.',
+    title: 'DiscreetKit Ghana - Confidential Health Products',
+    description: 'Anonymous, private, and discreet delivery of health essentials in Ghana.',
     images: [logoUrl],
   },
 };

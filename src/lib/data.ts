@@ -166,9 +166,9 @@ export const discounts: DiscountLocation[] = [
 export const steps: Step[] = [
   {
     number: 1,
-    title: 'Order Your Kit',
+    title: 'Place Your Order',
     icon: ShoppingCart,
-    description: 'Choose the test kit that meets your needs. We offer standard and student pricing, with discounts applied automatically for campus deliveries.',
+    description: 'Choose the health products that meet your needs. We offer standard and student pricing, with discounts applied automatically for campus deliveries.',
     details: ['Select products from our shop', 'No account or name needed', 'Pay securely with Mobile Money or Card'],
     imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757952399/medium-shot-woman-laying-couch_ojrtnp.jpg',
     imageHint: 'woman couch relaxing',

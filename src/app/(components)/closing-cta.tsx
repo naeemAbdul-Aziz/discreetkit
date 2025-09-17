@@ -14,12 +14,12 @@ export function ClosingCta() {
             Your Health, Your Terms.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-primary-foreground/80">
-            Ready to get started? Your <strong>peace of mind</strong> is just a few clicks away. Order your <strong>confidential self-test kit</strong> now.
+            Ready to get started? Your <strong>peace of mind</strong> is just a few clicks away. Order your <strong>confidential health products</strong> now.
           </p>
           <div className="mt-8">
             <Button asChild size="lg" variant="accent">
               <Link href="/cart">
-                Order Your Test Kit Securely
+                Shop Securely
                 <ArrowRight />
               </Link>
             </Button>
