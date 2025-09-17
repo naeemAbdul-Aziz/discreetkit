@@ -107,6 +107,9 @@ export default function Home() {
         <Testimonials />
       </SectionWrapper>
       <SectionWrapper className="bg-muted">
+        <ClosingCta />
+      </SectionWrapper>
+      <SectionWrapper className="bg-muted">
         <CoverageMap />
       </SectionWrapper>
       <SectionWrapper className="bg-background">
@@ -114,9 +117,6 @@ export default function Home() {
       </SectionWrapper>
       <SectionWrapper className="bg-muted">
         <ContactUs />
-      </SectionWrapper>
-      <SectionWrapper className="bg-muted">
-        <ClosingCta />
       </SectionWrapper>
     </div>
   );
