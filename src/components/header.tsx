@@ -54,7 +54,7 @@ export function Header() {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757605306/discreetKIT-logo_pgf7vt.png';
+  const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758105183/discreetkit_logo_1_dc765q.png';
 
   useEffect(() => {
     setIsMounted(true);
