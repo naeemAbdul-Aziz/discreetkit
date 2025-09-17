@@ -10,7 +10,6 @@ const componentMap = {
   ProductSelector: { height: '700px' },
   ProductBenefits: { height: '100px' },
   HowItWorks: { height: '800px' },
-  WhatsInTheKit: { height: '500px' },
   TrustStats: { height: '600px' },
   PartnerLogos: { height: '200px' },
   OurVision: { height: '800px' },
@@ -36,10 +35,6 @@ const ProductBenefits = dynamic(
 const HowItWorks = dynamic(
   () => import('./(components)/how-it-works').then((mod) => mod.HowItWorks),
   { loading: () => <LoadingSkeleton height={componentMap.HowItWorks.height} /> }
-);
-const WhatsInTheKit = dynamic(
-  () => import('./(components)/whats-in-the-kit').then((mod) => mod.WhatsInTheKit),
-  { loading: () => <LoadingSkeleton height={componentMap.WhatsInTheKit.height} /> }
 );
 const TrustStats = dynamic(
   () => import('./(components)/trust-stats').then((mod) => mod.TrustStats),
@@ -94,10 +89,6 @@ export default function Home() {
 
       <SectionWrapper className="bg-muted">
         <HowItWorks />
-      </SectionWrapper>
-
-      <SectionWrapper className="bg-background">
-        <WhatsInTheKit />
       </SectionWrapper>
 
       <SectionWrapper className="bg-muted">
