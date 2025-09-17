@@ -1,16 +1,18 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import type { EmblaCarouselType } from 'embla-carousel';
 import { products } from '@/lib/data';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { Plus, Minus, Trash2 } from 'lucide-react';
+import { Plus, Minus, Trash2, ArrowRight } from 'lucide-react';
 import { useCart } from '@/hooks/use-cart';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import { cn } from '@/lib/utils';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -45,14 +47,14 @@ function ProductCard({ product }: { product: typeof products[0] }) {
     const price = hasStudentDeal ? product.studentPriceGHS : product.priceGHS;
 
     return (
-        <Card className="group flex h-full flex-col overflow-hidden rounded-2xl shadow-sm transition-shadow hover:shadow-lg">
+        <Card className="flex h-full flex-col overflow-hidden rounded-2xl shadow-sm">
             <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-muted">
                 <Image
                     src={product.imageUrl}
                     alt={product.name}
                     width={200}
                     height={200}
-                    className="object-contain transition-transform duration-300 group-hover:scale-105 p-4"
+                    className="object-contain p-4"
                     sizes="(max-width: 768px) 80vw, 30vw"
                     data-ai-hint="medical test kit"
                     placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(200, 200))}`}
@@ -114,6 +116,22 @@ function ProductCard({ product }: { product: typeof products[0] }) {
 
 export function ProductSelector() {
     const featuredProducts = products.filter(p => p.featured);
+    const [api, setApi] = useState<EmblaCarouselType | undefined>();
+    const [selectedIndex, setSelectedIndex] = useState(0);
+
+    const onSelect = useCallback((emblaApi: EmblaCarouselType) => {
+        setSelectedIndex(emblaApi.selectedScrollSnap());
+    }, []);
+
+    useEffect(() => {
+        if (!api) return;
+        onSelect(api);
+        api.on('select', onSelect);
+        api.on('reInit', onSelect);
+        return () => {
+          api.off('select', onSelect);
+        };
+    }, [api, onSelect]);
 
     return (
         <section id="products" className="bg-background py-12 md:py-24">
@@ -130,7 +148,36 @@ export function ProductSelector() {
                     </p>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-4">
+                {/* Mobile Carousel */}
+                <div className="md:hidden">
+                    <Carousel setApi={setApi} opts={{ align: 'start' }} className="w-full">
+                        <CarouselContent>
+                            {featuredProducts.map((product) => (
+                                <CarouselItem key={product.id} className="basis-[85%] sm:basis-1/2">
+                                    <div className="p-1 h-full">
+                                        <ProductCard product={product} />
+                                    </div>
+                                </CarouselItem>
+                            ))}
+                        </CarouselContent>
+                    </Carousel>
+                    <div className="flex items-center justify-center gap-2 mt-8">
+                        {featuredProducts.map((_, index) => (
+                            <button
+                                key={index}
+                                onClick={() => api?.scrollTo(index)}
+                                className={cn(
+                                    'h-2 w-2 rounded-full bg-border transition-all',
+                                    index === selectedIndex ? 'w-4 bg-primary' : 'hover:bg-primary/50'
+                                )}
+                                aria-label={`Go to slide ${index + 1}`}
+                            />
+                        ))}
+                    </div>
+                </div>
+
+                {/* Desktop Grid */}
+                <div className="hidden md:grid grid-cols-2 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-4">
                     {featuredProducts.map((product) => (
                         <ProductCard key={product.id} product={product} />
                     ))}
