@@ -47,13 +47,13 @@ function ProductCard({ product }: { product: typeof products[0] }) {
 
     return (
         <Card className="group flex h-full flex-col overflow-hidden rounded-2xl shadow-sm transition-shadow hover:shadow-lg">
-            <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-muted p-4">
+            <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-muted">
                 <Image
                     src={product.imageUrl}
                     alt={product.name}
                     width={200}
                     height={200}
-                    className="object-contain transition-transform duration-300 group-hover:scale-105"
+                    className="object-contain transition-transform duration-300 group-hover:scale-105 p-4"
                     sizes="(max-width: 768px) 80vw, 30vw"
                     data-ai-hint="medical test kit"
                     placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(200, 200))}`}
@@ -65,20 +65,20 @@ function ProductCard({ product }: { product: typeof products[0] }) {
                 )}
             </div>
             <div className="flex flex-grow flex-col p-4 md:p-6 bg-card text-left">
-                <h3 className="flex-grow text-base font-bold text-foreground leading-tight">{product.name}</h3>
-                <p className="mt-2 min-h-[3rem] text-sm text-muted-foreground">{product.description}</p>
+                <h3 className="flex-grow text-lg font-bold text-foreground leading-tight">{product.name}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">{product.description}</p>
                 
                 <div className="mt-6 flex items-center justify-between">
                     <div className="text-left">
                         {hasStudentDeal ? (
                             <>
-                                <p className="font-bold text-success text-xl">GHS {price.toFixed(2)}</p>
+                                <p className="font-bold text-success text-2xl">GHS {price.toFixed(2)}</p>
                                 <p className="text-muted-foreground/80 line-through text-xs font-normal">
                                     GHS {product.priceGHS.toFixed(2)}
                                 </p>
                             </>
                         ) : (
-                            <p className="font-bold text-xl text-foreground">
+                            <p className="font-bold text-2xl text-foreground">
                                 GHS {price.toFixed(2)}
                             </p>
                         )}
