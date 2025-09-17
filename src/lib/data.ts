@@ -121,7 +121,7 @@ export const products: Product[] = [
         description: 'A single dose of emergency contraception to be taken after unprotected intercourse.',
         priceGHS: 90.00,
         studentPriceGHS: 80.00,
-        imageUrl: "https://picsum.photos/seed/postpill/250/250",
+        imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758178128/discreetkit-postpill_gbtfsv.png',
         featured: true,
     },
     {
@@ -130,21 +130,21 @@ export const products: Product[] = [
         description: 'A 12-pack of ultra-thin, lubricated latex condoms for safety and comfort.',
         priceGHS: 50.00,
         studentPriceGHS: 40.00,
-        imageUrl: 'https://picsum.photos/seed/condoms/250/250',
+        imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758178128/discreetkit-condoms_wndg8h.png',
     },
     {
         id: 6,
         name: 'Aqua-based Personal Lubricant',
         description: 'A gentle, water-based lubricant for enhanced comfort. Safe to use with condoms.',
         priceGHS: 60.00,
-        imageUrl: 'https://picsum.photos/seed/lubricant/250/250',
+        imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758178128/discreetkit-lube_uiojpr.png',
     },
     {
         id: 7,
         name: 'Weekend Ready Bundle',
         description: 'Includes a 12-pack of condoms and a personal lubricant for complete preparation.',
         priceGHS: 100.00,
-        imageUrl: 'https://picsum.photos/seed/weekendBundle/250/250',
+        imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758178129/discreetkit-weekend-bundle_rq5smu.png',
     },
     {
         id: 8,
@@ -152,7 +152,7 @@ export const products: Product[] = [
         description: 'Contains 1 HIV Kit, 1 Pregnancy Test, and 1 Postpill. Your all-in-one pack.',
         priceGHS: 200.00,
         studentPriceGHS: 170.00,
-        imageUrl: 'https://picsum.photos/seed/peaceOfMindBundle/250/250',
+        imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758178129/discreetkit-peace-of-mind-bundle_gftmqa.png',
     }
 ];
 

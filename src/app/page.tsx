@@ -1,3 +1,4 @@
+
 import dynamic from 'next/dynamic';
 import { Hero } from './(components)/hero';
 import { ClosingCta } from './(components)/closing-cta';
@@ -91,22 +92,22 @@ export default function Home() {
       <SectionWrapper className="bg-primary">
         <ProductBenefits />
       </SectionWrapper>
-      <SectionWrapper className="bg-background">
+      <SectionWrapper className="bg-muted">
         <HowItWorks />
       </SectionWrapper>
-      <SectionWrapper className="bg-muted">
+      <SectionWrapper className="bg-background">
         <WhatsInTheKit />
       </SectionWrapper>
-      <SectionWrapper className="bg-background">
+      <SectionWrapper className="bg-muted">
         <TrustStats />
       </SectionWrapper>
-      <SectionWrapper className="bg-muted">
+       <SectionWrapper className="bg-background">
         <OurVision />
       </SectionWrapper>
-      <SectionWrapper className="bg-background">
+      <SectionWrapper className="bg-muted">
         <Testimonials />
       </SectionWrapper>
-      <SectionWrapper className="bg-muted">
+      <SectionWrapper className="bg-background">
         <ClosingCta />
       </SectionWrapper>
       <SectionWrapper className="bg-muted">

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -46,8 +47,8 @@ function ProductCard({ product }: { product: typeof products[0] }) {
     const price = hasStudentDeal ? product.studentPriceGHS : product.priceGHS;
 
     return (
-        <Card className="flex h-full flex-col overflow-hidden rounded-2xl shadow-md border">
-            <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-muted p-4">
+        <Card className="flex h-full flex-col overflow-hidden rounded-2xl border">
+            <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-muted/50 p-4">
                 <Image
                     src={product.imageUrl}
                     alt={product.name}
@@ -59,12 +60,12 @@ function ProductCard({ product }: { product: typeof products[0] }) {
                     placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(200, 200))}`}
                 />
                 {hasStudentDeal && (
-                    <Badge variant="secondary" className="absolute left-3 top-3 bg-primary/20 text-primary border border-primary/30">
-                        Student Deal
+                    <Badge variant="destructive" className="absolute left-3 top-3 -rotate-12 text-base">
+                        DEAL
                     </Badge>
                 )}
             </div>
-            <div className="flex flex-grow flex-col p-4 md:p-6 bg-card text-left">
+            <div className="flex flex-grow flex-col p-4 md:p-6 text-left">
                 <h3 className="flex-grow text-lg font-bold text-foreground leading-tight">{product.name}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{product.description}</p>
                 
@@ -143,15 +144,36 @@ export function ProductSelector() {
                        Private Health Essentials
                     </h2>
                     <p className="mt-4 max-w-2xl mx-auto text-base text-muted-foreground">
-                        Choose from our selection of WHO-approved tests, wellness products, and more. Delivered discreetly to you.
+                        Private Health Essentials. Delivered with discretion, built on trust.
                     </p>
                 </div>
                 
-                {/* Mobile Grid */}
-                <div className="grid grid-cols-2 gap-4 md:hidden">
-                    {featuredProducts.map((product) => (
-                        <ProductCard key={product.id} product={product} />
-                    ))}
+                {/* Mobile Carousel */}
+                <div className="md:hidden">
+                    <Carousel setApi={setApi} className="w-full" opts={{loop: true}}>
+                        <CarouselContent>
+                            {featuredProducts.map((product) => (
+                                <CarouselItem key={product.id} className="basis-4/5">
+                                    <div className="p-1">
+                                        <ProductCard product={product} />
+                                    </div>
+                                </CarouselItem>
+                            ))}
+                        </CarouselContent>
+                    </Carousel>
+                     <div className="flex items-center justify-center gap-2 mt-8">
+                        {featuredProducts.map((_, index) => (
+                            <button
+                            key={index}
+                            onClick={() => api?.scrollTo(index)}
+                            className={cn(
+                                'h-2 w-2 rounded-full bg-border transition-all',
+                                index === selectedIndex ? 'w-4 bg-primary' : 'hover:bg-primary/50'
+                            )}
+                            aria-label={`Go to slide ${index + 1}`}
+                            />
+                        ))}
+                    </div>
                 </div>
 
                 {/* Desktop Grid */}

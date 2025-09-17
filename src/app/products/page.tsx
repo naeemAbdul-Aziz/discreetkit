@@ -43,8 +43,8 @@ function ProductCard({ product }: { product: typeof products[0] }) {
     const price = hasStudentDeal ? product.studentPriceGHS : product.priceGHS;
 
     return (
-        <Card className="flex h-full flex-col overflow-hidden rounded-2xl">
-            <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-muted p-4">
+        <Card className="flex h-full flex-col overflow-hidden rounded-2xl border">
+            <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-muted/50 p-4">
                 <Image
                     src={product.imageUrl}
                     alt={product.name}
@@ -55,13 +55,13 @@ function ProductCard({ product }: { product: typeof products[0] }) {
                     data-ai-hint="medical test kit"
                     placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(200, 200))}`}
                 />
-                {hasStudentDeal && (
-                    <Badge variant="secondary" className="absolute left-3 top-3 bg-primary/20 text-primary border border-primary/30">
-                        Student Deal
+                 {hasStudentDeal && (
+                    <Badge variant="destructive" className="absolute left-3 top-3 -rotate-12 text-base">
+                        DEAL
                     </Badge>
                 )}
             </div>
-            <div className="flex flex-grow flex-col p-4 md:p-6 bg-card text-left">
+            <div className="flex flex-grow flex-col p-4 md:p-6 text-left">
                 <h3 className="flex-grow text-lg font-bold text-foreground leading-tight">{product.name}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{product.description}</p>
                 
