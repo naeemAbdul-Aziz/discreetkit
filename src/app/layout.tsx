@@ -40,6 +40,7 @@ export const metadata: Metadata = {
   icons: {
     icon: logoUrl,
     shortcut: logoUrl,
+    apple: logoUrl,
   },
 };
 
