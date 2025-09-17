@@ -106,13 +106,12 @@ export async function createOrderAction(prevState: any, formData: FormData) {
      
     // 3. (PLACEHOLDER) Send SMS Notification
     // TODO: Replace this with a real SMS provider integration (e.g., Twilio, Termii)
-    console.log(`
-      ======================================================
-      === SMS NOTIFICATION TO BE SENT ===
-      TO: ${validatedFields.data.phone_masked}
-      MESSAGE: Hi! Your DiscreetKit order #${code} is confirmed. Our delivery rider will call you soon. Track your order here: ${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${code}
-      ======================================================
-    `);
+    const smsPayload = {
+        to: validatedFields.data.phone_masked,
+        message: `Your DiscreetKit order #${code} is confirmed. Track your delivery: ${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${code}`
+    };
+    console.log('--- Sending SMS (Placeholder) ---', smsPayload);
+
 
     // 4. Initialize Paystack Transaction
     const paystackSecretKey = process.env.PAYSTACK_SECRET_KEY;
