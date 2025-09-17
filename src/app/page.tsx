@@ -14,7 +14,6 @@ const componentMap = {
   TrustStats: { height: '600px' },
   OurVision: { height: '800px' },
   Testimonials: { height: '500px' },
-  CoverageMap: { height: '600px' },
   Faq: { height: '600px' },
   ContactUs: { height: '600px' },
 };
@@ -52,10 +51,6 @@ const OurVision = dynamic(
 const Testimonials = dynamic(
   () => import('./(components)/testimonials').then((mod) => mod.Testimonials),
   { loading: () => <LoadingSkeleton height={componentMap.Testimonials.height} /> }
-);
-const CoverageMap = dynamic(
-  () => import('./(components)/coverage-map').then((mod) => mod.CoverageMap),
-  { loading: () => <LoadingSkeleton height={componentMap.CoverageMap.height} /> }
 );
 const Faq = dynamic(
   () => import('./(components)/faq').then((mod) => mod.Faq),
@@ -112,12 +107,8 @@ export default function Home() {
         <Testimonials />
       </SectionWrapper>
       
-      <SectionWrapper className="bg-background">
-        <ClosingCta />
-      </SectionWrapper>
-
       <SectionWrapper className="bg-muted">
-        <CoverageMap />
+        <ClosingCta />
       </SectionWrapper>
       
       <SectionWrapper className="bg-background">
