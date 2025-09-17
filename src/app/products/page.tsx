@@ -69,13 +69,13 @@ function ProductCard({ product }: { product: typeof products[0] }) {
                      <div className="text-left">
                         {hasStudentDeal ? (
                             <>
-                                <p className="font-bold text-success text-2xl">GHS {price.toFixed(2)}</p>
+                                <p className="font-bold text-success text-xl">GHS {price.toFixed(2)}</p>
                                 <p className="text-muted-foreground/80 line-through text-xs font-normal">
                                     GHS {product.priceGHS.toFixed(2)}
                                 </p>
                             </>
                         ) : (
-                            <p className="font-bold text-2xl text-foreground">
+                            <p className="font-bold text-xl text-foreground">
                                 GHS {price.toFixed(2)}
                             </p>
                         )}
