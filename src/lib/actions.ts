@@ -1,3 +1,4 @@
+
 /**
  * @file This file contains all the server actions for the application, which handle
  * database operations and other server-side logic. These actions are designed to be
@@ -102,8 +103,18 @@ export async function createOrderAction(prevState: any, formData: FormData) {
         status: 'Order Received',
         note: 'Order placed, awaiting payment confirmation.',
      });
+     
+    // 3. (PLACEHOLDER) Send SMS Notification
+    // TODO: Replace this with a real SMS provider integration (e.g., Twilio, Termii)
+    console.log(`
+      ======================================================
+      === SMS NOTIFICATION TO BE SENT ===
+      TO: ${validatedFields.data.phone_masked}
+      MESSAGE: Hi! Your DiscreetKit order #${code} is confirmed. Our delivery rider will call you soon. Track your order here: ${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${code}
+      ======================================================
+    `);
 
-    // 3. Initialize Paystack Transaction
+    // 4. Initialize Paystack Transaction
     const paystackSecretKey = process.env.PAYSTACK_SECRET_KEY;
     if (!paystackSecretKey) {
         console.error('Paystack secret key is not configured in .env.local');
@@ -237,3 +248,5 @@ export async function handleChat(
     return "I'm sorry, I'm having trouble connecting right now. Please try again later.";
   }
 }
+
+    

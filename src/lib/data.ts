@@ -111,6 +111,14 @@ export const products: Product[] = [
         priceGHS: 140.00,
         imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756312643/couple-kit_h3h1gc.png',
     },
+    {
+        id: 4,
+        name: 'Postpill (Emergency Contraception)',
+        description: 'A single dose of emergency contraception to be taken after unprotected intercourse.',
+        priceGHS: 90.00,
+        studentPriceGHS: 80.00,
+        imageUrl: "https://picsum.photos/seed/postpill/250/250"
+    }
 ];
 
 export const discounts: DiscountLocation[] = [
@@ -240,3 +248,5 @@ export const testimonials: Testimonial[] = [
     avatar: "https://i.pravatar.cc/150?img=11"
   },
 ];
+
+    
