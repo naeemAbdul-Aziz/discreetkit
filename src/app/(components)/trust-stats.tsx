@@ -28,8 +28,6 @@ const stats = [
 ];
 
 export function TrustStats() {
-  const extendedPartners = [...partners, ...partners];
-
   return (
     <section className="py-12 md:py-24">
       <div className="container mx-auto px-4 md:px-6">
@@ -76,35 +74,6 @@ export function TrustStats() {
                 <div key={stat.label} className="text-center">
                     <p className="text-2xl md:text-3xl font-bold text-primary">{stat.value}</p>
                     <p className="text-xs md:text-sm text-muted-foreground mt-1">{stat.label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-16 md:mt-24">
-          <h2 className="mb-8 text-center text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-            Our Network of Health & Student Partners
-          </h2>
-          
-          <div
-            className="group relative w-full max-w-4xl mx-auto overflow-hidden"
-            style={{
-              maskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)',
-              WebkitMaskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)',
-            }}
-          >
-            <div className="flex animate-marquee group-hover:[animation-play-state:paused]">
-              {extendedPartners.map((partner, index) => (
-                <div key={`${partner.id}-${index}`} className="flex-shrink-0 p-4 mx-4">
-                  <Image
-                    src={partner.logoUrl}
-                    alt={`${partner.name} Logo`}
-                    width={120}
-                    height={40}
-                    className="h-10 w-auto object-contain grayscale"
-                    data-ai-hint="logo health"
-                  />
                 </div>
               ))}
             </div>

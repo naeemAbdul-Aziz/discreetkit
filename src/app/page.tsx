@@ -12,6 +12,7 @@ const componentMap = {
   HowItWorks: { height: '800px' },
   WhatsInTheKit: { height: '500px' },
   TrustStats: { height: '600px' },
+  PartnerLogos: { height: '200px' },
   OurVision: { height: '800px' },
   Testimonials: { height: '500px' },
   Faq: { height: '600px' },
@@ -43,6 +44,10 @@ const WhatsInTheKit = dynamic(
 const TrustStats = dynamic(
   () => import('./(components)/trust-stats').then((mod) => mod.TrustStats),
   { loading: () => <LoadingSkeleton height={componentMap.TrustStats.height} /> }
+);
+const PartnerLogos = dynamic(
+  () => import('./(components)/partner-logos').then((mod) => mod.PartnerLogos),
+  { loading: () => <LoadingSkeleton height={componentMap.PartnerLogos.height} /> }
 );
 const OurVision = dynamic(
   () => import('./(components)/our-vision').then((mod) => mod.OurVision),
@@ -117,6 +122,10 @@ export default function Home() {
       
       <SectionWrapper className="bg-muted">
         <ContactUs />
+      </SectionWrapper>
+
+      <SectionWrapper>
+        <PartnerLogos />
       </SectionWrapper>
     </div>
   );
