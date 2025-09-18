@@ -2,8 +2,16 @@
 import { Package, ShoppingCart, Truck, CheckCircle, ShieldCheck, HeartHandshake, Zap, Award, Users, TestTube, Droplet, FileText, FlaskConical, Plus } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { CartItem } from "@/hooks/use-cart";
-import type { Product } from "@/app/products/page";
 
+export type Product = {
+    id: number;
+    name: string;
+    description: string | null;
+    price_ghs: number;
+    student_price_ghs: number | null;
+    image_url: string | null;
+    featured: boolean | null;
+}
 
 export type Order = {
     id: string;
@@ -15,6 +23,7 @@ export type Order = {
     isStudent: boolean;
     subtotal: number;
     studentDiscount: number;
+
     deliveryFee: number;
     totalPrice: number;
     events: {
@@ -206,3 +215,5 @@ export const testimonials: Testimonial[] = [
     avatar: "https://images.unsplash.com/photo-1580852300021-3349a882d385?w=150&h=150&fit=crop&q=75"
   },
 ];
+
+    

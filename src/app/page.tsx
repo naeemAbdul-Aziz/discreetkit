@@ -5,7 +5,7 @@ import { ClosingCta } from './(components)/closing-cta';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { getSupabaseClient } from '@/lib/supabase';
-import type { Product } from './products/page';
+import type { Product } from '@/lib/data';
 
 async function getProducts(): Promise<Product[]> {
     const supabase = getSupabaseClient();
@@ -133,3 +133,5 @@ export default async function Home() {
     </div>
   );
 }
+
+    

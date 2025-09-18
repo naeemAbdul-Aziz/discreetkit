@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { Plus, Minus, Trash2 } from 'lucide-react';
 import { useCart } from '@/hooks/use-cart';
-import type { Product } from '@/app/products/page';
+import type { Product } from '@/lib/data';
 import { cn } from '@/lib/utils';
 
 const shimmer = (w: number, h: number) => `
@@ -106,3 +106,5 @@ export function ProductCard({ product }: { product: Product }) {
         </Card>
     );
 }
+
+    

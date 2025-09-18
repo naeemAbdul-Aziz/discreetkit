@@ -5,20 +5,10 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { Plus, Minus, Trash2 } from 'lucide-react';
 import { ProductCard } from './(components)/product-card';
+import type { Product } from '@/lib/data';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60; // Revalidate data every 60 seconds
-
-// Define the type for a single product based on your new database schema
-export type Product = {
-    id: number;
-    name: string;
-    description: string | null;
-    price_ghs: number;
-    student_price_ghs: number | null;
-    image_url: string | null;
-    featured: boolean | null;
-}
 
 async function getProducts(): Promise<Product[]> {
     const supabase = getSupabaseClient();
@@ -67,3 +57,5 @@ export default async function ProductsPage() {
     </div>
   );
 }
+
+    

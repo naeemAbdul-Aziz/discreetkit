@@ -4,7 +4,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { type DiscountLocation, discounts, DELIVERY_FEES } from '@/lib/data';
-import type { Product } from '@/app/products/page';
+import type { Product } from '@/lib/data';
 
 export type CartItem = {
   id: number;
@@ -155,3 +155,5 @@ export const useCart = create<CartState>()(
     }
   )
 );
+
+    

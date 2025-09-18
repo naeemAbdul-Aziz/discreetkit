@@ -8,7 +8,7 @@ import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import { cn } from '@/lib/utils';
-import type { Product } from '@/app/products/page';
+import type { Product } from '@/lib/data';
 import { ProductCard } from '@/app/products/(components)/product-card';
 
 
@@ -95,3 +95,5 @@ export function ProductSelector({ products }: { products: Product[] }) {
         </section>
     );
 }
+
+    
