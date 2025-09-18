@@ -58,6 +58,10 @@ export type Partner = {
     id: number;
     name: string;
     logoUrl: string;
+    description: string;
+    location: string;
+    phone: string;
+    mapUrl?: string;
 };
 
 export type ProductBenefit = {
@@ -186,7 +190,7 @@ export const steps: Step[] = [
     number: 3,
     title: 'Get Your Results',
     icon: CheckCircle,
-    description: 'Each kit comes with a simple, visual instruction manual. You can get a clear result in the comfort of your own space in under 20 minutes.',
+    description: 'For test kits, each kit comes with a simple, visual instruction manual. You can get a clear result in the comfort of your own space in under 20 minutes.',
     details: ['Easy-to-follow visual instructions', 'Results in under 20 minutes', 'WHO-approved for 99% accuracy'],
     imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757952387/man-being-happy-after-getting-negative-covid-test-result_udxny5.jpg',
     imageHint: 'man happy result',
@@ -211,12 +215,44 @@ export const productBenefits: ProductBenefit[] = [
 ];
 
 export const partners: Partner[] = [
-    { id: 1, name: "University of Ghana SRC", logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318481/ug_ytf3bp.png" },
-    { id: 2, name: "GIMPA SRC", logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318480/gimpa_vz8ko5.jpg" },
-    { id: 3, name: "TopUp SRC", logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318480/topup_x2q874.webp" },
-    { id: 4, name: "Bedita Pharmacy", logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/bedita_ekekhs.png" },
-    { id: 5, name: "Ernest Chemist", logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/ernest_chemist_ebxjug.webp" },
+    { 
+        id: 1, 
+        name: "University of Ghana SRC", 
+        logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318481/ug_ytf3bp.png",
+        description: "Official student body partner, ensuring our services meet student needs and are accessible on campus.",
+        location: "University of Ghana, Legon Campus",
+        phone: "055-123-4567",
+        mapUrl: "https://maps.app.goo.gl/P2g4sWkF7kL9r8bB8"
+    },
+    { 
+        id: 2, 
+        name: "GIMPA SRC", 
+        logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318480/gimpa_vz8ko5.jpg",
+        description: "Collaborating to provide GIMPA students with confidential and affordable health solutions.",
+        location: "GIMPA Campus, Accra",
+        phone: "024-765-4321",
+        mapUrl: "https://maps.app.goo.gl/9x8y7z6f5e4d3c2b1"
+    },
+    { 
+        id: 3, 
+        name: "Bedita Pharmacy", 
+        logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/bedita_ekekhs.png",
+        description: "A trusted pharmacy partner for professional health services and product pick-up points.",
+        location: "East Legon, Accra",
+        phone: "030-987-6543",
+        mapUrl: "https://maps.app.goo.gl/a1b2c3d4e5f6g7h8i"
+    },
+    { 
+        id: 4, 
+        name: "Ernest Chemist", 
+        logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/ernest_chemist_ebxjug.webp",
+        description: "A leading name in pharmaceuticals, providing access to a wide range of health products and professional advice.",
+        location: "Osu, Accra",
+        phone: "020-112-2334",
+        mapUrl: "https://maps.app.goo.gl/j9k8l7m6n5p4q3r2s"
+    },
 ];
+
 
 export const faqItems: FaqItem[] = [
   {
@@ -237,11 +273,11 @@ export const faqItems: FaqItem[] = [
   },
   {
     question: "What areas do you deliver to?",
-    answer: "We currently deliver across Greater Accra, Kumasi, and Cape Coast, including major university campuses like UG, UPSA, and GIMPA. You can see our full coverage on the map on our homepage."
+    answer: "We currently deliver across Greater Accra, Kumasi, and Cape Coast, including major university campuses like UG, UPSA, and GIMPA."
   },
   {
-    question: "Can I get a student discount?",
-    answer: "Yes! We offer a GHS 10 discount on the HIV and Pregnancy kits for students. Just select your campus as the delivery location, and the discount will be applied automatically to your cart."
+    question: "How do I get a student discount?",
+    answer: "We offer discounts on select products for students. Just select your campus as the delivery location, and the discount will be applied automatically to your cart."
   },
 ];
 
@@ -250,36 +286,36 @@ export const testimonials: Testimonial[] = [
     quote: "The entire process was so simple and private. I got my package the next day in a plain box. It's a huge relief to have a service like this in Ghana.",
     name: "Ama K.",
     role: "University of Ghana Student",
-    avatar: "https://i.pravatar.cc/150?img=1"
+    avatar: "https://images.unsplash.com/photo-1596495577886-d9256242498b?w=150&h=150&fit=crop&q=75"
   },
   {
     quote: "DiscreetKit is a game-changer. I was worried about going to a pharmacy, but this was completely anonymous. The tracking code gave me peace of mind.",
     name: "David A.",
     role: "Young Professional, Osu",
-    avatar: "https://i.pravatar.cc/150?img=3"
+    avatar: "https://images.unsplash.com/photo-1584012961505-507d844cc8a0?w=150&h=150&fit=crop&q=75"
   },
   {
     quote: "As a student leader, I see the need for this every day. It's a responsible, safe, and judgment-free way for young people to take control of their health.",
     name: "Fatima S.",
     role: "Student Rep, UPSA",
-    avatar: "https://i.pravatar.cc/150?img=5"
+    avatar: "https://images.unsplash.com/photo-1610476034959-548995964893?w=150&h=150&fit=crop&q=75"
   },
   {
     quote: "The instructions were so easy to follow. I had my result in 15 minutes. Knowing my status privately has lifted a huge weight off my shoulders.",
     name: "Michael B.",
     role: "GIMPA Graduate",
-    avatar: "https://i.pravatar.cc/150?img=7"
+    avatar: "https://images.unsplash.com/photo-1607990281513-2c3f162de8ac?w=150&h=150&fit=crop&q=75"
   },
     {
     quote: "I ordered the couple's bundle with my partner. It helped us have an open conversation and support each other through the process. Highly recommend.",
     name: "Esi & Kofi",
     role: "Couple, Accra",
-    avatar: "https://i.pravatar.cc/150?img=9"
+    avatar: "https://images.unsplash.com/photo-1541533848316-f333b210a501?w=150&h=150&fit=crop&q=75"
   },
     {
     quote: "Fast, professional, and exactly as advertised. The package was so discreet, even I wasn't sure what it was at first. 10/10 service.",
     name: "Josephine O.",
     role: "Entrepreneur, East Legon",
-    avatar: "https://i.pravatar.cc/150?img=11"
+    avatar: "https://images.unsplash.com/photo-1580852300021-3349a882d385?w=150&h=150&fit=crop&q=75"
   },
 ];

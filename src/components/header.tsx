@@ -18,6 +18,7 @@ const navLinksLeft = [
 ];
 
 const navLinksRight = [
+  { href: '/partners', label: 'Our Partners' },
   { href: '/#faq', label: 'FAQ' },
   { href: '/track', label: 'Track Order' },
 ];
@@ -122,7 +123,7 @@ export function Header() {
         >
           {/* Desktop Navigation */}
           <nav className="hidden md:flex md:w-1/3 justify-start items-center gap-1">
-            {navLinksLeft.map((link) => (
+            {[...navLinksLeft, navLinksRight[0]].map((link) => (
               <NavLink key={link.href} {...link} />
             ))}
           </nav>
@@ -141,7 +142,7 @@ export function Header() {
           </div>
           
           <nav className="hidden md:flex md:w-1/3 justify-end items-center gap-1">
-            {navLinksRight.map((link) => (
+            {navLinksRight.slice(1).map((link) => (
               <NavLink key={link.href} {...link} />
             ))}
             <CartLink />

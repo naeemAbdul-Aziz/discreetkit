@@ -11,6 +11,7 @@ import { ArrowRight, Pause, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -79,6 +80,14 @@ export function HowItWorks() {
                           ))}
                       </ul>
                   </div>
+                  {step.number === 4 && (
+                      <Button asChild variant="default">
+                          <Link href="/partners">
+                              Find a Partner
+                              <ArrowRight />
+                          </Link>
+                      </Button>
+                  )}
                 </div>
               </div>
             ))}
@@ -126,6 +135,16 @@ export function HowItWorks() {
                                 ))}
                             </ul>
                             </div>
+                            {step.number === 4 && (
+                                <div className="mt-8">
+                                    <Button asChild variant="default" size="lg">
+                                        <Link href="/partners">
+                                            Find a Support Partner
+                                            <ArrowRight />
+                                        </Link>
+                                    </Button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
