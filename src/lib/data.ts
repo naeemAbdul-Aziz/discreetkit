@@ -1,6 +1,6 @@
 
 
-import { Package, ShoppingCart, Truck, CheckCircle, ShieldCheck, HeartHandshake, Zap, Award, Users, TestTube, Droplet, FileText, FlaskConical, Plus } from "lucide-react";
+import { Package, ShoppingCart, Truck, CheckCircle, ShieldCheck, HeartHandshake, Zap, Award, Users } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { CartItem } from "@/hooks/use-cart";
 
@@ -55,19 +55,22 @@ export type Testimonial = {
     avatar: string;
 };
 
-export type Partner = {
-    id: number;
+export type MarieStopesData = {
     name: string;
     logo_url: string;
-    location: string;
-    services: string[];
-    is_preferred: boolean;
+    description: string;
+    locations: string[];
     contact: {
         phone: string | null;
         whatsapp: string | null;
         website: string | null;
     };
-};
+    services: {
+        title: string;
+        description: string;
+    }[];
+    faq: FaqItem[];
+}
 
 export type ProductBenefit = {
     icon: LucideIcon;
@@ -151,73 +154,65 @@ export const productBenefits: ProductBenefit[] = [
     { icon: Users, title: 'No Accounts, No Names' },
 ];
 
-export const partners: Partner[] = [
-  {
-    id: 1,
-    name: 'Nyaho Medical Centre',
-    logo_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758117781/nyaho-logo_b3xt0u.png',
-    location: 'Airport Residential, Accra',
-    services: ['Confirmatory Testing', 'Counseling', 'General Practice'],
-    is_preferred: true,
+export const marieStopesData: MarieStopesData = {
+    name: "Marie Stopes Ghana",
+    logo_url: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758163048/marie-stopes-logo_zvjpgo.png",
+    description: "Marie Stopes Ghana is a leader in sexual and reproductive healthcare, providing modern, reliable, and affordable services. They are dedicated to empowering men, women, and young people to take control of their health in a safe, respectful, and non-judgmental environment.",
+    locations: ["Accra", "Kumasi", "Takoradi", "Sunyani"],
     contact: {
-      phone: '0302775341',
-      whatsapp: null,
-      website: 'https://www.nyahomedical.com',
+        phone: "0800208585",
+        whatsapp: "0556561081",
+        website: "https://www.mariestopes.org.gh"
     },
-  },
-  {
-    id: 2,
-    name: 'Akai House Clinic',
-    logo_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758117781/akai-logo_j4m53q.png',
-    location: 'Cantonments, Accra',
-    services: ['Sexual Health', 'Confirmatory Testing', 'Dermatology'],
-    is_preferred: true,
-    contact: {
-      phone: '0302784772',
-      whatsapp: '0561113580',
-      website: 'https://www.akaihouseclinic.com',
-    },
-  },
-  {
-    id: 5,
-    name: 'The Accra London Health Centre',
-    logo_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758118029/talhc-logo_d9c9h1.png',
-    location: 'Ringway Estates, Osu',
-    services: ['STI Testing', 'Contraceptive Counselling', 'Fertility Care'],
-    is_preferred: false,
-    contact: {
-        phone: '0302787122',
-        whatsapp: '0556561081',
-        website: 'https://www.theaccralondonclinic.com'
-    }
-  },
-  {
-    id: 3,
-    name: 'Bedita Pharmacy',
-    logo_url: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/bedita_ekekhs.png",
-    location: 'East Legon, Accra',
-    services: ['Pharmaceuticals', 'Health Consultation', 'Wellness Products'],
-    is_preferred: false,
-    contact: {
-      phone: '0302507838',
-      whatsapp: null,
-      website: null,
-    },
-  },
-    {
-    id: 4,
-    name: 'Ernest Chemist',
-    logo_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/ernest_chemist_ebxjug.webp',
-    location: 'Multiple Branches',
-    services: ['Pharmaceuticals', 'Nationwide Access'],
-    is_preferred: false,
-    contact: {
-      phone: '0302251411',
-      whatsapp: null,
-      website: 'https://www.ernestchemist.com',
-    },
-  },
-];
+    services: [
+        {
+            title: "Confirmatory Testing",
+            description: "Receive a professional and confidential confirmatory test for HIV and other STIs in a clinical setting to ensure you have a definitive diagnosis."
+        },
+        {
+            title: "Professional Counselling",
+            description: "Speak with trained counsellors about your results, your options, and any concerns you may have regarding your sexual health in a private and supportive space."
+        },
+        {
+            title: "Contraceptive Services",
+            description: "Access a wide range of modern contraceptive options, from short-term to long-term methods, with expert guidance to find what's best for you."
+        },
+        {
+            title: "STI & UTI Treatment",
+            description: "Get diagnosis and treatment for sexually transmitted infections (STIs) and urinary tract infections (UTIs) from experienced healthcare providers."
+        },
+        {
+            title: "Cervical Cancer Screening",
+            description: "Protect your health with regular cervical cancer screening (e.g., Pap smear or HPV test), a vital service for women's long-term wellness."
+        },
+        {
+            title: "General Medical Care",
+            description: "Address your overall health needs with their general practice services, ensuring you receive holistic and comprehensive care."
+        }
+    ],
+    faq: [
+        {
+            question: "Is it really confidential?",
+            answer: "Yes. Marie Stopes is a professional healthcare provider with a strict confidentiality policy. Your visit, tests, and results are private and will not be shared without your consent."
+        },
+        {
+            question: "Do I need an appointment?",
+            answer: "While walk-ins are often welcome, calling ahead is recommended to reduce your waiting time. You can use the phone number or WhatsApp to check their schedule."
+        },
+        {
+            question: "What should I say when I contact them?",
+            answer: "You can simply say you were referred by DiscreetKit for a confidential health service, such as a confirmatory test or a sexual health consultation. They will understand and guide you."
+        },
+        {
+            question: "How much do the services cost?",
+            answer: "Costs vary depending on the service. We recommend contacting Marie Stopes directly for the most accurate pricing. Mentioning DiscreetKit may provide access to a supportive experience."
+        },
+        {
+            question: "I'm nervous about going. What should I expect?",
+            answer: "It's completely normal to feel nervous. Marie Stopes' staff are trained to be non-judgmental and supportive. They will guide you through every step in a calm and respectful manner, ensuring you feel as comfortable as possible."
+        }
+    ]
+};
 
 export const faqItems: FaqItem[] = [
   {
@@ -230,7 +225,7 @@ export const faqItems: FaqItem[] = [
   },
   {
     question: "What happens if I test positive?",
-    answer: "A self-test is a screening test, not a final diagnosis. If you get a positive result, it's very important to get a confirmatory test. We provide a confidential connection to our trusted partner hospitals who offer discounted, non-judgmental follow-up care."
+    answer: "A self-test is a screening test, not a final diagnosis. If you get a positive result, it's very important to get a confirmatory test. We provide a confidential connection to our trusted partner, Marie Stopes Ghana."
   },
   {
     question: "How is my order delivered?",

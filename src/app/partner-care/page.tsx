@@ -1,33 +1,11 @@
 
 
-import { partners, faqItems } from '@/lib/data';
-import { PartnerCareHeader } from './(components)/partner-care-header';
+import { marieStopesData } from '@/lib/data';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import Image from 'next/image';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Phone, Globe } from 'lucide-react';
-import { cn } from '@/lib/utils';
-
-
-const partnerFaqItems = [
-    {
-        question: "I need a confidential confirmatory test after a self-test. Who should I see?",
-        answer: "For a fully confidential and professional confirmatory test, we recommend either Nyaho Medical Centre or Akai House Clinic. Both are experienced in handling these situations with discretion and care."
-    },
-    {
-        question: "I'm looking for professional counselling about my sexual health.",
-        answer: "Nyaho Medical Centre provides excellent counselling services. They offer a safe space to discuss your concerns with a professional."
-    },
-    {
-        question: "Where can I get general health advice or other wellness products?",
-        answer: "Bedita Pharmacy and Ernest Chemist are great resources for general health consultations and a wide range of wellness products. Their pharmacists can provide professional advice."
-    },
-    {
-        question: "I have a specific concern about STIs or dermatology.",
-        answer: "Akai House Clinic specializes in Sexual Health and Dermatology. They are an excellent choice for specialized care in these areas."
-    }
-]
+import { Phone, Globe, Lock, CheckCircle } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const WhatsAppIcon = () => (
     <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 fill-current">
@@ -42,94 +20,105 @@ export default function PartnerCarePage() {
     <div className="bg-muted">
       <div className="container mx-auto max-w-5xl px-4 py-12 md:px-6 md:py-24">
         
-        <PartnerCareHeader />
-
-        <div className="mt-16 text-center">
-            <h3 className="text-2xl font-bold text-foreground">Our Trusted Partners</h3>
-            <p className="mt-2 text-muted-foreground">Handpicked for their professionalism and discretion.</p>
+        {/* Header Section */}
+        <div className="text-center">
+            <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+                Your Bridge to Confidential Care
+            </h1>
+            <p className="mx-auto mt-4 max-w-3xl text-base text-muted-foreground">
+                For comprehensive, non-judgmental follow-up care, we are proud to partner with Marie Stopes Ghana—a leader in sexual and reproductive health.
+            </p>
+             <div className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-background px-4 py-2 text-sm text-muted-foreground">
+                <Lock className="h-4 w-4 text-success" />
+                <span>Your privacy and comfort are our priorities.</span>
+            </div>
         </div>
 
-        {partners.length > 0 ? (
-            <div className="mt-12 grid grid-cols-1 gap-16">
-            {partners.map((hospital, index) => (
-                <div key={hospital.id} className="grid grid-cols-1 items-center gap-8 md:grid-cols-2 md:gap-12">
-                    <div className={cn("relative flex h-48 w-full items-center justify-center rounded-2xl bg-white p-6 shadow-md md:h-64", index % 2 === 1 && "md:order-last")}>
-                         {hospital.logo_url ? (
-                            <Image
-                                src={hospital.logo_url}
-                                alt={`${hospital.name} Logo`}
-                                width={200}
-                                height={80}
-                                className="object-contain"
-                                data-ai-hint="logo"
-                            />
-                            ) : (
-                            <span className="font-bold text-muted-foreground">{hospital.name}</span>
-                        )}
-                    </div>
-                     <div className={cn("flex flex-col justify-center", index % 2 === 1 && "md:order-first")}>
-                        <h3 className="text-2xl font-bold text-foreground">{hospital.name}</h3>
-                        <p className="mt-1 text-base font-medium text-muted-foreground">{hospital.location}</p>
-                        <p className="mt-4 text-base text-foreground">{hospital.description}</p>
-                        
-                        {hospital.services && hospital.services.length > 0 && (
-                            <div className="mt-4 flex flex-wrap gap-2">
-                            {hospital.services.map((service) => (
-                                <Badge key={service} variant="secondary" className="bg-primary/10 text-primary">
-                                {service}
-                                </Badge>
-                            ))}
-                            </div>
-                        )}
-                        
-                        <div className="mt-6 flex flex-wrap gap-2">
-                           {hospital.contact?.phone && (
-                                <Button asChild size="sm">
-                                    <a href={`tel:${hospital.contact.phone}`}>
-                                        <Phone />
-                                        Call Now
-                                    </a>
-                                </Button>
-                            )}
-                            {hospital.contact?.whatsapp && (
-                                <Button asChild size="sm" variant="accent" className="bg-green-500 hover:bg-green-600 text-white">
-                                    <a href={`https://wa.me/233${hospital.contact.whatsapp.slice(1)}`} target="_blank" rel="noopener noreferrer">
-                                        <WhatsAppIcon />
-                                        WhatsApp
-                                    </a>
-                                </Button>
-                            )}
-                            {hospital.contact?.website && (
-                                <Button asChild size="sm" variant="outline">
-                                    <a href={hospital.contact.website} target="_blank" rel="noopener noreferrer">
-                                        <Globe />
-                                        Website
-                                    </a>
-                                </Button>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            ))}
-          </div>
-        ) : (
-            <div className="text-center py-16">
-                <p className="text-muted-foreground">No partner hospitals are listed at this time. Please check back later.</p>
+        {/* Introduction to Marie Stopes */}
+        <div className="mt-16 grid grid-cols-1 items-center gap-8 md:grid-cols-2 md:gap-12">
+            <div className="relative flex h-48 w-full items-center justify-center rounded-2xl bg-white p-6 shadow-md md:h-64">
+                <Image
+                    src={marieStopesData.logo_url}
+                    alt={`${marieStopesData.name} Logo`}
+                    width={220}
+                    height={90}
+                    className="object-contain"
+                    data-ai-hint="logo"
+                />
+                
             </div>
-        )}
+            <div className="flex flex-col justify-center">
+                <h2 className="text-3xl font-bold text-foreground">{marieStopesData.name}</h2>
+                <p className="mt-1 text-base font-medium text-primary">{marieStopesData.locations.join(' | ')}</p>
+                <p className="mt-4 text-base text-foreground">{marieStopesData.description}</p>
+                 <div className="mt-6 flex flex-wrap gap-2">
+                    {marieStopesData.contact?.phone && (
+                        <Button asChild size="sm">
+                            <a href={`tel:${marieStopesData.contact.phone}`}>
+                                <Phone />
+                                Call Now
+                            </a>
+                        </Button>
+                    )}
+                    {marieStopesData.contact?.whatsapp && (
+                        <Button asChild size="sm" variant="accent" className="bg-green-500 hover:bg-green-600 text-white">
+                            <a href={`https://wa.me/233${marieStopesData.contact.whatsapp.slice(1)}`} target="_blank" rel="noopener noreferrer">
+                                <WhatsAppIcon />
+                                WhatsApp
+                            </a>
+                        </Button>
+                    )}
+                    {marieStopesData.contact?.website && (
+                        <Button asChild size="sm" variant="outline">
+                            <a href={marieStopesData.contact.website} target="_blank" rel="noopener noreferrer">
+                                <Globe />
+                                Website
+                            </a>
+                        </Button>
+                    )}
+                </div>
+            </div>
+        </div>
 
+        {/* Detailed Services Section */}
+        <div className="mt-24">
+            <div className="text-center">
+                <h3 className="text-2xl font-bold text-foreground">Services We Recommend</h3>
+                <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">Marie Stopes offers a safe, confidential environment for these key services. Mention DiscreetKit for a supportive experience.</p>
+            </div>
+            <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {marieStopesData.services.map(service => (
+                    <Card key={service.title} className="flex flex-col">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-3">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 flex-shrink-0">
+                                    <CheckCircle className="h-6 w-6 text-primary" />
+                                </div>
+                                <span className="text-lg">{service.title}</span>
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="flex-grow">
+                            <p className="text-sm text-muted-foreground">{service.description}</p>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+        </div>
+
+
+        {/* Partner FAQ Section */}
         <div className="mt-24 max-w-3xl mx-auto">
             <div className="text-center">
                 <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-                    A Guide to Your Care Options
+                    Your Questions, Answered
                 </h2>
                 <p className="mt-4 text-base text-muted-foreground">
-                    Find the right support for your needs.
+                    Important things to know before you visit a Marie Stopes centre.
                 </p>
             </div>
              <div className="mt-8">
                 <Accordion type="single" collapsible className="w-full">
-                    {partnerFaqItems.map((item, index) => (
+                    {marieStopesData.faq.map((item, index) => (
                     <AccordionItem key={index} value={`item-${index}`}>
                         <AccordionTrigger className="text-left text-base hover:no-underline">
                         {item.question}
