@@ -76,7 +76,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="mt-12 flex flex-col items-center justify-between border-t border-primary-foreground/20 pt-8 sm:flex-row">
           <p className="text-sm text-primary-foreground/80">
-            &copy; {new Date().getFullYear()} DiscreetKit Ghana. All rights reserved.
+            &copy; {new Date().getFullYear()} Access DiscreetKit Ltd. All rights reserved.
           </p>
           <div className="mt-4 flex items-center space-x-2 sm:mt-0">
              {socialLinks.map((link) => (
