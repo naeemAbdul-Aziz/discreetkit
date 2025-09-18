@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { Plus, Minus, Trash2 } from 'lucide-react';
 import { useCart } from '@/hooks/use-cart';
 import type { Product } from '@/app/products/page';
+import { cn } from '@/lib/utils';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -42,22 +43,28 @@ export function ProductCard({ product }: { product: Product }) {
     const price = hasStudentDeal ? product.student_price_ghs : product.price_ghs;
 
     return (
-        <Card className="flex h-full flex-col overflow-hidden rounded-2xl bg-card p-4 shadow-sm transition-shadow duration-300 hover:shadow-lg">
-            <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-muted/50 p-4 rounded-lg">
+        <div className="group relative flex h-full min-h-[420px] w-full flex-col overflow-hidden rounded-2xl bg-card shadow-sm transition-shadow duration-300 hover:shadow-lg">
+            {/* Image Container with Clip Path */}
+            <div 
+                className="relative h-2/5 w-full bg-muted/50"
+                style={{ clipPath: 'polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%)' }}
+            >
                 {product.image_url && (
                     <Image
                         src={product.image_url}
                         alt={product.name}
-                        width={250}
-                        height={188}
-                        className="object-contain"
+                        fill
+                        className="object-contain p-4"
                         sizes="(max-width: 768px) 80vw, 30vw"
                         data-ai-hint="medical test kit"
                         placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(250, 188))}`}
                     />
                 )}
+                 <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent" />
             </div>
-            <div className="flex flex-grow flex-col pt-4 text-left">
+
+            {/* Content Section */}
+            <div className="flex flex-grow flex-col justify-between p-6 pt-8 text-left">
                 <div className="flex-grow">
                     <h3 className="text-lg font-bold text-foreground leading-tight">{product.name}</h3>
                     <p className="mt-2 text-sm text-muted-foreground">{product.description}</p>
@@ -102,6 +109,6 @@ export function ProductCard({ product }: { product: Product }) {
                     </div>
                 </div>
             </div>
-        </Card>
+        </div>
     );
 }
