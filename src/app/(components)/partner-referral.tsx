@@ -62,7 +62,7 @@ export function PartnerReferral() {
                 Your Bridge to Confidential Care
                 </h2>
                 <p className="mt-4 text-base text-muted-foreground">
-                Need to talk to someone or get a confirmatory test? We've built relationships with trusted, non-judgmental clinics and counselors who are ready to support you.
+                Need to talk to someone or get a confirmatory test? We've built a relationship with a trusted, non-judgmental partner who is ready to support you.
                 </p>
                 <p className="mt-2 text-base text-muted-foreground">
                 Mention DiscreetKit when you contact them to ensure a private and respectful experience.
@@ -70,7 +70,7 @@ export function PartnerReferral() {
                 <div className="mt-8">
                 <Button asChild size="lg">
                     <Link href="/partner-care">
-                    Browse Partner Clinics
+                    Learn About Our Partner
                     <ArrowRight />
                     </Link>
                 </Button>

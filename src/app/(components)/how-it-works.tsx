@@ -83,7 +83,7 @@ export function HowItWorks() {
                   {step.number === 4 && (
                       <Button asChild variant="default">
                           <Link href="/partner-care">
-                              Find a Partner
+                              Meet Our Support Partner
                               <ArrowRight />
                           </Link>
                       </Button>
@@ -139,7 +139,7 @@ export function HowItWorks() {
                                 <div className="mt-8">
                                     <Button asChild variant="default" size="lg">
                                         <Link href="/partner-care">
-                                            Find a Support Partner
+                                            Meet Our Support Partner
                                             <ArrowRight />
                                         </Link>
                                     </Button>
