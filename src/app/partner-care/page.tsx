@@ -35,7 +35,13 @@ const toBase64 = (str: string) =>
 export default function PartnerCarePage() {
 
     const scrollTo = (id: string) => {
-        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+        const element = document.getElementById(id);
+        if (element) {
+            element.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+            });
+        }
     }
 
   return (
@@ -84,7 +90,7 @@ export default function PartnerCarePage() {
             
             <Separator id="services" className="my-16 md:my-24" />
             
-            <div className="max-w-6xl mx-auto">
+             <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-12">
                      <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
                        Services to Support You
@@ -94,18 +100,24 @@ export default function PartnerCarePage() {
                     </p>
                 </div>
                 
-                <Carousel
-                    opts={{
-                        align: "start",
-                        loop: true,
+                <div
+                    className="relative"
+                    style={{
+                        maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
                     }}
-                    className="w-full"
                 >
-                    <CarouselContent>
-                        {marieStopesData.services.map((service, index) => (
-                           <CarouselItem key={index} className="basis-4/5 sm:basis-1/2 md:basis-1/3 lg:basis-1/3">
-                               <div className="p-1 h-full">
-                                <Card className="flex flex-col h-[380px] w-full overflow-hidden rounded-2xl shadow-lg transition-shadow hover:shadow-xl">
+                    <Carousel
+                        opts={{
+                            align: "start",
+                            loop: true,
+                        }}
+                        className="w-full"
+                    >
+                        <CarouselContent>
+                            {marieStopesData.services.map((service, index) => (
+                            <CarouselItem key={index} className="basis-4/5 sm:basis-1/2 md:basis-1/3 lg:basis-1/3">
+                                <div className="p-1 h-full">
+                                    <Card className="flex flex-col h-[420px] w-full overflow-hidden rounded-2xl transition-shadow hover:shadow-xl">
                                         <div className="relative h-[220px] w-full">
                                             <Image
                                                 src={service.imageUrl}
@@ -114,14 +126,14 @@ export default function PartnerCarePage() {
                                                 className="absolute inset-0 h-full w-full object-cover"
                                                 style={{ clipPath: 'polygon(0 0, 100% 0, 100% 85%, 0% 100%)' }}
                                                 placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 220))}`}
-                                                sizes="300px"
+                                                sizes="(max-width: 768px) 80vw, 30vw"
                                                 data-ai-hint={service.imageHint}
                                             />
                                         </div>
                                         <CardContent className="flex flex-col justify-between flex-1 p-6 bg-card text-center">
                                         <div>
-                                            <h3 className="text-base font-bold text-foreground">{service.title}</h3>
-                                            <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{service.description}</p>
+                                            <h3 className="text-lg font-bold text-foreground">{service.title}</h3>
+                                            <p className="mt-2 text-sm text-muted-foreground line-clamp-3">{service.description}</p>
                                         </div>
                                         {marieStopesData.website && (
                                                 <Button asChild variant="secondary" size="sm" className="mt-4 w-fit mx-auto">
@@ -134,9 +146,10 @@ export default function PartnerCarePage() {
                                     </Card>
                                </div>
                             </CarouselItem>
-                        ))}
-                    </CarouselContent>
-                </Carousel>
+                            ))}
+                        </CarouselContent>
+                    </Carousel>
+                </div>
             </div>
 
             <Separator className="my-16 md:my-24" />
