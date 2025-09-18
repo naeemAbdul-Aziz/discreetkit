@@ -25,7 +25,11 @@ export function Footer() {
       { href: '#', icon: Facebook, label: 'Facebook' },
   ]
 
-  const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758119851/discreetkit_logo_4_npbt4m.png';
+  const Logo = () => (
+    <span className="font-headline text-2xl font-bold tracking-tighter text-primary-foreground">
+        DiscreetKit
+    </span>
+);
 
   return (
     <footer className="border-t bg-primary text-primary-foreground">
@@ -34,13 +38,7 @@ export function Footer() {
           {/* Brand Section */}
           <div className="md:col-span-4">
             <Link href="/" className="mb-4 inline-flex items-center space-x-2">
-              <Image 
-                src={logoUrl} 
-                alt="DiscreetKit Logo" 
-                width={160} 
-                height={40} 
-                className="brightness-0 invert h-auto w-auto"
-              />
+              <Logo />
             </Link>
             <p className="max-w-xs text-sm text-primary-foreground/80">
               Private health answers, delivered with trust. Confidential, reliable self-test kits in Ghana.

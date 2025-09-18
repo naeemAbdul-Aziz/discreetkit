@@ -53,12 +53,17 @@ function CartLink() {
   );
 }
 
+const Logo = () => (
+    <span className="font-headline text-2xl font-bold tracking-tighter text-foreground">
+        DiscreetKit
+    </span>
+);
+
 export function Header() {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758119851/discreetkit_logo_4_npbt4m.png';
 
   useEffect(() => {
     setIsMounted(true);
@@ -130,14 +135,7 @@ export function Header() {
 
           <div className="hidden md:flex md:w-1/3 justify-center">
             <Link href="/" aria-label="DiscreetKit Homepage">
-              <Image
-                src={logoUrl}
-                alt="DiscreetKit Logo"
-                width={160}
-                height={40}
-                className="h-auto"
-                priority
-              />
+              <Logo />
             </Link>
           </div>
           
@@ -151,14 +149,7 @@ export function Header() {
           {/* Mobile Menu */}
           <div className="flex w-full items-center justify-between md:hidden">
             <Link href="/" className="flex items-center" aria-label="DiscreetKit Homepage">
-              <Image
-                src={logoUrl}
-                alt="DiscreetKit Logo"
-                width={140}
-                height={35}
-                className="h-auto w-auto"
-                priority
-              />
+              <Logo />
             </Link>
 
             <div className="flex items-center gap-2">
@@ -174,13 +165,7 @@ export function Header() {
                    <SheetHeader className="flex flex-row justify-between items-center">
                      <SheetTitle className="text-left">
                        <Link href="/" onClick={() => setMobileMenuOpen(false)} aria-label="DiscreetKit Homepage">
-                        <Image
-                          src={logoUrl}
-                          alt="DiscreetKit Logo"
-                          width={140}
-                          height={35}
-                          className="h-auto w-auto"
-                        />
+                        <Logo />
                       </Link>
                      </SheetTitle>
                      <SheetClose asChild>
