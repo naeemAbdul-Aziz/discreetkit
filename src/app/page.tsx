@@ -30,7 +30,7 @@ const componentMap = {
   ProductSelector: { height: '700px' },
   ProductBenefits: { height: '100px' },
   HowItWorks: { height: '800px' },
-  TelehealthServices: { height: '600px' },
+  PartnerReferral: { height: '500px' },
   OurVision: { height: '800px' },
   Testimonials: { height: '500px' },
   Faq: { height: '600px' },
@@ -55,9 +55,9 @@ const HowItWorks = dynamic(
   () => import('./(components)/how-it-works').then((mod) => mod.HowItWorks),
   { loading: () => <LoadingSkeleton height={componentMap.HowItWorks.height} /> }
 );
-const TelehealthServices = dynamic(
-  () => import('./(components)/telehealth-services').then((mod) => mod.TelehealthServices),
-  { loading: () => <LoadingSkeleton height={componentMap.TelehealthServices.height} /> }
+const PartnerReferral = dynamic(
+  () => import('./(components)/partner-referral').then((mod) => mod.PartnerReferral),
+  { loading: () => <LoadingSkeleton height={componentMap.PartnerReferral.height} /> }
 );
 const OurVision = dynamic(
   () => import('./(components)/our-vision').then((mod) => mod.OurVision),
@@ -108,7 +108,7 @@ export default async function Home() {
       </SectionWrapper>
 
       <SectionWrapper className="bg-background">
-        <TelehealthServices />
+        <PartnerReferral />
       </SectionWrapper>
       
       <SectionWrapper className="bg-background">
