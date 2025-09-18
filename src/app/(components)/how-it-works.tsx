@@ -51,7 +51,7 @@ export function HowItWorks() {
           <div className="absolute left-5 top-0 h-full w-0.5 bg-border -translate-x-1/2" aria-hidden="true"></div>
           <div className="space-y-12">
             {steps.map((step) => (
-              <div key={step.number} className="flex items-start gap-4">
+              <div key={step.number} className="relative flex items-start gap-4">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-primary bg-background font-bold text-primary z-10 flex-shrink-0">
                   {step.number}
                 </div>
