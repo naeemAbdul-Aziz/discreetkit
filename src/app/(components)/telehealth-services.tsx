@@ -113,7 +113,7 @@ export function TelehealthServices() {
                 WebkitMaskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)',
             }}
         >
-            <div className="overflow-x-auto pb-8 -mb-8">
+            <div className="overflow-x-auto pb-8 -mb-8 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                 <div className="grid grid-flow-col auto-cols-[80%] sm:auto-cols-[45%] md:auto-cols-[30%] lg:auto-cols-[22%] gap-6 px-4">
                     {services.map((service, index) => (
                         <div key={index} className={cn('grid', 
