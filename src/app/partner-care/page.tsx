@@ -1,3 +1,4 @@
+
 import { getSupabaseClient } from '@/lib/supabase';
 import { PartnerCareHeader } from './(components)/partner-care-header';
 import { HospitalCard } from './(components)/hospital-card';
@@ -49,7 +50,7 @@ export default async function PartnerCarePage() {
         {!fetchError && (
             <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {hospitals.map((hospital) => (
-              <HospitalCard key={hospital.id} hospital={hospital} />
+              <HospitalCard key={hospital.id} hospital={hospital as any} />
             ))}
           </div>
         )}

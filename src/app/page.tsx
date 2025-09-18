@@ -6,7 +6,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { getSupabaseClient } from '@/lib/supabase';
 import type { Product } from './products/page';
-import type { PartnerShowcase as PartnerShowcaseType } from './(components)/partner-showcase';
 
 async function getProducts(): Promise<Product[]> {
     const supabase = getSupabaseClient();
@@ -32,7 +31,6 @@ const componentMap = {
   ProductBenefits: { height: '100px' },
   HowItWorks: { height: '800px' },
   TelehealthServices: { height: '600px' },
-  PartnerShowcase: { height: '500px' },
   OurVision: { height: '800px' },
   Testimonials: { height: '500px' },
   Faq: { height: '600px' },
@@ -60,10 +58,6 @@ const HowItWorks = dynamic(
 const TelehealthServices = dynamic(
   () => import('./(components)/telehealth-services').then((mod) => mod.TelehealthServices),
   { loading: () => <LoadingSkeleton height={componentMap.TelehealthServices.height} /> }
-);
-const PartnerShowcase = dynamic(
-  () => import('./(components)/partner-showcase').then((mod) => mod.PartnerShowcase as any),
-  { loading: () => <LoadingSkeleton height={componentMap.PartnerShowcase.height} /> }
 );
 const OurVision = dynamic(
   () => import('./(components)/our-vision').then((mod) => mod.OurVision),
@@ -121,10 +115,6 @@ export default async function Home() {
         <OurVision />
       </SectionWrapper>
 
-      <SectionWrapper className="bg-background">
-        <PartnerShowcase />
-      </SectionWrapper>
-      
       <SectionWrapper className="bg-muted">
         <Testimonials />
       </SectionWrapper>
