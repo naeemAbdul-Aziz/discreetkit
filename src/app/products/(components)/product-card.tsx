@@ -42,7 +42,7 @@ export function ProductCard({ product }: { product: Product }) {
     const price = hasStudentDeal ? product.student_price_ghs : product.price_ghs;
 
     return (
-        <Card className="flex h-full flex-col overflow-hidden rounded-2xl border bg-card p-4">
+        <Card className="flex h-full flex-col overflow-hidden rounded-2xl bg-card p-4 shadow-sm transition-shadow duration-300 hover:shadow-lg">
             <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-muted/50 p-4 rounded-lg">
                 {product.image_url && (
                     <Image
