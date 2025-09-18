@@ -103,7 +103,7 @@ export default async function Home() {
         <ProductBenefits />
       </SectionWrapper>
 
-      <SectionWrapper className="bg-muted">
+      <SectionWrapper className="bg-background">
         <HowItWorks />
       </SectionWrapper>
 
