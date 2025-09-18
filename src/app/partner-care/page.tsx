@@ -5,13 +5,15 @@ import { marieStopesData } from '@/lib/data';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Phone, MessageSquare, Globe, ArrowRight, ArrowDown } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { HowItWorksPartner } from './(components)/how-it-works';
+import { cn } from '@/lib/utils';
+
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -86,7 +88,7 @@ export default function PartnerCarePage() {
             <Separator id="services" className="my-16 md:my-24" />
 
             {/* Services Carousel Section */}
-            <div className="max-w-5xl mx-auto">
+            <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-12">
                      <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
                        Services to Support You
@@ -108,33 +110,36 @@ export default function PartnerCarePage() {
                     ]}
                     className="w-full"
                     >
-                    <CarouselContent>
-                        {marieStopesData.services.map((service) => (
-                        <CarouselItem key={service.title} className="md:basis-1/2 lg:basis-1/3">
+                    <CarouselContent className="-ml-4">
+                        {marieStopesData.services.map((service, index) => (
+                        <CarouselItem key={index} className="basis-full sm:basis-1/2 lg:basis-1/3 pl-4">
                             <div className="p-1 h-full">
-                               <Card className="relative flex min-h-[380px] w-full flex-col justify-end overflow-hidden rounded-2xl p-6 shadow-lg text-primary-foreground">
-                                    <Image
-                                        src={service.imageUrl}
-                                        alt={service.title}
-                                        fill
-                                        className="absolute inset-0 h-full w-full object-cover -z-10"
-                                        placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 500))}`}
-                                        sizes="(max-width: 768px) 100vw, 33vw"
-                                        data-ai-hint={service.imageHint}
-                                    />
-                                    <div className="absolute inset-0 -z-10 bg-gradient-to-t from-black/80 via-black/50 to-transparent"></div>
-                                    <div className="relative">
-                                        <h3 className="text-xl font-bold">{service.title}</h3>
-                                        <p className="mt-2 text-sm text-primary-foreground/80">{service.description}</p>
-                                        {marieStopesData.website && (
-                                             <Button asChild variant="secondary" className="mt-4">
+                               <Card className="flex flex-col h-[380px] w-full overflow-hidden rounded-2xl shadow-lg transition-shadow hover:shadow-xl">
+                                    <div className="relative h-[220px] w-full">
+                                         <Image
+                                            src={service.imageUrl}
+                                            alt={service.title}
+                                            fill
+                                            className="absolute inset-0 h-full w-full object-cover"
+                                            style={{ clipPath: 'polygon(0 0, 100% 0, 100% 85%, 0% 100%)' }}
+                                            placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 220))}`}
+                                            sizes="(max-width: 768px) 100vw, 33vw"
+                                            data-ai-hint={service.imageHint}
+                                        />
+                                    </div>
+                                    <CardContent className="flex flex-col justify-between flex-1 p-6 bg-card text-center">
+                                       <div>
+                                         <h3 className="text-base font-bold text-foreground">{service.title}</h3>
+                                        <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{service.description}</p>
+                                       </div>
+                                       {marieStopesData.website && (
+                                             <Button asChild variant="secondary" size="sm" className="mt-4 w-fit mx-auto">
                                                 <Link href={marieStopesData.website} target="_blank" rel="noopener noreferrer">
                                                     Learn More
-                                                    <ArrowRight />
                                                 </Link>
                                             </Button>
                                         )}
-                                    </div>
+                                    </CardContent>
                                 </Card>
                             </div>
                         </CarouselItem>
