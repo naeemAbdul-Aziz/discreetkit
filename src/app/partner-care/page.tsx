@@ -117,7 +117,7 @@ export default function PartnerCarePage() {
                             {marieStopesData.services.map((service, index) => (
                             <CarouselItem key={index} className="basis-4/5 sm:basis-1/2 md:basis-1/3 lg:basis-1/3">
                                 <div className="p-1 h-full">
-                                    <Card className="flex flex-col h-[420px] w-full overflow-hidden rounded-2xl transition-shadow hover:shadow-xl">
+                                    <Card className="flex flex-col h-[420px] w-full overflow-hidden rounded-2xl transition-shadow">
                                         <div className="relative h-[220px] w-full">
                                             <Image
                                                 src={service.imageUrl}
