@@ -250,36 +250,36 @@ export const testimonials: Testimonial[] = [
     quote: "The entire process was so simple and private. I got my package the next day in a plain box. It's a huge relief to have a service like this in Ghana.",
     name: "Ama K.",
     role: "University of Ghana Student",
-    avatar: "https://i.pravatar.cc/150?img=1"
+    avatar: "https://images.unsplash.com/photo-1521119989659-a83eee488004?w=150&h=150&fit=crop&q=75"
   },
   {
     quote: "DiscreetKit is a game-changer. I was worried about going to a pharmacy, but this was completely anonymous. The tracking code gave me peace of mind.",
     name: "David A.",
     role: "Young Professional, Osu",
-    avatar: "https://i.pravatar.cc/150?img=3"
+    avatar: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=150&h=150&fit=crop&q=75"
   },
   {
     quote: "As a student leader, I see the need for this every day. It's a responsible, safe, and judgment-free way for young people to take control of their health.",
     name: "Fatima S.",
     role: "Student Rep, UPSA",
-    avatar: "https://i.pravatar.cc/150?img=5"
+    avatar: "https://images.unsplash.com/photo-1596854407944-bf87f6fdd49e?w=150&h=150&fit=crop&q=75"
   },
   {
     quote: "The instructions were so easy to follow. I had my result in 15 minutes. Knowing my status privately has lifted a huge weight off my shoulders.",
     name: "Michael B.",
     role: "GIMPA Graduate",
-    avatar: "https://i.pravatar.cc/150?img=7"
+    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&q=75"
   },
     {
     quote: "I ordered the couple's bundle with my partner. It helped us have an open conversation and support each other through the process. Highly recommend.",
     name: "Esi & Kofi",
     role: "Couple, Accra",
-    avatar: "https://i.pravatar.cc/150?img=9"
+    avatar: "https://images.unsplash.com/photo-1544168190-79c17527004f?w=150&h=150&fit=crop&q=75"
   },
     {
     quote: "Fast, professional, and exactly as advertised. The package was so discreet, even I wasn't sure what it was at first. 10/10 service.",
     name: "Josephine O.",
     role: "Entrepreneur, East Legon",
-    avatar: "https://i.pravatar.cc/150?img=11"
+    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&h=150&fit=crop&q=75"
   },
 ];
