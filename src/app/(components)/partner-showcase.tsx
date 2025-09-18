@@ -2,6 +2,8 @@
 import { getSupabaseClient } from '@/lib/supabase';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { PartnerShowcaseCard } from '../partner-care/(components)/partner-showcase-card';
+import { Badge } from '@/components/ui/badge';
+import { Award } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,6 +39,12 @@ export async function PartnerShowcase() {
           <p className="mt-4 max-w-2xl mx-auto text-base text-muted-foreground">
             Explore our network of preferred partners for confidential, professional health services.
           </p>
+           <div className="mt-6 flex justify-center">
+            <Badge variant="secondary" className="bg-primary/10 text-primary text-sm px-4 py-2 border-primary/20">
+                <Award className="mr-2 h-4 w-4" />
+                Mention DiscreetKit for a discounted & private experience.
+            </Badge>
+          </div>
         </div>
         
         <div
