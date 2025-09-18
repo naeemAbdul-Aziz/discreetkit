@@ -1,6 +1,6 @@
 
 
-import { Package, ShoppingCart, Truck, CheckCircle, ShieldCheck, HeartHandshake, Zap, Award, Users, TestTube, Droplet, FileText, FlaskConical, Plus } from "lucide-react";
+import { Package, ShoppingCart, Truck, CheckCircle, ShieldCheck, HeartHandshake, Zap, Award, Users, Phone, MessageSquare, Globe } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { CartItem } from "@/hooks/use-cart";
 
@@ -55,20 +55,24 @@ export type Testimonial = {
     avatar: string;
 };
 
-export type Partner = {
-    id: number;
-    name: string;
+export type MarieStopesService = {
+    title: string;
     description: string;
-    logo_url: string;
-    location: string;
-    services: string[];
-    is_preferred: boolean;
+    imageUrl: string;
+    imageHint: string;
+}
+
+export type MarieStopesData = {
+    name: string;
+    logoUrl: string;
+    website: string | null;
     contact: {
         phone: string | null;
         whatsapp: string | null;
-        website: string | null;
-    };
-};
+    }
+    services: MarieStopesService[];
+    faqs: FaqItem[];
+}
 
 export type ProductBenefit = {
     icon: LucideIcon;
@@ -144,6 +148,45 @@ export const steps: Step[] = [
   },
 ];
 
+export const partnerCareSteps: Step[] = [
+    {
+      number: 1,
+      title: 'Order Your Kit',
+      icon: ShoppingCart,
+      description: 'Start by choosing the test kit that’s right for you from our shop. The entire process is anonymous and secure from the very beginning.',
+      details: ['Choose your health product', 'Pay securely online', 'No personal name required'],
+      imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757952399/medium-shot-woman-laying-couch_ojrtnp.jpg',
+      imageHint: 'woman couch relaxing',
+    },
+    {
+      number: 2,
+      title: 'Get Your Private Results',
+      icon: CheckCircle,
+      description: 'Your kit arrives in a plain package. Use the simple instructions to get a clear result in under 20 minutes in the privacy of your own home.',
+      details: ['Discreet, unbranded package', 'Easy-to-follow instructions', 'Results in under 20 minutes'],
+      imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757952387/man-being-happy-after-getting-negative-covid-test-result_udxny5.jpg',
+      imageHint: 'man happy result',
+    },
+    {
+      number: 3,
+      title: 'Contact Our Partner',
+      icon: Phone,
+      description: "If you need support or a confirmatory test, your next step is to reach out to Marie Stopes. You can call them toll-free or chat on WhatsApp—it's your choice.",
+      details: ['Use the contact buttons on this page', 'Mention you were referred by DiscreetKit', 'Your call is 100% confidential'],
+      imageUrl: 'https://images.unsplash.com/photo-1614324420919-4235395a3a42?q=80&w=800&fit=crop',
+      imageHint: 'person on phone',
+    },
+    {
+      number: 4,
+      title: 'Receive Confidential Care',
+      icon: HeartHandshake,
+      description: 'Marie Stopes provides a safe, non-judgmental environment for confirmatory testing, counseling, and other health services to give you peace of mind.',
+      details: ['Visit a welcoming, private clinic', 'Speak with expert, friendly staff', 'Get the professional care you need'],
+      imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=800&fit=crop',
+      imageHint: 'doctor patient tablet',
+    },
+];
+
 export const productBenefits: ProductBenefit[] = [
     { icon: ShieldCheck, title: '100% Private & Anonymous' },
     { icon: Award, title: 'WHO-Approved 99% Accuracy' },
@@ -152,78 +195,57 @@ export const productBenefits: ProductBenefit[] = [
     { icon: Users, title: 'No Accounts, No Names' },
 ];
 
-export const partners: Partner[] = [
-  {
-    id: 1,
-    name: 'Nyaho Medical Centre',
-    description: "As one of Ghana's most reputable private hospitals, Nyaho Medical Centre offers a premium, confidential experience. Their dedicated team provides comprehensive services, from confirmatory testing to general practice and professional counseling, all within a modern and welcoming environment.",
-    logo_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758117781/nyaho-logo_b3xt0u.png',
-    location: 'Airport Residential, Accra',
-    services: ['Confirmatory Testing', 'Counseling', 'General Practice'],
-    is_preferred: true,
+export const marieStopesData: MarieStopesData = {
+    name: "Marie Stopes Ghana",
+    logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758223637/marie-stopes-logo_do0j8g.png",
+    website: "https://www.mariestopes.org.gh",
     contact: {
-      phone: '0302775341',
-      whatsapp: null,
-      website: 'https://www.nyahomedical.com',
+        phone: "0800208080",
+        whatsapp: "0556561081"
     },
-  },
-  {
-    id: 2,
-    name: 'Akai House Clinic',
-    description: "Akai House Clinic is a specialist facility renowned for its expertise in sexual health and dermatology. They provide discreet, patient-centered care for STI testing, treatment, and other sensitive health concerns, making them a top choice for specialized needs.",
-    logo_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758117781/akai-logo_j4m53q.png',
-    location: 'Cantonments, Accra',
-    services: ['Sexual Health', 'Confirmatory Testing', 'Dermatology'],
-    is_preferred: true,
-    contact: {
-      phone: '0302784772',
-      whatsapp: '0561113580',
-      website: 'https://www.akaihouseclinic.com',
-    },
-  },
-  {
-    id: 5,
-    name: 'The Accra London Health Centre',
-    description: "The Accra London Health Centre (TALHC) is a trusted name in advanced healthcare, offering specialized services in sexual health, contraceptive counselling, and fertility care. Their international standard of care ensures a private and supportive environment for all patients.",
-    logo_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758118029/talhc-logo_d9c9h1.png',
-    location: 'Ringway Estates, Osu',
-    services: ['STI Testing', 'Contraceptive Counselling', 'Fertility Care'],
-    is_preferred: false,
-    contact: {
-        phone: '0302787122',
-        whatsapp: '0556561081',
-        website: 'https://www.theaccralondonclinic.com'
-    }
-  },
-  {
-    id: 3,
-    name: 'Bedita Pharmacy',
-    description: "Bedita Pharmacy is a well-regarded community pharmacy known for its professional service and wide range of wellness products. Their pharmacists are available for health consultations, providing accessible and reliable advice for general health concerns.",
-    logo_url: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/bedita_ekekhs.png",
-    location: 'East Legon, Accra',
-    services: ['Pharmaceuticals', 'Health Consultation', 'Wellness Products'],
-    is_preferred: false,
-    contact: {
-      phone: '0302507838',
-      whatsapp: null,
-      website: null,
-    },
-  },
-    {
-    id: 4,
-    name: 'Ernest Chemist',
-    description: "With branches across the country, Ernest Chemist is one of Ghana's most recognized pharmaceutical retailers. Their wide network provides nationwide access to medicines and health products, ensuring you can find support wherever you are.",
-    logo_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/ernest_chemist_ebxjug.webp',
-    location: 'Multiple Branches',
-    services: ['Pharmaceuticals', 'Nationwide Access'],
-    is_preferred: false,
-    contact: {
-      phone: '0302251411',
-      whatsapp: null,
-      website: 'https://www.ernestchemist.com',
-    },
-  },
-];
+    services: [
+        {
+            title: "Confirmatory Testing",
+            description: "Get a professional test in a clinical setting to confirm your status and understand your health.",
+            imageUrl: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=800&fit=crop",
+            imageHint: "doctor patient tablet"
+        },
+        {
+            title: "Professional Counselling",
+            description: "Speak with a trained professional in a private, non-judgmental space to discuss your results and options.",
+            imageUrl: "https://images.unsplash.com/photo-1544006659-f0b21884ce1d?q=80&w=800&fit=crop",
+            imageHint: "counselor listening patient"
+        },
+        {
+            title: "Contraceptive Services",
+            description: "Explore a wide range of modern contraceptive options with expert guidance to fit your lifestyle.",
+            imageUrl: "https://images.unsplash.com/photo-1584515933487-759821d27167?q=80&w=800&fit=crop",
+            imageHint: "hands holding package"
+        },
+    ],
+    faqs: [
+        {
+            question: "Do I need an appointment?",
+            answer: "Walk-ins are welcome, but we recommend calling ahead to confirm the best time and reduce your waiting period. You can call their toll-free number at 0800 20 8080."
+        },
+        {
+            question: "Will my visit be confidential?",
+            answer: "Absolutely. Marie Stopes Ghana operates under strict confidentiality policies. Your information is protected and will not be shared. They are known for providing a safe and private environment."
+        },
+        {
+            question: "What should I expect during my visit?",
+            answer: "You will be greeted by friendly, non-judgmental staff. A trained counselor or healthcare provider will speak with you privately about your needs, explain the process, and answer any questions you have before any tests are done."
+        },
+        {
+            question: "Is there a special benefit for coming from DiscreetKit?",
+            answer: "While there isn't a direct discount, mentioning you came from DiscreetKit can help their staff understand your need for a discreet and sensitive experience. Our partnership ensures you will be treated with the utmost respect and privacy."
+        },
+        {
+            question: "How long will it take to get results?",
+            answer: "Results for many tests, including confirmatory HIV tests, are often available quickly, sometimes on the same day. The staff will inform you of the expected timeline for your specific test."
+        }
+    ]
+};
 
 export const faqItems: FaqItem[] = [
   {
@@ -236,7 +258,7 @@ export const faqItems: FaqItem[] = [
   },
   {
     question: "What happens if I test positive?",
-    answer: "A self-test is a screening test, not a final diagnosis. If you get a positive result, it's very important to get a confirmatory test. We provide a confidential connection to our trusted partner hospitals who offer discounted, non-judgmental follow-up care."
+    answer: "A self-test is a screening test, not a final diagnosis. If you get a positive result, it's very important to get a confirmatory test. We provide a confidential connection to our trusted partner, Marie Stopes Ghana, who offer professional follow-up care."
   },
   {
     question: "How is my order delivered?",

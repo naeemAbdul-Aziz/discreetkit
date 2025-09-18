@@ -12,6 +12,7 @@ import Autoplay from 'embla-carousel-autoplay';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Phone, MessageSquare, Globe, ShieldCheck, HeartHandshake, UserCheck } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { HowItWorksPartner } from './(components)/how-it-works';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -83,59 +84,7 @@ export default function PartnerCarePage() {
       <div className="container mx-auto px-4 py-12 md:px-6 md:py-24">
         <div className="mx-auto max-w-7xl">
 
-            {/* Services Carousel Section */}
-            <div className="text-center mb-12">
-                <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-                    Recommended Next Steps & Services
-                </h2>
-                <p className="mt-4 max-w-2xl mx-auto text-base text-muted-foreground">
-                    Based on your results, here are the key services they offer to give you clarity and peace of mind.
-                </p>
-            </div>
-            <Carousel
-                opts={{ align: "start", loop: true }}
-                plugins={[ Autoplay({ delay: 5000, stopOnInteraction: true }) ]}
-                className="w-full"
-            >
-                <CarouselContent>
-                {marieStopesData.services.map((service, index) => (
-                    <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
-                    <div className="p-2 h-full">
-                        <Card className="h-full flex flex-col rounded-2xl shadow-sm transition-shadow duration-300 hover:shadow-lg overflow-hidden">
-                            <div className="relative aspect-video w-full bg-muted/50 overflow-hidden">
-                                <Image
-                                    src={service.imageUrl}
-                                    alt={service.title}
-                                    fill
-                                    className="object-cover"
-                                    sizes="(max-width: 768px) 90vw, 30vw"
-                                    data-ai-hint={service.imageHint}
-                                    placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 450))}`}
-                                />
-                            </div>
-                            <CardContent className="flex flex-grow flex-col justify-between p-6">
-                                <div className="flex-grow">
-                                    <h3 className="text-lg font-bold text-foreground">{service.title}</h3>
-                                    <p className="mt-2 text-sm text-muted-foreground">{service.description}</p>
-                                </div>
-                                <div className="mt-6">
-                                    {marieStopesData.website && (
-                                        <Button asChild className="w-full" variant="outline">
-                                            <Link href={marieStopesData.website} target="_blank" rel="noopener noreferrer">
-                                                Learn More
-                                            </Link>
-                                        </Button>
-                                    )}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
-                    </CarouselItem>
-                ))}
-                </CarouselContent>
-                <CarouselPrevious className="hidden sm:flex" />
-                <CarouselNext className="hidden sm:flex" />
-            </Carousel>
+            <HowItWorksPartner />
             
             <Separator className="my-16 md:my-24" />
 
