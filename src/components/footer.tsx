@@ -1,7 +1,6 @@
 
 import Link from 'next/link';
 import { ShieldCheck, Twitter, Instagram, Facebook } from 'lucide-react';
-import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
 

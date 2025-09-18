@@ -8,7 +8,6 @@ import { Menu, ShoppingCart, Loader2, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
 import { useCart } from '@/hooks/use-cart';
 import { Separator } from './ui/separator';
 
@@ -54,7 +53,7 @@ function CartLink() {
 }
 
 const Logo = () => (
-    <span className="font-headline text-2xl font-bold tracking-tighter text-foreground">
+    <span className="font-headline text-2xl font-bold tracking-tighter text-primary">
         DiscreetKit
     </span>
 );
