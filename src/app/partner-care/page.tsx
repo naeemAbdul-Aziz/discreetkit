@@ -10,7 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Phone, MessageSquare, Globe, ShieldCheck, HeartHandshake, UserCheck } from 'lucide-react';
+import { Phone, MessageSquare, Globe, ShieldCheck, HeartHandshake, UserCheck, ArrowRight } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { HowItWorksPartner } from './(components)/how-it-works';
 
@@ -35,11 +35,6 @@ const toBase64 = (str: string) =>
 
 
 export default function PartnerCarePage() {
-  const trustPoints = [
-    { icon: ShieldCheck, title: "100% Confidential", description: "Your privacy is their top priority. All services are delivered in a completely confidential environment." },
-    { icon: UserCheck, title: "Expert & Friendly Staff", description: "Their team consists of highly-trained, non-judgmental healthcare professionals." },
-    { icon: HeartHandshake, title: "Supportive Environment", description: "They provide a safe, welcoming space for you to ask questions and get the care you need." }
-  ];
 
   return (
     <div className="bg-background">
@@ -88,27 +83,63 @@ export default function PartnerCarePage() {
             
             <Separator className="my-16 md:my-24" />
 
-            {/* Why We Trust Them Section */}
-             <div className="max-w-5xl mx-auto">
+            {/* Services Carousel Section */}
+            <div className="max-w-5xl mx-auto">
                 <div className="text-center mb-12">
                      <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-                       Why We Trust Marie Stopes
+                       Services to Support You
                     </h2>
                     <p className="mt-4 max-w-2xl mx-auto text-base text-muted-foreground">
-                        Our partnership is built on a shared commitment to your well-being and privacy.
+                        Our partnership ensures you have access to the right confidential services when you need them.
                     </p>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                    {trustPoints.map((point) => (
-                        <div key={point.title} className="flex flex-col items-center">
-                            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
-                                <point.icon className="h-8 w-8 text-primary" />
+                 <Carousel
+                    opts={{
+                        align: "start",
+                        loop: true,
+                    }}
+                    plugins={[
+                        Autoplay({
+                            delay: 5000,
+                            stopOnInteraction: false,
+                        })
+                    ]}
+                    className="w-full"
+                    >
+                    <CarouselContent>
+                        {marieStopesData.services.map((service) => (
+                        <CarouselItem key={service.title} className="md:basis-1/2 lg:basis-1/3">
+                            <div className="p-1 h-full">
+                               <Card className="relative flex min-h-[380px] w-full flex-col justify-end overflow-hidden rounded-2xl p-6 shadow-lg text-primary-foreground">
+                                    <Image
+                                        src={service.imageUrl}
+                                        alt={service.title}
+                                        fill
+                                        className="absolute inset-0 h-full w-full object-cover -z-10 brightness-50"
+                                        placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 500))}`}
+                                        sizes="(max-width: 768px) 100vw, 33vw"
+                                        data-ai-hint={service.imageHint}
+                                    />
+                                    <div className="relative">
+                                        <h3 className="text-xl font-bold">{service.title}</h3>
+                                        <p className="mt-2 text-sm text-primary-foreground/80">{service.description}</p>
+                                        {marieStopesData.website && (
+                                             <Button asChild variant="secondary" className="mt-4">
+                                                <Link href={marieStopesData.website} target="_blank" rel="noopener noreferrer">
+                                                    Learn More
+                                                    <ArrowRight />
+                                                </Link>
+                                            </Button>
+                                        )}
+                                    </div>
+                                </Card>
                             </div>
-                            <h3 className="text-lg font-bold text-foreground">{point.title}</h3>
-                            <p className="mt-2 text-sm text-muted-foreground">{point.description}</p>
-                        </div>
-                    ))}
-                </div>
+                        </CarouselItem>
+                        ))}
+                    </CarouselContent>
+                    <CarouselPrevious className="-left-4 sm:-left-6 hidden md:flex" />
+                    <CarouselNext className="-right-4 sm:-right-6 hidden md:flex" />
+                </Carousel>
             </div>
 
             <Separator className="my-16 md:my-24" />
