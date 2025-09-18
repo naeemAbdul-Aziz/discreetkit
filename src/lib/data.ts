@@ -23,7 +23,6 @@ export type Order = {
     isStudent: boolean;
     subtotal: number;
     studentDiscount: number;
-
     deliveryFee: number;
     totalPrice: number;
     events: {
@@ -87,6 +86,7 @@ export const generateTrackingCode = (): string => {
   }
   return result;
 };
+
 
 export const discounts: DiscountLocation[] = [
     { id: 1, campus: "University of Ghana (Legon)" },
@@ -215,5 +215,3 @@ export const testimonials: Testimonial[] = [
     avatar: "https://images.unsplash.com/photo-1580852300021-3349a882d385?w=150&h=150&fit=crop&q=75"
   },
 ];
-
-    
