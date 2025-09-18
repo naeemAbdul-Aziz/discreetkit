@@ -6,14 +6,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import Autoplay from 'embla-carousel-autoplay';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Phone, MessageSquare, Globe, ArrowRight, ArrowDown } from 'lucide-react';
+import { Phone, MessageSquare, Globe, ArrowDown } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { HowItWorksPartner } from './(components)/how-it-works';
-import { cn } from '@/lib/utils';
-
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -44,7 +40,7 @@ export default function PartnerCarePage() {
   return (
     <div className="bg-background">
       {/* Hero Section */}
-      <section className="relative bg-muted overflow-hidden">
+       <section className="relative bg-muted overflow-hidden">
         <div className="container mx-auto px-4 md:px-6">
             <div className="grid md:grid-cols-2 items-center min-h-[500px] md:min-h-[600px] py-12">
                 <div className="relative z-10 text-center md:text-left">
@@ -86,8 +82,8 @@ export default function PartnerCarePage() {
             <HowItWorksPartner />
             
             <Separator id="services" className="my-16 md:my-24" />
-
-            {/* Services Carousel Section */}
+            
+            {/* Services Marquee Section */}
             <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-12">
                      <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
@@ -97,23 +93,11 @@ export default function PartnerCarePage() {
                         Our partnership ensures you have access to the right confidential services when you need them.
                     </p>
                 </div>
-                 <Carousel
-                    opts={{
-                        align: "start",
-                        loop: true,
-                    }}
-                    plugins={[
-                        Autoplay({
-                            delay: 5000,
-                            stopOnInteraction: false,
-                        })
-                    ]}
-                    className="w-full"
-                    >
-                    <CarouselContent className="-ml-4">
-                        {marieStopesData.services.map((service, index) => (
-                        <CarouselItem key={index} className="basis-full sm:basis-1/2 lg:basis-1/3 pl-4">
-                            <div className="p-1 h-full">
+                
+                <div className="relative w-full overflow-hidden" style={{ maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}>
+                    <div className="flex w-max animate-marquee">
+                        {[...marieStopesData.services, ...marieStopesData.services].map((service, index) => (
+                           <div key={index} className="w-[300px] flex-shrink-0 p-4">
                                <Card className="flex flex-col h-[380px] w-full overflow-hidden rounded-2xl shadow-lg transition-shadow hover:shadow-xl">
                                     <div className="relative h-[220px] w-full">
                                          <Image
@@ -123,7 +107,7 @@ export default function PartnerCarePage() {
                                             className="absolute inset-0 h-full w-full object-cover"
                                             style={{ clipPath: 'polygon(0 0, 100% 0, 100% 85%, 0% 100%)' }}
                                             placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 220))}`}
-                                            sizes="(max-width: 768px) 100vw, 33vw"
+                                            sizes="300px"
                                             data-ai-hint={service.imageHint}
                                         />
                                     </div>
@@ -142,12 +126,9 @@ export default function PartnerCarePage() {
                                     </CardContent>
                                 </Card>
                             </div>
-                        </CarouselItem>
                         ))}
-                    </CarouselContent>
-                    <CarouselPrevious className="-left-4 sm:-left-6 hidden md:flex" />
-                    <CarouselNext className="-right-4 sm:-right-6 hidden md:flex" />
-                </Carousel>
+                    </div>
+                </div>
             </div>
 
             <Separator className="my-16 md:my-24" />
