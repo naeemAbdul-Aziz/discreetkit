@@ -38,35 +38,54 @@ export function HowItWorksPartner() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {partnerCareSteps.map((step) => (
-                <div key={step.number} className="relative flex flex-col items-start gap-4">
-                     <div className="flex items-center gap-4 w-full">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted font-bold text-muted-foreground z-10 flex-shrink-0">
-                          {step.number}
-                        </div>
-                        {step.number < 4 && (
-                          <div className="flex-grow h-px bg-border"></div>
-                        )}
-                    </div>
-                    <div className="mt-2">
-                        <h3 className="text-lg font-bold text-foreground">{step.title}</h3>
+        {/* Desktop and Mobile Layout */}
+        <div className="relative">
+          {/* Vertical line for mobile */}
+          <div className="absolute left-4 top-4 h-full w-0.5 bg-border -translate-x-1/2 md:hidden" aria-hidden="true"></div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
+              {partnerCareSteps.map((step) => (
+                  <div key={step.number} className="relative flex flex-col items-start gap-4">
+                      {/* Mobile Step Header */}
+                       <div className="flex items-center gap-4 md:hidden">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted font-bold text-muted-foreground z-10 flex-shrink-0">
+                            {step.number}
+                          </div>
+                           <h3 className="text-lg font-bold text-foreground">{step.title}</h3>
+                      </div>
+                      
+                      {/* Desktop Step Header */}
+                      <div className="hidden md:flex items-center gap-4 w-full">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted font-bold text-muted-foreground z-10 flex-shrink-0">
+                            {step.number}
+                          </div>
+                          {step.number < 4 && (
+                            <div className="flex-grow h-px bg-border"></div>
+                          )}
+                      </div>
+                       <div className="hidden md:block mt-2">
+                          <h3 className="text-lg font-bold text-foreground">{step.title}</h3>
+                      </div>
+
+                      <div className="pl-12 md:pl-0">
                         <p className="mt-2 text-sm text-muted-foreground">{step.description}</p>
-                    </div>
-                    <div className="mt-4 relative aspect-[4/3] w-full rounded-xl overflow-hidden shadow-lg">
-                        <Image
-                            src={step.imageUrl}
-                            alt={step.title}
-                            fill
-                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                            className="object-cover"
-                            data-ai-hint={step.imageHint}
-                            placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 600))}`}
-                        />
-                    </div>
-                </div>
-            ))}
+                        <div className="mt-4 relative aspect-[4/3] w-full rounded-xl overflow-hidden shadow-lg">
+                            <Image
+                                src={step.imageUrl}
+                                alt={step.title}
+                                fill
+                                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                                className="object-cover"
+                                data-ai-hint={step.imageHint}
+                                placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 600))}`}
+                            />
+                        </div>
+                      </div>
+                  </div>
+              ))}
+          </div>
         </div>
+
       </div>
     </section>
   );
