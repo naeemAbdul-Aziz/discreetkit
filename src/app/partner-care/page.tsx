@@ -117,11 +117,12 @@ export default function PartnerCarePage() {
                                         src={service.imageUrl}
                                         alt={service.title}
                                         fill
-                                        className="absolute inset-0 h-full w-full object-cover -z-10 brightness-50"
+                                        className="absolute inset-0 h-full w-full object-cover -z-10"
                                         placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 500))}`}
                                         sizes="(max-width: 768px) 100vw, 33vw"
                                         data-ai-hint={service.imageHint}
                                     />
+                                    <div className="absolute inset-0 -z-10 bg-gradient-to-t from-black/80 via-black/50 to-transparent"></div>
                                     <div className="relative">
                                         <h3 className="text-xl font-bold">{service.title}</h3>
                                         <p className="mt-2 text-sm text-primary-foreground/80">{service.description}</p>
