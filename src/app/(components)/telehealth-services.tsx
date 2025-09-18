@@ -5,42 +5,38 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
 
 const services = [
   {
-    title: 'STD care within 2 hours',
+    title: 'Private STD Consultation',
     imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=800&h=600&fit=crop',
     imageHint: 'doctor using tablet',
-    rowSpan: 'row-span-2',
-    link: '#',
+    link: '/partner-care',
   },
   {
-    title: "Women's health consult",
+    title: "Women's Health Support",
     imageUrl: 'https://images.unsplash.com/photo-1528819622759-4233b6a32247?q=80&w=800&h=600&fit=crop',
     imageHint: 'two women talking',
-    rowSpan: 'row-span-3',
-    link: '#',
+    link: '/partner-care',
   },
   {
-    title: "Men's health consult",
+    title: "Men's Health Advice",
     imageUrl: 'https://images.unsplash.com/photo-1530031092839-74b445d47228?q=80&w=800&h=600&fit=crop',
     imageHint: 'man exercising outdoors',
-    rowSpan: 'row-span-2',
-    link: '#',
+    link: '/partner-care',
   },
   {
-    title: 'Check your thyroid health',
+    title: 'Mental Wellness & Counseling',
     imageUrl: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?q=80&w=800&h=600&fit=crop',
     imageHint: 'smiling woman',
-    rowSpan: 'row-span-3',
-    link: '#',
+    link: '/partner-care',
   },
   {
-    title: 'General wellness, talk to a provider',
+    title: 'General Wellness Provider',
     imageUrl: 'https://images.unsplash.com/photo-1551198298-971a820839be?q=80&w=800&h=600&fit=crop',
     imageHint: 'doctor waving',
-    rowSpan: 'row-span-2',
-    link: '#',
+    link: '/partner-care',
   },
 ];
 
@@ -80,12 +76,16 @@ function ServiceCard({ service }: { service: (typeof services)[0] }) {
           data-ai-hint={service.imageHint}
           placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 600))}`}
         />
+         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
       </div>
       <div className="flex flex-grow flex-col justify-between p-6 pt-8 text-center">
         <h3 className="text-base font-semibold text-foreground">{service.title}</h3>
         <div className="mt-4">
           <Button asChild variant="outline" size="sm" className="rounded-full bg-background">
-            <Link href={service.link}>Schedule</Link>
+            <Link href={service.link}>
+                Learn More
+                <ArrowRight className="transition-transform duration-300 group-hover:translate-x-1"/>
+            </Link>
           </Button>
         </div>
       </div>
@@ -99,10 +99,10 @@ export function TelehealthServices() {
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-12">
           <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-            Fast and easy telehealth calls
+            More Ways to Find Support
           </h2>
           <p className="mt-4 max-w-xl mx-auto text-base text-muted-foreground">
-            Schedule virtual care visits that accept major insurance plans.
+            Explore confidential virtual care options from trusted providers.
           </p>
         </div>
 
@@ -117,8 +117,7 @@ export function TelehealthServices() {
                 <div className="grid grid-flow-col auto-cols-[80%] sm:auto-cols-[45%] md:auto-cols-[30%] lg:auto-cols-[22%] gap-6 px-4">
                     {services.map((service, index) => (
                         <div key={index} className={cn('grid', 
-                            index % 3 === 0 ? 'md:pt-0' : 
-                            index % 3 === 1 ? 'md:pt-12' : 'md:pt-24'
+                            index % 2 === 0 ? 'md:pt-0' : 'md:pt-16'
                         )}>
                             <ServiceCard service={service} />
                         </div>
