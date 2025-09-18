@@ -83,7 +83,6 @@ export default function PartnerCarePage() {
             
             <Separator id="services" className="my-16 md:my-24" />
             
-           {/* Services Marquee Section */}
             <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-12">
                      <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
@@ -94,10 +93,13 @@ export default function PartnerCarePage() {
                     </p>
                 </div>
                 
-                <div className="relative w-full overflow-hidden" style={{ maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}>
+                <div 
+                    className="relative w-full overflow-hidden"
+                    style={{ maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}
+                >
                     <div className="flex w-max animate-marquee">
                         {[...marieStopesData.services, ...marieStopesData.services].map((service, index) => (
-                           <div key={index} className="w-[80vw] max-w-[320px] md:max-w-[300px] flex-shrink-0 p-4">
+                           <div key={index} className="w-[80vw] max-w-[320px] md:w-[300px] flex-shrink-0 p-4">
                                <Card className="flex flex-col h-[380px] w-full overflow-hidden rounded-2xl shadow-lg transition-shadow hover:shadow-xl">
                                     <div className="relative h-[220px] w-full">
                                          <Image
@@ -133,7 +135,6 @@ export default function PartnerCarePage() {
 
             <Separator className="my-16 md:my-24" />
 
-            {/* FAQ Section */}
             <div className="max-w-4xl mx-auto">
                  <div className="text-center mb-12">
                     <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
@@ -159,8 +160,7 @@ export default function PartnerCarePage() {
             
             <Separator className="my-16 md:my-24" />
 
-             {/* Final CTA Section */}
-            <div id="contact" className="max-w-4xl mx-auto text-center bg-muted p-8 md:p-12 rounded-2xl">
+             <div id="contact" className="max-w-4xl mx-auto text-center bg-muted p-8 md:p-12 rounded-2xl">
                  <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
                     Ready to Take the Next Step?
                 </h2>
@@ -196,5 +196,3 @@ export default function PartnerCarePage() {
     </div>
   );
 }
-
-    
