@@ -68,7 +68,7 @@ export function HospitalCard({ hospital }: { hospital: Partner }) {
         </div>
         
         <div className="mt-6 flex flex-wrap gap-2">
-            {contact.phone && (
+            {contact?.phone && (
                 <Button asChild size="sm" className="flex-1 min-w-[100px]">
                     <a href={`tel:${contact.phone}`}>
                         <Phone />
@@ -76,7 +76,7 @@ export function HospitalCard({ hospital }: { hospital: Partner }) {
                     </a>
                 </Button>
             )}
-             {contact.whatsapp && (
+             {contact?.whatsapp && (
                 <Button asChild size="sm" variant="accent" className="flex-1 bg-green-500 hover:bg-green-600 text-white min-w-[100px]">
                      <a href={`https://wa.me/233${contact.whatsapp.slice(1)}`} target="_blank" rel="noopener noreferrer">
                         <WhatsAppIcon />
@@ -84,7 +84,7 @@ export function HospitalCard({ hospital }: { hospital: Partner }) {
                     </a>
                 </Button>
             )}
-             {contact.website && (
+             {contact?.website && (
                 <Button asChild size="sm" variant="outline" className="flex-1 min-w-[100px]">
                      <a href={contact.website} target="_blank" rel="noopener noreferrer">
                         <Globe />
