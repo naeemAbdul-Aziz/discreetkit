@@ -44,11 +44,11 @@ export default function PartnerCarePage() {
   return (
     <div className="bg-background">
       {/* Hero Section */}
-      <section className="relative bg-background overflow-hidden">
+      <section className="relative bg-muted overflow-hidden">
         <div className="container mx-auto px-4 md:px-6">
             <div className="grid md:grid-cols-2 items-center min-h-[500px] md:min-h-[600px] py-12">
                 <div className="relative z-10 text-center md:text-left">
-                     <div className="inline-block rounded-full bg-primary/10 px-4 py-2 mb-4">
+                     <div className="inline-block rounded-full bg-background px-4 py-2 mb-4">
                          <Image src={marieStopesData.logoUrl} alt={`${marieStopesData.name} Logo`} width={120} height={40} className="object-contain" />
                     </div>
                     <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground md:text-5xl">
