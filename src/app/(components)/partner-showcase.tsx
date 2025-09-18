@@ -57,7 +57,7 @@ export async function PartnerShowcase() {
                 {partners.map((partner) => (
                     <CarouselItem key={partner.id} className="pl-4 basis-full sm:basis-1/2 md:basis-1/2 lg:basis-1/3">
                         <div className="p-1 h-full">
-                            <PartnerShowcaseCard partner={hospital as any} />
+                            <PartnerShowcaseCard partner={partner as any} />
                         </div>
                     </CarouselItem>
                 ))}
