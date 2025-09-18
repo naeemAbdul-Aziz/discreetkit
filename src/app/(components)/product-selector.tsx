@@ -77,10 +77,7 @@ export function ProductSelector({ products }: { products: Product[] }) {
                 {/* Desktop Grid */}
                 <div className="hidden md:grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                     {featuredProducts.map((product, index) => (
-                        <div key={product.id} className={cn(
-                            'transition-transform duration-500 ease-in-out',
-                             index % 2 !== 0 ? 'md:pt-8' : 'pt-0'
-                        )}>
+                        <div key={product.id}>
                             <ProductCard product={product} />
                         </div>
                     ))}
