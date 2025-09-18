@@ -10,6 +10,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Phone, MessageSquare, Globe, ArrowDown } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { HowItWorksPartner } from './(components)/how-it-works';
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -93,44 +94,49 @@ export default function PartnerCarePage() {
                     </p>
                 </div>
                 
-                <div 
-                    className="relative w-full overflow-hidden"
-                    style={{ maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}
+                <Carousel
+                    opts={{
+                        align: "start",
+                        loop: true,
+                    }}
+                    className="w-full"
                 >
-                    <div className="flex w-max animate-marquee">
-                        {[...marieStopesData.services, ...marieStopesData.services].map((service, index) => (
-                           <div key={index} className="w-[80vw] max-w-[320px] md:w-[300px] flex-shrink-0 p-4">
-                               <Card className="flex flex-col h-[380px] w-full overflow-hidden rounded-2xl shadow-lg transition-shadow hover:shadow-xl">
-                                    <div className="relative h-[220px] w-full">
-                                         <Image
-                                            src={service.imageUrl}
-                                            alt={service.title}
-                                            fill
-                                            className="absolute inset-0 h-full w-full object-cover"
-                                            style={{ clipPath: 'polygon(0 0, 100% 0, 100% 85%, 0% 100%)' }}
-                                            placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 220))}`}
-                                            sizes="300px"
-                                            data-ai-hint={service.imageHint}
-                                        />
-                                    </div>
-                                    <CardContent className="flex flex-col justify-between flex-1 p-6 bg-card text-center">
-                                       <div>
-                                         <h3 className="text-base font-bold text-foreground">{service.title}</h3>
-                                        <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{service.description}</p>
-                                       </div>
-                                       {marieStopesData.website && (
-                                             <Button asChild variant="secondary" size="sm" className="mt-4 w-fit mx-auto">
-                                                <Link href={marieStopesData.website} target="_blank" rel="noopener noreferrer">
-                                                    Learn More
-                                                </Link>
-                                            </Button>
-                                        )}
-                                    </CardContent>
-                                </Card>
-                            </div>
+                    <CarouselContent>
+                        {marieStopesData.services.map((service, index) => (
+                           <CarouselItem key={index} className="basis-4/5 sm:basis-1/2 md:basis-1/3 lg:basis-1/3">
+                               <div className="p-1 h-full">
+                                <Card className="flex flex-col h-[380px] w-full overflow-hidden rounded-2xl shadow-lg transition-shadow hover:shadow-xl">
+                                        <div className="relative h-[220px] w-full">
+                                            <Image
+                                                src={service.imageUrl}
+                                                alt={service.title}
+                                                fill
+                                                className="absolute inset-0 h-full w-full object-cover"
+                                                style={{ clipPath: 'polygon(0 0, 100% 0, 100% 85%, 0% 100%)' }}
+                                                placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 220))}`}
+                                                sizes="300px"
+                                                data-ai-hint={service.imageHint}
+                                            />
+                                        </div>
+                                        <CardContent className="flex flex-col justify-between flex-1 p-6 bg-card text-center">
+                                        <div>
+                                            <h3 className="text-base font-bold text-foreground">{service.title}</h3>
+                                            <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{service.description}</p>
+                                        </div>
+                                        {marieStopesData.website && (
+                                                <Button asChild variant="secondary" size="sm" className="mt-4 w-fit mx-auto">
+                                                    <Link href={marieStopesData.website} target="_blank" rel="noopener noreferrer">
+                                                        Learn More
+                                                    </Link>
+                                                </Button>
+                                            )}
+                                        </CardContent>
+                                    </Card>
+                               </div>
+                            </CarouselItem>
                         ))}
-                    </div>
-                </div>
+                    </CarouselContent>
+                </Carousel>
             </div>
 
             <Separator className="my-16 md:my-24" />
