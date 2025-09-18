@@ -3,8 +3,8 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, ShoppingCart, Loader2 } from 'lucide-react';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from '@/components/ui/sheet';
+import { Menu, ShoppingCart, Loader2, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
@@ -56,6 +56,7 @@ export function Header() {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758119851/discreetkit_logo_4_npbt4m.png';
 
   useEffect(() => {
@@ -67,15 +68,29 @@ export function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const NavLink = ({ href, label }: { href: string; label: string }) => (
+  const NavLink = ({ href, label, onClick }: { href: string; label: string; onClick?: () => void }) => (
     <Link
       href={href}
+      onClick={onClick}
       className={cn(
         'rounded-full px-3 py-1.5 text-sm transition-colors hover:text-foreground/80',
         pathname === href ? 'bg-muted font-semibold text-foreground' : 'text-foreground/60'
       )}
     >
       {label}
+    </Link>
+  );
+
+  const MobileNavLink = ({ href, label, onClick }: { href: string; label: string; onClick?: () => void }) => (
+    <Link
+        href={href}
+        onClick={onClick}
+        className={cn(
+            'rounded-lg p-3 text-lg transition-colors hover:bg-muted',
+            pathname === href ? 'bg-muted font-semibold text-foreground' : 'text-foreground/70'
+        )}
+    >
+        {label}
     </Link>
   );
 
@@ -147,7 +162,7 @@ export function Header() {
 
             <div className="flex items-center gap-2">
               <CartLink />
-              <Sheet>
+              <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon">
                     <Menu className="h-6 w-6" />
@@ -155,9 +170,9 @@ export function Header() {
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-full max-w-sm">
-                   <SheetHeader>
+                   <SheetHeader className="flex flex-row justify-between items-center">
                      <SheetTitle className="text-left">
-                       <Link href="/" aria-label="DiscreetKit Homepage">
+                       <Link href="/" onClick={() => setMobileMenuOpen(false)} aria-label="DiscreetKit Homepage">
                         <Image
                           src={logoUrl}
                           alt="DiscreetKit Logo"
@@ -167,20 +182,22 @@ export function Header() {
                         />
                       </Link>
                      </SheetTitle>
+                     <SheetClose asChild>
+                        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
+                            <X className="h-5 w-5" />
+                            <span className="sr-only">Close menu</span>
+                        </Button>
+                     </SheetClose>
                    </SheetHeader>
                    <Separator className="my-4" />
                   <div className="mt-8 flex flex-col space-y-2">
                     {[...navLinksLeft, ...navLinksRight].map((link) => (
-                      <Link
+                      <MobileNavLink
                         key={link.href}
                         href={link.href}
-                        className={cn(
-                          'rounded-lg p-3 text-lg transition-colors hover:bg-muted',
-                          pathname === link.href ? 'bg-muted font-semibold text-foreground' : 'text-foreground/70'
-                        )}
-                      >
-                        {link.label}
-                      </Link>
+                        label={link.label}
+                        onClick={() => setMobileMenuOpen(false)}
+                      />
                     ))}
                   </div>
                 </SheetContent>
