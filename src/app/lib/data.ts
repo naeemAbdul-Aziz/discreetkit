@@ -58,6 +58,7 @@ export type Testimonial = {
 export type Partner = {
     id: number;
     name: string;
+    description: string;
     logo_url: string;
     location: string;
     services: string[];
@@ -155,6 +156,7 @@ export const partners: Partner[] = [
   {
     id: 1,
     name: 'Nyaho Medical Centre',
+    description: "As one of Ghana's most reputable private hospitals, Nyaho Medical Centre offers a premium, confidential experience. Their dedicated team provides comprehensive services, from confirmatory testing to general practice and professional counseling, all within a modern and welcoming environment.",
     logo_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758117781/nyaho-logo_b3xt0u.png',
     location: 'Airport Residential, Accra',
     services: ['Confirmatory Testing', 'Counseling', 'General Practice'],
@@ -168,6 +170,7 @@ export const partners: Partner[] = [
   {
     id: 2,
     name: 'Akai House Clinic',
+    description: "Akai House Clinic is a specialist facility renowned for its expertise in sexual health and dermatology. They provide discreet, patient-centered care for STI testing, treatment, and other sensitive health concerns, making them a top choice for specialized needs.",
     logo_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758117781/akai-logo_j4m53q.png',
     location: 'Cantonments, Accra',
     services: ['Sexual Health', 'Confirmatory Testing', 'Dermatology'],
@@ -179,14 +182,29 @@ export const partners: Partner[] = [
     },
   },
   {
+    id: 5,
+    name: 'The Accra London Health Centre',
+    description: "The Accra London Health Centre (TALHC) is a trusted name in advanced healthcare, offering specialized services in sexual health, contraceptive counselling, and fertility care. Their international standard of care ensures a private and supportive environment for all patients.",
+    logo_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758118029/talhc-logo_d9c9h1.png',
+    location: 'Ringway Estates, Osu',
+    services: ['STI Testing', 'Contraceptive Counselling', 'Fertility Care'],
+    is_preferred: false,
+    contact: {
+        phone: '0302787122',
+        whatsapp: '0556561081',
+        website: 'https://www.theaccralondonclinic.com'
+    }
+  },
+  {
     id: 3,
     name: 'Bedita Pharmacy',
+    description: "Bedita Pharmacy is a well-regarded community pharmacy known for its professional service and wide range of wellness products. Their pharmacists are available for health consultations, providing accessible and reliable advice for general health concerns.",
     logo_url: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/bedita_ekekhs.png",
     location: 'East Legon, Accra',
     services: ['Pharmaceuticals', 'Health Consultation', 'Wellness Products'],
     is_preferred: false,
     contact: {
-      phone: '03025 Bedita',
+      phone: '0302507838',
       whatsapp: null,
       website: null,
     },
@@ -194,12 +212,13 @@ export const partners: Partner[] = [
     {
     id: 4,
     name: 'Ernest Chemist',
+    description: "With branches across the country, Ernest Chemist is one of Ghana's most recognized pharmaceutical retailers. Their wide network provides nationwide access to medicines and health products, ensuring you can find support wherever you are.",
     logo_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/ernest_chemist_ebxjug.webp',
     location: 'Multiple Branches',
     services: ['Pharmaceuticals', 'Nationwide Access'],
     is_preferred: false,
     contact: {
-      phone: '03022 Ernest',
+      phone: '0302251411',
       whatsapp: null,
       website: 'https://www.ernestchemist.com',
     },

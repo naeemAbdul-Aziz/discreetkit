@@ -69,7 +69,8 @@ export default function PartnerCarePage() {
                     </div>
                      <div className={cn("flex flex-col justify-center", index % 2 === 1 && "md:order-first")}>
                         <h3 className="text-2xl font-bold text-foreground">{hospital.name}</h3>
-                        <p className="mt-1 text-base text-muted-foreground">{hospital.location}</p>
+                        <p className="mt-1 text-base font-medium text-muted-foreground">{hospital.location}</p>
+                        <p className="mt-4 text-base text-foreground">{hospital.description}</p>
                         
                         {hospital.services && hospital.services.length > 0 && (
                             <div className="mt-4 flex flex-wrap gap-2">
