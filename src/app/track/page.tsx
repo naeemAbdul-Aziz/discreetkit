@@ -262,7 +262,7 @@ function Tracker() {
                         <div key={item.id} className="flex justify-between items-center gap-2">
                             <div className="flex items-center gap-3">
                                 <div className="relative h-12 w-12 flex-shrink-0 rounded-md bg-muted overflow-hidden">
-                                     <Image src={item.imageUrl} alt={item.name} fill className="object-contain p-1" />
+                                     {item.image_url && <Image src={item.image_url} alt={item.name} fill className="object-contain p-1" />}
                                 </div>
                                 <div>
                                     <p className="font-semibold text-sm">{item.name}</p>
@@ -270,7 +270,7 @@ function Tracker() {
                                 </div>
                             </div>
                         <p className="font-medium text-sm text-right">
-                            GHS {(order.isStudent && item.studentPriceGHS ? item.studentPriceGHS : item.priceGHS).toFixed(2)}
+                            GHS {(order.isStudent && item.student_price_ghs ? item.student_price_ghs : item.price_ghs).toFixed(2)}
                         </p>
                         </div>
                     ))}

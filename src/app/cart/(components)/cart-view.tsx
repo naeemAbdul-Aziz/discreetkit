@@ -59,31 +59,33 @@ export function CartView() {
                              <div key={item.id} className="p-4 sm:p-6">
                                 <div className="grid grid-cols-[80px_1fr_auto] items-center gap-4 sm:gap-6">
                                     <div className="relative aspect-square w-[80px] rounded-lg bg-muted overflow-hidden">
-                                        <Image
-                                            src={item.imageUrl}
-                                            alt={item.name}
-                                            fill
-                                            className="object-contain p-2"
-                                            data-ai-hint="medical test kit"
-                                            placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(80, 80))}`}
-                                            sizes="80px"
-                                        />
+                                        {item.image_url && (
+                                            <Image
+                                                src={item.image_url}
+                                                alt={item.name}
+                                                fill
+                                                className="object-contain p-2"
+                                                data-ai-hint="medical test kit"
+                                                placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(80, 80))}`}
+                                                sizes="80px"
+                                            />
+                                        )}
                                     </div>
                                     <div className="flex flex-col justify-center">
                                         <h3 className="text-base font-bold text-foreground">{item.name}</h3>
                                     </div>
                                     <div className="flex flex-col items-end justify-between space-y-2 self-stretch">
                                          <div className="text-right">
-                                        {isStudent && item.studentPriceGHS ? (
+                                        {isStudent && item.student_price_ghs ? (
                                                 <>
-                                                    <p className="font-bold text-success text-base">GHS {item.studentPriceGHS.toFixed(2)}</p>
+                                                    <p className="font-bold text-success text-base">GHS {item.student_price_ghs.toFixed(2)}</p>
                                                     <p className="text-muted-foreground/80 line-through text-xs font-normal">
-                                                        GHS {item.priceGHS.toFixed(2)}
+                                                        GHS {item.price_ghs.toFixed(2)}
                                                     </p>
                                                 </>
                                             ) : (
                                                 <p className="font-bold text-base text-foreground">
-                                                    GHS {item.priceGHS.toFixed(2)}
+                                                    GHS {item.price_ghs.toFixed(2)}
                                                 </p>
                                             )}
                                         </div>

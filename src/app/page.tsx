@@ -4,7 +4,28 @@ import { Hero } from './(components)/hero';
 import { ClosingCta } from './(components)/closing-cta';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
-import { Card } from '@/components/ui/card';
+import { getSupabaseClient } from '@/lib/supabase';
+import type { Product } from './products/page';
+import type { ProductSelector as ProductSelectorType } from './(components)/product-selector';
+
+async function getProducts(): Promise<Product[]> {
+    const supabase = getSupabaseClient();
+    const { data: products, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('id', { ascending: true });
+
+    if (error) {
+        console.error("Error fetching products:", error);
+        return [];
+    }
+    return products.map(p => ({
+      ...p,
+      price_ghs: Number(p.price_ghs),
+      student_price_ghs: p.student_price_ghs ? Number(p.student_price_ghs) : null,
+    }));
+}
+
 
 const componentMap = {
   ProductSelector: { height: '700px' },
@@ -25,7 +46,7 @@ const LoadingSkeleton = ({ height }: { height: string }) => (
 );
 
 const ProductSelector = dynamic(
-  () => import('./(components)/product-selector').then((mod) => mod.ProductSelector),
+  () => import('./(components)/product-selector').then((mod) => mod.ProductSelector as any),
   { loading: () => <LoadingSkeleton height={componentMap.ProductSelector.height} /> }
 );
 const ProductBenefits = dynamic(
@@ -72,7 +93,8 @@ const SectionWrapper: React.FC<SectionWrapperProps> = ({ children, className }) 
   </div>
 );
 
-export default function Home() {
+export default async function Home() {
+  const products = await getProducts();
   return (
     <div className="flex flex-col">
       <SectionWrapper className="bg-background">
@@ -80,7 +102,7 @@ export default function Home() {
       </SectionWrapper>
       
       <SectionWrapper className="bg-background">
-        <ProductSelector />
+        <ProductSelector products={products} />
       </SectionWrapper>
 
       <SectionWrapper className="bg-primary">

@@ -286,7 +286,7 @@ export function OrderForm() {
                             <div key={item.id} className="flex justify-between items-center gap-4">
                                 <div className="flex items-center gap-4">
                                     <div className="relative h-12 w-12 flex-shrink-0 rounded-md bg-muted overflow-hidden">
-                                        <Image src={item.imageUrl} alt={item.name} fill className="object-contain p-1" placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(48, 48))}`} />
+                                        {item.image_url && <Image src={item.image_url} alt={item.name} fill className="object-contain p-1" placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(48, 48))}`} />}
                                     </div>
                                     <div>
                                         <p className="font-semibold text-foreground">{item.name}</p>
@@ -294,13 +294,13 @@ export function OrderForm() {
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    {isStudent && item.studentPriceGHS ? (
+                                    {isStudent && item.student_price_ghs ? (
                                         <>
-                                            <p className="font-bold text-success">GHS {(item.studentPriceGHS * item.quantity).toFixed(2)}</p>
-                                            <p className="text-xs text-muted-foreground/80 line-through">GHS {(item.priceGHS * item.quantity).toFixed(2)}</p>
+                                            <p className="font-bold text-success">GHS {(item.student_price_ghs * item.quantity).toFixed(2)}</p>
+                                            <p className="text-xs text-muted-foreground/80 line-through">GHS {(item.price_ghs * item.quantity).toFixed(2)}</p>
                                         </>
                                     ) : (
-                                        <p className="font-medium text-foreground">GHS {(item.priceGHS * item.quantity).toFixed(2)}</p>
+                                        <p className="font-medium text-foreground">GHS {(item.price_ghs * item.quantity).toFixed(2)}</p>
                                     )}
                                 </div>
                             </div>

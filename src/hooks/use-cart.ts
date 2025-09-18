@@ -3,16 +3,17 @@
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { type Product, discounts, type DiscountLocation, DELIVERY_FEES } from '@/lib/data';
+import { type DiscountLocation, discounts, DELIVERY_FEES } from '@/lib/data';
+import type { Product } from '@/app/products/page';
 
 export type CartItem = {
   id: number;
   name: string;
-  priceGHS: number;
-  studentPriceGHS?: number;
-  imageUrl: string;
+  price_ghs: number;
+  student_price_ghs?: number | null;
+  image_url: string | null;
   quantity: number;
-  description: string;
+  description: string | null;
 };
 
 interface CartState {
@@ -43,12 +44,12 @@ const calculateTotals = (items: CartItem[], deliveryLocation: string | null) => 
   const totalItems = items.reduce((total, item) => total + item.quantity, 0);
 
   const subtotal = items.reduce((total, item) => {
-    return total + item.priceGHS * item.quantity;
+    return total + item.price_ghs * item.quantity;
   }, 0);
 
   const studentDiscount = isStudent ? items.reduce((total, item) => {
-    if (item.studentPriceGHS) {
-        const discountForItem = item.priceGHS - item.studentPriceGHS;
+    if (item.student_price_ghs) {
+        const discountForItem = item.price_ghs - item.student_price_ghs;
         return total + (discountForItem * item.quantity);
     }
     return total;
@@ -94,9 +95,9 @@ export const useCart = create<CartState>()(
           const newItem: CartItem = {
             id: product.id,
             name: product.name,
-            priceGHS: product.priceGHS,
-            studentPriceGHS: product.studentPriceGHS,
-            imageUrl: product.imageUrl,
+            price_ghs: product.price_ghs,
+            student_price_ghs: product.student_price_ghs,
+            image_url: product.image_url,
             quantity: 1,
             description: product.description,
           };
