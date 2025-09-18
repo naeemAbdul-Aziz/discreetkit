@@ -40,11 +40,11 @@ export default function PartnerCarePage() {
   return (
     <div className="bg-background">
       {/* Hero Section */}
-       <section className="relative bg-muted overflow-hidden">
+       <section className="relative bg-primary/5 overflow-hidden border-b">
         <div className="container mx-auto px-4 md:px-6">
             <div className="grid md:grid-cols-2 items-center min-h-[500px] md:min-h-[600px] py-12">
                 <div className="relative z-10 text-center md:text-left">
-                     <div className="inline-block rounded-full bg-background px-4 py-2 mb-4">
+                     <div className="inline-block rounded-full bg-background px-4 py-2 mb-4 shadow-sm border">
                          <Image src={marieStopesData.logoUrl} alt={`${marieStopesData.name} Logo`} width={120} height={40} className="object-contain" />
                     </div>
                     <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground md:text-5xl">
@@ -83,7 +83,7 @@ export default function PartnerCarePage() {
             
             <Separator id="services" className="my-16 md:my-24" />
             
-            {/* Services Marquee Section */}
+           {/* Services Marquee Section */}
             <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-12">
                      <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
@@ -177,7 +177,7 @@ export default function PartnerCarePage() {
                     )}
                     {marieStopesData.contact.whatsapp && (
                         <Button asChild size="lg" variant="secondary">
-                            <a href={`https://wa.me/${marieStopesData.contact.whatsapp}`} target="_blank" rel="noopener noreferrer">
+                            <a href={`https://wa.me/233${marieStopesData.contact.whatsapp.substring(1)}`} target="_blank" rel="noopener noreferrer">
                                 <MessageSquare /> Chat on WhatsApp
                             </a>
                         </Button>
@@ -196,3 +196,5 @@ export default function PartnerCarePage() {
     </div>
   );
 }
+
+    
