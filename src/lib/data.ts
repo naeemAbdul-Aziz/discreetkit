@@ -1,6 +1,6 @@
 
 
-import { Package, ShoppingCart, Truck, CheckCircle, ShieldCheck, HeartHandshake, Zap, Award, Users } from "lucide-react";
+import { Package, ShoppingCart, Truck, CheckCircle, ShieldCheck, HeartHandshake, Zap, Award, Users, Phone, MessageSquare, Globe } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { CartItem } from "@/hooks/use-cart";
 
@@ -146,6 +146,45 @@ export const steps: Step[] = [
     imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757955894/counselling_old_lady_modern_xbthvs.jpg',
     imageHint: 'professional counseling support',
   },
+];
+
+export const partnerCareSteps: Step[] = [
+    {
+      number: 1,
+      title: 'Order Your Kit',
+      icon: ShoppingCart,
+      description: 'Start by choosing the test kit that’s right for you from our shop. The entire process is anonymous and secure from the very beginning.',
+      details: ['Choose your health product', 'Pay securely online', 'No personal name required'],
+      imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757952399/medium-shot-woman-laying-couch_ojrtnp.jpg',
+      imageHint: 'woman couch relaxing',
+    },
+    {
+      number: 2,
+      title: 'Get Your Private Results',
+      icon: CheckCircle,
+      description: 'Your kit arrives in a plain package. Use the simple instructions to get a clear result in under 20 minutes in the privacy of your own home.',
+      details: ['Discreet, unbranded package', 'Easy-to-follow instructions', 'Results in under 20 minutes'],
+      imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757952387/man-being-happy-after-getting-negative-covid-test-result_udxny5.jpg',
+      imageHint: 'man happy result',
+    },
+    {
+      number: 3,
+      title: 'Contact Our Partner',
+      icon: Phone,
+      description: "If you need support or a confirmatory test, your next step is to reach out to Marie Stopes. You can call them toll-free or chat on WhatsApp—it's your choice.",
+      details: ['Use the contact buttons on this page', 'Mention you were referred by DiscreetKit', 'Your call is 100% confidential'],
+      imageUrl: 'https://images.unsplash.com/photo-1614324420919-4235395a3a42?q=80&w=800&fit=crop',
+      imageHint: 'person on phone',
+    },
+    {
+      number: 4,
+      title: 'Receive Confidential Care',
+      icon: HeartHandshake,
+      description: 'Marie Stopes provides a safe, non-judgmental environment for confirmatory testing, counseling, and other health services to give you peace of mind.',
+      details: ['Visit a welcoming, private clinic', 'Speak with expert, friendly staff', 'Get the professional care you need'],
+      imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=800&fit=crop',
+      imageHint: 'doctor patient tablet',
+    },
 ];
 
 export const productBenefits: ProductBenefit[] = [
