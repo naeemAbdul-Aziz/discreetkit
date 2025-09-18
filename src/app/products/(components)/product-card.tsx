@@ -39,8 +39,10 @@ export function ProductCard({ product }: { product: Product }) {
 
     const quantity = isMounted ? getItemQuantity(product.id) : 0;
     const isInCart = quantity > 0;
-    const hasStudentDeal = isStudent && product.student_price_ghs;
-    const price = (hasStudentDeal && product.student_price_ghs) ? product.student_price_ghs : product.price_ghs;
+    
+    const hasStudentDeal = isStudent && product.student_price_ghs && product.student_price_ghs > 0;
+    const price = hasStudentDeal ? product.student_price_ghs : product.price_ghs;
+    const regularPrice = product.price_ghs;
 
     return (
         <Card className="h-full flex flex-col rounded-2xl shadow-sm transition-shadow duration-300 hover:shadow-lg overflow-hidden">
@@ -61,7 +63,7 @@ export function ProductCard({ product }: { product: Product }) {
             <CardContent className="flex flex-grow flex-col justify-between p-6 text-left">
                 <div className="flex-grow">
                     <h3 className="text-lg font-bold text-foreground leading-tight">{product.name}</h3>
-                    <p className="mt-2 text-sm text-muted-foreground">{product.description}</p>
+                    {product.description && <p className="mt-2 text-sm text-muted-foreground">{product.description}</p>}
                 </div>
                 
                 <div className="mt-6 flex items-center justify-between">
@@ -70,12 +72,12 @@ export function ProductCard({ product }: { product: Product }) {
                             <>
                                 <p className="font-bold text-success text-lg">GHS {price.toFixed(2)}</p>
                                 <p className="text-muted-foreground/80 line-through text-xs font-normal">
-                                    GHS {product.price_ghs.toFixed(2)}
+                                    GHS {regularPrice.toFixed(2)}
                                 </p>
                             </>
                         ) : (
                             <p className="font-bold text-lg text-foreground">
-                                GHS {product.price_ghs.toFixed(2)}
+                                GHS {regularPrice.toFixed(2)}
                             </p>
                         )}
                     </div>
@@ -106,5 +108,3 @@ export function ProductCard({ product }: { product: Product }) {
         </Card>
     );
 }
-
-    

@@ -56,7 +56,7 @@ export function CartView() {
                     {items.map((item) => {
                         const quantity = item.quantity;
                         const price = item.price_ghs || 0;
-                        const studentPrice = item.student_price_ghs;
+                        const studentPrice = item.student_price_ghs || 0;
 
                         return (
                              <div key={item.id} className="p-4 sm:p-6">
@@ -79,7 +79,7 @@ export function CartView() {
                                     </div>
                                     <div className="flex flex-col items-end justify-between space-y-2 self-stretch">
                                          <div className="text-right">
-                                        {isStudent && studentPrice ? (
+                                        {isStudent && studentPrice > 0 ? (
                                                 <>
                                                     <p className="font-bold text-success text-base">GHS {studentPrice.toFixed(2)}</p>
                                                     <p className="text-muted-foreground/80 line-through text-xs font-normal">

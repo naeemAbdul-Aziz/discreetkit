@@ -96,10 +96,10 @@ export const useCart = create<CartState>()(
             id: product.id,
             name: product.name,
             price_ghs: product.price_ghs || 0,
-            student_price_ghs: product.student_price_ghs,
-            image_url: product.image_url,
+            student_price_ghs: product.student_price_ghs || null,
+            image_url: product.image_url || null,
             quantity: 1,
-            description: product.description,
+            description: product.description || null,
           };
           updatedItems = [...currentItems, newItem];
         }
@@ -155,5 +155,3 @@ export const useCart = create<CartState>()(
     }
   )
 );
-
-    
