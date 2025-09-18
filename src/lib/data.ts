@@ -179,6 +179,19 @@ export const partners: Partner[] = [
     },
   },
   {
+    id: 5,
+    name: 'The Accra London Health Centre',
+    logo_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758118029/talhc-logo_d9c9h1.png',
+    location: 'Ringway Estates, Osu',
+    services: ['STI Testing', 'Contraceptive Counselling', 'Fertility Care'],
+    is_preferred: false,
+    contact: {
+        phone: '0302787122',
+        whatsapp: '0556561081',
+        website: 'https://www.theaccralondonclinic.com'
+    }
+  },
+  {
     id: 3,
     name: 'Bedita Pharmacy',
     logo_url: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/bedita_ekekhs.png",
@@ -199,7 +212,7 @@ export const partners: Partner[] = [
     services: ['Pharmaceuticals', 'Nationwide Access'],
     is_preferred: false,
     contact: {
-      phone: '0302251 Ernest',
+      phone: '0302251411',
       whatsapp: null,
       website: 'https://www.ernestchemist.com',
     },
@@ -238,36 +251,36 @@ export const testimonials: Testimonial[] = [
     quote: "The entire process was so simple and private. I got my package the next day in a plain box. It's a huge relief to have a service like this in Ghana.",
     name: "Ama K.",
     role: "University of Ghana Student",
-    avatar: "https://i.pravatar.cc/150?u=ama"
+    avatar: "https://images.unsplash.com/photo-1596495577886-d9256242498b?w=150&h=150&fit=crop&q=75"
   },
   {
     quote: "DiscreetKit is a game-changer. I was worried about going to a pharmacy, but this was completely anonymous. The tracking code gave me peace of mind.",
     name: "David A.",
     role: "Young Professional, Osu",
-    avatar: "https://i.pravatar.cc/150?u=david"
+    avatar: "https://images.unsplash.com/photo-1584012961505-507d844cc8a0?w=150&h=150&fit=crop&q=75"
   },
   {
     quote: "As a student leader, I see the need for this every day. It's a responsible, safe, and judgment-free way for young people to take control of their health.",
     name: "Fatima S.",
     role: "Student Rep, UPSA",
-    avatar: "https://i.pravatar.cc/150?u=fatima"
+    avatar: "https://images.unsplash.com/photo-1610476034959-548995964893?w=150&h=150&fit=crop&q=75"
   },
   {
     quote: "The instructions were so easy to follow. I had my result in 15 minutes. Knowing my status privately has lifted a huge weight off my shoulders.",
     name: "Michael B.",
     role: "GIMPA Graduate",
-    avatar: "https://i.pravatar.cc/150?u=michael"
+    avatar: "https://images.unsplash.com/photo-1607990281513-2c3f162de8ac?w=150&h=150&fit=crop&q=75"
   },
     {
     quote: "I ordered the couple's bundle with my partner. It helped us have an open conversation and support each other through the process. Highly recommend.",
     name: "Esi & Kofi",
     role: "Couple, Accra",
-    avatar: "https://i.pravatar.cc/150?u=esi-kofi"
+    avatar: "https://images.unsplash.com/photo-1541533848316-f333b210a501?w=150&h=150&fit=crop&q=75"
   },
     {
     quote: "Fast, professional, and exactly as advertised. The package was so discreet, even I wasn't sure what it was at first. 10/10 service.",
     name: "Josephine O.",
     role: "Entrepreneur, East Legon",
-    avatar: "https://i.pravatar.cc/150?u=josephine"
+    avatar: "https://images.unsplash.com/photo-1580852300021-3349a882d385?w=150&h=150&fit=crop&q=75"
   },
 ];

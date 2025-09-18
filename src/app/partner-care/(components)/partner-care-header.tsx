@@ -1,3 +1,4 @@
+
 import { Lock } from 'lucide-react';
 
 export function PartnerCareHeader() {
@@ -7,7 +8,7 @@ export function PartnerCareHeader() {
         Your Next Step Towards Care
       </h1>
       <p className="mx-auto mt-4 max-w-3xl text-base text-muted-foreground">
-        We've partnered with leading health facilities to provide you with discreet, supportive, and confidential follow-up care. The choice to reach out is always yours.
+        We've partnered with leading health facilities to provide you with confidential and supportive follow-up care. The choice to reach out is always yours.
       </p>
       <div className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-background px-4 py-2 text-sm text-muted-foreground">
         <Lock className="h-4 w-4 text-success" />
