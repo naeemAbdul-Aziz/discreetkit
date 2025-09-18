@@ -222,6 +222,12 @@ export const marieStopesData: MarieStopesData = {
             imageUrl: "https://images.unsplash.com/photo-1584515933487-759821d27167?q=80&w=800&fit=crop",
             imageHint: "hands holding package"
         },
+        {
+            title: "STI & STD Services",
+            description: "Get confidential testing, diagnosis, and treatment for other sexually transmitted infections.",
+            imageUrl: "https://images.unsplash.com/photo-1620704990263-6e379a759654?q=80&w=800&fit=crop",
+            imageHint: "lab test samples"
+        },
     ],
     faqs: [
         {

@@ -97,7 +97,7 @@ export default function PartnerCarePage() {
                 <div className="relative w-full overflow-hidden" style={{ maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}>
                     <div className="flex w-max animate-marquee">
                         {[...marieStopesData.services, ...marieStopesData.services].map((service, index) => (
-                           <div key={index} className="w-[300px] flex-shrink-0 p-4">
+                           <div key={index} className="w-[80vw] max-w-[320px] md:max-w-[300px] flex-shrink-0 p-4">
                                <Card className="flex flex-col h-[380px] w-full overflow-hidden rounded-2xl shadow-lg transition-shadow hover:shadow-xl">
                                     <div className="relative h-[220px] w-full">
                                          <Image
