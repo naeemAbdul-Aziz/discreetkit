@@ -1,11 +1,10 @@
 
 
 import { marieStopesData } from '@/lib/data';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Phone, Globe, Lock, CheckCircle } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Phone, Globe, Lock } from 'lucide-react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 const WhatsAppIcon = () => (
     <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 fill-current">
@@ -18,120 +17,105 @@ export default function PartnerCarePage() {
 
   return (
     <div className="bg-muted">
-      <div className="container mx-auto max-w-5xl px-4 py-12 md:px-6 md:py-24">
+      <div className="container mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-24">
         
         {/* Header Section */}
         <div className="text-center">
+            <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-primary">
+                Our Trusted Partner: Marie Stopes Ghana
+            </p>
             <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-                Your Bridge to Confidential Care
+                Exceptional Care, Always Confidential
             </h1>
             <p className="mx-auto mt-4 max-w-3xl text-base text-muted-foreground">
-                For comprehensive, non-judgmental follow-up care, we are proud to partner with Marie Stopes Ghana—a leader in sexual and reproductive health.
+                For comprehensive, non-judgmental follow-up care, we are proud to partner with Marie Stopes Ghana—a leader in sexual and reproductive health. The choice to reach out is always yours.
             </p>
-             <div className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-background px-4 py-2 text-sm text-muted-foreground">
+             <div className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-background px-4 py-2 text-sm text-muted-foreground shadow-sm">
                 <Lock className="h-4 w-4 text-success" />
-                <span>Your privacy and comfort are our priorities.</span>
+                <span>Your privacy is our highest priority.</span>
             </div>
         </div>
 
-        {/* Introduction to Marie Stopes */}
-        <div className="mt-16 grid grid-cols-1 items-center gap-8 md:grid-cols-2 md:gap-12">
-            <div className="relative flex h-48 w-full items-center justify-center rounded-2xl bg-white p-6 shadow-md md:h-64">
-                <Image
-                    src={marieStopesData.logo_url}
-                    alt={`${marieStopesData.name} Logo`}
-                    width={220}
-                    height={90}
-                    className="object-contain"
-                    data-ai-hint="logo"
-                />
-                
+        {/* Services Grid */}
+        <div className="mt-16 grid grid-cols-1 gap-x-8 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
+            {marieStopesData.services.map((service, index) => (
+                <div key={service.title} className="flex flex-col text-left">
+                     <div className="flex items-center gap-4 mb-4">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary font-bold">{index + 1}</div>
+                        <h3 className="text-xl font-bold text-foreground">{service.title}</h3>
+                     </div>
+                     <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl shadow-lg mb-4">
+                        <Image
+                            src={service.imageUrl}
+                            alt={service.title}
+                            fill
+                            sizes="(max-width: 768px) 100vw, 33vw"
+                            className="object-cover"
+                            data-ai-hint={service.imageHint}
+                        />
+                     </div>
+                    <p className="text-base text-muted-foreground flex-grow">{service.description}</p>
+                </div>
+            ))}
+        </div>
+
+        {/* Contact and FAQ Section */}
+        <div className="mt-24 grid grid-cols-1 gap-12 rounded-2xl bg-card p-8 shadow-lg md:grid-cols-5 md:p-12">
+            <div className="md:col-span-2">
+                 <div className="sticky top-28">
+                    <h2 className="text-2xl font-bold text-foreground">Connect with Marie Stopes</h2>
+                    <p className="mt-2 text-muted-foreground">They are ready to help you with the next step. Mention DiscreetKit for a supportive experience.</p>
+                    <div className="mt-6 flex flex-col gap-3">
+                        {marieStopesData.contact?.phone && (
+                            <Button asChild size="lg">
+                                <a href={`tel:${marieStopesData.contact.phone}`}>
+                                    <Phone />
+                                    Call Now
+                                </a>
+                            </Button>
+                        )}
+                        {marieStopesData.contact?.whatsapp && (
+                            <Button asChild size="lg" variant="accent" className="bg-green-500 hover:bg-green-600 text-white">
+                                <a href={`https://wa.me/233${marieStopesData.contact.whatsapp.slice(1)}`} target="_blank" rel="noopener noreferrer">
+                                    <WhatsAppIcon />
+                                    WhatsApp
+                                </a>
+                            </Button>
+                        )}
+                        {marieStopesData.contact?.website && (
+                            <Button asChild size="lg" variant="outline">
+                                <a href={marieStopesData.contact.website} target="_blank" rel="noopener noreferrer">
+                                    <Globe />
+                                    Visit Website
+                                </a>
+                            </Button>
+                        )}
+                    </div>
+                     <div className="mt-6 text-sm text-muted-foreground">
+                        <p className="font-semibold">Locations:</p>
+                        <p>{marieStopesData.locations.join(' | ')}</p>
+                    </div>
+                 </div>
             </div>
-            <div className="flex flex-col justify-center">
-                <h2 className="text-3xl font-bold text-foreground">{marieStopesData.name}</h2>
-                <p className="mt-1 text-base font-medium text-primary">{marieStopesData.locations.join(' | ')}</p>
-                <p className="mt-4 text-base text-foreground">{marieStopesData.description}</p>
-                 <div className="mt-6 flex flex-wrap gap-2">
-                    {marieStopesData.contact?.phone && (
-                        <Button asChild size="sm">
-                            <a href={`tel:${marieStopesData.contact.phone}`}>
-                                <Phone />
-                                Call Now
-                            </a>
-                        </Button>
-                    )}
-                    {marieStopesData.contact?.whatsapp && (
-                        <Button asChild size="sm" variant="accent" className="bg-green-500 hover:bg-green-600 text-white">
-                            <a href={`https://wa.me/233${marieStopesData.contact.whatsapp.slice(1)}`} target="_blank" rel="noopener noreferrer">
-                                <WhatsAppIcon />
-                                WhatsApp
-                            </a>
-                        </Button>
-                    )}
-                    {marieStopesData.contact?.website && (
-                        <Button asChild size="sm" variant="outline">
-                            <a href={marieStopesData.contact.website} target="_blank" rel="noopener noreferrer">
-                                <Globe />
-                                Website
-                            </a>
-                        </Button>
-                    )}
+            <div className="md:col-span-3">
+                <h2 className="text-2xl font-bold text-foreground">Your Questions, Answered</h2>
+                <p className="mt-2 text-muted-foreground">Important things to know before you visit a Marie Stopes centre.</p>
+                <div className="mt-6">
+                    <Accordion type="single" collapsible className="w-full">
+                        {marieStopesData.faq.map((item, index) => (
+                        <AccordionItem key={index} value={`item-${index}`}>
+                            <AccordionTrigger className="text-left text-base hover:no-underline">
+                            {item.question}
+                            </AccordionTrigger>
+                            <AccordionContent className="text-sm text-muted-foreground">
+                            {item.answer}
+                            </AccordionContent>
+                        </AccordionItem>
+                        ))}
+                    </Accordion>
                 </div>
             </div>
         </div>
-
-        {/* Detailed Services Section */}
-        <div className="mt-24">
-            <div className="text-center">
-                <h3 className="text-2xl font-bold text-foreground">Services We Recommend</h3>
-                <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">Marie Stopes offers a safe, confidential environment for these key services. Mention DiscreetKit for a supportive experience.</p>
-            </div>
-            <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {marieStopesData.services.map(service => (
-                    <Card key={service.title} className="flex flex-col">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-3">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 flex-shrink-0">
-                                    <CheckCircle className="h-6 w-6 text-primary" />
-                                </div>
-                                <span className="text-lg">{service.title}</span>
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="flex-grow">
-                            <p className="text-sm text-muted-foreground">{service.description}</p>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
-        </div>
-
-
-        {/* Partner FAQ Section */}
-        <div className="mt-24 max-w-3xl mx-auto">
-            <div className="text-center">
-                <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-                    Your Questions, Answered
-                </h2>
-                <p className="mt-4 text-base text-muted-foreground">
-                    Important things to know before you visit a Marie Stopes centre.
-                </p>
-            </div>
-             <div className="mt-8">
-                <Accordion type="single" collapsible className="w-full">
-                    {marieStopesData.faq.map((item, index) => (
-                    <AccordionItem key={index} value={`item-${index}`}>
-                        <AccordionTrigger className="text-left text-base hover:no-underline">
-                        {item.question}
-                        </AccordionTrigger>
-                        <AccordionContent className="text-sm text-muted-foreground">
-                        {item.answer}
-                        </AccordionContent>
-                    </AccordionItem>
-                    ))}
-                </Accordion>
-             </div>
-        </div>
-
       </div>
     </div>
   );
