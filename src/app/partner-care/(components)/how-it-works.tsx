@@ -4,6 +4,7 @@
 
 import Image from 'next/image';
 import { partnerCareSteps } from '@/lib/data';
+import { ShoppingCart, CheckCircle, Phone, HeartHandshake } from 'lucide-react';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -41,17 +42,31 @@ export function HowItWorksPartner() {
         {/* Desktop and Mobile Layout */}
         <div className="relative">
           {/* Vertical line for mobile */}
-          <div className="absolute left-4 top-4 h-full w-0.5 bg-border -translate-x-1/2 md:hidden" aria-hidden="true"></div>
+          <div className="absolute left-5 top-0 h-full w-0.5 bg-border -translate-x-1/2 md:hidden" aria-hidden="true"></div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
               {partnerCareSteps.map((step) => (
-                  <div key={step.number} className="relative flex flex-col items-start gap-4">
-                      {/* Mobile Step Header */}
-                       <div className="flex items-center gap-4 md:hidden">
-                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted font-bold text-muted-foreground z-10 flex-shrink-0">
+                  <div key={step.number} className="relative flex flex-col items-start gap-4 md:block">
+                     {/* Mobile Step Header */}
+                       <div className="flex items-start gap-4 md:hidden w-full">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-primary bg-background font-bold text-primary z-10 flex-shrink-0 mt-1">
                             {step.number}
                           </div>
-                           <h3 className="text-lg font-bold text-foreground">{step.title}</h3>
+                          <div className="flex-1 space-y-2">
+                             <h3 className="text-lg font-bold text-foreground pt-2">{step.title}</h3>
+                             <p className="text-sm text-muted-foreground">{step.description}</p>
+                             <div className="mt-4 relative aspect-[4/3] w-full rounded-xl overflow-hidden shadow-lg">
+                                <Image
+                                    src={step.imageUrl}
+                                    alt={step.title}
+                                    fill
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                                    className="object-cover"
+                                    data-ai-hint={step.imageHint}
+                                    placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 600))}`}
+                                />
+                            </div>
+                          </div>
                       </div>
                       
                       {/* Desktop Step Header */}
@@ -67,7 +82,7 @@ export function HowItWorksPartner() {
                           <h3 className="text-lg font-bold text-foreground">{step.title}</h3>
                       </div>
 
-                      <div className="pl-12 md:pl-0">
+                      <div className="hidden md:block pl-0">
                         <p className="mt-2 text-sm text-muted-foreground">{step.description}</p>
                         <div className="mt-4 relative aspect-[4/3] w-full rounded-xl overflow-hidden shadow-lg">
                             <Image
