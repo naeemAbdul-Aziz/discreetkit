@@ -65,7 +65,7 @@ function ServiceCard({ service, isZigged }: { service: (typeof services)[0], isZ
     <div className={cn("group relative flex h-full min-h-[380px] w-full flex-col overflow-hidden rounded-2xl bg-card shadow-sm transition-all duration-300 hover:shadow-lg", isZigged && "md:translate-y-8")}>
       <div 
         className="relative h-3/5 w-full"
-        style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 30% 90%, 0 100%)' }}
+        style={{ clipPath: 'polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%)' }}
       >
         <Image
           src={service.imageUrl}
