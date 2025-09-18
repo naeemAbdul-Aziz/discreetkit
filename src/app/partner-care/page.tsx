@@ -90,7 +90,7 @@ export default function PartnerCarePage() {
             
             <Separator id="services" className="my-16 md:my-24" />
             
-             <div className="max-w-6xl mx-auto">
+            <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-12">
                      <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
                        Services to Support You
