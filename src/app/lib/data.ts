@@ -1,4 +1,5 @@
 
+
 import { Package, ShoppingCart, Truck, CheckCircle, ShieldCheck, HeartHandshake, Zap, Award, Users, TestTube, Droplet, FileText, FlaskConical, Plus } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { CartItem } from "@/hooks/use-cart";
@@ -6,11 +7,11 @@ import type { CartItem } from "@/hooks/use-cart";
 export type Product = {
     id: number;
     name: string;
-    description: string;
-    priceGHS: number;
-    studentPriceGHS?: number;
-    imageUrl: string;
-    featured?: boolean;
+    description: string | null;
+    price_ghs: number;
+    student_price_ghs: number | null;
+    image_url: string | null;
+    featured: boolean | null;
 }
 
 export type Order = {
@@ -57,7 +58,15 @@ export type Testimonial = {
 export type Partner = {
     id: number;
     name: string;
-    logoUrl: string;
+    logo_url: string;
+    location: string;
+    services: string[];
+    is_preferred: boolean;
+    contact: {
+        phone: string | null;
+        whatsapp: string | null;
+        website: string | null;
+    };
 };
 
 export type ProductBenefit = {
@@ -87,74 +96,6 @@ export const generateTrackingCode = (): string => {
   return result;
 };
 
-
-export const products: Product[] = [
-    {
-        id: 1,
-        name: 'Standard HIV Kit',
-        description: 'A single-use, private HIV self-test kit. It is WHO-approved for 99% accuracy.',
-        priceGHS: 75.00,
-        studentPriceGHS: 65.00,
-        imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756312643/hiv-kit_p18jif.png',
-        featured: true,
-    },
-    {
-        id: 2,
-        name: 'Pregnancy Test Kit',
-        description: 'A reliable, easy-to-use pregnancy test for fast and private results.',
-        priceGHS: 45.00,
-        studentPriceGHS: 35.00,
-        imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756312643/preg-kit_d5xpyb.png',
-        featured: true,
-    },
-    {
-        id: 3,
-        name: 'Support Bundle (Couple)',
-        description: 'Contains two HIV self-test kits. Encourages testing together for mutual support.',
-        priceGHS: 140.00,
-        imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756312643/couple-kit_h3h1gc.png',
-        featured: true,
-    },
-    {
-        id: 4,
-        name: 'Postpill (Emergency Contraception)',
-        description: 'A single dose of emergency contraception to be taken after unprotected intercourse.',
-        priceGHS: 90.00,
-        studentPriceGHS: 80.00,
-        imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758178128/discreetkit-postpill_gbtfsv.png',
-        featured: true,
-    },
-    {
-        id: 5,
-        name: 'Premium Condom Pack',
-        description: 'A 12-pack of ultra-thin, lubricated latex condoms for safety and comfort.',
-        priceGHS: 50.00,
-        studentPriceGHS: 40.00,
-        imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758178128/discreetkit-condoms_wndg8h.png',
-    },
-    {
-        id: 6,
-        name: 'Aqua-based Personal Lubricant',
-        description: 'A gentle, water-based lubricant for enhanced comfort. Safe to use with condoms.',
-        priceGHS: 60.00,
-        imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758178128/discreetkit-lube_uiojpr.png',
-    },
-    {
-        id: 7,
-        name: 'Weekend Ready Bundle',
-        description: 'Includes a 12-pack of condoms and a personal lubricant for complete preparation.',
-        priceGHS: 100.00,
-        imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758178129/discreetkit-weekend-bundle_rq5smu.png',
-    },
-    {
-        id: 8,
-        name: 'Complete Peace of Mind Bundle',
-        description: 'Contains 1 HIV Kit, 1 Pregnancy Test, and 1 Postpill. Your all-in-one pack.',
-        priceGHS: 200.00,
-        studentPriceGHS: 170.00,
-        imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758178129/discreetkit-peace-of-mind-bundle_gftmqa.png',
-    }
-];
 
 export const discounts: DiscountLocation[] = [
     { id: 1, campus: "University of Ghana (Legon)" },
@@ -211,11 +152,58 @@ export const productBenefits: ProductBenefit[] = [
 ];
 
 export const partners: Partner[] = [
-    { id: 1, name: "University of Ghana SRC", logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318481/ug_ytf3bp.png" },
-    { id: 2, name: "GIMPA SRC", logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318480/gimpa_vz8ko5.jpg" },
-    { id: 3, name: "TopUp SRC", logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318480/topup_x2q874.webp" },
-    { id: 4, name: "Bedita Pharmacy", logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/bedita_ekekhs.png" },
-    { id: 5, name: "Ernest Chemist", logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/ernest_chemist_ebxjug.webp" },
+  {
+    id: 1,
+    name: 'Nyaho Medical Centre',
+    logo_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758117781/nyaho-logo_b3xt0u.png',
+    location: 'Airport Residential, Accra',
+    services: ['Confirmatory Testing', 'Counseling', 'General Practice'],
+    is_preferred: true,
+    contact: {
+      phone: '0302775341',
+      whatsapp: null,
+      website: 'https://www.nyahomedical.com',
+    },
+  },
+  {
+    id: 2,
+    name: 'Akai House Clinic',
+    logo_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758117781/akai-logo_j4m53q.png',
+    location: 'Cantonments, Accra',
+    services: ['Sexual Health', 'Confirmatory Testing', 'Dermatology'],
+    is_preferred: true,
+    contact: {
+      phone: '0302784772',
+      whatsapp: '0561113580',
+      website: 'https://www.akaihouseclinic.com',
+    },
+  },
+  {
+    id: 3,
+    name: 'Bedita Pharmacy',
+    logo_url: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/bedita_ekekhs.png",
+    location: 'East Legon, Accra',
+    services: ['Pharmaceuticals', 'Health Consultation', 'Wellness Products'],
+    is_preferred: false,
+    contact: {
+      phone: '03025 Bedita',
+      whatsapp: null,
+      website: null,
+    },
+  },
+    {
+    id: 4,
+    name: 'Ernest Chemist',
+    logo_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/ernest_chemist_ebxjug.webp',
+    location: 'Multiple Branches',
+    services: ['Pharmaceuticals', 'Nationwide Access'],
+    is_preferred: false,
+    contact: {
+      phone: '03022 Ernest',
+      whatsapp: null,
+      website: 'https://www.ernestchemist.com',
+    },
+  },
 ];
 
 export const faqItems: FaqItem[] = [
