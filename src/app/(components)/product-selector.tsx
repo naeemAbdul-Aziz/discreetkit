@@ -3,11 +3,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import type { EmblaCarouselType } from 'embla-carousel';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import Image from 'next/image';
-import { Plus, Minus, Trash2, ArrowRight } from 'lucide-react';
-import { useCart } from '@/hooks/use-cart';
+import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import { cn } from '@/lib/utils';
@@ -78,9 +75,14 @@ export function ProductSelector({ products }: { products: Product[] }) {
                 </div>
 
                 {/* Desktop Grid */}
-                <div className="hidden md:grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-4">
-                    {featuredProducts.map((product) => (
-                        <ProductCard key={product.id} product={product} />
+                <div className="hidden md:grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                    {featuredProducts.map((product, index) => (
+                        <div key={product.id} className={cn(
+                            'transition-transform duration-500 ease-in-out',
+                             index % 2 !== 0 ? 'md:pt-8' : 'pt-0'
+                        )}>
+                            <ProductCard product={product} />
+                        </div>
                     ))}
                 </div>
 

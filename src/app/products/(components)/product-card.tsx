@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { Plus, Minus, Trash2 } from 'lucide-react';
@@ -43,12 +43,8 @@ export function ProductCard({ product }: { product: Product }) {
     const price = hasStudentDeal ? product.student_price_ghs : product.price_ghs;
 
     return (
-        <div className="group relative flex h-full min-h-[420px] w-full flex-col overflow-hidden rounded-2xl bg-card shadow-sm transition-shadow duration-300 hover:shadow-lg">
-            {/* Image Container with Clip Path */}
-            <div 
-                className="relative h-2/5 w-full bg-muted/50"
-                style={{ clipPath: 'polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%)' }}
-            >
+        <Card className="h-full flex flex-col rounded-2xl shadow-sm transition-shadow duration-300 hover:shadow-lg overflow-hidden">
+            <div className="relative aspect-[4/3] w-full bg-muted/50">
                 {product.image_url && (
                     <Image
                         src={product.image_url}
@@ -60,11 +56,9 @@ export function ProductCard({ product }: { product: Product }) {
                         placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(250, 188))}`}
                     />
                 )}
-                 <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent" />
             </div>
 
-            {/* Content Section */}
-            <div className="flex flex-grow flex-col justify-between p-6 pt-8 text-left">
+            <CardContent className="flex flex-grow flex-col justify-between p-6 text-left">
                 <div className="flex-grow">
                     <h3 className="text-lg font-bold text-foreground leading-tight">{product.name}</h3>
                     <p className="mt-2 text-sm text-muted-foreground">{product.description}</p>
@@ -108,7 +102,7 @@ export function ProductCard({ product }: { product: Product }) {
                         )}
                     </div>
                 </div>
-            </div>
-        </div>
+            </CardContent>
+        </Card>
     );
 }
