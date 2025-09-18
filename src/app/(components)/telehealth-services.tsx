@@ -60,9 +60,9 @@ const toBase64 = (str: string) =>
     : window.btoa(str);
 
 
-function ServiceCard({ service }: { service: (typeof services)[0] }) {
+function ServiceCard({ service, isZigged }: { service: (typeof services)[0], isZigged: boolean }) {
   return (
-    <div className="group relative flex h-full min-h-[380px] w-full flex-col overflow-hidden rounded-2xl bg-card shadow-sm transition-shadow duration-300 hover:shadow-lg">
+    <div className={cn("group relative flex h-full min-h-[380px] w-full flex-col overflow-hidden rounded-2xl bg-card shadow-sm transition-all duration-300 hover:shadow-lg", isZigged && "md:translate-y-8")}>
       <div 
         className="relative h-3/5 w-full"
         style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 30% 90%, 0 100%)' }}
@@ -116,9 +116,7 @@ export function TelehealthServices() {
             <div className="overflow-x-auto pb-8 -mb-8 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                 <div className="grid grid-flow-col auto-cols-[80%] sm:auto-cols-[45%] md:auto-cols-[30%] lg:auto-cols-[22%] gap-6 px-4">
                     {services.map((service, index) => (
-                        <div key={index}>
-                            <ServiceCard service={service} />
-                        </div>
+                        <ServiceCard key={index} service={service} isZigged={index % 2 !== 0} />
                     ))}
                 </div>
             </div>
