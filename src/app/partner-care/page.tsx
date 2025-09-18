@@ -100,12 +100,12 @@ export default function PartnerCarePage() {
                     </p>
                 </div>
                 
-                <div
+                 <div
                     className="relative"
-                    style={{
-                        maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
-                    }}
                 >
+                    <div className="absolute inset-0 z-10 pointer-events-none" style={{
+                        background: 'linear-gradient(to right, hsl(var(--background)), transparent 10%, transparent 90%, hsl(var(--background)))'
+                    }} />
                     <Carousel
                         opts={{
                             align: "start",
@@ -115,9 +115,9 @@ export default function PartnerCarePage() {
                     >
                         <CarouselContent>
                             {marieStopesData.services.map((service, index) => (
-                            <CarouselItem key={index} className="basis-4/5 sm:basis-1/2 md:basis-1/3 lg:basis-1/3">
-                                <div className="p-1 h-full">
-                                    <Card className="flex flex-col h-[420px] w-full overflow-hidden rounded-2xl transition-shadow">
+                            <CarouselItem key={index} className="basis-4/5 sm:basis-1/2 md:basis-1/3 lg:basis-[30%]">
+                                <div className="p-2 h-full">
+                                    <Card className="flex flex-col h-[420px] w-full overflow-hidden rounded-2xl border bg-card">
                                         <div className="relative h-[220px] w-full">
                                             <Image
                                                 src={service.imageUrl}
@@ -130,7 +130,7 @@ export default function PartnerCarePage() {
                                                 data-ai-hint={service.imageHint}
                                             />
                                         </div>
-                                        <CardContent className="flex flex-col justify-between flex-1 p-6 bg-card text-center">
+                                        <CardContent className="flex flex-col justify-between flex-1 p-6 text-center">
                                         <div>
                                             <h3 className="text-lg font-bold text-foreground">{service.title}</h3>
                                             <p className="mt-2 text-sm text-muted-foreground line-clamp-3">{service.description}</p>
