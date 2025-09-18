@@ -22,13 +22,13 @@ export default function PartnerCarePage() {
         {/* Header Section */}
         <div className="text-center">
             <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-primary">
-                Our Trusted Partner: Marie Stopes Ghana
+                Our Trusted Partner for Your Next Step
             </p>
             <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-                Exceptional Care, Always Confidential
+                Support with Marie Stopes Ghana
             </h1>
             <p className="mx-auto mt-4 max-w-3xl text-base text-muted-foreground">
-                For comprehensive, non-judgmental follow-up care, we are proud to partner with Marie Stopes Ghana—a leader in sexual and reproductive health. The choice to reach out is always yours.
+                For confidential and non-judgmental follow-up care, we are proud to partner with Marie Stopes, a leader in sexual and reproductive health. This guide highlights the key services they offer to support you. The choice to reach out is always yours.
             </p>
              <div className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-background px-4 py-2 text-sm text-muted-foreground shadow-sm">
                 <Lock className="h-4 w-4 text-success" />
@@ -36,27 +36,34 @@ export default function PartnerCarePage() {
             </div>
         </div>
 
-        {/* Services Grid */}
-        <div className="mt-16 grid grid-cols-1 gap-x-8 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
-            {marieStopesData.services.map((service, index) => (
-                <div key={service.title} className="flex flex-col text-left">
-                     <div className="flex items-center gap-4 mb-4">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary font-bold">{index + 1}</div>
-                        <h3 className="text-xl font-bold text-foreground">{service.title}</h3>
-                     </div>
-                     <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl shadow-lg mb-4">
-                        <Image
-                            src={service.imageUrl}
-                            alt={service.title}
-                            fill
-                            sizes="(max-width: 768px) 100vw, 33vw"
-                            className="object-cover"
-                            data-ai-hint={service.imageHint}
-                        />
-                     </div>
-                    <p className="text-base text-muted-foreground flex-grow">{service.description}</p>
+        {/* Services Guide */}
+        <div className="mt-16 max-w-4xl mx-auto">
+             <div className="relative">
+                <div className="absolute left-5 top-0 h-full w-0.5 bg-border -translate-x-1/2" aria-hidden="true"></div>
+                <div className="space-y-16">
+                {marieStopesData.services.map((service, index) => (
+                    <div key={service.title} className="flex items-start gap-6 md:gap-8">
+                        <div className="flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full border-2 border-primary bg-background font-bold text-primary z-10 flex-shrink-0">
+                            {index + 1}
+                        </div>
+                        <div className="flex-1 space-y-4 pt-1">
+                            <h3 className="text-xl md:text-2xl font-bold text-foreground">{service.title}</h3>
+                             <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden shadow-xl">
+                                <Image
+                                    src={service.imageUrl}
+                                    alt={service.title}
+                                    fill
+                                    sizes="100vw"
+                                    className="object-cover"
+                                    data-ai-hint={service.imageHint}
+                                />
+                            </div>
+                            <p className="text-base text-muted-foreground">{service.description}</p>
+                        </div>
+                    </div>
+                ))}
                 </div>
-            ))}
+            </div>
         </div>
 
         {/* Contact and FAQ Section */}

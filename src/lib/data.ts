@@ -171,40 +171,22 @@ export const marieStopesData: MarieStopesData = {
     services: [
         {
             title: "Confirmatory Testing",
-            description: "Receive a professional and confidential confirmatory test for HIV and other STIs in a clinical setting to ensure you have a definitive diagnosis.",
+            description: "If you've used one of our self-test kits and need a definitive result, Marie Stopes offers professional, confidential testing in a clinical setting. This is a crucial next step to confirm your status and understand your health.",
             imageUrl: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=800&fit=crop",
             imageHint: "doctor patient tablet"
         },
         {
             title: "Professional Counselling",
-            description: "Speak with trained counsellors about your results, your options, and any concerns you may have regarding your sexual health in a private and supportive space.",
+            description: "Regardless of your test results, speaking with a trained professional can be incredibly helpful. Marie Stopes provides a private, non-judgmental space to discuss your results, your feelings, and your options for the future.",
             imageUrl: "https://images.unsplash.com/photo-1544006659-f0b21884ce1d?q=80&w=800&fit=crop",
             imageHint: "counselor listening patient"
         },
         {
             title: "Contraceptive Services",
-            description: "Access a wide range of modern contraceptive options, from short-term to long-term methods, with expert guidance to find what's best for you.",
+            description: "Taking control of your sexual health is about more than just testing. Marie Stopes offers expert guidance on a wide range of modern contraceptive options, helping you find the method that best fits your lifestyle.",
             imageUrl: "https://images.unsplash.com/photo-1584515933487-759821d27167?q=80&w=800&fit=crop",
             imageHint: "hands holding package"
         },
-        {
-            title: "STI & UTI Treatment",
-            description: "Get diagnosis and treatment for sexually transmitted infections (STIs) and urinary tract infections (UTIs) from experienced healthcare providers.",
-            imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758253162/close-up-view-doctor-holding-medicine_23-2148842136_b2klyb.jpg",
-            imageHint: "doctor holding medicine"
-        },
-        {
-            title: "Cervical Cancer Screening",
-            description: "Protect your health with regular cervical cancer screening (e.g., Pap smear or HPV test), a vital service for women's long-term wellness.",
-            imageUrl: "https://images.unsplash.com/photo-1624969862293-f4493512903a?q=80&w=800&fit=crop",
-            imageHint: "medical screening equipment"
-        },
-        {
-            title: "General Medical Care",
-            description: "Address your overall health needs with their general practice services, ensuring you receive holistic and comprehensive care.",
-            imageUrl: "https://images.unsplash.com/photo-1551192422-6ea72a06141a?q=80&w=800&fit=crop",
-            imageHint: "stethoscope on desk"
-        }
     ],
     faq: [
         {
