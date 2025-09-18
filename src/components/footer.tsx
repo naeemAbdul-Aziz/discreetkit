@@ -9,7 +9,7 @@ export function Footer() {
   const footerLinks = {
     company: [
       { href: '/#how-it-works', label: 'How It Works' },
-      { href: '/partners', label: 'Our Partners' },
+      { href: '/partner-care', label: 'Our Partners' },
       { href: '/#faq', label: 'FAQ' },
       { href: '/#contact', label: 'Contact Us' },
     ],

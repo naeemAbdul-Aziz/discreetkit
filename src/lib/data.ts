@@ -58,10 +58,6 @@ export type Partner = {
     id: number;
     name: string;
     logoUrl: string;
-    description: string;
-    location: string;
-    phone: string;
-    mapUrl?: string;
 };
 
 export type ProductBenefit = {
@@ -215,44 +211,12 @@ export const productBenefits: ProductBenefit[] = [
 ];
 
 export const partners: Partner[] = [
-    { 
-        id: 1, 
-        name: "University of Ghana SRC", 
-        logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318481/ug_ytf3bp.png",
-        description: "Official student body partner, ensuring our services meet student needs and are accessible on campus.",
-        location: "University of Ghana, Legon Campus",
-        phone: "055-123-4567",
-        mapUrl: "https://maps.app.goo.gl/P2g4sWkF7kL9r8bB8"
-    },
-    { 
-        id: 2, 
-        name: "GIMPA SRC", 
-        logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318480/gimpa_vz8ko5.jpg",
-        description: "Collaborating to provide GIMPA students with confidential and affordable health solutions.",
-        location: "GIMPA Campus, Accra",
-        phone: "024-765-4321",
-        mapUrl: "https://maps.app.goo.gl/9x8y7z6f5e4d3c2b1"
-    },
-    { 
-        id: 3, 
-        name: "Bedita Pharmacy", 
-        logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/bedita_ekekhs.png",
-        description: "A trusted pharmacy partner for professional health services and product pick-up points.",
-        location: "East Legon, Accra",
-        phone: "030-987-6543",
-        mapUrl: "https://maps.app.goo.gl/a1b2c3d4e5f6g7h8i"
-    },
-    { 
-        id: 4, 
-        name: "Ernest Chemist", 
-        logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/ernest_chemist_ebxjug.webp",
-        description: "A leading name in pharmaceuticals, providing access to a wide range of health products and professional advice.",
-        location: "Osu, Accra",
-        phone: "020-112-2334",
-        mapUrl: "https://maps.app.goo.gl/j9k8l7m6n5p4q3r2s"
-    },
+    { id: 1, name: "University of Ghana SRC", logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318481/ug_ytf3bp.png" },
+    { id: 2, name: "GIMPA SRC", logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318480/gimpa_vz8ko5.jpg" },
+    { id: 3, name: "TopUp SRC", logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318480/topup_x2q874.webp" },
+    { id: 4, name: "Bedita Pharmacy", logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/bedita_ekekhs.png" },
+    { id: 5, name: "Ernest Chemist", logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/ernest_chemist_ebxjug.webp" },
 ];
-
 
 export const faqItems: FaqItem[] = [
   {
