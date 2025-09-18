@@ -64,8 +64,14 @@ export type MarieStopesService = {
 
 export type MarieStopesData = {
     name: string;
+    logoUrl: string;
     website: string | null;
+    contact: {
+        phone: string | null;
+        whatsapp: string | null;
+    }
     services: MarieStopesService[];
+    faqs: FaqItem[];
 }
 
 export type ProductBenefit = {
@@ -152,11 +158,16 @@ export const productBenefits: ProductBenefit[] = [
 
 export const marieStopesData: MarieStopesData = {
     name: "Marie Stopes Ghana",
+    logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758223637/marie-stopes-logo_do0j8g.png",
     website: "https://www.mariestopes.org.gh",
+    contact: {
+        phone: "0800208080",
+        whatsapp: "0556561081"
+    },
     services: [
         {
             title: "Confirmatory Testing",
-            description: "Get a definitive, professional test in a clinical setting to confirm your status and understand your health.",
+            description: "Get a professional test in a clinical setting to confirm your status and understand your health.",
             imageUrl: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=800&fit=crop",
             imageHint: "doctor patient tablet"
         },
@@ -173,6 +184,28 @@ export const marieStopesData: MarieStopesData = {
             imageHint: "hands holding package"
         },
     ],
+    faqs: [
+        {
+            question: "Do I need an appointment?",
+            answer: "Walk-ins are welcome, but we recommend calling ahead to confirm the best time and reduce your waiting period. You can call their toll-free number at 0800 20 8080."
+        },
+        {
+            question: "Will my visit be confidential?",
+            answer: "Absolutely. Marie Stopes Ghana operates under strict confidentiality policies. Your information is protected and will not be shared. They are known for providing a safe and private environment."
+        },
+        {
+            question: "What should I expect during my visit?",
+            answer: "You will be greeted by friendly, non-judgmental staff. A trained counselor or healthcare provider will speak with you privately about your needs, explain the process, and answer any questions you have before any tests are done."
+        },
+        {
+            question: "Is there a special benefit for coming from DiscreetKit?",
+            answer: "While there isn't a direct discount, mentioning you came from DiscreetKit can help their staff understand your need for a discreet and sensitive experience. Our partnership ensures you will be treated with the utmost respect and privacy."
+        },
+        {
+            question: "How long will it take to get results?",
+            answer: "Results for many tests, including confirmatory HIV tests, are often available quickly, sometimes on the same day. The staff will inform you of the expected timeline for your specific test."
+        }
+    ]
 };
 
 export const faqItems: FaqItem[] = [
@@ -186,7 +219,7 @@ export const faqItems: FaqItem[] = [
   },
   {
     question: "What happens if I test positive?",
-    answer: "A self-test is a screening test, not a final diagnosis. If you get a positive result, it's very important to get a confirmatory test. We provide a confidential connection to our trusted partner, Marie Stopes Ghana."
+    answer: "A self-test is a screening test, not a final diagnosis. If you get a positive result, it's very important to get a confirmatory test. We provide a confidential connection to our trusted partner, Marie Stopes Ghana, who offer professional follow-up care."
   },
   {
     question: "How is my order delivered?",
