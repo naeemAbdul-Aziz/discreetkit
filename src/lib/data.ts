@@ -64,16 +64,8 @@ export type MarieStopesService = {
 
 export type MarieStopesData = {
     name: string;
-    logo_url: string;
-    description: string;
-    locations: string[];
-    contact: {
-        phone: string | null;
-        whatsapp: string | null;
-        website: string | null;
-    };
+    website: string | null;
     services: MarieStopesService[];
-    faq: FaqItem[];
 }
 
 export type ProductBenefit = {
@@ -160,56 +152,27 @@ export const productBenefits: ProductBenefit[] = [
 
 export const marieStopesData: MarieStopesData = {
     name: "Marie Stopes Ghana",
-    logo_url: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758163048/marie-stopes-logo_zvjpgo.png",
-    description: "Marie Stopes Ghana is a leader in sexual and reproductive healthcare, providing modern, reliable, and affordable services. They are dedicated to empowering men, women, and young people to take control of their health in a safe, respectful, and non-judgmental environment.",
-    locations: ["Accra", "Kumasi", "Takoradi", "Sunyani"],
-    contact: {
-        phone: "0800208585",
-        whatsapp: "0556561081",
-        website: "https://www.mariestopes.org.gh"
-    },
+    website: "https://www.mariestopes.org.gh",
     services: [
         {
             title: "Confirmatory Testing",
-            description: "If you've used one of our self-test kits and need a definitive result, Marie Stopes offers professional, confidential testing in a clinical setting. This is a crucial next step to confirm your status and understand your health.",
+            description: "Get a definitive, professional test in a clinical setting to confirm your status and understand your health.",
             imageUrl: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=800&fit=crop",
             imageHint: "doctor patient tablet"
         },
         {
             title: "Professional Counselling",
-            description: "Regardless of your test results, speaking with a trained professional can be incredibly helpful. Marie Stopes provides a private, non-judgmental space to discuss your results, your feelings, and your options for the future.",
+            description: "Speak with a trained professional in a private, non-judgmental space to discuss your results and options.",
             imageUrl: "https://images.unsplash.com/photo-1544006659-f0b21884ce1d?q=80&w=800&fit=crop",
             imageHint: "counselor listening patient"
         },
         {
             title: "Contraceptive Services",
-            description: "Taking control of your sexual health is about more than just testing. Marie Stopes offers expert guidance on a wide range of modern contraceptive options, helping you find the method that best fits your lifestyle.",
+            description: "Explore a wide range of modern contraceptive options with expert guidance to fit your lifestyle.",
             imageUrl: "https://images.unsplash.com/photo-1584515933487-759821d27167?q=80&w=800&fit=crop",
             imageHint: "hands holding package"
         },
     ],
-    faq: [
-        {
-            question: "Is it really confidential?",
-            answer: "Yes. Marie Stopes is a professional healthcare provider with a strict confidentiality policy. Your visit, tests, and results are private and will not be shared without your consent."
-        },
-        {
-            question: "Do I need an appointment?",
-            answer: "While walk-ins are often welcome, calling ahead is recommended to reduce your waiting time. You can use the phone number or WhatsApp to check their schedule."
-        },
-        {
-            question: "What should I say when I contact them?",
-            answer: "You can simply say you were referred by DiscreetKit for a confidential health service, such as a confirmatory test or a sexual health consultation. They will understand and guide you."
-        },
-        {
-            question: "How much do the services cost?",
-            answer: "Costs vary depending on the service. We recommend contacting Marie Stopes directly for the most accurate pricing. Mentioning DiscreetKit may provide access to a supportive experience."
-        },
-        {
-            question: "I'm nervous about going. What should I expect?",
-            answer: "It's completely normal to feel nervous. Marie Stopes' staff are trained to be non-judgmental and supportive. They will guide you through every step in a calm and respectful manner, ensuring you feel as comfortable as possible."
-        }
-    ]
 };
 
 export const faqItems: FaqItem[] = [
