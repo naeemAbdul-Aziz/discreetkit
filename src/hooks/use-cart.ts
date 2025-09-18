@@ -44,12 +44,12 @@ const calculateTotals = (items: CartItem[], deliveryLocation: string | null) => 
   const totalItems = items.reduce((total, item) => total + item.quantity, 0);
 
   const subtotal = items.reduce((total, item) => {
-    return total + item.price_ghs * item.quantity;
+    return total + (item.price_ghs || 0) * item.quantity;
   }, 0);
 
   const studentDiscount = isStudent ? items.reduce((total, item) => {
-    if (item.student_price_ghs) {
-        const discountForItem = item.price_ghs - item.student_price_ghs;
+    if (item.student_price_ghs && item.price_ghs) {
+        const discountForItem = (item.price_ghs || 0) - (item.student_price_ghs || 0);
         return total + (discountForItem * item.quantity);
     }
     return total;
@@ -95,7 +95,7 @@ export const useCart = create<CartState>()(
           const newItem: CartItem = {
             id: product.id,
             name: product.name,
-            price_ghs: product.price_ghs,
+            price_ghs: product.price_ghs || 0,
             student_price_ghs: product.student_price_ghs,
             image_url: product.image_url,
             quantity: 1,

@@ -40,7 +40,7 @@ export function ProductCard({ product }: { product: Product }) {
     const quantity = isMounted ? getItemQuantity(product.id) : 0;
     const isInCart = quantity > 0;
     const hasStudentDeal = isStudent && product.student_price_ghs;
-    const price = hasStudentDeal ? product.student_price_ghs : product.price_ghs;
+    const price = (hasStudentDeal && product.student_price_ghs) ? product.student_price_ghs : product.price_ghs;
 
     return (
         <Card className="h-full flex flex-col rounded-2xl shadow-sm transition-shadow duration-300 hover:shadow-lg overflow-hidden">

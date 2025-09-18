@@ -55,6 +55,9 @@ export function CartView() {
                 <div className="divide-y divide-border">
                     {items.map((item) => {
                         const quantity = item.quantity;
+                        const price = item.price_ghs || 0;
+                        const studentPrice = item.student_price_ghs;
+
                         return (
                              <div key={item.id} className="p-4 sm:p-6">
                                 <div className="grid grid-cols-[80px_1fr_auto] items-center gap-4 sm:gap-6">
@@ -76,16 +79,16 @@ export function CartView() {
                                     </div>
                                     <div className="flex flex-col items-end justify-between space-y-2 self-stretch">
                                          <div className="text-right">
-                                        {isStudent && item.student_price_ghs ? (
+                                        {isStudent && studentPrice ? (
                                                 <>
-                                                    <p className="font-bold text-success text-base">GHS {item.student_price_ghs.toFixed(2)}</p>
+                                                    <p className="font-bold text-success text-base">GHS {studentPrice.toFixed(2)}</p>
                                                     <p className="text-muted-foreground/80 line-through text-xs font-normal">
-                                                        GHS {item.price_ghs.toFixed(2)}
+                                                        GHS {price.toFixed(2)}
                                                     </p>
                                                 </>
                                             ) : (
                                                 <p className="font-bold text-base text-foreground">
-                                                    GHS {item.price_ghs.toFixed(2)}
+                                                    GHS {price.toFixed(2)}
                                                 </p>
                                             )}
                                         </div>
