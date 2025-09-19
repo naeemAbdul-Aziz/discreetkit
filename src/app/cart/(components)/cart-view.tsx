@@ -32,7 +32,7 @@ const toBase64 = (str: string) =>
 
 
 export function CartView() {
-    const { items, updateQuantity, isStudent, totalItems, subtotal, studentDiscount, deliveryFee, totalPrice } = useCart();
+    const { items, updateQuantity, totalItems, subtotal, studentDiscount, deliveryFee, totalPrice } = useCart();
     const [isLoading, setIsLoading] = useState(false);
     const pathname = usePathname();
 
@@ -56,7 +56,6 @@ export function CartView() {
                     {items.map((item) => {
                         const quantity = item.quantity;
                         const price = item.price_ghs || 0;
-                        const studentPrice = item.student_price_ghs || 0;
 
                         return (
                              <div key={item.id} className="p-4 sm:p-6">
@@ -79,18 +78,9 @@ export function CartView() {
                                     </div>
                                     <div className="flex flex-col items-end justify-between space-y-2 self-stretch">
                                          <div className="text-right">
-                                        {isStudent && studentPrice > 0 ? (
-                                                <>
-                                                    <p className="font-bold text-success text-base">GHS {studentPrice.toFixed(2)}</p>
-                                                    <p className="text-muted-foreground/80 line-through text-xs font-normal">
-                                                        GHS {price.toFixed(2)}
-                                                    </p>
-                                                </>
-                                            ) : (
-                                                <p className="font-bold text-base text-foreground">
-                                                    GHS {price.toFixed(2)}
-                                                </p>
-                                            )}
+                                            <p className="font-bold text-base text-foreground">
+                                                GHS {price.toFixed(2)}
+                                            </p>
                                         </div>
                                         <div className="flex items-center">
                                             <div className="flex h-10 items-center justify-between rounded-full border border-primary/50 bg-background p-1 shadow-sm">
@@ -119,7 +109,7 @@ export function CartView() {
                         </div>
                         {studentDiscount > 0 && (
                             <div className="flex justify-between text-success font-medium">
-                                <p>Student Discount</p>
+                                <p>Student Discount (Free Delivery)</p>
                                 <p>- GHS {studentDiscount.toFixed(2)}</p>
                             </div>
                         )}

@@ -26,6 +26,7 @@ async function getProducts(): Promise<Product[]> {
       ...p,
       price_ghs: Number(p.price_ghs),
       student_price_ghs: p.student_price_ghs ? Number(p.student_price_ghs) : null,
+      savings_ghs: p.savings_ghs ? Number(p.savings_ghs) : null,
     }));
 }
 

@@ -73,7 +73,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     
     const priceDetails = {
       subtotal: parseFloat(validatedFields.data.subtotal),
-      student_discount: parseFloat(validatedFields.data.studentDiscount),
+      student_discount: parseFloat(validatedFields.data.studentDiscount), // This is now the waived delivery fee for students
       delivery_fee: parseFloat(validatedFields.data.deliveryFee),
       total_price: parseFloat(validatedFields.data.totalPrice),
     };

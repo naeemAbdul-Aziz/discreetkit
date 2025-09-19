@@ -202,7 +202,7 @@ export function OrderForm() {
                                 ))}
                         </SelectContent>
                         </Select>
-                        <p className="text-[0.8rem] text-muted-foreground">Select a campus to apply student discounts.</p>
+                        <p className="text-[0.8rem] text-muted-foreground">Select a campus for FREE delivery.</p>
                         {state.errors?.deliveryArea?.[0] && (
                             <Alert variant="warning" className="mt-2">
                             <AlertTriangle className="h-4 w-4" />
@@ -278,7 +278,7 @@ export function OrderForm() {
                         {isStudent && (
                             <div className="flex items-center gap-2 rounded-lg bg-success/10 p-3 text-success">
                                 <GraduationCap className="h-5 w-5" />
-                                <p className="text-sm font-medium">Student discount applied!</p>
+                                <p className="text-sm font-medium">Student discount (Free Delivery) applied!</p>
                             </div>
                         )}
                         <div className="space-y-4 text-sm">
@@ -294,14 +294,7 @@ export function OrderForm() {
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    {isStudent && item.student_price_ghs ? (
-                                        <>
-                                            <p className="font-bold text-success">GHS {(item.student_price_ghs * item.quantity).toFixed(2)}</p>
-                                            <p className="text-xs text-muted-foreground/80 line-through">GHS {(item.price_ghs * item.quantity).toFixed(2)}</p>
-                                        </>
-                                    ) : (
-                                        <p className="font-medium text-foreground">GHS {(item.price_ghs * item.quantity).toFixed(2)}</p>
-                                    )}
+                                    <p className="font-medium text-foreground">GHS {(item.price_ghs * item.quantity).toFixed(2)}</p>
                                 </div>
                             </div>
                         ))}
@@ -316,7 +309,7 @@ export function OrderForm() {
                             </div>
                         {studentDiscount > 0 && (
                             <div className="flex justify-between text-success font-medium">
-                                <p>Student Discount</p>
+                                <p>Student Discount (Free Delivery)</p>
                                 <p>- GHS {studentDiscount.toFixed(2)}</p>
                             </div>
                             )}

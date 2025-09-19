@@ -9,7 +9,8 @@ export type Product = {
     name: string;
     description: string | null;
     price_ghs: number;
-    student_price_ghs: number | null;
+    student_price_ghs: number | null; // This can be deprecated or used for other future discounts
+    savings_ghs: number | null; // To show savings on bundles
     image_url: string | null;
     featured: boolean | null;
 }
@@ -23,7 +24,7 @@ export type Order = {
     deliveryAddressNote: string | null;
     isStudent: boolean;
     subtotal: number;
-    studentDiscount: number;
+    studentDiscount: number; // Will store the waived delivery fee amount
     deliveryFee: number;
     totalPrice: number;
     events: {
@@ -111,28 +112,28 @@ export const steps: Step[] = [
   {
     number: 1,
     title: 'Place Your Order',
-    description: 'Choose your products anonymously and pay securely online. No account or name is ever needed.',
+    description: 'Choose the health products that meet your needs. We offer standard and student pricing, with discounts applied automatically for campus deliveries.',
     imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757952399/medium-shot-woman-laying-couch_ojrtnp.jpg',
     imageHint: 'woman couch relaxing',
   },
   {
     number: 2,
     title: 'Private & Fast Delivery',
-    description: 'Your order arrives in a plain, unbranded package. You can track its progress with your unique, anonymous code.',
+    description: 'Your order is packaged in plain, unbranded materials and delivered by a professional rider. We only use your number to coordinate the drop-off.',
     imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757953240/close-up-delivery-person-giving-parcel-client_al5mjd.jpg',
     imageHint: 'discreet package delivery',
   },
   {
     number: 3,
     title: 'Get Your Results',
-    description: 'Each kit includes simple visual instructions. Get a clear, 99% accurate result in the privacy of your own space in under 20 minutes.',
+    description: 'For test kits, each kit comes with a simple, visual instruction manual. You can get a clear result in the comfort of your own space in under 20 minutes.',
     imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757952387/man-being-happy-after-getting-negative-covid-test-result_udxny5.jpg',
     imageHint: 'man happy result',
   },
   {
     number: 4,
     title: 'Get Support (If Needed)',
-    description: "A self-test is not a diagnosis. If you get a positive result, we provide a confidential link to our trusted partners for professional follow-up care.",
+    description: 'A self-test is a first step, not a final diagnosis. If you get a positive result, we provide a confidential bridge to our trusted hospital partners for professional, discounted follow-up care.',
     imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757955894/counselling_old_lady_modern_xbthvs.jpg',
     imageHint: 'professional counseling support',
   },
@@ -258,13 +259,13 @@ export const faqItems: FaqItem[] = [
   },
   {
     question: "How do I get a student discount?",
-    answer: "We offer discounts on select products for students. Just select your campus as the delivery location, and the discount will be applied automatically to your cart."
+    answer: "Students get FREE delivery! Just select your campus as the delivery location, and the delivery fee will be automatically waived in your cart."
   },
 ];
 
 export const testimonials: Testimonial[] = [
   {
-    quote: "The entire process was so simple and private. I got my package the next day in a plain box. It's a huge relief to have a service like this in Ghana.",
+    quote: "The entire process was so simple and private. I got my package the next day in a plain box. The free delivery for students is a huge plus. It's a relief to have a service like this.",
     name: "Ama K.",
     role: "University of Ghana Student",
     avatar: "https://images.unsplash.com/photo-1596495577886-d9256242498b?w=150&h=150&fit=crop&q=75"
@@ -276,7 +277,7 @@ export const testimonials: Testimonial[] = [
     avatar: "https://images.unsplash.com/photo-1584012961505-507d844cc8a0?w=150&h=150&fit=crop&q=75"
   },
   {
-    quote: "As a student leader, I see the need for this every day. It's a responsible, safe, and judgment-free way for young people to take control of their health.",
+    quote: "As a student leader, I see the need for this every day. It's a responsible, safe, and judgment-free way for young people to take control of their health. Free delivery makes it so accessible.",
     name: "Fatima S.",
     role: "Student Rep, UPSA",
     avatar: "https://images.unsplash.com/photo-1610476034959-548995964893?w=150&h=150&fit=crop&q=75"
@@ -288,7 +289,7 @@ export const testimonials: Testimonial[] = [
     avatar: "https://images.unsplash.com/photo-1607990281513-2c3f162de8ac?w=150&h=150&fit=crop&q=75"
   },
     {
-    quote: "I ordered the couple's bundle with my partner. It helped us have an open conversation and support each other through the process. Highly recommend.",
+    quote: "I ordered the couple's bundle with my partner. It helped us have an open conversation and support each other. Seeing the bundle savings upfront was nice too.",
     name: "Esi & Kofi",
     role: "Couple, Accra",
     avatar: "https://images.unsplash.com/photo-1541533848316-f333b210a501?w=150&h=150&fit=crop&q=75"

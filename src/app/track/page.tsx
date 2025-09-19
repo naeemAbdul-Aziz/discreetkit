@@ -270,7 +270,7 @@ function Tracker() {
                                 </div>
                             </div>
                         <p className="font-medium text-sm text-right">
-                            GHS {(order.isStudent && item.student_price_ghs ? item.student_price_ghs : item.price_ghs).toFixed(2)}
+                            GHS {item.price_ghs.toFixed(2)}
                         </p>
                         </div>
                     ))}
@@ -282,7 +282,7 @@ function Tracker() {
                         </div>
                         {order.studentDiscount > 0 && (
                             <div className="flex justify-between text-success font-medium">
-                                <p>Student Discount</p>
+                                <p>Student Discount (Free Delivery)</p>
                                 <p>- GHS {order.studentDiscount.toFixed(2)}</p>
                             </div>
                         )}

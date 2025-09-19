@@ -6,14 +6,8 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { type DiscountLocation, discounts, DELIVERY_FEES } from '@/lib/data';
 import type { Product } from '@/lib/data';
 
-export type CartItem = {
-  id: number;
-  name: string;
-  price_ghs: number;
-  student_price_ghs?: number | null;
-  image_url: string | null;
+export type CartItem = Product & {
   quantity: number;
-  description: string | null;
 };
 
 interface CartState {
@@ -47,17 +41,13 @@ const calculateTotals = (items: CartItem[], deliveryLocation: string | null) => 
     return total + (item.price_ghs || 0) * item.quantity;
   }, 0);
 
-  const studentDiscount = isStudent ? items.reduce((total, item) => {
-    if (item.student_price_ghs && item.price_ghs) {
-        const discountForItem = (item.price_ghs || 0) - (item.student_price_ghs || 0);
-        return total + (discountForItem * item.quantity);
-    }
-    return total;
-  }, 0) : 0;
+  const baseDeliveryFee = totalItems > 0 ? (discounts.some(d => d.campus === deliveryLocation) ? DELIVERY_FEES.campus : DELIVERY_FEES.standard) : 0;
   
-  const deliveryFee = totalItems > 0 ? (isStudent ? DELIVERY_FEES.campus : DELIVERY_FEES.standard) : 0;
+  // New Logic: Students get free delivery.
+  const studentDiscount = isStudent ? baseDeliveryFee : 0;
+  const deliveryFee = baseDeliveryFee - studentDiscount;
 
-  const totalPrice = subtotal - studentDiscount + deliveryFee;
+  const totalPrice = subtotal + deliveryFee;
 
   return { totalItems, subtotal, studentDiscount, deliveryFee, totalPrice, isStudent };
 };
@@ -92,16 +82,7 @@ export const useCart = create<CartState>()(
               : item
           );
         } else {
-          const newItem: CartItem = {
-            id: product.id,
-            name: product.name,
-            price_ghs: product.price_ghs || 0,
-            student_price_ghs: product.student_price_ghs || null,
-            image_url: product.image_url || null,
-            quantity: 1,
-            description: product.description || null,
-          };
-          updatedItems = [...currentItems, newItem];
+          updatedItems = [...currentItems, { ...product, quantity: 1 }];
         }
 
         const { totalItems, subtotal, studentDiscount, deliveryFee, totalPrice, isStudent } = calculateTotals(updatedItems, get().deliveryLocation);

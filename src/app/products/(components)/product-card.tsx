@@ -9,6 +9,7 @@ import { Plus, Minus, Trash2 } from 'lucide-react';
 import { useCart } from '@/hooks/use-cart';
 import type { Product } from '@/lib/data';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -30,7 +31,7 @@ const toBase64 = (str: string) =>
     : window.btoa(str);
 
 export function ProductCard({ product }: { product: Product }) {
-    const { addItem, getItemQuantity, updateQuantity, isStudent } = useCart();
+    const { addItem, getItemQuantity, updateQuantity } = useCart();
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
@@ -39,10 +40,6 @@ export function ProductCard({ product }: { product: Product }) {
 
     const quantity = isMounted ? getItemQuantity(product.id) : 0;
     const isInCart = quantity > 0;
-    
-    const hasStudentDeal = isStudent && product.student_price_ghs && product.student_price_ghs > 0;
-    const price = hasStudentDeal ? product.student_price_ghs : product.price_ghs;
-    const regularPrice = product.price_ghs;
 
     return (
         <Card className="h-full flex flex-col rounded-2xl overflow-hidden">
@@ -58,6 +55,11 @@ export function ProductCard({ product }: { product: Product }) {
                         placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(250, 188))}`}
                     />
                 )}
+                 {product.savings_ghs && product.savings_ghs > 0 && (
+                    <Badge variant="accent" className="absolute top-3 right-3 shadow-lg">
+                        Save GHS {product.savings_ghs.toFixed(2)}
+                    </Badge>
+                )}
             </div>
 
             <CardContent className="flex flex-grow flex-col justify-between p-6 text-left">
@@ -68,18 +70,9 @@ export function ProductCard({ product }: { product: Product }) {
                 
                 <div className="mt-6 flex items-center justify-between">
                     <div className="text-left">
-                        {hasStudentDeal && price ? (
-                            <>
-                                <p className="font-bold text-success text-lg">GHS {price.toFixed(2)}</p>
-                                <p className="text-muted-foreground/80 line-through text-xs font-normal">
-                                    GHS {regularPrice.toFixed(2)}
-                                </p>
-                            </>
-                        ) : (
-                            <p className="font-bold text-lg text-foreground">
-                                GHS {regularPrice.toFixed(2)}
-                            </p>
-                        )}
+                        <p className="font-bold text-lg text-foreground">
+                            GHS {product.price_ghs.toFixed(2)}
+                        </p>
                     </div>
                     
                     <div className="w-auto text-right">
