@@ -1,7 +1,13 @@
 
+/**
+ * @file page.tsx
+ * @description the main entry point for the homepage. it fetches product data
+ *              and dynamically loads all the sections that make up the page.
+ */
+
 import dynamic from 'next/dynamic';
-import { Hero } from './(components)/hero';
-import { ClosingCta } from './(components)/closing-cta';
+import { Hero } from './(home)/components/hero';
+import { ClosingCta } from './(home)/components/closing-cta';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { getSupabaseClient } from '@/lib/supabase';
@@ -45,35 +51,35 @@ const LoadingSkeleton = ({ height }: { height: string }) => (
 );
 
 const ProductSelector = dynamic(
-  () => import('./(components)/product-selector').then((mod) => mod.ProductSelector as any),
+  () => import('./(home)/components/product-selector').then((mod) => mod.ProductSelector as any),
   { loading: () => <LoadingSkeleton height={componentMap.ProductSelector.height} /> }
 );
 const ProductBenefits = dynamic(
-  () => import('./(components)/product-benefits').then((mod) => mod.ProductBenefits),
+  () => import('./(home)/components/product-benefits').then((mod) => mod.ProductBenefits),
   { loading: () => <LoadingSkeleton height={componentMap.ProductBenefits.height} /> }
 );
 const HowItWorks = dynamic(
-  () => import('./(components)/how-it-works').then((mod) => mod.HowItWorks),
+  () => import('./(home)/components/how-it-works').then((mod) => mod.HowItWorks),
   { loading: () => <LoadingSkeleton height={componentMap.HowItWorks.height} /> }
 );
 const PartnerReferral = dynamic(
-  () => import('./(components)/partner-referral').then((mod) => mod.PartnerReferral),
+  () => import('./(home)/components/partner-referral').then((mod) => mod.PartnerReferral),
   { loading: () => <LoadingSkeleton height={componentMap.PartnerReferral.height} /> }
 );
 const OurVision = dynamic(
-  () => import('./(components)/our-vision').then((mod) => mod.OurVision),
+  () => import('./(home)/components/our-vision').then((mod) => mod.OurVision),
   { loading: () => <LoadingSkeleton height={componentMap.OurVision.height} /> }
 );
 const Testimonials = dynamic(
-  () => import('./(components)/testimonials').then((mod) => mod.Testimonials),
+  () => import('./(home)/components/testimonials').then((mod) => mod.Testimonials),
   { loading: () => <LoadingSkeleton height={componentMap.Testimonials.height} /> }
 );
 const Faq = dynamic(
-  () => import('./(components)/faq').then((mod) => mod.Faq),
+  () => import('./(home)/components/faq').then((mod) => mod.Faq),
   { loading: () => <LoadingSkeleton height={componentMap.Faq.height} /> }
 );
 const ContactUs = dynamic(
-  () => import('./(components)/contact-us').then((mod) => mod.ContactUs),
+  () => import('./(home)/components/contact-us').then((mod) => mod.ContactUs),
   { loading: () => <LoadingSkeleton height={componentMap.ContactUs.height} /> }
 );
 

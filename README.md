@@ -1,4 +1,3 @@
-
 # DiscreetKit Ghana - Confidential Health Products
 
 This repository contains the source code for the DiscreetKit Ghana web application, a service designed to provide private, anonymous, and confidential health products (including self-test kits for HIV and pregnancy) to young people and students in Ghana.
@@ -48,7 +47,7 @@ PAYSTACK_SECRET_KEY="your-paystack-secret-key"
 GEMINI_API_KEY="your-google-ai-api-key"
 
 # Site URL (IMPORTANT: Use the port from your dev script)
-NEXT_PUBLIC_SITE_URL="http://localhost:9002"
+NEXT_PUBLIC_SITE_URL="http://localhost:3000"
 ```
 
 ### 4. Run the Development Server
@@ -59,7 +58,7 @@ Once the dependencies are installed and the environment variables are set, you c
 npm run dev
 ```
 
-The application will be available at `http://localhost:9002`.
+The application will be available at `http://localhost:3000`.
 
 ## 🛠 Tech Stack
 
