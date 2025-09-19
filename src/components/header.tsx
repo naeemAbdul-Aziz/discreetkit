@@ -168,8 +168,8 @@ export function Header() {
                       </Link>
                      </SheetTitle>
                      <SheetClose asChild>
-                        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
-                            <X className="h-5 w-5" />
+                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full">
+                            <X className="h-6 w-6" />
                             <span className="sr-only">Close menu</span>
                         </Button>
                      </SheetClose>
