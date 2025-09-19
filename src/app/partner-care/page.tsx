@@ -100,56 +100,49 @@ export default function PartnerCarePage() {
                     </p>
                 </div>
                 
-                 <div
-                    className="relative"
+                <Carousel
+                    opts={{
+                        align: "start",
+                        loop: false,
+                    }}
+                    className="w-full"
                 >
-                    <div className="absolute inset-0 z-10 pointer-events-none" style={{
-                        background: 'linear-gradient(to right, hsl(var(--background)), transparent 10%, transparent 90%, hsl(var(--background)))'
-                    }} />
-                    <Carousel
-                        opts={{
-                            align: "start",
-                            loop: true,
-                        }}
-                        className="w-full"
-                    >
-                        <CarouselContent>
-                            {marieStopesData.services.map((service, index) => (
-                            <CarouselItem key={index} className="basis-4/5 sm:basis-1/2 md:basis-1/3 lg:basis-[30%]">
-                                <div className="p-2 h-full">
-                                    <Card className="flex flex-col h-[420px] w-full overflow-hidden rounded-2xl border bg-card">
-                                        <div className="relative h-[220px] w-full">
-                                            <Image
-                                                src={service.imageUrl}
-                                                alt={service.title}
-                                                fill
-                                                className="absolute inset-0 h-full w-full object-cover"
-                                                style={{ clipPath: 'polygon(0 0, 100% 0, 100% 85%, 0% 100%)' }}
-                                                placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 220))}`}
-                                                sizes="(max-width: 768px) 80vw, 30vw"
-                                                data-ai-hint={service.imageHint}
-                                            />
-                                        </div>
-                                        <CardContent className="flex flex-col justify-between flex-1 p-6 text-center">
-                                        <div>
-                                            <h3 className="text-lg font-bold text-foreground">{service.title}</h3>
-                                            <p className="mt-2 text-sm text-muted-foreground line-clamp-3">{service.description}</p>
-                                        </div>
-                                        {marieStopesData.website && (
-                                                <Button asChild variant="secondary" size="sm" className="mt-4 w-fit mx-auto">
-                                                    <Link href={marieStopesData.website} target="_blank" rel="noopener noreferrer">
-                                                        Learn More
-                                                    </Link>
-                                                </Button>
-                                            )}
-                                        </CardContent>
-                                    </Card>
-                               </div>
-                            </CarouselItem>
-                            ))}
-                        </CarouselContent>
-                    </Carousel>
-                </div>
+                    <CarouselContent>
+                        {marieStopesData.services.map((service, index) => (
+                        <CarouselItem key={index} className="basis-4/5 sm:basis-1/2 md:basis-1/3 lg:basis-[30%]">
+                            <div className="p-2 h-full">
+                                <Card className="flex flex-col h-[420px] w-full overflow-hidden rounded-2xl border bg-card">
+                                    <div className="relative h-[220px] w-full">
+                                        <Image
+                                            src={service.imageUrl}
+                                            alt={service.title}
+                                            fill
+                                            className="absolute inset-0 h-full w-full object-cover"
+                                            style={{ clipPath: 'polygon(0 0, 100% 0, 100% 85%, 0% 100%)' }}
+                                            placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 220))}`}
+                                            sizes="(max-width: 768px) 80vw, 30vw"
+                                            data-ai-hint={service.imageHint}
+                                        />
+                                    </div>
+                                    <CardContent className="flex flex-col justify-between flex-1 p-6 text-center">
+                                    <div>
+                                        <h3 className="text-lg font-bold text-foreground">{service.title}</h3>
+                                        <p className="mt-2 text-sm text-muted-foreground line-clamp-3">{service.description}</p>
+                                    </div>
+                                    {marieStopesData.website && (
+                                            <Button asChild variant="secondary" size="sm" className="mt-4 w-fit mx-auto">
+                                                <Link href={marieStopesData.website} target="_blank" rel="noopener noreferrer">
+                                                    Learn More
+                                                </Link>
+                                            </Button>
+                                        )}
+                                    </CardContent>
+                                </Card>
+                           </div>
+                        </CarouselItem>
+                        ))}
+                    </CarouselContent>
+                </Carousel>
             </div>
 
             <Separator className="my-16 md:my-24" />
