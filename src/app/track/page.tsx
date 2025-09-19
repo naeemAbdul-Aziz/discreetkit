@@ -137,7 +137,7 @@ function Tracker() {
 
   return (
     <div className="w-full max-w-3xl">
-      <Card className="rounded-2xl shadow-lg">
+      <Card className="rounded-2xl">
         <CardHeader>
           <CardTitle>Track Your Order</CardTitle>
           <CardDescription>
@@ -180,7 +180,7 @@ function Tracker() {
       )}
 
       {isPending && !order && (
-        <Card className="mt-4 rounded-2xl shadow-lg">
+        <Card className="mt-4 rounded-2xl">
           <CardContent className="pt-6">
             <div className="flex items-center justify-center space-x-2">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -191,7 +191,7 @@ function Tracker() {
       )}
 
       {order && (
-        <Card className="mt-4 rounded-2xl shadow-lg">
+        <Card className="mt-4 rounded-2xl">
           <CardContent className="p-4 sm:p-6 grid gap-6">
 
              {/* Order Status Section */}

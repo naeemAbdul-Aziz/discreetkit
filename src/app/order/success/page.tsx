@@ -27,7 +27,7 @@ function SuccessContent() {
     // Simulate a short delay to allow webhooks to potentially process first
     const timer = setTimeout(() => {
         // In a real app, you might make a fetch request to your backend to get the latest order status.
-        // For now, we'll assume the webhook will handle it, and this page is for user feedback.
+        // For now, we'll just assume the webhook will handle it, and this page is for user feedback.
         // We'll just show the success message based on the redirect.
         setIsVerifying(false);
         setPaymentStatus('success'); 
@@ -38,7 +38,7 @@ function SuccessContent() {
 
   if (isVerifying) {
     return (
-        <Card className="w-full max-w-lg text-center shadow-lg">
+        <Card className="w-full max-w-lg text-center">
             <CardHeader className="items-center">
                 <Loader2 className="h-16 w-16 animate-spin text-primary" />
                 <CardTitle className="mt-4 text-3xl">Verifying Payment...</CardTitle>
@@ -52,7 +52,7 @@ function SuccessContent() {
 
   if (!code || paymentStatus === 'failed') {
     return (
-      <Card className="w-full max-w-lg text-center shadow-lg">
+      <Card className="w-full max-w-lg text-center">
         <CardHeader className="items-center">
             <AlertCircle className="h-16 w-16 text-destructive" />
             <CardTitle className="mt-4 text-2xl text-destructive">Payment Issue</CardTitle>
@@ -83,7 +83,7 @@ function SuccessContent() {
   };
 
   return (
-    <Card className="w-full max-w-lg text-center shadow-lg">
+    <Card className="w-full max-w-lg text-center">
       <CardHeader className="items-center">
         <CheckCircle2 className="h-16 w-16 text-success" />
         <CardTitle className="mt-4 text-3xl">Order Confirmed!</CardTitle>

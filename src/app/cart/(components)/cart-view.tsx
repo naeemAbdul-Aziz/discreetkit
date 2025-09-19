@@ -44,7 +44,7 @@ export function CartView() {
 
 
     return (
-        <Card className="shadow-sm overflow-hidden rounded-2xl">
+        <Card className="overflow-hidden rounded-2xl">
             <CardHeader>
                 <CardTitle className="font-headline text-3xl font-bold md:text-4xl">Review Your Cart</CardTitle>
                 <CardDescription>

@@ -30,7 +30,7 @@ export function PartnerReferral() {
   return (
     <section className="py-12 md:py-24">
       <div className="container mx-auto max-w-5xl px-4 md:px-6">
-        <Card className="relative grid grid-cols-1 overflow-hidden rounded-2xl shadow-lg md:grid-cols-2">
+        <Card className="relative grid grid-cols-1 overflow-hidden rounded-2xl md:grid-cols-2">
             
             {/* Image container */}
             <div className="relative h-64 md:h-auto min-h-[350px]">

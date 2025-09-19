@@ -156,7 +156,7 @@ export function OrderForm() {
         <input type="hidden" name="deliveryFee" value={deliveryFee} />
         <input type="hidden" name="totalPrice" value={totalPrice} />
         
-        <Card className="bg-card shadow-sm rounded-2xl">
+        <Card className="bg-card rounded-2xl">
              <CardHeader>
                 <CardTitle>Delivery & Payment Details</CardTitle>
                 <CardDescription>
@@ -381,7 +381,7 @@ function OrderFormSkeleton() {
       </div>
      
       <form className="mt-8 space-y-8 animate-pulse">
-        <Card className="bg-card shadow-sm rounded-2xl">
+        <Card className="bg-card rounded-2xl">
              <CardHeader>
                 <div className="h-7 w-1/2 bg-muted rounded" />
                 <div className="h-4 w-3/4 bg-muted rounded" />

@@ -78,7 +78,7 @@ export function Testimonials() {
               {testimonials.map((testimonial, index) => (
                 <CarouselItem key={index} className="basis-full md:basis-1/2 lg:basis-1/3">
                   <div className="p-1 h-full">
-                     <Card className="h-full flex flex-col shadow-sm hover:shadow-md transition-shadow duration-300 rounded-2xl">
+                     <Card className="h-full flex flex-col rounded-2xl">
                         <CardContent className="flex-grow flex flex-col p-6 space-y-4">
                             <Quote className="h-8 w-8 text-primary/30" />
                             <blockquote className="flex-grow text-base text-muted-foreground">

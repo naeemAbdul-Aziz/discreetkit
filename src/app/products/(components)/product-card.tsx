@@ -45,7 +45,7 @@ export function ProductCard({ product }: { product: Product }) {
     const regularPrice = product.price_ghs;
 
     return (
-        <Card className="h-full flex flex-col rounded-2xl shadow-sm transition-shadow duration-300 hover:shadow-lg overflow-hidden">
+        <Card className="h-full flex flex-col rounded-2xl overflow-hidden">
             <div className="relative aspect-[4/3] w-full bg-muted/50">
                 {product.image_url && (
                     <Image

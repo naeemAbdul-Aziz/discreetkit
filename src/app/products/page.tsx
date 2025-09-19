@@ -31,7 +31,7 @@ async function getProducts(): Promise<Product[]> {
 
 function FeaturedProduct({ product }: { product: Product }) {
     return (
-        <Card className="overflow-hidden rounded-2xl shadow-lg mb-16">
+        <Card className="overflow-hidden rounded-2xl mb-16">
           <div className="grid md:grid-cols-2">
             <div className="flex flex-col justify-center p-8 text-center md:p-12 md:text-left">
               <h2 className="text-sm font-semibold uppercase tracking-wider text-primary">Featured Bundle</h2>

@@ -74,7 +74,7 @@ export default function PartnerCarePage() {
         <div className="container mx-auto px-4 md:px-6">
             <div className="grid md:grid-cols-2 items-center min-h-[500px] md:min-h-[600px] py-12">
                 <div className="relative z-10 text-center md:text-left">
-                     <div className="inline-block rounded-full bg-background px-4 py-2 mb-4 shadow-sm border">
+                     <div className="inline-block rounded-full bg-background px-4 py-2 mb-4 border">
                          <Image src={marieStopesData.logoUrl} alt={`${marieStopesData.name} Logo`} width={120} height={40} className="object-contain" />
                     </div>
                     <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground md:text-5xl">
@@ -135,7 +135,7 @@ export default function PartnerCarePage() {
                         {marieStopesData.services.map((service, index) => (
                         <CarouselItem key={index} className="basis-4/5 sm:basis-1/2 md:basis-1/3">
                             <div className="p-2 h-full">
-                                <Card className="flex flex-col h-[420px] w-full overflow-hidden rounded-2xl border bg-card">
+                                <Card className="flex flex-col h-full w-full overflow-hidden rounded-2xl bg-card">
                                     <div className="relative h-[220px] w-full">
                                         <Image
                                             src={service.imageUrl}
