@@ -51,15 +51,15 @@ export function HowItWorks() {
 
         {/* mobile: vertical timeline */}
         <div className="md:hidden relative">
-            <div className="absolute left-5 top-0 h-full w-0.5 bg-border -translate-x-1/2" aria-hidden="true"></div>
+            <div className="absolute left-[1.1rem] top-2 h-full w-px bg-border" aria-hidden="true"></div>
             <div className="space-y-12">
                 {steps.map((step) => (
-                <div key={step.number} className="relative flex items-start gap-4 pl-10">
-                    <div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-md border-2 border-primary bg-background font-bold text-primary z-10 flex-shrink-0">
-                    {step.number}
+                <div key={step.number} className="relative flex items-start gap-4">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-md bg-muted font-semibold text-muted-foreground z-10 flex-shrink-0">
+                        {step.number}
                     </div>
-                    <div className="flex-1 space-y-4 pt-1">
-                        <h3 className="text-xl font-bold text-foreground">{step.title}</h3>
+                    <div className="flex-1 space-y-3 pt-1">
+                        <h3 className="text-lg font-bold text-foreground">{step.title}</h3>
                         <p className="text-base text-muted-foreground">{step.description}</p>
                         <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden">
                             <Image
@@ -107,7 +107,7 @@ export function HowItWorks() {
 
                          <div className={cn("p-8 flex flex-col justify-center", index % 2 === 1 && "md:order-first")}>
                             <div className="flex items-center gap-4 mb-4">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-md border-2 border-primary bg-background font-bold text-primary z-10 flex-shrink-0">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-muted font-bold text-muted-foreground z-10 flex-shrink-0">
                                 {step.number}
                             </div>
                             <h3 className="text-xl md:text-2xl font-bold">
