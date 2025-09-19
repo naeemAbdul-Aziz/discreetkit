@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Truck } from 'lucide-react';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -47,6 +47,12 @@ export function Hero() {
                         <Link href="/products">
                         View Products
                         <ArrowRight />
+                        </Link>
+                    </Button>
+                     <Button asChild size="lg" variant="outline" className="w-full sm:w-auto">
+                        <Link href="/track">
+                            <Truck />
+                            Track Your Order
                         </Link>
                     </Button>
                 </div>
