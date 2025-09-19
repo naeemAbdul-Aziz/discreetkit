@@ -1,4 +1,3 @@
-
 /**
  * @file page.tsx
  * @description the main entry point for the homepage. it fetches product data
@@ -13,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { getSupabaseClient } from '@/lib/supabase';
 import type { Product } from '@/lib/data';
 
+// fetches all products from the supabase database.
 async function getProducts(): Promise<Product[]> {
     const supabase = getSupabaseClient();
     const { data: products, error } = await supabase
@@ -21,9 +21,10 @@ async function getProducts(): Promise<Product[]> {
         .order('id', { ascending: true });
 
     if (error) {
-        console.error("Error fetching products:", error);
+        console.error("error fetching products:", error);
         return [];
     }
+    // ensure numeric types are correctly cast from what might be strings in the db.
     return products.map(p => ({
       ...p,
       price_ghs: Number(p.price_ghs),
@@ -32,7 +33,7 @@ async function getProducts(): Promise<Product[]> {
     }));
 }
 
-
+// a map to define heights for loading skeletons for a better user experience.
 const componentMap = {
   ProductSelector: { height: '700px' },
   ProductBenefits: { height: '100px' },
@@ -44,12 +45,15 @@ const componentMap = {
   ContactUs: { height: '600px' },
 };
 
+// a generic loading skeleton component.
 const LoadingSkeleton = ({ height }: { height: string }) => (
   <div className="container mx-auto px-4 md:px-6 py-12 md:py-24">
     <Skeleton className="w-full" style={{ height }} />
   </div>
 );
 
+// dynamically import components to enable code splitting and improve performance.
+// this means components are only loaded when they are needed.
 const ProductSelector = dynamic(
   () => import('./(home)/components/product-selector').then((mod) => mod.ProductSelector as any),
   { loading: () => <LoadingSkeleton height={componentMap.ProductSelector.height} /> }
@@ -83,18 +87,15 @@ const ContactUs = dynamic(
   { loading: () => <LoadingSkeleton height={componentMap.ContactUs.height} /> }
 );
 
-interface SectionWrapperProps {
-  children: React.ReactNode;
-  className?: string;
-}
-
-const SectionWrapper: React.FC<SectionWrapperProps> = ({ children, className }) => (
+// a wrapper component to provide consistent styling for page sections.
+const SectionWrapper: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className }) => (
   <div className={cn(className)}>
     {children}
   </div>
 );
 
 export default async function Home() {
+  // fetch product data on the server.
   const products = await getProducts();
   return (
     <div className="flex flex-col">
