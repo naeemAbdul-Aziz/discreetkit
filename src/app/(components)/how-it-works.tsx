@@ -1,17 +1,12 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import type { EmblaCarouselType } from 'embla-carousel';
 import { steps } from '@/lib/data';
-import { Card, CardContent } from '@/components/ui/card';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import Autoplay from 'embla-carousel-autoplay';
-import { ArrowRight, Pause, Play } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -51,12 +46,13 @@ export function HowItWorks() {
             <div className="absolute left-5 top-0 h-full w-0.5 bg-border -translate-x-1/2" aria-hidden="true"></div>
             <div className="space-y-12">
                 {steps.map((step) => (
-                <div key={step.number} className="relative flex items-start gap-5 pl-10">
-                    <div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-full border-2 border-primary bg-background font-bold text-primary z-10 flex-shrink-0">
+                <div key={step.number} className="relative flex items-start gap-4 pl-10">
+                    <div className="absolute left-0 top-0 flex h-8 w-8 items-center justify-center rounded-md bg-muted font-bold text-muted-foreground z-10 flex-shrink-0">
                     {step.number}
                     </div>
                     <div className="flex-1 space-y-4 pt-1">
                         <h3 className="text-xl font-bold text-foreground">{step.title}</h3>
+                        <p className="text-base text-muted-foreground">{step.description}</p>
                         <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden shadow-xl">
                             <Image
                                 src={step.imageUrl}
@@ -68,7 +64,6 @@ export function HowItWorks() {
                                 placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 600))}`}
                             />
                         </div>
-                        <p className="text-base text-muted-foreground">{step.description}</p>
                         {step.number === 4 && (
                             <Button asChild variant="default">
                                 <Link href="/partner-care">
@@ -104,14 +99,14 @@ export function HowItWorks() {
 
                          <div className={cn("p-8 flex flex-col justify-center", index % 2 === 1 && "md:order-first")}>
                             <div className="flex items-center gap-4 mb-4">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 flex-shrink-0">
-                                <step.icon className="h-6 w-6 text-primary" />
+                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted font-bold text-muted-foreground z-10 flex-shrink-0">
+                                {step.number}
                             </div>
                             <h3 className="text-xl md:text-2xl font-bold">
-                                {step.number}. {step.title}
+                                {step.title}
                             </h3>
                             </div>
-                            <p className="text-sm md:text-base text-muted-foreground mb-6">{step.description}</p>
+                            <p className="text-base text-muted-foreground mb-6">{step.description}</p>
                             {step.number === 4 && (
                                 <div className="mt-8">
                                     <Button asChild variant="default" size="lg">

@@ -37,8 +37,6 @@ export type Step = {
     number: number;
     title: string;
     description: string;
-    icon?: LucideIcon;
-    details?: string[];
     imageUrl: string;
     imageHint: string;
 };
@@ -113,32 +111,28 @@ export const steps: Step[] = [
   {
     number: 1,
     title: 'Place Your Order',
-    icon: ShoppingCart,
-    description: 'Choose your products anonymously and pay securely. No account or name needed.',
+    description: 'Choose your products anonymously and pay securely online. No account or name is ever needed.',
     imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757952399/medium-shot-woman-laying-couch_ojrtnp.jpg',
     imageHint: 'woman couch relaxing',
   },
   {
     number: 2,
     title: 'Private & Fast Delivery',
-    icon: Truck,
-    description: 'Your order arrives in a plain, unbranded package. Track its progress with your unique, anonymous code.',
+    description: 'Your order arrives in a plain, unbranded package. You can track its progress with your unique, anonymous code.',
     imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757953240/close-up-delivery-person-giving-parcel-client_al5mjd.jpg',
     imageHint: 'discreet package delivery',
   },
   {
     number: 3,
     title: 'Get Your Results',
-    icon: CheckCircle,
-    description: 'Each kit includes simple visual instructions. Get a clear, 99% accurate result in under 20 minutes.',
+    description: 'Each kit includes simple visual instructions. Get a clear, 99% accurate result in the privacy of your own space in under 20 minutes.',
     imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757952387/man-being-happy-after-getting-negative-covid-test-result_udxny5.jpg',
     imageHint: 'man happy result',
   },
   {
     number: 4,
     title: 'Get Support (If Needed)',
-    icon: HeartHandshake,
-    description: "A self-test is not a final diagnosis. If needed, we provide a confidential bridge to our trusted hospital partners for professional follow-up care.",
+    description: "A self-test is not a diagnosis. If you get a positive result, we provide a confidential link to our trusted partners for professional follow-up care.",
     imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757955894/counselling_old_lady_modern_xbthvs.jpg',
     imageHint: 'professional counseling support',
   },
@@ -148,14 +142,14 @@ export const partnerCareSteps: Step[] = [
     {
       number: 1,
       title: 'Get Your Private Results',
-      description: 'Use the simple instructions in your discreetly packaged kit to get a clear result in under 20 minutes, all in the privacy of your own home.',
+      description: 'Your kit arrives in a plain package. Use the simple instructions to get a clear result in under 20 minutes, in the privacy of your own home.',
       imageUrl: 'https://images.unsplash.com/photo-1618495034073-404391999866?q=80&w=800&fit=crop',
       imageHint: 'person holding test',
     },
     {
       number: 2,
       title: 'Contact Our Partner',
-      description: "If you need support or a confirmatory test, reach out to Marie Stopes. You can call their toll-free number or chat on WhatsApp—it's 100% confidential.",
+      description: "If you need support or a confirmatory test, reach out to Marie Stopes. You can call them toll-free or chat on WhatsApp—it's 100% confidential.",
       imageUrl: 'https://images.unsplash.com/photo-1614324420919-4235395a3a42?q=80&w=800&fit=crop',
       imageHint: 'person on phone',
     },
@@ -169,7 +163,7 @@ export const partnerCareSteps: Step[] = [
     {
         number: 4,
         title: 'Continued Support on Your Journey',
-        description: 'Our partnership ensures you have a trusted place for follow-up care, prescriptions, and any future health questions you might have on your journey.',
+        description: 'Our partnership ensures you have a trusted place for follow-up care, prescriptions, and any future health questions you might have.',
         imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758223637/marie-stopes-logo_do0j8g.png',
         imageHint: 'continued support journey',
     }
