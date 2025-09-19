@@ -47,13 +47,24 @@ export function PartnerReferral() {
 
             {/* Content container */}
             <div className="relative flex flex-col justify-center bg-card p-8 md:p-12">
-                {/* This pseudo-element creates the curved cutout */}
+                {/* This pseudo-element creates the curved cutout on desktop */}
                 <div 
                     className="absolute bottom-0 left-0 hidden h-24 w-24 translate-x-[-99%] bg-transparent md:block"
                     style={{
                         content: '""',
                         borderBottomLeftRadius: '100%',
                         boxShadow: '2.5rem 2.5rem 0 0 hsl(var(--card))'
+                    }}
+                ></div>
+                
+                 {/* This pseudo-element creates the curved cutout on mobile */}
+                <div
+                    className="absolute -top-12 left-0 h-12 w-full bg-transparent md:hidden"
+                    style={{
+                        content: '""',
+                        borderBottomLeftRadius: '100%',
+                        borderBottomRightRadius: '100%',
+                        boxShadow: '0 2.5rem 0 0 hsl(var(--card))'
                     }}
                 ></div>
 
