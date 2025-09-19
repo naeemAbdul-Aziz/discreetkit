@@ -37,7 +37,7 @@ export function PartnerReferral() {
   return (
     <section className="py-12 md:py-24">
       <div className="container mx-auto max-w-5xl px-4 md:px-6">
-        <Card className="relative grid grid-cols-1 rounded-2xl md:grid-cols-2">
+        <Card className="grid grid-cols-1 rounded-2xl md:grid-cols-2 overflow-hidden">
             
             {/* image container */}
             <div className="relative h-64 md:h-auto min-h-[350px]">
@@ -45,7 +45,7 @@ export function PartnerReferral() {
                   src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=800&fit=crop"
                   alt="a healthcare professional showing information on a tablet to a patient"
                   fill
-                  className="object-cover rounded-t-2xl md:rounded-l-2xl md:rounded-tr-none"
+                  className="object-cover"
                   sizes="(max-width: 768px) 100vw, 50vw"
                   data-ai-hint="doctor patient tablet"
                   placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 600))}`}
@@ -53,28 +53,7 @@ export function PartnerReferral() {
             </div>
 
             {/* content container */}
-            <div className="relative flex flex-col justify-center bg-card p-8 md:p-12">
-                {/* this pseudo-element creates the curved cutout on desktop. */}
-                <div 
-                    className="absolute bottom-0 left-0 hidden h-24 w-24 -translate-x-1/2 bg-transparent md:block"
-                    style={{
-                        content: '""',
-                        borderBottomLeftRadius: '100%',
-                        boxShadow: '2.5rem 2.5rem 0 0 hsl(var(--card))'
-                    }}
-                ></div>
-                
-                 {/* this pseudo-element creates the curved cutout on mobile. */}
-                <div
-                    className="absolute -top-12 left-0 h-12 w-full bg-transparent md:hidden"
-                    style={{
-                        content: '""',
-                        borderBottomLeftRadius: '100%',
-                        borderBottomRightRadius: '100%',
-                        boxShadow: '0 2.5rem 0 0 hsl(var(--card))'
-                    }}
-                ></div>
-
+            <div className="flex flex-col justify-center bg-card p-8 md:p-12">
                 <HeartHandshake className="mb-4 h-10 w-10 text-primary" />
                 <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
                 Your Bridge to Confidential Care
