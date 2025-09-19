@@ -4,25 +4,22 @@ import { Target, ShieldCheck, HeartHandshake } from 'lucide-react';
 const visionPoints = [
   {
     icon: Target,
-    title: "A Service Born from Understanding",
-    description: "DiscreetKit isn't just a business; it's a direct response to a real-world problem. We listened to the quiet concerns and understood the powerful barriers—the fear of judgment, the anxiety of public pharmacies, the lack of a truly private option for essential health products.",
-    details: "That's why we built this service from the ground up, with your privacy as our unbreakable foundation. We believe everyone deserves a safe space to take control of their health, and our mission is to provide that space, no questions asked.",
+    title: "Born from Understanding",
+    description: "DiscreetKit is a direct response to a real-world problem. We saw the fear of judgment and lack of privacy in accessing health products, so we built a service from the ground up with your anonymity as our foundation.",
     imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757944590/medium-shot-women-holding-each-other_yqjad1.jpg",
     imageHint: "empathy support friends",
   },
   {
     icon: ShieldCheck,
-    title: "Technology as Your Shield",
-    description: "In a world where data is everything, we use technology not to collect, but to protect. Our entire system is engineered for anonymity. We intentionally designed it without user accounts, name requirements, or email sign-ups. Your order is tied to a unique, anonymous code—not your identity.",
-    details: "This isn't just a feature; it's our promise. By stripping away the need for personal data, we eliminate the risk and anxiety. You can focus entirely on your health, confident that your privacy is shielded by a system built to forget you.",
+    title: "Technology as a Shield",
+    description: "Our system is engineered to protect, not collect. We intentionally designed it without accounts or name requirements. Your order is tied to an anonymous code, not your identity, eliminating risk and anxiety so you can focus on your health.",
     imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757944636/hug_soldier_empathy_oxnes6.jpg",
     imageHint: "private secure online",
   },
   {
     icon: HeartHandshake,
-    title: "More Than a Product—A Bridge to Care",
-    description: "Getting a product is often just the first step. True peace of mind comes from knowing what to do next. We see ourselves as a responsible bridge, not just a delivery service. That's why we've built strong partnerships with trusted hospitals, clinics, and professional counselors.",
-    details: "For test results that require follow-up, we provide a warm, confidential connection to our partners who offer discounted, non-judgmental care. Your well-being is our ultimate goal, and we are committed to supporting you on every step of your health journey.",
+    title: "A Bridge to Professional Care",
+    description: "Getting a product is just the first step. We see ourselves as a responsible bridge to what comes next. Through our partnerships with trusted hospitals and clinics, we provide a warm, confidential connection to non-judgmental follow-up care.",
     imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757945982/group-people-sitting-facility-waiting-area-reading-health-insurance-fliers-waiting-physician-patients-health-center-having-checkup-appointments-cure-disease_fivf0l.jpg",
     imageHint: "healthcare professional consulting",
   }
@@ -86,9 +83,6 @@ export function OurVision() {
                 </div>
                 <p className="text-base text-muted-foreground md:text-lg">
                     {point.description}
-                </p>
-                <p className="text-base text-foreground">
-                    {point.details}
                 </p>
               </div>
             </div>

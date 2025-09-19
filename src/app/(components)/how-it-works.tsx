@@ -48,50 +48,39 @@ export function HowItWorks() {
 
         {/* Mobile: Vertical Timeline */}
         <div className="md:hidden relative">
-          <div className="absolute left-5 top-0 h-full w-0.5 bg-border -translate-x-1/2" aria-hidden="true"></div>
-          <div className="space-y-12">
-            {steps.map((step) => (
-              <div key={step.number} className="relative flex items-start gap-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-primary bg-background font-bold text-primary z-10 flex-shrink-0">
-                  {step.number}
+            <div className="absolute left-5 top-0 h-full w-0.5 bg-border -translate-x-1/2" aria-hidden="true"></div>
+            <div className="space-y-12">
+                {steps.map((step) => (
+                <div key={step.number} className="relative flex items-start gap-5 pl-10">
+                    <div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-full border-2 border-primary bg-background font-bold text-primary z-10 flex-shrink-0">
+                    {step.number}
+                    </div>
+                    <div className="flex-1 space-y-4 pt-1">
+                        <h3 className="text-xl font-bold text-foreground">{step.title}</h3>
+                        <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden shadow-xl">
+                            <Image
+                                src={step.imageUrl}
+                                alt={step.title}
+                                fill
+                                sizes="100vw"
+                                className="object-cover"
+                                data-ai-hint={step.imageHint}
+                                placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 600))}`}
+                            />
+                        </div>
+                        <p className="text-base text-muted-foreground">{step.description}</p>
+                        {step.number === 4 && (
+                            <Button asChild variant="default">
+                                <Link href="/partner-care">
+                                    Meet Our Support Partner
+                                    <ArrowRight />
+                                </Link>
+                            </Button>
+                        )}
+                    </div>
                 </div>
-                <div className="flex-1 space-y-4 pt-1">
-                  <h3 className="text-xl font-bold text-foreground">{step.title}</h3>
-                  <p className="text-base text-muted-foreground">{step.description}</p>
-                  <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden shadow-xl">
-                      <Image
-                          src={step.imageUrl}
-                          alt={step.title}
-                          fill
-                          sizes="100vw"
-                          className="object-cover"
-                          data-ai-hint={step.imageHint}
-                          placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 600))}`}
-                      />
-                  </div>
-                  <div>
-                      <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground mb-3">What You'll Do:</h4>
-                      <ul className="space-y-2">
-                          {step.details.map((detail, i) => (
-                          <li key={i} className="flex items-start gap-3">
-                              <ArrowRight className="mt-1 h-4 w-4 flex-shrink-0 text-primary" />
-                              <span className="text-sm text-foreground">{detail}</span>
-                          </li>
-                          ))}
-                      </ul>
-                  </div>
-                  {step.number === 4 && (
-                      <Button asChild variant="default">
-                          <Link href="/partner-care">
-                              Meet Our Support Partner
-                              <ArrowRight />
-                          </Link>
-                      </Button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+                ))}
+            </div>
         </div>
         
         {/* Desktop: Alternating Grid */}
@@ -123,18 +112,6 @@ export function HowItWorks() {
                             </h3>
                             </div>
                             <p className="text-sm md:text-base text-muted-foreground mb-6">{step.description}</p>
-
-                            <div>
-                            <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground mb-3">What You'll Do:</h4>
-                            <ul className="space-y-2">
-                                {step.details.map((detail, i) => (
-                                <li key={i} className="flex items-start gap-3">
-                                    <ArrowRight className="mt-1 h-4 w-4 flex-shrink-0 text-primary" />
-                                    <span className="text-sm text-foreground">{detail}</span>
-                                </li>
-                                ))}
-                            </ul>
-                            </div>
                             {step.number === 4 && (
                                 <div className="mt-8">
                                     <Button asChild variant="default" size="lg">
