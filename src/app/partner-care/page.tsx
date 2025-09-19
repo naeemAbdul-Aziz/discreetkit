@@ -11,6 +11,9 @@ import { Phone, MessageSquare, Globe, ArrowDown } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { HowItWorksPartner } from './(components)/how-it-works';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import { useState, useEffect, useCallback } from 'react';
+import type { EmblaCarouselType } from 'embla-carousel';
+import { cn } from '@/lib/utils';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -33,6 +36,26 @@ const toBase64 = (str: string) =>
 
 
 export default function PartnerCarePage() {
+    const [api, setApi] = useState<EmblaCarouselType | undefined>();
+    const [selectedIndex, setSelectedIndex] = useState(0);
+
+    const onSelect = useCallback((emblaApi: EmblaCarouselType) => {
+        setSelectedIndex(emblaApi.selectedScrollSnap());
+    }, []);
+
+    useEffect(() => {
+        if (!api) {
+        return;
+        }
+
+        onSelect(api);
+        api.on('select', onSelect);
+        api.on('reInit', onSelect);
+
+        return () => {
+            api.off('select', onSelect);
+        };
+    }, [api, onSelect]);
 
     const scrollTo = (id: string) => {
         const element = document.getElementById(id);
@@ -101,15 +124,16 @@ export default function PartnerCarePage() {
                 </div>
                 
                 <Carousel
+                    setApi={setApi}
                     opts={{
                         align: "start",
-                        loop: false,
+                        loop: true,
                     }}
                     className="w-full"
                 >
                     <CarouselContent>
                         {marieStopesData.services.map((service, index) => (
-                        <CarouselItem key={index} className="basis-4/5 sm:basis-1/2 md:basis-1/3 lg:basis-[30%]">
+                        <CarouselItem key={index} className="basis-4/5 sm:basis-1/2 md:basis-1/3">
                             <div className="p-2 h-full">
                                 <Card className="flex flex-col h-[420px] w-full overflow-hidden rounded-2xl border bg-card">
                                     <div className="relative h-[220px] w-full">
@@ -143,6 +167,19 @@ export default function PartnerCarePage() {
                         ))}
                     </CarouselContent>
                 </Carousel>
+                <div className="flex items-center justify-center gap-2 mt-8">
+                    {marieStopesData.services.map((_, index) => (
+                        <button
+                        key={index}
+                        onClick={() => api?.scrollTo(index)}
+                        className={cn(
+                            'h-2 w-2 rounded-full bg-border transition-all',
+                            index === selectedIndex ? 'w-4 bg-primary' : 'hover:bg-primary/50'
+                        )}
+                        aria-label={`Go to slide ${index + 1}`}
+                        />
+                    ))}
+                </div>
             </div>
 
             <Separator className="my-16 md:my-24" />
