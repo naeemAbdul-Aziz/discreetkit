@@ -1,30 +1,37 @@
+/**
+ * @file our-vision.tsx
+ * @description a section that outlines the core principles and mission of discreetkit.
+ */
+
 import Image from 'next/image';
 import { Target, ShieldCheck, HeartHandshake } from 'lucide-react';
 
+// data for the vision points, including icons, text, and images.
 const visionPoints = [
   {
     icon: Target,
     title: "Born from Understanding",
-    description: "DiscreetKit is a direct response to a real-world problem. We saw the fear of judgment and lack of privacy in accessing health products, so we built a service from the ground up with your anonymity as our foundation.",
+    description: "discreetkit is a direct response to a real-world problem. we saw the fear of judgment and lack of privacy in accessing health products, so we built a service from the ground up with your anonymity as our foundation.",
     imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757944590/medium-shot-women-holding-each-other_yqjad1.jpg",
     imageHint: "empathy support friends",
   },
   {
     icon: ShieldCheck,
     title: "Technology as a Shield",
-    description: "Our system is engineered to protect, not collect. We intentionally designed it without accounts or name requirements. Your order is tied to an anonymous code, not your identity, eliminating risk and anxiety so you can focus on your health.",
+    description: "our system is engineered to protect, not collect. we intentionally designed it without accounts or name requirements. your order is tied to an anonymous code, not your identity, eliminating risk and anxiety.",
     imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757944636/hug_soldier_empathy_oxnes6.jpg",
     imageHint: "private secure online",
   },
   {
     icon: HeartHandshake,
     title: "A Bridge to Professional Care",
-    description: "Getting a product is just the first step. We see ourselves as a responsible bridge to what comes next. Through our partnerships with trusted hospitals and clinics, we provide a warm, confidential connection to non-judgmental follow-up care.",
+    description: "getting a product is just the first step. we see ourselves as a responsible bridge to what comes next, providing a warm, confidential connection to non-judgmental follow-up care through our trusted partners.",
     imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757945982/group-people-sitting-facility-waiting-area-reading-health-insurance-fliers-waiting-physician-patients-health-center-having-checkup-appointments-cure-disease_fivf0l.jpg",
     imageHint: "healthcare professional consulting",
   }
 ];
 
+// a shimmer effect for image placeholders to improve loading perception.
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <defs>
@@ -39,6 +46,7 @@ const shimmer = (w: number, h: number) => `
   <animate xlink:href="#r" attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite"  />
 </svg>`;
 
+// converts the shimmer svg to a base64 string for the placeholder.
 const toBase64 = (str: string) =>
   typeof window === 'undefined'
     ? Buffer.from(str).toString('base64')
@@ -70,7 +78,7 @@ export function OurVision() {
                   alt={point.title}
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
-                  className="rounded-2xl object-cover shadow-xl"
+                  className="rounded-2xl object-cover"
                   data-ai-hint={point.imageHint}
                   placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(600, 800))}`}
                 />

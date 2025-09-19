@@ -1,3 +1,8 @@
+/**
+ * @file contact-us.tsx
+ * @description a section for users to get in touch with the company via a contact form.
+ */
+
 'use client';
 
 import { useState } from 'react';
@@ -9,6 +14,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Mail, MapPin, ArrowRight, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
+// static contact information.
 const contactInfo = [
   {
     icon: Mail,
@@ -26,10 +32,11 @@ export function ContactUs() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
+  // handles the form submission with a simulated api call.
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate API call
+    // simulate api call for demonstration purposes.
     setTimeout(() => {
         setIsLoading(false);
         toast({
@@ -44,7 +51,7 @@ export function ContactUs() {
       <div className="container mx-auto max-w-6xl px-4 md:px-6">
         <div className="grid gap-12 md:grid-cols-2 md:gap-16 items-center">
           
-          {/* Left Column: Information */}
+          {/* left column: information */}
           <div className="space-y-8">
             <div>
                 <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-primary">
@@ -72,7 +79,7 @@ export function ContactUs() {
             </div>
           </div>
 
-          {/* Right Column: Form */}
+          {/* right column: form */}
           <div>
             <Card className="rounded-2xl p-4 sm:p-8 bg-card">
               <CardContent className="p-0">

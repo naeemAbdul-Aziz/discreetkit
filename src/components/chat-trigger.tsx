@@ -1,3 +1,7 @@
+/**
+ * @file chat-trigger.tsx
+ * @description a ui component that provides a button to open the ai chatbot.
+ */
 
 'use client';
 

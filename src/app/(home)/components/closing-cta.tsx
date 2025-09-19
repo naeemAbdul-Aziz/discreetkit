@@ -1,3 +1,8 @@
+/**
+ * @file closing-cta.tsx
+ * @description a final call-to-action component at the bottom of the page,
+ *              prompting users to proceed to the shop.
+ */
 
 'use client';
 
@@ -7,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 
+// a shimmer effect for image placeholders to improve loading perception.
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <defs>
@@ -21,6 +27,7 @@ const shimmer = (w: number, h: number) => `
   <animate xlink:href="#r" attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite"  />
 </svg>`;
 
+// converts the shimmer svg to a base64 string for the placeholder.
 const toBase64 = (str: string) =>
   typeof window === 'undefined'
     ? Buffer.from(str).toString('base64')
@@ -52,7 +59,7 @@ export function ClosingCta() {
             <div className="relative h-64 min-h-[300px] w-full md:h-full">
               <Image
                 src="https://images.unsplash.com/photo-1584515933487-759821d27167?q=80&w=800&fit=crop"
-                alt="A person's hands holding a small, discreet package."
+                alt="a person's hands holding a small, discreet package."
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 50vw"

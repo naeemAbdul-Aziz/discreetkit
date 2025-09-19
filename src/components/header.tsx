@@ -1,3 +1,8 @@
+/**
+ * @file header.tsx
+ * @description the main site header, including navigation links, the logo,
+ *              and the cart icon. it is responsive and handles mobile and desktop layouts.
+ */
 
 'use client';
 
@@ -11,6 +16,7 @@ import { useState, useEffect } from 'react';
 import { useCart } from '@/hooks/use-cart';
 import { Separator } from './ui/separator';
 
+// define navigation links for easy management.
 const navLinksLeft = [
   { href: '/products', label: 'Shop' },
   { href: '/#how-it-works', label: 'How It Works' },
@@ -22,17 +28,19 @@ const navLinksRight = [
   { href: '/track', label: 'Track Order' },
 ];
 
+// a client component to display the cart icon with a badge for the number of items.
 function CartLink() {
   const { totalItems } = useCart();
   const [isMounted, setIsMounted] = useState(false);
 
+  // ensure the component is mounted on the client before accessing localstorage via the cart hook.
   useEffect(() => {
     setIsMounted(true);
   }, []);
   
   if (!isMounted) {
     return (
-      <Button variant="ghost" size="icon" className="relative" disabled aria-label="Loading Cart">
+      <Button variant="ghost" size="icon" className="relative" disabled aria-label="loading cart">
           <Loader2 className="h-5 w-5 animate-spin" />
       </Button>
     )
@@ -40,7 +48,7 @@ function CartLink() {
 
   return (
      <Button asChild variant="ghost" size="icon" className="relative">
-        <Link href="/cart" aria-label={`Open Cart with ${totalItems} items`}>
+        <Link href="/cart" aria-label={`open cart with ${totalItems} items`}>
           <ShoppingCart />
           {totalItems > 0 && (
               <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground" aria-hidden="true">
@@ -52,6 +60,7 @@ function CartLink() {
   );
 }
 
+// a simple component for the site logo.
 const Logo = () => (
     <span className="font-headline text-2xl font-bold tracking-tighter text-primary">
         DiscreetKit
@@ -64,6 +73,7 @@ export function Header() {
   const [isMounted, setIsMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // handle scroll and mount state.
   useEffect(() => {
     setIsMounted(true);
     const handleScroll = () => {
@@ -73,6 +83,7 @@ export function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // reusable navlink component for desktop.
   const NavLink = ({ href, label, onClick }: { href: string; label: string; onClick?: () => void }) => (
     <Link
       href={href}
@@ -86,6 +97,7 @@ export function Header() {
     </Link>
   );
 
+  // reusable navlink component for the mobile menu.
   const MobileNavLink = ({ href, label, onClick }: { href: string; label: string; onClick?: () => void }) => (
     <Link
         href={href}
@@ -99,6 +111,7 @@ export function Header() {
     </Link>
   );
 
+  // show a skeleton header before the component is mounted to prevent layout shifts.
   if (!isMounted) {
     return (
         <>
@@ -112,6 +125,7 @@ export function Header() {
 
   return (
     <>
+      {/* top promotional bar */}
       <div className="bg-primary p-2 text-center text-sm text-primary-foreground">
         Free Delivery on UG Campus!{' '}
         <Link href="/cart" className="font-semibold underline">
@@ -125,7 +139,7 @@ export function Header() {
             isScrolled ? 'shadow-md' : ''
           )}
         >
-          {/* Desktop Navigation */}
+          {/* desktop navigation */}
           <nav className="hidden md:flex md:w-1/3 justify-start items-center gap-1">
             {[...navLinksLeft, navLinksRight[0]].map((link) => (
               <NavLink key={link.href} {...link} />
@@ -145,7 +159,7 @@ export function Header() {
             <CartLink />
           </nav>
 
-          {/* Mobile Menu */}
+          {/* mobile menu */}
           <div className="flex w-full items-center justify-between md:hidden">
             <Link href="/" className="flex items-center" aria-label="DiscreetKit Homepage">
               <Logo />

@@ -1,3 +1,8 @@
+/**
+ * @file testimonials.tsx
+ * @description a carousel component displaying customer testimonials.
+ *              includes autoplay functionality with play/pause controls.
+ */
 
 'use client';
 
@@ -17,6 +22,7 @@ export function Testimonials() {
   const [isPlaying, setIsPlaying] = useState(true);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
+  // function to toggle the autoplay plugin.
   const togglePlay = useCallback(() => {
     const autoplay = api?.plugins()?.autoplay;
     if (!autoplay) return;
@@ -29,10 +35,12 @@ export function Testimonials() {
     setIsPlaying((prev) => !prev);
   }, [api]);
 
+  // callback to update the selected index when the carousel moves.
   const onSelect = useCallback((emblaApi: EmblaCarouselType) => {
     setSelectedIndex(emblaApi.selectedScrollSnap());
   }, []);
 
+  // effect to set up and manage carousel events and plugins.
   useEffect(() => {
     if (!api) return;
 
@@ -104,15 +112,17 @@ export function Testimonials() {
             <CarouselNext className="-right-4 sm:-right-6" />
             
             <div className="flex items-center justify-center gap-4 mt-8">
+                {/* play/pause button for the autoplay feature. */}
                 <Button
                     variant="ghost"
                     size="icon"
                     onClick={togglePlay}
                     className="rounded-full h-10 w-10 text-muted-foreground hover:text-foreground"
-                    aria-label={isPlaying ? 'Pause carousel' : 'Play carousel'}
+                    aria-label={isPlaying ? 'pause carousel' : 'play carousel'}
                 >
                     {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
                 </Button>
+                {/* dot indicators for carousel position. */}
                 <div className="flex items-center justify-center gap-2">
                 {testimonials.map((_, index) => (
                     <button
@@ -122,7 +132,7 @@ export function Testimonials() {
                         'h-2 w-2 rounded-full bg-border transition-all',
                         index === selectedIndex ? 'w-4 bg-primary' : 'hover:bg-primary/50'
                     )}
-                    aria-label={`Go to slide ${index + 1}`}
+                    aria-label={`go to slide ${index + 1}`}
                     />
                 ))}
                 </div>

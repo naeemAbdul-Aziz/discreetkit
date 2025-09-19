@@ -1,3 +1,8 @@
+/**
+ * @file partner-referral.tsx
+ * @description a component that highlights the partnership with care providers and
+ *              encourages users to seek follow-up support if needed.
+ */
 
 'use client';
 
@@ -7,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ArrowRight, HeartHandshake } from 'lucide-react';
 
+// a shimmer effect for image placeholders to improve loading perception.
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <defs>
@@ -21,6 +27,7 @@ const shimmer = (w: number, h: number) => `
   <animate xlink:href="#r" attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite"  />
 </svg>`;
 
+// converts the shimmer svg to a base64 string for the placeholder.
 const toBase64 = (str: string) =>
   typeof window === 'undefined'
     ? Buffer.from(str).toString('base64')
@@ -32,11 +39,11 @@ export function PartnerReferral() {
       <div className="container mx-auto max-w-5xl px-4 md:px-6">
         <Card className="relative grid grid-cols-1 overflow-hidden rounded-2xl md:grid-cols-2">
             
-            {/* Image container */}
+            {/* image container */}
             <div className="relative h-64 md:h-auto min-h-[350px]">
               <Image
                   src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=800&fit=crop"
-                  alt="A healthcare professional showing information on a tablet to a patient"
+                  alt="a healthcare professional showing information on a tablet to a patient"
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 50vw"
@@ -45,11 +52,11 @@ export function PartnerReferral() {
               />
             </div>
 
-            {/* Content container */}
+            {/* content container */}
             <div className="relative flex flex-col justify-center bg-card p-8 md:p-12">
-                {/* This pseudo-element creates the curved cutout on desktop */}
+                {/* this pseudo-element creates the curved cutout on desktop. */}
                 <div 
-                    className="absolute bottom-0 left-0 hidden h-24 w-24 translate-x-[-99%] bg-transparent md:block"
+                    className="absolute bottom-0 left-0 hidden h-24 w-24 -translate-x-1/2 bg-transparent md:block"
                     style={{
                         content: '""',
                         borderBottomLeftRadius: '100%',
@@ -57,7 +64,7 @@ export function PartnerReferral() {
                     }}
                 ></div>
                 
-                 {/* This pseudo-element creates the curved cutout on mobile */}
+                 {/* this pseudo-element creates the curved cutout on mobile. */}
                 <div
                     className="absolute -top-12 left-0 h-12 w-full bg-transparent md:hidden"
                     style={{

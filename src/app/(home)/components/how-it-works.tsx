@@ -1,3 +1,9 @@
+/**
+ * @file how-it-works.tsx
+ * @description a visual step-by-step guide explaining the service process.
+ *              it adapts between a vertical timeline for mobile and an alternating
+ *              grid for desktop.
+ */
 
 'use client';
 
@@ -8,6 +14,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+// a shimmer effect for image placeholders to improve loading perception.
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <defs>
@@ -22,6 +29,7 @@ const shimmer = (w: number, h: number) => `
   <animate xlink:href="#r" attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite"  />
 </svg>`;
 
+// converts the shimmer svg to a base64 string for the placeholder.
 const toBase64 = (str: string) =>
   typeof window === 'undefined'
     ? Buffer.from(str).toString('base64')
@@ -41,19 +49,19 @@ export function HowItWorks() {
           </p>
         </div>
 
-        {/* Mobile: Vertical Timeline */}
+        {/* mobile: vertical timeline */}
         <div className="md:hidden relative">
             <div className="absolute left-5 top-0 h-full w-0.5 bg-border -translate-x-1/2" aria-hidden="true"></div>
             <div className="space-y-12">
                 {steps.map((step) => (
                 <div key={step.number} className="relative flex items-start gap-4 pl-10">
-                    <div className="absolute left-0 top-0 flex h-8 w-8 items-center justify-center rounded-md bg-muted font-bold text-muted-foreground z-10 flex-shrink-0">
+                    <div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-md border-2 border-primary bg-background font-bold text-primary z-10 flex-shrink-0">
                     {step.number}
                     </div>
                     <div className="flex-1 space-y-4 pt-1">
                         <h3 className="text-xl font-bold text-foreground">{step.title}</h3>
                         <p className="text-base text-muted-foreground">{step.description}</p>
-                        <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden shadow-xl">
+                        <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden">
                             <Image
                                 src={step.imageUrl}
                                 alt={step.title}
@@ -78,14 +86,14 @@ export function HowItWorks() {
             </div>
         </div>
         
-        {/* Desktop: Alternating Grid */}
+        {/* desktop: alternating grid */}
         <div className="hidden md:grid md:grid-cols-1 gap-16 max-w-5xl mx-auto">
             {steps.map((step, index) => (
                  <div
                     key={step.number}
                  >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                        <div className={cn("relative aspect-[4/3] w-full rounded-2xl overflow-hidden shadow-xl", index % 2 === 1 && "md:order-last")}>
+                        <div className={cn("relative aspect-[4/3] w-full rounded-2xl overflow-hidden", index % 2 === 1 && "md:order-last")}>
                             <Image
                                 src={step.imageUrl}
                                 alt={step.title}
@@ -99,7 +107,7 @@ export function HowItWorks() {
 
                          <div className={cn("p-8 flex flex-col justify-center", index % 2 === 1 && "md:order-first")}>
                             <div className="flex items-center gap-4 mb-4">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted font-bold text-muted-foreground z-10 flex-shrink-0">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-md border-2 border-primary bg-background font-bold text-primary z-10 flex-shrink-0">
                                 {step.number}
                             </div>
                             <h3 className="text-xl md:text-2xl font-bold">

@@ -1,8 +1,12 @@
+/**
+ * @file product-benefits.tsx
+ * @description a compact component highlighting the key benefits of the products,
+ *              using a carousel on mobile and a grid on desktop.
+ */
 
 'use client';
 
 import { productBenefits } from '@/lib/data';
-import { Card } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
 
@@ -11,7 +15,7 @@ export function ProductBenefits() {
     <section className="py-6 text-primary-foreground">
       <div className="container mx-auto px-4 md:px-6">
         
-        {/* Mobile: Carousel */}
+        {/* mobile: carousel */}
         <div className="md:hidden">
           <Carousel 
             opts={{ align: 'start', loop: true }}
@@ -31,7 +35,7 @@ export function ProductBenefits() {
           </Carousel>
         </div>
 
-        {/* Desktop: Grid */}
+        {/* desktop: grid */}
         <div className="hidden md:grid md:grid-cols-5 gap-x-8 justify-items-center">
           {productBenefits.map((benefit) => (
             <div key={benefit.title} className="flex items-center gap-3 text-left">

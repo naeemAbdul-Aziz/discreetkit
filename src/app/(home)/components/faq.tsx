@@ -1,3 +1,8 @@
+/**
+ * @file faq.tsx
+ * @description displays a list of frequently asked questions in an accordion format.
+ *              also includes a trigger to open the ai chatbot.
+ */
 
 import { faqItems } from '@/lib/data';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -16,6 +21,7 @@ export function Faq() {
           </p>
         </div>
 
+        {/* the chat trigger component allows users to open the chatbot. */}
         <div className="mt-8">
             <ChatTrigger />
         </div>

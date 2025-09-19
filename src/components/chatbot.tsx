@@ -1,3 +1,8 @@
+/**
+ * @file chatbot.tsx
+ * @description the main component for the ai chatbot interface. it manages chat history,
+ *              handles user input, and communicates with the ai backend via a server action.
+ */
 
 'use client';
 
@@ -12,6 +17,7 @@ import { Avatar, AvatarFallback } from './ui/avatar';
 import { cn } from '@/lib/utils';
 import { useChatbot } from '@/hooks/use-chatbot';
 
+// type definition for a chat message.
 type Message = {
   role: 'user' | 'model';
   parts: string;
@@ -24,17 +30,20 @@ export function Chatbot() {
   const [isPending, startTransition] = useTransition();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
+  // initial message to greet the user.
   const initialMessage: Message = {
       role: 'model',
       parts: "Hello! I'm Pacely, your friendly assistant. How can I help you today? You can ask about our test kits, the ordering process, or delivery locations."
   };
 
+  // effect to set the initial message when the chat opens.
   useEffect(() => {
     if (isOpen && history.length === 0) {
         setHistory([initialMessage]);
     }
   }, [isOpen, history.length]);
 
+  // effect to auto-scroll to the bottom of the chat on new messages.
   useEffect(() => {
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollTo({
@@ -44,6 +53,7 @@ export function Chatbot() {
     }
   }, [history]);
 
+  // handles form submission when a user sends a message.
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isPending) return;
@@ -53,6 +63,7 @@ export function Chatbot() {
     setHistory(newHistory);
     setInput('');
     
+    // use a transition to call the server action, preventing ui blocking.
     startTransition(async () => {
         const aiResponse = await handleChat(newHistory, input);
         setHistory(prev => [...prev, { role: 'model', parts: aiResponse }]);
@@ -91,6 +102,7 @@ export function Chatbot() {
                     )}
                   </div>
                 ))}
+                {/* show a loading indicator while the ai is "thinking". */}
                 {isPending && (
                     <div className="flex items-start gap-3 justify-start">
                         <Avatar className="h-8 w-8">

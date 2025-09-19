@@ -1,3 +1,9 @@
+/**
+ * @file card.tsx
+ * @description a versatile card component with consistent styling for headers,
+ *              content, and footers. it now features a flat design with a
+ *              subtle shadow and border effect on hover.
+ */
 
 import * as React from "react"
 

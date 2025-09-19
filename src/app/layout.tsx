@@ -1,3 +1,8 @@
+/**
+ * @file layout.tsx
+ * @description the root layout for the entire application. it sets up the main html structure,
+ *              loads fonts, defines metadata, and wraps pages with the header and footer.
+ */
 
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
@@ -11,6 +16,7 @@ import NextTopLoader from 'nextjs-toploader';
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://discreetkit.com';
 const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758119851/discreetkit_logo_4_npbt4m.png';
 
+// metadata for seo and social sharing.
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: 'DiscreetKit Ghana - Confidential Health Products',
@@ -44,6 +50,7 @@ export const metadata: Metadata = {
   },
 };
 
+// viewport settings for responsive design.
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1.0,
@@ -59,9 +66,11 @@ export default function RootLayout({
   return (
     <html lang="en">
        <head>
+          {/* load the 'satoshi' font from fontshare. */}
           <link href="https://api.fontshare.com/v2/css?f[]=satoshi@1,900,700,500,301,701,300,501,401,901,400,2&display=swap" rel="stylesheet" />
       </head>
       <body className={cn('min-h-screen bg-background font-body antialiased')}>
+        {/* top loading bar for page transitions. */}
         <NextTopLoader
           color="hsl(var(--primary))"
           initialPosition={0.08}
@@ -79,6 +88,7 @@ export default function RootLayout({
           <Footer />
           <Chatbot />
         </div>
+        {/* toaster for displaying notifications. */}
         <Toaster />
       </body>
     </html>

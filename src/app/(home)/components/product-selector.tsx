@@ -1,3 +1,8 @@
+/**
+ * @file product-selector.tsx
+ * @description displays a selection of featured products, using a carousel on mobile
+ *              and a grid on desktop, with a link to see all products.
+ */
 
 'use client';
 
@@ -13,14 +18,17 @@ import { ProductCard } from '@/app/products/(components)/product-card';
 
 
 export function ProductSelector({ products }: { products: Product[] }) {
+    // filter to show only featured products in this section.
     const featuredProducts = products.filter(p => p.featured);
     const [api, setApi] = useState<EmblaCarouselType | undefined>();
     const [selectedIndex, setSelectedIndex] = useState(0);
 
+    // callback to update the selected index when the carousel moves.
     const onSelect = useCallback((emblaApi: EmblaCarouselType) => {
         setSelectedIndex(emblaApi.selectedScrollSnap());
     }, []);
 
+    // effect to initialize and manage carousel events.
     useEffect(() => {
         if (!api) return;
         onSelect(api);
@@ -46,7 +54,7 @@ export function ProductSelector({ products }: { products: Product[] }) {
                     </p>
                 </div>
                 
-                {/* Mobile Carousel */}
+                {/* mobile carousel */}
                 <div className="md:hidden">
                     <Carousel setApi={setApi} className="w-full" opts={{loop: true}}>
                         <CarouselContent>
@@ -68,15 +76,15 @@ export function ProductSelector({ products }: { products: Product[] }) {
                                 'h-2 w-2 rounded-full bg-border transition-all',
                                 index === selectedIndex ? 'w-4 bg-primary' : 'hover:bg-primary/50'
                             )}
-                            aria-label={`Go to slide ${index + 1}`}
+                            aria-label={`go to slide ${index + 1}`}
                             />
                         ))}
                     </div>
                 </div>
 
-                {/* Desktop Grid */}
+                {/* desktop grid */}
                 <div className="hidden md:grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                    {featuredProducts.map((product, index) => (
+                    {featuredProducts.map((product) => (
                         <div key={product.id}>
                             <ProductCard product={product} />
                         </div>
@@ -95,5 +103,3 @@ export function ProductSelector({ products }: { products: Product[] }) {
         </section>
     );
 }
-
-    
