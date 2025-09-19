@@ -78,8 +78,8 @@ export function Header() {
       href={href}
       onClick={onClick}
       className={cn(
-        'rounded-full px-3 py-1.5 text-sm transition-colors hover:text-foreground/80',
-        pathname === href ? 'bg-muted font-semibold text-foreground' : 'text-foreground/60'
+        'rounded-full px-3 py-1.5 text-sm transition-colors hover:text-primary',
+        pathname === href ? 'font-semibold text-primary' : 'text-foreground/70'
       )}
     >
       {label}
@@ -92,7 +92,7 @@ export function Header() {
         onClick={onClick}
         className={cn(
             'rounded-lg p-3 text-lg transition-colors hover:bg-muted',
-            pathname === href ? 'bg-muted font-semibold text-foreground' : 'text-foreground/70'
+            pathname === href ? 'bg-muted font-semibold text-primary' : 'text-foreground/70'
         )}
     >
         {label}
