@@ -1,3 +1,4 @@
+
 # DiscreetKit Ghana - Confidential Health Products
 
 This repository contains the source code for the DiscreetKit Ghana web application, a service designed to provide private, anonymous, and confidential health products (including self-test kits for HIV and pregnancy) to young people and students in Ghana.
@@ -43,8 +44,9 @@ SUPABASE_SERVICE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 # Paystack (Replace with your own keys)
 PAYSTACK_SECRET_KEY="your-paystack-secret-key"
 
-# Arkesel SMS API Key (Replace with your own key)
-ARKESEL_API_KEY="cHNIRlBqdXJncklObmFpelB0R0Q"
+# Hubtel SMS (Replace with your keys from hubtel.com)
+HUBTEL_API_ID="your-hubtel-api-id"
+HUBTEL_API_SECRET="your-hubtel-api-secret"
 
 # Genkit (Google AI - Replace with your own key)
 GEMINI_API_KEY="your-google-ai-api-key"
@@ -87,9 +89,11 @@ The application will now be accessible via your ngrok URL, and Paystack will be 
 *   **Generative AI:** [Firebase Genkit](https://firebase.google.com/docs/genkit) with [Google's Gemini models](https://ai.google.dev/)
 *   **Backend & Database:** [Supabase](https://supabase.io/)
 *   **Payments:** [Paystack](https://paystack.com/)
-*   **Notifications:** [Arkesel SMS](https://arkesel.com/)
+*   **Notifications:** [Hubtel SMS](https://hubtel.com/)
 *   **Deployment:** [Vercel](https://vercel.com/) / [Firebase App Hosting](https://firebase.google.com/docs/app-hosting)
 
 ## 📦 Deployment
 
 This project is optimized for deployment on Vercel or Firebase App Hosting. Simply connect your Git repository and configure the environment variables in the hosting provider's dashboard. Remember to set `NEXT_PUBLIC_SITE_URL` to your actual production domain.
+
+    

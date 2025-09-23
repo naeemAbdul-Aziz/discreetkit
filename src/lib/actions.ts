@@ -104,9 +104,11 @@ export async function createOrderAction(prevState: any, formData: FormData) {
         note: 'Order placed, awaiting payment confirmation.',
      });
      
-    // 3. Send SMS Notification via Arkesel
-    const arkeselApiKey = process.env.ARKESEL_API_KEY;
-    if (arkeselApiKey && arkeselApiKey !== 'cHNIRlBqdXJncklObmFpelB0R0Q') { // Check against placeholder
+    // 3. Send SMS Notification via Hubtel
+    const hubtelApiId = process.env.HUBTEL_API_ID;
+    const hubtelApiSecret = process.env.HUBTEL_API_SECRET;
+
+    if (hubtelApiId && hubtelApiSecret) {
         const recipient = validatedFields.data.phone_masked.startsWith('0') 
             ? `233${validatedFields.data.phone_masked.substring(1)}` 
             : validatedFields.data.phone_masked;
@@ -114,36 +116,36 @@ export async function createOrderAction(prevState: any, formData: FormData) {
         const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${code}`;
         const smsMessage = `Your DiscreetKit order ${code} has been confirmed. We're now preparing it for its discreet journey to you. Track its progress here: ${trackingUrl}. Should you need any support, remember we're here to help.`;
 
+        const hubtelAuth = Buffer.from(`${hubtelApiId}:${hubtelApiSecret}`).toString('base64');
+        
         try {
-            const smsResponse = await fetch('https://sms.arkesel.com/api/v2/sms/send', {
+            const smsResponse = await fetch('https://api.hubtel.com/v1/messages/send', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${arkeselApiKey}`,
+                    'Authorization': `Basic ${hubtelAuth}`,
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json'
                 },
                 body: JSON.stringify({
-                    sender: 'DiscreetKit',
-                    message: smsMessage,
-                    recipients: [recipient],
-                    sandbox: false
+                    From: 'DiscreetKit',
+                    To: recipient,
+                    Content: smsMessage,
                 })
             });
 
             if (!smsResponse.ok) {
                 const errorData = await smsResponse.json();
-                console.warn('Arkesel SMS API Warning:', errorData);
+                console.warn('Hubtel SMS API Warning:', errorData);
             } else {
-                 console.log('Successfully sent SMS notification via Arkesel.');
+                 console.log('Successfully sent SMS notification via Hubtel.');
             }
         } catch (smsError) {
-            console.error('Failed to send SMS notification:', smsError);
+            console.error('Failed to send SMS notification via Hubtel:', smsError);
         }
     } else {
-        console.log('--- (Skipping SMS: Arkesel API key not configured or is placeholder) ---');
+        console.log('--- (Skipping SMS: Hubtel API credentials not configured) ---');
         const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${code}`;
         const smsPayload = {
-          to: `+233${validatedFields.data.phone_masked.slice(1)}`, // Example for Ghana number format
+          to: `+233${validatedFields.data.phone_masked.slice(1)}`,
           message: `Your DiscreetKit order ${code} has been confirmed. We're now preparing it for its discreet journey to you. Track its progress here: ${trackingUrl}. Should you need any support, remember we're here to help.`
         };
         console.log('--- Placeholder SMS Payload ---', smsPayload);
@@ -284,5 +286,7 @@ export async function handleChat(
     return "I'm sorry, I'm having trouble connecting right now. Please try again later.";
   }
 }
+
+    
 
     
