@@ -12,8 +12,6 @@ import {answerQuestions} from '@/ai/flows/answer-questions';
 import {revalidatePath} from 'next/cache';
 import {type CartItem} from '@/hooks/use-cart';
 import {getSupabaseAdminClient} from './supabase';
-import {discounts} from './data';
-import {redirect} from 'next/navigation';
 
 const orderSchema = z.object({
   cartItems: z.string().min(1, 'Cart cannot be empty.'),
@@ -104,13 +102,43 @@ export async function createOrderAction(prevState: any, formData: FormData) {
         note: 'Order placed, awaiting payment confirmation.',
      });
      
-    // 3. (PLACEHOLDER) Send SMS Notification
-    // TODO: Replace this with a real SMS provider integration (e.g., Twilio, Termii)
-    const smsPayload = {
-        to: validatedFields.data.phone_masked,
-        message: `Your DiscreetKit order #${code} is confirmed. Track your delivery: ${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${code}`
-    };
-    console.log('--- Sending SMS (Placeholder) ---', smsPayload);
+    // 3. Send SMS Notification via Arkesel
+    const arkeselApiKey = process.env.ARKESEL_API_KEY;
+    if (arkeselApiKey && arkeselApiKey !== 'your-arkesel-api-key') {
+        const recipient = validatedFields.data.phone_masked.startsWith('0') 
+            ? `233${validatedFields.data.phone_masked.substring(1)}` 
+            : validatedFields.data.phone_masked;
+
+        const smsMessage = `Your order [${code}] is confirmed. Expect discreet delivery. If you need extra support, our trusted partner hospitals are here for you — privately, with care. Thank you for choosing DiscreetKit.`;
+
+        try {
+            const smsResponse = await fetch('https://sms.arkesel.com/api/v2/sms/send', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${arkeselApiKey}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    sender: 'DISCREETKIT',
+                    message: smsMessage,
+                    recipients: [recipient],
+                    sandbox: false
+                })
+            });
+
+            if (!smsResponse.ok) {
+                const errorData = await smsResponse.json();
+                console.warn('Arkesel SMS API Warning:', errorData);
+            } else {
+                 console.log('Successfully sent SMS notification via Arkesel.');
+            }
+        } catch (smsError) {
+            console.error('Failed to send SMS notification:', smsError);
+        }
+    } else {
+        console.log('--- (Skipping SMS: Arkesel API key not configured) ---');
+    }
 
 
     // 4. Initialize Paystack Transaction
