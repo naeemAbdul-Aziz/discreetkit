@@ -1,4 +1,5 @@
 
+
 /**
  * @file This file contains all the server actions for the application, which handle
  * database operations and other server-side logic. These actions are designed to be
@@ -12,6 +13,7 @@ import {answerQuestions} from '@/ai/flows/answer-questions';
 import {revalidatePath} from 'next/cache';
 import {type CartItem} from '@/hooks/use-cart';
 import {getSupabaseAdminClient} from './supabase';
+import {redirect} from 'next/navigation';
 
 const orderSchema = z.object({
   cartItems: z.string().min(1, 'Cart cannot be empty.'),
@@ -71,7 +73,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     
     const priceDetails = {
       subtotal: parseFloat(validatedFields.data.subtotal),
-      student_discount: parseFloat(validatedFields.data.studentDiscount),
+      student_discount: parseFloat(validatedFields.data.studentDiscount), // This is now the waived delivery fee for students
       delivery_fee: parseFloat(validatedFields.data.deliveryFee),
       total_price: parseFloat(validatedFields.data.totalPrice),
     };
@@ -104,12 +106,13 @@ export async function createOrderAction(prevState: any, formData: FormData) {
      
     // 3. Send SMS Notification via Arkesel
     const arkeselApiKey = process.env.ARKESEL_API_KEY;
-    if (arkeselApiKey && arkeselApiKey !== 'cHNIRlBqdXJncklObmFpelB0R0Q') {
+    if (arkeselApiKey && arkeselApiKey !== 'cHNIRlBqdXJncklObmFpelB0R0Q') { // Check against placeholder
         const recipient = validatedFields.data.phone_masked.startsWith('0') 
             ? `233${validatedFields.data.phone_masked.substring(1)}` 
             : validatedFields.data.phone_masked;
 
-        const smsMessage = `Your order [${code}] is confirmed. Expect discreet delivery. If you need extra support, our trusted partner hospitals are here for you — privately, with care. Thank you for choosing DiscreetKit.`;
+        const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${code}`;
+        const smsMessage = `Your DiscreetKit order ${code} has been confirmed. We're now preparing it for its discreet journey to you. Track its progress here: ${trackingUrl}. Should you need any support, remember we're here to help.`;
 
         try {
             const smsResponse = await fetch('https://sms.arkesel.com/api/v2/sms/send', {
@@ -120,7 +123,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
                     'Accept': 'application/json'
                 },
                 body: JSON.stringify({
-                    sender: 'Discreet',
+                    sender: 'DSKIT',
                     message: smsMessage,
                     recipients: [recipient],
                     sandbox: false
@@ -138,6 +141,12 @@ export async function createOrderAction(prevState: any, formData: FormData) {
         }
     } else {
         console.log('--- (Skipping SMS: Arkesel API key not configured or is placeholder) ---');
+        const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${code}`;
+        const smsPayload = {
+          to: `+233${validatedFields.data.phone_masked.slice(1)}`, // Example for Ghana number format
+          message: `Your DiscreetKit order ${code} has been confirmed. We're now preparing it for its discreet journey to you. Track its progress here: ${trackingUrl}. Should you need any support, remember we're here to help.`
+        };
+        console.log('--- Placeholder SMS Payload ---', smsPayload);
     }
 
 
@@ -275,3 +284,5 @@ export async function handleChat(
     return "I'm sorry, I'm having trouble connecting right now. Please try again later.";
   }
 }
+
+    
