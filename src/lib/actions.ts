@@ -104,7 +104,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
      
     // 3. Send SMS Notification via Arkesel
     const arkeselApiKey = process.env.ARKESEL_API_KEY;
-    if (arkeselApiKey && arkeselApiKey !== 'your-arkesel-api-key') {
+    if (arkeselApiKey && arkeselApiKey !== 'cHNIRlBqdXJncklObmFpelB0R0Q') {
         const recipient = validatedFields.data.phone_masked.startsWith('0') 
             ? `233${validatedFields.data.phone_masked.substring(1)}` 
             : validatedFields.data.phone_masked;
@@ -120,7 +120,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
                     'Accept': 'application/json'
                 },
                 body: JSON.stringify({
-                    sender: 'DISCREETKIT',
+                    sender: 'Discreet',
                     message: smsMessage,
                     recipients: [recipient],
                     sandbox: false
@@ -137,7 +137,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
             console.error('Failed to send SMS notification:', smsError);
         }
     } else {
-        console.log('--- (Skipping SMS: Arkesel API key not configured) ---');
+        console.log('--- (Skipping SMS: Arkesel API key not configured or is placeholder) ---');
     }
 
 
@@ -275,5 +275,3 @@ export async function handleChat(
     return "I'm sorry, I'm having trouble connecting right now. Please try again later.";
   }
 }
-
-    
