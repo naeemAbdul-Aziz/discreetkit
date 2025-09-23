@@ -286,7 +286,3 @@ export async function handleChat(
     return "I'm sorry, I'm having trouble connecting right now. Please try again later.";
   }
 }
-
-    
-
-    

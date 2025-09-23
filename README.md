@@ -95,5 +95,3 @@ The application will now be accessible via your ngrok URL, and Paystack will be 
 ## 📦 Deployment
 
 This project is optimized for deployment on Vercel or Firebase App Hosting. Simply connect your Git repository and configure the environment variables in the hosting provider's dashboard. Remember to set `NEXT_PUBLIC_SITE_URL` to your actual production domain.
-
-    
