@@ -95,11 +95,11 @@ export function HowItWorks() {
                   {step.description}
                 </p>
                  {step.details && (
-                    <ul className="mt-4 space-y-2 text-muted-foreground">
+                    <ul className="mt-4 space-y-3 text-muted-foreground">
                         {step.details.map((detail, i) => (
-                            <li key={i} className="flex items-start gap-2">
-                                <CheckCircle className="h-5 w-5 text-success mt-0.5 flex-shrink-0" />
-                                <span>{detail}</span>
+                            <li key={i} className="flex items-start gap-3">
+                                <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                                <span className="text-base">{detail}</span>
                             </li>
                         ))}
                     </ul>
@@ -123,21 +123,17 @@ export function HowItWorks() {
   );
 }
 
-// Add CheckCircle icon to the component file scope
 const CheckCircle = ({ className }: { className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={cn("h-5 w-5", className)}
-  >
-    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-    <polyline points="22 4 12 14.01 9 11.01" />
-  </svg>
-);
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={cn("h-5 w-5", className)}
+    >
+      <path
+        fillRule="evenodd"
+        d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.06-1.06l-3.25 3.25-1.5-1.5a.75.75 0 00-1.06 1.06l2 2a.75.75 0 001.06 0l3.75-3.75z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
