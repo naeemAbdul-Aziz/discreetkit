@@ -1,4 +1,5 @@
 
+
 /**
  * @file This file contains all the server actions for the application, which handle
  * database operations and other server-side logic. These actions are designed to be
@@ -12,7 +13,6 @@ import {answerQuestions} from '@/ai/flows/answer-questions';
 import {revalidatePath} from 'next/cache';
 import {type CartItem} from '@/hooks/use-cart';
 import {getSupabaseAdminClient} from './supabase';
-import {discounts} from './data';
 import {redirect} from 'next/navigation';
 
 const orderSchema = z.object({
@@ -104,12 +104,49 @@ export async function createOrderAction(prevState: any, formData: FormData) {
         note: 'Order placed, awaiting payment confirmation.',
      });
      
-    // 3. (PLACEHOLDER) Send SMS Notification
-    const smsPayload = {
-      to: `+233${validatedFields.data.phone_masked.slice(1)}`, // Example for Ghana number format
-      message: `Your DiscreetKit order #${code} is confirmed and will be delivered shortly. Track here: ${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${code}`
-    };
-    console.log('--- Sending SMS (Placeholder) ---', smsPayload);
+    // 3. Send SMS Notification via Arkesel
+    const arkeselApiKey = process.env.ARKESEL_API_KEY;
+    if (arkeselApiKey && arkeselApiKey !== 'cHNIRlBqdXJncklObmFpelB0R0Q') { // Check against placeholder
+        const recipient = validatedFields.data.phone_masked.startsWith('0') 
+            ? `233${validatedFields.data.phone_masked.substring(1)}` 
+            : validatedFields.data.phone_masked;
+
+        const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${code}`;
+        const smsMessage = `Your DiscreetKit order #${code} is confirmed. We're preparing it for discreet delivery. You can track its status here: ${trackingUrl}. Thank you for trusting us with your health.`;
+
+        try {
+            const smsResponse = await fetch('https://sms.arkesel.com/api/v2/sms/send', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${arkeselApiKey}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    sender: 'Discreet',
+                    message: smsMessage,
+                    recipients: [recipient],
+                    sandbox: false
+                })
+            });
+
+            if (!smsResponse.ok) {
+                const errorData = await smsResponse.json();
+                console.warn('Arkesel SMS API Warning:', errorData);
+            } else {
+                 console.log('Successfully sent SMS notification via Arkesel.');
+            }
+        } catch (smsError) {
+            console.error('Failed to send SMS notification:', smsError);
+        }
+    } else {
+        console.log('--- (Skipping SMS: Arkesel API key not configured or is placeholder) ---');
+        const smsPayload = {
+          to: `+233${validatedFields.data.phone_masked.slice(1)}`, // Example for Ghana number format
+          message: `Your DiscreetKit order #${code} is confirmed. We're preparing it for discreet delivery. You can track its status here: ${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${code}. Thank you for trusting us with your health.`
+        };
+        console.log('--- Placeholder SMS Payload ---', smsPayload);
+    }
 
 
     // 4. Initialize Paystack Transaction
@@ -246,3 +283,5 @@ export async function handleChat(
     return "I'm sorry, I'm having trouble connecting right now. Please try again later.";
   }
 }
+
+    
