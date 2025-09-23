@@ -13,8 +13,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
-// a shimmer effect for image placeholders to improve loading perception.
+const toBase64 = (str: string) =>
+  typeof window === 'undefined'
+    ? Buffer.from(str).toString('base64')
+    : window.btoa(str);
+
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <defs>
@@ -29,108 +34,120 @@ const shimmer = (w: number, h: number) => `
   <animate xlink:href="#r" attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite"  />
 </svg>`;
 
-// converts the shimmer svg to a base64 string for the placeholder.
-const toBase64 = (str: string) =>
-  typeof window === 'undefined'
-    ? Buffer.from(str).toString('base64')
-    : window.btoa(str);
-
-
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-12 md:py-24">
+    <section id="how-it-works" className="py-12 md:py-24 bg-muted/50">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="text-center mb-12">
-          <h2 className="mt-2 font-headline text-2xl font-bold text-foreground md:text-3xl">
+        <div className="text-center mb-16">
+          <h2 className="mt-2 font-headline text-3xl font-bold text-foreground md:text-4xl">
             A Responsible Path to Your Health Answers
           </h2>
-          <p className="mt-4 max-w-2xl mx-auto text-base text-muted-foreground">
+          <p className="mt-4 max-w-2xl mx-auto text-base text-muted-foreground md:text-lg">
             Get your results in 4 simple, private, and secure steps.
           </p>
         </div>
 
-        {/* mobile: vertical timeline */}
-        <div className="md:hidden relative">
-            <div className="absolute left-[1.1rem] top-2 h-full w-px bg-border" aria-hidden="true"></div>
-            <div className="space-y-12">
-                {steps.map((step) => (
-                <div key={step.number} className="relative flex items-start gap-4">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-md bg-muted font-semibold text-muted-foreground z-10 flex-shrink-0">
-                        {step.number}
-                    </div>
-                    <div className="flex-1 space-y-3 pt-1">
-                        <h3 className="text-lg font-bold text-foreground">{step.title}</h3>
-                        <p className="text-base text-muted-foreground">{step.description}</p>
-                        <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden">
-                            <Image
-                                src={step.imageUrl}
-                                alt={step.title}
-                                fill
-                                sizes="100vw"
-                                className="object-cover"
-                                data-ai-hint={step.imageHint}
-                                placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 600))}`}
-                            />
-                        </div>
-                        {step.number === 4 && (
-                            <Button asChild variant="default">
-                                <Link href="/partner-care">
-                                    Meet Our Support Partner
-                                    <ArrowRight />
-                                </Link>
-                            </Button>
-                        )}
-                    </div>
-                </div>
-                ))}
-            </div>
-        </div>
-        
-        {/* desktop: alternating grid */}
-        <div className="hidden md:grid md:grid-cols-1 gap-16 max-w-5xl mx-auto">
-            {steps.map((step, index) => (
-                 <div
-                    key={step.number}
-                 >
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                        <div className={cn("relative aspect-[4/3] w-full rounded-2xl overflow-hidden", index % 2 === 1 && "md:order-last")}>
-                            <Image
-                                src={step.imageUrl}
-                                alt={step.title}
-                                fill
-                                sizes="50vw"
-                                className="object-cover"
-                                data-ai-hint={step.imageHint}
-                                placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 600))}`}
-                            />
-                        </div>
+        {/* Combined Layout for Mobile and Desktop */}
+        <div className="space-y-16 md:space-y-24 max-w-5xl mx-auto">
+          {steps.map((step, index) => (
+            <motion.div
+              key={step.number}
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center"
+            >
+              {/* Image Column */}
+              <div
+                className={cn(
+                  'relative aspect-[4/3] w-full rounded-2xl overflow-hidden group',
+                  index % 2 === 1 && 'md:order-last'
+                )}
+              >
+                <Image
+                  src={step.imageUrl}
+                  alt={step.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  data-ai-hint={step.imageHint}
+                  placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 600))}`}
+                />
+              </div>
 
-                         <div className={cn("p-8 flex flex-col justify-center", index % 2 === 1 && "md:order-first")}>
-                            <div className="flex items-center gap-4 mb-4">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-muted font-bold text-muted-foreground z-10 flex-shrink-0">
-                                {step.number}
-                            </div>
-                            <h3 className="text-xl md:text-2xl font-bold">
-                                {step.title}
-                            </h3>
-                            </div>
-                            <p className="text-base text-muted-foreground mb-6">{step.description}</p>
-                            {step.number === 4 && (
-                                <div className="mt-8">
-                                    <Button asChild variant="default" size="lg">
-                                        <Link href="/partner-care">
-                                            Meet Our Support Partner
-                                            <ArrowRight />
-                                        </Link>
-                                    </Button>
-                                </div>
-                            )}
-                        </div>
-                    </div>
+              {/* Text Content Column */}
+              <div
+                className={cn(
+                  'flex flex-col justify-center',
+                  index % 2 === 1 && 'md:order-first'
+                )}
+              >
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center justify-center font-headline text-5xl font-bold text-primary/20">
+                    0{step.number}
+                  </div>
+                  <h3 className="text-2xl md:text-3xl font-bold text-foreground">
+                    {step.title}
+                  </h3>
                 </div>
-            ))}
+                <p className="mt-4 text-base text-muted-foreground md:text-lg">
+                  {step.description}
+                </p>
+                 {step.details && (
+                    <ul className="mt-4 space-y-2 text-muted-foreground">
+                        {step.details.map((detail, i) => (
+                            <li key={i} className="flex items-start gap-2">
+                                <CheckCircle className="h-5 w-5 text-success mt-0.5 flex-shrink-0" />
+                                <span>{detail}</span>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+                {step.number === 4 && (
+                  <div className="mt-8">
+                    <Button asChild variant="secondary" size="lg">
+                      <Link href="/partner-care">
+                        Meet Our Support Partner
+                        <ArrowRight />
+                      </Link>
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          ))}
         </div>
+
+        <div className="text-center mt-20">
+            <Button asChild size="lg">
+                <Link href="/products">
+                    Get Started Now
+                    <ArrowRight />
+                </Link>
+            </Button>
+        </div>
+
       </div>
     </section>
   );
 }
+
+// Add CheckCircle icon to the component file scope
+const CheckCircle = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={cn("h-5 w-5", className)}
+  >
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+    <polyline points="22 4 12 14.01 9 11.01" />
+  </svg>
+);

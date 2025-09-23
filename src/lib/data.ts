@@ -38,6 +38,7 @@ export type Step = {
     number: number;
     title: string;
     description: string;
+    details?: string[];
     imageUrl: string;
     imageHint: string;
 };
@@ -112,7 +113,8 @@ export const steps: Step[] = [
   {
     number: 1,
     title: 'Place Your Order',
-    description: 'Choose the health products that meet your needs. We offer standard and student pricing, with discounts applied automatically for campus deliveries.',
+    description: 'Choose the health products you need with our simple, account-free checkout. We offer student and standard pricing, with free delivery for campus orders.',
+    details: ['Select products from our shop', 'No account or name needed', 'Pay securely with Mobile Money or Card'],
     imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757952399/medium-shot-woman-laying-couch_ojrtnp.jpg',
     imageHint: 'woman couch relaxing',
   },
@@ -120,20 +122,23 @@ export const steps: Step[] = [
     number: 2,
     title: 'Private & Fast Delivery',
     description: 'Your order is packaged in plain, unbranded materials and delivered by a professional rider. We only use your number to coordinate the drop-off.',
+    details: ['Completely plain, unbranded packaging', '24-48 hour delivery in Accra', 'Track your order with an anonymous code'],
     imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757953240/close-up-delivery-person-giving-parcel-client_al5mjd.jpg',
     imageHint: 'discreet package delivery',
   },
   {
     number: 3,
     title: 'Get Your Results',
-    description: 'For test kits, each kit comes with a simple, visual instruction manual. You can get a clear result in the comfort of your own space in under 20 minutes.',
+    description: 'Each kit comes with a simple, visual instruction manual. Get a clear result in the comfort of your own space in under 20 minutes.',
+    details: ['Easy-to-follow visual instructions', 'Results in under 20 minutes', 'WHO-approved for over 99% accuracy'],
     imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757952387/man-being-happy-after-getting-negative-covid-test-result_udxny5.jpg',
     imageHint: 'man happy result',
   },
   {
     number: 4,
     title: 'Get Support (If Needed)',
-    description: 'A self-test is a first step, not a final diagnosis. If you get a positive result, we provide a confidential bridge to our trusted hospital partners for professional, discounted follow-up care.',
+    description: 'A self-test is a first step, not a final diagnosis. If you need it, we provide a confidential bridge to our trusted partners for professional follow-up care.',
+    details: ['Confidential connections to care', 'Trusted partner hospitals & counselors', 'Support for confirmatory testing & advice'],
     imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757955894/counselling_old_lady_modern_xbthvs.jpg',
     imageHint: 'professional counseling support',
   },

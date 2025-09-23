@@ -111,7 +111,7 @@ export default async function Home() {
         <ProductBenefits />
       </SectionWrapper>
 
-      <SectionWrapper className="bg-background">
+      <SectionWrapper className="bg-muted/50">
         <HowItWorks />
       </SectionWrapper>
 
