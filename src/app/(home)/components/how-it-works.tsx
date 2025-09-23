@@ -118,16 +118,6 @@ export function HowItWorks() {
             </motion.div>
           ))}
         </div>
-
-        <div className="text-center mt-20">
-            <Button asChild size="lg">
-                <Link href="/products">
-                    Get Started Now
-                    <ArrowRight />
-                </Link>
-            </Button>
-        </div>
-
       </div>
     </section>
   );
