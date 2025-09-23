@@ -112,7 +112,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
             : validatedFields.data.phone_masked;
 
         const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${code}`;
-        const smsMessage = `Your DiscreetKit order #${code} is confirmed. We're preparing it for discreet delivery. You can track its status here: ${trackingUrl}. Thank you for trusting us with your health.`;
+        const smsMessage = `Your DiscreetKit order ${code} is confirmed and is being prepared for its discreet journey to you. Your privacy is our priority. Track its status here: ${trackingUrl}. Remember, we're here for what comes next.`;
 
         try {
             const smsResponse = await fetch('https://sms.arkesel.com/api/v2/sms/send', {
@@ -143,7 +143,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
         console.log('--- (Skipping SMS: Arkesel API key not configured or is placeholder) ---');
         const smsPayload = {
           to: `+233${validatedFields.data.phone_masked.slice(1)}`, // Example for Ghana number format
-          message: `Your DiscreetKit order #${code} is confirmed. We're preparing it for discreet delivery. You can track its status here: ${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${code}. Thank you for trusting us with your health.`
+          message: `Your DiscreetKit order ${code} is confirmed and is being prepared for its discreet journey to you. Your privacy is our priority. Track its status here: ${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${code}. Remember, we're here for what comes next.`
         };
         console.log('--- Placeholder SMS Payload ---', smsPayload);
     }
