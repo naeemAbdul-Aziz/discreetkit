@@ -141,9 +141,10 @@ export async function createOrderAction(prevState: any, formData: FormData) {
         }
     } else {
         console.log('--- (Skipping SMS: Arkesel API key not configured or is placeholder) ---');
+        const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${code}`;
         const smsPayload = {
           to: `+233${validatedFields.data.phone_masked.slice(1)}`, // Example for Ghana number format
-          message: `Your DiscreetKit order ${code} has been confirmed. We're now preparing it for its discreet journey to you. Track its progress here: ${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${code}. Should you need any support, remember we're here to help.`
+          message: `Your DiscreetKit order ${code} has been confirmed. We're now preparing it for its discreet journey to you. Track its progress here: ${trackingUrl}. Should you need any support, remember we're here to help.`
         };
         console.log('--- Placeholder SMS Payload ---', smsPayload);
     }
