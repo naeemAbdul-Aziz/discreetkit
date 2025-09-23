@@ -123,7 +123,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
                     'Accept': 'application/json'
                 },
                 body: JSON.stringify({
-                    sender: 'DSKIT',
+                    sender: 'DiscreetKit',
                     message: smsMessage,
                     recipients: [recipient],
                     sandbox: false
