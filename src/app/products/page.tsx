@@ -1,4 +1,3 @@
-
 import { getSupabaseClient } from '@/lib/supabase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -77,7 +76,7 @@ export default async function ProductsPage() {
         <div className="mx-auto max-w-7xl">
             <div className="text-center mb-12">
                 <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-                    All Health Essentials
+                    Our Health Products
                 </h1>
                 <p className="mt-4 max-w-2xl mx-auto text-base text-muted-foreground">
                     Your complete source for confidential health and wellness products.

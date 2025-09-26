@@ -46,7 +46,7 @@ export function Hero() {
                     Stay Supported Fully.
                 </h1>
                 <p className="mt-4 max-w-md mx-auto md:mx-0 text-base text-muted-foreground">
-                    Get confidential health essentials delivered to your door. We're here for what's next.
+                    Get confidential self-test kits and health products delivered to your door. We're here for what's next.
                 </p>
                 
                 <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
