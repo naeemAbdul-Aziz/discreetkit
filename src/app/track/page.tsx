@@ -181,8 +181,7 @@ function Tracker() {
       </Card>
 
       {error && (
-        <Alert variant="destructive" className="mt-4">
-          <AlertCircle className="h-4 w-4" />
+        <Alert variant="warning" className="mt-4">
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
