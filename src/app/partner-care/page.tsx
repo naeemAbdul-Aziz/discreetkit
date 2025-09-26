@@ -14,13 +14,6 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
 import { useState, useEffect, useCallback } from 'react';
 import type { EmblaCarouselType } from 'embla-carousel';
 import { cn } from '@/lib/utils';
-import type { Metadata } from 'next';
-
-export const metadata: Metadata = {
-    title: 'Our Care Partner: Marie Stopes Ghana',
-    description: 'Learn about our partnership with Marie Stopes Ghana for confidential, non-judgmental follow-up care, including confirmatory testing and professional counseling.',
-};
-
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
