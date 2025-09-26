@@ -47,10 +47,10 @@ export function ProductSelector({ products }: { products: Product[] }) {
                         Our Products
                     </p>
                     <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-                       Private Health Essentials
+                       Peace of Mind, Delivered Discreetly.
                     </h2>
                     <p className="mt-4 max-w-2xl mx-auto text-base text-muted-foreground">
-                        Private Health Essentials. Delivered with discretion, built on trust.
+                        Your confidential health essentials, delivered with trust and complete privacy.
                     </p>
                 </div>
                 
