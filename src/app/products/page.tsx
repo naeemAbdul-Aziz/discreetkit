@@ -6,6 +6,12 @@ import { ProductCard } from './(components)/product-card';
 import type { Product } from '@/lib/data';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Shop All Products',
+  description: 'Browse our full range of confidential health products, including HIV self-test kits, pregnancy tests, value bundles, and wellness essentials. Order online for discreet delivery.',
+};
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60; // Revalidate data every 60 seconds

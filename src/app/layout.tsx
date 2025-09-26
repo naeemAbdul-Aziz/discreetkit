@@ -19,28 +19,45 @@ const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758119851/d
 // metadata for seo and social sharing.
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: 'DiscreetKit Ghana - Confidential Health Products',
-  description: 'Order confidential health products like self-test kits, emergency contraception, and more in Ghana. Anonymous, private, and discreet delivery for students and young professionals.',
-  keywords: ['self-test kit', 'HIV test Ghana', 'pregnancy test Ghana', 'postpill', 'confidential testing', 'anonymous testing', 'private health test', 'discreet delivery', 'DiscreetKit'],
+  title: {
+    default: 'DiscreetKit Ghana: Confidential Health Products Delivered',
+    template: '%s | DiscreetKit Ghana',
+  },
+  description: 'Order confidential self-test kits for HIV, pregnancy, and more. Get Postpill and wellness products delivered discreetly to your door in Ghana. 100% private, anonymous, and secure.',
+  keywords: [
+      'DiscreetKit', 
+      'self-test kit Ghana', 
+      'at-home HIV test', 
+      'private pregnancy test', 
+      'emergency contraception Ghana', 
+      'Postpill delivery', 
+      'confidential health products', 
+      'anonymous testing Accra', 
+      'student health services', 
+      'UG Legon delivery', 
+      'UPSA health',
+      'discreet delivery',
+      'sexual health Ghana'
+  ],
   openGraph: {
     type: 'website',
     url: siteUrl,
-    title: 'DiscreetKit Ghana - Confidential Health Products',
-    description: 'Anonymous, private, and discreet delivery of health essentials in Ghana.',
+    title: 'DiscreetKit Ghana: Confidential Health Products Delivered',
+    description: '100% private, anonymous, and secure delivery of self-test kits and wellness products in Ghana.',
     images: [
       {
         url: logoUrl,
         width: 1200,
         height: 630,
-        alt: 'DiscreetKit Ghana Logo',
+        alt: 'DiscreetKit Ghana Logo over a discreet package',
       },
     ],
     siteName: 'DiscreetKit Ghana',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'DiscreetKit Ghana - Confidential Health Products',
-    description: 'Anonymous, private, and discreet delivery of health essentials in Ghana.',
+    title: 'DiscreetKit Ghana: Confidential Health Products Delivered',
+    description: '100% private, anonymous, and secure delivery of self-test kits and wellness products in Ghana.',
     images: [logoUrl],
   },
   icons: {
