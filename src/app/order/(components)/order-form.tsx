@@ -182,7 +182,6 @@ export function OrderForm() {
                         </p>
                         {state.errors?.email?.[0] && (
                             <Alert variant="warning" className="mt-2">
-                            <AlertTriangle className="h-4 w-4" />
                             <AlertDescription>
                                 {state.errors.email[0]}
                             </AlertDescription>
@@ -205,7 +204,6 @@ export function OrderForm() {
                         <p className="text-[0.8rem] text-muted-foreground">Select a campus for FREE delivery.</p>
                         {state.errors?.deliveryArea?.[0] && (
                             <Alert variant="warning" className="mt-2">
-                            <AlertTriangle className="h-4 w-4" />
                             <AlertDescription>
                                 {state.errors.deliveryArea[0]}
                             </AlertDescription>
@@ -224,7 +222,6 @@ export function OrderForm() {
                                 />
                                 {state.errors?.otherDeliveryArea?.[0] && (
                                 <Alert variant="warning" className="mt-2">
-                                    <AlertTriangle className="h-4 w-4" />
                                     <AlertDescription>
                                     {state.errors.otherDeliveryArea[0]}
                                     </AlertDescription>
@@ -261,7 +258,6 @@ export function OrderForm() {
                         </p>
                         {state.errors?.phone_masked?.[0] && (
                             <Alert variant="warning" className="mt-2">
-                            <AlertTriangle className="h-4 w-4" />
                             <AlertDescription>
                                 {state.errors.phone_masked[0]}
                             </AlertDescription>
