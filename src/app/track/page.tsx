@@ -31,15 +31,6 @@ import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 import { getSupabaseClient } from '@/lib/supabase';
 import Image from 'next/image';
-import type { Metadata } from 'next';
-
-// Note: This metadata is defined in a client component, but Next.js will
-// handle it correctly during server-rendering.
-export const metadata: Metadata = {
-  title: 'Track Your Order',
-  description: 'Enter your unique tracking code to see the real-time status of your DiscreetKit delivery. See updates from processing to delivery.',
-};
-
 
 export const dynamic = 'force-dynamic';
 
@@ -182,6 +173,7 @@ function Tracker() {
 
       {error && (
         <Alert variant="warning" className="mt-4">
+          <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
