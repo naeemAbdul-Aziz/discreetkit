@@ -15,27 +15,10 @@ import { Button } from './ui/button';
 import { ArrowRight, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
-const animatedTexts = [
-  "Need answers?",
-  "Private Testing.",
-  "Discreet Delivery.",
-  "Your Health, Your Terms.",
-];
-
 export function QuickShopBanner() {
   const pathname = usePathname();
-  const [textIndex, setTextIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
-
-  // effect to cycle through the animated texts.
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTextIndex((prevIndex) => (prevIndex + 1) % animatedTexts.length);
-    }, 3000); // change text every 3 seconds
-
-    return () => clearInterval(interval);
-  }, []);
 
   // effect to show the banner after a delay, but only once per session.
   useEffect(() => {
@@ -91,20 +74,9 @@ export function QuickShopBanner() {
                 />
               </div>
               <div className="flex-grow">
-                <div className="h-6">
-                  <AnimatePresence mode="wait">
-                    <motion.p
-                      key={textIndex}
-                      initial={{ y: 10, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      exit={{ y: -10, opacity: 0 }}
-                      transition={{ duration: 0.5 }}
-                      className="text-base font-semibold text-foreground"
-                    >
-                      {animatedTexts[textIndex]}
-                    </motion.p>
-                  </AnimatePresence>
-                </div>
+                <p className="text-base font-semibold text-foreground">
+                    Safe. Discreet. Sorted.
+                </p>
                 <Button asChild size="sm" className="mt-2">
                   <Link href="/products">
                     Shop Now <ArrowRight />
