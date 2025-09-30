@@ -12,6 +12,7 @@ import { Footer } from '@/components/footer';
 import { Toaster } from "@/components/ui/toaster";
 import { Chatbot } from '@/components/chatbot';
 import NextTopLoader from 'nextjs-toploader';
+import { StickyShopLink } from '@/components/sticky-shop-link';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://discreetkit.com';
 const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758119851/discreetkit_logo_4_npbt4m.png';
@@ -104,6 +105,7 @@ export default function RootLayout({
           <main className="flex-1">{children}</main>
           <Footer />
           <Chatbot />
+          <StickyShopLink />
         </div>
         {/* toaster for displaying notifications. */}
         <Toaster />
