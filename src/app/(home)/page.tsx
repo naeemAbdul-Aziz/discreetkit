@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { getSupabaseClient } from '@/lib/supabase';
 import type { Product } from '@/lib/data';
+import { ProductFeature } from './components/product-feature';
 
 // fetches all products from the supabase database.
 async function getProducts(): Promise<Product[]> {
@@ -97,6 +98,9 @@ const SectionWrapper: React.FC<{ children: React.ReactNode; className?: string }
 export default async function Home() {
   // fetch product data on the server.
   const products = await getProducts();
+  const hivTestKit = products.find(p => p.id === 1); // Standard HIV Kit
+  const pregnancyTest = products.find(p => p.id === 2); // Pregnancy Test Kit
+
   return (
     <div className="flex flex-col">
       <SectionWrapper className="bg-background">
@@ -106,6 +110,18 @@ export default async function Home() {
       <SectionWrapper className="bg-background">
         <ProductSelector products={products} />
       </SectionWrapper>
+      
+      {hivTestKit && (
+          <SectionWrapper className="bg-muted/30">
+              <ProductFeature product={hivTestKit} />
+          </SectionWrapper>
+      )}
+
+      {pregnancyTest && (
+           <SectionWrapper className="bg-background">
+              <ProductFeature product={pregnancyTest} reverse={true} />
+          </SectionWrapper>
+      )}
 
       <SectionWrapper className="bg-primary">
         <ProductBenefits />
