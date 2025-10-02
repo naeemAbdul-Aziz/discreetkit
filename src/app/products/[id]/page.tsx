@@ -48,7 +48,7 @@ async function getRelatedProducts(currentProductId: number): Promise<Product[]> 
             imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759404957/discreetkit_pregnancy_cujiod.png';
         }
         if (p.id === 3) { // Couple Bundle
-            imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407003/couple_cxwfer.png';
+            imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413735/couple_bundle_rfbpn0.png';
         }
         if (p.id === 4) { // Postpill
             imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png';
@@ -85,7 +85,7 @@ export default async function ProductDetailPageWrapper({ params }: { params: { i
     product.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759404957/discreetkit_pregnancy_cujiod.png';
   }
   if (product.id === 3) { // Couple Bundle
-      product.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407003/couple_cxwfer.png';
+      product.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413735/couple_bundle_rfbpn0.png';
   }
   if (product.id === 4) { // Postpill
     product.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png';

@@ -103,7 +103,7 @@ export default async function Home() {
   }
   const coupleBundle = products.find(p => p.id === 3);
   if (coupleBundle) {
-      coupleBundle.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407003/couple_cxwfer.png';
+      coupleBundle.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413735/couple_bundle_rfbpn0.png';
   }
   const hivTest = products.find(p => p.id === 1);
   if (hivTest) {

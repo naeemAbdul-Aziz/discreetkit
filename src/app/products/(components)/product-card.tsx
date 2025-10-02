@@ -43,9 +43,9 @@ export function ProductCard({ product, showAddToCart = true }: { product: Produc
     const isInCart = quantity > 0;
 
     return (
-        <Card className="h-full flex flex-col rounded-2xl overflow-hidden group bg-card">
-             <Link href={`/products/${product.id}`} className="block">
-                <div className="relative aspect-[4/3] w-full bg-muted/50">
+        <Card className="h-full flex flex-col rounded-2xl overflow-hidden group bg-card transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+            <Link href={`/products/${product.id}`} className="block" passHref>
+                <div className="relative aspect-[4/3] w-full bg-muted/50 overflow-hidden">
                     {product.image_url && (
                         <Image
                             src={product.image_url}
@@ -62,17 +62,15 @@ export function ProductCard({ product, showAddToCart = true }: { product: Produc
                             Save GHS {product.savings_ghs.toFixed(2)}
                         </Badge>
                     )}
-                     {!showAddToCart && (
-                        <div className="absolute top-4 right-4 h-10 w-10 bg-background/50 backdrop-blur-sm rounded-full flex items-center justify-center text-foreground">
-                            <ArrowUpRight className="h-5 w-5" />
-                        </div>
-                    )}
+                    <div className="absolute top-4 right-4 h-10 w-10 bg-background/50 backdrop-blur-sm rounded-full flex items-center justify-center text-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <ArrowUpRight className="h-5 w-5" />
+                    </div>
                 </div>
             </Link>
 
             <CardContent className="flex flex-grow flex-col justify-between p-6 text-left">
                 <div className="flex-grow">
-                    <Link href={`/products/${product.id}`} className="block">
+                     <Link href={`/products/${product.id}`} className="block" passHref>
                         <h3 className="text-lg font-bold text-foreground leading-tight hover:text-primary transition-colors">{product.name}</h3>
                     </Link>
                     {product.description && <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{product.description}</p>}
@@ -80,13 +78,15 @@ export function ProductCard({ product, showAddToCart = true }: { product: Produc
                 
                 <div className="mt-6 flex items-center justify-between">
                     <div className="text-left">
-                        <p className="font-bold text-lg text-foreground">
-                            GHS {product.price_ghs.toFixed(2)}
-                        </p>
+                         <Link href={`/products/${product.id}`} className="block" passHref>
+                            <p className="font-bold text-lg text-foreground">
+                                GHS {product.price_ghs.toFixed(2)}
+                            </p>
+                        </Link>
                     </div>
                     
                     <div className="w-auto text-right">
-                       {showAddToCart ? (
+                       {showAddToCart && (
                            <>
                                 {!isMounted ? (
                                     <Button disabled className="w-[120px]">
@@ -94,24 +94,20 @@ export function ProductCard({ product, showAddToCart = true }: { product: Produc
                                     </Button>
                                 ) : isInCart ? (
                                     <div className="flex h-10 items-center justify-between rounded-full border bg-background p-1 shadow-sm w-[120px]">
-                                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-primary" onClick={() => updateQuantity(product.id, quantity - 1)}>
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-primary" onClick={(e) => {e.stopPropagation(); updateQuantity(product.id, quantity - 1)}}>
                                             {quantity === 1 ? <Trash2 className="h-4 w-4" /> : <Minus className="h-4 w-4" />}
                                         </Button>
                                         <span className="w-8 text-center font-bold text-foreground">{quantity}</span>
-                                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-primary" onClick={() => updateQuantity(product.id, quantity + 1)}>
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-primary" onClick={(e) => {e.stopPropagation(); updateQuantity(product.id, quantity + 1)}}>
                                             <Plus className="h-4 w-4" />
                                         </Button>
                                     </div>
                                 ) : (
-                                    <Button onClick={() => addItem(product)} className="w-[120px]">
+                                    <Button onClick={(e) => {e.stopPropagation(); addItem(product)}} className="w-[120px]">
                                         Add to cart
                                     </Button>
                                 )}
                            </>
-                       ) : (
-                           // On homepage cards, this space is now intentionally left blank 
-                           // to keep the layout consistent, with the icon serving as the CTA.
-                           <div className="h-10 w-[120px]" />
                        )}
                     </div>
                 </div>
