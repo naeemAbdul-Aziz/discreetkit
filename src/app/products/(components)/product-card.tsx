@@ -39,11 +39,13 @@ export function ProductCard({ product, showAddToCart = true }: { product: Produc
         setIsMounted(true);
     }, []);
 
+    if (!product) return null;
+
     const quantity = isMounted ? getItemQuantity(product.id) : 0;
     const isInCart = quantity > 0;
 
     return (
-        <Card className="h-full flex flex-col rounded-2xl overflow-hidden group bg-card transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+        <Card className="h-full flex flex-col rounded-2xl overflow-hidden group bg-card">
             <Link href={`/products/${product.id}`} className="block" passHref>
                 <div className="relative aspect-[4/3] w-full bg-muted/50 overflow-hidden">
                     {product.image_url && (
@@ -51,7 +53,7 @@ export function ProductCard({ product, showAddToCart = true }: { product: Produc
                             src={product.image_url}
                             alt={product.name}
                             fill
-                            className="object-cover transition-transform duration-300 group-hover:scale-105"
+                            className="object-cover"
                             sizes="(max-width: 768px) 80vw, 30vw"
                             data-ai-hint="medical test kit"
                             placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(250, 188))}`}
