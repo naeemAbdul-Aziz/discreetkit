@@ -28,7 +28,7 @@ export function AddToCartManager({ product }: { product: Product }) {
 
     if (isInCart) {
         return (
-            <div className="flex h-11 items-center justify-between rounded-full border bg-background p-1 shadow-sm w-full">
+            <div className="flex h-11 items-center justify-between rounded-full border bg-background p-1 shadow-sm w-full max-w-[150px] mx-auto">
                 <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-primary" onClick={() => updateQuantity(product.id, quantity - 1)}>
                     {quantity === 1 ? <Trash2 className="h-5 w-5" /> : <Minus className="h-5 w-5" />}
                 </Button>

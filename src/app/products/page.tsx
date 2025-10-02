@@ -1,9 +1,8 @@
 
 import { getSupabaseClient } from '@/lib/supabase';
-import { ProductCard } from './(components)/product-card';
 import type { Product } from '@/lib/data';
 import type { Metadata } from 'next';
-import { ProductFeature } from '../(home)/components/product-feature';
+import { ProductLineShowcase } from './(components)/product-line-showcase';
 
 export const metadata: Metadata = {
   title: 'Shop All Products',
@@ -36,34 +35,17 @@ export default async function ProductsPage() {
     const products = await getProducts();
     
     // Override images with new mockups
+    products.forEach(p => {
+        if (p.id === 1) p.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png';
+        if (p.id === 2) p.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759404957/discreetkit_pregnancy_cujiod.png';
+        if (p.id === 3) p.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413735/couple_bundle_rfbpn0.png';
+        if (p.id === 4) p.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png';
+        if (p.id === 6) p.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413266/lube_ysdpst.png';
+        if (p.id === 8) p.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png';
+    });
+    
+    const testKits = products.filter(p => p.id === 1 || p.id === 2);
     const allInOneBundle = products.find(p => p.id === 8);
-    if (allInOneBundle) {
-        allInOneBundle.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png';
-    }
-    const coupleBundle = products.find(p => p.id === 3);
-    if (coupleBundle) {
-        coupleBundle.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413735/couple_bundle_rfbpn0.png';
-    }
-    const hivTest = products.find(p => p.id === 1);
-    if (hivTest) {
-      hivTest.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png';
-    }
-    const pregnancyTest = products.find(p => p.id === 2);
-    if (pregnancyTest) {
-      pregnancyTest.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759404957/discreetkit_pregnancy_cujiod.png';
-    }
-    const postpill = products.find(p => p.id === 4);
-    if (postpill) {
-      postpill.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png';
-    }
-    const lubricant = products.find(p => p.id === 6);
-    if (lubricant) {
-        lubricant.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413266/lube_ysdpst.png';
-    }
-
-    const testKits = products.filter(p => p.name.includes('HIV') || p.name.includes('Pregnancy'));
-    const bundles = products.filter(p => p.name.includes('Bundle') || p.name.includes('All-In-One'));
-    const wellness = products.filter(p => !testKits.includes(p) && !bundles.includes(p));
 
   return (
     <div className="bg-background">
@@ -77,38 +59,18 @@ export default async function ProductsPage() {
                     Your complete source for confidential health and wellness products.
                 </p>
             </div>
-
-            {allInOneBundle && <ProductFeature product={allInOneBundle} />}
-
-            {/* Test Kits Section */}
-            <div id="test-kits" className="mb-16 scroll-mt-24">
-                <h2 className="font-headline text-2xl font-bold text-foreground mb-6">Test Kits</h2>
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-                    {testKits.map((product) => (
-                        <ProductCard key={product.id} product={product} />
-                    ))}
-                </div>
-            </div>
-
-            {/* Bundles Section */}
-            <div id="bundles" className="mb-16 scroll-mt-24">
-                 <h2 className="font-headline text-2xl font-bold text-foreground mb-6">Value Bundles</h2>
-                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-                    {bundles.filter(p => p.id !== allInOneBundle?.id).map((product) => (
-                        <ProductCard key={product.id} product={product} />
-                    ))}
-                </div>
-            </div>
             
-            {/* Wellness Essentials Section */}
-             <div id="wellness" className="scroll-mt-24">
-                 <h2 className="font-headline text-2xl font-bold text-foreground mb-6">Wellness Essentials</h2>
-                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-                    {wellness.map((product) => (
-                        <ProductCard key={product.id} product={product} />
-                    ))}
-                </div>
-            </div>
+            {allInOneBundle && (
+                 <ProductLineShowcase 
+                    line={{
+                        title: 'Private Test Kits',
+                        headline: 'Get Your Answers, Confidentially.',
+                        description: 'WHO-approved, 99% accurate self-test kits for private use. Get your results in under 20 minutes from the comfort of home.',
+                        showcaseImageUrl: allInOneBundle.image_url || '',
+                    }}
+                    products={testKits} 
+                />
+            )}
 
         </div>
       </div>
