@@ -6,31 +6,55 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, HeartPulse, Package, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const categories = [
     {
         name: 'Test Kits',
         description: 'Private, WHO-approved self-test kits for HIV and pregnancy.',
-        icon: HeartPulse,
+        image_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png',
+        image_hint: 'HIV test kit',
         href: '/products#test-kits'
     },
     {
         name: 'Value Bundles',
         description: 'Save money with our curated bundles for complete peace of mind.',
-        icon: Package,
+        image_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png',
+        image_hint: 'health product bundle',
         href: '/products#bundles'
     },
     {
         name: 'Wellness Essentials',
-        description: 'Complete your health toolkit with contraception and personal care items.',
-        icon: Sparkles,
+        description: 'Contraception and personal care to complete your health toolkit.',
+        image_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png',
+        image_hint: 'emergency contraception pill',
         href: '/products#wellness'
     },
 ]
+
+const shimmer = (w: number, h: number) => `
+<svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <linearGradient id="g">
+      <stop stop-color="#f0f0f0" offset="20%" />
+      <stop stop-color="#e0e0e0" offset="50%" />
+      <stop stop-color="#f0f0f0" offset="70%" />
+    </linearGradient>
+  </defs>
+  <rect width="${w}" height="${h}" fill="#f0f0f0" />
+  <rect id="r" width="${w}" height="${h}" fill="url(#g)" />
+  <animate xlink:href="#r" attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite"  />
+</svg>`;
+
+const toBase64 = (str: string) =>
+  typeof window === 'undefined'
+    ? Buffer.from(str).toString('base64')
+    : window.btoa(str);
+
 
 export function ProductSelector() {
     return (
@@ -48,7 +72,7 @@ export function ProductSelector() {
                     </p>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
                     {categories.map((category, index) => (
                         <motion.div
                             key={category.name}
@@ -56,14 +80,27 @@ export function ProductSelector() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.5, delay: index * 0.1 }}
+                            className="h-full"
                         >
                             <Link href={category.href} className="h-full block group">
-                                <Card className="h-full flex flex-col items-center justify-center p-8 text-center rounded-2xl bg-card hover:bg-muted transition-colors">
-                                    <category.icon className="h-10 w-10 text-primary mb-4" />
-                                    <h3 className="text-xl font-bold text-foreground">{category.name}</h3>
-                                    <p className="mt-2 text-base text-muted-foreground flex-grow">{category.description}</p>
-                                    <div className="mt-6 text-sm font-semibold text-primary flex items-center gap-2 group-hover:underline">
-                                        Shop Now <ArrowRight className="h-4 w-4" />
+                                <Card className="h-full flex flex-col rounded-2xl bg-card overflow-hidden">
+                                     <div className="relative aspect-[4/3] w-full bg-muted/50">
+                                        <Image
+                                            src={category.image_url}
+                                            alt={category.name}
+                                            fill
+                                            className="object-contain p-4"
+                                            sizes="(max-width: 768px) 100vw, 33vw"
+                                            data-ai-hint={category.image_hint}
+                                            placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
+                                        />
+                                    </div>
+                                    <div className="p-6 flex flex-col flex-grow">
+                                        <h3 className="text-xl font-bold text-foreground">{category.name}</h3>
+                                        <p className="mt-2 text-base text-muted-foreground flex-grow">{category.description}</p>
+                                        <div className="mt-6 text-sm font-semibold text-primary flex items-center gap-2 group-hover:underline">
+                                            Shop Now <ArrowRight className="h-4 w-4" />
+                                        </div>
                                     </div>
                                 </Card>
                             </Link>
