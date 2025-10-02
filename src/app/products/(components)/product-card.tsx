@@ -58,9 +58,14 @@ export function ProductCard({ product, showAddToCart = true }: { product: Produc
                         />
                     )}
                     {product.savings_ghs && product.savings_ghs > 0 && (
-                        <Badge variant="accent" className="absolute top-3 right-3 shadow-lg">
+                        <Badge variant="accent" className="absolute top-3 left-3 shadow-lg">
                             Save GHS {product.savings_ghs.toFixed(2)}
                         </Badge>
+                    )}
+                     {!showAddToCart && (
+                        <div className="absolute top-3 right-3 h-8 w-8 bg-background/50 backdrop-blur-sm rounded-full flex items-center justify-center text-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <ArrowRight className="h-5 w-5" />
+                        </div>
                     )}
                 </div>
             </Link>
@@ -104,12 +109,9 @@ export function ProductCard({ product, showAddToCart = true }: { product: Produc
                                 )}
                            </>
                        ) : (
-                           <Button asChild variant="outline">
-                               <Link href={`/products/${product.id}`}>
-                                   View Details
-                                   <ArrowRight />
-                               </Link>
-                           </Button>
+                           // On homepage cards, this space is now intentionally left blank 
+                           // to keep the layout consistent, with the icon serving as the CTA.
+                           <div className="h-10 w-[120px]" />
                        )}
                     </div>
                 </div>
