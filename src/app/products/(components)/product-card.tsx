@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Plus, Minus, Trash2 } from 'lucide-react';
 import { useCart } from '@/hooks/use-cart';
 import type { Product } from '@/lib/data';
@@ -42,30 +43,34 @@ export function ProductCard({ product }: { product: Product }) {
     const isInCart = quantity > 0;
 
     return (
-        <Card className="h-full flex flex-col rounded-2xl overflow-hidden">
-            <div className="relative aspect-[4/3] w-full bg-muted/50">
-                {product.image_url && (
-                    <Image
-                        src={product.image_url}
-                        alt={product.name}
-                        fill
-                        className="object-contain p-4"
-                        sizes="(max-width: 768px) 80vw, 30vw"
-                        data-ai-hint="medical test kit"
-                        placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(250, 188))}`}
-                    />
-                )}
-                 {product.savings_ghs && product.savings_ghs > 0 && (
-                    <Badge variant="accent" className="absolute top-3 right-3 shadow-lg">
-                        Save GHS {product.savings_ghs.toFixed(2)}
-                    </Badge>
-                )}
-            </div>
+        <Card className="h-full flex flex-col rounded-2xl overflow-hidden group">
+             <Link href={`/products/${product.id}`} className="block">
+                <div className="relative aspect-[4/3] w-full bg-muted/50">
+                    {product.image_url && (
+                        <Image
+                            src={product.image_url}
+                            alt={product.name}
+                            fill
+                            className="object-contain p-4 transition-transform duration-300 group-hover:scale-105"
+                            sizes="(max-width: 768px) 80vw, 30vw"
+                            data-ai-hint="medical test kit"
+                            placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(250, 188))}`}
+                        />
+                    )}
+                    {product.savings_ghs && product.savings_ghs > 0 && (
+                        <Badge variant="accent" className="absolute top-3 right-3 shadow-lg">
+                            Save GHS {product.savings_ghs.toFixed(2)}
+                        </Badge>
+                    )}
+                </div>
+            </Link>
 
             <CardContent className="flex flex-grow flex-col justify-between p-6 text-left">
                 <div className="flex-grow">
-                    <h3 className="text-lg font-bold text-foreground leading-tight">{product.name}</h3>
-                    {product.description && <p className="mt-2 text-sm text-muted-foreground">{product.description}</p>}
+                    <Link href={`/products/${product.id}`} className="block">
+                        <h3 className="text-lg font-bold text-foreground leading-tight hover:text-primary transition-colors">{product.name}</h3>
+                    </Link>
+                    {product.description && <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{product.description}</p>}
                 </div>
                 
                 <div className="mt-6 flex items-center justify-between">
