@@ -113,18 +113,6 @@ export default async function Home() {
         <ProductSelector products={products} />
       </SectionWrapper>
       
-      {hivTestKit && (
-          <SectionWrapper>
-              <ProductFeature product={hivTestKit} />
-          </SectionWrapper>
-      )}
-
-      {pregnancyTest && (
-           <SectionWrapper>
-              <ProductFeature product={pregnancyTest} reverse={true} />
-          </SectionWrapper>
-      )}
-
       {coupleBundle && (
           <SectionWrapper>
               <ProductFeature product={coupleBundle} />
@@ -134,6 +122,18 @@ export default async function Home() {
       {allInOneBundle && (
            <SectionWrapper>
               <ProductFeature product={allInOneBundle} reverse={true} />
+          </SectionWrapper>
+      )}
+
+      {hivTestKit && (
+          <SectionWrapper>
+              <ProductFeature product={hivTestKit} />
+          </SectionWrapper>
+      )}
+
+      {pregnancyTest && (
+           <SectionWrapper>
+              <ProductFeature product={pregnancyTest} reverse={true} />
           </SectionWrapper>
       )}
 
