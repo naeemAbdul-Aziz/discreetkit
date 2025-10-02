@@ -48,7 +48,7 @@ function FeaturedProduct({ product }: { product: Product }) {
                 {product.description}
               </p>
                <div className="mt-8">
-                  <ProductCard product={product} />
+                  <ProductCard product={product} showAddToCart={true} />
               </div>
             </div>
             <div className="relative h-64 min-h-[300px] w-full md:h-full bg-muted/50">
@@ -87,6 +87,14 @@ export default async function ProductsPage() {
     const wellness = products.filter(p => !testKits.includes(p) && !bundles.includes(p));
 
     const featuredBundle = products.find(p => p.id === 8); // Complete Peace of Mind Bundle
+    if (featuredBundle) {
+        featuredBundle.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png';
+    }
+    const coupleBundle = products.find(p => p.id === 3);
+    if (coupleBundle) {
+        coupleBundle.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407003/couple_cxwfer.png';
+    }
+
 
   return (
     <div className="bg-background">
@@ -108,7 +116,7 @@ export default async function ProductsPage() {
                 <h2 className="font-headline text-2xl font-bold text-foreground mb-6">Test Kits</h2>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
                     {testKits.map((product) => (
-                        <ProductCard key={product.id} product={product} />
+                        <ProductCard key={product.id} product={product} showAddToCart={true} />
                     ))}
                 </div>
             </div>
@@ -118,7 +126,7 @@ export default async function ProductsPage() {
                  <h2 className="font-headline text-2xl font-bold text-foreground mb-6">Value Bundles</h2>
                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
                     {bundles.filter(p => p.id !== featuredBundle?.id).map((product) => (
-                        <ProductCard key={product.id} product={product} />
+                        <ProductCard key={product.id} product={product} showAddToCart={true} />
                     ))}
                 </div>
             </div>
@@ -128,7 +136,7 @@ export default async function ProductsPage() {
                  <h2 className="font-headline text-2xl font-bold text-foreground mb-6">Wellness Essentials</h2>
                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
                     {wellness.map((product) => (
-                        <ProductCard key={product.id} product={product} />
+                        <ProductCard key={product.id} product={product} showAddToCart={true} />
                     ))}
                 </div>
             </div>
