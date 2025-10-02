@@ -94,32 +94,28 @@ const SectionWrapper: React.FC<{ children: React.ReactNode; className?: string }
 export default async function Home() {
   // fetch product data on the server.
   const products = await getProducts();
-  const coupleBundle = products.find(p => p.id === 3); // Support Bundle (Couple)
-  const allInOneBundle = products.find(p => p.id === 8); // The All-In-One
-  const pregnancyTest = products.find(p => p.id === 2);
-  const postpill = products.find(p => p.id === 4);
-  const hivTest = products.find(p => p.id === 1);
   
+  // Override images with new mockups
+  const allInOneBundle = products.find(p => p.id === 8);
   if (allInOneBundle) {
       allInOneBundle.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png';
   }
-
-  if (pregnancyTest) {
-    pregnancyTest.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759404957/discreetkit_pregnancy_cujiod.png';
-  }
-
-  if (postpill) {
-    postpill.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png';
-  }
-
-  if (hivTest) {
-    hivTest.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png';
-  }
-  
+  const coupleBundle = products.find(p => p.id === 3);
   if (coupleBundle) {
       coupleBundle.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407003/couple_cxwfer.png';
   }
-
+  const hivTest = products.find(p => p.id === 1);
+  if (hivTest) {
+    hivTest.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png';
+  }
+  const pregnancyTest = products.find(p => p.id === 2);
+  if (pregnancyTest) {
+    pregnancyTest.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759404957/discreetkit_pregnancy_cujiod.png';
+  }
+  const postpill = products.find(p => p.id === 4);
+  if (postpill) {
+    postpill.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png';
+  }
 
   return (
     <div className="flex flex-col">

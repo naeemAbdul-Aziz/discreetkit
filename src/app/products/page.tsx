@@ -70,6 +70,20 @@ function FeaturedProduct({ product }: { product: Product }) {
 
 export default async function ProductsPage() {
     const products = await getProducts();
+    
+    // Override images with new mockups
+    const allInOneBundle = products.find(p => p.id === 8);
+    if (allInOneBundle) {
+        allInOneBundle.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png';
+    }
+    const coupleBundle = products.find(p => p.id === 3);
+    if (coupleBundle) {
+        coupleBundle.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407003/couple_cxwfer.png';
+    }
+    const hivTest = products.find(p => p.id === 1);
+    if (hivTest) {
+      hivTest.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png';
+    }
     const pregnancyTest = products.find(p => p.id === 2);
     if (pregnancyTest) {
       pregnancyTest.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759404957/discreetkit_pregnancy_cujiod.png';
@@ -78,24 +92,10 @@ export default async function ProductsPage() {
     if (postpill) {
       postpill.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png';
     }
-    const hivTest = products.find(p => p.id === 1);
-    if (hivTest) {
-        hivTest.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png';
-    }
-    
-    const testKits = products.filter(p => p.name.includes('HIV Kit') || p.name.includes('Pregnancy Test'));
-    const bundles = products.filter(p => p.name.includes('Bundle'));
+
+    const testKits = products.filter(p => p.name.includes('HIV') || p.name.includes('Pregnancy'));
+    const bundles = products.filter(p => p.name.includes('Bundle') || p.name.includes('All-In-One'));
     const wellness = products.filter(p => !testKits.includes(p) && !bundles.includes(p));
-
-    const featuredBundle = products.find(p => p.id === 8); // Complete Peace of Mind Bundle
-    if (featuredBundle) {
-        featuredBundle.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png';
-    }
-    const coupleBundle = products.find(p => p.id === 3);
-    if (coupleBundle) {
-        coupleBundle.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407003/couple_cxwfer.png';
-    }
-
 
   return (
     <div className="bg-background">
@@ -110,7 +110,7 @@ export default async function ProductsPage() {
                 </p>
             </div>
 
-            {featuredBundle && <FeaturedProduct product={featuredBundle} />}
+            {allInOneBundle && <FeaturedProduct product={allInOneBundle} />}
 
             {/* Test Kits Section */}
             <div className="mb-16">
@@ -126,7 +126,7 @@ export default async function ProductsPage() {
             <div className="mb-16">
                  <h2 className="font-headline text-2xl font-bold text-foreground mb-6">Value Bundles</h2>
                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-                    {bundles.filter(p => p.id !== featuredBundle?.id).map((product) => (
+                    {bundles.filter(p => p.id !== allInOneBundle?.id).map((product) => (
                         <ProductCard key={product.id} product={product} showAddToCart={true} />
                     ))}
                 </div>
