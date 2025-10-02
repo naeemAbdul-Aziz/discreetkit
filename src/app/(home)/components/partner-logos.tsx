@@ -8,7 +8,7 @@ import Image from 'next/image';
 
 // partner data, including names and logo urls.
 const partners = [
-    { name: 'Marie Stopes', logoUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758223637/marie-stopes-logo_do0j8g.png' },
+    { name: 'Marie Stopes', logoUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759415106/marie_stopes_logo_zqmikw.webp' },
     { name: 'Top Up Pharmacy', logoUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318480/topup_x2q874.webp' },
     { name: 'Bedita Pharmacy', logoUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/bedita_ekekhs.png' },
     { name: 'Ernest Chemist', logoUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/ernest_chemist_ebxjug.webp' },
