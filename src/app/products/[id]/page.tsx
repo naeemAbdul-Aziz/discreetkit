@@ -10,6 +10,8 @@ import type { Metadata } from 'next';
 import { ProductCard } from '../(components)/product-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60; // Revalidate data every 60 seconds
@@ -61,7 +63,7 @@ async function getRelatedProducts(currentProductId: number): Promise<Product[]> 
         .from('products')
         .select('*')
         .not('id', 'eq', currentProductId)
-        .limit(3);
+        .limit(4);
 
     if (error) {
         console.error("Error fetching related products:", error);
@@ -198,7 +200,7 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
 
             {/* Right Column: Sticky CTA */}
             <div className="md:sticky md:top-24">
-                <div className="flex flex-col gap-8">
+                <div className="flex flex-col gap-6">
                     <div>
                         <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground md:text-4xl">
                             {product.name}
@@ -213,14 +215,14 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
                     <Card className="bg-card">
                         <CardContent className="p-6 space-y-6">
                             <div className="flex flex-col items-start gap-2">
-                                <p className="font-bold text-3xl text-foreground">
-                                    GHS {product.price_ghs.toFixed(2)}
-                                </p>
                                 {product.savings_ghs && product.savings_ghs > 0 && (
                                     <Badge variant="accent">
                                         Bundle & Save GHS {product.savings_ghs.toFixed(2)}
                                     </Badge>
                                 )}
+                                <p className="font-bold text-3xl text-foreground">
+                                    GHS {product.price_ghs.toFixed(2)}
+                                </p>
                             </div>
                             
                             <AddToCartManager product={product} />
@@ -247,11 +249,25 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
                 <h2 className="font-headline text-3xl font-bold text-foreground mb-8 text-center">
                     You Might Also Like
                 </h2>
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {relatedProducts.map((p) => (
-                        <ProductCard key={p.id} product={p} />
-                    ))}
-                </div>
+                <Carousel
+                    opts={{
+                        align: "start",
+                        loop: false,
+                    }}
+                    className="w-full"
+                >
+                    <CarouselContent className="-ml-4">
+                        {relatedProducts.map((p) => (
+                           <CarouselItem key={p.id} className="pl-4 basis-1/2 md:basis-1/3 lg:basis-1/4">
+                                <div className="h-full p-1">
+                                    <ProductCard product={p} />
+                                </div>
+                            </CarouselItem>
+                        ))}
+                    </CarouselContent>
+                    <CarouselPrevious className="absolute -left-4 top-1/2 -translate-y-1/2" />
+                    <CarouselNext className="absolute -right-4 top-1/2 -translate-y-1/2" />
+                </Carousel>
             </div>
         )}
       </div>
