@@ -31,7 +31,7 @@ const toBase64 = (str: string) =>
     ? Buffer.from(str).toString('base64')
     : window.btoa(str);
 
-export function ProductCard({ product, showAddToCart = true }: { product: Product; showAddToCart?: boolean }) {
+export function ProductCard({ product }: { product: Product; }) {
     const { addItem, getItemQuantity, updateQuantity } = useCart();
     const [isMounted, setIsMounted] = useState(false);
 
@@ -88,7 +88,7 @@ export function ProductCard({ product, showAddToCart = true }: { product: Produc
                     </div>
                     
                     <div className="w-auto text-right">
-                       {showAddToCart && (
+                       
                            <>
                                 {!isMounted ? (
                                     <Button disabled className="w-[120px]">
@@ -110,7 +110,7 @@ export function ProductCard({ product, showAddToCart = true }: { product: Produc
                                     </Button>
                                 )}
                            </>
-                       )}
+                       
                     </div>
                 </div>
             </CardContent>

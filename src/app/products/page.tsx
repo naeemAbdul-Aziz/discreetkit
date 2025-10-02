@@ -1,13 +1,9 @@
 
 import { getSupabaseClient } from '@/lib/supabase';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import Image from 'next/image';
 import { ProductCard } from './(components)/product-card';
 import type { Product } from '@/lib/data';
-import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
 import type { Metadata } from 'next';
+import { ProductFeature } from '../(home)/components/product-feature';
 
 export const metadata: Metadata = {
   title: 'Shop All Products',
@@ -34,38 +30,6 @@ async function getProducts(): Promise<Product[]> {
       student_price_ghs: p.student_price_ghs ? Number(p.student_price_ghs) : null,
       savings_ghs: p.savings_ghs ? Number(p.savings_ghs) : null,
     }));
-}
-
-function FeaturedProduct({ product }: { product: Product }) {
-    return (
-        <Card className="overflow-hidden rounded-2xl mb-16">
-          <div className="grid md:grid-cols-2">
-            <div className="flex flex-col justify-center p-8 text-center md:p-12 md:text-left">
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-primary">Featured Bundle</h2>
-              <h3 className="mt-2 font-headline text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                {product.name}
-              </h3>
-              <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground md:mx-0">
-                {product.description}
-              </p>
-               <div className="mt-8">
-                  <ProductCard product={product} showAddToCart={true} />
-              </div>
-            </div>
-            <div className="relative h-64 min-h-[300px] w-full md:h-full bg-muted/50">
-              {product.image_url && (
-                <Image
-                    src={product.image_url}
-                    alt={product.name}
-                    fill
-                    className="object-contain p-8"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                />
-              )}
-            </div>
-          </div>
-        </Card>
-    )
 }
 
 export default async function ProductsPage() {
@@ -114,34 +78,34 @@ export default async function ProductsPage() {
                 </p>
             </div>
 
-            {allInOneBundle && <FeaturedProduct product={allInOneBundle} />}
+            {allInOneBundle && <ProductFeature product={allInOneBundle} />}
 
             {/* Test Kits Section */}
-            <div className="mb-16">
+            <div id="test-kits" className="mb-16 scroll-mt-24">
                 <h2 className="font-headline text-2xl font-bold text-foreground mb-6">Test Kits</h2>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
                     {testKits.map((product) => (
-                        <ProductCard key={product.id} product={product} showAddToCart={true} />
+                        <ProductCard key={product.id} product={product} />
                     ))}
                 </div>
             </div>
 
             {/* Bundles Section */}
-            <div className="mb-16">
+            <div id="bundles" className="mb-16 scroll-mt-24">
                  <h2 className="font-headline text-2xl font-bold text-foreground mb-6">Value Bundles</h2>
                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
                     {bundles.filter(p => p.id !== allInOneBundle?.id).map((product) => (
-                        <ProductCard key={product.id} product={product} showAddToCart={true} />
+                        <ProductCard key={product.id} product={product} />
                     ))}
                 </div>
             </div>
             
             {/* Wellness Essentials Section */}
-             <div>
+             <div id="wellness" className="scroll-mt-24">
                  <h2 className="font-headline text-2xl font-bold text-foreground mb-6">Wellness Essentials</h2>
                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
                     {wellness.map((product) => (
-                        <ProductCard key={product.id} product={product} showAddToCart={true} />
+                        <ProductCard key={product.id} product={product} />
                     ))}
                 </div>
             </div>

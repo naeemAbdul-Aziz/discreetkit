@@ -1,44 +1,38 @@
 /**
  * @file product-selector.tsx
- * @description displays a selection of featured products, using a carousel on mobile
- *              and a grid on desktop, with a link to see all products.
+ * @description displays a selection of product categories, linking to the main shop page.
  */
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import type { EmblaCarouselType } from 'embla-carousel';
-import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
-import { cn } from '@/lib/utils';
-import type { Product } from '@/lib/data';
-import { ProductCard } from '@/app/products/(components)/product-card';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { ArrowRight, HeartPulse, Package, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
 
+const categories = [
+    {
+        name: 'Test Kits',
+        description: 'Private, WHO-approved self-test kits for HIV and pregnancy.',
+        icon: HeartPulse,
+        href: '/products#test-kits'
+    },
+    {
+        name: 'Value Bundles',
+        description: 'Save money with our curated bundles for complete peace of mind.',
+        icon: Package,
+        href: '/products#bundles'
+    },
+    {
+        name: 'Wellness Essentials',
+        description: 'Complete your health toolkit with contraception and personal care items.',
+        icon: Sparkles,
+        href: '/products#wellness'
+    },
+]
 
-export function ProductSelector({ products }: { products: Product[] }) {
-    // filter to show only featured products in this section.
-    const featuredProducts = products.filter(p => p.featured);
-    const [api, setApi] = useState<EmblaCarouselType | undefined>();
-    const [selectedIndex, setSelectedIndex] = useState(0);
-
-    // callback to update the selected index when the carousel moves.
-    const onSelect = useCallback((emblaApi: EmblaCarouselType) => {
-        setSelectedIndex(emblaApi.selectedScrollSnap());
-    }, []);
-
-    // effect to initialize and manage carousel events.
-    useEffect(() => {
-        if (!api) return;
-        onSelect(api);
-        api.on('select', onSelect);
-        api.on('reInit', onSelect);
-        return () => {
-          api.off('select', onSelect);
-        };
-    }, [api, onSelect]);
-
+export function ProductSelector() {
     return (
         <section id="products" className="py-12 md:py-24">
             <div className="container mx-auto px-4 md:px-6">
@@ -50,38 +44,32 @@ export function ProductSelector({ products }: { products: Product[] }) {
                        Safe. Discreet. Sorted.
                     </h2>
                     <p className="mt-4 max-w-2xl mx-auto text-base text-muted-foreground">
-                        Your confidential health essentials, delivered with trust.
+                        Your confidential health essentials, delivered with trust. Browse our categories to get started.
                     </p>
                 </div>
                 
-                <Carousel 
-                    setApi={setApi} 
-                    className="w-full" 
-                    opts={{loop: true, align: 'start'}}
-                >
-                    <CarouselContent className="-ml-2 md:-ml-4">
-                        {featuredProducts.map((product) => (
-                            <CarouselItem key={product.id} className="basis-4/5 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 pl-2 md:pl-4">
-                                <div className="p-1 h-full">
-                                    <ProductCard product={product} showAddToCart={true} />
-                                </div>
-                            </CarouselItem>
-                        ))}
-                    </CarouselContent>
-                    <div className="flex items-center justify-center gap-2 mt-8">
-                        {featuredProducts.map((_, index) => (
-                            <button
-                            key={index}
-                            onClick={() => api?.scrollTo(index)}
-                            className={cn(
-                                'h-2 w-2 rounded-full bg-border transition-all',
-                                index === selectedIndex ? 'w-4 bg-primary' : 'hover:bg-primary/50'
-                            )}
-                            aria-label={`go to slide ${index + 1}`}
-                            />
-                        ))}
-                    </div>
-                </Carousel>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                    {categories.map((category, index) => (
+                        <motion.div
+                            key={category.name}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.5, delay: index * 0.1 }}
+                        >
+                            <Link href={category.href} className="h-full block group">
+                                <Card className="h-full flex flex-col items-center justify-center p-8 text-center rounded-2xl bg-card hover:bg-muted transition-colors">
+                                    <category.icon className="h-10 w-10 text-primary mb-4" />
+                                    <h3 className="text-xl font-bold text-foreground">{category.name}</h3>
+                                    <p className="mt-2 text-base text-muted-foreground flex-grow">{category.description}</p>
+                                    <div className="mt-6 text-sm font-semibold text-primary flex items-center gap-2 group-hover:underline">
+                                        Shop Now <ArrowRight className="h-4 w-4" />
+                                    </div>
+                                </Card>
+                            </Link>
+                        </motion.div>
+                    ))}
+                </div>
 
                 <div className="text-center mt-12">
                     <Button asChild variant="outline" size="lg">

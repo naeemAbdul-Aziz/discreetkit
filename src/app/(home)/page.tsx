@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { getSupabaseClient } from '@/lib/supabase';
 import type { Product } from '@/lib/data';
 import { ProductFeature } from './components/product-feature';
+import { ProductSelector } from './components/product-selector';
 
 // fetches all products from the supabase database.
 async function getProducts(): Promise<Product[]> {
@@ -38,7 +39,7 @@ async function getProducts(): Promise<Product[]> {
 // a map to define heights for loading skeletons for a better user experience.
 const componentMap = {
   PartnerLogos: { height: '200px' },
-  ProductSelector: { height: '700px' },
+  ProductSelector: { height: '500px' },
   ProductBenefits: { height: '100px' },
   HowItWorks: { height: '800px' },
   OurVision: { height: '800px' },
@@ -60,10 +61,6 @@ const LoadingSkeleton = ({ height }: { height: string }) => (
 const PartnerLogos = dynamic(
   () => import('./components/partner-logos').then((mod) => mod.PartnerLogos),
   { loading: () => <LoadingSkeleton height={componentMap.PartnerLogos.height} /> }
-);
-const ProductSelector = dynamic(
-  () => import('./components/product-selector').then((mod) => mod.ProductSelector as any),
-  { loading: () => <LoadingSkeleton height={componentMap.ProductSelector.height} /> }
 );
 const ProductBenefits = dynamic(
   () => import('./components/product-benefits').then((mod) => mod.ProductBenefits),
@@ -125,7 +122,6 @@ export default async function Home() {
   const lubricant = products.find(p => p.id === 6);
   if (lubricant) {
     lubricant.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413266/lube_ysdpst.png';
-    // Mark lubricant as featured for the homepage carousel
     lubricant.featured = true;
   }
 
@@ -140,7 +136,7 @@ export default async function Home() {
       </SectionWrapper>
       
       <SectionWrapper>
-        <ProductSelector products={products} />
+        <ProductSelector />
       </SectionWrapper>
       
       {coupleBundle && (
