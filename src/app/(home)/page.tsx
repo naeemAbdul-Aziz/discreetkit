@@ -101,7 +101,7 @@ export default async function Home() {
   const hivTest = products.find(p => p.id === 1);
   
   if (allInOneBundle) {
-      allInOneBundle.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406231/discreetkit_bundle_wtlser.png';
+      allInOneBundle.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png';
   }
 
   if (pregnancyTest) {
