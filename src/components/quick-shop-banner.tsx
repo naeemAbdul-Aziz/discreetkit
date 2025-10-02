@@ -37,29 +37,18 @@ export function FloatingShopButton() {
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0, opacity: 0 }}
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 100, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 260, damping: 20 }}
           className="fixed bottom-6 right-6 z-50"
         >
-          <motion.div
-            animate={{
-              rotate: [0, -10, 10, -10, 10, 0],
-            }}
-            transition={{
-              duration: 0.5,
-              repeat: Infinity,
-              repeatDelay: 5, // Wiggle every 5 seconds
-              repeatType: 'loop',
-            }}
-          >
-            <Button asChild size="icon" className="h-14 w-14 rounded-full shadow-2xl">
+            <Button asChild size="lg" className="h-14 rounded-full shadow-2xl pl-5 pr-6">
               <Link href="/products" aria-label="shop all products">
-                <ShoppingBag className="h-7 w-7" />
+                <ShoppingBag className="h-6 w-6" />
+                <span className="ml-2 font-bold">Shop Now</span>
               </Link>
             </Button>
-          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
