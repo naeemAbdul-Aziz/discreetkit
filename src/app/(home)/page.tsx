@@ -37,11 +37,11 @@ async function getProducts(): Promise<Product[]> {
 
 // a map to define heights for loading skeletons for a better user experience.
 const componentMap = {
+  PartnerLogos: { height: '200px' },
   ProductSelector: { height: '700px' },
   ProductBenefits: { height: '100px' },
   HowItWorks: { height: '800px' },
   OurVision: { height: '800px' },
-  PartnerLogos: { height: '200px' },
   Testimonials: { height: '500px' },
   Faq: { height: '600px' },
   ContactUs: { height: '600px' },
@@ -57,6 +57,10 @@ const LoadingSkeleton = ({ height }: { height: string }) => (
 
 // dynamically import components to enable code splitting and improve performance.
 // this means components are only loaded when they are needed.
+const PartnerLogos = dynamic(
+  () => import('./components/partner-logos').then((mod) => mod.PartnerLogos),
+  { loading: () => <LoadingSkeleton height={componentMap.PartnerLogos.height} /> }
+);
 const ProductSelector = dynamic(
   () => import('./components/product-selector').then((mod) => mod.ProductSelector as any),
   { loading: () => <LoadingSkeleton height={componentMap.ProductSelector.height} /> }
@@ -72,10 +76,6 @@ const HowItWorks = dynamic(
 const OurVision = dynamic(
   () => import('./components/our-vision').then((mod) => mod.OurVision),
   { loading: () => <LoadingSkeleton height={componentMap.OurVision.height} /> }
-);
-const PartnerLogos = dynamic(
-  () => import('./components/partner-logos').then((mod) => mod.PartnerLogos),
-  { loading: () => <LoadingSkeleton height={componentMap.PartnerLogos.height} /> }
 );
 const Testimonials = dynamic(
   () => import('./components/testimonials').then((mod) => mod.Testimonials),
@@ -134,6 +134,10 @@ export default async function Home() {
       <SectionWrapper>
         <Hero />
       </SectionWrapper>
+
+      <SectionWrapper>
+        <PartnerLogos />
+      </SectionWrapper>
       
       <SectionWrapper>
         <ProductSelector products={products} />
@@ -161,10 +165,6 @@ export default async function Home() {
       
       <SectionWrapper>
         <OurVision />
-      </SectionWrapper>
-
-      <SectionWrapper>
-        <PartnerLogos />
       </SectionWrapper>
 
       <SectionWrapper>
