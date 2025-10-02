@@ -61,7 +61,7 @@ export function ProductSelector({ products }: { products: Product[] }) {
                             {featuredProducts.map((product) => (
                                 <CarouselItem key={product.id} className="basis-4/5">
                                     <div className="p-1 h-full">
-                                        <ProductCard product={product} showAddToCart={false} />
+                                        <ProductCard product={product} showAddToCart={true} />
                                     </div>
                                 </CarouselItem>
                             ))}
@@ -86,7 +86,7 @@ export function ProductSelector({ products }: { products: Product[] }) {
                 <div className="hidden md:grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                     {featuredProducts.map((product) => (
                         <div key={product.id}>
-                            <ProductCard product={product} showAddToCart={false} />
+                            <ProductCard product={product} showAddToCart={true} />
                         </div>
                     ))}
                 </div>
