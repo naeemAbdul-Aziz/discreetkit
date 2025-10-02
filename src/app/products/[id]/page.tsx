@@ -1,4 +1,3 @@
-
 import { getSupabaseClient } from '@/lib/supabase';
 import type { Product } from '@/lib/data';
 import { notFound } from 'next/navigation';
@@ -53,6 +52,9 @@ export default async function ProductDetailPageWrapper({ params }: { params: { i
   }
 
   // Override images with new mockups
+  if (product.id === 1) { // HIV Test
+    product.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png';
+  }
   if (product.id === 2) { // Pregnancy Test
     product.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759404957/discreetkit_pregnancy_cujiod.png';
   }

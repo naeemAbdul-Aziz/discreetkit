@@ -98,6 +98,7 @@ export default async function Home() {
   const allInOneBundle = products.find(p => p.id === 8); // The All-In-One
   const pregnancyTest = products.find(p => p.id === 2);
   const postpill = products.find(p => p.id === 4);
+  const hivTest = products.find(p => p.id === 1);
   
   if (allInOneBundle) {
       allInOneBundle.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406231/discreetkit_bundle_wtlser.png';
@@ -109,6 +110,10 @@ export default async function Home() {
 
   if (postpill) {
     postpill.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png';
+  }
+
+  if (hivTest) {
+    hivTest.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png';
   }
 
 

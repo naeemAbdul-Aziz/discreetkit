@@ -77,6 +77,10 @@ export default async function ProductsPage() {
     if (postpill) {
       postpill.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png';
     }
+    const hivTest = products.find(p => p.id === 1);
+    if (hivTest) {
+        hivTest.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png';
+    }
     
     const testKits = products.filter(p => p.name.includes('HIV Kit') || p.name.includes('Pregnancy Test'));
     const bundles = products.filter(p => p.name.includes('Bundle'));
