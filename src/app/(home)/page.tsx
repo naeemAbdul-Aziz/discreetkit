@@ -96,9 +96,14 @@ export default async function Home() {
   const products = await getProducts();
   const coupleBundle = products.find(p => p.id === 3); // Support Bundle (Couple)
   const allInOneBundle = products.find(p => p.id === 8); // The All-In-One
+  const pregnancyTest = products.find(p => p.id === 2);
   
   if (allInOneBundle) {
       allInOneBundle.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759403673/bundle_qwaywe.png';
+  }
+
+  if (pregnancyTest) {
+    pregnancyTest.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759404957/discreetkit_pregnancy_cujiod.png';
   }
 
 

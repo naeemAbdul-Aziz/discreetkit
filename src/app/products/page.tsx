@@ -69,6 +69,10 @@ function FeaturedProduct({ product }: { product: Product }) {
 
 export default async function ProductsPage() {
     const products = await getProducts();
+    const pregnancyTest = products.find(p => p.id === 2);
+    if (pregnancyTest) {
+      pregnancyTest.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759404957/discreetkit_pregnancy_cujiod.png';
+    }
     
     const testKits = products.filter(p => p.name.includes('HIV Kit') || p.name.includes('Pregnancy Test'));
     const bundles = products.filter(p => p.name.includes('Bundle'));
