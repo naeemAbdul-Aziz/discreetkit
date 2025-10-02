@@ -21,7 +21,6 @@ async function getProduct(id: string): Promise<Product | null> {
       ...data,
       price_ghs: Number(data.price_ghs),
       student_price_ghs: data.student_price_ghs ? Number(data.student_price_ghs) : null,
-      savings_ghs: data.savings_ghs ? Number(data.savings_ghs) : null,
     };
 }
 
@@ -53,8 +52,14 @@ async function getRelatedProducts(currentProductId: number): Promise<Product[]> 
         if (p.id === 4) { // Postpill
             imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png';
         }
+         if (p.id === 5) { // Condom Pack
+            imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413220/condoms_j5qyqj.png';
+        }
         if (p.id === 6) { // Lubricant
             imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413266/lube_ysdpst.png';
+        }
+        if (p.id === 7) { // Weekend Ready Bundle
+            imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413627/weekend_bundle_t8cfxp.png';
         }
         if (p.id === 8) { // All-in-one
             imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png';
@@ -64,7 +69,6 @@ async function getRelatedProducts(currentProductId: number): Promise<Product[]> 
             image_url: imageUrl,
             price_ghs: Number(p.price_ghs),
             student_price_ghs: p.student_price_ghs ? Number(p.student_price_ghs) : null,
-            savings_ghs: p.savings_ghs ? Number(p.savings_ghs) : null,
         };
     });
 }
@@ -90,8 +94,14 @@ export default async function ProductDetailPageWrapper({ params }: { params: { i
   if (product.id === 4) { // Postpill
     product.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png';
   }
+   if (product.id === 5) { // Condom Pack
+    product.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413220/condoms_j5qyqj.png';
+  }
    if (product.id === 6) { // Lubricant
     product.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413266/lube_ysdpst.png';
+  }
+  if (product.id === 7) { // Weekend Ready Bundle
+    product.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413627/weekend_bundle_t8cfxp.png';
   }
   if (product.id === 8) { // All-in-one
     product.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png';

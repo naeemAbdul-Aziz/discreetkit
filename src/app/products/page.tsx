@@ -3,6 +3,7 @@ import { getSupabaseClient } from '@/lib/supabase';
 import type { Product } from '@/lib/data';
 import type { Metadata } from 'next';
 import { ProductLineShowcase } from './(components)/product-line-showcase';
+import { Separator } from '@/components/ui/separator';
 
 export const metadata: Metadata = {
   title: 'Shop All Products',
@@ -40,12 +41,17 @@ export default async function ProductsPage() {
         if (p.id === 2) p.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759404957/discreetkit_pregnancy_cujiod.png';
         if (p.id === 3) p.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413735/couple_bundle_rfbpn0.png';
         if (p.id === 4) p.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png';
+        if (p.id === 5) p.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413220/condoms_j5qyqj.png';
         if (p.id === 6) p.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413266/lube_ysdpst.png';
+        if (p.id === 7) p.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413627/weekend_bundle_t8cfxp.png';
         if (p.id === 8) p.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png';
     });
     
     const testKits = products.filter(p => p.id === 1 || p.id === 2);
     const allInOneBundle = products.find(p => p.id === 8);
+
+    const wellnessProducts = products.filter(p => p.id === 4 || p.id === 5 || p.id === 6);
+    const weekendBundle = products.find(p => p.id === 7);
 
   return (
     <div className="bg-background">
@@ -69,6 +75,20 @@ export default async function ProductsPage() {
                         showcaseImageUrl: allInOneBundle.image_url || '',
                     }}
                     products={testKits} 
+                />
+            )}
+
+            <Separator className="my-16 md:my-24" />
+
+             {weekendBundle && (
+                 <ProductLineShowcase 
+                    line={{
+                        title: 'Wellness & Protection',
+                        headline: 'Stay Prepared, Feel Confident.',
+                        description: 'A curated selection of wellness essentials, from emergency contraception to personal care, for your peace of mind.',
+                        showcaseImageUrl: weekendBundle.image_url || '',
+                    }}
+                    products={wellnessProducts} 
                 />
             )}
 

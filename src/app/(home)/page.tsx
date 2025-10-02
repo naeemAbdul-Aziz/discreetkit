@@ -32,7 +32,6 @@ async function getProducts(): Promise<Product[]> {
       ...p,
       price_ghs: Number(p.price_ghs),
       student_price_ghs: p.student_price_ghs ? Number(p.student_price_ghs) : null,
-      savings_ghs: p.savings_ghs ? Number(p.savings_ghs) : null,
     }));
 }
 
@@ -124,6 +123,15 @@ export default async function Home() {
     lubricant.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413266/lube_ysdpst.png';
     lubricant.featured = true;
   }
+  const condomPack = products.find(p => p.id === 5);
+  if (condomPack) {
+      condomPack.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413220/condoms_j5qyqj.png';
+  }
+  const weekendBundle = products.find(p => p.id === 7);
+  if (weekendBundle) {
+    weekendBundle.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413627/weekend_bundle_t8cfxp.png';
+  }
+
 
   return (
     <div className="flex flex-col">

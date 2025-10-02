@@ -43,6 +43,9 @@ export function ProductCard({ product }: { product: Product; }) {
 
     const quantity = isMounted ? getItemQuantity(product.id) : 0;
     const isInCart = quantity > 0;
+    
+    const savings = product.savings_ghs;
+
 
     return (
         <Card className="h-full flex flex-col rounded-2xl overflow-hidden group bg-card">
@@ -59,9 +62,9 @@ export function ProductCard({ product }: { product: Product; }) {
                             placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(250, 188))}`}
                         />
                     )}
-                    {product.savings_ghs && product.savings_ghs > 0 && (
+                    {savings && savings > 0 && (
                         <Badge variant="accent" className="absolute top-3 left-3 shadow-lg">
-                            Save GHS {product.savings_ghs.toFixed(2)}
+                            Save GHS {savings.toFixed(2)}
                         </Badge>
                     )}
                     <div className="absolute top-4 right-4 h-10 w-10 bg-background/50 backdrop-blur-sm rounded-full flex items-center justify-center text-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300">

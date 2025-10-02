@@ -12,6 +12,7 @@ export type Product = {
     student_price_ghs: number | null;
     image_url: string | null;
     featured: boolean | null;
+    brand?: string | null;
     savings_ghs?: number | null;
 }
 
