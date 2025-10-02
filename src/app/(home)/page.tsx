@@ -102,23 +102,23 @@ export default async function Home() {
   const pregnancyTest = products.find(p => p.id === 2); // Pregnancy Test Kit
 
   return (
-    <div className="flex flex-col">
-      <SectionWrapper className="bg-background">
+    <div className="flex flex-col bg-background">
+      <SectionWrapper>
         <Hero />
       </SectionWrapper>
       
-      <SectionWrapper className="bg-background">
+      <SectionWrapper>
         <ProductSelector products={products} />
       </SectionWrapper>
       
       {hivTestKit && (
-          <SectionWrapper className="bg-muted/30">
+          <SectionWrapper>
               <ProductFeature product={hivTestKit} />
           </SectionWrapper>
       )}
 
       {pregnancyTest && (
-           <SectionWrapper className="bg-background">
+           <SectionWrapper>
               <ProductFeature product={pregnancyTest} reverse={true} />
           </SectionWrapper>
       )}
@@ -127,27 +127,27 @@ export default async function Home() {
         <ProductBenefits />
       </SectionWrapper>
 
-      <SectionWrapper className="bg-muted/50">
+      <SectionWrapper>
         <HowItWorks />
       </SectionWrapper>
 
-      <SectionWrapper className="bg-background">
+      <SectionWrapper>
         <PartnerReferral />
       </SectionWrapper>
       
-      <SectionWrapper className="bg-background">
+      <SectionWrapper>
         <OurVision />
       </SectionWrapper>
 
-      <SectionWrapper className="bg-muted">
+      <SectionWrapper>
         <Testimonials />
       </SectionWrapper>
       
-      <SectionWrapper className="bg-muted">
+      <SectionWrapper>
         <ClosingCta />
       </SectionWrapper>
       
-      <SectionWrapper className="bg-background">
+      <SectionWrapper>
         <Faq />
       </SectionWrapper>
       

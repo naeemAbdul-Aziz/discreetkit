@@ -36,9 +36,9 @@ const toBase64 = (str: string) =>
 
 export function ClosingCta() {
   return (
-    <section className="py-12 md:py-24">
+    <section className="py-12 md:py-24 bg-background">
       <div className="container mx-auto max-w-5xl px-4 md:px-6">
-        <Card className="overflow-hidden rounded-2xl">
+        <Card className="overflow-hidden rounded-2xl bg-card">
           <div className="grid md:grid-cols-2">
             <div className="flex flex-col justify-center p-8 text-center md:p-12 md:text-left">
               <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground sm:text-3xl">

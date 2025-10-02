@@ -36,7 +36,7 @@ const shimmer = (w: number, h: number) => `
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-12 md:py-24 bg-muted/50">
+    <section id="how-it-works" className="py-12 md:py-24 bg-background">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-16">
           <h2 className="mt-2 font-headline text-3xl font-bold text-foreground md:text-4xl">
