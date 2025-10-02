@@ -8,7 +8,7 @@ import { Minus, Plus, Trash2, ArrowRight, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 
 const shimmer = (w: number, h: number) => `
@@ -35,13 +35,49 @@ export function CartView() {
     const { items, updateQuantity, totalItems, subtotal, studentDiscount, deliveryFee, totalPrice } = useCart();
     const [isLoading, setIsLoading] = useState(false);
     const pathname = usePathname();
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     const handleClick = () => {
         if (pathname !== '/order') {
             setIsLoading(true);
         }
     };
-
+    
+    if (!isMounted) {
+        return (
+             <Card className="overflow-hidden rounded-2xl animate-pulse">
+                <CardHeader>
+                    <div className="h-9 w-3/5 bg-muted rounded-md" />
+                    <div className="h-5 w-4/5 bg-muted rounded-md" />
+                </CardHeader>
+                <CardContent className="p-0">
+                    <div className="p-6 bg-muted/50 border-t space-y-4">
+                        <div className="h-6 w-1/3 bg-muted rounded-md" />
+                        <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                                <div className="h-5 w-1/4 bg-muted rounded-md" />
+                                <div className="h-5 w-1/5 bg-muted rounded-md" />
+                            </div>
+                            <div className="flex justify-between">
+                                <div className="h-5 w-1/3 bg-muted rounded-md" />
+                                <div className="h-5 w-1/5 bg-muted rounded-md" />
+                            </div>
+                        </div>
+                        <Separator />
+                        <div className="flex justify-between">
+                           <div className="h-7 w-1/4 bg-muted rounded-md" />
+                           <div className="h-7 w-1/3 bg-muted rounded-md" />
+                        </div>
+                        <div className="h-12 w-full bg-muted rounded-full" />
+                    </div>
+                </CardContent>
+            </Card>
+        )
+    }
 
     return (
         <Card className="overflow-hidden rounded-2xl">

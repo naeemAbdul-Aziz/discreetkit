@@ -108,7 +108,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     const hubtelApiId = process.env.HUBTEL_API_ID;
     const hubtelApiSecret = process.env.HUBTEL_API_SECRET;
 
-    if (hubtelApiId && hubtelApiSecret) {
+    if (hubtelApiId && hubtelApiSecret && hubtelApiId !== 'your-hubtel-api-id') {
         const recipient = validatedFields.data.phone_masked.startsWith('0') 
             ? `233${validatedFields.data.phone_masked.substring(1)}` 
             : validatedFields.data.phone_masked;
@@ -142,7 +142,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
             console.error('Failed to send SMS notification via Hubtel:', smsError);
         }
     } else {
-        console.log('--- (Skipping SMS: Hubtel API credentials not configured) ---');
+        console.log('--- (Skipping SMS: Hubtel API credentials not configured or are placeholder) ---');
         const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${code}`;
         const smsPayload = {
           to: `+233${validatedFields.data.phone_masked.slice(1)}`,

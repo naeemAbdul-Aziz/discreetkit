@@ -1,3 +1,5 @@
+
+
 import { Package, ShoppingCart, Truck, CheckCircle, ShieldCheck, HeartHandshake, Zap, Award, Users, Phone, MessageSquare, Globe } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { CartItem } from "@/hooks/use-cart";
