@@ -1,8 +1,4 @@
 
-'use client';
-
-import { useState, useEffect, useCallback } from 'react';
-import type { EmblaCarouselType } from 'embla-carousel';
 import { getSupabaseClient } from '@/lib/supabase';
 import type { Product } from '@/lib/data';
 import { notFound } from 'next/navigation';
@@ -16,6 +12,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { cn } from '@/lib/utils';
+import { useState, useEffect, useCallback } from 'react';
+import type { EmblaCarouselType } from 'embla-carousel';
 
 
 // This function fetches the data for a single product.
@@ -113,7 +111,9 @@ const getWhatsInTheBox = (productId: number) => {
     }
 }
 
+// This is the client component that handles interactions
 function ProductDetailContent({ product, relatedProducts }: { product: Product, relatedProducts: Product[] }) {
+    'use client';
     const instructions = getUsageInstructions(product.id);
     const boxContents = getWhatsInTheBox(product.id);
 
