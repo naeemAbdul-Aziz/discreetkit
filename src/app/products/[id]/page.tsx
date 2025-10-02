@@ -4,10 +4,12 @@ import type { Product } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { AddToCartManager } from './(components)/add-to-cart-manager';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check, ClipboardList, Package, FileText } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Check, Package, FileText, ShieldCheck, Lock } from 'lucide-react';
 import type { Metadata } from 'next';
 import { ProductCard } from '../(components)/product-card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60; // Revalidate data every 60 seconds
@@ -145,10 +147,9 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
     <div className="bg-background">
       <div className="container mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-24">
         
-        {/* Main Product Section */}
         <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-start">
             {/* Left Column: Image and Details */}
-            <div className="space-y-12">
+            <div className="space-y-8">
                 <div className="relative aspect-square w-full rounded-3xl bg-muted/50 p-8">
                     {product.image_url && (
                         <Image
@@ -163,44 +164,41 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
                     )}
                 </div>
 
-                <div className="space-y-8">
-                    {/* Usage Instructions */}
-                    <div className="border-t pt-8">
-                        <h2 className="font-headline text-2xl font-bold flex items-center gap-3 mb-4">
-                            <FileText />
-                            Usage Instructions
-                        </h2>
-                        <ul className="space-y-3 text-muted-foreground">
-                            {instructions.map((step, index) => (
-                                <li key={index} className="flex items-start gap-3">
-                                    <Check className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
-                                    <span>{step}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    {/* What's in the Box */}
-                    <div className="border-t pt-8">
-                        <h2 className="font-headline text-2xl font-bold flex items-center gap-3 mb-4">
-                            <Package />
-                           What's in the Box?
-                        </h2>
-                        <ul className="space-y-2 text-muted-foreground">
-                            {boxContents.map((item, index) => (
-                                <li key={index} className="flex items-center gap-3">
-                                     <ClipboardList className="h-4 w-4 text-primary/70 flex-shrink-0" />
-                                     <span>{item}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                </div>
+                <Tabs defaultValue="instructions" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="instructions">
+                      <FileText className="mr-2 h-4 w-4" /> Usage
+                    </TabsTrigger>
+                    <TabsTrigger value="contents">
+                      <Package className="mr-2 h-4 w-4" /> In the Box
+                    </TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="instructions" className="border rounded-lg p-6 mt-4">
+                     <ul className="space-y-3 text-muted-foreground">
+                        {instructions.map((step, index) => (
+                            <li key={index} className="flex items-start gap-3">
+                                <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                                <span>{step}</span>
+                            </li>
+                        ))}
+                    </ul>
+                  </TabsContent>
+                  <TabsContent value="contents" className="border rounded-lg p-6 mt-4">
+                    <ul className="space-y-3 text-muted-foreground">
+                        {boxContents.map((item, index) => (
+                            <li key={index} className="flex items-start gap-3">
+                                 <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                                 <span>{item}</span>
+                            </li>
+                        ))}
+                    </ul>
+                  </TabsContent>
+                </Tabs>
             </div>
 
             {/* Right Column: Sticky CTA */}
             <div className="md:sticky md:top-24">
-                 <div className="flex flex-col">
+                <div className="flex flex-col gap-8">
                     <div>
                         <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground md:text-4xl">
                             {product.name}
@@ -212,23 +210,33 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
                         )}
                     </div>
 
-                    <div className="mt-8">
-                        <Card className="bg-card">
-                            <CardContent className="p-6">
-                                <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-                                    <div>
-                                        <p className="text-sm text-muted-foreground">Price</p>
-                                        <p className="font-bold text-3xl text-foreground">
-                                            GHS {product.price_ghs.toFixed(2)}
-                                        </p>
-                                    </div>
-                                    <div className="w-full sm:w-auto">
-                                        <AddToCartManager product={product} />
-                                    </div>
+                    <Card className="bg-card">
+                        <CardContent className="p-6 space-y-6">
+                            <div className="flex flex-col items-start gap-2">
+                                <p className="font-bold text-3xl text-foreground">
+                                    GHS {product.price_ghs.toFixed(2)}
+                                </p>
+                                {product.savings_ghs && product.savings_ghs > 0 && (
+                                    <Badge variant="accent">
+                                        Bundle & Save GHS {product.savings_ghs.toFixed(2)}
+                                    </Badge>
+                                )}
+                            </div>
+                            
+                            <AddToCartManager product={product} />
+
+                            <div className="space-y-3 text-xs text-muted-foreground">
+                                <div className="flex items-center gap-2">
+                                    <ShieldCheck className="h-4 w-4 text-primary" />
+                                    <span>Discreet, unbranded shipping</span>
                                 </div>
-                            </CardContent>
-                        </Card>
-                    </div>
+                                <div className="flex items-center gap-2">
+                                    <Lock className="h-4 w-4 text-primary" />
+                                    <span>Secure online payment via Paystack</span>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
         </div>
