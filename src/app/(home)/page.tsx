@@ -98,8 +98,6 @@ const SectionWrapper: React.FC<{ children: React.ReactNode; className?: string }
 export default async function Home() {
   // fetch product data on the server.
   const products = await getProducts();
-  const hivTestKit = products.find(p => p.id === 1); // Standard HIV Kit
-  const pregnancyTest = products.find(p => p.id === 2); // Pregnancy Test Kit
   const coupleBundle = products.find(p => p.id === 3); // Support Bundle (Couple)
   const allInOneBundle = products.find(p => p.id === 8); // The All-In-One
 
@@ -122,18 +120,6 @@ export default async function Home() {
       {allInOneBundle && (
            <SectionWrapper>
               <ProductFeature product={allInOneBundle} reverse={true} />
-          </SectionWrapper>
-      )}
-
-      {hivTestKit && (
-          <SectionWrapper>
-              <ProductFeature product={hivTestKit} />
-          </SectionWrapper>
-      )}
-
-      {pregnancyTest && (
-           <SectionWrapper>
-              <ProductFeature product={pregnancyTest} reverse={true} />
           </SectionWrapper>
       )}
 
