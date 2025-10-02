@@ -54,20 +54,21 @@ export function ProductSelector({ products }: { products: Product[] }) {
                     </p>
                 </div>
                 
-                {/* mobile carousel */}
-                <div className="md:hidden">
-                    <Carousel setApi={setApi} className="w-full" opts={{loop: true}}>
-                        <CarouselContent>
-                            {featuredProducts.map((product) => (
-                                <CarouselItem key={product.id} className="basis-4/5">
-                                    <div className="p-1 h-full">
-                                        <ProductCard product={product} showAddToCart={true} />
-                                    </div>
-                                </CarouselItem>
-                            ))}
-                        </CarouselContent>
-                    </Carousel>
-                     <div className="flex items-center justify-center gap-2 mt-8">
+                <Carousel 
+                    setApi={setApi} 
+                    className="w-full" 
+                    opts={{loop: true, align: 'start'}}
+                >
+                    <CarouselContent className="-ml-2 md:-ml-4">
+                        {featuredProducts.map((product) => (
+                            <CarouselItem key={product.id} className="basis-4/5 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 pl-2 md:pl-4">
+                                <div className="p-1 h-full">
+                                    <ProductCard product={product} showAddToCart={true} />
+                                </div>
+                            </CarouselItem>
+                        ))}
+                    </CarouselContent>
+                    <div className="flex items-center justify-center gap-2 mt-8">
                         {featuredProducts.map((_, index) => (
                             <button
                             key={index}
@@ -80,16 +81,7 @@ export function ProductSelector({ products }: { products: Product[] }) {
                             />
                         ))}
                     </div>
-                </div>
-
-                {/* desktop grid */}
-                <div className="hidden md:grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                    {featuredProducts.map((product) => (
-                        <div key={product.id}>
-                            <ProductCard product={product} showAddToCart={true} />
-                        </div>
-                    ))}
-                </div>
+                </Carousel>
 
                 <div className="text-center mt-12">
                     <Button asChild variant="outline" size="lg">

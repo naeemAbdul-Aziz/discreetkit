@@ -120,6 +120,8 @@ export default async function Home() {
   const lubricant = products.find(p => p.id === 6);
   if (lubricant) {
     lubricant.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413266/lube_ysdpst.png';
+    // Mark lubricant as featured for the homepage carousel
+    lubricant.featured = true;
   }
 
   return (
