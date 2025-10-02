@@ -8,7 +8,7 @@ import type { Product } from '@/lib/data';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { AddToCartManager } from '@/app/products/[id]/(components)/add-to-cart-manager';
 
@@ -58,6 +58,9 @@ export function ProductFeature({ product, reverse = false }: { product: Product,
                         placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(600, 600))}`}
                     />
                 )}
+                 <div className="absolute top-4 right-4 h-10 w-10 bg-background/50 backdrop-blur-sm rounded-full flex items-center justify-center text-foreground">
+                    <ArrowUpRight className="h-5 w-5" />
+                </div>
             </Link>
 
             {/* content column */}
@@ -88,14 +91,6 @@ export function ProductFeature({ product, reverse = false }: { product: Product,
                                 Bundle & Save GHS {product.savings_ghs.toFixed(2)}
                             </Badge>
                         )}
-                    </div>
-                    <div className="w-full sm:w-auto">
-                        <Button size="lg" variant="outline" className="w-full sm:w-auto" asChild>
-                            <Link href={`/products/${product.id}`}>
-                                View Details
-                                <ArrowRight />
-                            </Link>
-                        </Button>
                     </div>
                 </div>
             </div>
