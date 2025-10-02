@@ -63,7 +63,7 @@ export function ProductCard({ product, showAddToCart = true }: { product: Produc
                         </Badge>
                     )}
                      {!showAddToCart && (
-                        <div className="absolute top-3 right-3 h-8 w-8 bg-background/50 backdrop-blur-sm rounded-full flex items-center justify-center text-foreground transition-transform group-hover:scale-110 group-hover:-rotate-45">
+                        <div className="absolute top-3 right-3 h-8 w-8 bg-background/50 backdrop-blur-sm rounded-full flex items-center justify-center text-foreground -rotate-45">
                             <ArrowRight className="h-5 w-5" />
                         </div>
                     )}
