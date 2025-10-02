@@ -298,7 +298,7 @@ export default async function ProductDetailPageWrapper({ params }: { params: { i
     product.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png';
   }
   if (product.id === 8) { // All-in-one
-    product.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759403673/bundle_qwaywe.png';
+    product.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406231/discreetkit_bundle_wtlser.png';
   }
 
 

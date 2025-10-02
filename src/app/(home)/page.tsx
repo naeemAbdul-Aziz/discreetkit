@@ -100,7 +100,7 @@ export default async function Home() {
   const postpill = products.find(p => p.id === 4);
   
   if (allInOneBundle) {
-      allInOneBundle.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759403673/bundle_qwaywe.png';
+      allInOneBundle.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406231/discreetkit_bundle_wtlser.png';
   }
 
   if (pregnancyTest) {
