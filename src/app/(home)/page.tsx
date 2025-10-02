@@ -90,7 +90,7 @@ const ContactUs = dynamic(
 
 // a wrapper component to provide consistent styling for page sections.
 const SectionWrapper: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className }) => (
-  <div className={cn(className)}>
+  <div className={cn('bg-background', className)}>
     {children}
   </div>
 );
@@ -100,9 +100,11 @@ export default async function Home() {
   const products = await getProducts();
   const hivTestKit = products.find(p => p.id === 1); // Standard HIV Kit
   const pregnancyTest = products.find(p => p.id === 2); // Pregnancy Test Kit
+  const coupleBundle = products.find(p => p.id === 3); // Support Bundle (Couple)
+  const allInOneBundle = products.find(p => p.id === 8); // The All-In-One
 
   return (
-    <div className="flex flex-col bg-background">
+    <div className="flex flex-col">
       <SectionWrapper>
         <Hero />
       </SectionWrapper>
@@ -120,6 +122,18 @@ export default async function Home() {
       {pregnancyTest && (
            <SectionWrapper>
               <ProductFeature product={pregnancyTest} reverse={true} />
+          </SectionWrapper>
+      )}
+
+      {coupleBundle && (
+          <SectionWrapper>
+              <ProductFeature product={coupleBundle} />
+          </SectionWrapper>
+      )}
+
+      {allInOneBundle && (
+           <SectionWrapper>
+              <ProductFeature product={allInOneBundle} reverse={true} />
           </SectionWrapper>
       )}
 
@@ -151,7 +165,7 @@ export default async function Home() {
         <Faq />
       </SectionWrapper>
       
-      <SectionWrapper className="bg-muted">
+      <SectionWrapper>
         <ContactUs />
       </SectionWrapper>
     </div>

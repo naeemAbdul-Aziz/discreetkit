@@ -46,7 +46,7 @@ We sell a range of health and wellness products for private, informational use.
     *   Description: Includes a 12-pack of condoms and a personal lubricant for complete preparation.
     *   Price: GHS 100.00
 
-8.  **The Trifecta**
+8.  **The All-In-One**
     *   Description: Contains 1 HIV Kit, 1 Pregnancy Test, and 1 Postpill. Your all-in-one pack for total readiness.
     *   Standard Price: GHS 200.00
     *   Student Price: GHS 170.00
@@ -84,5 +84,5 @@ A self-test result is preliminary and not a medical diagnosis.
 -   **Negative Result:** A negative result is reassuring, but it's important to be aware of the window period for tests like HIV.
 
 ## Refunds & Returns
-Due to the medical and personal nature of our products, all sales are final. We cannot accept returns. If a product arrives damaged, the user should contact us within their order code for a replacement.
+Due to the medical and personal nature of our products, all sales are final. We cannot accept returns. If a product arrives damaged, the user should contact us with their order code for a replacement.
 `
