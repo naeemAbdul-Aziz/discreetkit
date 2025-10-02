@@ -35,12 +35,22 @@ async function getTestKits(): Promise<Product[]> {
           price_ghs: Number(p.price_ghs),
           student_price_ghs: p.student_price_ghs ? Number(p.student_price_ghs) : null,
           savings_ghs: p.savings_ghs ? Number(p.savings_ghs) : null,
+          brand: p.brand || 'DiscreetKit',
         };
     });
 }
 
 export default async function TestKitsPage() {
     const testKits = await getTestKits();
+
+    const productsByBrand = testKits.reduce((acc, product) => {
+        const brand = product.brand || 'Other Brands';
+        if (!acc[brand]) {
+            acc[brand] = [];
+        }
+        acc[brand].push(product);
+        return acc;
+    }, {} as Record<string, Product[]>);
 
   return (
     <div className="bg-background">
@@ -55,9 +65,16 @@ export default async function TestKitsPage() {
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {testKits.map((product) => (
-                    <ProductCard key={product.id} product={product} />
+            <div className="space-y-12">
+                {Object.entries(productsByBrand).map(([brand, products]) => (
+                    <div key={brand}>
+                        <h2 className="font-headline text-2xl font-bold text-foreground mb-6 border-b pb-2">{brand}</h2>
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                            {products.map((product) => (
+                                <ProductCard key={product.id} product={product} />
+                            ))}
+                        </div>
+                    </div>
                 ))}
             </div>
         </div>

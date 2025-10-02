@@ -176,7 +176,7 @@ export const partnerCareSteps: Step[] = [
         number: 4,
         title: 'Continued Support on Your Journey',
         description: 'Our partnership ensures you have a trusted place for follow-up care, prescriptions, and any future health questions you might have.',
-        imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759415106/marie_stopes_logo_zqmikw.webp',
+        imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758223637/marie-stopes-logo_do0j8g.png',
         imageHint: 'continued support journey',
     }
 ];
@@ -191,7 +191,7 @@ export const productBenefits: ProductBenefit[] = [
 
 export const marieStopesData: MarieStopesData = {
     name: "Marie Stopes Ghana",
-    logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759415106/marie_stopes_logo_zqmikw.webp",
+    logoUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758223637/marie-stopes-logo_do0j8g.png",
     website: "https://www.mariestopes.org.gh",
     contact: {
         phone: "0800208080",
