@@ -1,4 +1,8 @@
 
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import type { EmblaCarouselType } from 'embla-carousel';
 import { getSupabaseClient } from '@/lib/supabase';
 import type { Product } from '@/lib/data';
 import { notFound } from 'next/navigation';
@@ -11,31 +15,8 @@ import { ProductCard } from '../(components)/product-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { cn } from '@/lib/utils';
 
-
-export const dynamic = 'force-dynamic';
-export const revalidate = 60; // Revalidate data every 60 seconds
-
-// This generates the metadata for the page (e.g., title, description).
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const product = await getProduct(params.id);
-
-  if (!product) {
-    return {
-      title: 'Product Not Found',
-    };
-  }
-
-  return {
-    title: product.name,
-    description: product.description || 'View details for our confidential health products.',
-    openGraph: {
-        title: product.name,
-        description: product.description || '',
-        images: product.image_url ? [product.image_url] : [],
-    },
-  };
-}
 
 // This function fetches the data for a single product.
 async function getProduct(id: string): Promise<Product | null> {
@@ -133,17 +114,58 @@ const getWhatsInTheBox = (productId: number) => {
 }
 
 
-export default async function ProductDetailPage({ params }: { params: { id: string } }) {
-    const product = await getProduct(params.id);
-    
-    if (!product) {
-        notFound();
-    }
+export default function ProductDetailPageWrapper({ params }: { params: { id: string } }) {
+  const [product, setProduct] = useState<Product | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    const relatedProducts = await getRelatedProducts(product.id);
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      const productData = await getProduct(params.id);
+      if (productData) {
+        setProduct(productData);
+        const relatedData = await getRelatedProducts(productData.id);
+        setRelatedProducts(relatedData);
+      } else {
+        notFound();
+      }
+      setLoading(false);
+    };
+    fetchData();
+  }, [params.id]);
+  
+  if (loading) {
+    return <div className="min-h-screen bg-background" />;
+  }
+
+  if (!product) {
+    return notFound();
+  }
+
+  return <ProductDetailContent product={product} relatedProducts={relatedProducts} />;
+}
+
+function ProductDetailContent({ product, relatedProducts }: { product: Product, relatedProducts: Product[] }) {
     const instructions = getUsageInstructions(product.id);
     const boxContents = getWhatsInTheBox(product.id);
 
+    const [api, setApi] = useState<EmblaCarouselType | undefined>();
+    const [selectedIndex, setSelectedIndex] = useState(0);
+
+    const onSelect = useCallback((emblaApi: EmblaCarouselType) => {
+        setSelectedIndex(emblaApi.selectedScrollSnap());
+    }, []);
+
+    useEffect(() => {
+        if (!api) return;
+        onSelect(api);
+        api.on('select', onSelect);
+        api.on('reInit', onSelect);
+        return () => {
+          api.off('select', onSelect);
+        };
+    }, [api, onSelect]);
 
   return (
     <div className="bg-background">
@@ -249,25 +271,43 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
                 <h2 className="font-headline text-3xl font-bold text-foreground mb-8 text-center">
                     You Might Also Like
                 </h2>
-                <Carousel
-                    opts={{
-                        align: "start",
-                        loop: false,
-                    }}
-                    className="w-full"
-                >
-                    <CarouselContent className="-ml-4">
-                        {relatedProducts.map((p) => (
-                           <CarouselItem key={p.id} className="pl-4 basis-1/2 md:basis-1/3 lg:basis-1/4">
-                                <div className="h-full p-1">
-                                    <ProductCard product={p} />
-                                </div>
-                            </CarouselItem>
+                
+                {/* mobile carousel */}
+                <div className="md:hidden">
+                    <Carousel setApi={setApi} className="w-full" opts={{loop: true}}>
+                        <CarouselContent>
+                            {relatedProducts.map((p) => (
+                                <CarouselItem key={p.id} className="basis-4/5">
+                                    <div className="p-1 h-full">
+                                        <ProductCard product={p} />
+                                    </div>
+                                </CarouselItem>
+                            ))}
+                        </CarouselContent>
+                    </Carousel>
+                    <div className="flex items-center justify-center gap-2 mt-8">
+                        {relatedProducts.map((_, index) => (
+                            <button
+                            key={index}
+                            onClick={() => api?.scrollTo(index)}
+                            className={cn(
+                                'h-2 w-2 rounded-full bg-border transition-all',
+                                index === selectedIndex ? 'w-4 bg-primary' : 'hover:bg-primary/50'
+                            )}
+                            aria-label={`go to slide ${index + 1}`}
+                            />
                         ))}
-                    </CarouselContent>
-                    <CarouselPrevious className="absolute -left-4 top-1/2 -translate-y-1/2" />
-                    <CarouselNext className="absolute -right-4 top-1/2 -translate-y-1/2" />
-                </Carousel>
+                    </div>
+                </div>
+
+                {/* desktop grid */}
+                <div className="hidden md:grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                    {relatedProducts.map((p) => (
+                        <div key={p.id}>
+                            <ProductCard product={p} />
+                        </div>
+                    ))}
+                </div>
             </div>
         )}
       </div>
