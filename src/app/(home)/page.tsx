@@ -39,7 +39,6 @@ const componentMap = {
   ProductSelector: { height: '700px' },
   ProductBenefits: { height: '100px' },
   HowItWorks: { height: '800px' },
-  PartnerReferral: { height: '500px' },
   OurVision: { height: '800px' },
   Testimonials: { height: '500px' },
   Faq: { height: '600px' },
@@ -66,10 +65,6 @@ const ProductBenefits = dynamic(
 const HowItWorks = dynamic(
   () => import('./components/how-it-works').then((mod) => mod.HowItWorks),
   { loading: () => <LoadingSkeleton height={componentMap.HowItWorks.height} /> }
-);
-const PartnerReferral = dynamic(
-  () => import('./components/partner-referral').then((mod) => mod.PartnerReferral),
-  { loading: () => <LoadingSkeleton height={componentMap.PartnerReferral.height} /> }
 );
 const OurVision = dynamic(
   () => import('./components/our-vision').then((mod) => mod.OurVision),
@@ -129,10 +124,6 @@ export default async function Home() {
 
       <SectionWrapper>
         <HowItWorks />
-      </SectionWrapper>
-
-      <SectionWrapper>
-        <PartnerReferral />
       </SectionWrapper>
       
       <SectionWrapper>
