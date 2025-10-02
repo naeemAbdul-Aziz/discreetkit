@@ -113,39 +113,6 @@ const getWhatsInTheBox = (productId: number) => {
     }
 }
 
-
-export default function ProductDetailPageWrapper({ params }: { params: { id: string } }) {
-  const [product, setProduct] = useState<Product | null>(null);
-  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      const productData = await getProduct(params.id);
-      if (productData) {
-        setProduct(productData);
-        const relatedData = await getRelatedProducts(productData.id);
-        setRelatedProducts(relatedData);
-      } else {
-        notFound();
-      }
-      setLoading(false);
-    };
-    fetchData();
-  }, [params.id]);
-  
-  if (loading) {
-    return <div className="min-h-screen bg-background" />;
-  }
-
-  if (!product) {
-    return notFound();
-  }
-
-  return <ProductDetailContent product={product} relatedProducts={relatedProducts} />;
-}
-
 function ProductDetailContent({ product, relatedProducts }: { product: Product, relatedProducts: Product[] }) {
     const instructions = getUsageInstructions(product.id);
     const boxContents = getWhatsInTheBox(product.id);
@@ -313,4 +280,17 @@ function ProductDetailContent({ product, relatedProducts }: { product: Product, 
       </div>
     </div>
   );
+}
+
+
+export default async function ProductDetailPageWrapper({ params }: { params: { id: string } }) {
+  const product = await getProduct(params.id);
+  
+  if (!product) {
+    notFound();
+  }
+
+  const relatedProducts = await getRelatedProducts(product.id);
+
+  return <ProductDetailContent product={product} relatedProducts={relatedProducts} />;
 }
