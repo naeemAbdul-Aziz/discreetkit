@@ -63,7 +63,7 @@ export function ProductCard({ product, showAddToCart = true }: { product: Produc
                         </Badge>
                     )}
                      {!showAddToCart && (
-                        <div className="absolute top-3 right-3 h-8 w-8 bg-background/50 backdrop-blur-sm rounded-full flex items-center justify-center text-foreground">
+                        <div className="absolute top-4 right-4 h-10 w-10 bg-background/50 backdrop-blur-sm rounded-full flex items-center justify-center text-foreground">
                             <ArrowUpRight className="h-5 w-5" />
                         </div>
                     )}
