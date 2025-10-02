@@ -4,10 +4,13 @@
  *              call-to-action buttons, and a prominent image.
  */
 
+'use client';
+
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, Truck } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 // a shimmer effect for image placeholders to improve loading perception.
 const shimmer = (w: number, h: number) => `
@@ -35,10 +38,13 @@ export function Hero() {
   return (
     <section className="overflow-hidden">
       <div className="container mx-auto px-4 md:px-6 py-12 md:pt-20 md:pb-12">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-8 items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             {/* left content column */}
-            <div
-                className="md:col-span-2 text-center md:text-left"
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="text-center md:text-left"
             >
                 <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
                     Get Sorted <span className="font-light italic text-primary">Discreetly</span>.
@@ -65,11 +71,14 @@ export function Hero() {
                         </Link>
                     </Button>
                 </div>
-            </div>
+            </motion.div>
 
             {/* right image column */}
-            <div 
-                className="relative md:col-span-3 h-[300px] md:h-[450px] w-full"
+            <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="relative h-[300px] md:h-[450px] w-full"
             >
                 <Image
                     src="https://res.cloudinary.com/dzfa6wqb8/image/upload/w_800,h_600,c_fill,q_auto,f_auto/v1756313856/woman_smiling_package_g5rnqh.jpg"
@@ -80,7 +89,7 @@ export function Hero() {
                     data-ai-hint="happy woman box"
                     placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 600))}`}
                 />
-            </div>
+            </motion.div>
         </div>
       </div>
     </section>
