@@ -92,6 +92,10 @@ export default async function ProductsPage() {
     if (postpill) {
       postpill.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png';
     }
+    const lubricant = products.find(p => p.id === 6);
+    if (lubricant) {
+        lubricant.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413266/lube_ysdpst.png';
+    }
 
     const testKits = products.filter(p => p.name.includes('HIV') || p.name.includes('Pregnancy'));
     const bundles = products.filter(p => p.name.includes('Bundle') || p.name.includes('All-In-One'));

@@ -1,3 +1,4 @@
+
 /**
  * @file page.tsx
  * @description the main entry point for the homepage. it fetches product data
@@ -115,6 +116,10 @@ export default async function Home() {
   const postpill = products.find(p => p.id === 4);
   if (postpill) {
     postpill.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png';
+  }
+  const lubricant = products.find(p => p.id === 6);
+  if (lubricant) {
+    lubricant.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413266/lube_ysdpst.png';
   }
 
   return (
