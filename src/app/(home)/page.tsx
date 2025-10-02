@@ -115,6 +115,10 @@ export default async function Home() {
   if (hivTest) {
     hivTest.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png';
   }
+  
+  if (coupleBundle) {
+      coupleBundle.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407003/couple_cxwfer.png';
+  }
 
 
   return (
