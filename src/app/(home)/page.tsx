@@ -28,11 +28,24 @@ async function getProducts(): Promise<Product[]> {
         return [];
     }
     // ensure numeric types are correctly cast from what might be strings in the db.
-    return products.map(p => ({
-      ...p,
-      price_ghs: Number(p.price_ghs),
-      student_price_ghs: p.student_price_ghs ? Number(p.student_price_ghs) : null,
-    }));
+    return products.map(p => {
+      let imageUrl = p.image_url;
+      if (p.id === 1) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png';
+      if (p.id === 2) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759404957/discreetkit_pregnancy_cujiod.png';
+      if (p.id === 3) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413735/couple_bundle_rfbpn0.png';
+      if (p.id === 4) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png';
+      if (p.id === 5) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413220/condoms_j5qyqj.png';
+      if (p.id === 6) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413266/lube_ysdpst.png';
+      if (p.id === 7) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413627/weekend_bundle_t8cfxp.png';
+      if (p.id === 8) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png';
+      
+      return {
+        ...p,
+        image_url: imageUrl,
+        price_ghs: Number(p.price_ghs),
+        student_price_ghs: p.student_price_ghs ? Number(p.student_price_ghs) : null,
+      };
+    });
 }
 
 // a map to define heights for loading skeletons for a better user experience.
@@ -97,42 +110,9 @@ export default async function Home() {
   // fetch product data on the server.
   const products = await getProducts();
   
-  // Override images with new mockups
-  const allInOneBundle = products.find(p => p.id === 8);
-  if (allInOneBundle) {
-      allInOneBundle.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png';
-  }
   const coupleBundle = products.find(p => p.id === 3);
-  if (coupleBundle) {
-      coupleBundle.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413735/couple_bundle_rfbpn0.png';
-  }
-  const hivTest = products.find(p => p.id === 1);
-  if (hivTest) {
-    hivTest.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png';
-  }
-  const pregnancyTest = products.find(p => p.id === 2);
-  if (pregnancyTest) {
-    pregnancyTest.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759404957/discreetkit_pregnancy_cujiod.png';
-  }
-  const postpill = products.find(p => p.id === 4);
-  if (postpill) {
-    postpill.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png';
-  }
-  const lubricant = products.find(p => p.id === 6);
-  if (lubricant) {
-    lubricant.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413266/lube_ysdpst.png';
-    lubricant.featured = true;
-  }
-  const condomPack = products.find(p => p.id === 5);
-  if (condomPack) {
-      condomPack.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413220/condoms_j5qyqj.png';
-  }
-  const weekendBundle = products.find(p => p.id === 7);
-  if (weekendBundle) {
-    weekendBundle.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413627/weekend_bundle_t8cfxp.png';
-  }
-
-
+  const allInOneBundle = products.find(p => p.id === 8);
+  
   return (
     <div className="flex flex-col">
       <SectionWrapper>
