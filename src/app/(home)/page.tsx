@@ -97,6 +97,7 @@ export default async function Home() {
   const coupleBundle = products.find(p => p.id === 3); // Support Bundle (Couple)
   const allInOneBundle = products.find(p => p.id === 8); // The All-In-One
   const pregnancyTest = products.find(p => p.id === 2);
+  const postpill = products.find(p => p.id === 4);
   
   if (allInOneBundle) {
       allInOneBundle.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759403673/bundle_qwaywe.png';
@@ -104,6 +105,10 @@ export default async function Home() {
 
   if (pregnancyTest) {
     pregnancyTest.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759404957/discreetkit_pregnancy_cujiod.png';
+  }
+
+  if (postpill) {
+    postpill.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405241/discreetkit_postpill_fgpy5d.png';
   }
 
 

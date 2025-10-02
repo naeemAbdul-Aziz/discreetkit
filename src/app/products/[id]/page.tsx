@@ -290,6 +290,18 @@ export default async function ProductDetailPageWrapper({ params }: { params: { i
     notFound();
   }
 
+  // Override images with new mockups
+  if (product.id === 2) { // Pregnancy Test
+    product.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759404957/discreetkit_pregnancy_cujiod.png';
+  }
+  if (product.id === 4) { // Postpill
+    product.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405241/discreetkit_postpill_fgpy5d.png';
+  }
+  if (product.id === 8) { // All-in-one
+    product.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759403673/bundle_qwaywe.png';
+  }
+
+
   const relatedProducts = await getRelatedProducts(product.id);
 
   return <ProductDetailContent product={product} relatedProducts={relatedProducts} />;
