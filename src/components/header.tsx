@@ -17,16 +17,15 @@ import { useCart } from '@/hooks/use-cart';
 import { Separator } from './ui/separator';
 
 // define navigation links for easy management.
-const navLinksLeft = [
-  { href: '/products', label: 'Shop' },
+const navLinks = [
+  { href: '/products/test-kits', label: 'Test Kits' },
+  { href: '/products/bundles', label: 'Bundles' },
+  { href: '/products/wellness', label: 'Wellness' },
   { href: '/#how-it-works', label: 'How It Works' },
-];
-
-const navLinksRight = [
   { href: '/partner-care', label: 'Our Partners' },
-  { href: '/#faq', label: 'FAQ' },
   { href: '/track', label: 'Track Order' },
 ];
+
 
 // a client component to display the cart icon with a badge for the number of items.
 function CartLink() {
@@ -140,24 +139,18 @@ export function Header() {
           )}
         >
           {/* desktop navigation */}
-          <nav className="hidden md:flex md:w-1/3 justify-start items-center gap-1">
-            {[...navLinksLeft, navLinksRight[0]].map((link) => (
+          <nav className="hidden md:flex items-center gap-4">
+            <Link href="/" aria-label="DiscreetKit Homepage" className="mr-4">
+              <Logo />
+            </Link>
+            {navLinks.map((link) => (
               <NavLink key={link.href} {...link} />
             ))}
           </nav>
 
-          <div className="hidden md:flex md:w-1/3 justify-center">
-            <Link href="/" aria-label="DiscreetKit Homepage">
-              <Logo />
-            </Link>
-          </div>
-          
-          <nav className="hidden md:flex md:w-1/3 justify-end items-center gap-1">
-            {navLinksRight.slice(1).map((link) => (
-              <NavLink key={link.href} {...link} />
-            ))}
+          <div className="hidden md:flex items-center gap-1">
             <CartLink />
-          </nav>
+          </div>
 
           {/* mobile menu */}
           <div className="flex w-full items-center justify-between md:hidden">
@@ -190,7 +183,7 @@ export function Header() {
                    </SheetHeader>
                    <Separator className="my-4" />
                   <div className="mt-8 flex flex-col space-y-2">
-                    {[...navLinksLeft, ...navLinksRight].map((link) => (
+                    {navLinks.map((link) => (
                       <MobileNavLink
                         key={link.href}
                         href={link.href}

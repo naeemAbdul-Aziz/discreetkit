@@ -19,7 +19,7 @@ const categories = [
         examples: ['HIV Self-test', 'Pregnancy Test'],
         image_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png',
         image_hint: 'HIV test kit',
-        href: '/products#test-kits'
+        href: '/products/test-kits'
     },
     {
         name: 'Value Bundles',
@@ -27,7 +27,7 @@ const categories = [
         examples: ['The All-In-One', 'Support Bundle'],
         image_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png',
         image_hint: 'health product bundle',
-        href: '/products#bundles'
+        href: '/products/bundles'
     },
     {
         name: 'Wellness Essentials',
@@ -35,7 +35,7 @@ const categories = [
         examples: ['Emergency Contraception', 'Condoms & Lube'],
         image_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png',
         image_hint: 'emergency contraception pill',
-        href: '/products#wellness'
+        href: '/products/wellness'
     },
 ]
 
@@ -123,7 +123,7 @@ export function ProductSelector() {
 
                 <div className="text-center mt-12">
                     <Button asChild variant="outline" size="lg">
-                        <Link href="/products">
+                        <Link href="/products/bundles">
                             Shop All Products
                             <ArrowRight />
                         </Link>
