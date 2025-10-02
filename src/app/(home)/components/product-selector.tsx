@@ -9,27 +9,30 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const categories = [
     {
         name: 'Test Kits',
-        description: 'Private, WHO-approved self-test kits for HIV and pregnancy.',
+        description: 'Private, WHO-approved self-test kits.',
+        examples: ['HIV Self-test', 'Pregnancy Test'],
         image_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png',
         image_hint: 'HIV test kit',
         href: '/products#test-kits'
     },
     {
         name: 'Value Bundles',
-        description: 'Save money with our curated bundles for complete peace of mind.',
+        description: 'Save money with our curated bundles.',
+        examples: ['The All-In-One', 'Support Bundle'],
         image_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png',
         image_hint: 'health product bundle',
         href: '/products#bundles'
     },
     {
         name: 'Wellness Essentials',
-        description: 'Contraception and personal care to complete your health toolkit.',
+        description: 'Contraception and personal care items.',
+        examples: ['Emergency Contraception', 'Condoms & Lube'],
         image_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png',
         image_hint: 'emergency contraception pill',
         href: '/products#wellness'
@@ -84,12 +87,12 @@ export function ProductSelector() {
                         >
                             <Link href={category.href} className="h-full block group">
                                 <Card className="h-full flex flex-col rounded-2xl bg-card overflow-hidden">
-                                     <div className="relative aspect-[4/3] w-full bg-muted/50">
+                                     <div className="relative aspect-square w-full bg-muted/50">
                                         <Image
                                             src={category.image_url}
                                             alt={category.name}
                                             fill
-                                            className="object-contain p-4"
+                                            className="object-contain p-4 transition-transform duration-300 group-hover:scale-105"
                                             sizes="(max-width: 768px) 100vw, 33vw"
                                             data-ai-hint={category.image_hint}
                                             placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
@@ -97,7 +100,17 @@ export function ProductSelector() {
                                     </div>
                                     <div className="p-6 flex flex-col flex-grow">
                                         <h3 className="text-xl font-bold text-foreground">{category.name}</h3>
-                                        <p className="mt-2 text-base text-muted-foreground flex-grow">{category.description}</p>
+                                        <p className="mt-2 text-sm text-muted-foreground">{category.description}</p>
+                                        
+                                        <ul className="mt-4 space-y-2 text-sm text-muted-foreground flex-grow">
+                                            {category.examples.map(example => (
+                                                <li key={example} className="flex items-center gap-2">
+                                                    <Check className="h-4 w-4 text-primary" />
+                                                    <span>{example}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+
                                         <div className="mt-6 text-sm font-semibold text-primary flex items-center gap-2 group-hover:underline">
                                             Shop Now <ArrowRight className="h-4 w-4" />
                                         </div>
