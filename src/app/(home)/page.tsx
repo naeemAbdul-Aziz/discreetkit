@@ -98,7 +98,7 @@ export default async function Home() {
   const allInOneBundle = products.find(p => p.id === 8); // The All-In-One
   
   if (allInOneBundle) {
-      allInOneBundle.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758603359/all-in-one-mockup_v2_fqi3kc.png';
+      allInOneBundle.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759403673/bundle_qwaywe.png';
   }
 
 
