@@ -75,7 +75,7 @@ export default async function ProductsPage() {
     }
     const postpill = products.find(p => p.id === 4);
     if (postpill) {
-      postpill.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405241/discreetkit_postpill_fgpy5d.png';
+      postpill.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png';
     }
     
     const testKits = products.filter(p => p.name.includes('HIV Kit') || p.name.includes('Pregnancy Test'));

@@ -108,7 +108,7 @@ export default async function Home() {
   }
 
   if (postpill) {
-    postpill.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405241/discreetkit_postpill_fgpy5d.png';
+    postpill.image_url = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png';
   }
 
 

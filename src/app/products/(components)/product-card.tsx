@@ -43,7 +43,7 @@ export function ProductCard({ product, showAddToCart = true }: { product: Produc
     const isInCart = quantity > 0;
 
     return (
-        <Card className="h-full flex flex-col rounded-2xl overflow-hidden group">
+        <Card className="h-full flex flex-col rounded-2xl overflow-hidden group bg-background">
              <Link href={`/products/${product.id}`} className="block">
                 <div className="relative aspect-[4/3] w-full bg-muted/50">
                     {product.image_url && (
