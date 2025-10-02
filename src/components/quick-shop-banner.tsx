@@ -1,8 +1,8 @@
 /**
- * @file quick-shop-banner.tsx
- * @description a floating banner that remains visible, providing a persistent and
- *              engaging link to products to encourage conversion. It features an
- *              image and animated text to capture user attention.
+ * @file floating-shop-button.tsx
+ * @description A floating action button that provides a persistent link to the
+ *              products page, designed to gently encourage conversion. It features
+ *              a subtle animation to catch the user's eye.
  */
 
 'use client';
@@ -10,35 +10,26 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Button } from './ui/button';
-import { ArrowRight, X } from 'lucide-react';
+import { ShoppingBag } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
-export function QuickShopBanner() {
+export function FloatingShopButton() {
   const pathname = usePathname();
   const [isVisible, setIsVisible] = useState(false);
-  const [isDismissed, setIsDismissed] = useState(false);
 
-  // effect to show the banner after a delay, but only once per session.
+  // Effect to show the button after a short delay to not be intrusive on page load.
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (sessionStorage.getItem('quickShopBannerDismissed') !== 'true') {
-        setIsVisible(true);
-      }
-    }, 3000); // show after 3 seconds
+      setIsVisible(true);
+    }, 1500); // Show after 1.5 seconds
 
     return () => clearTimeout(timer);
   }, []);
 
-  const handleDismiss = () => {
-    setIsVisible(false);
-    setIsDismissed(true);
-    sessionStorage.setItem('quickShopBannerDismissed', 'true');
-  };
-
-  // hide the banner on checkout pages or if it has been dismissed.
-  if (isDismissed || pathname.startsWith('/cart') || pathname.startsWith('/order') || pathname.startsWith('/track')) {
+  // Do not show the button on cart or order pages to avoid distraction during checkout.
+  if (pathname.startsWith('/cart') || pathname.startsWith('/order')) {
     return null;
   }
 
@@ -46,45 +37,29 @@ export function QuickShopBanner() {
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          initial={{ y: 200, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 200, opacity: 0 }}
-          transition={{ type: 'spring', stiffness: 260, damping: 30 }}
-          className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-md"
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0, opacity: 0 }}
+          transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+          className="fixed bottom-6 right-6 z-50"
         >
-          <div className="relative overflow-hidden rounded-2xl border bg-card p-4 shadow-2xl">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-2 right-2 h-7 w-7 rounded-full bg-black/5"
-              onClick={handleDismiss}
-              aria-label="dismiss banner"
-            >
-              <X className="h-4 w-4 text-muted-foreground" />
+          <motion.div
+            animate={{
+              rotate: [0, -10, 10, -10, 10, 0],
+            }}
+            transition={{
+              duration: 0.5,
+              repeat: Infinity,
+              repeatDelay: 5, // Wiggle every 5 seconds
+              repeatType: 'loop',
+            }}
+          >
+            <Button asChild size="icon" className="h-14 w-14 rounded-full shadow-2xl">
+              <Link href="/products" aria-label="shop all products">
+                <ShoppingBag className="h-7 w-7" />
+              </Link>
             </Button>
-            <div className="flex items-center gap-4">
-              <div className="relative h-16 w-16 flex-shrink-0 rounded-lg bg-muted overflow-hidden">
-                <Image
-                  src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757958930/hiv-test-kit-on-white-background_l9jxyx.png"
-                  alt="HIV Self-Test Kit"
-                  fill
-                  className="object-contain p-2"
-                  sizes="64px"
-                  data-ai-hint="medical test kit"
-                />
-              </div>
-              <div className="flex-grow">
-                <p className="text-base font-semibold text-foreground">
-                    Safe. Discreet. Sorted.
-                </p>
-                <Button asChild size="sm" className="mt-2">
-                  <Link href="/products">
-                    Shop Now <ArrowRight />
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          </div>
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
