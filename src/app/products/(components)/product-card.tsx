@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Plus, Minus, Trash2 } from 'lucide-react';
+import { Plus, Minus, Trash2, ArrowRight } from 'lucide-react';
 import { useCart } from '@/hooks/use-cart';
 import type { Product } from '@/lib/data';
 import { cn } from '@/lib/utils';
@@ -31,7 +31,7 @@ const toBase64 = (str: string) =>
     ? Buffer.from(str).toString('base64')
     : window.btoa(str);
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product, showAddToCart = true }: { product: Product; showAddToCart?: boolean }) {
     const { addItem, getItemQuantity, updateQuantity } = useCart();
     const [isMounted, setIsMounted] = useState(false);
 
@@ -81,25 +81,36 @@ export function ProductCard({ product }: { product: Product }) {
                     </div>
                     
                     <div className="w-auto text-right">
-                        {!isMounted ? (
-                            <Button disabled className="w-[120px]">
-                                Add to cart
-                            </Button>
-                        ) : isInCart ? (
-                            <div className="flex h-10 items-center justify-between rounded-full border bg-background p-1 shadow-sm w-[120px]">
-                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-primary" onClick={() => updateQuantity(product.id, quantity - 1)}>
-                                    {quantity === 1 ? <Trash2 className="h-4 w-4" /> : <Minus className="h-4 w-4" />}
-                                </Button>
-                                <span className="w-8 text-center font-bold text-foreground">{quantity}</span>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-primary" onClick={() => updateQuantity(product.id, quantity + 1)}>
-                                    <Plus className="h-4 w-4" />
-                                </Button>
-                            </div>
-                        ) : (
-                            <Button onClick={() => addItem(product)} className="w-[120px]">
-                                Add to cart
-                            </Button>
-                        )}
+                       {showAddToCart ? (
+                           <>
+                                {!isMounted ? (
+                                    <Button disabled className="w-[120px]">
+                                        Add to cart
+                                    </Button>
+                                ) : isInCart ? (
+                                    <div className="flex h-10 items-center justify-between rounded-full border bg-background p-1 shadow-sm w-[120px]">
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-primary" onClick={() => updateQuantity(product.id, quantity - 1)}>
+                                            {quantity === 1 ? <Trash2 className="h-4 w-4" /> : <Minus className="h-4 w-4" />}
+                                        </Button>
+                                        <span className="w-8 text-center font-bold text-foreground">{quantity}</span>
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-primary" onClick={() => updateQuantity(product.id, quantity + 1)}>
+                                            <Plus className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                ) : (
+                                    <Button onClick={() => addItem(product)} className="w-[120px]">
+                                        Add to cart
+                                    </Button>
+                                )}
+                           </>
+                       ) : (
+                           <Button asChild variant="outline">
+                               <Link href={`/products/${product.id}`}>
+                                   View Details
+                                   <ArrowRight />
+                               </Link>
+                           </Button>
+                       )}
                     </div>
                 </div>
             </CardContent>
