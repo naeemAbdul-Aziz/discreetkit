@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Plus, Minus, Trash2, ArrowRight } from 'lucide-react';
+import { Plus, Minus, Trash2, ArrowUpRight } from 'lucide-react';
 import { useCart } from '@/hooks/use-cart';
 import type { Product } from '@/lib/data';
 import { cn } from '@/lib/utils';
@@ -63,8 +63,8 @@ export function ProductCard({ product, showAddToCart = true }: { product: Produc
                         </Badge>
                     )}
                      {!showAddToCart && (
-                        <div className="absolute top-3 right-3 h-8 w-8 bg-background/50 backdrop-blur-sm rounded-full flex items-center justify-center text-foreground -rotate-45">
-                            <ArrowRight className="h-5 w-5" />
+                        <div className="absolute top-3 right-3 h-8 w-8 bg-background/50 backdrop-blur-sm rounded-full flex items-center justify-center text-foreground">
+                            <ArrowUpRight className="h-5 w-5" />
                         </div>
                     )}
                 </div>
