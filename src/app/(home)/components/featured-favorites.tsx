@@ -22,10 +22,10 @@ export function FeaturedFavoritesSection({ products }: { products: FeaturedProdu
       <div className="container mx-auto max-w-6xl px-4 md:px-6">
         <div className="text-center">
           <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            Customer Favorites: Selling Out Fast!
+            Popular Combo Deals
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground">
-            Don't miss out on what everyone is talking about. These top-rated essentials are flying off the shelves.
+            Get everything you need in one convenient package and save. Explore our best-value bundles.
           </p>
         </div>
 

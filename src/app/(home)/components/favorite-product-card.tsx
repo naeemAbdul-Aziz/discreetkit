@@ -104,13 +104,6 @@ export function FavoriteProductCard({ product }: { product: FeaturedProduct }) {
 
           <p className="mt-2 text-sm text-muted-foreground">{product.benefit}</p>
 
-          <div className="mt-3 flex items-center gap-3">
-            <div className="flex items-center gap-1 text-amber-500">
-              <Star className="h-4 w-4 fill-current" />
-              <span className="font-bold text-foreground">{product.rating_avg} Stars</span>
-            </div>
-            <span className="text-sm text-muted-foreground">({product.review_count.toLocaleString()} Reviews)</span>
-          </div>
         </div>
 
         <div className="mt-6 space-y-4">
