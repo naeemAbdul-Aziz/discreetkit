@@ -1,16 +1,21 @@
 /**
  * @file product-selector.tsx
  * @description displays a selection of product categories, linking to the main shop page.
+ *              It uses a carousel on mobile and a grid on desktop.
  */
 
 'use client';
 
+import { useState, useEffect, useCallback } from 'react';
+import type { EmblaCarouselType } from 'embla-carousel';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import { cn } from '@/lib/utils';
 
 const categories = [
     {
@@ -22,20 +27,20 @@ const categories = [
         href: '/products/test-kits'
     },
     {
-        name: 'Value Bundles',
-        description: 'Save money with our curated bundles.',
-        examples: ['The All-In-One', 'Support Bundle'],
-        image_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png',
-        image_hint: 'health product bundle',
-        href: '/products/bundles'
-    },
-    {
         name: 'Wellness Essentials',
         description: 'Contraception and personal care items.',
         examples: ['Emergency Contraception', 'Condoms & Lube'],
         image_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png',
         image_hint: 'emergency contraception pill',
         href: '/products/wellness'
+    },
+    {
+        name: 'Value Bundles',
+        description: 'Save money with our curated bundles.',
+        examples: ['The All-In-One', 'Support Bundle'],
+        image_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png',
+        image_hint: 'health product bundle',
+        href: '/products/bundles'
     },
 ]
 
@@ -60,6 +65,23 @@ const toBase64 = (str: string) =>
 
 
 export function ProductSelector() {
+    const [api, setApi] = useState<EmblaCarouselType | undefined>();
+    const [selectedIndex, setSelectedIndex] = useState(0);
+
+    const onSelect = useCallback((emblaApi: EmblaCarouselType) => {
+        setSelectedIndex(emblaApi.selectedScrollSnap());
+    }, []);
+
+    useEffect(() => {
+        if (!api) return;
+        onSelect(api);
+        api.on('select', onSelect);
+        api.on('reInit', onSelect);
+        return () => {
+            api.off('select', onSelect);
+        };
+    }, [api, onSelect]);
+
     return (
         <section id="products" className="py-12 md:py-24">
             <div className="container mx-auto px-4 md:px-6">
@@ -75,7 +97,69 @@ export function ProductSelector() {
                     </p>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                {/* Mobile Carousel */}
+                <div className="md:hidden">
+                    <Carousel
+                        setApi={setApi}
+                        opts={{ align: 'center', loop: true }}
+                        className="w-full"
+                    >
+                        <CarouselContent>
+                            {categories.map((category) => (
+                                <CarouselItem key={category.name} className="basis-4/5">
+                                    <div className="p-1 h-full">
+                                        <Link href={category.href} className="h-full block group">
+                                            <Card className="h-full flex flex-col rounded-2xl bg-card overflow-hidden">
+                                                <div className="relative aspect-square w-full bg-muted/50">
+                                                    <Image
+                                                        src={category.image_url}
+                                                        alt={category.name}
+                                                        fill
+                                                        className="object-contain p-4 transition-transform duration-300 group-hover:scale-105"
+                                                        sizes="(max-width: 768px) 80vw, 33vw"
+                                                        data-ai-hint={category.image_hint}
+                                                        placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
+                                                    />
+                                                </div>
+                                                <div className="p-6 flex flex-col flex-grow">
+                                                    <h3 className="text-xl font-bold text-foreground">{category.name}</h3>
+                                                    <p className="mt-2 text-sm text-muted-foreground">{category.description}</p>
+                                                    <ul className="mt-4 space-y-2 text-sm text-muted-foreground flex-grow">
+                                                        {category.examples.map(example => (
+                                                            <li key={example} className="flex items-center gap-2">
+                                                                <Check className="h-4 w-4 text-primary" />
+                                                                <span>{example}</span>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                    <div className="mt-6 text-sm font-semibold text-primary flex items-center gap-2 group-hover:underline">
+                                                        Shop Now <ArrowRight className="h-4 w-4" />
+                                                    </div>
+                                                </div>
+                                            </Card>
+                                        </Link>
+                                    </div>
+                                </CarouselItem>
+                            ))}
+                        </CarouselContent>
+                    </Carousel>
+                    <div className="flex items-center justify-center gap-2 mt-8">
+                        {categories.map((_, index) => (
+                            <button
+                                key={index}
+                                onClick={() => api?.scrollTo(index)}
+                                className={cn(
+                                    'h-2 w-2 rounded-full bg-border transition-all',
+                                    index === selectedIndex ? 'w-4 bg-primary' : 'hover:bg-primary/50'
+                                )}
+                                aria-label={`go to slide ${index + 1}`}
+                            />
+                        ))}
+                    </div>
+                </div>
+
+                {/* Desktop Grid */}
+                <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
                     {categories.map((category, index) => (
                         <motion.div
                             key={category.name}
