@@ -74,7 +74,7 @@ export function FavoriteProductCard({ product }: { product: FeaturedProduct }) {
   };
 
   return (
-    <Card className="group grid grid-cols-1 overflow-hidden rounded-2xl border-transparent transition-all md:grid-cols-[40%_60%] hover:shadow-lg">
+    <Card className="group grid grid-cols-1 overflow-hidden rounded-2xl transition-all md:grid-cols-[40%_60%] hover:-translate-y-1 hover:border-primary/30 hover:shadow-sm">
       <div className="relative aspect-[4/3] bg-muted/50">
         <Link href={`/products/${product.id}`} className="block h-full w-full">
           {product.image_url && (
