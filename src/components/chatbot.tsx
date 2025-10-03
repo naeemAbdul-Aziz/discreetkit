@@ -8,10 +8,10 @@
 
 import { useState, useRef, useEffect, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetClose } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Bot, Loader2, Send, User } from 'lucide-react';
+import { Bot, Loader2, Send, User, X } from 'lucide-react';
 import { handleChat } from '@/lib/actions';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { cn } from '@/lib/utils';
@@ -61,7 +61,7 @@ export function Chatbot() {
     const userMessage: Message = { role: 'user', parts: input };
     const newHistory = [...history, userMessage];
     setHistory(newHistory);
-    setInput('');
+setInput('');
     
     // use a transition to call the server action, preventing ui blocking.
     startTransition(async () => {
@@ -73,14 +73,18 @@ export function Chatbot() {
   return (
     <>
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetContent className="flex w-full flex-col sm:max-w-md">
-          <SheetHeader>
+        <SheetContent className="flex w-full flex-col sm:max-w-md p-0">
+          <SheetHeader className="p-6">
             <SheetTitle className="flex items-center gap-2">
                 <Bot /> Pacely
             </SheetTitle>
             <SheetDescription>
               Your friendly AI assistant for questions about DiscreetKit.
             </SheetDescription>
+             <SheetClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </SheetClose>
           </SheetHeader>
           <div className="flex-1 overflow-hidden">
             <ScrollArea className="h-full" ref={scrollAreaRef}>
