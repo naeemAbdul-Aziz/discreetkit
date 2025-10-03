@@ -12,8 +12,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { getSupabaseClient } from '@/lib/supabase';
 import type { Product } from '@/lib/data';
-import { ProductFeature } from './components/product-feature';
 import { ProductSelector } from './components/product-selector';
+import { FeaturedFavoritesSection } from './components/featured-favorites';
 
 // fetches all products from the supabase database.
 async function getProducts(): Promise<Product[]> {
@@ -113,6 +113,12 @@ export default async function Home() {
   const coupleBundle = products.find(p => p.id === 3);
   const allInOneBundle = products.find(p => p.id === 8);
   
+  // Add mock data for the new featured section
+  const featuredProducts = [
+    { ...allInOneBundle, stock_level: 45, review_count: 1245, rating_avg: 4.9, benefit: "Your all-in-one pack for total readiness." },
+    { ...coupleBundle, stock_level: 8, review_count: 890, rating_avg: 4.8, benefit: "Test together for mutual support." },
+  ].filter(p => p.id !== undefined) as (Product & { stock_level: number; review_count: number; rating_avg: number; benefit: string; })[];
+  
   return (
     <div className="flex flex-col">
       <SectionWrapper>
@@ -127,16 +133,10 @@ export default async function Home() {
         <ProductSelector />
       </SectionWrapper>
       
-      {coupleBundle && (
-          <SectionWrapper>
-              <ProductFeature product={coupleBundle} />
-          </SectionWrapper>
-      )}
-
-      {allInOneBundle && (
-           <SectionWrapper>
-              <ProductFeature product={allInOneBundle} reverse={true} />
-          </SectionWrapper>
+      {featuredProducts.length > 0 && (
+        <SectionWrapper>
+          <FeaturedFavoritesSection products={featuredProducts} />
+        </SectionWrapper>
       )}
 
       <SectionWrapper className="bg-primary">
