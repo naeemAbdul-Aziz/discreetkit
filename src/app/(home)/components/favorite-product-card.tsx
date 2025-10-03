@@ -74,15 +74,15 @@ export function FavoriteProductCard({ product }: { product: FeaturedProduct }) {
   };
 
   return (
-    <Card className="group grid grid-cols-1 overflow-hidden rounded-2xl transition-all md:grid-cols-[40%_60%] hover:-translate-y-1 hover:border-primary/30 hover:shadow-sm">
-      <div className="relative aspect-[4/3] bg-muted/50">
+    <Card className="group flex h-full flex-col overflow-hidden rounded-2xl transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-sm">
+      <div className="relative aspect-square w-full overflow-hidden bg-muted/50">
         <Link href={`/products/${product.id}`} className="block h-full w-full">
           {product.image_url && (
             <Image
               src={product.image_url}
               alt={product.name}
               fill
-              className="object-contain p-4 transition-transform duration-300 group-hover:scale-105"
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
               sizes="(max-width: 768px) 100vw, 50vw"
               placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
             />
@@ -96,7 +96,7 @@ export function FavoriteProductCard({ product }: { product: FeaturedProduct }) {
         )}
       </div>
 
-      <div className="flex flex-col justify-between p-6">
+      <div className="flex flex-grow flex-col justify-between p-6">
         <div>
           <Link href={`/products/${product.id}`} className="block">
             <h3 className="font-headline text-xl font-bold text-foreground">{product.name}</h3>

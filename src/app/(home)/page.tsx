@@ -98,6 +98,11 @@ const ContactUs = dynamic(
   () => import('./components/contact-us').then((mod) => mod.ContactUs),
   { loading: () => <LoadingSkeleton height={componentMap.ContactUs.height} /> }
 );
+const ProductFeature = dynamic(
+  () => import('./components/product-feature').then((mod) => mod.ProductFeature),
+  { loading: () => <LoadingSkeleton height={componentMap.PartnerReferral.height} /> }
+);
+
 
 // a wrapper component to provide consistent styling for page sections.
 const SectionWrapper: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className }) => (
@@ -112,11 +117,12 @@ export default async function Home() {
   
   const coupleBundle = products.find(p => p.id === 3);
   const allInOneBundle = products.find(p => p.id === 8);
+  const weekendBundle = products.find(p => p.id === 7);
   
   // Add mock data for the new featured section
   const featuredProducts = [
-    { ...allInOneBundle, stock_level: 45, review_count: 1245, rating_avg: 4.9, benefit: "Your all-in-one pack for total readiness." },
-    { ...coupleBundle, stock_level: 8, review_count: 890, rating_avg: 4.8, benefit: "Test together for mutual support." },
+    { ...allInOneBundle, stock_level: 45, review_count: 1245, rating_avg: 4.9, benefit: "Your all-in-one pack for total readiness.", image_url: "https://images.unsplash.com/photo-1629095316223-c159235a4d19?q=80&w=800&fit=crop" },
+    { ...weekendBundle, stock_level: 8, review_count: 890, rating_avg: 4.8, benefit: "Everything you need for a safe & fun weekend.", image_url: "https://images.unsplash.com/photo-1595034654378-95a9404ce9e3?q=80&w=800&fit=crop" },
   ].filter(p => p.id !== undefined) as (Product & { stock_level: number; review_count: number; rating_avg: number; benefit: string; })[];
   
   return (
@@ -147,6 +153,13 @@ export default async function Home() {
         <HowItWorks />
       </SectionWrapper>
       
+      {coupleBundle && allInOneBundle && (
+        <>
+            <ProductFeature product={allInOneBundle} />
+            <ProductFeature product={coupleBundle} reverse={true} />
+        </>
+      )}
+
       <SectionWrapper>
         <OurVision />
       </SectionWrapper>
