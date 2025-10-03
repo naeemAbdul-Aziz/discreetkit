@@ -6,7 +6,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { Product } from '@/lib/data';
 import { useCart } from '@/hooks/use-cart';
 import { Card, CardContent } from '@/components/ui/card';
@@ -14,7 +14,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Star, Flame, Check } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 
@@ -45,18 +44,28 @@ const toBase64 = (str: string) =>
     : window.btoa(str);
 
 export function FavoriteProductCard({ product }: { product: FeaturedProduct }) {
-  const { addItem, getItemQuantity } = useCart();
+  const { addItem } = useCart();
   const [isAdded, setIsAdded] = useState(false);
 
   const stockLevel = product.stock_level;
   const isOutOfStock = stockLevel === 0;
-  
-  let urgency = { text: '', color: '', percentage: 0 };
-  if (stockLevel < 10) {
-    urgency = { text: `Selling Out! Only ${stockLevel} left!`, color: 'bg-destructive', percentage: (stockLevel / 10) * 100 };
-  } else if (stockLevel < 50) {
-    urgency = { text: `Low Stock! Only ${stockLevel} left.`, color: 'bg-amber-500', percentage: (stockLevel / 50) * 100 };
+
+  // Badge Logic
+  let badge: { text: string; variant: 'destructive' | 'accent' } | null = null;
+  if (stockLevel > 0 && stockLevel <= 9) {
+    badge = { text: 'Selling Out', variant: 'destructive' };
+  } else if (stockLevel >= 10 && stockLevel <= 45) {
+    badge = { text: 'Low Stock', variant: 'accent' };
   }
+  
+  // Urgency Meter Logic
+  let urgency: { text: string; color: string; percentage: number } | null = null;
+  if (stockLevel > 0 && stockLevel <= 15) {
+    urgency = { text: `Selling Out! Only ${stockLevel} left!`, color: 'bg-destructive', percentage: (stockLevel / 15) * 100 };
+  } else if (stockLevel > 15 && stockLevel <= 45) {
+    urgency = { text: `Low Stock! Only ${stockLevel} left.`, color: 'bg-amber-500', percentage: (stockLevel / 45) * 100 };
+  }
+
 
   const handleAddToCart = () => {
     addItem(product);
@@ -65,7 +74,7 @@ export function FavoriteProductCard({ product }: { product: FeaturedProduct }) {
   };
 
   return (
-    <Card className="group relative grid grid-cols-1 overflow-hidden rounded-2xl border-2 border-transparent transition-all hover:border-primary hover:shadow-2xl md:grid-cols-2">
+    <Card className="group grid grid-cols-1 overflow-hidden rounded-2xl border-transparent transition-all md:grid-cols-[40%_60%] hover:shadow-lg">
       <div className="relative aspect-[4/3] bg-muted/50">
         <Link href={`/products/${product.id}`} className="block h-full w-full">
           {product.image_url && (
@@ -79,10 +88,10 @@ export function FavoriteProductCard({ product }: { product: FeaturedProduct }) {
             />
           )}
         </Link>
-         {urgency.text && !isOutOfStock && (
-            <Badge variant="destructive" className="absolute left-3 top-3 flex items-center gap-1.5 shadow-lg">
+         {badge && !isOutOfStock && (
+            <Badge variant={badge.variant} className="absolute left-3 top-3 flex items-center gap-1.5 shadow-lg">
                 <Flame className="h-3 w-3"/> 
-                {stockLevel < 10 ? 'Selling Out' : 'Low Stock'}
+                {badge.text}
             </Badge>
         )}
       </div>
@@ -93,19 +102,19 @@ export function FavoriteProductCard({ product }: { product: FeaturedProduct }) {
             <h3 className="font-headline text-xl font-bold text-foreground">{product.name}</h3>
           </Link>
 
-          <div className="mt-2 flex items-center gap-3">
+          <p className="mt-2 text-sm text-muted-foreground">{product.benefit}</p>
+
+          <div className="mt-3 flex items-center gap-3">
             <div className="flex items-center gap-1 text-amber-500">
               <Star className="h-4 w-4 fill-current" />
               <span className="font-bold text-foreground">{product.rating_avg} Stars</span>
             </div>
             <span className="text-sm text-muted-foreground">({product.review_count.toLocaleString()} Reviews)</span>
           </div>
-
-          <p className="mt-3 text-sm text-muted-foreground">{product.benefit}</p>
         </div>
 
         <div className="mt-6 space-y-4">
-            {urgency.text && !isOutOfStock && (
+            {urgency && !isOutOfStock && (
                 <div className="space-y-2">
                     <p className="text-xs font-semibold text-destructive">{urgency.text}</p>
                     <div className="relative h-2 w-full overflow-hidden rounded-full bg-muted">
