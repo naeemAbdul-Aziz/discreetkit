@@ -1,0 +1,29 @@
+diff --git a/node_modules/framer-motion/dist/es/utils/use-unmount-effect.mjs b/node_modules/framer-motion/dist/es/utils/use-unmount-effect.mjs
+index c52f4a4..83a0747 100644
+--- a/node_modules/framer-motion/dist/es/utils/use-unmount-effect.mjs
++++ b/node_modules/framer-motion/dist/es/utils/use-unmount-effect.mjs
+@@ -1,6 +1,9 @@
+ import { useEffect, useRef } from "react";
++import { MotionGlobalConfig } from "../..";
+ 
+ function useUnmountEffect(callback) {
++    if (MotionGlobalConfig.skipAnimations)
++        return;
+     const callbackRef = useRef(callback);
+     callbackRef.current = callback;
+     useEffect(() => () => {
+diff --git a/node_modules/framer-motion/dist/es/value/use-combine-values.mjs b/node_modules/framer-motion/dist/es/value/use-combine-values.mjs
+index ad4d54d..6c3104c 100644
+--- a/node_modules/framer-motion/dist/es/value/use-combine-values.mjs
++++ b/node_modules/framer-motion/dist/es/value/use-combine-values.mjs
+@@ -1,7 +1,10 @@
+ import { useMemo } from 'react';
+ import { combineMotionValues } from './combine.mjs';
++import { MotionGlobalConfig } from '../..';
+ 
+ function useCombineMotionValues(values, combine) {
++    if (MotionGlobalConfig.skipAnimations)
++        return;
+     return useMemo(() => combineMotionValues(values, combine), [values]);
+ }
+ 
