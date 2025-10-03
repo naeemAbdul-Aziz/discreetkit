@@ -1,12 +1,40 @@
-
 import { getSupabaseClient } from '@/lib/supabase';
 import type { Product } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { ProductDetailContent } from './(components)/product-detail-content';
 
-// This function fetches the data for a single product.
+const allTestKits = [
+    {
+        id: 17,
+        name: 'Syphilis Self-Test Kit',
+        description: 'A private, easy-to-use blood-spot test for detecting Syphilis antibodies.',
+        price_ghs: 120.00,
+        student_price_ghs: null,
+        image_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png', // Placeholder
+        brand: 'Partner Brand',
+        featured: false,
+    },
+    {
+        id: 18,
+        name: 'Chlamydia & Gonorrhea Test Kit',
+        description: 'A comprehensive 2-in-1 urine test for two of the most common STIs.',
+        price_ghs: 250.00,
+        student_price_ghs: null,
+        image_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png', // Placeholder
+        brand: 'Partner Brand',
+        featured: false,
+    },
+];
+
 async function getProduct(id: string): Promise<Product | null> {
+    // First, check our local list of non-db products
+    const localProduct = allTestKits.find(p => p.id === Number(id));
+    if (localProduct) {
+        return localProduct as Product;
+    }
+    
+    // If not found, check the database
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
         .from('products')
@@ -24,7 +52,6 @@ async function getProduct(id: string): Promise<Product | null> {
     };
 }
 
-// This function fetches related products, excluding the current one.
 async function getRelatedProducts(currentProductId: number): Promise<Product[]> {
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
@@ -68,11 +95,11 @@ async function getRelatedProducts(currentProductId: number): Promise<Product[]> 
 
 export default async function ProductDetailPageWrapper({ params }: { params: { id: string } }) {
   // The wellness page products are not in the DB, so we must check for them separately.
-  const isWellnessProduct = [4, 5, 6, 9, 10, 11, 12, 13, 16, 17, 18].includes(Number(params.id));
+  const isWellnessProduct = [4, 5, 6, 9, 10, 11, 12, 13, 16].includes(Number(params.id));
   let product: Product | null;
 
   if (isWellnessProduct) {
-      const wellnessProducts = (await import('../wellness/page')).default.wellnessProducts;
+      const { wellnessProducts } = (await import('../wellness/page'));
       product = wellnessProducts.find(p => p.id === Number(params.id)) || null;
   } else {
       product = await getProduct(params.id);

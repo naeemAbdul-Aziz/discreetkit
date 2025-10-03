@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -9,10 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { motion } from 'framer-motion';
 
 type WellnessProduct = Product & {
-  category: 'Contraception' | 'Condoms' | 'Personal Care' | 'STI Tests';
+  category: 'Contraception' | 'Condoms' | 'Personal Care';
 };
 
-const wellnessProducts: WellnessProduct[] = [
+export const wellnessProducts: WellnessProduct[] = [
     {
         id: 4,
         name: 'Lydia Postpill',
@@ -34,28 +33,6 @@ const wellnessProducts: WellnessProduct[] = [
         brand: 'Postinor',
         featured: false,
         category: 'Contraception'
-    },
-    {
-        id: 17,
-        name: 'Syphilis Self-Test Kit',
-        description: 'A private, easy-to-use test for detecting Syphilis antibodies.',
-        price_ghs: 120.00,
-        student_price_ghs: null,
-        image_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png', // Placeholder
-        brand: 'Partner Brand',
-        featured: false,
-        category: 'STI Tests'
-    },
-    {
-        id: 18,
-        name: 'Chlamydia & Gonorrhea Test Kit',
-        description: 'A comprehensive 2-in-1 test for two of the most common STIs.',
-        price_ghs: 250.00,
-        student_price_ghs: null,
-        image_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png', // Placeholder
-        brand: 'Partner Brand',
-        featured: false,
-        category: 'STI Tests'
     },
     {
         id: 5,
@@ -137,7 +114,7 @@ const wellnessProducts: WellnessProduct[] = [
 ];
 
 const brands = ['All', ...Array.from(new Set(wellnessProducts.map(p => p.brand || ''))).filter(Boolean)];
-const categories = ['All', 'STI Tests', 'Condoms', 'Contraception', 'Personal Care'];
+const categories = ['All', 'Condoms', 'Contraception', 'Personal Care'];
 
 export default function WellnessPage() {
     const [categoryFilter, setCategoryFilter] = useState('All');
@@ -158,12 +135,11 @@ export default function WellnessPage() {
                     Wellness Essentials
                 </h1>
                 <p className="mt-4 max-w-2xl mx-auto text-base text-muted-foreground">
-                    Explore contraception, personal care, and STI tests. Carefully selected, discreetly delivered.
+                    Explore contraception, personal care, and more. Carefully selected, discreetly delivered.
                 </p>
             </div>
             
-            {/* Filter Controls */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 mb-12">
+             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 mb-12">
                 <ToggleGroup
                     type="single"
                     value={categoryFilter}
@@ -190,7 +166,7 @@ export default function WellnessPage() {
                 </Select>
             </div>
 
-            {/* Product Grid */}
+            
             <motion.div 
                 key={categoryFilter + brandFilter}
                 initial={{ opacity: 0 }}

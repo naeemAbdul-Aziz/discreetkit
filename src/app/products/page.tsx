@@ -1,4 +1,3 @@
-
 import { getSupabaseClient } from '@/lib/supabase';
 import { ProductCard } from './(components)/product-card';
 import type { Product } from '@/lib/data';
@@ -85,15 +84,20 @@ function FeaturedProduct({ product }: { product: Product }) {
 
 export default async function ProductsPage() {
     const dbProducts = await getProducts();
-    // Since wellness products are now local, we import them and merge
-    const wellnessProducts = (await import('./wellness/page')).default.wellnessProducts;
-    const products = [...dbProducts, ...wellnessProducts].sort((a, b) => a.id - b.id);
+    const { wellnessProducts } = await import('./wellness/page');
+    const allLocalKits = (await import('./test-kits/page')).allTestKits;
+
+    // Combine all product sources
+    const products = [...dbProducts, ...wellnessProducts, ...allLocalKits].sort((a, b) => a.id - b.id);
     
-    const screeningKits = products.filter(p => [1, 2, 14].includes(p.id));
-    const bundles = products.filter(p => [3, 7, 8, 15].includes(p.id));
-    const wellness = products.filter(p => ![...screeningKits.map(k=>k.id), ...bundles.map(b=>b.id)].includes(p.id));
+    // Create unique set of products by ID
+    const uniqueProducts = Array.from(new Map(products.map(p => [p.id, p])).values());
+
+    const screeningKits = uniqueProducts.filter(p => [1, 2, 14, 17, 18].includes(p.id));
+    const bundles = uniqueProducts.filter(p => [3, 7, 8, 15].includes(p.id));
+    const wellness = uniqueProducts.filter(p => ![...screeningKits.map(k=>k.id), ...bundles.map(b=>b.id)].includes(p.id));
     
-    const featuredBundle = products.find(p => p.id === 8); // The All-In-One
+    const featuredBundle = uniqueProducts.find(p => p.id === 8); // The All-In-One
 
   return (
     <div className="bg-background">
@@ -110,7 +114,6 @@ export default async function ProductsPage() {
 
             {featuredBundle && <FeaturedProduct product={featuredBundle} />}
 
-            {/* Screening Kits Section */}
             <div id="test-kits" className="mb-16 scroll-mt-20">
                 <h2 className="font-headline text-2xl font-bold text-foreground mb-6">Screening Kits</h2>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
@@ -120,7 +123,6 @@ export default async function ProductsPage() {
                 </div>
             </div>
 
-            {/* Bundles Section */}
             <div id="bundles" className="mb-16 scroll-mt-20">
                  <h2 className="font-headline text-2xl font-bold text-foreground mb-6">Value Bundles</h2>
                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
@@ -130,7 +132,6 @@ export default async function ProductsPage() {
                 </div>
             </div>
             
-            {/* Wellness Essentials Section */}
              <div id="wellness" className="scroll-mt-20">
                  <h2 className="font-headline text-2xl font-bold text-foreground mb-6">Wellness Essentials</h2>
                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">

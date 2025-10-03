@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -192,7 +191,7 @@ export function ProductDetailContent({ product, relatedProducts }: { product: Pr
                             <div className="flex flex-col items-start gap-2">
                                 {product.savings_ghs && product.savings_ghs > 0 && (
                                     <Badge variant="accent">
-                                        Bundle & Save GHS {product.savings_ghs.toFixed(2)}
+                                        Bundle &amp; Save GHS {product.savings_ghs.toFixed(2)}
                                     </Badge>
                                 )}
                                 <p className="font-bold text-3xl text-foreground">
