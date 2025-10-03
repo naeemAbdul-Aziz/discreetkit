@@ -1,8 +1,10 @@
+
 import { getSupabaseClient } from '@/lib/supabase';
 import type { Product } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { ProductDetailContent } from './(components)/product-detail-content';
+import { wellnessProducts } from '../wellness/page';
 
 const allTestKits = [
     {
@@ -99,7 +101,6 @@ export default async function ProductDetailPageWrapper({ params }: { params: { i
   let product: Product | null;
 
   if (isWellnessProduct) {
-      const { wellnessProducts } = (await import('../wellness/page'));
       product = wellnessProducts.find(p => p.id === Number(params.id)) || null;
   } else {
       product = await getProduct(params.id);
