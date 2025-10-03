@@ -9,7 +9,7 @@
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Truck } from 'lucide-react';
+import { ArrowRight, Info } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 // a shimmer effect for image placeholders to improve loading perception.
@@ -52,22 +52,22 @@ export function Hero() {
                     Stay Supported Fully.
                 </h1>
                 <p className="mt-4 max-w-md mx-auto md:mx-0 text-base text-muted-foreground">
-                  Your one-stop hub for the things you'd like to keep private. We're here for what's next.
+                  Get the private, personal products you need, delivered securely and supported by experts. Your journey starts here.
                 </p>
                 
                 <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
                     {/* primary call-to-action to view products. */}
                     <Button asChild size="lg" className="w-full sm:w-auto">
-                        <Link href="/products/test-kits">
-                        View Products
+                        <Link href="/#products">
+                        Start Your Order
                         <ArrowRight />
                         </Link>
                     </Button>
                     {/* secondary call-to-action for returning users to track their order. */}
                      <Button asChild size="lg" variant="outline" className="w-full sm:w-auto">
-                        <Link href="/track">
-                            <Truck />
-                            Track Your Order
+                        <Link href="/#how-it-works">
+                            <Info />
+                            Learn How It Works
                         </Link>
                     </Button>
                 </div>
