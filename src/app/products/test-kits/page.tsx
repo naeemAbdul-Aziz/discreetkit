@@ -17,7 +17,7 @@ async function getTestKits(): Promise<Product[]> {
     const { data, error } = await supabase
         .from('products')
         .select('*')
-        .in('id', [1, 2]) // Fetch only Standard HIV Kit and Pregnancy Test
+        .in('id', [1, 2, 14]) // Fetch HIV Kit, Pregnancy Test, and Digital Pregnancy Test
         .order('id', { ascending: true });
 
     if (error) {
@@ -29,13 +29,17 @@ async function getTestKits(): Promise<Product[]> {
         let imageUrl = p.image_url;
         if (p.id === 1) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png';
         if (p.id === 2) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759404957/discreetkit_pregnancy_cujiod.png';
+        if (p.id === 14) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759404957/discreetkit_pregnancy_cujiod.png';
+
+        const brand = p.id === 14 ? 'Partner Brand' : 'DiscreetKit';
+        
         return {
           ...p,
           image_url: imageUrl,
           price_ghs: Number(p.price_ghs),
           student_price_ghs: p.student_price_ghs ? Number(p.student_price_ghs) : null,
           savings_ghs: p.savings_ghs ? Number(p.savings_ghs) : null,
-          brand: p.brand || 'DiscreetKit',
+          brand,
         };
     });
 }

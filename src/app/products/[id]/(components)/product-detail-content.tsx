@@ -35,11 +35,19 @@ const getUsageInstructions = (productId: number) => {
                 "Read the result: two lines for pregnant, one line for not pregnant."
             ]
         case 8: // All-in-one
+        case 15: // Safe & Sound Bundle
              return [
                 "This bundle contains multiple products.",
-                "Please refer to the individual package insert for each item (HIV Kit, Pregnancy Test, Postpill) for detailed usage instructions.",
+                "Please refer to the individual package insert for each item for detailed usage instructions.",
                 "Ensure you read the instructions for each test carefully before use."
             ];
+        case 14: // Digital Pregnancy Test
+            return [
+                "Remove the digital test from its wrapper.",
+                "Hold the absorbent tip in your urine stream as directed.",
+                "The display will show a waiting symbol, then your result ('Pregnant' or 'Not Pregnant') will appear in words.",
+                "The result is clear and easy to read, eliminating interpretation guesswork."
+            ]
         default:
             return ["Please refer to the package insert for detailed instructions."];
     }
@@ -56,13 +64,22 @@ const getWhatsInTheBox = (productId: number) => {
         case 4: // Postpill
             return ["1 Tablet of Emergency Contraceptive", "1 Instruction Leaflet"];
          case 5: // Condom Pack
-            return ["12 Ultra-thin Latex Condoms"];
-        case 6: // Lubricant
-            return ["1 Bottle of Aqua-based Lubricant"];
+         case 6:
+         case 9:
+         case 10:
+         case 11:
+         case 12:
+            return ["12 Latex Condoms"];
         case 7: // Weekend Ready Bundle
             return ["12 Ultra-thin Latex Condoms", "1 Bottle of Aqua-based Lubricant"];
         case 8: // All-in-one
             return ["1 Standard HIV Kit", "1 Pregnancy Test Kit", "1 Postpill (Emergency Contraceptive)"];
+        case 13: // Lubricant
+            return ["1 Bottle of Aqua-based Lubricant"];
+        case 14: // Digital Pregnancy Test
+            return ["1 Digital Pregnancy Test Stick", "1 Instruction Manual"];
+        case 15: // Safe & Sound Bundle
+            return ["1 Standard HIV Kit", "1 Pack of 12 Condoms"];
         default:
             return ["Contents as described on packaging."];
     }

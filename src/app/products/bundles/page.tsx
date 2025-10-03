@@ -17,7 +17,7 @@ async function getBundles(): Promise<Product[]> {
     const { data, error } = await supabase
         .from('products')
         .select('*')
-        .in('id', [3, 7, 8]) // Fetch Couple, Weekend, and All-in-One bundles
+        .in('id', [3, 7, 8, 15]) // Fetch Couple, Weekend, All-in-One, and Safe & Sound bundles
         .order('id', { ascending: true });
 
     if (error) {
@@ -29,6 +29,8 @@ async function getBundles(): Promise<Product[]> {
         if (p.id === 3) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413735/couple_bundle_rfbpn0.png';
         if (p.id === 7) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413627/weekend_bundle_t8cfxp.png';
         if (p.id === 8) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png';
+        if (p.id === 15) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png';
+
         return {
           ...p,
           image_url: imageUrl,
