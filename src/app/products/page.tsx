@@ -33,16 +33,8 @@ async function getProducts(): Promise<Product[]> {
         if (p.id === 1) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png';
         if (p.id === 2) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759404957/discreetkit_pregnancy_cujiod.png';
         if (p.id === 3) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413735/couple_bundle_rfbpn0.png';
-        if (p.id === 4) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png';
-        if (p.id === 5) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413220/condoms_j5qyqj.png';
-        if (p.id === 6) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413220/condoms_j5qyqj.png';
         if (p.id === 7) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413627/weekend_bundle_t8cfxp.png';
         if (p.id === 8) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png';
-        if (p.id === 9) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413220/condoms_j5qyqj.png';
-        if (p.id === 10) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413220/condoms_j5qyqj.png';
-        if (p.id === 11) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413220/condoms_j5qyqj.png';
-        if (p.id === 12) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413220/condoms_j5qyqj.png';
-        if (p.id === 13) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413266/lube_ysdpst.png';
         if (p.id === 14) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759404957/discreetkit_pregnancy_cujiod.png';
         if (p.id === 15) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png';
         
@@ -92,12 +84,15 @@ function FeaturedProduct({ product }: { product: Product }) {
 }
 
 export default async function ProductsPage() {
-    const products = await getProducts();
+    const dbProducts = await getProducts();
+    // Since wellness products are now local, we import them and merge
+    const wellnessProducts = (await import('./wellness/page')).default.wellnessProducts;
+    const products = [...dbProducts, ...wellnessProducts].sort((a, b) => a.id - b.id);
     
-    const testKits = products.filter(p => [1, 2, 14].includes(p.id));
+    const screeningKits = products.filter(p => [1, 2, 14].includes(p.id));
     const bundles = products.filter(p => [3, 7, 8, 15].includes(p.id));
-    const wellness = products.filter(p => ![1, 2, 14, 3, 7, 8, 15].includes(p.id));
-
+    const wellness = products.filter(p => ![...screeningKits.map(k=>k.id), ...bundles.map(b=>b.id)].includes(p.id));
+    
     const featuredBundle = products.find(p => p.id === 8); // The All-In-One
 
   return (
@@ -115,11 +110,11 @@ export default async function ProductsPage() {
 
             {featuredBundle && <FeaturedProduct product={featuredBundle} />}
 
-            {/* Test Kits Section */}
+            {/* Screening Kits Section */}
             <div id="test-kits" className="mb-16 scroll-mt-20">
-                <h2 className="font-headline text-2xl font-bold text-foreground mb-6">Test Kits</h2>
+                <h2 className="font-headline text-2xl font-bold text-foreground mb-6">Screening Kits</h2>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-                    {testKits.map((product) => (
+                    {screeningKits.map((product) => (
                         <ProductCard key={product.id} product={product} />
                     ))}
                 </div>

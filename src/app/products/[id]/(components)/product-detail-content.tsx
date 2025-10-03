@@ -19,6 +19,7 @@ const getUsageInstructions = (productId: number) => {
     switch(productId) {
         case 1: // Standard HIV Kit
         case 3: // Support Bundle
+        case 17: // Syphilis Test
             return [
                 "Open the pouch and lay out all components.",
                 "Use the lancet to prick your finger and collect a blood sample.",
@@ -48,6 +49,14 @@ const getUsageInstructions = (productId: number) => {
                 "The display will show a waiting symbol, then your result ('Pregnant' or 'Not Pregnant') will appear in words.",
                 "The result is clear and easy to read, eliminating interpretation guesswork."
             ]
+        case 18: // Chlamydia & Gonorrhea
+            return [
+                "This is a urine-based test.",
+                "Collect a urine sample in the provided sterile container.",
+                "Use the pipette to transfer the specified amount of urine to the test device.",
+                "Wait for the time indicated in the manual.",
+                "Read the results for both Chlamydia and Gonorrhea separately on the cassette."
+            ]
         default:
             return ["Please refer to the package insert for detailed instructions."];
     }
@@ -56,12 +65,13 @@ const getUsageInstructions = (productId: number) => {
 const getWhatsInTheBox = (productId: number) => {
      switch(productId) {
         case 1: // Standard HIV Kit
+        case 17: // Syphilis Test
             return ["1 Test Cassette", "1 Lancet", "1 Buffer Solution Vial", "1 Alcohol Prep Pad", "1 Instruction Manual"];
         case 2: // Pregnancy Test
             return ["1 Pregnancy Test Stick", "1 Desiccant Packet", "1 Instruction Manual"];
         case 3: // Support Bundle
             return ["2 Test Cassettes", "2 Lancets", "2 Buffer Solution Vials", "2 Alcohol Prep Pads", "2 Instruction Manuals"];
-        case 4: // Postpill
+        case 4: // Lydia Postpill
         case 16: // Postinor 2
             return ["1 Tablet of Emergency Contraceptive", "1 Instruction Leaflet"];
          case 5: // Condom Pack
@@ -81,6 +91,8 @@ const getWhatsInTheBox = (productId: number) => {
             return ["1 Digital Pregnancy Test Stick", "1 Instruction Manual"];
         case 15: // Safe & Sound Bundle
             return ["1 Standard HIV Kit", "1 Pack of 12 Condoms"];
+        case 18: // Chlamydia & Gonorrhea
+            return ["1 Test Cassette", "1 Urine Collection Cup", "1 Pipette", "1 Buffer Solution", "1 Instruction Manual"];
         default:
             return ["Contents as described on packaging."];
     }

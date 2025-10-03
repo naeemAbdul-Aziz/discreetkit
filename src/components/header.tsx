@@ -18,7 +18,7 @@ import { Separator } from './ui/separator';
 
 // define navigation links for easy management.
 const navLinks = [
-  { href: '/products/test-kits', label: 'Test Kits' },
+  { href: '/products/test-kits', label: 'Screening Kits' },
   { href: '/products/bundles', label: 'Bundles' },
   { href: '/products/wellness', label: 'Wellness' },
   { href: '/#how-it-works', label: 'How It Works' },
