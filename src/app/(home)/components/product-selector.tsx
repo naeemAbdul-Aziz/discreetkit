@@ -123,7 +123,7 @@ export function ProductSelector() {
 
                 <div className="text-center mt-12">
                     <Button asChild variant="outline" size="lg">
-                        <Link href="/products/bundles">
+                        <Link href="/products">
                             Shop All Products
                             <ArrowRight />
                         </Link>

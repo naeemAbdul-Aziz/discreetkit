@@ -127,7 +127,7 @@ export function Header() {
       {/* top promotional bar */}
       <div className="bg-primary p-2 text-center text-sm text-primary-foreground">
         Free Delivery on UG Campus!{' '}
-        <Link href="/cart" className="font-semibold underline">
+        <Link href="/products" className="font-semibold underline">
           Shop Now
         </Link>
       </div>
