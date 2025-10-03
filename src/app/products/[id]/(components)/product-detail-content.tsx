@@ -62,6 +62,7 @@ const getWhatsInTheBox = (productId: number) => {
         case 3: // Support Bundle
             return ["2 Test Cassettes", "2 Lancets", "2 Buffer Solution Vials", "2 Alcohol Prep Pads", "2 Instruction Manuals"];
         case 4: // Postpill
+        case 16: // Postinor 2
             return ["1 Tablet of Emergency Contraceptive", "1 Instruction Leaflet"];
          case 5: // Condom Pack
          case 6:

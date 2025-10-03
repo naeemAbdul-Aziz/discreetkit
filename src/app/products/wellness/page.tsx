@@ -20,9 +20,20 @@ const wellnessProducts: WellnessProduct[] = [
         price_ghs: 90.00,
         student_price_ghs: 80.00,
         image_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png',
-        brand: 'Partner Brand',
+        brand: 'Lydia',
         featured: false,
         category: 'Contraception',
+    },
+    {
+        id: 16, // New ID for Postinor 2
+        name: 'Postinor 2',
+        description: 'A trusted emergency contraceptive pill for preventing pregnancy within 72 hours.',
+        price_ghs: 85.00,
+        student_price_ghs: null,
+        image_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png',
+        brand: 'Postinor',
+        featured: false,
+        category: 'Contraception'
     },
     {
         id: 5,
