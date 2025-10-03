@@ -15,7 +15,7 @@ type WellnessProduct = Product & {
 const wellnessProducts: WellnessProduct[] = [
     {
         id: 4,
-        name: 'Postpill (Emergency Contraceptive)',
+        name: 'Lydia Postpill',
         description: 'A single dose of emergency contraception to be taken after unprotected intercourse.',
         price_ghs: 90.00,
         student_price_ghs: 80.00,
