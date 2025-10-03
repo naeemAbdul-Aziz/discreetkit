@@ -134,6 +134,19 @@ function OrderSummaryCard() {
     );
 }
 
+const FieldError = ({ message }: { message?: string }) => {
+  if (!message) return null;
+  return (
+    <div className="relative mt-2 text-sm text-destructive">
+      <div className="bg-destructive/10 border border-destructive/20 text-destructive rounded-lg px-3 py-2 flex items-center gap-2">
+         <AlertTriangle className="h-4 w-4" />
+        <span>{message}</span>
+      </div>
+    </div>
+  );
+};
+
+
 export function OrderForm() {
   const router = useRouter();
   const { toast } = useToast();
@@ -188,7 +201,7 @@ export function OrderForm() {
       });
       // Redirect to Paystack for payment
       window.location.href = state.authorization_url;
-    } else if (!state.success && state.message) {
+    } else if (!state.success && state.message && !state.errors) {
         toast({
             title: 'An error occurred',
             description: state.message,
@@ -250,13 +263,7 @@ export function OrderForm() {
                           <p className="text-[0.8rem] text-muted-foreground">
                           For payment confirmation from Paystack. We don't store it.
                           </p>
-                          {state.errors?.email?.[0] && (
-                              <Alert variant="warning" className="mt-2">
-                              <AlertDescription>
-                                  {state.errors.email[0]}
-                              </AlertDescription>
-                              </Alert>
-                          )}
+                          <FieldError message={state.errors?.email?.[0]} />
                       </div>
                       <div className="space-y-2">
                           <Label htmlFor="deliveryArea">Delivery Area / Campus *</Label>
@@ -272,13 +279,7 @@ export function OrderForm() {
                           </SelectContent>
                           </Select>
                           <p className="text-[0.8rem] text-muted-foreground">Select a campus for FREE delivery.</p>
-                          {state.errors?.deliveryArea?.[0] && (
-                              <Alert variant="warning" className="mt-2">
-                              <AlertDescription>
-                                  {state.errors.deliveryArea[0]}
-                              </AlertDescription>
-                              </Alert>
-                          )}
+                          <FieldError message={state.errors?.deliveryArea?.[0]} />
                       </div>
 
                       {showOther && (
@@ -290,13 +291,7 @@ export function OrderForm() {
                                   placeholder="e.g., Osu, Airport Area" 
                                   className={cn(state.errors?.otherDeliveryArea && "border-destructive")}
                                   />
-                                  {state.errors?.otherDeliveryArea?.[0] && (
-                                  <Alert variant="warning" className="mt-2">
-                                      <AlertDescription>
-                                      {state.errors.otherDeliveryArea[0]}
-                                      </AlertDescription>
-                                  </Alert>
-                                  )}
+                                  <FieldError message={state.errors?.otherDeliveryArea?.[0]} />
                           </div>
                       )}
                       
@@ -326,13 +321,7 @@ export function OrderForm() {
                           <ShieldCheck className="h-3.5 w-3.5 text-primary" />
                           This will be masked and is only for the rider to contact you.
                           </p>
-                          {state.errors?.phone_masked?.[0] && (
-                              <Alert variant="warning" className="mt-2">
-                              <AlertDescription>
-                                  {state.errors.phone_masked[0]}
-                              </AlertDescription>
-                              </Alert>
-                          )}
+                          <FieldError message={state.errors?.phone_masked?.[0]} />
                       </div>
                   </div>
 
