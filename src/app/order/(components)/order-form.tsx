@@ -138,8 +138,13 @@ const FieldError = ({ message }: { message?: string }) => {
   if (!message) return null;
   return (
     <div className="relative mt-2 text-sm text-destructive">
-      <div className="bg-destructive/10 border border-destructive/20 text-destructive rounded-lg px-3 py-2 flex items-center gap-2">
-         <AlertTriangle className="h-4 w-4" />
+      <div 
+        className="bg-destructive/10 border border-destructive/20 text-destructive rounded-lg px-3 py-2 flex items-center gap-2 relative"
+      >
+        <div 
+          className="absolute -top-2 left-4 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-b-8 border-b-destructive/20"
+        />
+        <AlertTriangle className="h-4 w-4" />
         <span>{message}</span>
       </div>
     </div>
@@ -201,7 +206,7 @@ export function OrderForm() {
       });
       // Redirect to Paystack for payment
       window.location.href = state.authorization_url;
-    } else if (!state.success && state.message && !state.errors) {
+    } else if (!state.success && state.message && Object.keys(state.errors || {}).length === 0) {
         toast({
             title: 'An error occurred',
             description: state.message,
