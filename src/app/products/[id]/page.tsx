@@ -5,29 +5,8 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { ProductDetailContent } from './(components)/product-detail-content';
 import { wellnessProducts } from '../wellness/page';
+import { allTestKits } from '../test-kits/page';
 
-const allTestKits = [
-    {
-        id: 17,
-        name: 'Syphilis Self-Test Kit',
-        description: 'A private, easy-to-use blood-spot test for detecting Syphilis antibodies.',
-        price_ghs: 120.00,
-        student_price_ghs: null,
-        image_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png', // Placeholder
-        brand: 'Partner Brand',
-        featured: false,
-    },
-    {
-        id: 18,
-        name: 'Chlamydia & Gonorrhea Test Kit',
-        description: 'A comprehensive 2-in-1 urine test for two of the most common STIs.',
-        price_ghs: 250.00,
-        student_price_ghs: null,
-        image_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png', // Placeholder
-        brand: 'Partner Brand',
-        featured: false,
-    },
-];
 
 async function getProduct(id: string): Promise<Product | null> {
     // First, check our local list of non-db products
