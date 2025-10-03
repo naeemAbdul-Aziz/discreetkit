@@ -1,10 +1,11 @@
 
+
 import { getSupabaseClient } from '@/lib/supabase';
 import type { Product } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { ProductDetailContent } from './(components)/product-detail-content';
-import { wellnessProducts } from '../wellness/page';
+import { wellnessProducts } from '@/lib/data';
 import { allTestKits } from '../test-kits/page';
 
 
@@ -102,3 +103,5 @@ export default async function ProductDetailPageWrapper({ params }: { params: { i
 
   return <ProductDetailContent product={product} relatedProducts={relatedProducts} />;
 }
+
+    

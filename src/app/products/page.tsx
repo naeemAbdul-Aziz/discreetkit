@@ -1,6 +1,7 @@
 import { getSupabaseClient } from '@/lib/supabase';
 import { ProductCard } from './(components)/product-card';
 import type { Product } from '@/lib/data';
+import { wellnessProducts } from '@/lib/data';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import type { Metadata } from 'next';
@@ -84,7 +85,6 @@ function FeaturedProduct({ product }: { product: Product }) {
 
 export default async function ProductsPage() {
     const dbProducts = await getProducts();
-    const { wellnessProducts } = await import('./wellness/page');
     const allLocalKits = (await import('./test-kits/page')).allTestKits;
 
     // Combine all product sources
@@ -146,3 +146,5 @@ export default async function ProductsPage() {
     </div>
   );
 }
+
+    
