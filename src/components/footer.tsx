@@ -1,8 +1,48 @@
 
 import Link from 'next/link';
-import { ShieldCheck, Twitter, Instagram, Facebook } from 'lucide-react';
+import { Twitter, Instagram, Facebook } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
+
+// Custom SVG for Snapchat
+const SnapchatIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <path d="M14.5 2H9.5a1 1 0 0 0-1 1v4.5a.5.5 0 0 0 .5.5h6a.5.5 0 0 0 .5-.5V3a1 1 0 0 0-1-1Z" />
+      <path d="M12 12.5a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9Z" />
+      <path d="M12 2v2.5" />
+      <path d="M12 17a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z" />
+    </svg>
+  );
+  
+// Custom SVG for WhatsApp
+const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z" />
+    </svg>
+);
+
 
 export function Footer() {
   const footerLinks = {
@@ -19,9 +59,11 @@ export function Footer() {
   };
 
   const socialLinks = [
-      { href: '#', icon: Twitter, label: 'Twitter' },
-      { href: '#', icon: Instagram, label: 'Instagram' },
-      { href: '#', icon: Facebook, label: 'Facebook' },
+      { href: 'https://x.com/discreetkit', icon: Twitter, label: 'Twitter' },
+      { href: 'https://instagram.com/discreetkit', icon: Instagram, label: 'Instagram' },
+      { href: 'https://facebook.com/discreetkit', icon: Facebook, label: 'Facebook' },
+      { href: 'https://wa.me/233000000000', icon: WhatsAppIcon, label: 'WhatsApp' },
+      { href: 'https://snapchat.com/add/discreetkit', icon: SnapchatIcon, label: 'Snapchat' },
   ]
 
   const Logo = () => (
