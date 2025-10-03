@@ -137,15 +137,16 @@ function OrderSummaryCard() {
 const FieldError = ({ message }: { message?: string }) => {
   if (!message) return null;
   return (
-    <div className="relative mt-2 text-sm text-destructive">
+    <div className="relative -mt-2 z-10">
       <div 
-        className="bg-destructive/10 border border-destructive/20 text-destructive rounded-lg px-3 py-2 flex items-center gap-2 relative"
+        className="bg-background border border-destructive text-foreground rounded-lg px-3 py-2 flex items-center gap-2 relative shadow-md"
       >
         <div 
-          className="absolute -top-2 left-4 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-b-8 border-b-destructive/20"
+          className="absolute -bottom-2 left-4 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-background"
         />
-        <AlertTriangle className="h-4 w-4" />
-        <span>{message}</span>
+         <div className="absolute -bottom-[9px] left-[15px] w-0 h-0 border-l-[9px] border-l-transparent border-r-[9px] border-r-transparent border-t-[9px] border-t-destructive z-[-1]" />
+        <AlertTriangle className="h-4 w-4 text-amber-500" />
+        <span className="text-sm font-medium">{message}</span>
       </div>
     </div>
   );
@@ -255,6 +256,7 @@ export function OrderForm() {
                   <div className="space-y-4">
                       <div className="space-y-2">
                           <Label htmlFor="email">Email Address *</Label>
+                          <FieldError message={state.errors?.email?.[0]} />
                           <div className="relative">
                               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                               <Input 
@@ -262,18 +264,18 @@ export function OrderForm() {
                                   name="email" 
                                   type="email" 
                                   placeholder="e.g., yourname@email.com" 
-                                  className={cn("pl-10", state.errors?.email && "border-destructive")}
+                                  className={cn("pl-10", state.errors?.email && "border-destructive focus-visible:ring-destructive")}
                               />
                           </div>
                           <p className="text-[0.8rem] text-muted-foreground">
                           For payment confirmation from Paystack. We don't store it.
                           </p>
-                          <FieldError message={state.errors?.email?.[0]} />
                       </div>
                       <div className="space-y-2">
                           <Label htmlFor="deliveryArea">Delivery Area / Campus *</Label>
+                          <FieldError message={state.errors?.deliveryArea?.[0]} />
                           <Select name="deliveryArea" onValueChange={handleLocationChange} defaultValue={deliveryLocation || "Other"} disabled={!isMounted}>
-                          <SelectTrigger className={cn(state.errors?.deliveryArea && "border-destructive")}>
+                          <SelectTrigger className={cn(state.errors?.deliveryArea && "border-destructive focus-visible:ring-destructive")}>
                               <SelectValue placeholder="Select a location..." />
                           </SelectTrigger>
                           <SelectContent>
@@ -284,19 +286,18 @@ export function OrderForm() {
                           </SelectContent>
                           </Select>
                           <p className="text-[0.8rem] text-muted-foreground">Select a campus for FREE delivery.</p>
-                          <FieldError message={state.errors?.deliveryArea?.[0]} />
                       </div>
 
                       {showOther && (
                           <div className="space-y-2">
                                   <Label htmlFor="otherDeliveryArea">Please Specify Your Location *</Label>
+                                  <FieldError message={state.errors?.otherDeliveryArea?.[0]} />
                               <Input 
                                   id="otherDeliveryArea" 
                                   name="otherDeliveryArea" 
                                   placeholder="e.g., Osu, Airport Area" 
-                                  className={cn(state.errors?.otherDeliveryArea && "border-destructive")}
+                                  className={cn(state.errors?.otherDeliveryArea && "border-destructive focus-visible:ring-destructive")}
                                   />
-                                  <FieldError message={state.errors?.otherDeliveryArea?.[0]} />
                           </div>
                       )}
                       
@@ -315,18 +316,18 @@ export function OrderForm() {
                           <div className="flex items-center gap-2">
                           <Label htmlFor="phone_masked">Contact Number (for delivery rider only) *</Label>
                           </div>
+                           <FieldError message={state.errors?.phone_masked?.[0]} />
                           <Input 
                           id="phone_masked" 
                           name="phone_masked" 
                           type="tel" 
                           placeholder="e.g., 024xxxxxxx" 
-                          className={cn(state.errors?.phone_masked && "border-destructive")}
+                          className={cn(state.errors?.phone_masked && "border-destructive focus-visible:ring-destructive")}
                           />
                           <p className="text-[0.8rem] text-muted-foreground flex items-center gap-1.5">
                           <ShieldCheck className="h-3.5 w-3.5 text-primary" />
                           This will be masked and is only for the rider to contact you.
                           </p>
-                          <FieldError message={state.errors?.phone_masked?.[0]} />
                       </div>
                   </div>
 
