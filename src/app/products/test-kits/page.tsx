@@ -71,15 +71,6 @@ export default async function TestKitsPage() {
     const dbKits = await getScreeningKits();
     const allKits = [...dbKits, ...allTestKits].sort((a, b) => a.id - b.id);
 
-    const productsByBrand = allKits.reduce((acc, product) => {
-        const brand = product.brand || 'Other Brands';
-        if (!acc[brand]) {
-            acc[brand] = [];
-        }
-        acc[brand].push(product);
-        return acc;
-    }, {} as Record<string, Product[]>);
-
   return (
     <div className="bg-background">
       <div className="container mx-auto px-4 py-12 md:px-6 md:py-24">
@@ -93,16 +84,9 @@ export default async function TestKitsPage() {
                 </p>
             </div>
 
-            <div className="space-y-12">
-                {Object.entries(productsByBrand).map(([brand, products]) => (
-                    <div key={brand}>
-                        <h2 className="font-headline text-2xl font-bold text-foreground mb-6 border-b pb-2">{brand}</h2>
-                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                            {products.map((product) => (
-                                <ProductCard key={product.id} product={product} />
-                            ))}
-                        </div>
-                    </div>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {allKits.map((product) => (
+                    <ProductCard key={product.id} product={product} />
                 ))}
             </div>
         </div>
