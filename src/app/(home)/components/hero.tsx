@@ -52,13 +52,13 @@ export function Hero() {
                     Stay Supported Fully.
                 </h1>
                 <p className="mt-4 max-w-md mx-auto md:mx-0 text-base text-muted-foreground">
-                    Your one-stop hub for confidential health essentials. Private, fast, and delivered to your door.
+                  Your one-stop hub for the things you'd like to keep private. We're here for what's next.
                 </p>
                 
                 <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
                     {/* primary call-to-action to view products. */}
                     <Button asChild size="lg" className="w-full sm:w-auto">
-                        <Link href="/products">
+                        <Link href="/products/test-kits">
                         View Products
                         <ArrowRight />
                         </Link>
