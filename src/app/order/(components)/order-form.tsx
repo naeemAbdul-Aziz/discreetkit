@@ -66,6 +66,74 @@ const toBase64 = (str: string) =>
     ? Buffer.from(str).toString('base64')
     : window.btoa(str);
 
+function OrderSummaryCard() {
+    const { items, subtotal, studentDiscount, deliveryFee, totalPrice, isStudent } = useCart();
+    
+    if (items.length === 0) {
+        return null;
+    }
+
+    return (
+        <Card className="rounded-2xl">
+            <CardHeader>
+                <CardTitle>Order Summary</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                {isStudent && (
+                    <div className="flex items-center gap-2 rounded-lg bg-success/10 p-3 text-success">
+                        <GraduationCap className="h-5 w-5" />
+                        <p className="text-sm font-medium">Student discount (Free Delivery) applied!</p>
+                    </div>
+                )}
+                <div className="space-y-4 text-sm">
+                {items.map(item => (
+                    <div key={item.id} className="flex justify-between items-center gap-4">
+                        <div className="flex items-center gap-4">
+                            <div className="relative h-12 w-12 flex-shrink-0 rounded-md bg-muted overflow-hidden">
+                                {item.image_url && <Image src={item.image_url} alt={item.name} fill className="object-contain p-1" placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(48, 48))}`} />}
+                            </div>
+                            <div>
+                                <p className="font-semibold text-foreground">{item.name}</p>
+                                <p className="text-muted-foreground">Qty: {item.quantity}</p>
+                            </div>
+                        </div>
+                        <div className="text-right">
+                            <p className="font-medium text-foreground">GHS {(item.price_ghs * item.quantity).toFixed(2)}</p>
+                        </div>
+                    </div>
+                ))}
+                </div>
+
+                <Separator />
+
+                <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                        <p className="text-muted-foreground">Subtotal</p>
+                        <p className="font-medium text-foreground">GHS {subtotal.toFixed(2)}</p>
+                    </div>
+                {studentDiscount > 0 && (
+                    <div className="flex justify-between text-success font-medium">
+                        <p>Student Discount (Free Delivery)</p>
+                        <p>- GHS {studentDiscount.toFixed(2)}</p>
+                    </div>
+                    )}
+                    <div className="flex justify-between">
+                        <p className="text-muted-foreground">Delivery Fee</p>
+                        <p className="font-medium text-foreground">GHS {deliveryFee.toFixed(2)}</p>
+                    </div>
+                </div>
+                
+                <Separator />
+
+                <div className="flex items-baseline justify-between font-bold text-lg">
+                    <p>Total</p>
+                    <p className="text-primary">GHS {totalPrice.toFixed(2)}</p>
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
+
 export function OrderForm() {
   const router = useRouter();
   const { toast } = useToast();
@@ -145,218 +213,167 @@ export function OrderForm() {
 
   return (
     <>
-      <div className="mt-8">
+      <div className="mt-8 mb-8 md:mb-0">
         <ChatTrigger />
       </div>
 
-      <form ref={formRef} action={dispatch} className="mt-8 space-y-8">
-        <input type="hidden" name="cartItems" value={JSON.stringify(items)} />
-        <input type="hidden" name="subtotal" value={subtotal} />
-        <input type="hidden" name="studentDiscount" value={studentDiscount} />
-        <input type="hidden" name="deliveryFee" value={deliveryFee} />
-        <input type="hidden" name="totalPrice" value={totalPrice} />
-        
-        <Card className="bg-card rounded-2xl">
-             <CardHeader>
-                <CardTitle>Delivery & Payment Details</CardTitle>
-                <CardDescription>
-                    We only need a location and contact for the delivery rider. Your details are deleted after delivery.
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-                <div className="space-y-4">
-                     <div className="space-y-2">
-                        <Label htmlFor="email">Email Address *</Label>
-                         <div className="relative">
-                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input 
-                                id="email" 
-                                name="email" 
-                                type="email" 
-                                placeholder="e.g., yourname@email.com" 
-                                className={cn("pl-10", state.errors?.email && "border-destructive")}
-                            />
-                        </div>
-                        <p className="text-[0.8rem] text-muted-foreground">
-                        For payment confirmation from Paystack. We don't store it.
-                        </p>
-                        {state.errors?.email?.[0] && (
-                            <Alert variant="warning" className="mt-2">
-                            <AlertDescription>
-                                {state.errors.email[0]}
-                            </AlertDescription>
-                            </Alert>
-                        )}
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="deliveryArea">Delivery Area / Campus *</Label>
-                        <Select name="deliveryArea" onValueChange={handleLocationChange} defaultValue={deliveryLocation || "Other"} disabled={!isMounted}>
-                        <SelectTrigger className={cn(state.errors?.deliveryArea && "border-destructive")}>
-                            <SelectValue placeholder="Select a location..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                                <SelectItem value="Other">Other (Standard Delivery)</SelectItem>
-                                {discounts.map(loc => (
-                                <SelectItem key={loc.id} value={loc.campus}>{loc.campus}</SelectItem>
-                                ))}
-                        </SelectContent>
-                        </Select>
-                        <p className="text-[0.8rem] text-muted-foreground">Select a campus for FREE delivery.</p>
-                        {state.errors?.deliveryArea?.[0] && (
-                            <Alert variant="warning" className="mt-2">
-                            <AlertDescription>
-                                {state.errors.deliveryArea[0]}
-                            </AlertDescription>
-                            </Alert>
-                        )}
-                    </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 md:gap-12 md:items-start mt-8">
+        {/* Left Column: Form */}
+        <form ref={formRef} action={dispatch} className="space-y-8">
+          <input type="hidden" name="cartItems" value={JSON.stringify(items)} />
+          <input type="hidden" name="subtotal" value={subtotal} />
+          <input type="hidden" name="studentDiscount" value={studentDiscount} />
+          <input type="hidden" name="deliveryFee" value={deliveryFee} />
+          <input type="hidden" name="totalPrice" value={totalPrice} />
+          
+          <Card className="bg-card rounded-2xl">
+              <CardHeader>
+                  <CardTitle>Delivery & Payment Details</CardTitle>
+                  <CardDescription>
+                      We only need a location and contact for the delivery rider. Your details are deleted after delivery.
+                  </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                      <div className="space-y-2">
+                          <Label htmlFor="email">Email Address *</Label>
+                          <div className="relative">
+                              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                              <Input 
+                                  id="email" 
+                                  name="email" 
+                                  type="email" 
+                                  placeholder="e.g., yourname@email.com" 
+                                  className={cn("pl-10", state.errors?.email && "border-destructive")}
+                              />
+                          </div>
+                          <p className="text-[0.8rem] text-muted-foreground">
+                          For payment confirmation from Paystack. We don't store it.
+                          </p>
+                          {state.errors?.email?.[0] && (
+                              <Alert variant="warning" className="mt-2">
+                              <AlertDescription>
+                                  {state.errors.email[0]}
+                              </AlertDescription>
+                              </Alert>
+                          )}
+                      </div>
+                      <div className="space-y-2">
+                          <Label htmlFor="deliveryArea">Delivery Area / Campus *</Label>
+                          <Select name="deliveryArea" onValueChange={handleLocationChange} defaultValue={deliveryLocation || "Other"} disabled={!isMounted}>
+                          <SelectTrigger className={cn(state.errors?.deliveryArea && "border-destructive")}>
+                              <SelectValue placeholder="Select a location..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                                  <SelectItem value="Other">Other (Standard Delivery)</SelectItem>
+                                  {discounts.map(loc => (
+                                  <SelectItem key={loc.id} value={loc.campus}>{loc.campus}</SelectItem>
+                                  ))}
+                          </SelectContent>
+                          </Select>
+                          <p className="text-[0.8rem] text-muted-foreground">Select a campus for FREE delivery.</p>
+                          {state.errors?.deliveryArea?.[0] && (
+                              <Alert variant="warning" className="mt-2">
+                              <AlertDescription>
+                                  {state.errors.deliveryArea[0]}
+                              </AlertDescription>
+                              </Alert>
+                          )}
+                      </div>
 
-                    {showOther && (
-                        <div className="space-y-2">
-                                <Label htmlFor="otherDeliveryArea">Please Specify Your Location *</Label>
-                            <Input 
-                                id="otherDeliveryArea" 
-                                name="otherDeliveryArea" 
-                                placeholder="e.g., Osu, Airport Area" 
-                                className={cn(state.errors?.otherDeliveryArea && "border-destructive")}
-                                />
-                                {state.errors?.otherDeliveryArea?.[0] && (
-                                <Alert variant="warning" className="mt-2">
-                                    <AlertDescription>
-                                    {state.errors.otherDeliveryArea[0]}
-                                    </AlertDescription>
-                                </Alert>
-                                )}
-                        </div>
-                    )}
-                    
-                    <div className="space-y-2">
-                        <Label htmlFor="deliveryAddressNote">Additional Notes for Delivery Agent</Label>
-                        <Textarea
-                        id="deliveryAddressNote"
-                        name="deliveryAddressNote"
-                        placeholder="e.g., 'Call upon arrival at the main gate', 'Leave with the security.'"
-                        />
-                        <p className="text-[0.8rem] text-muted-foreground">
-                        Optional notes to help the rider find you.
-                        </p>
-                    </div>
-                    <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                        <Label htmlFor="phone_masked">Contact Number (for delivery rider only) *</Label>
-                        </div>
-                        <Input 
-                        id="phone_masked" 
-                        name="phone_masked" 
-                        type="tel" 
-                        placeholder="e.g., 024xxxxxxx" 
-                        className={cn(state.errors?.phone_masked && "border-destructive")}
-                        />
-                        <p className="text-[0.8rem] text-muted-foreground flex items-center gap-1.5">
-                        <ShieldCheck className="h-3.5 w-3.5 text-primary" />
-                        This will be masked and is only for the rider to contact you.
-                        </p>
-                        {state.errors?.phone_masked?.[0] && (
-                            <Alert variant="warning" className="mt-2">
-                            <AlertDescription>
-                                {state.errors.phone_masked[0]}
-                            </AlertDescription>
-                            </Alert>
-                        )}
-                    </div>
-                </div>
+                      {showOther && (
+                          <div className="space-y-2">
+                                  <Label htmlFor="otherDeliveryArea">Please Specify Your Location *</Label>
+                              <Input 
+                                  id="otherDeliveryArea" 
+                                  name="otherDeliveryArea" 
+                                  placeholder="e.g., Osu, Airport Area" 
+                                  className={cn(state.errors?.otherDeliveryArea && "border-destructive")}
+                                  />
+                                  {state.errors?.otherDeliveryArea?.[0] && (
+                                  <Alert variant="warning" className="mt-2">
+                                      <AlertDescription>
+                                      {state.errors.otherDeliveryArea[0]}
+                                      </AlertDescription>
+                                  </Alert>
+                                  )}
+                          </div>
+                      )}
+                      
+                      <div className="space-y-2">
+                          <Label htmlFor="deliveryAddressNote">Additional Notes for Delivery Agent</Label>
+                          <Textarea
+                          id="deliveryAddressNote"
+                          name="deliveryAddressNote"
+                          placeholder="e.g., 'Call upon arrival at the main gate', 'Leave with the security.'"
+                          />
+                          <p className="text-[0.8rem] text-muted-foreground">
+                          Optional notes to help the rider find you.
+                          </p>
+                      </div>
+                      <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                          <Label htmlFor="phone_masked">Contact Number (for delivery rider only) *</Label>
+                          </div>
+                          <Input 
+                          id="phone_masked" 
+                          name="phone_masked" 
+                          type="tel" 
+                          placeholder="e.g., 024xxxxxxx" 
+                          className={cn(state.errors?.phone_masked && "border-destructive")}
+                          />
+                          <p className="text-[0.8rem] text-muted-foreground flex items-center gap-1.5">
+                          <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+                          This will be masked and is only for the rider to contact you.
+                          </p>
+                          {state.errors?.phone_masked?.[0] && (
+                              <Alert variant="warning" className="mt-2">
+                              <AlertDescription>
+                                  {state.errors.phone_masked[0]}
+                              </AlertDescription>
+                              </Alert>
+                          )}
+                      </div>
+                  </div>
 
-                <Separator />
-                
-                {items.length > 0 && (
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-semibold">Order Summary</h3>
-                        {isStudent && (
-                            <div className="flex items-center gap-2 rounded-lg bg-success/10 p-3 text-success">
-                                <GraduationCap className="h-5 w-5" />
-                                <p className="text-sm font-medium">Student discount (Free Delivery) applied!</p>
-                            </div>
-                        )}
-                        <div className="space-y-4 text-sm">
-                        {items.map(item => (
-                            <div key={item.id} className="flex justify-between items-center gap-4">
-                                <div className="flex items-center gap-4">
-                                    <div className="relative h-12 w-12 flex-shrink-0 rounded-md bg-muted overflow-hidden">
-                                        {item.image_url && <Image src={item.image_url} alt={item.name} fill className="object-contain p-1" placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(48, 48))}`} />}
-                                    </div>
-                                    <div>
-                                        <p className="font-semibold text-foreground">{item.name}</p>
-                                        <p className="text-muted-foreground">Qty: {item.quantity}</p>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <p className="font-medium text-foreground">GHS {(item.price_ghs * item.quantity).toFixed(2)}</p>
-                                </div>
-                            </div>
-                        ))}
-                        </div>
+                  <Separator />
+                  
+                  <div className="items-top flex space-x-2 pt-2">
+                      <Checkbox id="terms" checked={termsAccepted} onCheckedChange={(checked) => setTermsAccepted(checked as boolean)} />
+                      <div className="grid gap-1.5 leading-none">
+                          <label
+                          htmlFor="terms"
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          >
+                          By checking this box, you agree to our{' '}
+                          <Link href="/terms" className="underline text-primary hover:text-primary/80" target="_blank">
+                              Terms and Conditions
+                          </Link>{' '}
+                          and{' '}
+                          <Link href="/privacy" className="underline text-primary hover:text-primary/80" target="_blank">
+                              Privacy Notice
+                          </Link>
+                          .
+                          </label>
+                      </div>
+                  </div>
+              </CardContent>
+          </Card>
+          
+          <SubmitButton disabled={items.length === 0 || !termsAccepted} />
+        </form>
 
-                        <Separator />
-
-                        <div className="space-y-2 text-sm">
-                            <div className="flex justify-between">
-                                <p className="text-muted-foreground">Subtotal</p>
-                                <p className="font-medium text-foreground">GHS {subtotal.toFixed(2)}</p>
-                            </div>
-                        {studentDiscount > 0 && (
-                            <div className="flex justify-between text-success font-medium">
-                                <p>Student Discount (Free Delivery)</p>
-                                <p>- GHS {studentDiscount.toFixed(2)}</p>
-                            </div>
-                            )}
-                            <div className="flex justify-between">
-                                <p className="text-muted-foreground">Delivery Fee</p>
-                                <p className="font-medium text-foreground">GHS {deliveryFee.toFixed(2)}</p>
-                            </div>
-                        </div>
-                        
-                        <Separator />
-
-                        <div className="flex items-baseline justify-between font-bold text-lg">
-                            <p>Total</p>
-                            <p className="text-primary">GHS {totalPrice.toFixed(2)}</p>
-                        </div>
-                    </div>
-                )}
-                 
-                 <Separator />
-
-                <div className="items-top flex space-x-2 pt-2">
-                    <Checkbox id="terms" checked={termsAccepted} onCheckedChange={(checked) => setTermsAccepted(checked as boolean)} />
-                    <div className="grid gap-1.5 leading-none">
-                        <label
-                        htmlFor="terms"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                        By checking this box, you agree to our{' '}
-                        <Link href="/terms" className="underline text-primary hover:text-primary/80" target="_blank">
-                            Terms and Conditions
-                        </Link>{' '}
-                        and{' '}
-                        <Link href="/privacy" className="underline text-primary hover:text-primary/80" target="_blank">
-                            Privacy Notice
-                        </Link>
-                        .
-                        </label>
-                    </div>
-                </div>
-
+        {/* Right Column: Order Summary */}
+        <div className="row-start-1 md:row-auto md:col-start-2">
+            <div className="md:sticky md:top-24 space-y-8">
+                <OrderSummaryCard />
                  <div className="flex items-center gap-2 rounded-lg bg-muted p-3 text-muted-foreground">
                     <Lock className="h-5 w-5 text-success flex-shrink-0" />
                     <p className="text-xs font-medium">Secured via Paystack. Your privacy is guaranteed.</p>
                 </div>
-            </CardContent>
-        </Card>
-
-        
-        <SubmitButton disabled={items.length === 0 || !termsAccepted} />
-          
-      </form>
+            </div>
+        </div>
+      </div>
     </>
   );
 }

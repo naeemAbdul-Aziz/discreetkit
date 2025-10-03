@@ -52,7 +52,7 @@ function OrderPageLoading() {
 export default function OrderPage() {
   return (
     <div className="bg-background">
-      <div className="container mx-auto max-w-2xl px-4 py-12 md:px-6 md:py-24">
+      <div className="container mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-24">
         <div className="text-center">
             <h1 className="font-headline text-3xl font-bold md:text-4xl">Complete Your Order</h1>
             <p className="mt-2 text-base text-muted-foreground md:text-lg">
