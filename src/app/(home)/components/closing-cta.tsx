@@ -42,15 +42,15 @@ export function ClosingCta() {
           <div className="grid md:grid-cols-2">
             <div className="flex flex-col justify-center p-8 text-center md:p-12 md:text-left">
               <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                Your Health, Your Terms.
+                Stop Waiting. Start Knowing.
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground md:mx-0">
-                Ready to get started? Your <strong>peace of mind</strong> is just a few clicks away. Order your <strong>confidential health products</strong> now.
+                Your journey to <strong>peace of mind</strong> is private, fast, and fully supported. Take control of your health today—<strong>securely and confidentially.</strong>
               </p>
               <div className="mt-8 flex justify-center md:justify-start">
                 <Button asChild size="lg">
                   <Link href="/cart">
-                    Shop Securely
+                    Start My Private Order
                     <ArrowRight />
                   </Link>
                 </Button>
