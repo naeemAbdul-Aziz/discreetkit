@@ -56,9 +56,9 @@ export function ClosingCta() {
                 </Button>
               </div>
             </div>
-            <div className="relative h-64 min-h-[300px] w-full md:h-full">
+            <div className="relative h-64 min-h-[400px] w-full md:h-full">
               <Image
-                src="https://images.unsplash.com/photo-1584515933487-759821d27167?q=80&w=800&fit=crop"
+                src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759593544/closing_cta_b4iufa.png"
                 alt="a person's hands holding a small, discreet package."
                 fill
                 className="object-cover"
