@@ -37,7 +37,7 @@ const toBase64 = (str: string) =>
 export function Hero() {
   return (
     <section className="overflow-hidden">
-      <div className="container mx-auto px-4 md:px-6 py-12 md:pt-20 md:pb-12">
+      <div className="container mx-auto px-6 py-12 md:pt-20 md:pb-12 max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             {/* left content column */}
             <motion.div
