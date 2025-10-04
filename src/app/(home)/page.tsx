@@ -161,15 +161,15 @@ export default async function Home() {
       </SectionWrapper>
       
       <SectionWrapper>
-        <ClosingCta />
-      </SectionWrapper>
-      
-      <SectionWrapper>
         <Faq />
       </SectionWrapper>
       
       <SectionWrapper>
         <ContactUs />
+      </SectionWrapper>
+
+      <SectionWrapper>
+        <ClosingCta />
       </SectionWrapper>
     </div>
   );
