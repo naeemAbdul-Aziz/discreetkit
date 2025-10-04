@@ -81,12 +81,12 @@ export function Hero() {
                 className="relative h-[300px] md:h-[450px] w-full"
             >
                 <Image
-                    src="https://res.cloudinary.com/dzfa6wqb8/image/upload/w_800,h_600,c_fill,q_auto,f_auto/v1756313856/woman_smiling_package_g5rnqh.jpg"
-                    alt="a woman viewed from above, sitting on a couch and holding a discreet delivery box and her phone."
+                    src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759591519/hero_zdxd3p.png"
+                    alt="A collection of DiscreetKit's health products arranged neatly on a neutral background."
                     fill
                     priority
                     className="object-cover rounded-3xl"
-                    data-ai-hint="happy woman box"
+                    data-ai-hint="product flatlay"
                     placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 600))}`}
                 />
             </motion.div>
