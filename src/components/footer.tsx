@@ -88,7 +88,7 @@ export function Footer() {
   ]
 
   const Logo = () => (
-    <span className="font-headline text-2xl font-bold tracking-tighter text-primary-foreground">
+    <span className="font-headline text-2xl font-bold tracking-tight text-primary-foreground">
         DiscreetKit
     </span>
 );

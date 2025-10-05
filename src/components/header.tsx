@@ -61,7 +61,7 @@ function CartLink() {
 
 // a simple component for the site logo.
 const Logo = () => (
-    <span className="font-headline text-2xl font-bold tracking-tighter text-primary">
+    <span className="font-headline text-2xl font-bold tracking-tight text-primary">
         DiscreetKit
     </span>
 );
