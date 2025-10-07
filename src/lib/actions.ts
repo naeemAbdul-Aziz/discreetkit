@@ -261,7 +261,7 @@ export async function getOrderAction(code: string): Promise<Order | null> {
       studentDiscount: order.student_discount,
       deliveryFee: order.delivery_fee,
       totalPrice: order.total_price,
-      events: order.order_events
+      events: order.events
         .map((e: any) => ({
           status: e.status,
           note: e.note ?? '',
@@ -404,4 +404,52 @@ export async function saveProduct(prevState: any, formData: FormData) {
 
     revalidatePath('/admin/products');
     return { success: true, message: 'Product saved successfully!' };
+}
+
+const updateFieldSchema = z.object({
+  id: z.number(),
+  field: z.enum(['price_ghs', 'stock_level']),
+  value: z.coerce.number().min(0),
+});
+
+/**
+ * Updates a single field for a product in the database.
+ * @param {object} params - The parameters for the update.
+ * @param {number} params.id - The ID of the product to update.
+ * @param {'price_ghs' | 'stock_level'} params.field - The field to update.
+ * @param {number} params.value - The new value for the field.
+ * @returns A promise that resolves to an object indicating success or failure.
+ */
+export async function updateProductField(params: {
+  id: number;
+  field: 'price_ghs' | 'stock_level';
+  value: number;
+}) {
+  const validated = updateFieldSchema.safeParse(params);
+  if (!validated.success) {
+    return {
+      success: false,
+      message: 'Invalid input.',
+    };
+  }
+
+  const { id, field, value } = validated.data;
+  const supabase = getSupabaseAdminClient();
+
+  try {
+    const { error } = await supabase
+      .from('products')
+      .update({ [field]: value })
+      .eq('id', id);
+
+    if (error) throw error;
+  } catch (e: any) {
+    return {
+      success: false,
+      message: `Database Error: ${e.message}`,
+    };
+  }
+
+  revalidatePath('/admin/products');
+  return { success: true };
 }

@@ -5,7 +5,7 @@
  */
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { getAdminProducts, getProductById } from '@/lib/actions';
 import type { Product } from '@/lib/data';
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,6 @@ import {
 } from '@/components/ui/table';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PlusCircle, MoreHorizontal, ArrowUpDown, Search } from 'lucide-react';
-import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -28,6 +27,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { ProductForm } from './(components)/product-form';
+import { InlineEditField } from './(components)/inline-edit-field';
 
 type SortableColumn = 'name' | 'category' | 'price_ghs' | 'stock_level';
 type SortDirection = 'asc' | 'desc';
@@ -78,16 +78,16 @@ export default function AdminProductsPage() {
 
   const uniqueCategories = ['All', ...Array.from(new Set(products.map(p => p.category).filter(Boolean)))];
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     setIsLoading(true);
     const fetchedProducts = await getAdminProducts();
     setProducts(fetchedProducts);
     setIsLoading(false);
-  }
+  }, []);
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [fetchProducts]);
 
   const handleSort = (column: SortableColumn) => {
     setSort(prevSort => ({
@@ -189,9 +189,21 @@ export default function AdminProductsPage() {
         <TableCell>
             <Badge variant="outline">{product.category}</Badge>
         </TableCell>
-        <TableCell>{product.price_ghs.toFixed(2)}</TableCell>
         <TableCell>
-            <StockBadge stock_level={product.stock_level} />
+          <InlineEditField 
+            productId={product.id}
+            fieldName="price_ghs"
+            value={product.price_ghs}
+            onUpdate={fetchProducts}
+          />
+        </TableCell>
+        <TableCell>
+          <InlineEditField 
+            productId={product.id}
+            fieldName="stock_level"
+            value={product.stock_level}
+            onUpdate={fetchProducts}
+          />
         </TableCell>
         <TableCell>
             <DropdownMenu>
@@ -203,8 +215,8 @@ export default function AdminProductsPage() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem onClick={() => handleEdit(product.id)}>Edit</DropdownMenuItem>
-                <DropdownMenuItem>Delete</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleEdit(product.id)}>Edit Full Details</DropdownMenuItem>
+                <DropdownMenuItem className="text-destructive focus:bg-destructive/10 focus:text-destructive">Delete</DropdownMenuItem>
             </DropdownMenuContent>
             </DropdownMenu>
         </TableCell>
@@ -220,7 +232,7 @@ export default function AdminProductsPage() {
             <div>
                 <CardTitle>Products</CardTitle>
                 <CardDescription>
-                    Manage your product inventory.
+                    Manage your product inventory. Click on price or stock to edit inline.
                 </CardDescription>
             </div>
             <div className="flex w-full sm:w-auto items-center gap-2">
