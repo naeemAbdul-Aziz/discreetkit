@@ -62,9 +62,7 @@ function FeaturedProduct({ product }: { product: Product }) {
                 {product.description}
               </p>
                <div className="mt-8">
-                    <Link href={`/products/${product.id}`} passHref className="block">
-                        <ProductCard product={product} />
-                    </Link>
+                    <ProductCard product={product} />
               </div>
             </div>
             <div className="relative h-64 min-h-[300px] w-full md:h-full bg-muted/50">
