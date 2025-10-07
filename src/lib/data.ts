@@ -14,7 +14,9 @@ export type Product = {
     featured: boolean | null;
     brand?: string | null;
     savings_ghs?: number | null;
-    category?: 'Contraception' | 'Condoms' | 'Personal Care' | 'STI Tests' | string;
+    category?: 'Contraception' | 'Condoms' | 'Personal Care' | 'STI Tests' | 'Medication' | string;
+    usage_instructions?: string[];
+    in_the_box?: string[];
 }
 
 export type WellnessProduct = Product & {
@@ -32,6 +34,13 @@ export const wellnessProducts: WellnessProduct[] = [
         brand: 'Lydia',
         featured: false,
         category: 'Contraception',
+        usage_instructions: [
+            "Take one tablet as soon as possible after unprotected intercourse.",
+            "Most effective when taken within 72 hours (3 days).",
+            "This is a single-dose treatment.",
+            "It is not a regular contraceptive pill."
+        ],
+        in_the_box: ["1 Tablet of Emergency Contraceptive", "1 Instruction Leaflet"],
     },
     {
         id: 16,
@@ -42,7 +51,14 @@ export const wellnessProducts: WellnessProduct[] = [
         image_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png',
         brand: 'Postinor',
         featured: false,
-        category: 'Contraception'
+        category: 'Contraception',
+        usage_instructions: [
+            "Take one tablet as soon as possible after unprotected intercourse.",
+            "Most effective when taken within 72 hours (3 days).",
+            "This is a single-dose treatment.",
+            "It is not a regular contraceptive pill."
+        ],
+        in_the_box: ["1 Tablet of Emergency Contraceptive", "1 Instruction Leaflet"],
     },
     {
         id: 5,
@@ -54,6 +70,7 @@ export const wellnessProducts: WellnessProduct[] = [
         brand: 'Durex',
         featured: false,
         category: 'Condoms',
+        in_the_box: ["12 Extra Safe Latex Condoms"],
     },
     {
         id: 6,
@@ -65,6 +82,7 @@ export const wellnessProducts: WellnessProduct[] = [
         brand: 'Durex',
         featured: false,
         category: 'Condoms',
+        in_the_box: ["12 Performa Latex Condoms"],
     },
     {
         id: 9,
@@ -76,6 +94,7 @@ export const wellnessProducts: WellnessProduct[] = [
         brand: 'Durex',
         featured: false,
         category: 'Condoms',
+        in_the_box: ["12 Assorted Flavored Latex Condoms"],
     },
     {
         id: 10,
@@ -87,6 +106,7 @@ export const wellnessProducts: WellnessProduct[] = [
         brand: 'Fiesta',
         featured: false,
         category: 'Condoms',
+        in_the_box: ["12 Classic Latex Condoms"],
     },
     {
         id: 11,
@@ -98,6 +118,7 @@ export const wellnessProducts: WellnessProduct[] = [
         brand: 'Fiesta',
         featured: false,
         category: 'Condoms',
+        in_the_box: ["12 Banana Flavored Latex Condoms"],
     },
     {
         id: 12,
@@ -109,6 +130,7 @@ export const wellnessProducts: WellnessProduct[] = [
         brand: 'Fiesta',
         featured: false,
         category: 'Condoms',
+        in_the_box: ["12 Ribbed Latex Condoms"],
     },
     {
         id: 13,
@@ -120,6 +142,7 @@ export const wellnessProducts: WellnessProduct[] = [
         brand: 'Durex',
         featured: false,
         category: 'Personal Care',
+        in_the_box: ["1 Bottle of Aqua-based Lubricant"],
     },
 ];
 
@@ -413,6 +436,5 @@ export const testimonials: Testimonial[] = [
     avatar: "https://images.unsplash.com/photo-1580852300021-3349a882d385?w=150&h=150&fit=crop&q=75"
   },
 ];
-
 
     

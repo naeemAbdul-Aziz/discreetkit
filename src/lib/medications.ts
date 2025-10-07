@@ -11,6 +11,13 @@ export const medications: Product[] = [
         brand: 'Generic',
         featured: false,
         category: 'Medication',
+        usage_instructions: [
+            "Take one tablet orally, once daily.",
+            "Can be taken with or without food.",
+            "It is important to take your medication at the same time each day to maintain consistent levels in your blood.",
+            "Do not miss or skip doses. If you miss a dose, take it as soon as you remember. If it's close to your next dose, skip the missed dose and continue your regular schedule."
+        ],
+        in_the_box: ["30 Tablets (30-Day Supply)"],
     },
     {
         id: 102,
@@ -23,6 +30,13 @@ export const medications: Product[] = [
         featured: false,
         category: 'Medication',
         savings_ghs: 100.00,
+        usage_instructions: [
+            "Take one tablet orally, once daily.",
+            "Can be taken with or without food.",
+            "It is important to take your medication at the same time each day.",
+            "This 90-day supply helps ensure you do not run out of medication."
+        ],
+        in_the_box: ["90 Tablets (90-Day Supply)"],
     },
      {
         id: 103,
@@ -34,7 +48,16 @@ export const medications: Product[] = [
         brand: 'Generic',
         featured: false,
         category: 'Medication',
+        usage_instructions: [
+            "Take one tablet orally, once daily, to prevent HIV.",
+            "PrEP is most effective when taken consistently every day.",
+            "PrEP does not protect against other sexually transmitted infections (STIs).",
+            "Regular check-ups and testing with your healthcare provider are required while on PrEP."
+        ],
+        in_the_box: ["30 Tablets (30-Day Supply)"],
     },
 ];
+
+    
 
     

@@ -13,94 +13,9 @@ import { ProductCard } from '../../(components)/product-card';
 import { cn } from '@/lib/utils';
 import type { Product } from '@/lib/data';
 
-// These functions should ideally live with your data layer, but are here for simplicity.
-const getUsageInstructions = (productId: number) => {
-    switch(productId) {
-        case 1: // Standard HIV Kit
-        case 3: // Support Bundle
-        case 17: // Syphilis Test
-            return [
-                "Open the pouch and lay out all components.",
-                "Use the lancet to prick your finger and collect a blood sample.",
-                "Apply the sample to the test cassette.",
-                "Add the buffer solution and wait 15-20 minutes.",
-                "Read the result based on the lines that appear."
-            ];
-        case 2: // Pregnancy Test
-            return [
-                "Open the package and remove the test stick.",
-                "Hold the absorbent tip in your urine stream for 5-10 seconds.",
-                "Lay the test flat with the result window facing up.",
-                "Wait 3-5 minutes for the result to appear.",
-                "Read the result: two lines for pregnant, one line for not pregnant."
-            ]
-        case 8: // All-in-one
-        case 15: // Safe & Sound Bundle
-             return [
-                "This bundle contains multiple products.",
-                "Please refer to the individual package insert for each item for detailed usage instructions.",
-                "Ensure you read the instructions for each test carefully before use."
-            ];
-        case 14: // Digital Pregnancy Test
-            return [
-                "Remove the digital test from its wrapper.",
-                "Hold the absorbent tip in your urine stream as directed.",
-                "The display will show a waiting symbol, then your result ('Pregnant' or 'Not Pregnant') will appear in words.",
-                "The result is clear and easy to read, eliminating interpretation guesswork."
-            ]
-        case 18: // Chlamydia & Gonorrhea
-            return [
-                "This is a urine-based test.",
-                "Collect a urine sample in the provided sterile container.",
-                "Use the pipette to transfer the specified amount of urine to the test device.",
-                "Wait for the time indicated in the manual.",
-                "Read the results for both Chlamydia and Gonorrhea separately on the cassette."
-            ]
-        default:
-            return ["Please refer to the package insert for detailed instructions."];
-    }
-}
-
-const getWhatsInTheBox = (productId: number) => {
-     switch(productId) {
-        case 1: // Standard HIV Kit
-        case 17: // Syphilis Test
-            return ["1 Test Cassette", "1 Lancet", "1 Buffer Solution Vial", "1 Alcohol Prep Pad", "1 Instruction Manual"];
-        case 2: // Pregnancy Test
-            return ["1 Pregnancy Test Stick", "1 Desiccant Packet", "1 Instruction Manual"];
-        case 3: // Support Bundle
-            return ["2 Test Cassettes", "2 Lancets", "2 Buffer Solution Vials", "2 Alcohol Prep Pads", "2 Instruction Manuals"];
-        case 4: // Lydia Postpill
-        case 16: // Postinor 2
-            return ["1 Tablet of Emergency Contraceptive", "1 Instruction Leaflet"];
-         case 5: // Condom Pack
-         case 6:
-         case 9:
-         case 10:
-         case 11:
-         case 12:
-            return ["12 Latex Condoms"];
-        case 7: // Weekend Ready Bundle
-            return ["12 Ultra-thin Latex Condoms", "1 Bottle of Aqua-based Lubricant"];
-        case 8: // All-in-one
-            return ["1 Standard HIV Kit", "1 Pregnancy Test Kit", "1 Postpill (Emergency Contraceptive)"];
-        case 13: // Lubricant
-            return ["1 Bottle of Aqua-based Lubricant"];
-        case 14: // Digital Pregnancy Test
-            return ["1 Digital Pregnancy Test Stick", "1 Instruction Manual"];
-        case 15: // Safe & Sound Bundle
-            return ["1 Standard HIV Kit", "1 Pack of 12 Condoms"];
-        case 18: // Chlamydia & Gonorrhea
-            return ["1 Test Cassette", "1 Urine Collection Cup", "1 Pipette", "1 Buffer Solution", "1 Instruction Manual"];
-        default:
-            return ["Contents as described on packaging."];
-    }
-}
-
-
 export function ProductDetailContent({ product, relatedProducts }: { product: Product, relatedProducts: Product[] }) {
-    const instructions = getUsageInstructions(product.id);
-    const boxContents = getWhatsInTheBox(product.id);
+    const instructions = product.usage_instructions;
+    const boxContents = product.in_the_box;
 
     const [api, setApi] = useState<EmblaCarouselType | undefined>();
     const [selectedIndex, setSelectedIndex] = useState(0);
@@ -118,6 +33,8 @@ export function ProductDetailContent({ product, relatedProducts }: { product: Pr
           api.off('select', onSelect);
         };
     }, [api, onSelect]);
+
+    const hasInfoTabs = instructions || boxContents;
 
   return (
     <div className="bg-background">
@@ -140,36 +57,46 @@ export function ProductDetailContent({ product, relatedProducts }: { product: Pr
                     )}
                 </div>
 
-                <Tabs defaultValue="instructions" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="instructions">
-                      <FileText className="mr-2 h-4 w-4" /> Usage
-                    </TabsTrigger>
-                    <TabsTrigger value="contents">
-                      <Package className="mr-2 h-4 w-4" /> In the Box
-                    </TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="instructions" className="border rounded-lg p-6 mt-4">
-                     <ul className="space-y-3 text-muted-foreground">
-                        {instructions.map((step, index) => (
-                            <li key={index} className="flex items-start gap-3">
-                                <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                                <span>{step}</span>
-                            </li>
-                        ))}
-                    </ul>
-                  </TabsContent>
-                  <TabsContent value="contents" className="border rounded-lg p-6 mt-4">
-                    <ul className="space-y-3 text-muted-foreground">
-                        {boxContents.map((item, index) => (
-                            <li key={index} className="flex items-start gap-3">
-                                 <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                                 <span>{item}</span>
-                            </li>
-                        ))}
-                    </ul>
-                  </TabsContent>
-                </Tabs>
+                {hasInfoTabs && (
+                    <Tabs defaultValue="instructions" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                        {instructions && (
+                            <TabsTrigger value="instructions">
+                            <FileText className="mr-2 h-4 w-4" /> Usage
+                            </TabsTrigger>
+                        )}
+                        {boxContents && (
+                            <TabsTrigger value="contents">
+                            <Package className="mr-2 h-4 w-4" /> In the Box
+                            </TabsTrigger>
+                        )}
+                    </TabsList>
+                    {instructions && (
+                        <TabsContent value="instructions" className="border rounded-lg p-6 mt-4">
+                            <ul className="space-y-3 text-muted-foreground">
+                                {instructions.map((step, index) => (
+                                    <li key={index} className="flex items-start gap-3">
+                                        <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                                        <span>{step}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </TabsContent>
+                    )}
+                    {boxContents && (
+                        <TabsContent value="contents" className="border rounded-lg p-6 mt-4">
+                            <ul className="space-y-3 text-muted-foreground">
+                                {boxContents.map((item, index) => (
+                                    <li key={index} className="flex items-start gap-3">
+                                        <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                                        <span>{item}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </TabsContent>
+                    )}
+                    </Tabs>
+                )}
             </div>
 
             {/* Right Column: Sticky CTA */}
@@ -266,3 +193,5 @@ export function ProductDetailContent({ product, relatedProducts }: { product: Pr
     </div>
   );
 }
+
+    

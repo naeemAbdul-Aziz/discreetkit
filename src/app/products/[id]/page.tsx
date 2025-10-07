@@ -7,16 +7,20 @@ import type { Metadata } from 'next';
 import { ProductDetailContent } from './(components)/product-detail-content';
 import { wellnessProducts } from '@/lib/data';
 import { allTestKits } from '../test-kits/page';
+import { medications } from '@/lib/medications';
 
 
 async function getProduct(id: string): Promise<Product | null> {
-    // First, check our local list of non-db products
-    const localProduct = allTestKits.find(p => p.id === Number(id));
+    const numericId = Number(id);
+    
+    // Combine all static product lists
+    const allStaticProducts = [...wellnessProducts, ...allTestKits, ...medications];
+    const localProduct = allStaticProducts.find(p => p.id === numericId);
     if (localProduct) {
-        return localProduct as Product;
+        return localProduct;
     }
     
-    // If not found, check the database
+    // If not found in static lists, check the database
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
         .from('products')
@@ -76,15 +80,7 @@ async function getRelatedProducts(currentProductId: number): Promise<Product[]> 
 
 
 export default async function ProductDetailPageWrapper({ params }: { params: { id: string } }) {
-  // The wellness page products are not in the DB, so we must check for them separately.
-  const isWellnessProduct = [4, 5, 6, 9, 10, 11, 12, 13, 16].includes(Number(params.id));
-  let product: Product | null;
-
-  if (isWellnessProduct) {
-      product = wellnessProducts.find(p => p.id === Number(params.id)) || null;
-  } else {
-      product = await getProduct(params.id);
-  }
+  const product = await getProduct(params.id);
   
   if (!product) {
     notFound();

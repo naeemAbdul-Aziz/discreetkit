@@ -16,6 +16,15 @@ export const allTestKits: Product[] = [
         image_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png', // Placeholder
         brand: 'Partner Brand',
         featured: false,
+        category: 'STI Tests',
+        usage_instructions: [
+            "Use the lancet to collect a blood sample from your fingertip.",
+            "Apply the blood sample to the designated area on the test cassette.",
+            "Add the provided buffer solution.",
+            "Wait 10-15 minutes for the result to appear.",
+            "Consult a healthcare professional for confirmatory testing if the result is positive."
+        ],
+        in_the_box: ["1 Test Cassette", "1 Lancet", "1 Buffer Solution", "1 Alcohol Prep Pad", "1 Instruction Manual"],
     },
     {
         id: 18,
@@ -26,6 +35,14 @@ export const allTestKits: Product[] = [
         image_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png', // Placeholder
         brand: 'Partner Brand',
         featured: false,
+        category: 'STI Tests',
+        usage_instructions: [
+            "Collect a urine sample in the provided sterile container.",
+            "Use the pipette to transfer the specified amount of urine to the test device.",
+            "Wait for the time indicated in the manual (usually 15-20 minutes).",
+            "Read the results for both Chlamydia and Gonorrhea separately on the cassette."
+        ],
+        in_the_box: ["1 Test Cassette", "1 Urine Collection Cup", "1 Pipette", "1 Buffer Solution", "1 Instruction Manual"],
     },
 ];
 
@@ -88,3 +105,5 @@ export default async function TestKitsPage() {
     </div>
   );
 }
+
+    
