@@ -26,6 +26,13 @@ interface NavItem {
   icon: LucideIcon;
 }
 
+const navItems: NavItem[] = [
+    { href: '/admin/dashboard', label: 'Dashboard', icon: Home },
+    { href: '/admin/products', label: 'Products', icon: Package },
+    { href: '/admin/orders', label: 'Orders', icon: ShoppingCart },
+    { href: '/admin/customers', label: 'Customers', icon: Users },
+];
+
 const Logo = () => (
     <span className="font-headline text-2xl font-bold tracking-tight text-primary">
         DiscreetKit
@@ -53,10 +60,8 @@ const NavLink = ({ item, isMobile = false }: { item: NavItem, isMobile?: boolean
 
 export function AdminShell({
   children,
-  navItems
 }: {
   children: React.ReactNode;
-  navItems: NavItem[];
 }) {
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
   
