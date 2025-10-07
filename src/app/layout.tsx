@@ -1,18 +1,15 @@
 /**
  * @file layout.tsx
  * @description the root layout for the entire application. it sets up the main html structure,
- *              loads fonts, defines metadata, and wraps pages with the header and footer.
+ *              loads fonts, and defines metadata. server-side logic resides here.
  */
-
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { cn } from '@/lib/utils';
-import { Header } from '@/components/header';
-import { Footer } from '@/components/footer';
 import { Toaster } from "@/components/ui/toaster";
 import { Chatbot } from '@/components/chatbot';
 import NextTopLoader from 'nextjs-toploader';
-import { FloatingShopButton } from '@/components/quick-shop-banner';
+import { ClientLayout } from './client-layout';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://discreetkit.com';
 const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758119851/discreetkit_logo_4_npbt4m.png';
@@ -105,14 +102,9 @@ export default function RootLayout({
           speed={200}
           shadow="0 0 10px hsl(var(--primary)),0 0 5px hsl(var(--primary))"
         />
-        <div className="relative flex min-h-dvh flex-col bg-background">
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
-          <Chatbot />
-          <FloatingShopButton />
-        </div>
-        {/* toaster for displaying notifications. */}
+        <ClientLayout>{children}</ClientLayout>
+        {/* toaster and chatbot are client-side, so they can be here or in ClientLayout */}
+        <Chatbot />
         <Toaster />
       </body>
     </html>
