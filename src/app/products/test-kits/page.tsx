@@ -1,12 +1,6 @@
 import { getSupabaseClient } from '@/lib/supabase';
 import { ProductCard } from '../(components)/product-card';
 import type { Product } from '@/lib/data';
-import type { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'Test Kits | DiscreetKit Ghana',
-  description: 'Shop private, WHO-approved self-test kits for HIV, Pregnancy, Syphilis, and more. Get accurate results in minutes, delivered discreetly to your door.',
-};
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60; // Revalidate data every 60 seconds
