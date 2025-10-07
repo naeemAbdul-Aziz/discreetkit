@@ -29,15 +29,20 @@ async function getDashboardAnalytics() {
         };
     }
 
+    // A successful order is any order that is NOT pending payment.
+    // This includes 'received', 'processing', 'out_for_delivery', and 'completed'.
     const successfulOrders = orders.filter(o => o.status !== 'pending_payment');
 
     const totalRevenue = successfulOrders.reduce((sum, order) => sum + (order.total_price || 0), 0);
     const totalSales = successfulOrders.length;
 
     // Use email to approximate unique customers for this metric
-    const uniqueCustomers = new Set(successfulOrders.map(o => o.email)).size;
+    const uniqueCustomers = new Set(successfulOrders.map(o => o.email).filter(Boolean)).size;
     
+    // All orders includes those pending payment.
     const allOrders = orders.length;
+
+    // Breakdown by fulfillment status
     const pendingOrders = orders.filter(o => o.status === 'received').length;
     const inTransitOrders = orders.filter(o => o.status === 'out_for_delivery').length;
     const deliveredOrders = orders.filter(o => o.status === 'completed').length;
@@ -196,5 +201,3 @@ export default async function AdminDashboardPage() {
     </div>
   );
 }
-
-    
