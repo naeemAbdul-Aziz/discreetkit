@@ -7,15 +7,63 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { PlusCircle, ShoppingCart, Users, Truck, PackageCheck, Hourglass, BarChart3 } from "lucide-react";
+import { getSupabaseAdminClient } from "@/lib/supabase";
+import type { Order } from "@/lib/data";
 
-export default function AdminDashboardPage() {
+// Fetches orders and calculates key performance indicators.
+async function getDashboardAnalytics() {
+    const supabase = getSupabaseAdminClient();
+    const { data: orders, error } = await supabase.from('orders').select('*');
+
+    if (error) {
+        console.error("Error fetching dashboard data:", error);
+        // Return zeroed-out data on error
+        return {
+            totalRevenue: 0,
+            totalSales: 0,
+            newCustomers: 0,
+            allOrders: 0,
+            pendingOrders: 0,
+            inTransitOrders: 0,
+            deliveredOrders: 0,
+        };
+    }
+
+    const successfulOrders = orders.filter(o => o.status !== 'pending_payment');
+
+    const totalRevenue = successfulOrders.reduce((sum, order) => sum + (order.total_price || 0), 0);
+    const totalSales = successfulOrders.length;
+
+    // Use email to approximate unique customers for this metric
+    const uniqueCustomers = new Set(successfulOrders.map(o => o.email)).size;
+    
+    const allOrders = orders.length;
+    const pendingOrders = orders.filter(o => o.status === 'received').length;
+    const inTransitOrders = orders.filter(o => o.status === 'out_for_delivery').length;
+    const deliveredOrders = orders.filter(o => o.status === 'completed').length;
+
+    return {
+        totalRevenue,
+        totalSales,
+        newCustomers: uniqueCustomers,
+        allOrders,
+        pendingOrders,
+        inTransitOrders,
+        deliveredOrders,
+    };
+}
+
+
+export default async function AdminDashboardPage() {
+    const analytics = await getDashboardAnalytics();
+
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
         <div>
             <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
             <p className="text-muted-foreground">
-                Welcome back! Here's a quick overview of your store's operations.
+                Welcome back! Here's a real-time overview of your store's operations.
             </p>
         </div>
          <Button asChild>
@@ -34,9 +82,9 @@ export default function AdminDashboardPage() {
                 <span className="text-muted-foreground font-bold">GHS</span>
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold">45,231.89</div>
+                <div className="text-2xl font-bold">{analytics.totalRevenue.toFixed(2)}</div>
                 <p className="text-xs text-muted-foreground">
-                +20.1% from last month
+                From all successful sales
                 </p>
             </CardContent>
         </Card>
@@ -48,23 +96,23 @@ export default function AdminDashboardPage() {
                 <BarChart3 className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold">+1,234</div>
+                <div className="text-2xl font-bold">+{analytics.totalSales}</div>
                 <p className="text-xs text-muted-foreground">
-                +19% from last month
+                Total successful transactions
                 </p>
             </CardContent>
         </Card>
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                New Customers
+                Unique Customers
                 </CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold">+892</div>
+                <div className="text-2xl font-bold">+{analytics.newCustomers}</div>
                 <p className="text-xs text-muted-foreground">
-                +35 since last week
+                Based on unique email addresses
                 </p>
             </CardContent>
         </Card>
@@ -76,9 +124,9 @@ export default function AdminDashboardPage() {
                 <ShoppingCart className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold">+2350</div>
+                <div className="text-2xl font-bold">+{analytics.allOrders}</div>
                 <p className="text-xs text-muted-foreground">
-                +180.1% from last month
+                Total orders placed
                 </p>
             </CardContent>
         </Card>
@@ -90,7 +138,7 @@ export default function AdminDashboardPage() {
                 <Hourglass className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold">32</div>
+                <div className="text-2xl font-bold">{analytics.pendingOrders}</div>
                 <p className="text-xs text-muted-foreground">
                 Awaiting processing
                 </p>
@@ -104,7 +152,7 @@ export default function AdminDashboardPage() {
                 <Truck className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold">18</div>
+                <div className="text-2xl font-bold">{analytics.inTransitOrders}</div>
                 <p className="text-xs text-muted-foreground">
                 Out for delivery
                 </p>
@@ -118,9 +166,9 @@ export default function AdminDashboardPage() {
                 <PackageCheck className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold">2,150</div>
+                <div className="text-2xl font-bold">{analytics.deliveredOrders}</div>
                 <p className="text-xs text-muted-foreground">
-                Completed this month
+                Total completed orders
                 </p>
             </CardContent>
         </Card>
@@ -148,3 +196,5 @@ export default function AdminDashboardPage() {
     </div>
   );
 }
+
+    
