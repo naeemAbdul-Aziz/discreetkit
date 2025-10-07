@@ -25,10 +25,10 @@ interface InlineCategoryEditProps {
 const getCategoryBadgeVariant = (category: string | null): 'default' | 'secondary' | 'destructive' | 'accent' | 'outline' => {
     if (!category) return 'outline';
     switch (category.toLowerCase()) {
-        case 'test kit': return 'default';
-        case 'wellness': return 'secondary';
-        case 'bundle': return 'accent';
-        case 'medication': return 'destructive';
+        case 'test kit': return 'default'; // Primary color
+        case 'wellness': return 'secondary'; // Secondary color
+        case 'bundle': return 'accent'; // Accent color
+        case 'medication': return 'outline'; // Neutral outline
         default: return 'outline';
     }
 }
@@ -82,7 +82,7 @@ export function InlineCategoryEdit({ productId, value, onUpdate, allCategories }
             {isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-                <Badge variant={getCategoryBadgeVariant(currentValue)} className="text-xs">
+                <Badge variant={getCategoryBadgeVariant(currentValue)} className="text-xs capitalize">
                     {currentValue || "Select category..."}
                 </Badge>
             )}
@@ -106,7 +106,7 @@ export function InlineCategoryEdit({ productId, value, onUpdate, allCategories }
                     currentValue === category ? "opacity-100" : "opacity-0"
                   )}
                 />
-                {category}
+                <span className="capitalize">{category}</span>
               </CommandItem>
             ))}
           </CommandGroup>

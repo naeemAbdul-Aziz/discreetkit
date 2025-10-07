@@ -17,14 +17,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { PlusCircle, MoreHorizontal, ArrowUpDown, Search } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { cn } from '@/lib/utils';
 import { ProductForm } from './(components)/product-form';
 import { InlineEditField } from './(components)/inline-edit-field';
 import { InlineCategoryEdit } from './(components)/inline-category-edit';
@@ -61,7 +60,7 @@ export default function AdminProductsPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(undefined);
 
-  const uniqueCategories = ['All', ...Array.from(new Set(products.map(p => p.category).filter(Boolean)))];
+  const uniqueCategories = ['All', ...Array.from(new Set(products.map(p => p.category).filter(Boolean))) as string[]];
 
   const fetchProducts = useCallback(async () => {
     setIsLoading(true);
@@ -173,7 +172,7 @@ export default function AdminProductsPage() {
         <TableCell className="font-medium">{product.name}</TableCell>
         <TableCell>
            <InlineCategoryEdit
-                productId={product.id}
+                productId={product.id!}
                 value={product.category || ''}
                 onUpdate={fetchProducts}
                 allCategories={uniqueCategories.filter(c => c !== 'All')}
@@ -181,7 +180,7 @@ export default function AdminProductsPage() {
         </TableCell>
         <TableCell>
           <InlineEditField 
-            productId={product.id}
+            productId={product.id!}
             fieldName="price_ghs"
             value={product.price_ghs}
             onUpdate={fetchProducts}
@@ -189,9 +188,9 @@ export default function AdminProductsPage() {
         </TableCell>
         <TableCell>
           <InlineEditField 
-            productId={product.id}
+            productId={product.id!}
             fieldName="stock_level"
-            value={product.stock_level}
+            value={product.stock_level!}
             onUpdate={fetchProducts}
           />
         </TableCell>
@@ -205,7 +204,7 @@ export default function AdminProductsPage() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem onClick={() => handleEdit(product.id)}>Edit Full Details</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleEdit(product.id!)}>Edit Full Details</DropdownMenuItem>
                 <DropdownMenuItem className="text-destructive focus:bg-destructive/10 focus:text-destructive">Delete</DropdownMenuItem>
             </DropdownMenuContent>
             </DropdownMenu>
@@ -215,79 +214,82 @@ export default function AdminProductsPage() {
   }
 
   return (
-    <>
-    <Card className="rounded-2xl">
-      <CardHeader>
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div className="flex flex-col gap-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-                <CardTitle>Products</CardTitle>
-                <CardDescription>
+                <h1 className="text-2xl font-bold tracking-tight">Products</h1>
+                <p className="text-muted-foreground">
                     Manage your product inventory. Click on price or stock to edit inline.
-                </CardDescription>
+                </p>
             </div>
             <div className="flex w-full sm:w-auto items-center gap-2">
-                 <div className="relative w-full sm:w-48">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input 
-                        placeholder="Search by name..."
-                        className="pl-10"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-                 <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                    <SelectTrigger className="w-full sm:w-[160px]">
-                        <SelectValue placeholder="Filter by category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {uniqueCategories.map(cat => (
-                            <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-                <Button onClick={handleAddNew}>
+                <Button onClick={handleAddNew} className="w-full sm:w-auto">
                     <PlusCircle className="mr-2 h-4 w-4" />
-                    <span className="hidden sm:inline">Add New</span>
+                    Add New
                 </Button>
             </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="hidden w-[100px] sm:table-cell">
-                Image
-              </TableHead>
-              <SortableHeader column="name" label="Name" currentSort={sort} onSort={handleSort} />
-              <SortableHeader column="category" label="Category" currentSort={sort} onSort={handleSort} />
-              <SortableHeader column="price_ghs" label="Price (GHS)" currentSort={sort} onSort={handleSort} />
-              <SortableHeader column="stock_level" label="Stock" currentSort={sort} onSort={handleSort} />
-              <TableHead>
-                <span className="sr-only">Actions</span>
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {renderTableBody()}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
 
-    <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent className="sm:max-w-3xl">
-            <DialogHeader>
-                <DialogTitle>{selectedProduct ? 'Edit Product' : 'Add New Product'}</DialogTitle>
-                <DialogDescription>
-                    {selectedProduct ? 'Update the details of this product.' : 'Fill out the form to add a new product.'}
-                </DialogDescription>
-            </DialogHeader>
-            <div className="py-4">
-                <ProductForm product={selectedProduct} onFormSubmit={onFormSubmit} />
-            </div>
-        </DialogContent>
-    </Dialog>
-    </>
+        <Card className="rounded-lg">
+            <CardHeader>
+                <div className="flex items-center gap-2">
+                    <div className="relative w-full sm:w-64">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input 
+                            placeholder="Search by name..."
+                            className="pl-10"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                        <SelectTrigger className="w-full sm:w-[180px]">
+                            <SelectValue placeholder="Filter by category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {uniqueCategories.map(cat => (
+                                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+            </CardHeader>
+            <CardContent>
+                <Table>
+                <TableHeader>
+                    <TableRow>
+                    <TableHead className="hidden w-[100px] sm:table-cell">
+                        Image
+                    </TableHead>
+                    <SortableHeader column="name" label="Name" currentSort={sort} onSort={handleSort} />
+                    <SortableHeader column="category" label="Category" currentSort={sort} onSort={handleSort} />
+                    <SortableHeader column="price_ghs" label="Price (GHS)" currentSort={sort} onSort={handleSort} />
+                    <SortableHeader column="stock_level" label="Stock" currentSort={sort} onSort={handleSort} />
+                    <TableHead>
+                        <span className="sr-only">Actions</span>
+                    </TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {renderTableBody()}
+                </TableBody>
+                </Table>
+            </CardContent>
+        </Card>
+
+        <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+            <DialogContent className="sm:max-w-3xl">
+                <DialogHeader>
+                    <DialogTitle>{selectedProduct ? 'Edit Product' : 'Add New Product'}</DialogTitle>
+                    <DialogDescription>
+                        {selectedProduct ? 'Update the details of this product.' : 'Fill out the form to add a new product.'}
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="py-4">
+                    <ProductForm product={selectedProduct} onFormSubmit={onFormSubmit} />
+                </div>
+            </DialogContent>
+        </Dialog>
+    </div>
   );
 }

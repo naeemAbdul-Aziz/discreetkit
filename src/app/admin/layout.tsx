@@ -1,8 +1,16 @@
 /**
  * @file layout.tsx
- * @description The shared layout for the admin section. It provides a
- *              consistent container and styling for all admin pages.
+ * @description The shared layout for the admin section. It now implements a
+ *              professional sidebar navigation for scalability and a better user experience.
  */
+
+import {
+  Home,
+  Package,
+  ShoppingCart,
+  Users,
+} from 'lucide-react';
+import { AdminShell } from './(components)/admin-shell';
 
 export default function AdminLayout({
   children,
@@ -10,10 +18,15 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-muted/40">
-      <div className="container mx-auto max-w-7xl px-4 py-12 md:py-24">
-        {children}
-      </div>
-    </div>
+    <AdminShell
+      navItems={[
+        { href: '/admin/dashboard', label: 'Dashboard', icon: Home },
+        { href: '/admin/products', label: 'Products', icon: Package },
+        { href: '/admin/orders', label: 'Orders', icon: ShoppingCart },
+        { href: '/admin/customers', label: 'Customers', icon: Users },
+      ]}
+    >
+      {children}
+    </AdminShell>
   );
 }
