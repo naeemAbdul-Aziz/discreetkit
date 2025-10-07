@@ -261,7 +261,7 @@ export async function getOrderAction(code: string): Promise<Order | null> {
       studentDiscount: order.student_discount,
       deliveryFee: order.delivery_fee,
       totalPrice: order.total_price,
-      events: order.events
+      events: (order.order_events as any[])
         .map((e: any) => ({
           status: e.status,
           note: e.note ?? '',
@@ -357,6 +357,8 @@ const productSchema = z.object({
     image_url: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
     requires_prescription: z.preprocess((val) => val === 'on' || val === true, z.boolean()),
     is_student_product: z.preprocess((val) => val === 'on' || val === true, z.boolean()),
+    usage_instructions: z.string().optional(),
+    in_the_box: z.string().optional(),
 });
 
 /**
@@ -378,7 +380,14 @@ export async function saveProduct(prevState: any, formData: FormData) {
         };
     }
     
-    const { id, ...productData } = validatedFields.data;
+    const { id, usage_instructions, in_the_box, ...productData } = validatedFields.data;
+
+    const finalProductData = {
+        ...productData,
+        usage_instructions: usage_instructions?.split('\n').filter(line => line.trim() !== '') || [],
+        in_the_box: in_the_box?.split('\n').filter(line => line.trim() !== '') || [],
+    };
+    
     const supabase = getSupabaseAdminClient();
 
     try {
@@ -386,13 +395,13 @@ export async function saveProduct(prevState: any, formData: FormData) {
             // Update existing product
             const { error } = await supabase
                 .from('products')
-                .update(productData)
+                .update(finalProductData)
                 .eq('id', id);
             
             if (error) throw error;
         } else {
             // Create new product
-            const { error } = await supabase.from('products').insert(productData);
+            const { error } = await supabase.from('products').insert(finalProductData);
             if (error) throw error;
         }
     } catch (e: any) {

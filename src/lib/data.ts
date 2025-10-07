@@ -14,9 +14,13 @@ export type Product = {
     featured: boolean | null;
     brand?: string | null;
     savings_ghs?: number | null;
-    category?: 'Contraception' | 'Condoms' | 'Personal Care' | 'STI Tests' | 'Medication' | string;
-    usage_instructions?: string[];
-    in_the_box?: string[];
+    category?: string;
+    sub_category?: string | null;
+    usage_instructions?: string[] | null;
+    in_the_box?: string[] | null;
+    stock_level?: number;
+    requires_prescription?: boolean;
+    is_student_product?: boolean;
 }
 
 export type WellnessProduct = Product & {
@@ -436,5 +440,3 @@ export const testimonials: Testimonial[] = [
     avatar: "https://images.unsplash.com/photo-1580852300021-3349a882d385?w=150&h=150&fit=crop&q=75"
   },
 ];
-
-    

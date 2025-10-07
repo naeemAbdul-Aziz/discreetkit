@@ -47,6 +47,8 @@ const productFormSchema = z.object({
   image_url: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
   requires_prescription: z.boolean().default(false),
   is_student_product: z.boolean().default(false),
+  usage_instructions: z.string().optional(),
+  in_the_box: z.string().optional(),
 });
 
 type ProductFormValues = z.infer<typeof productFormSchema>;
@@ -70,23 +72,44 @@ export function ProductForm({ product, onFormSubmit }: { product?: Product, onFo
       image_url: '',
       requires_prescription: false,
       is_student_product: false,
+      usage_instructions: '',
+      in_the_box: '',
     },
   });
 
   // Effect to reset form when the product prop changes
    useEffect(() => {
-    form.reset({
-      name: product?.name ?? '',
-      description: product?.description ?? '',
-      price_ghs: product?.price_ghs ?? 0,
-      category: product?.category ?? '',
-      sub_category: product?.sub_category ?? '',
-      brand: product?.brand ?? '',
-      stock_level: product?.stock_level ?? 0,
-      image_url: product?.image_url ?? '',
-      requires_prescription: product?.requires_prescription ?? false,
-      is_student_product: product?.is_student_product ?? false,
-    });
+    if (product) {
+        form.reset({
+            name: product.name ?? '',
+            description: product.description ?? '',
+            price_ghs: product.price_ghs ?? 0,
+            category: product.category ?? '',
+            sub_category: product.sub_category ?? '',
+            brand: product.brand ?? '',
+            stock_level: product.stock_level ?? 0,
+            image_url: product.image_url ?? '',
+            requires_prescription: product.requires_prescription ?? false,
+            is_student_product: product.is_student_product ?? false,
+            usage_instructions: product.usage_instructions?.join('\n') ?? '',
+            in_the_box: product.in_the_box?.join('\n') ?? '',
+        });
+    } else {
+        form.reset({
+            name: '',
+            description: '',
+            price_ghs: 0,
+            category: '',
+            sub_category: '',
+            brand: '',
+            stock_level: 0,
+            image_url: '',
+            requires_prescription: false,
+            is_student_product: false,
+            usage_instructions: '',
+            in_the_box: '',
+        });
+    }
   }, [product, form.reset]);
 
 
@@ -114,7 +137,7 @@ export function ProductForm({ product, onFormSubmit }: { product?: Product, onFo
     <Form {...form}>
       <form
         action={formAction}
-        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8"
       >
         {product && <input type="hidden" name="id" value={product.id} />}
 
@@ -192,6 +215,24 @@ export function ProductForm({ product, onFormSubmit }: { product?: Product, onFo
               )}
             />
           </div>
+          
+            <FormField
+                control={form.control}
+                name="usage_instructions"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Usage Instructions</FormLabel>
+                    <FormControl>
+                    <Textarea
+                        placeholder="Enter each instruction on a new line."
+                        rows={4}
+                        {...field}
+                    />
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
         </div>
 
         <div className="space-y-6">
@@ -262,11 +303,29 @@ export function ProductForm({ product, onFormSubmit }: { product?: Product, onFo
               <FormItem>
                 <FormLabel>Brand</FormLabel>
                 <FormControl>
-                  <Input placeholder="e.g., Durex, Fiesta" {...field} />
+                  <Input placeholder="e.g., Durex, Fiesta" {...field} value={field.value ?? ''} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
+          />
+          
+           <FormField
+              control={form.control}
+              name="in_the_box"
+              render={({ field }) => (
+              <FormItem>
+                  <FormLabel>What's in the Box</FormLabel>
+                  <FormControl>
+                  <Textarea
+                      placeholder="Enter each item on a new line."
+                      rows={4}
+                      {...field}
+                  />
+                  </FormControl>
+                  <FormMessage />
+              </FormItem>
+              )}
           />
 
           <div className="space-y-4 pt-4">
