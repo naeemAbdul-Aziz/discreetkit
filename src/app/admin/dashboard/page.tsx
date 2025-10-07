@@ -6,7 +6,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { PlusCircle, ShoppingCart, Users, Truck, PackageCheck, Hourglass, BarChart3 } from "lucide-react";
+import { PlusCircle, ShoppingCart, Users, Truck, PackageCheck, Hourglass, BarChart3, CreditCard } from "lucide-react";
 import { getSupabaseAdminClient } from "@/lib/supabase";
 import type { Order } from "@/lib/data";
 
@@ -23,6 +23,7 @@ async function getDashboardAnalytics() {
             totalSales: 0,
             newCustomers: 0,
             allOrders: 0,
+            pendingPaymentOrders: 0,
             pendingOrders: 0,
             inTransitOrders: 0,
             deliveredOrders: 0,
@@ -41,6 +42,8 @@ async function getDashboardAnalytics() {
     
     // All orders includes those pending payment.
     const allOrders = orders.length;
+    const pendingPaymentOrders = orders.filter(o => o.status === 'pending_payment').length;
+
 
     // Breakdown by fulfillment status
     const pendingOrders = orders.filter(o => o.status === 'received').length;
@@ -52,6 +55,7 @@ async function getDashboardAnalytics() {
         totalSales,
         newCustomers: uniqueCustomers,
         allOrders,
+        pendingPaymentOrders,
         pendingOrders,
         inTransitOrders,
         deliveredOrders,
@@ -103,7 +107,7 @@ export default async function AdminDashboardPage() {
             <CardContent>
                 <div className="text-2xl font-bold">+{analytics.totalSales}</div>
                 <p className="text-xs text-muted-foreground">
-                Total successful transactions
+                Total paid transactions
                 </p>
             </CardContent>
         </Card>
@@ -131,21 +135,35 @@ export default async function AdminDashboardPage() {
             <CardContent>
                 <div className="text-2xl font-bold">+{analytics.allOrders}</div>
                 <p className="text-xs text-muted-foreground">
-                Total orders placed
+                Total orders placed (incl. pending payment)
                 </p>
             </CardContent>
         </Card>
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                Pending
+                Awaiting Payment
+                </CardTitle>
+                <CreditCard className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+                <div className="text-2xl font-bold">{analytics.pendingPaymentOrders}</div>
+                <p className="text-xs text-muted-foreground">
+                Orders not yet paid
+                </p>
+            </CardContent>
+        </Card>
+        <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                Pending Fulfillment
                 </CardTitle>
                 <Hourglass className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold">{analytics.pendingOrders}</div>
                 <p className="text-xs text-muted-foreground">
-                Awaiting processing
+                Paid and awaiting processing
                 </p>
             </CardContent>
         </Card>
