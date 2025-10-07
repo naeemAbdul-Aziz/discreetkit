@@ -17,7 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardFooter } from '@/components/ui/card';
 import { PlusCircle, MoreHorizontal, ArrowUpDown, Search } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -27,9 +27,13 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ProductForm } from './(components)/product-form';
 import { InlineEditField } from './(components)/inline-edit-field';
 import { InlineCategoryEdit } from './(components)/inline-category-edit';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+
 
 type SortableColumn = 'name' | 'category' | 'price_ghs' | 'stock_level';
 type SortDirection = 'asc' | 'desc';
+const ITEMS_PER_PAGE = 10;
 
 // A reusable component for sortable table headers
 const SortableHeader = ({
@@ -59,6 +63,7 @@ export default function AdminProductsPage() {
   const [sort, setSort] = useState<{ column: SortableColumn, direction: SortDirection }>({ column: 'name', direction: 'asc' });
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(undefined);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const uniqueCategories = ['All', ...Array.from(new Set(products.map(p => p.category).filter(Boolean))) as string[]];
 
@@ -74,6 +79,7 @@ export default function AdminProductsPage() {
   }, [fetchProducts]);
 
   const handleSort = (column: SortableColumn) => {
+    setCurrentPage(1);
     setSort(prevSort => ({
       column,
       direction: prevSort.column === column && prevSort.direction === 'asc' ? 'desc' : 'asc',
@@ -97,6 +103,10 @@ export default function AdminProductsPage() {
     setIsFormOpen(false);
     fetchProducts(); // Re-fetch products to show the latest changes
   }
+  
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, categoryFilter]);
 
   const filteredAndSortedProducts = useMemo(() => {
     return products
@@ -105,8 +115,8 @@ export default function AdminProductsPage() {
         (categoryFilter === 'All' || product.category === categoryFilter)
       )
       .sort((a, b) => {
-        const aValue = a[sort.column];
-        const bValue = b[sort.column];
+        const aValue = a[sort.column] as any;
+        const bValue = b[sort.column] as any;
 
         if (aValue === null || bValue === null) return 0;
         
@@ -122,7 +132,23 @@ export default function AdminProductsPage() {
         return sort.direction === 'asc' ? comparison : -comparison;
       });
   }, [products, searchTerm, categoryFilter, sort]);
+  
+  const totalPages = Math.ceil(filteredAndSortedProducts.length / ITEMS_PER_PAGE);
+  const paginatedProducts = filteredAndSortedProducts.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
+  const renderStockBadge = (stock: number | null | undefined) => {
+    if (stock === null || stock === undefined) {
+      return <InlineEditField productId={0} fieldName="stock_level" value={0} onUpdate={fetchProducts} />;
+    }
+    let variant: 'destructive' | 'accent' | 'default' = 'default';
+    if (stock <= 10) variant = 'destructive';
+    else if (stock <= 20) variant = 'accent';
+
+    return <Badge variant={variant} className="capitalize">{stock}</Badge>;
+  }
 
   const renderTableBody = () => {
     if (isLoading) {
@@ -153,8 +179,18 @@ export default function AdminProductsPage() {
             </>
         )
     }
+    
+     if (paginatedProducts.length === 0) {
+      return (
+        <TableRow>
+          <TableCell colSpan={6} className="h-24 text-center">
+            No products found for your criteria.
+          </TableCell>
+        </TableRow>
+      );
+    }
 
-    return filteredAndSortedProducts.map((product) => (
+    return paginatedProducts.map((product) => (
         <TableRow key={product.id}>
         <TableCell className="hidden sm:table-cell">
             {product.image_url ? (
@@ -187,12 +223,12 @@ export default function AdminProductsPage() {
           />
         </TableCell>
         <TableCell>
-          <InlineEditField 
-            productId={product.id!}
-            fieldName="stock_level"
-            value={product.stock_level!}
-            onUpdate={fetchProducts}
-          />
+            <InlineEditField 
+                productId={product.id!}
+                fieldName="stock_level"
+                value={product.stock_level!}
+                onUpdate={fetchProducts}
+            />
         </TableCell>
         <TableCell>
             <DropdownMenu>
@@ -275,6 +311,36 @@ export default function AdminProductsPage() {
                 </TableBody>
                 </Table>
             </CardContent>
+            <CardFooter>
+                <div className="flex items-center justify-between w-full">
+                    <div className="text-xs text-muted-foreground">
+                       Showing{' '}
+                        <strong>
+                            {(currentPage - 1) * ITEMS_PER_PAGE + 1}-
+                            {Math.min(currentPage * ITEMS_PER_PAGE, filteredAndSortedProducts.length)}
+                        </strong>{' '}
+                        of <strong>{filteredAndSortedProducts.length}</strong> products
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCurrentPage(prev => prev - 1)}
+                            disabled={currentPage === 1}
+                        >
+                            Previous
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCurrentPage(prev => prev + 1)}
+                            disabled={currentPage === totalPages}
+                        >
+                            Next
+                        </Button>
+                    </div>
+                </div>
+            </CardFooter>
         </Card>
 
         <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
