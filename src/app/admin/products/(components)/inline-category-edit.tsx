@@ -28,7 +28,7 @@ const getCategoryBadgeVariant = (category: string | null): 'default' | 'secondar
         case 'test kit': return 'default';
         case 'wellness': return 'secondary';
         case 'bundle': return 'accent';
-        case 'medication': return 'outline';
+        case 'medication': return 'destructive';
         default: return 'outline';
     }
 }
