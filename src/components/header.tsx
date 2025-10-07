@@ -21,6 +21,7 @@ const navLinks = [
   { href: '/products/test-kits', label: 'Screening Kits' },
   { href: '/products/bundles', label: 'Bundles' },
   { href: '/products/wellness', label: 'Wellness' },
+  { href: '/products/medication', label: 'Medication' },
   { href: '/#how-it-works', label: 'How It Works' },
   { href: '/partner-care', label: 'Our Partners' },
   { href: '/track', label: 'Track Order' },
@@ -201,3 +202,5 @@ export function Header() {
     </>
   );
 }
+
+    

@@ -42,6 +42,14 @@ const categories = [
         image_hint: 'health product bundle',
         href: '/products/bundles'
     },
+    {
+        name: 'Medication Refills',
+        description: 'Confidential refill service for your essential prescriptions.',
+        examples: ['HIV Treatment', 'Long-term Support'],
+        image_url: 'https://images.unsplash.com/photo-1628771065518-1d82f193d4d0?q=80&w=800&fit=crop',
+        image_hint: 'prescription medication bottle',
+        href: '/products/medication'
+    }
 ]
 
 const shimmer = (w: number, h: number) => `
@@ -98,15 +106,15 @@ export function ProductSelector() {
                 </div>
                 
                 {/* Mobile Carousel */}
-                <div className="md:hidden">
+                <div className="lg:hidden">
                     <Carousel
                         setApi={setApi}
-                        opts={{ align: 'center', loop: true }}
+                        opts={{ align: 'center', loop: false }}
                         className="w-full"
                     >
                         <CarouselContent>
                             {categories.map((category) => (
-                                <CarouselItem key={category.name} className="basis-4/5">
+                                <CarouselItem key={category.name} className="basis-4/5 md:basis-1/2">
                                     <div className="p-1 h-full">
                                         <Link href={category.href} className="h-full block group">
                                             <Card className="h-full flex flex-col rounded-2xl bg-card overflow-hidden">
@@ -116,7 +124,7 @@ export function ProductSelector() {
                                                         alt={category.name}
                                                         fill
                                                         className="object-contain p-4 transition-transform duration-300 group-hover:scale-105"
-                                                        sizes="(max-width: 768px) 80vw, 33vw"
+                                                        sizes="(max-width: 768px) 80vw, 50vw"
                                                         data-ai-hint={category.image_hint}
                                                         placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
                                                     />
@@ -159,7 +167,7 @@ export function ProductSelector() {
                 </div>
 
                 {/* Desktop Grid */}
-                <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                <div className="hidden lg:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
                     {categories.map((category, index) => (
                         <motion.div
                             key={category.name}
@@ -177,7 +185,7 @@ export function ProductSelector() {
                                             alt={category.name}
                                             fill
                                             className="object-contain p-4 transition-transform duration-300 group-hover:scale-105"
-                                            sizes="(max-width: 768px) 100vw, 33vw"
+                                            sizes="25vw"
                                             data-ai-hint={category.image_hint}
                                             placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
                                         />
@@ -205,7 +213,7 @@ export function ProductSelector() {
                     ))}
                 </div>
 
-                <div className="text-center mt-12">
+                <div className="text-center mt-16">
                     <Button asChild variant="outline" size="lg">
                         <Link href="/products">
                             Shop All Products
@@ -217,3 +225,4 @@ export function ProductSelector() {
         </section>
     );
 }
+    

@@ -1,5 +1,3 @@
-
-
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -13,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { getSupabaseClient } from '@/lib/supabase';
 import { allTestKits } from './test-kits/page';
 import { Separator } from '@/components/ui/separator';
+import { medications } from '@/lib/medications';
 
 const ITEMS_PER_PAGE = 12;
 
@@ -60,7 +59,7 @@ export default function ProductsPage() {
     useEffect(() => {
         const fetchProducts = async () => {
             const dbProducts = await getProducts();
-            const products = [...dbProducts, ...wellnessProducts, ...allTestKits].sort((a, b) => a.id - b.id);
+            const products = [...dbProducts, ...wellnessProducts, ...allTestKits, ...medications].sort((a, b) => a.id - b.id);
             const uniqueProducts = Array.from(new Map(products.map(p => [p.id, p])).values());
             setAllProducts(uniqueProducts);
             setIsLoading(false);
@@ -70,8 +69,9 @@ export default function ProductsPage() {
 
     const screeningKitIds = [1, 2, 14, 17, 18];
     const bundleIds = [3, 7, 8, 15];
+    const medicationIds = medications.map(m => m.id);
 
-    const categories = ['All', 'Test Kits', 'Bundles', 'Wellness'];
+    const categories = ['All', 'Test Kits', 'Medication', 'Bundles', 'Wellness'];
     const wellnessCategories = ['All', 'Condoms', 'Contraception', 'Personal Care'];
     const brands = useMemo(() => ['All', ...Array.from(new Set(allProducts.map(p => p.brand || 'DiscreetKit'))).filter(Boolean)], [allProducts]);
     
@@ -82,8 +82,10 @@ export default function ProductsPage() {
                 categoryMatch = screeningKitIds.includes(product.id)
             } else if (categoryFilter === 'Bundles') {
                 categoryMatch = bundleIds.includes(product.id)
+            } else if (categoryFilter === 'Medication') {
+                categoryMatch = medicationIds.includes(product.id);
             } else if (categoryFilter === 'Wellness') {
-                const isWellnessProduct = !screeningKitIds.includes(product.id) && !bundleIds.includes(product.id);
+                const isWellnessProduct = !screeningKitIds.includes(product.id) && !bundleIds.includes(product.id) && !medicationIds.includes(product.id);
                 if (wellnessCategoryFilter === 'All') {
                     categoryMatch = isWellnessProduct;
                 } else {
@@ -248,3 +250,4 @@ export default function ProductsPage() {
     </div>
   );
 }
+    
