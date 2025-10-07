@@ -18,12 +18,17 @@ export function ClientLayout({
   const pathname = usePathname();
   const isAdminPage = pathname.startsWith('/admin');
 
+  // For admin pages, we render children directly without the main layout
+  if (isAdminPage) {
+    return <main className="flex-1">{children}</main>;
+  }
+
   return (
     <div className="relative flex min-h-dvh flex-col bg-background">
-      {!isAdminPage && <Header />}
+      <Header />
       <main className="flex-1">{children}</main>
-      {!isAdminPage && <Footer />}
-      {!isAdminPage && <FloatingShopButton />}
+      <Footer />
+      <FloatingShopButton />
     </div>
   );
 }

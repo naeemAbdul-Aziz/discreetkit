@@ -16,9 +16,11 @@ import {
   Package,
   ShoppingCart,
   Users,
+  LogOut,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { LucideIcon } from 'lucide-react';
+import { logout } from '@/lib/session';
 
 interface NavItem {
   href: string;
@@ -82,6 +84,14 @@ export function AdminShell({
               ))}
             </nav>
           </div>
+          <div className="mt-auto p-4">
+             <form action={logout}>
+                <Button variant="ghost" className="w-full justify-start">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                </Button>
+            </form>
+          </div>
         </div>
       </div>
       
@@ -110,6 +120,14 @@ export function AdminShell({
                   <NavLink key={item.href} item={item} isMobile />
                 ))}
               </nav>
+              <div className="mt-auto p-4">
+                 <form action={logout}>
+                    <Button variant="ghost" className="w-full justify-start text-lg">
+                        <LogOut className="mr-2 h-5 w-5" />
+                        Logout
+                    </Button>
+                </form>
+              </div>
             </SheetContent>
           </Sheet>
           <div className="flex-1">
