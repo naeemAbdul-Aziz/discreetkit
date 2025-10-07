@@ -1,5 +1,3 @@
-
-
 /**
  * @file This file contains all the server actions for the application, which handle
  * database operations and other server-side logic. These actions are designed to be
@@ -14,6 +12,7 @@ import {revalidatePath} from 'next/cache';
 import {type CartItem} from '@/hooks/use-cart';
 import {getSupabaseAdminClient} from './supabase';
 import {redirect} from 'next/navigation';
+import type { Product } from './data';
 
 const orderSchema = z.object({
   cartItems: z.string().min(1, 'Cart cannot be empty.'),
@@ -88,6 +87,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
         delivery_area: finalDeliveryArea,
         delivery_address_note: validatedFields.data.deliveryAddressNote,
         phone_masked: validatedFields.data.phone_masked,
+        email: validatedFields.data.email,
         ...priceDetails,
       })
       .select('id')
@@ -222,7 +222,16 @@ export async function getOrderAction(code: string): Promise<Order | null> {
       .from('orders')
       .select(
         `
-        *,
+        id,
+        code,
+        status,
+        items,
+        delivery_area,
+        delivery_address_note,
+        subtotal,
+        student_discount,
+        delivery_fee,
+        total_price,
         order_events (
           status,
           note,
@@ -253,12 +262,12 @@ export async function getOrderAction(code: string): Promise<Order | null> {
       deliveryFee: order.delivery_fee,
       totalPrice: order.total_price,
       events: order.order_events
-        .map(e => ({
+        .map((e: any) => ({
           status: e.status,
           note: e.note ?? '',
           date: new Date(e.created_at),
         }))
-        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+        .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()),
     };
   } catch (error) {
     console.error('Action Error in getOrderAction:', error);
@@ -285,4 +294,28 @@ export async function handleChat(
     console.error('AI Error:', error);
     return "I'm sorry, I'm having trouble connecting right now. Please try again later.";
   }
+}
+
+/**
+ * Fetches all products from the database for the admin dashboard.
+ * @returns A promise that resolves to an array of products.
+ */
+export async function getAdminProducts(): Promise<Product[]> {
+    const supabase = getSupabaseAdminClient();
+    const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('name', { ascending: true });
+
+    if (error) {
+        console.error('Error fetching admin products:', error);
+        return [];
+    }
+
+    // Supabase returns numbers as strings sometimes, ensure correct types
+    return data.map(p => ({
+        ...p,
+        price_ghs: Number(p.price_ghs),
+        stock_level: Number(p.stock_level),
+    })) as Product[];
 }
