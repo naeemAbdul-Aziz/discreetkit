@@ -1,29 +1,21 @@
 
+
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { ProductCard } from './(components)/product-card';
-import type { Product, WellnessProduct } from '@/lib/data';
+import type { Product } from '@/lib/data';
 import { wellnessProducts } from '@/lib/data';
-import type { Metadata } from 'next';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 import { getSupabaseClient } from '@/lib/supabase';
 import { allTestKits } from './test-kits/page';
-
-// This is now a client component, so metadata should be exported from a layout or parent if needed.
-// We'll keep a placeholder here for reference.
-// export const metadata: Metadata = {
-//   title: 'Shop All Products',
-//   description: 'Browse our full range of confidential health products, including HIV self-test kits, pregnancy tests, value bundles, and wellness essentials. Order online for discreet delivery.',
-// };
+import { Separator } from '@/components/ui/separator';
 
 const ITEMS_PER_PAGE = 12;
 
-// This function would ideally be a server-side fetch, but for now we do it on client
 async function getProducts(): Promise<Product[]> {
     const supabase = getSupabaseClient();
     const { data: products, error } = await supabase
@@ -35,7 +27,6 @@ async function getProducts(): Promise<Product[]> {
         console.error("Error fetching products:", error);
         return [];
     }
-     // Map over products to update images and cast numeric types
     return products.map(p => {
         let imageUrl = p.image_url;
         if (p.id === 1) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png';
@@ -62,11 +53,11 @@ export default function ProductsPage() {
     const [isLoading, setIsLoading] = useState(true);
 
     const [categoryFilter, setCategoryFilter] = useState('All');
+    const [wellnessCategoryFilter, setWellnessCategoryFilter] = useState('All');
     const [brandFilter, setBrandFilter] = useState('All');
     const [currentPage, setCurrentPage] = useState(1);
     
-    // Fetch products on mount
-    useState(() => {
+    useEffect(() => {
         const fetchProducts = async () => {
             const dbProducts = await getProducts();
             const products = [...dbProducts, ...wellnessProducts, ...allTestKits].sort((a, b) => a.id - b.id);
@@ -81,20 +72,30 @@ export default function ProductsPage() {
     const bundleIds = [3, 7, 8, 15];
 
     const categories = ['All', 'Test Kits', 'Bundles', 'Wellness'];
+    const wellnessCategories = ['All', 'Condoms', 'Contraception', 'Personal Care'];
     const brands = useMemo(() => ['All', ...Array.from(new Set(allProducts.map(p => p.brand || 'DiscreetKit'))).filter(Boolean)], [allProducts]);
     
     const filteredProducts = useMemo(() => {
         return allProducts.filter(product => {
-            const categoryMatch = categoryFilter === 'All' ||
-                (categoryFilter === 'Test Kits' && screeningKitIds.includes(product.id)) ||
-                (categoryFilter === 'Bundles' && bundleIds.includes(product.id)) ||
-                (categoryFilter === 'Wellness' && !screeningKitIds.includes(product.id) && !bundleIds.includes(product.id));
+            let categoryMatch = categoryFilter === 'All';
+            if (categoryFilter === 'Test Kits') {
+                categoryMatch = screeningKitIds.includes(product.id)
+            } else if (categoryFilter === 'Bundles') {
+                categoryMatch = bundleIds.includes(product.id)
+            } else if (categoryFilter === 'Wellness') {
+                const isWellnessProduct = !screeningKitIds.includes(product.id) && !bundleIds.includes(product.id);
+                if (wellnessCategoryFilter === 'All') {
+                    categoryMatch = isWellnessProduct;
+                } else {
+                    categoryMatch = isWellnessProduct && product.category === wellnessCategoryFilter;
+                }
+            }
             
             const brandMatch = brandFilter === 'All' || (product.brand || 'DiscreetKit') === brandFilter;
             
             return categoryMatch && brandMatch;
         });
-    }, [allProducts, categoryFilter, brandFilter]);
+    }, [allProducts, categoryFilter, wellnessCategoryFilter, brandFilter]);
 
     const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
     const paginatedProducts = filteredProducts.slice(
@@ -109,6 +110,12 @@ export default function ProductsPage() {
         }
     };
 
+    const resetFilters = () => {
+        setCategoryFilter('All');
+        setWellnessCategoryFilter('All');
+        setBrandFilter('All');
+        setCurrentPage(1);
+    };
 
   return (
     <div className="bg-background">
@@ -123,11 +130,11 @@ export default function ProductsPage() {
                 </p>
             </div>
             
-             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 mb-12">
+             <div className="flex flex-col items-center justify-center gap-4 sm:gap-8 mb-12">
                 <ToggleGroup
                     type="single"
                     value={categoryFilter}
-                    onValueChange={(value) => { if (value) { setCategoryFilter(value); setCurrentPage(1); } }}
+                    onValueChange={(value) => { if (value) { setCategoryFilter(value); setCurrentPage(1); if (value !== 'Wellness') setWellnessCategoryFilter('All'); } }}
                     aria-label="Filter by category"
                     className="flex-wrap justify-center"
                 >
@@ -137,6 +144,34 @@ export default function ProductsPage() {
                         </ToggleGroupItem>
                     ))}
                 </ToggleGroup>
+
+                <AnimatePresence>
+                    {categoryFilter === 'Wellness' && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="overflow-hidden w-full flex flex-col items-center gap-4"
+                        >
+                            <Separator className="my-2" />
+                             <ToggleGroup
+                                type="single"
+                                value={wellnessCategoryFilter}
+                                onValueChange={(value) => { if (value) { setWellnessCategoryFilter(value); setCurrentPage(1); } }}
+                                aria-label="Filter by wellness sub-category"
+                                className="flex-wrap justify-center"
+                            >
+                                {wellnessCategories.map(cat => (
+                                    <ToggleGroupItem key={cat} value={cat} aria-label={`Show ${cat}`}>
+                                        {cat}
+                                    </ToggleGroupItem>
+                                ))}
+                            </ToggleGroup>
+                            <Separator className="my-2" />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
                 
                 <Select value={brandFilter} onValueChange={(value) => { setBrandFilter(value); setCurrentPage(1); }}>
                     <SelectTrigger className="w-[180px]">
@@ -158,7 +193,7 @@ export default function ProductsPage() {
                 </div>
             ) : (
                 <motion.div 
-                    key={categoryFilter + brandFilter + currentPage}
+                    key={categoryFilter + wellnessCategoryFilter + brandFilter + currentPage}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.5 }}
@@ -172,6 +207,7 @@ export default function ProductsPage() {
                         <div className="col-span-full text-center py-16">
                             <h3 className="text-xl font-semibold">No Products Found</h3>
                             <p className="text-muted-foreground mt-2">Try adjusting your filters to find what you're looking for.</p>
+                            <Button variant="link" onClick={resetFilters}>Clear Filters</Button>
                         </div>
                     )}
                 </motion.div>

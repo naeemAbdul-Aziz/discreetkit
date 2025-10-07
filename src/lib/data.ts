@@ -14,6 +14,7 @@ export type Product = {
     featured: boolean | null;
     brand?: string | null;
     savings_ghs?: number | null;
+    category?: 'Contraception' | 'Condoms' | 'Personal Care' | 'STI Tests' | string;
 }
 
 export type WellnessProduct = Product & {
