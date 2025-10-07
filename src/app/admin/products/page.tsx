@@ -19,7 +19,6 @@ import {
 } from '@/components/ui/table';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PlusCircle, MoreHorizontal, ArrowUpDown, Search } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -28,6 +27,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { ProductForm } from './(components)/product-form';
 import { InlineEditField } from './(components)/inline-edit-field';
+import { InlineCategoryEdit } from './(components)/inline-category-edit';
 
 type SortableColumn = 'name' | 'category' | 'price_ghs' | 'stock_level';
 type SortDirection = 'asc' | 'desc';
@@ -51,21 +51,6 @@ const SortableHeader = ({
     </div>
   </TableHead>
 );
-
-const StockBadge = ({ stock_level }: { stock_level: number }) => {
-    let variant: 'destructive' | 'accent' | 'default' = 'default';
-    if (stock_level < 10) {
-        variant = 'destructive';
-    } else if (stock_level <= 20) {
-        variant = 'accent';
-    }
-
-    return (
-        <Badge variant={variant} className="w-16 justify-center">
-            {stock_level}
-        </Badge>
-    );
-};
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -187,7 +172,12 @@ export default function AdminProductsPage() {
         </TableCell>
         <TableCell className="font-medium">{product.name}</TableCell>
         <TableCell>
-            <Badge variant="outline">{product.category}</Badge>
+           <InlineCategoryEdit
+                productId={product.id}
+                value={product.category || ''}
+                onUpdate={fetchProducts}
+                allCategories={uniqueCategories.filter(c => c !== 'All')}
+            />
         </TableCell>
         <TableCell>
           <InlineEditField 

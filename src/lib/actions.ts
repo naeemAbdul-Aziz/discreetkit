@@ -453,3 +453,46 @@ export async function updateProductField(params: {
   revalidatePath('/admin/products');
   return { success: true };
 }
+
+
+const updateCategorySchema = z.object({
+  id: z.number(),
+  category: z.string().min(1, 'Category cannot be empty.'),
+});
+
+/**
+ * Updates the category for a specific product.
+ * @param {object} params - The parameters for the update.
+ * @param {number} params.id - The ID of the product to update.
+ * @param {string} params.category - The new category for the product.
+ * @returns A promise that resolves to an object indicating success or failure.
+ */
+export async function updateProductCategory(params: { id: number; category: string; }) {
+    const validated = updateCategorySchema.safeParse(params);
+    if (!validated.success) {
+        return {
+        success: false,
+        message: 'Invalid input.',
+        };
+    }
+
+    const { id, category } = validated.data;
+    const supabase = getSupabaseAdminClient();
+
+    try {
+        const { error } = await supabase
+        .from('products')
+        .update({ category })
+        .eq('id', id);
+
+        if (error) throw error;
+    } catch (e: any) {
+        return {
+        success: false,
+        message: `Database Error: ${e.message}`,
+        };
+    }
+
+    revalidatePath('/admin/products');
+    return { success: true };
+}
