@@ -1,21 +1,29 @@
-import { getSupabaseClient } from '@/lib/supabase';
+
+'use client';
+
+import { useState, useMemo } from 'react';
 import { ProductCard } from './(components)/product-card';
-import type { Product } from '@/lib/data';
+import type { Product, WellnessProduct } from '@/lib/data';
 import { wellnessProducts } from '@/lib/data';
-import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
 import type { Metadata } from 'next';
-import { Card } from '@/components/ui/card';
-import Image from 'next/image';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { getSupabaseClient } from '@/lib/supabase';
+import { allTestKits } from './test-kits/page';
 
-export const metadata: Metadata = {
-  title: 'Shop All Products',
-  description: 'Browse our full range of confidential health products, including HIV self-test kits, pregnancy tests, value bundles, and wellness essentials. Order online for discreet delivery.',
-};
+// This is now a client component, so metadata should be exported from a layout or parent if needed.
+// We'll keep a placeholder here for reference.
+// export const metadata: Metadata = {
+//   title: 'Shop All Products',
+//   description: 'Browse our full range of confidential health products, including HIV self-test kits, pregnancy tests, value bundles, and wellness essentials. Order online for discreet delivery.',
+// };
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 60; // Revalidate data every 60 seconds
+const ITEMS_PER_PAGE = 12;
 
+// This function would ideally be a server-side fetch, but for now we do it on client
 async function getProducts(): Promise<Product[]> {
     const supabase = getSupabaseClient();
     const { data: products, error } = await supabase
@@ -48,60 +56,65 @@ async function getProducts(): Promise<Product[]> {
     });
 }
 
-function FeaturedProduct({ product }: { product: Product }) {
-    if (!product) return null;
-    return (
-        <Card className="overflow-hidden rounded-2xl mb-16">
-          <div className="grid md:grid-cols-2">
-            <div className="flex flex-col justify-center p-8 text-center md:p-12 md:text-left">
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-primary">Featured Bundle</h2>
-              <h3 className="mt-2 font-headline text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                {product.name}
-              </h3>
-              <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground md:mx-0">
-                {product.description}
-              </p>
-               <div className="mt-8">
-                    <ProductCard product={product} />
-              </div>
-            </div>
-            <div className="relative h-64 min-h-[300px] w-full md:h-full bg-muted/50">
-              {product.image_url && (
-                <Image
-                    src={product.image_url}
-                    alt={product.name}
-                    fill
-                    className="object-contain p-8"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                />
-              )}
-            </div>
-          </div>
-        </Card>
-    )
-}
 
-export default async function ProductsPage() {
-    const dbProducts = await getProducts();
-    const allLocalKits = (await import('./test-kits/page')).allTestKits;
+export default function ProductsPage() {
+    const [allProducts, setAllProducts] = useState<Product[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-    // Combine all product sources
-    const products = [...dbProducts, ...wellnessProducts, ...allLocalKits].sort((a, b) => a.id - b.id);
+    const [categoryFilter, setCategoryFilter] = useState('All');
+    const [brandFilter, setBrandFilter] = useState('All');
+    const [currentPage, setCurrentPage] = useState(1);
     
-    // Create unique set of products by ID
-    const uniqueProducts = Array.from(new Map(products.map(p => [p.id, p])).values());
+    // Fetch products on mount
+    useState(() => {
+        const fetchProducts = async () => {
+            const dbProducts = await getProducts();
+            const products = [...dbProducts, ...wellnessProducts, ...allTestKits].sort((a, b) => a.id - b.id);
+            const uniqueProducts = Array.from(new Map(products.map(p => [p.id, p])).values());
+            setAllProducts(uniqueProducts);
+            setIsLoading(false);
+        }
+        fetchProducts();
+    }, []);
 
-    const screeningKits = uniqueProducts.filter(p => [1, 2, 14, 17, 18].includes(p.id));
-    const bundles = uniqueProducts.filter(p => [3, 7, 8, 15].includes(p.id));
-    const wellness = uniqueProducts.filter(p => ![...screeningKits.map(k=>k.id), ...bundles.map(b=>b.id)].includes(p.id));
+    const screeningKitIds = [1, 2, 14, 17, 18];
+    const bundleIds = [3, 7, 8, 15];
+
+    const categories = ['All', 'Test Kits', 'Bundles', 'Wellness'];
+    const brands = useMemo(() => ['All', ...Array.from(new Set(allProducts.map(p => p.brand || 'DiscreetKit'))).filter(Boolean)], [allProducts]);
     
-    const featuredBundle = uniqueProducts.find(p => p.id === 8); // The All-In-One
+    const filteredProducts = useMemo(() => {
+        return allProducts.filter(product => {
+            const categoryMatch = categoryFilter === 'All' ||
+                (categoryFilter === 'Test Kits' && screeningKitIds.includes(product.id)) ||
+                (categoryFilter === 'Bundles' && bundleIds.includes(product.id)) ||
+                (categoryFilter === 'Wellness' && !screeningKitIds.includes(product.id) && !bundleIds.includes(product.id));
+            
+            const brandMatch = brandFilter === 'All' || (product.brand || 'DiscreetKit') === brandFilter;
+            
+            return categoryMatch && brandMatch;
+        });
+    }, [allProducts, categoryFilter, brandFilter]);
+
+    const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+    const paginatedProducts = filteredProducts.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
+
+    const handlePageChange = (page: number) => {
+        if (page > 0 && page <= totalPages) {
+            setCurrentPage(page);
+            window.scrollTo(0, 0);
+        }
+    };
+
 
   return (
     <div className="bg-background">
       <div className="container mx-auto px-4 py-12 md:px-6 md:py-24">
         <div className="mx-auto max-w-7xl">
-            <div className="text-center mb-12">
+            <div className="text-center mb-8">
                 <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground md:text-4xl">
                     Our Health Products
                 </h1>
@@ -109,40 +122,93 @@ export default async function ProductsPage() {
                     Your complete source for confidential health and wellness products.
                 </p>
             </div>
-
-            {featuredBundle && <FeaturedProduct product={featuredBundle} />}
-
-            <div id="test-kits" className="mb-16 scroll-mt-20">
-                <h2 className="font-headline text-2xl font-bold text-foreground mb-6">Screening Kits</h2>
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-                    {screeningKits.map((product) => (
-                        <ProductCard key={product.id} product={product} />
-                    ))}
-                </div>
-            </div>
-
-            <div id="bundles" className="mb-16 scroll-mt-20">
-                 <h2 className="font-headline text-2xl font-bold text-foreground mb-6">Value Bundles</h2>
-                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-                    {bundles.filter(p => p.id !== featuredBundle?.id).map((product) => (
-                        <ProductCard key={product.id} product={product} />
-                    ))}
-                </div>
-            </div>
             
-             <div id="wellness" className="scroll-mt-20">
-                 <h2 className="font-headline text-2xl font-bold text-foreground mb-6">Wellness Essentials</h2>
-                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-                    {wellness.map((product) => (
-                        <ProductCard key={product.id} product={product} />
+             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 mb-12">
+                <ToggleGroup
+                    type="single"
+                    value={categoryFilter}
+                    onValueChange={(value) => { if (value) { setCategoryFilter(value); setCurrentPage(1); } }}
+                    aria-label="Filter by category"
+                    className="flex-wrap justify-center"
+                >
+                    {categories.map(cat => (
+                        <ToggleGroupItem key={cat} value={cat} aria-label={`Show ${cat}`}>
+                            {cat}
+                        </ToggleGroupItem>
                     ))}
-                </div>
+                </ToggleGroup>
+                
+                <Select value={brandFilter} onValueChange={(value) => { setBrandFilter(value); setCurrentPage(1); }}>
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Filter by brand" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {brands.map(brand => (
+                            <SelectItem key={brand} value={brand!}>{brand}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
             </div>
 
+            {isLoading ? (
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {Array.from({ length: 8 }).map((_, i) => (
+                        <div key={i} className="rounded-2xl bg-muted h-[350px] animate-pulse" />
+                    ))}
+                </div>
+            ) : (
+                <motion.div 
+                    key={categoryFilter + brandFilter + currentPage}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                    className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                >
+                    {paginatedProducts.length > 0 ? (
+                        paginatedProducts.map((product) => (
+                            <ProductCard key={product.id} product={product} />
+                        ))
+                    ) : (
+                        <div className="col-span-full text-center py-16">
+                            <h3 className="text-xl font-semibold">No Products Found</h3>
+                            <p className="text-muted-foreground mt-2">Try adjusting your filters to find what you're looking for.</p>
+                        </div>
+                    )}
+                </motion.div>
+            )}
+
+            {totalPages > 1 && (
+                 <div className="flex items-center justify-center space-x-2 mt-16">
+                    <Button
+                        variant="outline"
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                    >
+                        Previous
+                    </Button>
+                    
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                        <Button
+                            key={page}
+                            variant={currentPage === page ? 'default' : 'outline'}
+                            size="icon"
+                            onClick={() => handlePageChange(page)}
+                        >
+                            {page}
+                        </Button>
+                    ))}
+
+                    <Button
+                        variant="outline"
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                    >
+                        Next
+                    </Button>
+                </div>
+            )}
         </div>
       </div>
     </div>
   );
 }
-
-    
