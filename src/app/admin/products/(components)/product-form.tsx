@@ -54,12 +54,28 @@ type ProductFormValues = z.infer<typeof productFormSchema>;
 const productCategories = ['Test Kit', 'Wellness', 'Bundle', 'Medication'];
 const wellnessSubCategories = ['Contraception', 'Condoms', 'Personal Care'];
 
-export function ProductForm({ product }: { product?: Product }) {
+export function ProductForm({ product, onFormSubmit }: { product?: Product, onFormSubmit?: () => void }) {
   const { toast } = useToast();
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
     defaultValues: {
+      name: '',
+      description: '',
+      price_ghs: 0,
+      category: '',
+      sub_category: '',
+      brand: '',
+      stock_level: 0,
+      image_url: '',
+      requires_prescription: false,
+      is_student_product: false,
+    },
+  });
+
+  // Effect to reset form when the product prop changes
+   useEffect(() => {
+    form.reset({
       name: product?.name ?? '',
       description: product?.description ?? '',
       price_ghs: product?.price_ghs ?? 0,
@@ -70,20 +86,29 @@ export function ProductForm({ product }: { product?: Product }) {
       image_url: product?.image_url ?? '',
       requires_prescription: product?.requires_prescription ?? false,
       is_student_product: product?.is_student_product ?? false,
-    },
-  });
+    });
+  }, [product, form.reset]);
+
 
   const [state, formAction, isPending] = useActionState(saveProduct, null);
 
   useEffect(() => {
-    if (state?.message) {
+    if (state?.success) {
+        toast({
+            title: product ? "Product Updated!" : "Product Created!",
+            description: `${form.getValues('name')} has been saved successfully.`,
+        });
+        if (onFormSubmit) {
+          onFormSubmit();
+        }
+    } else if (state?.message) {
       toast({
         variant: 'destructive',
         title: 'An error occurred',
         description: state.message,
       });
     }
-  }, [state, toast]);
+  }, [state, toast, onFormSubmit, product, form]);
 
   return (
     <Form {...form}>
@@ -179,6 +204,7 @@ export function ProductForm({ product }: { product?: Product }) {
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
+                  value={field.value}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -208,6 +234,7 @@ export function ProductForm({ product }: { product?: Product }) {
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
+                    value={field.value || ''}
                   >
                     <FormControl>
                       <SelectTrigger>

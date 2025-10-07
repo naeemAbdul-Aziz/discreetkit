@@ -351,12 +351,12 @@ const productSchema = z.object({
     description: z.string().optional(),
     price_ghs: z.coerce.number().min(0, 'Price must be a positive number.'),
     category: z.string().min(1, 'Category is required.'),
-    sub_category: z.string().optional(),
-    brand: z.string().optional(),
+    sub_category: z.string().optional().nullable(),
+    brand: z.string().optional().nullable(),
     stock_level: z.coerce.number().int('Stock must be a whole number.').min(0, 'Stock cannot be negative.'),
     image_url: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
-    requires_prescription: z.enum(['true', 'false']).transform(v => v === 'true'),
-    is_student_product: z.enum(['true', 'false']).transform(v => v === 'true'),
+    requires_prescription: z.preprocess((val) => val === 'on' || val === true, z.boolean()),
+    is_student_product: z.preprocess((val) => val === 'on' || val === true, z.boolean()),
 });
 
 /**
@@ -372,6 +372,7 @@ export async function saveProduct(prevState: any, formData: FormData) {
 
     if (!validatedFields.success) {
         return {
+            success: false,
             errors: validatedFields.error.flatten().fieldErrors,
             message: 'Error: Please check the form fields.',
         };
@@ -396,10 +397,11 @@ export async function saveProduct(prevState: any, formData: FormData) {
         }
     } catch (e: any) {
         return {
+            success: false,
             message: `Database Error: ${e.message}`,
         };
     }
 
     revalidatePath('/admin/products');
-    redirect('/admin/products');
+    return { success: true, message: 'Product saved successfully!' };
 }

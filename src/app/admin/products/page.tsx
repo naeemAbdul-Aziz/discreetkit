@@ -6,7 +6,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { getAdminProducts } from '@/lib/actions';
+import { getAdminProducts, getProductById } from '@/lib/actions';
 import type { Product } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,9 +22,12 @@ import { PlusCircle, MoreHorizontal, ArrowUpDown, Search } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import { ProductForm } from './(components)/product-form';
 
 type SortableColumn = 'name' | 'category' | 'price_ghs' | 'stock_level';
 type SortDirection = 'asc' | 'desc';
@@ -68,16 +71,22 @@ export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('All');
   const [sort, setSort] = useState<{ column: SortableColumn, direction: SortDirection }>({ column: 'name', direction: 'asc' });
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(undefined);
+
+  const uniqueCategories = ['All', ...Array.from(new Set(products.map(p => p.category).filter(Boolean)))];
+
+  const fetchProducts = async () => {
+    setIsLoading(true);
+    const fetchedProducts = await getAdminProducts();
+    setProducts(fetchedProducts);
+    setIsLoading(false);
+  }
 
   useEffect(() => {
-    async function loadProducts() {
-        setIsLoading(true);
-        const fetchedProducts = await getAdminProducts();
-        setProducts(fetchedProducts);
-        setIsLoading(false);
-    }
-    loadProducts();
+    fetchProducts();
   }, []);
 
   const handleSort = (column: SortableColumn) => {
@@ -87,10 +96,29 @@ export default function AdminProductsPage() {
     }));
   };
 
+  const handleEdit = async (productId: number) => {
+    const product = await getProductById(productId);
+    if (product) {
+      setSelectedProduct(product);
+      setIsFormOpen(true);
+    }
+  }
+
+  const handleAddNew = () => {
+      setSelectedProduct(undefined);
+      setIsFormOpen(true);
+  }
+
+  const onFormSubmit = () => {
+    setIsFormOpen(false);
+    fetchProducts(); // Re-fetch products to show the latest changes
+  }
+
   const filteredAndSortedProducts = useMemo(() => {
     return products
       .filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase())
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        (categoryFilter === 'All' || product.category === categoryFilter)
       )
       .sort((a, b) => {
         const aValue = a[sort.column];
@@ -109,7 +137,7 @@ export default function AdminProductsPage() {
 
         return sort.direction === 'asc' ? comparison : -comparison;
       });
-  }, [products, searchTerm, sort]);
+  }, [products, searchTerm, categoryFilter, sort]);
 
 
   const renderTableBody = () => {
@@ -175,9 +203,7 @@ export default function AdminProductsPage() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem asChild>
-                <Link href={`/admin/products/${product.id}/edit`}>Edit</Link>
-                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleEdit(product.id)}>Edit</DropdownMenuItem>
                 <DropdownMenuItem>Delete</DropdownMenuItem>
             </DropdownMenuContent>
             </DropdownMenu>
@@ -187,30 +213,39 @@ export default function AdminProductsPage() {
   }
 
   return (
+    <>
     <Card className="rounded-2xl">
       <CardHeader>
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
                 <CardTitle>Products</CardTitle>
                 <CardDescription>
-                    Manage all products in your inventory.
+                    Manage your product inventory.
                 </CardDescription>
             </div>
             <div className="flex w-full sm:w-auto items-center gap-2">
-                 <div className="relative w-full sm:w-64">
+                 <div className="relative w-full sm:w-48">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input 
-                        placeholder="Search by product name..."
+                        placeholder="Search by name..."
                         className="pl-10"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-                <Button asChild>
-                    <Link href="/admin/products/new">
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                        <span className="hidden sm:inline">Add New</span>
-                    </Link>
+                 <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                    <SelectTrigger className="w-full sm:w-[160px]">
+                        <SelectValue placeholder="Filter by category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {uniqueCategories.map(cat => (
+                            <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                <Button onClick={handleAddNew}>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    <span className="hidden sm:inline">Add New</span>
                 </Button>
             </div>
         </div>
@@ -237,5 +272,20 @@ export default function AdminProductsPage() {
         </Table>
       </CardContent>
     </Card>
+
+    <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <DialogContent className="sm:max-w-3xl">
+            <DialogHeader>
+                <DialogTitle>{selectedProduct ? 'Edit Product' : 'Add New Product'}</DialogTitle>
+                <DialogDescription>
+                    {selectedProduct ? 'Update the details of this product.' : 'Fill out the form to add a new product.'}
+                </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+                <ProductForm product={selectedProduct} onFormSubmit={onFormSubmit} />
+            </div>
+        </DialogContent>
+    </Dialog>
+    </>
   );
 }
