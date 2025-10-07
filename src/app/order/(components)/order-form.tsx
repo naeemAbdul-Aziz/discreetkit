@@ -23,6 +23,7 @@ import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
 import Link from 'next/link';
+import { FileUpload } from './file-upload';
 
 function SubmitButton({ disabled }: { disabled: boolean }) {
   const { pending } = useFormStatus();
@@ -175,6 +176,9 @@ export function OrderForm() {
   const [showOther, setShowOther] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [prescriptionFile, setPrescriptionFile] = useState<File | null>(null);
+
+  const containsMedication = items.some(item => item.category === 'Medication');
 
   useEffect(() => {
     setIsMounted(true);
@@ -230,6 +234,8 @@ export function OrderForm() {
     return <OrderFormSkeleton />;
   }
 
+  const isSubmitDisabled = items.length === 0 || !termsAccepted || (containsMedication && !prescriptionFile);
+
   return (
     <>
       <div className="mt-8 mb-8 md:mb-0">
@@ -253,6 +259,15 @@ export function OrderForm() {
                   </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
+                  {containsMedication && (
+                    <div className='space-y-2'>
+                        <Label>Prescription Upload *</Label>
+                        <FileUpload onFileSelect={setPrescriptionFile} />
+                        {!prescriptionFile && (
+                          <p className="text-sm text-destructive">A prescription is required for medication items.</p>
+                        )}
+                    </div>
+                  )}
                   <div className="space-y-4">
                       <div className="space-y-2">
                           <Label htmlFor="email">Email Address *</Label>
@@ -355,7 +370,7 @@ export function OrderForm() {
               </CardContent>
           </Card>
           
-          <SubmitButton disabled={items.length === 0 || !termsAccepted} />
+          <SubmitButton disabled={isSubmitDisabled} />
         </form>
 
         {/* Right Column: Order Summary */}

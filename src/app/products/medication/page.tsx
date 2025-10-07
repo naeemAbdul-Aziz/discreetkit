@@ -17,7 +17,7 @@ export default function MedicationPage() {
                         </p>
                     </div>
 
-                    <Alert variant="warning" className="max-w-4xl mx-auto mb-12">
+                    <Alert className="max-w-4xl mx-auto mb-12 bg-card">
                         <AlertCircle className="h-4 w-4" />
                         <AlertTitle>Prescription Required</AlertTitle>
                         <AlertDescription>
@@ -35,5 +35,3 @@ export default function MedicationPage() {
         </div>
     );
 }
-
-    
