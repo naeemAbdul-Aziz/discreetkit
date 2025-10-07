@@ -1,4 +1,3 @@
-
 import type { Config } from 'tailwindcss';
 
 export default {
@@ -59,6 +58,22 @@ export default {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
+        "pastel-blue": {
+          DEFAULT: "hsl(210 100% 95%)",
+          foreground: "hsl(210 100% 30%)",
+        },
+        "pastel-green": {
+          DEFAULT: "hsl(140 100% 95%)",
+          foreground: "hsl(140 60% 30%)",
+        },
+        "pastel-yellow": {
+          DEFAULT: "hsl(45 100% 95%)",
+          foreground: "hsl(45 100% 25%)",
+        },
+        "pastel-purple": {
+          DEFAULT: "hsl(270 100% 96%)",
+          foreground: "hsl(270 50% 40%)",
+        }
       },
       borderRadius: {
         lg: 'var(--radius)',

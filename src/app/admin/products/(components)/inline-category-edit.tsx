@@ -22,13 +22,13 @@ interface InlineCategoryEditProps {
   allCategories: string[];
 }
 
-const getCategoryBadgeVariant = (category: string | null): 'default' | 'secondary' | 'destructive' | 'accent' | 'outline' => {
+const getCategoryBadgeVariant = (category: string | null): 'pastel-blue' | 'pastel-green' | 'pastel-yellow' | 'pastel-purple' | 'outline' => {
     if (!category) return 'outline';
     switch (category.toLowerCase()) {
-        case 'test kit': return 'default'; // Primary color
-        case 'wellness': return 'secondary'; // Secondary color
-        case 'bundle': return 'accent'; // Accent color
-        case 'medication': return 'outline'; // Neutral outline
+        case 'test kit': return 'pastel-blue';
+        case 'wellness': return 'pastel-green';
+        case 'bundle': return 'pastel-yellow';
+        case 'medication': return 'pastel-purple';
         default: return 'outline';
     }
 }
