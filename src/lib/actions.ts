@@ -319,3 +319,87 @@ export async function getAdminProducts(): Promise<Product[]> {
         stock_level: Number(p.stock_level),
     })) as Product[];
 }
+
+/**
+ * Fetches a single product from the database by its ID.
+ * @param id The ID of the product to fetch.
+ * @returns A promise that resolves to the product object or null if not found.
+ */
+export async function getProductById(id: string | number): Promise<Product | null> {
+    const supabase = getSupabaseAdminClient();
+    const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+    if (error) {
+        console.error(`Error fetching product with id ${id}:`, error);
+        return null;
+    }
+
+    return {
+        ...data,
+        price_ghs: Number(data.price_ghs),
+        stock_level: Number(data.stock_level),
+    } as Product;
+}
+
+const productSchema = z.object({
+    id: z.string().optional(),
+    name: z.string().min(3, 'Name must be at least 3 characters long.'),
+    description: z.string().optional(),
+    price_ghs: z.coerce.number().min(0, 'Price must be a positive number.'),
+    category: z.string().min(1, 'Category is required.'),
+    sub_category: z.string().optional(),
+    brand: z.string().optional(),
+    stock_level: z.coerce.number().int('Stock must be a whole number.').min(0, 'Stock cannot be negative.'),
+    image_url: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
+    requires_prescription: z.enum(['true', 'false']).transform(v => v === 'true'),
+    is_student_product: z.enum(['true', 'false']).transform(v => v === 'true'),
+});
+
+/**
+ * Creates or updates a product in the database.
+ * @param prevState The previous form state.
+ * @param formData The form data.
+ * @returns A promise that resolves to the new form state.
+ */
+export async function saveProduct(prevState: any, formData: FormData) {
+    const validatedFields = productSchema.safeParse(
+        Object.fromEntries(formData.entries())
+    );
+
+    if (!validatedFields.success) {
+        return {
+            errors: validatedFields.error.flatten().fieldErrors,
+            message: 'Error: Please check the form fields.',
+        };
+    }
+    
+    const { id, ...productData } = validatedFields.data;
+    const supabase = getSupabaseAdminClient();
+
+    try {
+        if (id) {
+            // Update existing product
+            const { error } = await supabase
+                .from('products')
+                .update(productData)
+                .eq('id', id);
+            
+            if (error) throw error;
+        } else {
+            // Create new product
+            const { error } = await supabase.from('products').insert(productData);
+            if (error) throw error;
+        }
+    } catch (e: any) {
+        return {
+            message: `Database Error: ${e.message}`,
+        };
+    }
+
+    revalidatePath('/admin/products');
+    redirect('/admin/products');
+}
