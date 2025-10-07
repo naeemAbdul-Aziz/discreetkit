@@ -10,7 +10,7 @@ import {
   ShoppingCart,
   Users,
 } from 'lucide-react';
-import { AdminShell } from './(components)/admin-shell';
+import { AdminShell } from '@/app/admin/(components)/admin-shell';
 
 export default function AdminLayout({
   children,
