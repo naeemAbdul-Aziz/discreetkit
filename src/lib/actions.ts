@@ -77,13 +77,13 @@ export async function createOrderAction(prevState: any, formData: FormData) {
       total_price: parseFloat(validatedFields.data.totalPrice),
     };
 
-    // 1. Insert into orders table with status 'received'
+    // 1. Insert into orders table with status 'pending_payment'
     const {data: orderData, error: orderError} = await supabaseAdmin
       .from('orders')
       .insert({
         code,
         items: cartItems,
-        status: 'received',
+        status: 'pending_payment',
         delivery_area: finalDeliveryArea,
         delivery_address_note: validatedFields.data.deliveryAddressNote,
         phone_masked: validatedFields.data.phone_masked,
