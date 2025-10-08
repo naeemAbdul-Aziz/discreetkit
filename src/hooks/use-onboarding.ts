@@ -5,36 +5,23 @@
 'use client';
 
 import { create } from 'zustand';
+import type { CallBackProps } from 'react-joyride';
 
 const ONBOARDING_KEY = 'discreetkit-tour-complete-v1';
 
 interface OnboardingState {
   run: boolean;
   stepIndex: number;
-  startTour: () => void;
-  handleJoyrideCallback: (data: any) => void;
+  setRun: (run: boolean) => void;
+  handleJoyrideCallback: (data: CallBackProps) => void;
 }
 
-const useOnboardingStore = create<OnboardingState>((set, get) => ({
+const useOnboardingStore = create<OnboardingState>((set) => ({
   run: false,
   stepIndex: 0,
-  startTour: () => {
-    try {
-      const hasCompletedTour = localStorage.getItem(ONBOARDING_KEY);
-      if (!hasCompletedTour) {
-        set({ run: true });
-      }
-    } catch (error) {
-      console.error('Failed to access localStorage for onboarding:', error);
-      // Failsafe to start tour if localStorage is unavailable
-      set({ run: true });
-    }
-  },
+  setRun: (run) => set({ run }),
   handleJoyrideCallback: (data) => {
     const { action, index, status, type } = data;
-    const { run } = get();
-
-    if (!run) return;
 
     if (['step:after', 'target:not-found'].includes(type)) {
       // Update step index

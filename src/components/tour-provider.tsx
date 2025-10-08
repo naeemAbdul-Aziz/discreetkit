@@ -5,7 +5,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Joyride, { type Step } from 'react-joyride';
+import Joyride, { type Step, type CallBackProps } from 'react-joyride';
 import { useOnboarding } from '@/hooks/use-onboarding';
 import { useChatbot } from '@/hooks/use-chatbot';
 import { ArrowRight } from 'lucide-react';
@@ -35,23 +35,23 @@ const tourSteps: Step[] = [
 ];
 
 export function TourProvider({ children }: { children: React.ReactNode }) {
-  const { run, stepIndex, startTour, handleJoyrideCallback } = useOnboarding();
+  const { run, stepIndex, setRun, handleJoyrideCallback } = useOnboarding();
   const { setIsOpen: setChatbotOpen } = useChatbot();
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
     // Start the tour shortly after the page loads to ensure all elements are present
-    const timer = setTimeout(() => {
-      startTour();
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [startTour]);
+    const hasCompletedTour = localStorage.getItem('discreetkit-tour-complete-v1');
+    if (!hasCompletedTour) {
+        const timer = setTimeout(() => {
+            setRun(true);
+        }, 1000);
+        return () => clearTimeout(timer);
+    }
+  }, [setRun]);
   
-  const customCallback = (data: any) => {
+  const customCallback = (data: CallBackProps) => {
     const { action, index, type } = data;
     // Special handling for the last step to open the chatbot
     if (type === 'step:after' && action === 'next' && index === 3) {
