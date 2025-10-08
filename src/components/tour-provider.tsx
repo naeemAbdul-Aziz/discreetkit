@@ -4,11 +4,12 @@
  */
 'use client';
 
-import { useState, useEffect } from 'react';
-import Joyride, { type Step, type CallBackProps } from 'react-joyride';
-import { useOnboarding } from '@/hooks/use-onboarding';
+import { useState, useEffect, useCallback } from 'react';
+import Joyride, { type Step, type CallBackProps, STATUS } from 'react-joyride';
 import { useChatbot } from '@/hooks/use-chatbot';
 import { ArrowRight } from 'lucide-react';
+
+const ONBOARDING_KEY = 'discreetkit-tour-complete-v1';
 
 const tourSteps: Step[] = [
   {
@@ -35,38 +36,52 @@ const tourSteps: Step[] = [
 ];
 
 export function TourProvider({ children }: { children: React.ReactNode }) {
-  const { run, setRun, handleJoyrideCallback } = useOnboarding();
-  const { setIsOpen: setChatbotOpen } = useChatbot();
+  const [runTour, setRunTour] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const { setIsOpen: setChatbotOpen } = useChatbot();
 
   useEffect(() => {
     setIsMounted(true);
-    const hasCompletedTour = localStorage.getItem('discreetkit-tour-complete-v1');
-    if (!hasCompletedTour) {
-        const timer = setTimeout(() => {
-            setRun(true);
-        }, 1000);
-        return () => clearTimeout(timer);
+    try {
+      const hasCompletedTour = localStorage.getItem(ONBOARDING_KEY);
+      if (!hasCompletedTour) {
+        // Start the tour after a short delay to allow the page to render
+        setTimeout(() => {
+          setRunTour(true);
+        }, 1500);
+      }
+    } catch (error) {
+      console.error("Could not access localStorage for onboarding tour:", error);
     }
-  }, [setRun]);
+  }, []);
   
-  const customCallback = (data: CallBackProps) => {
-    const { action, index, type } = data;
-    // Special handling for the last step to open the chatbot
+  const handleJoyrideCallback = useCallback((data: CallBackProps) => {
+    const { status, action, index, type } = data;
+    const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
+
+    if (finishedStatuses.includes(status)) {
+      setRunTour(false);
+      try {
+        localStorage.setItem(ONBOARDING_KEY, 'true');
+      } catch (error) {
+        console.error("Failed to update localStorage for onboarding:", error);
+      }
+    }
+
     if (type === 'step:after' && action === 'next' && index === 3) {
       setChatbotOpen(true);
     }
-    handleJoyrideCallback(data);
-  };
+  }, [setChatbotOpen]);
+
 
   return (
     <>
       {children}
       {isMounted && (
         <Joyride
-          callback={customCallback}
+          callback={handleJoyrideCallback}
           continuous
-          run={run}
+          run={runTour}
           steps={tourSteps}
           showProgress
           showSkipButton
