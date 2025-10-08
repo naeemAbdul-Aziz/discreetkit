@@ -4,7 +4,7 @@
  */
 'use client';
 
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Joyride, { type Step } from 'react-joyride';
 import { useOnboarding } from '@/hooks/use-onboarding';
 import { useChatbot } from '@/hooks/use-chatbot';
@@ -36,6 +36,11 @@ const tourSteps: Step[] = [
 export function TourProvider({ children }: { children: React.ReactNode }) {
   const { run, stepIndex, startTour, handleJoyrideCallback } = useOnboarding();
   const { setIsOpen: setChatbotOpen } = useChatbot();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     // Start the tour shortly after the page loads to ensure all elements are present
@@ -57,36 +62,38 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
   return (
     <>
       {children}
-      <Joyride
-        callback={customCallback}
-        continuous
-        run={run}
-        stepIndex={stepIndex}
-        steps={tourSteps}
-        showProgress
-        showSkipButton
-        styles={{
-          options: {
-            zIndex: 10000,
-            primaryColor: 'hsl(var(--primary))',
-            textColor: 'hsl(var(--foreground))',
-            arrowColor: 'hsl(var(--background))',
-          },
-          buttonNext: {
-            borderRadius: '9999px',
-          },
-          buttonBack: {
-            borderRadius: '9999px',
-          },
-          tooltip: {
-            borderRadius: 'var(--radius)',
-            backgroundColor: 'hsl(var(--background))',
-          },
-          spotlight: {
+      {isMounted && (
+        <Joyride
+          callback={customCallback}
+          continuous
+          run={run}
+          stepIndex={stepIndex}
+          steps={tourSteps}
+          showProgress
+          showSkipButton
+          styles={{
+            options: {
+              zIndex: 10000,
+              primaryColor: 'hsl(var(--primary))',
+              textColor: 'hsl(var(--foreground))',
+              arrowColor: 'hsl(var(--background))',
+            },
+            buttonNext: {
+              borderRadius: '9999px',
+            },
+            buttonBack: {
+              borderRadius: '9999px',
+            },
+            tooltip: {
               borderRadius: 'var(--radius)',
-          }
-        }}
-      />
+              backgroundColor: 'hsl(var(--background))',
+            },
+            spotlight: {
+                borderRadius: 'var(--radius)',
+            }
+          }}
+        />
+      )}
     </>
   );
 }
