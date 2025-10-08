@@ -9,7 +9,7 @@ import { usePathname } from 'next/navigation';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { FloatingShopButton } from '@/components/quick-shop-banner';
-import { OnboardingModal } from '@/components/onboarding-modal';
+import { TourProvider } from '@/components/tour-provider';
 
 export function ClientLayout({
   children,
@@ -25,12 +25,13 @@ export function ClientLayout({
   }
 
   return (
-    <div className="relative flex min-h-dvh flex-col bg-background">
-      <Header />
-      <main className="flex-1">{children}</main>
-      <Footer />
-      <FloatingShopButton />
-      <OnboardingModal />
-    </div>
+    <TourProvider>
+      <div className="relative flex min-h-dvh flex-col bg-background">
+        <Header />
+        <main className="flex-1">{children}</main>
+        <Footer />
+        <FloatingShopButton />
+      </div>
+    </TourProvider>
   );
 }

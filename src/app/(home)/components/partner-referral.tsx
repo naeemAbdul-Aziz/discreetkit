@@ -53,7 +53,7 @@ export function PartnerReferral() {
             </div>
 
             {/* content container */}
-            <div className="flex flex-col justify-center bg-card p-8 md:p-12">
+            <div id="partner-referral-cta" className="flex flex-col justify-center bg-card p-8 md:p-12">
                 <HeartHandshake className="mb-4 h-10 w-10 text-primary" />
                 <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
                 Your Bridge to Confidential Care

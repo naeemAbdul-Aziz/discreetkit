@@ -13,7 +13,7 @@ export function ChatTrigger() {
   const { setIsOpen } = useChatbot();
 
   return (
-    <div className="flex items-center justify-center rounded-lg border-2 border-dashed bg-muted p-6 text-center">
+    <div id="ask-pacely-cta" className="flex items-center justify-center rounded-lg border-2 border-dashed bg-muted p-6 text-center">
       <div className="flex flex-col items-center gap-2">
         <h3 className="font-semibold">Have Questions?</h3>
         <p className="text-sm text-muted-foreground">
