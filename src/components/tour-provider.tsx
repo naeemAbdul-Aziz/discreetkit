@@ -38,13 +38,13 @@ const tourSteps: Step[] = [
 export function TourProvider({ children }: { children: React.ReactNode }) {
   const [runTour, setRunTour] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const { setIsOpen: setChatbotOpen } = useChatbot();
 
   useEffect(() => {
     setIsMounted(true);
     try {
       const hasCompletedTour = localStorage.getItem(ONBOARDING_KEY);
       if (!hasCompletedTour) {
+        // Delay starting the tour to ensure the page is fully rendered
         setTimeout(() => {
           setRunTour(true);
         }, 1500);
@@ -55,22 +55,12 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
   }, []);
   
   const handleJoyrideCallback = (data: CallBackProps) => {
-    const { status, action, index, type } = data;
+    const { status } = data;
     const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
 
     if (finishedStatuses.includes(status)) {
       setRunTour(false);
       try {
-        localStorage.setItem(ONBOARDING_KEY, 'true');
-      } catch (error) {
-        console.error("Failed to update localStorage for onboarding:", error);
-      }
-    } else if (type === 'step:after' && action === 'next' && index === 3) {
-      // The tour is on the last step, and user clicked next.
-      // We also stop the tour here before opening the chatbot.
-      setRunTour(false);
-      setChatbotOpen(true);
-       try {
         localStorage.setItem(ONBOARDING_KEY, 'true');
       } catch (error) {
         console.error("Failed to update localStorage for onboarding:", error);
