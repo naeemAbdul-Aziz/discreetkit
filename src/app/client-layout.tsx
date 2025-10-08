@@ -9,6 +9,7 @@ import { usePathname } from 'next/navigation';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { FloatingShopButton } from '@/components/quick-shop-banner';
+import { OnboardingModal } from '@/components/onboarding-modal';
 
 export function ClientLayout({
   children,
@@ -29,6 +30,7 @@ export function ClientLayout({
       <main className="flex-1">{children}</main>
       <Footer />
       <FloatingShopButton />
+      <OnboardingModal />
     </div>
   );
 }
