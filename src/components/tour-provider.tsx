@@ -28,20 +28,19 @@ const tourSteps: Step[] = [
     placement: 'top',
   },
   {
-    target: '#faq',
+    target: '#ask-pacely-cta',
     content: 'Have questions? Pacely, our AI assistant, can help with product info, delivery, and more, 24/7.',
     placement: 'top',
   }
 ];
 
 export function TourProvider({ children }: { children: React.ReactNode }) {
-  const { run, stepIndex, setRun, handleJoyrideCallback } = useOnboarding();
+  const { run, setRun, handleJoyrideCallback } = useOnboarding();
   const { setIsOpen: setChatbotOpen } = useChatbot();
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
-    // Start the tour shortly after the page loads to ensure all elements are present
     const hasCompletedTour = localStorage.getItem('discreetkit-tour-complete-v1');
     if (!hasCompletedTour) {
         const timer = setTimeout(() => {
@@ -68,7 +67,6 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
           callback={customCallback}
           continuous
           run={run}
-          stepIndex={stepIndex}
           steps={tourSteps}
           showProgress
           showSkipButton

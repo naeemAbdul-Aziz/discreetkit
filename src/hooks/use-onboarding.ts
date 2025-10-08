@@ -11,29 +11,24 @@ const ONBOARDING_KEY = 'discreetkit-tour-complete-v1';
 
 interface OnboardingState {
   run: boolean;
-  stepIndex: number;
   setRun: (run: boolean) => void;
   handleJoyrideCallback: (data: CallBackProps) => void;
 }
 
 const useOnboardingStore = create<OnboardingState>((set) => ({
   run: false,
-  stepIndex: 0,
   setRun: (run) => set({ run }),
   handleJoyrideCallback: (data) => {
-    const { action, index, status, type } = data;
+    const { status } = data;
+    const finishedStatuses: string[] = ['finished', 'skipped'];
 
-    if (['step:after', 'target:not-found'].includes(type)) {
-      // Update step index
-      set({ stepIndex: index + (action === 'next' ? 1 : -1) });
-    } else if (['finished', 'skipped'].includes(status)) {
-      // Tour finished or skipped, mark as complete
+    if (finishedStatuses.includes(status)) {
       try {
         localStorage.setItem(ONBOARDING_KEY, 'true');
       } catch (error) {
         console.error('Failed to update localStorage for onboarding:', error);
       }
-      set({ run: false, stepIndex: 0 });
+      set({ run: false });
     }
   },
 }));
