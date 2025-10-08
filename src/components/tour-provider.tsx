@@ -45,7 +45,6 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
     try {
       const hasCompletedTour = localStorage.getItem(ONBOARDING_KEY);
       if (!hasCompletedTour) {
-        // Start the tour after a short delay to allow the page to render
         setTimeout(() => {
           setRunTour(true);
         }, 1500);
@@ -66,11 +65,16 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
       } catch (error) {
         console.error("Failed to update localStorage for onboarding:", error);
       }
-    }
-
-    if (type === 'step:after' && action === 'next' && index === 3) {
-      // The tour is on the last step, and user clicked next. Open the chatbot.
+    } else if (type === 'step:after' && action === 'next' && index === 3) {
+      // The tour is on the last step, and user clicked next.
+      // We also stop the tour here before opening the chatbot.
+      setRunTour(false);
       setChatbotOpen(true);
+       try {
+        localStorage.setItem(ONBOARDING_KEY, 'true');
+      } catch (error) {
+        console.error("Failed to update localStorage for onboarding:", error);
+      }
     }
   };
 
