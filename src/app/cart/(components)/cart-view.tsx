@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -159,8 +160,8 @@ export function CartView() {
                         <p>Total</p>
                         <p>GHS {totalPrice.toFixed(2)}</p>
                     </div>
-                    <Button size="lg" className="w-full" asChild disabled={isLoading} onClick={handleClick}>
-                      <Link href="/order">
+                    <Button size="lg" className="w-full" asChild disabled={isLoading || totalItems === 0} onClick={handleClick}>
+                      <Link href="/order" className={cn(totalItems === 0 && "pointer-events-none")}>
                         {isLoading ? (
                             <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

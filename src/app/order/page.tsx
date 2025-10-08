@@ -62,36 +62,31 @@ export default function OrderPage() {
 
         {/* Stepper */}
         <nav aria-label="Progress" className="my-12 max-w-md mx-auto">
-            <ol role="list" className="flex items-center">
+            <ol role="list" className="grid grid-cols-3">
                 {steps.map((step, stepIdx) => (
-                <li key={step.name} className={cn("relative flex-1", stepIdx !== steps.length - 1 ? "pr-8" : "")}>
-                    {step.status === 'complete' ? (
-                    <>
-                        <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                            <div className="h-0.5 w-full bg-primary" />
+                <li key={step.name} className="relative">
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center w-full">
+                             {stepIdx > 0 && (
+                                 <div className={cn("flex-1 h-0.5", step.status === 'complete' || step.status === 'current' ? 'bg-primary' : 'bg-border')} />
+                             )}
+                            {step.status === 'complete' ? (
+                                <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                                    <CheckCircle className="h-5 w-5" />
+                                </div>
+                            ) : step.status === 'current' ? (
+                                <div className="relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary bg-background">
+                                    <span className="h-2.5 w-2.5 rounded-full bg-primary" aria-hidden="true" />
+                                </div>
+                            ) : (
+                                <div className="relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-border bg-background" />
+                            )}
+                             {stepIdx < steps.length - 1 && (
+                                <div className={cn("flex-1 h-0.5", step.status === 'complete' ? 'bg-primary' : 'bg-border')} />
+                             )}
                         </div>
-                        <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                            <CheckCircle className="h-5 w-5" />
-                        </div>
-                    </>
-                    ) : step.status === 'current' ? (
-                    <>
-                        <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                             <div className="h-0.5 w-full bg-border" />
-                        </div>
-                        <div className="relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary bg-background">
-                            <span className="h-2.5 w-2.5 rounded-full bg-primary" aria-hidden="true" />
-                        </div>
-                    </>
-                    ) : (
-                    <>
-                        <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                            <div className="h-0.5 w-full bg-border" />
-                        </div>
-                        <div className="relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-border bg-background" />
-                    </>
-                    )}
-                     <div className="absolute top-10 w-max text-center left-1/2 -translate-x-1/2">
+                    </div>
+                    <div className="absolute top-10 w-max text-center left-1/2 -translate-x-1/2">
                         <p className={cn("text-xs font-medium", step.status === 'current' ? 'text-primary' : 'text-muted-foreground', step.status === 'complete' ? 'text-foreground' : '')}>{step.name}</p>
                     </div>
                 </li>
