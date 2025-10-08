@@ -4,7 +4,7 @@
  */
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Joyride, { type Step, type CallBackProps, STATUS } from 'react-joyride';
 import { useChatbot } from '@/hooks/use-chatbot';
 import { ArrowRight } from 'lucide-react';
@@ -55,7 +55,7 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
   
-  const handleJoyrideCallback = useCallback((data: CallBackProps) => {
+  const handleJoyrideCallback = (data: CallBackProps) => {
     const { status, action, index, type } = data;
     const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
 
@@ -69,9 +69,10 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
     }
 
     if (type === 'step:after' && action === 'next' && index === 3) {
+      // The tour is on the last step, and user clicked next. Open the chatbot.
       setChatbotOpen(true);
     }
-  }, [setChatbotOpen]);
+  };
 
 
   return (
