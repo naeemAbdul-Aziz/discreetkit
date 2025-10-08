@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import Joyride, { type Step } from 'react-joyride';
 import { useOnboarding } from '@/hooks/use-onboarding';
 import { useChatbot } from '@/hooks/use-chatbot';
+import { ArrowRight } from 'lucide-react';
 
 const tourSteps: Step[] = [
   {
@@ -22,12 +23,12 @@ const tourSteps: Step[] = [
     placement: 'top',
   },
   {
-    target: '#partner-referral-cta',
-    content: 'We provide a bridge to professional care. Learn about our trusted partners for follow-up support.',
+    target: '#featured-favorites',
+    content: 'Discover our most popular bundles and save. These are curated based on what our community loves.',
     placement: 'top',
   },
   {
-    target: '#ask-pacely-cta',
+    target: '#faq',
     content: 'Have questions? Pacely, our AI assistant, can help with product info, delivery, and more, 24/7.',
     placement: 'top',
   }
@@ -71,6 +72,13 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
           steps={tourSteps}
           showProgress
           showSkipButton
+          locale={{
+            next: (
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                Next <ArrowRight size={16} />
+              </span>
+            ),
+          }}
           styles={{
             options: {
               zIndex: 10000,
