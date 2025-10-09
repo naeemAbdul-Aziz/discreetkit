@@ -9,6 +9,7 @@ import { usePathname } from 'next/navigation';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { FloatingShopButton } from '@/components/quick-shop-banner';
+import { Toaster } from "@/components/ui/toaster";
 
 export function ClientLayout({
   children,
@@ -29,6 +30,8 @@ export function ClientLayout({
       <main className="flex-1">{children}</main>
       <Footer />
       <FloatingShopButton />
+      {/* The Toaster is now here, so it only renders on non-admin pages */}
+      <Toaster />
     </div>
   );
 }

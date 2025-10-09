@@ -6,7 +6,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { cn } from '@/lib/utils';
-import { Toaster } from "@/components/ui/toaster";
 import { Chatbot } from '@/components/chatbot';
 import NextTopLoader from 'nextjs-toploader';
 import { ClientLayout } from './client-layout';
@@ -103,9 +102,8 @@ export default function RootLayout({
           shadow="0 0 10px hsl(var(--primary)),0 0 5px hsl(var(--primary))"
         />
         <ClientLayout>{children}</ClientLayout>
-        {/* toaster and chatbot are client-side, so they can be here or in ClientLayout */}
+        {/* The chatbot can remain here as it's a Sheet that doesn't affect initial HTML structure */}
         <Chatbot />
-        <Toaster />
       </body>
     </html>
   );
