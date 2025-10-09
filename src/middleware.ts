@@ -6,14 +6,17 @@ export async function middleware(request: NextRequest) {
   const session = await getSession();
   const { pathname } = request.nextUrl;
 
-  // If there's no session and the user is trying to access a protected admin route
-  if (!session && pathname.startsWith('/admin') && pathname !== '/admin/login') {
-    return NextResponse.redirect(new URL('/admin/login', request.url));
-  }
-  
-  // If there IS a session and the user tries to access the login page
-  if (session && pathname === '/admin/login') {
-      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+  // If we are on an admin route
+  if (pathname.startsWith('/admin')) {
+    // If there's no session and the user is NOT on the login page, redirect to login
+    if (!session && pathname !== '/admin/login') {
+      return NextResponse.redirect(new URL('/admin/login', request.url));
+    }
+    
+    // If there IS a session and the user tries to access the login page, redirect to dashboard
+    if (session && pathname === '/admin/login') {
+        return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+    }
   }
 
   return NextResponse.next();
