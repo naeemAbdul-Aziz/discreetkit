@@ -14,7 +14,7 @@ import {getSupabaseAdminClient} from './supabase';
 import {redirect} from 'next/navigation';
 import type { Product } from './data';
 import { cookies } from 'next/headers';
-import { encrypt, decrypt } from '@/lib/session';
+import { encrypt, decrypt, getSession } from '@/lib/session';
 
 export async function login(prevState: { error: string } | undefined, formData: FormData) {
   const email = formData.get('email') as string;
