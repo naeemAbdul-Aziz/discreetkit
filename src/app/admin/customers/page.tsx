@@ -10,6 +10,7 @@ import { CustomersDataTable } from './(components)/customers-data-table';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent } from '@/components/ui/card';
 
 export default function CustomersPage() {
     const [customers, setCustomers] = useState<Customer[]>([]);
