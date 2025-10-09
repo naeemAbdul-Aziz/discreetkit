@@ -25,19 +25,18 @@ export async function login(prevState: { error: string } | undefined, formData: 
     return { error: 'Invalid credentials. Please try again.' };
   }
 
-  // Create the session
-  const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // Expires in 24 hours
-  const session = await encrypt({ user: { email }, expires });
+  // Create the session without an expiry date for persistence
+  const session = await encrypt({ user: { email } });
 
   // Save the session in a cookie
-  cookies().set('session', session, { expires, httpOnly: true });
+  cookies().set('session', session, { httpOnly: true });
   
   // Redirect to dashboard (will be handled by middleware)
   redirect('/admin/dashboard');
 }
 
 export async function logout() {
-  // Destroy the session
+  // Destroy the session cookie
   cookies().set('session', '', { expires: new Date(0) });
   redirect('/admin/login');
 }
@@ -533,4 +532,10 @@ export async function updateProductCategory(params: { id: number; category: stri
 
     revalidatePath('/admin/products');
     return { success: true };
+}
+
+// Action to verify session on the client
+export async function checkSession() {
+  const session = await getSession();
+  return { isAuthenticated: !!session };
 }

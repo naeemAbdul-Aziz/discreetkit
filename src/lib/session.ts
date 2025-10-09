@@ -11,7 +11,7 @@ export async function encrypt(payload: any) {
   return await new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
-    .setExpirationTime('1d') // Session expires in 1 day
+    // No expiration date set for persistent sessions
     .sign(key);
 }
 
@@ -28,11 +28,6 @@ export async function decrypt(input: string): Promise<any> {
   }
 }
 
-// Logs out a user by deleting the session.
-export async function logout() {
-  cookies().set('session', '', { expires: new Date(0) });
-}
-
 // Retrieves the current session from the cookie.
 export async function getSession() {
   const session = cookies().get('session')?.value;
@@ -40,7 +35,7 @@ export async function getSession() {
   return await decrypt(session);
 }
 
-// Refreshes the session expiration time on each request.
+// Refreshes the session on each request.
 export async function updateSession(request: NextRequest) {
   const session = request.cookies.get('session')?.value;
   if (!session) return NextResponse.next();
@@ -54,13 +49,8 @@ export async function updateSession(request: NextRequest) {
     return response;
   }
   
-  parsed.expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
   const res = NextResponse.next();
-  res.cookies.set({
-    name: 'session',
-    value: await encrypt(parsed),
-    httpOnly: true,
-    expires: parsed.expires,
-  });
+  // The cookie is httpOnly, so we don't need to re-set it on every request.
+  // The middleware will handle redirects, and the cookie will persist.
   return res;
 }
