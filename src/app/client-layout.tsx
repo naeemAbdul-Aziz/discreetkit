@@ -20,7 +20,7 @@ export function ClientLayout({
 
   // For admin pages, we render children directly without the main layout
   if (isAdminPage) {
-    return <main className="flex-1">{children}</main>;
+    return <>{children}</>;
   }
 
   return (
