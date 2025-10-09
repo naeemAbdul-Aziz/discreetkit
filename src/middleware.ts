@@ -1,29 +1,34 @@
-
 import { NextResponse, type NextRequest } from 'next/server';
 import { getSession } from '@/lib/session';
 
+// This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest) {
   const session = await getSession();
-  const pathname = request.nextUrl.pathname;
+  const { pathname } = request.nextUrl;
 
-  // If the user is not authenticated and is trying to access a protected admin route,
-  // redirect them to the login page.
-  if (!session && pathname !== '/admin/login') {
+  // If there's no session and the user is trying to access a protected admin route
+  if (!session && pathname.startsWith('/admin') && pathname !== '/admin/login') {
     return NextResponse.redirect(new URL('/admin/login', request.url));
   }
-
-  // If the user is authenticated and tries to visit the login page,
-  // redirect them to the admin dashboard.
-  if (session && pathname === '/admin/login') {
-    return NextResponse.redirect(new URL('/admin/dashboard', request.url));
-  }
   
-  // For all other cases, just continue with the request flow.
+  // If there IS a session and the user tries to access the login page
+  if (session && pathname === '/admin/login') {
+      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+  }
+
   return NextResponse.next();
 }
 
-// This config specifies that the middleware should only run on the admin routes.
-// It uses a negative lookahead to exclude all files in /_next, /api, and static assets.
+// See "Matching Paths" below to learn more
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  ],
 };

@@ -20,7 +20,6 @@ export async function login(prevState: { error: string } | undefined, formData: 
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
 
-  // Simple validation
   if (email !== process.env.ADMIN_EMAIL || password !== process.env.ADMIN_PASSWORD) {
     return { error: 'Invalid credentials. Please try again.' };
   }
@@ -32,10 +31,12 @@ export async function login(prevState: { error: string } | undefined, formData: 
   // Save the session in a cookie
   cookies().set('session', session, { 
     httpOnly: true,
+    secure: true,
     expires: expires,
+    sameSite: 'lax',
+    path: '/',
   });
   
-  // Redirect to dashboard (will be handled by middleware)
   redirect('/admin/dashboard');
 }
 

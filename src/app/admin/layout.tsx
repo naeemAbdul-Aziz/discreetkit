@@ -3,21 +3,19 @@
  * @description The shared layout for the admin section. It now implements a
  *              professional sidebar navigation for scalability and a better user experience.
  */
-'use client';
 import { AdminShell } from '@/app/admin/(components)/admin-shell';
-import { usePathname } from 'next/navigation';
+import { cookies } from 'next/headers';
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
-  const isLoginPage = pathname === '/admin/login';
+  const hasSession = cookies().has('session');
 
   // The middleware ensures only authenticated users can access admin pages.
   // We only need to differentiate to avoid showing the shell on the login page itself.
-  if (isLoginPage) {
+  if (!hasSession) {
     return <>{children}</>;
   }
 
