@@ -22,14 +22,14 @@ interface InlineCategoryEditProps {
   allCategories: string[];
 }
 
-const getCategoryBadgeVariant = (category: string | null): 'default' | 'secondary' | 'accent' | 'destructive' | 'outline' => {
-    if (!category) return 'outline';
+const getCategoryStyles = (category: string | null): { variant: 'default' | 'secondary' | 'accent' | 'destructive' | 'outline', className: string } => {
+    if (!category) return { variant: 'outline', className: '' };
     switch (category.toLowerCase()) {
-        case 'test kit': return 'default';
-        case 'wellness': return 'secondary';
-        case 'bundle': return 'accent';
-        case 'medication': return 'destructive';
-        default: return 'outline';
+        case 'test kit': return { variant: 'default', className: 'bg-primary' };
+        case 'wellness': return { variant: 'secondary', className: 'bg-secondary' };
+        case 'bundle': return { variant: 'accent', className: 'bg-accent' };
+        case 'medication': return { variant: 'destructive', className: 'bg-destructive' };
+        default: return { variant: 'outline', className: 'bg-border' };
     }
 }
 
@@ -69,6 +69,8 @@ export function InlineCategoryEdit({ productId, value, onUpdate, allCategories }
     });
   };
 
+  const currentStyles = getCategoryStyles(currentValue);
+
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
@@ -82,7 +84,7 @@ export function InlineCategoryEdit({ productId, value, onUpdate, allCategories }
             {isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-                <Badge variant={getCategoryBadgeVariant(currentValue)} className="text-xs capitalize">
+                <Badge variant={currentStyles.variant} className="text-xs capitalize">
                     {currentValue || "Select category..."}
                 </Badge>
             )}
@@ -94,7 +96,9 @@ export function InlineCategoryEdit({ productId, value, onUpdate, allCategories }
           <CommandInput placeholder="Search category..." />
           <CommandEmpty>No category found.</CommandEmpty>
           <CommandGroup>
-            {allCategories.map((category) => (
+            {allCategories.map((category) => {
+              const styles = getCategoryStyles(category);
+              return (
               <CommandItem
                 key={category}
                 value={category}
@@ -106,9 +110,12 @@ export function InlineCategoryEdit({ productId, value, onUpdate, allCategories }
                     currentValue === category ? "opacity-100" : "opacity-0"
                   )}
                 />
-                <span className="capitalize">{category}</span>
+                <div className="flex items-center gap-2">
+                    <span className={cn("h-2 w-2 rounded-full", styles.className)} />
+                    <span className="capitalize">{category}</span>
+                </div>
               </CommandItem>
-            ))}
+            )})}
           </CommandGroup>
         </Command>
       </PopoverContent>
