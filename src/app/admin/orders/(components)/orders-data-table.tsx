@@ -5,7 +5,7 @@
 'use client';
 
 import * as React from 'react';
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import type { Order } from '@/lib/data';
 import {
   Table,
@@ -23,6 +23,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowUpDown, Search } from 'lucide-react';
 import { format } from 'date-fns';
 import { InlineStatusEdit } from './inline-status-edit';
+import { getSupabaseClient } from '@/lib/supabase';
 
 type SortableColumn = 'code' | 'created_at' | 'email' | 'total_price' | 'status';
 type SortDirection = 'asc' | 'desc';
@@ -57,6 +58,42 @@ export function OrdersDataTable({ initialOrders }: { initialOrders: Order[] }) {
     
     const uniqueStatuses = ['All', 'pending_payment', 'received', 'processing', 'out_for_delivery', 'completed'];
 
+    const refreshOrders = useCallback(async () => {
+        // This is now handled by the real-time subscription
+    }, []);
+    
+    // Set up Supabase real-time subscription for the orders table
+    useEffect(() => {
+        const supabase = getSupabaseClient();
+        const channel = supabase
+        .channel('public:orders')
+        .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'orders' },
+            (payload) => {
+                // When a change is detected, update the state
+                if (payload.eventType === 'INSERT') {
+                    setOrders(currentOrders => [payload.new as Order, ...currentOrders]);
+                } else if (payload.eventType === 'UPDATE') {
+                    setOrders(currentOrders => 
+                        currentOrders.map(order => 
+                            order.id === payload.new.id ? payload.new as Order : order
+                        )
+                    );
+                } else if (payload.eventType === 'DELETE') {
+                     setOrders(currentOrders => 
+                        currentOrders.filter(order => order.id !== payload.old.id)
+                    );
+                }
+            }
+        )
+        .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, []);
+
     const handleSort = (column: SortableColumn) => {
         setCurrentPage(1);
         setSort(prevSort => ({
@@ -64,16 +101,6 @@ export function OrdersDataTable({ initialOrders }: { initialOrders: Order[] }) {
             direction: prevSort.column === column && prevSort.direction === 'asc' ? 'desc' : 'asc',
         }));
     };
-
-    const refreshOrders = useCallback(async () => {
-        setIsLoading(true);
-        // In a real app, you would fetch this from an action
-        // For now, we just simulate a fetch
-        // const updatedOrders = await getAdminOrders();
-        // setOrders(updatedOrders);
-        window.location.reload(); // Simple way to refresh data
-        setIsLoading(false);
-    }, []);
 
     const filteredAndSortedOrders = useMemo(() => {
         return orders
@@ -134,7 +161,7 @@ export function OrdersDataTable({ initialOrders }: { initialOrders: Order[] }) {
         return paginatedOrders.map(order => (
             <TableRow key={order.id}>
                 <TableCell className="font-mono">{order.code}</TableCell>
-                <TableCell>{format(new Date(order.created_at!), 'dd MMM yyyy, h:mm a')}</TableCell>
+                <TableCell>{order.created_at ? format(new Date(order.created_at), 'dd MMM yyyy, h:mm a') : 'N/A'}</TableCell>
                 <TableCell>{order.email}</TableCell>
                 <TableCell className="font-medium">GHS {order.total_price.toFixed(2)}</TableCell>
                 <TableCell>
@@ -168,7 +195,7 @@ export function OrdersDataTable({ initialOrders }: { initialOrders: Order[] }) {
                         <SelectContent>
                             {uniqueStatuses.map(status => (
                                 <SelectItem key={status} value={status} className="capitalize">
-                                    {status.replace('_', ' ')}
+                                    {status.replace(/_/g, ' ')}
                                 </SelectItem>
                             ))}
                         </SelectContent>

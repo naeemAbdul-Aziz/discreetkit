@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/table';
 import { Card, CardContent } from '@/components/ui/card';
 import type { Customer } from '@/lib/actions';
+import { format } from 'date-fns';
 
 export function CustomersDataTable({ customers }: { customers: Customer[] }) {
 
@@ -34,6 +35,8 @@ export function CustomersDataTable({ customers }: { customers: Customer[] }) {
                     <TableHeader>
                         <TableRow>
                             <TableHead>Email</TableHead>
+                            <TableHead>First Order</TableHead>
+                            <TableHead>Last Order</TableHead>
                             <TableHead className="text-right">Total Orders</TableHead>
                             <TableHead className="text-right">Total Spent (GHS)</TableHead>
                         </TableRow>
@@ -42,6 +45,8 @@ export function CustomersDataTable({ customers }: { customers: Customer[] }) {
                         {customers.map((customer) => (
                             <TableRow key={customer.email}>
                                 <TableCell className="font-medium">{customer.email}</TableCell>
+                                <TableCell>{format(new Date(customer.first_order_date), 'dd MMM yyyy')}</TableCell>
+                                <TableCell>{format(new Date(customer.last_order_date), 'dd MMM yyyy')}</TableCell>
                                 <TableCell className="text-right">{customer.total_orders}</TableCell>
                                 <TableCell className="text-right font-mono">{customer.total_spent.toFixed(2)}</TableCell>
                             </TableRow>
