@@ -5,7 +5,7 @@
 'use client';
 
 import { useFormState, useFormStatus } from 'react-dom';
-import { login } from '@/lib/session';
+import { login } from './actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
