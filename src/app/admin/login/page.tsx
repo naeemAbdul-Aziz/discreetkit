@@ -4,7 +4,8 @@
  */
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useFormStatus } from 'react-dom';
 import { login } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
@@ -26,7 +27,14 @@ function SubmitButton() {
 }
 
 export default function AdminLoginPage() {
+  const router = useRouter();
   const [state, formAction] = useActionState(login, undefined);
+
+  useEffect(() => {
+    if (state?.success) {
+      router.push('/admin/dashboard');
+    }
+  }, [state, router]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted p-4">

@@ -21,7 +21,7 @@ export async function login(prevState: { error: string } | undefined, formData: 
   const password = formData.get('password') as string;
 
   if (email !== process.env.ADMIN_EMAIL || password !== process.env.ADMIN_PASSWORD) {
-    return { error: 'Invalid credentials. Please try again.' };
+    return { success: false, error: 'Invalid credentials. Please try again.' };
   }
 
   // Create the session
@@ -31,18 +31,21 @@ export async function login(prevState: { error: string } | undefined, formData: 
   // Save the session in a cookie
   cookies().set('session', session, { 
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === 'production',
     expires: expires,
     sameSite: 'lax',
     path: '/',
   });
   
-  redirect('/admin/dashboard');
+  // Revalidate the admin path to ensure the layout re-renders with the new session
+  revalidatePath('/admin', 'layout');
+
+  return { success: true, error: undefined };
 }
 
 export async function logout() {
   // Destroy the session cookie
-  cookies().set('session', '', { expires: new Date(0) });
+  cookies().set('session', '', { expires: new Date(0), path: '/' });
   redirect('/admin/login');
 }
 
