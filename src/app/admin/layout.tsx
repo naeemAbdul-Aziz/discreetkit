@@ -5,8 +5,6 @@
  */
 'use client';
 import { AdminShell } from '@/app/admin/(components)/admin-shell';
-import { useAuth } from '@/hooks/use-auth';
-import { Loader2 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 export default function AdminLayout({
@@ -14,33 +12,18 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { isAuthenticated, isLoading } = useAuth();
   const pathname = usePathname();
+  const isLoginPage = pathname === '/admin/login';
 
-  // On the login page, we never show the shell, regardless of auth state.
-  if (pathname === '/admin/login') {
+  if (isLoginPage) {
     return <>{children}</>;
   }
 
-  // For all other admin pages, we first wait for auth check to complete.
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  // If authenticated, show the shell with the page content.
-  if (isAuthenticated) {
-    return (
-      <AdminShell>
-        {children}
-      </AdminShell>
-    );
-  }
-
-  // If not authenticated, middleware will redirect to login.
-  // Returning null here prevents flashing of un-styled content.
-  return null;
+  // The middleware ensures only authenticated users can access non-login admin pages.
+  // Therefore, we can safely render the shell for any page that isn't the login page.
+  return (
+    <AdminShell>
+      {children}
+    </AdminShell>
+  );
 }
