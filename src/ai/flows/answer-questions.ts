@@ -9,9 +9,9 @@
  */
 
 import {ai} from '@/ai/genkit';
+import { googleAI } from '@genkit-ai/googleai';
 import {z} from 'genkit';
 import { KNOWLEDGE_BASE } from '../knowledge';
-import { gemini15Flash } from 'genkit/models';
 
 const AnswerQuestionsInputSchema = z.object({
   query: z.string().describe('The user question about our health products, the ordering process, or available locations.'),
@@ -31,7 +31,7 @@ const prompt = ai.definePrompt({
   name: 'answerQuestionsPrompt',
   input: {schema: AnswerQuestionsInputSchema},
   output: {schema: AnswerQuestionsOutputSchema},
-  model: gemini15Flash,
+  model: googleAI('gemini-1.5-flash'),
   prompt: `You are a helpful, friendly, and stigma-free AI assistant for DiscreetKit Ghana.
 Your primary goal is to answer user questions based *only* on the official information provided in the KNOWLEDGE BASE below.
 Do not invent information or use external knowledge. If the answer is not in the knowledge base, politely state that you don't have that information.
