@@ -1,10 +1,10 @@
 /**
  * @file page.tsx
- * @description The root page for the /admin route. It immediately redirects
- *              the user to the login page to start the authentication flow.
+ * @description The root page for the /admin route. It now immediately redirects
+ *              the user to the dashboard, as login is no longer required.
  */
 import { redirect } from 'next/navigation';
 
 export default function AdminRootPage() {
-    redirect('/admin/login');
+    redirect('/admin/dashboard');
 }

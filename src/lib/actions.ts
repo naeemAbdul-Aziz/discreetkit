@@ -13,42 +13,6 @@ import {type CartItem} from '@/hooks/use-cart';
 import {getSupabaseAdminClient} from './supabase';
 import {redirect} from 'next/navigation';
 import type { Product } from './data';
-import { cookies } from 'next/headers';
-import { encrypt } from '@/lib/session';
-
-export async function login(prevState: { error: string } | undefined, formData: FormData) {
-  const email = formData.get('email') as string;
-  const password = formData.get('password') as string;
-
-  if (email !== process.env.ADMIN_EMAIL || password !== process.env.ADMIN_PASSWORD) {
-    return { success: false, error: 'Invalid credentials. Please try again.' };
-  }
-
-  // Create the session
-  const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
-  const session = await encrypt({ user: { email }, expires });
-
-  // Save the session in a cookie
-  cookies().set('session', session, { 
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    expires: expires,
-    sameSite: 'lax',
-    path: '/',
-  });
-  
-  // Revalidate the admin path to ensure the layout re-renders with the new session
-  revalidatePath('/admin', 'layout');
-
-  return { success: true, error: undefined };
-}
-
-export async function logout() {
-  // Destroy the session cookie
-  cookies().set('session', '', { expires: new Date(0), path: '/' });
-  redirect('/admin/login');
-}
-
 
 const orderSchema = z.object({
   cartItems: z.string().min(1, 'Cart cannot be empty.'),
@@ -190,7 +154,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
 
     // 4. Initialize Paystack Transaction
     const paystackSecretKey = process.env.PAYSTACK_SECRET_KEY;
-    if (!paystackSecretKey) {
+    if (!paystackSecretKey || paystackSecretKey === 'your-paystack-secret-key') {
         console.error('Paystack secret key is not configured in .env.local');
         throw new Error('Payment processing is not configured.');
     }
