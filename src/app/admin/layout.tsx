@@ -15,12 +15,12 @@ export default function AdminLayout({
   const pathname = usePathname();
   const isLoginPage = pathname === '/admin/login';
 
+  // The middleware ensures only authenticated users can access admin pages.
+  // We only need to differentiate to avoid showing the shell on the login page itself.
   if (isLoginPage) {
     return <>{children}</>;
   }
 
-  // The middleware ensures only authenticated users can access non-login admin pages.
-  // Therefore, we can safely render the shell for any page that isn't the login page.
   return (
     <AdminShell>
       {children}

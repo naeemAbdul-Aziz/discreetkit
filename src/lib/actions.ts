@@ -14,7 +14,7 @@ import {getSupabaseAdminClient} from './supabase';
 import {redirect} from 'next/navigation';
 import type { Product } from './data';
 import { cookies } from 'next/headers';
-import { encrypt, decrypt, getSession } from '@/lib/session';
+import { encrypt } from '@/lib/session';
 
 export async function login(prevState: { error: string } | undefined, formData: FormData) {
   const email = formData.get('email') as string;
@@ -29,7 +29,7 @@ export async function login(prevState: { error: string } | undefined, formData: 
   const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
   const session = await encrypt({ user: { email }, expires });
 
-  // Save the session in a cookie with an explicit maxAge
+  // Save the session in a cookie
   cookies().set('session', session, { 
     httpOnly: true,
     expires: expires,
@@ -536,10 +536,4 @@ export async function updateProductCategory(params: { id: number; category: stri
 
     revalidatePath('/admin/products');
     return { success: true };
-}
-
-// Action to verify session on the client
-export async function checkSession() {
-  const session = await getSession();
-  return { isAuthenticated: !!session };
 }
