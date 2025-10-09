@@ -27,6 +27,8 @@ export type WellnessProduct = Product & {
   category: 'Contraception' | 'Condoms' | 'Personal Care' | 'STI Tests';
 };
 
+export type OrderStatus = 'pending_payment' | 'received' | 'processing' | 'out_for_delivery' | 'completed';
+
 export const wellnessProducts: WellnessProduct[] = [
     {
         id: 4,
@@ -151,16 +153,23 @@ export const wellnessProducts: WellnessProduct[] = [
 ];
 
 export type Order = {
-    id: string;
+    id: number;
     code: string;
-    status: 'pending_payment' | 'received' | 'processing' | 'out_for_delivery' | 'completed';
+    created_at?: string;
+    email?: string;
+    status: OrderStatus;
     items: CartItem[];
     deliveryArea: string;
+    delivery_area: string;
     deliveryAddressNote: string | null;
+    delivery_address_note: string | null;
     isStudent: boolean;
     subtotal: number;
+    student_discount: number;
     studentDiscount: number;
+    delivery_fee: number;
     deliveryFee: number;
+    total_price: number;
     totalPrice: number;
     events: {
         status: string;

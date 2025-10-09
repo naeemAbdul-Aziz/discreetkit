@@ -1,33 +1,27 @@
 /**
  * @file page.tsx
- * @description A placeholder page for the upcoming order management feature.
+ * @description The main page for managing orders in the admin dashboard.
+ *              It fetches and displays all orders in a sortable, filterable table.
  */
-'use client';
+import { getAdminOrders } from '@/lib/actions';
+import { OrdersDataTable } from './(components)/orders-data-table';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Home } from 'lucide-react';
-import Link from 'next/link';
+export const dynamic = 'force-dynamic';
 
-export default function OrdersPage() {
+export default async function OrdersPage() {
+    const orders = await getAdminOrders();
+
     return (
-        <div className="flex h-full items-center justify-center">
-            <Card className="w-full max-w-md text-center p-8">
-                <CardHeader>
-                    <CardTitle className="font-headline text-3xl font-bold text-foreground">
-                        Order Management Coming Soon
-                    </CardTitle>
-                    <CardDescription className="text-base text-muted-foreground mt-4">
-                        This is where you will manage all incoming orders, view details, and update statuses. We are still building this section.
-                    </CardDescription>
-                </CardHeader>
-                <Button asChild className="mt-6">
-                    <Link href="/admin/dashboard">
-                        <Home />
-                        Return to Dashboard
-                    </Link>
-                </Button>
-            </Card>
+        <div className="flex flex-col gap-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold tracking-tight">Orders</h1>
+                    <p className="text-muted-foreground">
+                        View and manage all customer orders.
+                    </p>
+                </div>
+            </div>
+            <OrdersDataTable initialOrders={orders} />
         </div>
-    )
+    );
 }

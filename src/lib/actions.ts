@@ -250,7 +250,7 @@ export async function getOrderAction(code: string): Promise<Order | null> {
     const items = order.items as CartItem[];
     
     return {
-      id: order.id.toString(),
+      id: order.id,
       code: order.code,
       status: order.status,
       items: items,
@@ -504,4 +504,128 @@ export async function updateProductCategory(params: { id: number; category: stri
 
     revalidatePath('/admin/products');
     return { success: true };
+}
+
+/**
+ * Fetches all orders from the database for the admin dashboard.
+ * @returns A promise that resolves to an array of orders.
+ */
+export async function getAdminOrders(): Promise<Order[]> {
+    const supabase = getSupabaseAdminClient();
+    const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Error fetching admin orders:', error);
+        return [];
+    }
+
+    return data as Order[];
+}
+
+const updateStatusSchema = z.object({
+  id: z.number(),
+  status: z.enum(['pending_payment', 'received', 'processing', 'out_for_delivery', 'completed']),
+});
+
+/**
+ * Updates the status for a specific order.
+ * @param {object} params - The parameters for the update.
+ * @param {number} params.id - The ID of the order to update.
+ * @param {string} params.status - The new status for the order.
+ * @returns A promise that resolves to an object indicating success or failure.
+ */
+export async function updateOrderStatus(params: { id: number; status: OrderStatus; }) {
+    const validated = updateStatusSchema.safeParse(params);
+    if (!validated.success) {
+        return {
+            success: false,
+            message: 'Invalid status value.',
+        };
+    }
+
+    const { id, status } = validated.data;
+    const supabase = getSupabaseAdminClient();
+
+    try {
+        const { error } = await supabase
+            .from('orders')
+            .update({ status })
+            .eq('id', id);
+
+        if (error) throw error;
+
+        // Add a new order event
+        await supabase.from('order_events').insert({
+            order_id: id,
+            status: `Status Changed to ${status.replace('_', ' ')}`,
+            note: 'Status updated by admin.',
+        });
+
+    } catch (e: any) {
+        return {
+            success: false,
+            message: `Database Error: ${e.message}`,
+        };
+    }
+
+    revalidatePath('/admin/orders');
+    return { success: true };
+}
+
+export type Customer = {
+    email: string;
+    total_orders: number;
+    total_spent: number;
+    first_order_date: string;
+    last_order_date: string;
+};
+
+/**
+ * Fetches aggregated customer data from the orders table.
+ * @returns A promise that resolves to an array of customers.
+ */
+export async function getAdminCustomers(): Promise<Customer[]> {
+    const supabase = getSupabaseAdminClient();
+    // We only consider orders that have been successfully paid for
+    const { data, error } = await supabase
+        .from('orders')
+        .select('email, total_price, created_at')
+        .not('status', 'eq', 'pending_payment')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Error fetching orders for customer aggregation:', error);
+        return [];
+    }
+
+    if (!data) return [];
+
+    const customers = new Map<string, Customer>();
+
+    for (const order of data) {
+        if (!order.email) continue;
+
+        if (!customers.has(order.email)) {
+            customers.set(order.email, {
+                email: order.email,
+                total_orders: 0,
+                total_spent: 0,
+                first_order_date: order.created_at,
+                last_order_date: order.created_at,
+            });
+        }
+
+        const customer = customers.get(order.email)!;
+        customer.total_orders += 1;
+        customer.total_spent += order.total_price || 0;
+        
+        // Since we ordered by date descending, the first time we see an email is their last order
+        // We update the first_order_date as we go
+        customer.first_order_date = order.created_at;
+    }
+
+    return Array.from(customers.values()).sort((a, b) => b.total_spent - a.total_spent);
 }

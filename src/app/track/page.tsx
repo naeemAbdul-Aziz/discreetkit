@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { getOrderAction } from '@/lib/actions';
-import { type Order } from '@/lib/data';
+import { type Order, type OrderStatus } from '@/lib/data';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   AlertCircle,
@@ -34,7 +34,7 @@ import Image from 'next/image';
 
 export const dynamic = 'force-dynamic';
 
-const statusMap = {
+const statusMap: Record<OrderStatus, { icon: React.ElementType; label: string; description: string }> = {
   pending_payment: {
     icon: CreditCard,
     label: 'Pending Payment',
@@ -62,7 +62,7 @@ const statusMap = {
   },
 };
 
-const allStatuses: (keyof typeof statusMap)[] = [
+const allStatuses: OrderStatus[] = [
   'received',
   'processing',
   'out_for_delivery',
@@ -82,7 +82,7 @@ function Tracker() {
     setError(null);
     setOrder(null);
     startTransition(async () => {
-      const result = await getOrderAction(code.trim());
+      const result = await getOrderAction(code.trim().toUpperCase());
       if (result) {
         setOrder(result);
       } else {
@@ -104,14 +104,14 @@ function Tracker() {
 
     const supabase = getSupabaseClient();
     const channel = supabase
-      .channel(`orders:code=eq.${order.code}`)
+      .channel(`orders:id=eq.${order.id}`)
       .on(
         'postgres_changes',
         {
           event: 'UPDATE',
           schema: 'public',
           table: 'orders',
-          filter: `code=eq.${order.code}`,
+          filter: `id=eq.${order.id}`,
         },
         (payload) => {
           // When an update is received, re-fetch the order data to get events
@@ -132,7 +132,7 @@ function Tracker() {
 
 
   const currentStatusIndex = order
-    ? allStatuses.indexOf(order.status as any) // Cast because status can be 'pending_payment'
+    ? allStatuses.indexOf(order.status)
     : -1;
 
   return (
