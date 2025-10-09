@@ -25,11 +25,11 @@ interface InlineCategoryEditProps {
 const getCategoryStyles = (category: string | null): { variant: 'default' | 'secondary' | 'accent' | 'destructive' | 'outline', className: string } => {
     if (!category) return { variant: 'outline', className: '' };
     switch (category.toLowerCase()) {
-        case 'test kit': return { variant: 'default', className: 'bg-primary' };
-        case 'wellness': return { variant: 'secondary', className: 'bg-secondary' };
-        case 'bundle': return { variant: 'accent', className: 'bg-accent' };
-        case 'medication': return { variant: 'destructive', className: 'bg-destructive' };
-        default: return { variant: 'outline', className: 'bg-border' };
+        case 'test kit': return { variant: 'outline', className: 'text-blue-600 border-blue-300' };
+        case 'wellness': return { variant: 'outline', className: 'text-green-600 border-green-300' };
+        case 'bundle': return { variant: 'accent', className: 'bg-amber-500 text-white border-transparent' };
+        case 'medication': return { variant: 'destructive', className: 'bg-destructive text-destructive-foreground border-transparent' };
+        default: return { variant: 'outline', className: 'text-muted-foreground border-border' };
     }
 }
 
@@ -84,7 +84,7 @@ export function InlineCategoryEdit({ productId, value, onUpdate, allCategories }
             {isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-                <Badge variant={currentStyles.variant} className="text-xs capitalize">
+                <Badge variant={currentStyles.variant} className={cn("text-xs capitalize", currentStyles.className)}>
                     {currentValue || "Select category..."}
                 </Badge>
             )}
@@ -111,7 +111,7 @@ export function InlineCategoryEdit({ productId, value, onUpdate, allCategories }
                   )}
                 />
                 <div className="flex items-center gap-2">
-                    <span className={cn("h-2 w-2 rounded-full", styles.className)} />
+                    <span className={cn("h-2 w-2 rounded-full", styles.className, styles.variant === 'outline' ? '' : `bg-${styles.variant}`)} />
                     <span className="capitalize">{category}</span>
                 </div>
               </CommandItem>
