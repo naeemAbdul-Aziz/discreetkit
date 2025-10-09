@@ -14,7 +14,7 @@ import {getSupabaseAdminClient} from './supabase';
 import {redirect} from 'next/navigation';
 import type { Product } from './data';
 import { cookies } from 'next/headers';
-import { encrypt } from '@/lib/session';
+import { encrypt, decrypt } from '@/lib/session';
 
 export async function login(prevState: { error: string } | undefined, formData: FormData) {
   const email = formData.get('email') as string;
@@ -33,8 +33,15 @@ export async function login(prevState: { error: string } | undefined, formData: 
   cookies().set('session', session, { expires, httpOnly: true });
   
   // Redirect to dashboard (will be handled by middleware)
-  return {};
+  redirect('/admin/dashboard');
 }
+
+export async function logout() {
+  // Destroy the session
+  cookies().set('session', '', { expires: new Date(0) });
+  redirect('/admin/login');
+}
+
 
 const orderSchema = z.object({
   cartItems: z.string().min(1, 'Cart cannot be empty.'),
