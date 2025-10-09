@@ -35,30 +35,3 @@ export async function getSession() {
   if (!sessionCookie) return null;
   return await decrypt(sessionCookie);
 }
-
-// Updates and refreshes the session cookie on each request.
-export async function updateSession(request: NextRequest) {
-  const sessionCookie = request.cookies.get('session')?.value;
-  if (!sessionCookie) {
-    return NextResponse.next();
-  }
-
-  // Refresh the session so it doesn't expire during active use.
-  const parsed = await decrypt(sessionCookie);
-  if (!parsed) {
-    // If the session is invalid (e.g., expired), clear the cookie and proceed.
-    const response = NextResponse.next();
-    response.cookies.set('session', '', { httpOnly: true, expires: new Date(0) });
-    return response;
-  }
-  
-  // Re-encrypt the session and extend its validity.
-  const response = NextResponse.next();
-  response.cookies.set({
-    name: 'session',
-    value: await encrypt(parsed),
-    httpOnly: true,
-  });
-
-  return response;
-}

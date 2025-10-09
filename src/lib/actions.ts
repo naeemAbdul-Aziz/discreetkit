@@ -25,11 +25,15 @@ export async function login(prevState: { error: string } | undefined, formData: 
     return { error: 'Invalid credentials. Please try again.' };
   }
 
-  // Create the session without an expiry date for persistence
-  const session = await encrypt({ user: { email } });
+  // Create the session
+  const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
+  const session = await encrypt({ user: { email }, expires });
 
-  // Save the session in a cookie
-  cookies().set('session', session, { httpOnly: true });
+  // Save the session in a cookie with an explicit maxAge
+  cookies().set('session', session, { 
+    httpOnly: true,
+    expires: expires,
+  });
   
   // Redirect to dashboard (will be handled by middleware)
   redirect('/admin/dashboard');
