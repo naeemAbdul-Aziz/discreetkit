@@ -51,6 +51,11 @@ HUBTEL_API_SECRET="your-hubtel-api-secret"
 # Genkit (Google AI - Replace with your own key)
 GEMINI_API_KEY="your-google-ai-api-key"
 
+# Admin & Session
+ADMIN_EMAIL="admin@example.com"
+ADMIN_PASSWORD="your-secure-password"
+SESSION_SECRET="your-super-secret-key-that-is-at-least-32-bytes-long"
+
 # Site URL (IMPORTANT: Use ngrok for local development with Paystack)
 NEXT_PUBLIC_SITE_URL="https://your-ngrok-tunnel-url.ngrok-free.app"
 ```
