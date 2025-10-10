@@ -1,6 +1,3 @@
-/**
- * @file onboarding-modal.tsx
- * @description This file is now deprecated. The onboarding logic has been moved
- *              to the TourProvider component using react-joyride for a better user experience.
- */
+// This file is obsolete and has been intentionally left blank.
+// The tour logic is now self-contained within the TourProvider component.
 export {};

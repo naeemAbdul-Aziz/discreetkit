@@ -46,8 +46,15 @@ const TOUR_COMPLETED_KEY = 'discreetkit-tour-completed';
 export function TourProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [run, setRun] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
+
     // Only run the tour on the homepage
     if (pathname !== '/') {
       return;
@@ -64,7 +71,7 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Could not access localStorage for tour:', error);
     }
-  }, [pathname]);
+  }, [pathname, isMounted]);
 
   const handleJoyrideCallback = (data: CallBackProps) => {
     const { status } = data;
@@ -80,8 +87,8 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Do not render Joyride on non-homepage routes
-  if (pathname !== '/') {
+  // Do not render Joyride on non-homepage routes or during SSR
+  if (pathname !== '/' || !isMounted) {
     return <>{children}</>;
   }
 
