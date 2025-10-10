@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { Chatbot } from '@/components/chatbot';
 import NextTopLoader from 'nextjs-toploader';
 import { ClientLayout } from './client-layout';
+import { TourProvider } from '@/components/tour-provider';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://discreetkit.com';
 const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758119851/discreetkit_logo_4_npbt4m.png';
@@ -101,8 +102,9 @@ export default function RootLayout({
           speed={200}
           shadow="0 0 10px hsl(var(--primary)),0 0 5px hsl(var(--primary))"
         />
-        <ClientLayout>{children}</ClientLayout>
-        {/* The chatbot can remain here as it's a Sheet that doesn't affect initial HTML structure */}
+        <TourProvider>
+          <ClientLayout>{children}</ClientLayout>
+        </TourProvider>
         <Chatbot />
       </body>
     </html>

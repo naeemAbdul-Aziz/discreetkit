@@ -47,7 +47,7 @@ function CartLink() {
   }
 
   return (
-     <Button asChild variant="ghost" size="icon" className="relative">
+     <Button asChild variant="ghost" size="icon" className="relative" id="cart-icon">
         <Link href="/cart" aria-label={`open cart with ${totalItems} items`}>
           <ShoppingCart />
           {totalItems > 0 && (
@@ -202,5 +202,3 @@ export function Header() {
     </>
   );
 }
-
-    
