@@ -14,16 +14,17 @@ const TOUR_STEPS: Step[] = [
     target: 'body',
     content: "Welcome to DiscreetKit! Let's take a quick tour of how everything works.",
     placement: 'center',
+    title: 'Welcome!',
   },
   {
     target: '#products',
-    content: 'Start here. Browse our confidential test kits, wellness products, and bundles.',
-    placement: 'bottom',
+    content: 'Start here. Browse our confidential test kits, wellness products, and value bundles.',
+    placement: 'top',
     title: 'Our Products',
   },
   {
     target: '#how-it-works',
-    content: 'Learn about our simple, private, and secure 4-step process, from ordering to support.',
+    content: 'Learn about our simple, private, and secure 4-step process, from ordering to getting support.',
     placement: 'top',
     title: 'How It Works',
   },
@@ -57,6 +58,7 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
 
     // Only run the tour on the homepage
     if (pathname !== '/') {
+      setRun(false);
       return;
     }
 
@@ -66,7 +68,7 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
         // Use a timeout to ensure the page elements are rendered
         setTimeout(() => {
           setRun(true);
-        }, 1000);
+        }, 1500);
       }
     } catch (error) {
       console.error('Could not access localStorage for tour:', error);
@@ -112,15 +114,47 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
           },
           tooltip: {
             borderRadius: 'var(--radius)',
+            padding: 0,
+            width: '320px',
+          },
+          tooltipContainer: {
+            textAlign: 'left',
+          },
+          tooltipTitle: {
+            margin: 0,
+            padding: '1rem 1.25rem',
+            fontSize: '1.125rem',
+            fontWeight: 700,
+            borderBottom: '1px solid hsl(var(--border))',
+          },
+          tooltipContent: {
+            padding: '1.25rem',
+            margin: 0,
+            fontSize: '0.95rem',
+          },
+          tooltipFooter: {
+            margin: 0,
+            padding: '0 1.25rem 1.25rem',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
           },
           buttonNext: {
             borderRadius: '9999px',
             fontSize: '14px',
+            padding: '0.5rem 1.25rem',
+            backgroundColor: 'hsl(var(--primary))',
           },
           buttonBack: {
             borderRadius: '9999px',
             fontSize: '14px',
+            padding: '0.5rem 1rem',
+            color: 'hsl(var(--foreground))',
           },
+          buttonSkip: {
+            fontSize: '14px',
+            color: 'hsl(var(--muted-foreground))'
+          }
         }}
       />
     </>
