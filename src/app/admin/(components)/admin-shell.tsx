@@ -16,6 +16,7 @@ import {
   Package,
   ShoppingCart,
   Users,
+  Building,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { LucideIcon } from 'lucide-react';
@@ -28,9 +29,10 @@ interface NavItem {
 
 const navItems: NavItem[] = [
     { href: '/admin/dashboard', label: 'Dashboard', icon: Home },
-    { href: '/admin/products', label: 'Products', icon: Package },
     { href: '/admin/orders', label: 'Orders', icon: ShoppingCart },
+    { href: '/admin/products', label: 'Products', icon: Package },
     { href: '/admin/customers', label: 'Customers', icon: Users },
+    { href: '/admin/pharmacies', label: 'Pharmacies', icon: Building },
 ];
 
 const Logo = () => (

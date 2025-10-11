@@ -6,7 +6,7 @@
 
 import * as React from 'react';
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import type { Order } from '@/lib/data';
+import type { Order, Pharmacy } from '@/lib/data';
 import {
   Table,
   TableBody,
@@ -23,9 +23,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowUpDown, Search } from 'lucide-react';
 import { format } from 'date-fns';
 import { InlineStatusEdit } from './inline-status-edit';
+import { AssignPharmacyPopover } from './assign-pharmacy-popover';
 import { getSupabaseClient } from '@/lib/supabase';
 
-type SortableColumn = 'code' | 'created_at' | 'email' | 'total_price' | 'status';
+type SortableColumn = 'code' | 'created_at' | 'email' | 'total_price' | 'status' | 'pharmacy_id';
 type SortDirection = 'asc' | 'desc';
 const ITEMS_PER_PAGE = 15;
 
@@ -48,7 +49,7 @@ const SortableHeader = ({
   </TableHead>
 );
 
-export function OrdersDataTable({ initialOrders }: { initialOrders: Order[] }) {
+export function OrdersDataTable({ initialOrders, pharmacies }: { initialOrders: Order[], pharmacies: Pharmacy[] }) {
     const [orders, setOrders] = useState<Order[]>(initialOrders);
     const [isLoading, setIsLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
@@ -62,7 +63,6 @@ export function OrdersDataTable({ initialOrders }: { initialOrders: Order[] }) {
         // This is now handled by the real-time subscription
     }, []);
     
-    // Set up Supabase real-time subscription for the orders table
     useEffect(() => {
         const supabase = getSupabaseClient();
         const channel = supabase
@@ -71,7 +71,6 @@ export function OrdersDataTable({ initialOrders }: { initialOrders: Order[] }) {
             'postgres_changes',
             { event: '*', schema: 'public', table: 'orders' },
             (payload) => {
-                // When a change is detected, update the state
                 if (payload.eventType === 'INSERT') {
                     setOrders(currentOrders => [payload.new as Order, ...currentOrders]);
                 } else if (payload.eventType === 'UPDATE') {
@@ -144,6 +143,7 @@ export function OrdersDataTable({ initialOrders }: { initialOrders: Order[] }) {
                     <TableCell><Skeleton className="h-4 w-40" /></TableCell>
                     <TableCell><Skeleton className="h-4 w-20" /></TableCell>
                     <TableCell><Skeleton className="h-6 w-28 rounded-full" /></TableCell>
+                    <TableCell><Skeleton className="h-8 w-24" /></TableCell>
                 </TableRow>
             ));
         }
@@ -151,7 +151,7 @@ export function OrdersDataTable({ initialOrders }: { initialOrders: Order[] }) {
         if (paginatedOrders.length === 0) {
             return (
                 <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center">
+                    <TableCell colSpan={6} className="h-24 text-center">
                         No orders found.
                     </TableCell>
                 </TableRow>
@@ -168,6 +168,14 @@ export function OrdersDataTable({ initialOrders }: { initialOrders: Order[] }) {
                     <InlineStatusEdit
                         orderId={order.id}
                         currentStatus={order.status}
+                        onUpdate={refreshOrders}
+                    />
+                </TableCell>
+                 <TableCell>
+                    <AssignPharmacyPopover
+                        orderId={order.id}
+                        currentPharmacyId={order.pharmacy_id || null}
+                        pharmacies={pharmacies}
                         onUpdate={refreshOrders}
                     />
                 </TableCell>
@@ -211,6 +219,7 @@ export function OrdersDataTable({ initialOrders }: { initialOrders: Order[] }) {
                             <SortableHeader column="email" label="Customer" currentSort={sort} onSort={handleSort} />
                             <SortableHeader column="total_price" label="Total" currentSort={sort} onSort={handleSort} />
                             <SortableHeader column="status" label="Status" currentSort={sort} onSort={handleSort} />
+                            <SortableHeader column="pharmacy_id" label="Assigned Pharmacy" currentSort={sort} onSort={handleSort} />
                         </TableRow>
                     </TableHeader>
                     <TableBody>

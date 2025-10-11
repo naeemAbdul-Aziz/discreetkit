@@ -171,6 +171,7 @@ export type Order = {
     deliveryFee: number;
     total_price: number;
     totalPrice: number;
+    pharmacy_id?: number | null;
     events: {
         status: string;
         note: string;
@@ -228,6 +229,16 @@ export type DiscountLocation = {
     id: number;
     campus: string;
 }
+
+export type Pharmacy = {
+  id: number;
+  name: string;
+  location: string;
+  contact_person?: string | null;
+  phone_number?: string | null;
+  email?: string | null;
+};
+
 
 export const DELIVERY_FEES = {
     standard: 20.00,

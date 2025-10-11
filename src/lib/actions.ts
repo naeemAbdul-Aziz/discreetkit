@@ -6,7 +6,7 @@
 'use server';
 
 import {z} from 'zod';
-import {generateTrackingCode, type Order} from './data';
+import {generateTrackingCode, type Order, type OrderStatus, type Pharmacy} from './data';
 import {answerQuestions} from '@/ai/flows/answer-questions';
 import {revalidatePath} from 'next/cache';
 import {type CartItem} from '@/hooks/use-cart';
@@ -268,7 +268,7 @@ export async function getOrderAction(code: string): Promise<Order | null> {
           date: new Date(e.created_at),
         }))
         .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()),
-    };
+    } as Order;
   } catch (error) {
     console.error('Action Error in getOrderAction:', error);
     return null;
@@ -560,7 +560,7 @@ export async function updateOrderStatus(params: { id: number; status: OrderStatu
         // Add a new order event
         await supabase.from('order_events').insert({
             order_id: id,
-            status: `Status Changed to ${status.replace('_', ' ')}`,
+            status: `Status Changed to ${status.replace(/_/g, ' ')}`,
             note: 'Status updated by admin.',
         });
 
@@ -628,4 +628,110 @@ export async function getAdminCustomers(): Promise<Customer[]> {
     }
 
     return Array.from(customers.values()).sort((a, b) => b.total_spent - a.total_spent);
+}
+
+/**
+ * Fetches all pharmacy partners from the database.
+ * @returns A promise that resolves to an array of pharmacies.
+ */
+export async function getAdminPharmacies(): Promise<Pharmacy[]> {
+    const supabase = getSupabaseAdminClient();
+    const { data, error } = await supabase
+        .from('pharmacies')
+        .select('*')
+        .order('name', { ascending: true });
+
+    if (error) {
+        console.error('Error fetching admin pharmacies:', error);
+        return [];
+    }
+    return data as Pharmacy[];
+}
+
+const pharmacySchema = z.object({
+    id: z.string().optional(),
+    name: z.string().min(3, 'Name must be at least 3 characters long.'),
+    location: z.string().min(3, 'Location is required.'),
+    contact_person: z.string().optional(),
+    phone_number: z.string().optional(),
+    email: z.string().email('Must be a valid email.').optional().or(z.literal('')),
+});
+
+/**
+ * Creates or updates a pharmacy in the database.
+ */
+export async function savePharmacy(prevState: any, formData: FormData) {
+    const validatedFields = pharmacySchema.safeParse(
+        Object.fromEntries(formData.entries())
+    );
+
+    if (!validatedFields.success) {
+        return { success: false, message: 'Invalid form data.' };
+    }
+    
+    const { id, ...pharmacyData } = validatedFields.data;
+    const supabase = getSupabaseAdminClient();
+
+    try {
+        if (id) {
+            const { error } = await supabase.from('pharmacies').update(pharmacyData).eq('id', id);
+            if (error) throw error;
+        } else {
+            const { error } = await supabase.from('pharmacies').insert(pharmacyData);
+            if (error) throw error;
+        }
+    } catch (e: any) {
+        return { success: false, message: `Database Error: ${e.message}` };
+    }
+
+    revalidatePath('/admin/pharmacies');
+    return { success: true, message: 'Pharmacy saved successfully!' };
+}
+
+/**
+ * Deletes a pharmacy from the database.
+ */
+export async function deletePharmacy(id: number) {
+    const supabase = getSupabaseAdminClient();
+    try {
+        const { error } = await supabase.from('pharmacies').delete().eq('id', id);
+        if (error) throw error;
+    } catch (e: any) {
+        return { success: false, message: `Database Error: ${e.message}` };
+    }
+    revalidatePath('/admin/pharmacies');
+    return { success: true };
+}
+
+const assignOrderSchema = z.object({
+  orderId: z.number(),
+  pharmacyId: z.number(),
+});
+
+/**
+ * Assigns an order to a specific pharmacy.
+ */
+export async function assignOrderToPharmacy(params: { orderId: number; pharmacyId: number; }) {
+    const validated = assignOrderSchema.safeParse(params);
+    if (!validated.success) {
+        return { success: false, message: 'Invalid input.' };
+    }
+
+    const { orderId, pharmacyId } = validated.data;
+    const supabase = getSupabaseAdminClient();
+
+    try {
+        const { error } = await supabase
+            .from('orders')
+            .update({ pharmacy_id: pharmacyId === 0 ? null : pharmacyId })
+            .eq('id', orderId);
+
+        if (error) throw error;
+
+    } catch (e: any) {
+        return { success: false, message: `Database Error: ${e.message}` };
+    }
+
+    revalidatePath('/admin/orders');
+    return { success: true };
 }

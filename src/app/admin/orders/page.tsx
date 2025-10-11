@@ -3,13 +3,14 @@
  * @description The main page for managing orders in the admin dashboard.
  *              It fetches and displays all orders in a sortable, filterable table.
  */
-import { getAdminOrders } from '@/lib/actions';
+import { getAdminOrders, getAdminPharmacies } from '@/lib/actions';
 import { OrdersDataTable } from './(components)/orders-data-table';
 
 export const dynamic = 'force-dynamic';
 
 export default async function OrdersPage() {
     const orders = await getAdminOrders();
+    const pharmacies = await getAdminPharmacies();
 
     return (
         <div className="flex flex-col gap-8">
@@ -21,7 +22,7 @@ export default async function OrdersPage() {
                     </p>
                 </div>
             </div>
-            <OrdersDataTable initialOrders={orders} />
+            <OrdersDataTable initialOrders={orders} pharmacies={pharmacies} />
         </div>
     );
 }
