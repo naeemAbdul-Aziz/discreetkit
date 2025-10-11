@@ -8,6 +8,8 @@
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Joyride, { type Step, CallBackProps, STATUS } from 'react-joyride';
+import { Button } from './ui/button';
+import Link from 'next/link';
 
 const TOUR_STEPS: Step[] = [
   {
@@ -35,10 +37,24 @@ const TOUR_STEPS: Step[] = [
     title: 'Ask Pacely AI',
   },
   {
-    target: '#cart-icon',
-    content: 'When you add items to your cart, you can review your order and check out from here.',
-    placement: 'bottom',
-    title: 'Your Cart',
+    target: '.fixed.bottom-6.right-6',
+    content: 'Ready to begin? You can always use this button to jump straight to our products.',
+    placement: 'left',
+    title: 'Shop Anytime',
+  },
+  {
+    target: 'body',
+    placement: 'center',
+    title: "You're All Set!",
+    content: (
+        <div className="flex flex-col items-center text-center">
+            <p>Thanks for taking the tour! You now know how to find products, understand the process, and get help if you need it.</p>
+            <Link href="/products" className="mt-4">
+                <Button>Start Shopping</Button>
+            </Link>
+        </div>
+    ),
+    hideFooter: true,
   },
 ];
 
@@ -76,7 +92,7 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
   }, [pathname, isMounted]);
 
   const handleJoyrideCallback = (data: CallBackProps) => {
-    const { status } = data;
+    const { status, action, index, type } = data;
     const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
 
     if (finishedStatuses.includes(status)) {
@@ -85,6 +101,18 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
         setRun(false);
       } catch (error) {
         console.error('Could not save tour state to localStorage:', error);
+      }
+    } else if (type === 'step:after' && action === 'next' && index === 4) {
+      // Special handling for the last step if it has a custom component
+      // This forces the tour to "finish" when the user clicks the custom button
+      const step = TOUR_STEPS[index + 1];
+      if (step && step.hideFooter) {
+         try {
+            window.localStorage.setItem(TOUR_COMPLETED_KEY, 'true');
+            setRun(false);
+        } catch (error) {
+            console.error('Could not save tour state to localStorage:', error);
+        }
       }
     }
   };
