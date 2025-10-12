@@ -30,14 +30,33 @@ async function getProducts(): Promise<Product[]> {
     // ensure numeric types are correctly cast from what might be strings in the db.
     return products.map(p => {
       let imageUrl = p.image_url;
-      if (p.id === 1) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png';
-      if (p.id === 2) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759404957/discreetkit_pregnancy_cujiod.png';
-      if (p.id === 3) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413735/couple_bundle_rfbpn0.png';
-      if (p.id === 4) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png';
-      if (p.id === 5) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413220/condoms_j5qyqj.png';
-      if (p.id === 6) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413266/lube_ysdpst.png';
-      if (p.id === 7) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413627/weekend_bundle_t8cfxp.png';
-      if (p.id === 8) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png';
+      // Only override images for products that exist in the database
+      switch (p.id) {
+        case 1:
+          imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png';
+          break;
+        case 2:
+          imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759404957/discreetkit_pregnancy_cujiod.png';
+          break;
+        case 3:
+          imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413735/couple_bundle_rfbpn0.png';
+          break;
+        case 4:
+          imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png';
+          break;
+        case 5:
+          imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413220/condoms_j5qyqj.png';
+          break;
+        case 6:
+           imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413266/lube_ysdpst.png';
+           break;
+        case 7:
+          imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413627/weekend_bundle_t8cfxp.png';
+          break;
+        case 8:
+          imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png';
+          break;
+      }
       
       return {
         ...p,
@@ -118,11 +137,14 @@ export default async function Home() {
   const coupleBundle = products.find(p => p.id === 3);
   const allInOneBundle = products.find(p => p.id === 8);
   
-  // Add mock data for the new featured section
-  const featuredProducts = [
-    { ...allInOneBundle, stock_level: 45, review_count: 1245, rating_avg: 4.9, benefit: "Your all-in-one pack for total readiness.", image_url: "https://images.unsplash.com/photo-1629095316223-c159235a4d19?q=80&w=800&fit=crop" },
-    { ...coupleBundle, stock_level: 8, review_count: 890, rating_avg: 4.8, benefit: "Test together for mutual support and peace of mind.", image_url: "https://images.unsplash.com/photo-1595034654378-95a9404ce9e3?q=80&w=800&fit=crop" },
-  ].filter(p => p.id !== undefined) as (Product & { stock_level: number; review_count: number; rating_avg: number; benefit: string; })[];
+  let featuredProducts: (Product & { stock_level: number; review_count: number; rating_avg: number; benefit: string; })[] = [];
+
+  if (allInOneBundle && coupleBundle) {
+    featuredProducts = [
+      { ...allInOneBundle, stock_level: 45, review_count: 1245, rating_avg: 4.9, benefit: "Your all-in-one pack for total readiness.", image_url: "https://images.unsplash.com/photo-1629095316223-c159235a4d19?q=80&w=800&fit=crop" },
+      { ...coupleBundle, stock_level: 8, review_count: 890, rating_avg: 4.8, benefit: "Test together for mutual support and peace of mind.", image_url: "https://images.unsplash.com/photo-1595034654378-95a9404ce9e3?q=80&w=800&fit=crop" },
+    ].filter(p => p.id !== undefined) as (Product & { stock_level: number; review_count: number; rating_avg: number; benefit: string; })[];
+  }
   
   return (
     <div className="flex flex-col">
