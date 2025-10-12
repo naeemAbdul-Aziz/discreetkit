@@ -172,6 +172,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
             amount: amountInKobo,
             currency: 'GHS',
             reference: code, // Use our unique order code as the reference
+            channels: ['card', 'mobile_money'],
             metadata: {
               order_id: orderData.id,
               tracking_code: code,
@@ -735,4 +736,3 @@ export async function assignOrderToPharmacy(params: { orderId: number; pharmacyI
     revalidatePath('/admin/orders');
     return { success: true };
 }
-
