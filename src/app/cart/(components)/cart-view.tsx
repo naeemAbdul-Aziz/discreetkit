@@ -160,8 +160,8 @@ export function CartView() {
                         <p>Total</p>
                         <p>GHS {totalPrice.toFixed(2)}</p>
                     </div>
-                    <Button size="lg" className="w-full" asChild disabled={isLoading || totalItems === 0} onClick={handleClick}>
-                      <Link href="/order" className={cn(totalItems === 0 && "pointer-events-none")}>
+                    <Button size="lg" className="w-full" asChild disabled={isLoading || totalItems === 0}>
+                      <Link href="/order" onClick={handleClick} className={cn(totalItems === 0 && "pointer-events-none")}>
                         {isLoading ? (
                             <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
