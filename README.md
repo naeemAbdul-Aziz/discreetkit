@@ -44,9 +44,8 @@ SUPABASE_SERVICE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 # Paystack (Replace with your own keys)
 PAYSTACK_SECRET_KEY="your-paystack-secret-key"
 
-# Hubtel SMS (Replace with your keys from hubtel.com)
-HUBTEL_API_ID="your-hubtel-api-id"
-HUBTEL_API_SECRET="your-hubtel-api-secret"
+# Arkesel SMS (Replace with your V2 API key from arkesel.com)
+ARKESEL_API_KEY="your-arkesel-api-key"
 
 # Genkit (Google AI - Replace with your own key)
 GEMINI_API_KEY="your-google-ai-api-key"
@@ -94,7 +93,7 @@ The application will now be accessible via your ngrok URL, and Paystack will be 
 *   **Generative AI:** [Firebase Genkit](https://firebase.google.com/docs/genkit) with [Google's Gemini models](https://ai.google.dev/)
 *   **Backend & Database:** [Supabase](https://supabase.io/)
 *   **Payments:** [Paystack](https://paystack.com/)
-*   **Notifications:** [Hubtel SMS](https://hubtel.com/)
+*   **Notifications:** [Arkesel SMS](https://arkesel.com/)
 *   **Deployment:** [Vercel](https://vercel.com/) / [Firebase App Hosting](https://firebase.google.com/docs/app-hosting)
 
 ## 📦 Deployment
