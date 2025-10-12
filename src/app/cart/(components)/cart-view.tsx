@@ -42,9 +42,12 @@ export function CartView() {
         setIsMounted(true);
     }, []);
 
-    const handleClick = () => {
+    const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
         if (pathname !== '/order') {
             setIsLoading(true);
+        }
+        if (totalItems === 0) {
+            e.preventDefault();
         }
     };
     
@@ -160,8 +163,8 @@ export function CartView() {
                         <p>Total</p>
                         <p>GHS {totalPrice.toFixed(2)}</p>
                     </div>
-                    <Button size="lg" className="w-full" asChild disabled={isLoading || totalItems === 0}>
-                      <Link href="/order" onClick={handleClick} className={cn(totalItems === 0 && "pointer-events-none")}>
+                    <Button size="lg" className={cn("w-full", isLoading && "bg-primary/80")} asChild disabled={isLoading || totalItems === 0}>
+                      <Link href="/order" onClick={handleClick}>
                         {isLoading ? (
                             <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
