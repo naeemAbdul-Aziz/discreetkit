@@ -248,8 +248,8 @@ export function ProductSelector() {
                  {/* Product Suggestion Box */}
                 <div className="mt-20 max-w-4xl mx-auto">
                     <Card className="p-6 sm:p-8 bg-card rounded-2xl shadow-lg">
-                         <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8 text-center sm:text-left">
-                            <Lightbulb className="h-16 w-16 text-primary flex-shrink-0" />
+                         <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 text-center sm:text-left">
+                            <Lightbulb className="h-12 w-12 sm:h-16 sm:w-16 text-primary flex-shrink-0" />
                             <div className="flex-grow">
                                 <h3 className="text-xl font-bold text-foreground">Can't Find What You're Looking For?</h3>
                                 <p className="text-sm text-muted-foreground mt-1">
