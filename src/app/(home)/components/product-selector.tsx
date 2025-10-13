@@ -49,7 +49,7 @@ const categories = [
         name: 'Medication Refills',
         description: 'Confidential refill service for your essential prescriptions.',
         examples: ['HIV Treatment', 'Long-term Support'],
-        image_url: 'https://images.unsplash.com/photo-1628771065518-1d82f193d4d0?q=80&w=800&fit=crop',
+        image_url: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1760350797/prophylaxis_care_kit_qoksc6.png',
         image_hint: 'prescription medication bottle',
         href: '/products/medication'
     }
