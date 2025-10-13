@@ -211,7 +211,7 @@ export function OrderForm() {
       });
       // Redirect to Paystack for payment
       window.location.href = state.authorization_url;
-    } else if (!state.success && state.message && Object.keys(state.errors || {}).length === 0) {
+    } else if (!state.success && state.message) {
         toast({
             title: 'An error occurred',
             description: state.message,

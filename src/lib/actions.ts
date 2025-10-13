@@ -1,3 +1,5 @@
+
+
 /**
  * @file This file contains all the server actions for the application, which handle
  * database operations and other server-side logic. These actions are designed to be
@@ -6,66 +8,14 @@
 'use server';
 
 import {z} from 'zod';
-import {generateTrackingCode, type Order, type OrderStatus, type Pharmacy} from './data';
+import {generateTrackingCode, type Order} from './data';
 import {answerQuestions} from '@/ai/flows/answer-questions';
 import {revalidatePath} from 'next/cache';
 import {type CartItem} from '@/hooks/use-cart';
 import {getSupabaseAdminClient} from './supabase';
 import {redirect} from 'next/navigation';
-import type { Product } from './data';
-import { getSession, encrypt } from './session';
 import { cookies } from 'next/headers';
-
-const loginSchema = z.object({
-    email: z.string().email({ message: 'Please enter a valid email.' }),
-    password: z.string().min(1, { message: 'Password is required.' }),
-});
-
-/**
- * Authenticates an admin user and creates a session.
- */
-export async function login(prevState: any, formData: FormData) {
-    const validatedFields = loginSchema.safeParse(
-        Object.fromEntries(formData.entries())
-    );
-
-    if (!validatedFields.success) {
-        return {
-            success: false,
-            errors: validatedFields.error.flatten().fieldErrors,
-            message: null,
-        };
-    }
-
-    const { email, password } = validatedFields.data;
-
-    if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
-        // Create session
-        const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
-        const session = await encrypt({ user: { email }, expires });
-
-        // Save session to cookie
-        cookies().set('session', session, { expires, httpOnly: true });
-        
-        // Redirect to dashboard on successful login
-        redirect('/admin/dashboard');
-
-    } else {
-        return {
-            success: false,
-            message: 'Invalid email or password.',
-        };
-    }
-}
-
-/**
- * Logs out the admin user by clearing the session cookie.
- */
-export async function logout() {
-    cookies().set('session', '', { expires: new Date(0) });
-    redirect('/admin/login');
-}
-
+import { encrypt } from './session';
 
 const orderSchema = z.object({
   cartItems: z.string().min(1, 'Cart cannot be empty.'),
@@ -274,16 +224,7 @@ export async function getOrderAction(code: string): Promise<Order | null> {
       .from('orders')
       .select(
         `
-        id,
-        code,
-        status,
-        items,
-        delivery_area,
-        delivery_address_note,
-        subtotal,
-        student_discount,
-        delivery_fee,
-        total_price,
+        *,
         order_events (
           status,
           note,
@@ -313,14 +254,14 @@ export async function getOrderAction(code: string): Promise<Order | null> {
       studentDiscount: order.student_discount,
       deliveryFee: order.delivery_fee,
       totalPrice: order.total_price,
-      events: (order.order_events as any[])
-        .map((e: any) => ({
+      events: order.order_events
+        .map(e => ({
           status: e.status,
           note: e.note ?? '',
           date: new Date(e.created_at),
         }))
-        .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()),
-    } as Order;
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    };
   } catch (error) {
     console.error('Action Error in getOrderAction:', error);
     return null;
@@ -348,522 +289,93 @@ export async function handleChat(
   }
 }
 
-/**
- * Fetches all products from the database for the admin dashboard.
- * @returns A promise that resolves to an array of products.
- */
-export async function getAdminProducts(): Promise<Product[]> {
-    const supabase = getSupabaseAdminClient();
-    const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .order('name', { ascending: true });
-
-    if (error) {
-        console.error('Error fetching admin products:', error);
-        return [];
-    }
-
-    // Supabase returns numbers as strings sometimes, ensure correct types
-    return data.map(p => ({
-        ...p,
-        price_ghs: Number(p.price_ghs),
-        stock_level: Number(p.stock_level),
-    })) as Product[];
-}
-
-/**
- * Fetches a single product from the database by its ID.
- * @param id The ID of the product to fetch.
- * @returns A promise that resolves to the product object or null if not found.
- */
-export async function getProductById(id: string | number): Promise<Product | null> {
-    const supabase = getSupabaseAdminClient();
-    const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-    if (error) {
-        console.error(`Error fetching product with id ${id}:`, error);
-        return null;
-    }
-
-    return {
-        ...data,
-        price_ghs: Number(data.price_ghs),
-        stock_level: Number(data.stock_level),
-    } as Product;
-}
-
-const productSchema = z.object({
-    id: z.string().optional(),
-    name: z.string().min(3, 'Name must be at least 3 characters long.'),
-    description: z.string().optional(),
-    price_ghs: z.coerce.number().min(0, 'Price must be a positive number.'),
-    category: z.string().min(1, 'Category is required.'),
-    sub_category: z.string().optional().nullable(),
-    brand: z.string().optional().nullable(),
-    stock_level: z.coerce.number().int('Stock must be a whole number.').min(0, 'Stock cannot be negative.'),
-    image_url: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
-    requires_prescription: z.preprocess((val) => val === 'on' || val === true, z.boolean()),
-    is_student_product: z.preprocess((val) => val === 'on' || val === true, z.boolean()),
-    usage_instructions: z.string().optional(),
-    in_the_box: z.string().optional(),
+const loginSchema = z.object({
+  email: z.string().email('Invalid email address.'),
+  password: z.string().min(6, 'Password must be at least 6 characters.'),
 });
 
 /**
- * Creates or updates a product in the database.
- * @param prevState The previous form state.
- * @param formData The form data.
- * @returns A promise that resolves to the new form state.
+ * Authenticates an admin user, creates a session, and redirects to the dashboard.
+ *
+ * @param prevState - The previous state of the form.
+ * @param formData - The data submitted from the login form.
+ * @returns An object containing success status, a message, and any validation errors.
  */
-export async function saveProduct(prevState: any, formData: FormData) {
-    const validatedFields = productSchema.safeParse(
-        Object.fromEntries(formData.entries())
-    );
-
-    if (!validatedFields.success) {
-        return {
-            success: false,
-            errors: validatedFields.error.flatten().fieldErrors,
-            message: 'Error: Please check the form fields.',
-        };
-    }
-    
-    const { id, usage_instructions, in_the_box, ...productData } = validatedFields.data;
-
-    const finalProductData = {
-        ...productData,
-        usage_instructions: usage_instructions?.split('\n').filter(line => line.trim() !== '') || [],
-        in_the_box: in_the_box?.split('\n').filter(line => line.trim() !== '') || [],
-    };
-    
-    const supabase = getSupabaseAdminClient();
-
-    try {
-        if (id) {
-            // Update existing product
-            const { error } = await supabase
-                .from('products')
-                .update(finalProductData)
-                .eq('id', id);
-            
-            if (error) throw error;
-        } else {
-            // Create new product
-            const { error } = await supabase.from('products').insert(finalProductData);
-            if (error) throw error;
-        }
-    } catch (e: any) {
-        return {
-            success: false,
-            message: `Database Error: ${e.message}`,
-        };
-    }
-
-    revalidatePath('/admin/products');
-    return { success: true, message: 'Product saved successfully!' };
-}
-
-const updateFieldSchema = z.object({
-  id: z.number(),
-  field: z.enum(['price_ghs', 'stock_level']),
-  value: z.coerce.number().min(0),
-});
-
-/**
- * Updates a single field for a product in the database.
- * @param {object} params - The parameters for the update.
- * @param {number} params.id - The ID of the product to update.
- * @param {'price_ghs' | 'stock_level'} params.field - The field to update.
- * @param {number} params.value - The new value for the field.
- * @returns A promise that resolves to an object indicating success or failure.
- */
-export async function updateProductField(params: {
-  id: number;
-  field: 'price_ghs' | 'stock_level';
-  value: number;
-}) {
-  const validated = updateFieldSchema.safeParse(params);
-  if (!validated.success) {
-    return {
-      success: false,
-      message: 'Invalid input.',
-    };
-  }
-
-  const { id, field, value } = validated.data;
-  const supabase = getSupabaseAdminClient();
-
-  try {
-    const { error } = await supabase
-      .from('products')
-      .update({ [field]: value })
-      .eq('id', id);
-
-    if (error) throw error;
-  } catch (e: any) {
-    return {
-      success: false,
-      message: `Database Error: ${e.message}`,
-    };
-  }
-
-  revalidatePath('/admin/products');
-  return { success: true };
-}
-
-
-const updateCategorySchema = z.object({
-  id: z.number(),
-  category: z.string().min(1, 'Category cannot be empty.'),
-});
-
-/**
- * Updates the category for a specific product.
- * @param {object} params - The parameters for the update.
- * @param {number} params.id - The ID of the product to update.
- * @param {string} params.category - The new category for the product.
- * @returns A promise that resolves to an object indicating success or failure.
- */
-export async function updateProductCategory(params: { id: number; category: string; }) {
-    const validated = updateCategorySchema.safeParse(params);
-    if (!validated.success) {
-        return {
-        success: false,
-        message: 'Invalid input.',
-        };
-    }
-
-    const { id, category } = validated.data;
-    const supabase = getSupabaseAdminClient();
-
-    try {
-        const { error } = await supabase
-        .from('products')
-        .update({ category })
-        .eq('id', id);
-
-        if (error) throw error;
-    } catch (e: any) {
-        return {
-        success: false,
-        message: `Database Error: ${e.message}`,
-        };
-    }
-
-    revalidatePath('/admin/products');
-    return { success: true };
-}
-
-/**
- * Fetches all orders from the database for the admin dashboard.
- * @returns A promise that resolves to an array of orders.
- */
-export async function getAdminOrders(): Promise<Order[]> {
-    const supabase = getSupabaseAdminClient();
-    const { data, error } = await supabase
-        .from('orders')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-    if (error) {
-        console.error('Error fetching admin orders:', error);
-        return [];
-    }
-
-    return data as Order[];
-}
-
-const updateStatusSchema = z.object({
-  id: z.number(),
-  status: z.enum(['pending_payment', 'received', 'processing', 'out_for_delivery', 'completed']),
-});
-
-/**
- * Updates the status for a specific order.
- * @param {object} params - The parameters for the update.
- * @param {number} params.id - The ID of the order to update.
- * @param {string} params.status - The new status for the order.
- * @returns A promise that resolves to an object indicating success or failure.
- */
-export async function updateOrderStatus(params: { id: number; status: OrderStatus; }) {
-    const validated = updateStatusSchema.safeParse(params);
-    if (!validated.success) {
-        return {
-            success: false,
-            message: 'Invalid status value.',
-        };
-    }
-
-    const { id, status } = validated.data;
-    const supabase = getSupabaseAdminClient();
-
-    try {
-        const { error } = await supabase
-            .from('orders')
-            .update({ status })
-            .eq('id', id);
-
-        if (error) throw error;
-
-        // Add a new order event
-        await supabase.from('order_events').insert({
-            order_id: id,
-            status: `Status Changed to ${status.replace(/_/g, ' ')}`,
-            note: 'Status updated by admin.',
-        });
-
-    } catch (e: any) {
-        return {
-            success: false,
-            message: `Database Error: ${e.message}`,
-        };
-    }
-
-    revalidatePath('/admin/orders');
-    return { success: true };
-}
-
-export type Customer = {
-    email: string;
-    total_orders: number;
-    total_spent: number;
-    first_order_date: string;
-    last_order_date: string;
-};
-
-/**
- * Fetches aggregated customer data from the orders table.
- * @returns A promise that resolves to an array of customers.
- */
-export async function getAdminCustomers(): Promise<Customer[]> {
-    const supabase = getSupabaseAdminClient();
-    // We only consider orders that have been successfully paid for
-    const { data, error } = await supabase
-        .from('orders')
-        .select('email, total_price, created_at')
-        .not('status', 'eq', 'pending_payment')
-        .order('created_at', { ascending: false });
-
-    if (error) {
-        console.error('Error fetching orders for customer aggregation:', error);
-        return [];
-    }
-
-    if (!data) return [];
-
-    const customers = new Map<string, Customer>();
-
-    for (const order of data) {
-        if (!order.email) continue;
-
-        if (!customers.has(order.email)) {
-            customers.set(order.email, {
-                email: order.email,
-                total_orders: 0,
-                total_spent: 0,
-                first_order_date: order.created_at,
-                last_order_date: order.created_at,
-            });
-        }
-
-        const customer = customers.get(order.email)!;
-        customer.total_orders += 1;
-        customer.total_spent += order.total_price || 0;
-        
-        // Since we ordered by date descending, the first time we see an email is their last order
-        // We update the first_order_date as we go
-        customer.first_order_date = order.created_at;
-    }
-
-    return Array.from(customers.values()).sort((a, b) => b.total_spent - a.total_spent);
-}
-
-/**
- * Fetches all pharmacy partners from the database.
- * @returns A promise that resolves to an array of pharmacies.
- */
-export async function getAdminPharmacies(): Promise<Pharmacy[]> {
-    const supabase = getSupabaseAdminClient();
-    const { data, error } = await supabase
-        .from('pharmacies')
-        .select('*')
-        .order('name', { ascending: true });
-
-    if (error) {
-        console.error('Error fetching admin pharmacies:', error);
-        return [];
-    }
-    return data as Pharmacy[];
-}
-
-const pharmacySchema = z.object({
-    id: z.string().optional(),
-    name: z.string().min(3, 'Name must be at least 3 characters long.'),
-    location: z.string().min(3, 'Location is required.'),
-    contact_person: z.string().optional(),
-    phone_number: z.string().optional(),
-    email: z.string().email('Must be a valid email.').optional().or(z.literal('')),
-});
-
-/**
- * Creates or updates a pharmacy in the database.
- */
-export async function savePharmacy(prevState: any, formData: FormData) {
-    const validatedFields = pharmacySchema.safeParse(
-        Object.fromEntries(formData.entries())
-    );
-
-    if (!validatedFields.success) {
-        return { success: false, message: 'Invalid form data.' };
-    }
-    
-    const { id, ...pharmacyData } = validatedFields.data;
-    const supabase = getSupabaseAdminClient();
-
-    try {
-        if (id) {
-            const { error } = await supabase.from('pharmacies').update(pharmacyData).eq('id', id);
-            if (error) throw error;
-        } else {
-            const { error } = await supabase.from('pharmacies').insert(pharmacyData);
-            if (error) throw error;
-        }
-    } catch (e: any) {
-        return { success: false, message: `Database Error: ${e.message}` };
-    }
-
-    revalidatePath('/admin/pharmacies');
-    return { success: true, message: 'Pharmacy saved successfully!' };
-}
-
-/**
- * Deletes a pharmacy from the database.
- */
-export async function deletePharmacy(id: number) {
-    const supabase = getSupabaseAdminClient();
-    try {
-        const { error } = await supabase.from('pharmacies').delete().eq('id', id);
-        if (error) throw error;
-    } catch (e: any) {
-        return { success: false, message: `Database Error: ${e.message}` };
-    }
-    revalidatePath('/admin/pharmacies');
-    return { success: true };
-}
-
-const assignOrderSchema = z.object({
-  orderId: z.number(),
-  pharmacyId: z.number(),
-});
-
-/**
- * Assigns an order to a specific pharmacy.
- */
-export async function assignOrderToPharmacy(params: { orderId: number; pharmacyId: number; }) {
-    const validated = assignOrderSchema.safeParse(params);
-    if (!validated.success) {
-        return { success: false, message: 'Invalid input.' };
-    }
-
-    const { orderId, pharmacyId } = validated.data;
-    const supabase = getSupabaseAdminClient();
-
-    try {
-        const { error } = await supabase
-            .from('orders')
-            .update({ pharmacy_id: pharmacyId === 0 ? null : pharmacyId })
-            .eq('id', orderId);
-
-        if (error) throw error;
-
-    } catch (e: any) {
-        return { success: false, message: `Database Error: ${e.message}` };
-    }
-
-    revalidatePath('/admin/orders');
-    return { success: true };
-}
-
-const suggestionSchema = z.object({
-  suggestion: z.string().min(1, 'Suggestion cannot be empty.'),
-});
-
-/**
- * Saves a new product suggestion to the database.
- * @param prevState The previous form state.
- * @param formData The form data containing the suggestion.
- * @returns An object indicating success or failure.
- */
-export async function saveSuggestion(prevState: any, formData: FormData) {
-  const validatedFields = suggestionSchema.safeParse(
+export async function login(prevState: any, formData: FormData) {
+  const validatedFields = loginSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
 
   if (!validatedFields.success) {
     return {
-      success: false,
-      message: 'Suggestion cannot be empty.',
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Invalid email or password.',
     };
   }
 
-  const supabase = getSupabaseAdminClient();
+  const { email, password } = validatedFields.data;
 
-  try {
-    const { error } = await supabase
-      .from('suggestions')
-      .insert({ suggestion: validatedFields.data.suggestion });
-
-    if (error) throw error;
-  } catch (e: any) {
-    return {
-      success: false,
-      message: `Database Error: ${e.message}`,
-    };
+  // IMPORTANT: In a real-world application, never hardcode credentials.
+  // This should use a secure authentication provider or a hashed password from a database.
+  if (email !== process.env.ADMIN_EMAIL || password !== process.env.ADMIN_PASSWORD) {
+    return { message: 'Invalid credentials. Please try again.' };
   }
 
-  return { success: true, message: 'Suggestion submitted successfully!' };
+  // Create the session
+  const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+  const session = await encrypt({ user: { email }, expires });
+
+  // Save the session in a cookie
+  cookies().set('session', session, { expires, httpOnly: true });
+
+  // Redirect to the admin dashboard
+  redirect('/admin/dashboard');
 }
 
-export type Suggestion = {
-    id: number;
-    suggestion: string;
-    created_at: string;
-};
 
 /**
- * Fetches all suggestions from the database for the admin dashboard.
- * @returns A promise that resolves to an array of suggestions.
+ * Logs the admin user out by clearing the session cookie.
  */
-export async function getAdminSuggestions(): Promise<Suggestion[]> {
-    const supabase = getSupabaseAdminClient();
-    const { data, error } = await supabase
-        .from('suggestions')
-        .select('*')
-        .order('created_at', { ascending: false });
+export async function logout() {
+  cookies().set('session', '', { expires: new Date(0) });
+  redirect('/admin/login');
+}
 
-    if (error) {
-        console.error('Error fetching admin suggestions:', error);
-        return [];
+const suggestionSchema = z.object({
+  suggestion: z.string().min(5, 'Suggestion must be at least 5 characters long.'),
+});
+
+/**
+ * Saves a user's product suggestion to the database.
+ */
+export async function saveSuggestion(prevState: any, formData: FormData) {
+    const validatedFields = suggestionSchema.safeParse({
+        suggestion: formData.get('suggestion'),
+    });
+
+    if (!validatedFields.success) {
+        return {
+            message: validatedFields.error.flatten().fieldErrors.suggestion?.[0] || 'Invalid input.',
+            success: false,
+        };
     }
 
-    return data as Suggestion[];
-}
-
-/**
- * Deletes a suggestion from the database.
- */
-export async function deleteSuggestion(id: number) {
-    const supabase = getSupabaseAdminClient();
     try {
-        const { error } = await supabase.from('suggestions').delete().eq('id', id);
+        const supabase = getSupabaseAdminClient();
+        const { error } = await supabase.from('suggestions').insert({
+            suggestion: validatedFields.data.suggestion,
+        });
+
         if (error) throw error;
-    } catch (e: any) {
-        return { success: false, message: `Database Error: ${e.message}` };
+
+        revalidatePath('/admin/suggestions');
+
+        return { success: true, message: 'Suggestion saved!' };
+    } catch (error: any) {
+        return {
+            message: error.message || 'Failed to save suggestion.',
+            success: false,
+        };
     }
-    revalidatePath('/admin/suggestions');
-    return { success: true };
 }
+    
