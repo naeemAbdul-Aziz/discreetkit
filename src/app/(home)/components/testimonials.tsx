@@ -15,6 +15,9 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import Autoplay from 'embla-carousel-autoplay';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+
 
 export function Testimonials() {
   const [api, setApi] = useState<EmblaCarouselType | undefined>();
@@ -91,9 +94,15 @@ export function Testimonials() {
                             <blockquote className="flex-grow text-base text-muted-foreground">
                                 "{testimonial.quote}"
                             </blockquote>
-                            <div className="pt-4 border-t">
-                                <p className="font-semibold text-sm text-foreground">&mdash; {testimonial.name}</p>
-                                <p className="text-xs text-muted-foreground">{testimonial.role}</p>
+                            <div className="flex items-center gap-4 pt-4 border-t">
+                                <Avatar>
+                                    <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
+                                    <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                                <div>
+                                    <p className="font-semibold text-sm text-foreground">{testimonial.name}</p>
+                                    <p className="text-xs text-muted-foreground">{testimonial.role}</p>
+                                </div>
                             </div>
                         </CardContent>
                     </Card>

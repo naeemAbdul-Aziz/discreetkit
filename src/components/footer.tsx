@@ -91,7 +91,7 @@ export function Footer() {
       { href: 'https://instagram.com/discreetkit', icon: Instagram, label: 'Instagram' },
       { href: 'https://tiktok.com/@discreetkit', icon: TikTokIcon, label: 'TikTok' },
       { href: 'https://facebook.com/discreetkit', icon: Facebook, label: 'Facebook' },
-      { href: 'https://wa.me/233000000000', icon: WhatsAppIcon, label: 'WhatsApp' },
+      { href: 'https://wa.me/233556561081', icon: WhatsAppIcon, label: 'WhatsApp' },
       { href: 'https://snapchat.com/add/discreetkit', icon: SnapchatIcon, label: 'Snapchat' },
   ]
 
