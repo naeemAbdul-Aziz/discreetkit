@@ -46,7 +46,7 @@ async function getDashboardAnalytics(): Promise<DashboardAnalytics> {
 
     const successfulOrders = orders.filter(o => o.status !== 'pending_payment');
     const totalRevenue = successfulOrders.reduce((sum, order) => sum + (order.total_price || 0), 0);
-    const totalSales = successfulOrders.length;
+    const totalSales = orders.filter(o => o.status !== 'pending_payment').length;
     const uniqueCustomers = new Set(successfulOrders.map(o => o.email).filter(Boolean)).size;
     
     const allOrders = orders.length;
