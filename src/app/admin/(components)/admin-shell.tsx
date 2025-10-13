@@ -23,16 +23,6 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { LucideIcon } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { logout } from '@/lib/actions';
-
 
 interface NavItem {
   href: string;
@@ -86,10 +76,6 @@ export function AdminShell({
   const getPageTitle = () => {
     const currentNavItem = navItems.find(item => pathname.startsWith(item.href));
     return currentNavItem ? currentNavItem.label : 'Dashboard';
-  }
-
-  const handleLogout = async () => {
-    await logout();
   }
 
   return (
