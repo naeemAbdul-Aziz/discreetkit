@@ -138,7 +138,7 @@ export default async function Home() {
 
   if (allInOneBundle && coupleBundle) {
     featuredProducts = [
-      { ...allInOneBundle, stock_level: 45, review_count: 1245, rating_avg: 4.9, benefit: "Your all-in-one pack for total readiness.", image_url: "https://images.unsplash.com/photo-1629095316223-c1592354d19?q=80&w=800&fit=crop" },
+      { ...allInOneBundle, stock_level: 45, review_count: 1245, rating_avg: 4.9, benefit: "Your all-in-one pack for total readiness.", image_url: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1760350373/complete_bundle_z7vti5.png" },
       { ...coupleBundle, stock_level: 8, review_count: 890, rating_avg: 4.8, benefit: "Test together for mutual support and peace of mind.", image_url: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1760350254/couple_bundle_fe87qy.png" },
     ].filter(p => p.id !== undefined) as (Product & { stock_level: number; review_count: number; rating_avg: number; benefit: string; })[];
   }
