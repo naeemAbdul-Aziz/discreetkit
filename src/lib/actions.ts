@@ -109,7 +109,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
      
     // 3. Send SMS Notification via Arkesel
     const arkeselApiKey = process.env.ARKESEL_API_KEY;
-    if (arkeselApiKey && arkeselApiKey !== 'your-arkesel-api-key') {
+    if (arkeselApiKey) {
         const recipient = validatedFields.data.phone_masked.startsWith('0') 
             ? `233${validatedFields.data.phone_masked.substring(1)}` 
             : validatedFields.data.phone_masked;
@@ -155,7 +155,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
 
     // 4. Initialize Paystack Transaction
     const paystackSecretKey = process.env.PAYSTACK_SECRET_KEY;
-    if (!paystackSecretKey || paystackSecretKey === 'your-paystack-secret-key') {
+    if (!paystackSecretKey) {
         console.error('Paystack secret key is not configured in .env file');
         throw new Error('Payment processing is not configured.');
     }
