@@ -787,3 +787,83 @@ export async function assignOrderToPharmacy(params: { orderId: number; pharmacyI
     revalidatePath('/admin/orders');
     return { success: true };
 }
+
+const suggestionSchema = z.object({
+  suggestion: z.string().min(1, 'Suggestion cannot be empty.'),
+});
+
+/**
+ * Saves a new product suggestion to the database.
+ * @param prevState The previous form state.
+ * @param formData The form data containing the suggestion.
+ * @returns An object indicating success or failure.
+ */
+export async function saveSuggestion(prevState: any, formData: FormData) {
+  const validatedFields = suggestionSchema.safeParse(
+    Object.fromEntries(formData.entries())
+  );
+
+  if (!validatedFields.success) {
+    return {
+      success: false,
+      message: 'Suggestion cannot be empty.',
+    };
+  }
+
+  const supabase = getSupabaseAdminClient();
+
+  try {
+    const { error } = await supabase
+      .from('suggestions')
+      .insert({ suggestion: validatedFields.data.suggestion });
+
+    if (error) throw error;
+  } catch (e: any) {
+    return {
+      success: false,
+      message: `Database Error: ${e.message}`,
+    };
+  }
+
+  return { success: true, message: 'Suggestion submitted successfully!' };
+}
+
+export type Suggestion = {
+    id: number;
+    suggestion: string;
+    created_at: string;
+};
+
+/**
+ * Fetches all suggestions from the database for the admin dashboard.
+ * @returns A promise that resolves to an array of suggestions.
+ */
+export async function getAdminSuggestions(): Promise<Suggestion[]> {
+    const supabase = getSupabaseAdminClient();
+    const { data, error } = await supabase
+        .from('suggestions')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Error fetching admin suggestions:', error);
+        return [];
+    }
+
+    return data as Suggestion[];
+}
+
+/**
+ * Deletes a suggestion from the database.
+ */
+export async function deleteSuggestion(id: number) {
+    const supabase = getSupabaseAdminClient();
+    try {
+        const { error } = await supabase.from('suggestions').delete().eq('id', id);
+        if (error) throw error;
+    } catch (e: any) {
+        return { success: false, message: `Database Error: ${e.message}` };
+    }
+    revalidatePath('/admin/suggestions');
+    return { success: true };
+}

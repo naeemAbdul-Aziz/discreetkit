@@ -6,7 +6,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useActionState, useRef } from 'react';
 import type { EmblaCarouselType } from 'embla-carousel';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -18,7 +18,7 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
 import { cn } from '@/lib/utils';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Label } from '@/components/ui/label';
+import { saveSuggestion } from '@/lib/actions';
 
 const categories = [
     {
@@ -78,8 +78,26 @@ const toBase64 = (str: string) =>
 export function ProductSelector() {
     const [api, setApi] = useState<EmblaCarouselType | undefined>();
     const [selectedIndex, setSelectedIndex] = useState(0);
-    const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
+    const formRef = useRef<HTMLFormElement>(null);
+
+    const [state, formAction, isPending] = useActionState(saveSuggestion, null);
+
+    useEffect(() => {
+        if (state?.success) {
+            toast({
+                title: "Suggestion Received!",
+                description: "Thank you for helping us improve our catalog.",
+            });
+            formRef.current?.reset();
+        } else if (state?.message) {
+            toast({
+                variant: 'destructive',
+                title: "Submission Failed",
+                description: state.message,
+            });
+        }
+    }, [state, toast]);
 
     const onSelect = useCallback((emblaApi: EmblaCarouselType) => {
         setSelectedIndex(emblaApi.selectedScrollSnap());
@@ -94,20 +112,6 @@ export function ProductSelector() {
             api.off('select', onSelect);
         };
     }, [api, onSelect]);
-
-    const handleSuggestionSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsLoading(true);
-        setTimeout(() => {
-            setIsLoading(false);
-            toast({
-                title: "Suggestion Received!",
-                description: "Thank you for helping us improve our catalog.",
-            });
-            // Here you would typically reset the form
-            (e.target as HTMLFormElement).reset();
-        }, 1500);
-    };
 
     return (
         <section id="products" className="py-12 md:py-24">
@@ -251,15 +255,15 @@ export function ProductSelector() {
                                 <p className="text-sm text-muted-foreground mt-1">
                                     Let us know what products you'd like to see in our catalog.
                                 </p>
-                                 <form onSubmit={handleSuggestionSubmit} className="mt-4 flex flex-col sm:flex-row items-stretch gap-2">
+                                 <form ref={formRef} action={formAction} className="mt-4 flex flex-col sm:flex-row items-stretch gap-2">
                                     <Textarea
                                         name="suggestion"
                                         placeholder="Suggest a product or feature..."
                                         className="w-full sm:flex-grow"
                                         required
                                     />
-                                    <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
-                                        {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Send className="mr-2 h-4 w-4" /> Suggest</>}
+                                    <Button type="submit" disabled={isPending} className="w-full sm:w-auto">
+                                        {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Send className="mr-2 h-4 w-4" /> Suggest</>}
                                     </Button>
                                 </form>
                             </div>

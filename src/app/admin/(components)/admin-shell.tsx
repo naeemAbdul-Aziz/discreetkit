@@ -18,7 +18,8 @@ import {
   Users,
   Building,
   CircleUser,
-  LogOut
+  LogOut,
+  Lightbulb,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { LucideIcon } from 'lucide-react';
@@ -45,6 +46,7 @@ const navItems: NavItem[] = [
     { href: '/admin/products', label: 'Products', icon: Package },
     { href: '/admin/customers', label: 'Customers', icon: Users },
     { href: '/admin/pharmacies', label: 'Pharmacies', icon: Building },
+    { href: '/admin/suggestions', label: 'Suggestions', icon: Lightbulb },
 ];
 
 const Logo = () => (
