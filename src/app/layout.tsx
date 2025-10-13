@@ -11,7 +11,7 @@ import NextTopLoader from 'nextjs-toploader';
 import { ClientLayout } from './client-layout';
 import { TourProvider } from '@/components/tour-provider';
 
-const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758119851/discreetkit_logo_4_npbt4m.png';
+const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758105183/discreetkit_logo_1_dc765q.png';
 
 let metadataBase: URL;
 try {
