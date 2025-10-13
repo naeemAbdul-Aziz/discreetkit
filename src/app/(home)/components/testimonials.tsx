@@ -10,7 +10,6 @@ import { useState, useEffect, useCallback } from 'react';
 import type { EmblaCarouselType } from 'embla-carousel';
 import { testimonials } from '@/lib/data';
 import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Quote, Play, Pause } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
@@ -87,20 +86,14 @@ export function Testimonials() {
                 <CarouselItem key={index} className="basis-full md:basis-1/2 lg:basis-1/3">
                   <div className="p-1 h-full">
                      <Card className="h-full flex flex-col rounded-2xl bg-card">
-                        <CardContent className="flex-grow flex flex-col p-6 space-y-4">
+                        <CardContent className="flex-grow flex flex-col justify-between p-6 space-y-4">
                             <Quote className="h-8 w-8 text-primary/30" />
                             <blockquote className="flex-grow text-base text-muted-foreground">
                                 "{testimonial.quote}"
                             </blockquote>
-                            <div className="pt-4 flex items-center gap-4 border-t">
-                                <Avatar className="border-2 border-primary/10 h-12 w-12">
-                                <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
-                                <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
-                                </Avatar>
-                                <div>
-                                <p className="font-semibold text-sm text-foreground">{testimonial.name}</p>
+                            <div className="pt-4 border-t">
+                                <p className="font-semibold text-sm text-foreground">&mdash; {testimonial.name}</p>
                                 <p className="text-xs text-muted-foreground">{testimonial.role}</p>
-                                </div>
                             </div>
                         </CardContent>
                     </Card>

@@ -198,7 +198,6 @@ export type Testimonial = {
     quote: string;
     name: string;
     role: string;
-    avatar: string;
 };
 
 export type MarieStopesService = {
@@ -427,40 +426,32 @@ export const testimonials: Testimonial[] = [
     quote: "The entire process was so simple and private. I got my package the next day in a plain box. It's a huge relief to have a service like this in Ghana.",
     name: "Satisfied Customer",
     role: "University of Ghana Student",
-    avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704d"
   },
   {
     quote: "DiscreetKit is a game-changer. I was worried about going to a pharmacy, but this was completely anonymous. The tracking code gave me peace of mind.",
     name: "Happy User",
     role: "Young Professional, Osu",
-    avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704e"
   },
   {
     quote: "As a student leader, I see the need for this every day. It's a responsible, safe, and judgment-free way for young people to take control of their health.",
     name: "Student Rep",
     role: "UPSA",
-    avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704f"
   },
   {
     quote: "The instructions were so easy to follow. I had my result in 15 minutes. Knowing my status privately has lifted a huge weight off my shoulders.",
     name: "Relieved Customer",
     role: "GIMPA Graduate",
-    avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704a"
   },
     {
     quote: "I ordered the couple's bundle with my partner. It helped us have an open conversation and support each other through the process. Highly recommend.",
     name: "A Private Couple",
     role: "Accra",
-    avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704b"
   },
     {
     quote: "Fast, professional, and exactly as advertised. The package was so discreet, even I wasn't sure what it was at first. 10/10 service.",
     name: "Confident Customer",
     role: "Entrepreneur, East Legon",
-    avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704c"
   },
 ];
-
-    
 
     
