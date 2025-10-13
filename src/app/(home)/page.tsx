@@ -71,6 +71,7 @@ async function getProducts(): Promise<Product[]> {
 const componentMap = {
   PartnerLogos: { height: '200px' },
   ProductSelector: { height: '500px' },
+  FeaturedFavorites: { height: '600px'},
   ProductBenefits: { height: '100px' },
   HowItWorks: { height: '800px' },
   OurVision: { height: '800px' },
@@ -117,10 +118,6 @@ const ContactUs = dynamic(
   () => import('./components/contact-us').then((mod) => mod.ContactUs),
   { loading: () => <LoadingSkeleton height={componentMap.ContactUs.height} /> }
 );
-const ProductFeature = dynamic(
-  () => import('./components/product-feature').then((mod) => mod.ProductFeature),
-  { loading: () => <LoadingSkeleton height={componentMap.PartnerReferral.height} /> }
-);
 
 
 // a wrapper component to provide consistent styling for page sections.
@@ -161,7 +158,7 @@ export default async function Home() {
       </SectionWrapper>
       
       {featuredProducts.length > 0 && (
-        <SectionWrapper>
+        <SectionWrapper className="bg-muted/50">
           <FeaturedFavoritesSection products={featuredProducts} />
         </SectionWrapper>
       )}
