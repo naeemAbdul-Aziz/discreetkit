@@ -1,3 +1,10 @@
+/**
+ * @file footer.tsx
+ * @description the main site footer, including navigation links, social media,
+ *              and branding. it's responsive and provides key information.
+ */
+
+'use client';
 
 import Link from 'next/link';
 import { Twitter, Instagram, Facebook } from 'lucide-react';
