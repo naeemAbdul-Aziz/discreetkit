@@ -79,8 +79,8 @@ async function getRelatedProducts(currentProductId: number): Promise<Product[]> 
 }
 
 
-export default async function ProductDetailPageWrapper({ params }: { params: { id: string } }) {
-  const product = await getProduct(params.id);
+export default async function ProductDetailPageWrapper({ params: { id } }: { params: { id: string } }) {
+  const product = await getProduct(id);
   
   if (!product) {
     notFound();
