@@ -35,7 +35,7 @@ export async function POST(req: Request) {
 
   // 3. Handle the 'charge.success' event
   if (event.event === 'charge.success') {
-    const {reference, status, amount, currency} = event.data;
+    const {reference, status, amount} = event.data;
 
     if (status === 'success') {
       try {
