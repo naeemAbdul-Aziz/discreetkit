@@ -60,10 +60,10 @@ export function Testimonials() {
       <div className="container mx-auto max-w-6xl px-4 md:px-6">
         <div className="text-center">
           <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground sm:text-4xl">
-            Real People, Real Stories
+            Real Stories, Real Privacy
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground">
-            We're proud to provide a service that hundreds of young people and students trust for their confidential health needs.
+            We're proud to provide a service that hundreds of young people and students trust for their confidential health needs. All reviews are anonymous to protect our users.
           </p>
         </div>
 
@@ -94,7 +94,7 @@ export function Testimonials() {
                             </blockquote>
                             <div className="pt-4 flex items-center gap-4 border-t">
                                 <Avatar className="border-2 border-primary/10 h-12 w-12">
-                                <AvatarImage src={testimonial.avatar} alt={testimonial.name} data-ai-hint="person portrait" />
+                                <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
                                 <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
                                 </Avatar>
                                 <div>
@@ -143,3 +143,5 @@ export function Testimonials() {
     </section>
   );
 }
+
+    
