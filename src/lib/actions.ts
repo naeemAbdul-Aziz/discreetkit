@@ -180,7 +180,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
               customer_email: validatedFields.data.email,
             },
             // Paystack will redirect to this URL after payment attempt
-            callback_url: `${process.env.NEXT_PUBLIC_SITE_URL}/order/success?code=${code}`
+            callback_url: `${process.env.NEXT_PUBLIC_SITE_URL}/order/success`
         })
     });
 

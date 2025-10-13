@@ -12,7 +12,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 function SuccessContent() {
   const searchParams = useSearchParams();
-  const code = searchParams.get('code');
+  // Paystack returns 'reference' or 'trxref' in the query string
+  const code = searchParams.get('reference') || searchParams.get('trxref');
   const { toast } = useToast();
   const [isCopied, setIsCopied] = useState(false);
   const [isVerifying, setIsVerifying] = useState(true);
@@ -21,6 +22,7 @@ function SuccessContent() {
   useEffect(() => {
     if (!code) {
       setIsVerifying(false);
+      setPaymentStatus('failed');
       return;
     }
     
