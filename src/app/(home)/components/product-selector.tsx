@@ -242,27 +242,27 @@ export function ProductSelector() {
                 </div>
 
                  {/* Product Suggestion Box */}
-                <div className="mt-12 max-w-3xl mx-auto">
-                    <Card className="p-6 sm:p-8 bg-card rounded-2xl">
-                         <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
-                            <Lightbulb className="h-10 w-10 text-primary flex-shrink-0 hidden sm:block" />
+                <div className="mt-20 max-w-4xl mx-auto">
+                    <Card className="p-6 sm:p-8 bg-card rounded-2xl shadow-lg">
+                         <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8 text-center sm:text-left">
+                            <Lightbulb className="h-16 w-16 text-primary flex-shrink-0" />
                             <div className="flex-grow">
-                                <h3 className="text-lg font-bold text-foreground">Can't Find What You're Looking For?</h3>
+                                <h3 className="text-xl font-bold text-foreground">Can't Find What You're Looking For?</h3>
                                 <p className="text-sm text-muted-foreground mt-1">
                                     Let us know what products you'd like to see in our catalog.
                                 </p>
+                                 <form onSubmit={handleSuggestionSubmit} className="mt-4 flex flex-col sm:flex-row items-stretch gap-2">
+                                    <Textarea
+                                        name="suggestion"
+                                        placeholder="Suggest a product or feature..."
+                                        className="w-full sm:flex-grow"
+                                        required
+                                    />
+                                    <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
+                                        {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Send className="mr-2 h-4 w-4" /> Suggest</>}
+                                    </Button>
+                                </form>
                             </div>
-                             <form onSubmit={handleSuggestionSubmit} className="w-full sm:w-auto flex-shrink-0 flex flex-col sm:flex-row items-stretch gap-2">
-                                <Textarea
-                                    name="suggestion"
-                                    placeholder="I would love to see..."
-                                    className="w-full sm:w-64"
-                                    required
-                                />
-                                <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
-                                    {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Send className="mr-2 h-4 w-4" /> Suggest</>}
-                                </Button>
-                            </form>
                         </div>
                     </Card>
                 </div>
