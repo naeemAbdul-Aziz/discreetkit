@@ -12,7 +12,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Check, Lightbulb, Loader2 } from 'lucide-react';
+import { ArrowRight, Check, Lightbulb, Loader2, Send } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import { cn } from '@/lib/utils';
@@ -244,7 +244,7 @@ export function ProductSelector() {
                  {/* Product Suggestion Box */}
                 <div className="mt-12 max-w-3xl mx-auto">
                     <Card className="p-6 sm:p-8 bg-card rounded-2xl">
-                        <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
+                         <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
                             <Lightbulb className="h-10 w-10 text-primary flex-shrink-0 hidden sm:block" />
                             <div className="flex-grow">
                                 <h3 className="text-lg font-bold text-foreground">Can't Find What You're Looking For?</h3>
@@ -252,15 +252,15 @@ export function ProductSelector() {
                                     Let us know what products you'd like to see in our catalog.
                                 </p>
                             </div>
-                             <form onSubmit={handleSuggestionSubmit} className="w-full sm:w-auto flex-shrink-0 flex flex-col sm:flex-row items-center gap-2">
+                             <form onSubmit={handleSuggestionSubmit} className="w-full sm:w-auto flex-shrink-0 flex flex-col sm:flex-row items-stretch gap-2">
                                 <Textarea
                                     name="suggestion"
                                     placeholder="I would love to see..."
-                                    className="w-full sm:w-auto"
+                                    className="w-full sm:w-64"
                                     required
                                 />
                                 <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
-                                    {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Suggest'}
+                                    {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Send className="mr-2 h-4 w-4" /> Suggest</>}
                                 </Button>
                             </form>
                         </div>
