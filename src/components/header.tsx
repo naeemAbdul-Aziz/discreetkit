@@ -72,16 +72,27 @@ export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showPromoBanner, setShowPromoBanner] = useState(false);
 
   // handle scroll and mount state.
   useEffect(() => {
     setIsMounted(true);
+    
+    if (sessionStorage.getItem('promoBannerDismissed') !== 'true') {
+        setShowPromoBanner(true);
+    }
+    
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+  
+  const handleDismissBanner = () => {
+    setShowPromoBanner(false);
+    sessionStorage.setItem('promoBannerDismissed', 'true');
+  }
 
   // reusable navlink component for desktop.
   const NavLink = ({ href, label, onClick }: { href: string; label: string; onClick?: () => void }) => (
@@ -126,12 +137,21 @@ export function Header() {
   return (
     <>
       {/* top promotional bar */}
-      <div className="bg-primary p-2 text-center text-sm text-primary-foreground">
-        Free Delivery on UG Campus!{' '}
-        <Link href="/products" className="font-semibold underline">
-          Shop Now
-        </Link>
-      </div>
+      {showPromoBanner && (
+        <div className="relative bg-primary p-2 text-center text-sm text-primary-foreground">
+            Free Delivery on UG Campus!{' '}
+            <Link href="/products" className="font-semibold underline">
+                Shop Now
+            </Link>
+            <button 
+                onClick={handleDismissBanner}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary/50 transition-colors"
+                aria-label="Dismiss promotional banner"
+            >
+                <X className="h-4 w-4" />
+            </button>
+        </div>
+      )}
       <header className={cn('sticky top-0 z-50 w-full p-2')}>
         <div
           className={cn(
