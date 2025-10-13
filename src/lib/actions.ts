@@ -8,7 +8,7 @@
 'use server';
 
 import {z} from 'zod';
-import {generateTrackingCode, type Order} from './data';
+import {generateTrackingCode, type Order, type OrderStatus} from './data';
 import {answerQuestions} from '@/ai/flows/answer-questions';
 import {revalidatePath} from 'next/cache';
 import {type CartItem} from '@/hooks/use-cart';
@@ -75,7 +75,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     
     const priceDetails = {
       subtotal: parseFloat(validatedFields.data.subtotal),
-      student_discount: parseFloat(validatedFields.data.studentDiscount), // This is now the waived delivery fee for students
+      student_discount: parseFloat(validatedFields.data.studentDiscount),
       delivery_fee: parseFloat(validatedFields.data.deliveryFee),
       total_price: parseFloat(validatedFields.data.totalPrice),
     };
@@ -156,19 +156,8 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     // 4. Initialize Paystack Transaction
     const paystackSecretKey = process.env.PAYSTACK_SECRET_KEY;
     if (!paystackSecretKey || paystackSecretKey === 'your-paystack-secret-key') {
-        // Fallback for local development if key is missing
-        console.warn('Paystack secret key not configured. Simulating successful payment and redirect.');
-        
-        await supabaseAdmin.from('orders').update({ status: 'received' }).eq('id', orderData.id);
-        
-        await supabaseAdmin.from('order_events').insert({
-            order_id: orderData.id,
-            status: 'Payment Confirmed',
-            note: 'Successfully received GHS (Simulated).',
-        });
-
-        revalidatePath(`/track?code=${code}`);
-        redirect(`/order/success?code=${code}`);
+        console.error('Paystack secret key is not configured in .env file');
+        throw new Error('Payment processing is not configured.');
     }
     
     const amountInKobo = Math.round(priceDetails.total_price * 100);
@@ -703,3 +692,5 @@ export async function deleteSuggestion(id: number) {
         return { success: false, message: error.message };
     }
 }
+
+    
