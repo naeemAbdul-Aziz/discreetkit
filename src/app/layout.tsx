@@ -11,12 +11,12 @@ import NextTopLoader from 'nextjs-toploader';
 import { ClientLayout } from './client-layout';
 import { TourProvider } from '@/components/tour-provider';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://discreetkit.com';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ? new URL(process.env.NEXT_PUBLIC_SITE_URL) : new URL('https://discreetkit.com');
 const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758119851/discreetkit_logo_4_npbt4m.png';
 
 // metadata for seo and social sharing.
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: siteUrl,
   title: {
     default: 'DiscreetKit Ghana: Confidential Health Products Delivered',
     template: '%s | DiscreetKit Ghana',
