@@ -17,9 +17,21 @@ import {
   ShoppingCart,
   Users,
   Building,
+  CircleUser,
+  LogOut
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { LucideIcon } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { logout } from '@/lib/actions';
+
 
 interface NavItem {
   href: string;
@@ -67,6 +79,16 @@ export function AdminShell({
   children: React.ReactNode;
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const pathname = usePathname();
+  
+  const getPageTitle = () => {
+    const currentNavItem = navItems.find(item => pathname.startsWith(item.href));
+    return currentNavItem ? currentNavItem.label : 'Dashboard';
+  }
+
+  const handleLogout = async () => {
+    await logout();
+  }
 
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
@@ -89,14 +111,14 @@ export function AdminShell({
       </div>
       
       <div className="flex flex-col">
-        {/* Mobile Header */}
-        <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6 md:hidden">
+        {/* Mobile & Desktop Header */}
+        <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button
                 variant="outline"
                 size="icon"
-                className="shrink-0"
+                className="shrink-0 md:hidden"
               >
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Toggle navigation menu</span>
@@ -115,9 +137,25 @@ export function AdminShell({
               </nav>
             </SheetContent>
           </Sheet>
-          <div className="flex-1">
-             <h1 className="text-lg font-semibold">Admin Dashboard</h1>
+          <div className="w-full flex-1">
+             <h1 className="text-lg font-semibold">{getPageTitle()}</h1>
           </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="secondary" size="icon" className="rounded-full">
+                <CircleUser className="h-5 w-5" />
+                <span className="sr-only">Toggle user menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer">
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </header>
 
         {/* Main Content */}
@@ -128,5 +166,3 @@ export function AdminShell({
     </div>
   );
 }
-
-    

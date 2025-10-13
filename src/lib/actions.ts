@@ -13,6 +13,59 @@ import {type CartItem} from '@/hooks/use-cart';
 import {getSupabaseAdminClient} from './supabase';
 import {redirect} from 'next/navigation';
 import type { Product } from './data';
+import { getSession, encrypt } from './session';
+import { cookies } from 'next/headers';
+
+const loginSchema = z.object({
+    email: z.string().email({ message: 'Please enter a valid email.' }),
+    password: z.string().min(1, { message: 'Password is required.' }),
+});
+
+/**
+ * Authenticates an admin user and creates a session.
+ */
+export async function login(prevState: any, formData: FormData) {
+    const validatedFields = loginSchema.safeParse(
+        Object.fromEntries(formData.entries())
+    );
+
+    if (!validatedFields.success) {
+        return {
+            success: false,
+            errors: validatedFields.error.flatten().fieldErrors,
+            message: null,
+        };
+    }
+
+    const { email, password } = validatedFields.data;
+
+    if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+        // Create session
+        const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
+        const session = await encrypt({ user: { email }, expires });
+
+        // Save session to cookie
+        cookies().set('session', session, { expires, httpOnly: true });
+        
+        // Redirect to dashboard on successful login
+        redirect('/admin/dashboard');
+
+    } else {
+        return {
+            success: false,
+            message: 'Invalid email or password.',
+        };
+    }
+}
+
+/**
+ * Logs out the admin user by clearing the session cookie.
+ */
+export async function logout() {
+    cookies().set('session', '', { expires: new Date(0) });
+    redirect('/admin/login');
+}
+
 
 const orderSchema = z.object({
   cartItems: z.string().min(1, 'Cart cannot be empty.'),
