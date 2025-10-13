@@ -14,6 +14,7 @@ import { getSupabaseClient } from '@/lib/supabase';
 import type { Product } from '@/lib/data';
 import { ProductSelector } from './components/product-selector';
 import { FeaturedFavoritesSection } from './components/featured-favorites';
+import { ProductSuggestion } from './components/product-suggestion';
 
 // fetches all products from the supabase database.
 async function getProducts(): Promise<Product[]> {
@@ -71,6 +72,7 @@ async function getProducts(): Promise<Product[]> {
 const componentMap = {
   PartnerLogos: { height: '200px' },
   ProductSelector: { height: '500px' },
+  ProductSuggestion: { height: '400px' },
   FeaturedFavorites: { height: '600px'},
   ProductBenefits: { height: '100px' },
   HowItWorks: { height: '800px' },
@@ -155,6 +157,10 @@ export default async function Home() {
       
       <SectionWrapper>
         <ProductSelector />
+      </SectionWrapper>
+      
+      <SectionWrapper className="bg-muted/50">
+        <ProductSuggestion />
       </SectionWrapper>
       
       {featuredProducts.length > 0 && (
