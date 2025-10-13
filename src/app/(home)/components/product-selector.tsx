@@ -12,10 +12,13 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Check } from 'lucide-react';
+import { ArrowRight, Check, Lightbulb, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import { cn } from '@/lib/utils';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { Label } from '@/components/ui/label';
 
 const categories = [
     {
@@ -75,6 +78,8 @@ const toBase64 = (str: string) =>
 export function ProductSelector() {
     const [api, setApi] = useState<EmblaCarouselType | undefined>();
     const [selectedIndex, setSelectedIndex] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
+    const { toast } = useToast();
 
     const onSelect = useCallback((emblaApi: EmblaCarouselType) => {
         setSelectedIndex(emblaApi.selectedScrollSnap());
@@ -89,6 +94,20 @@ export function ProductSelector() {
             api.off('select', onSelect);
         };
     }, [api, onSelect]);
+
+    const handleSuggestionSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
+        setTimeout(() => {
+            setIsLoading(false);
+            toast({
+                title: "Suggestion Received!",
+                description: "Thank you for helping us improve our catalog.",
+            });
+            // Here you would typically reset the form
+            (e.target as HTMLFormElement).reset();
+        }, 1500);
+    };
 
     return (
         <section id="products" className="py-12 md:py-24">
@@ -221,8 +240,33 @@ export function ProductSelector() {
                         </Link>
                     </Button>
                 </div>
+
+                 {/* Product Suggestion Box */}
+                <div className="mt-12 max-w-3xl mx-auto">
+                    <Card className="p-6 sm:p-8 bg-card rounded-2xl">
+                        <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
+                            <Lightbulb className="h-10 w-10 text-primary flex-shrink-0 hidden sm:block" />
+                            <div className="flex-grow">
+                                <h3 className="text-lg font-bold text-foreground">Can't Find What You're Looking For?</h3>
+                                <p className="text-sm text-muted-foreground mt-1">
+                                    Let us know what products you'd like to see in our catalog.
+                                </p>
+                            </div>
+                             <form onSubmit={handleSuggestionSubmit} className="w-full sm:w-auto flex-shrink-0 flex flex-col sm:flex-row items-center gap-2">
+                                <Textarea
+                                    name="suggestion"
+                                    placeholder="I would love to see..."
+                                    className="w-full sm:w-auto"
+                                    required
+                                />
+                                <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
+                                    {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Suggest'}
+                                </Button>
+                            </form>
+                        </div>
+                    </Card>
+                </div>
             </div>
         </section>
     );
 }
-    
