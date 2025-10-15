@@ -9,7 +9,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import {
   Home,
   Menu,
@@ -113,11 +113,16 @@ export function AdminShell({
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="flex flex-col">
-                 <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6 -mx-6">
-                    <Link href="/" className="flex items-center gap-2 font-semibold" onClick={() => setMobileMenuOpen(false)}>
-                    <Logo />
-                    </Link>
-                </div>
+                <SheetHeader>
+                    <SheetTitle>
+                        <Link href="/" className="flex items-center gap-2 font-semibold" onClick={() => setMobileMenuOpen(false)}>
+                            <Logo />
+                        </Link>
+                    </SheetTitle>
+                    <SheetDescription>
+                        Admin navigation menu
+                    </SheetDescription>
+                </SheetHeader>
               <nav className="grid gap-2 text-lg font-medium flex-1 py-4">
                 {navItems.map(item => (
                   <NavLink key={item.href} item={item} isMobile onClick={() => setMobileMenuOpen(false)} />
