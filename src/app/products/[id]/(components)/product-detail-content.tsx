@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -156,7 +157,7 @@ export function ProductDetailContent({ product, relatedProducts }: { product: Pr
                     <Carousel setApi={setApi} className="w-full" opts={{loop: true}}>
                         <CarouselContent>
                             {relatedProducts.map((p) => (
-                                <CarouselItem key={p.id} className="basis-4/5">
+                                <CarouselItem key={p.id} className="basis-1/2">
                                     <div className="p-1 h-full">
                                         <ProductCard product={p} />
                                     </div>
@@ -193,5 +194,3 @@ export function ProductDetailContent({ product, relatedProducts }: { product: Pr
     </div>
   );
 }
-
-    

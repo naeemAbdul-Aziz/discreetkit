@@ -71,7 +71,7 @@ export default async function BundlesPage() {
                 {Object.entries(productsByBrand).map(([brand, products]) => (
                     <div key={brand}>
                         <h2 className="font-headline text-2xl font-bold text-foreground mb-6 border-b pb-2">{brand}</h2>
-                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
                             {products.map((product) => (
                                 <ProductCard key={product.id} product={product} />
                             ))}

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -188,9 +189,9 @@ export default function ProductsPage() {
             </div>
 
             {isLoading ? (
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
                     {Array.from({ length: 8 }).map((_, i) => (
-                        <div key={i} className="rounded-2xl bg-muted h-[350px] animate-pulse" />
+                        <div key={i} className="rounded-2xl bg-muted h-[300px] animate-pulse" />
                     ))}
                 </div>
             ) : (
@@ -199,7 +200,7 @@ export default function ProductsPage() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.5 }}
-                    className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                    className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4"
                 >
                     {paginatedProducts.length > 0 ? (
                         paginatedProducts.map((product) => (

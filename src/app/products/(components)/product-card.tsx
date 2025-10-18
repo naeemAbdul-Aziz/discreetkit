@@ -49,14 +49,14 @@ export function ProductCard({ product }: { product: Product; }) {
     return (
         <Card className="h-full flex flex-col rounded-2xl overflow-hidden group bg-card">
             <Link href={`/products/${product.id}`} className="block" passHref>
-                <div className="relative aspect-[4/3] w-full bg-muted/50 overflow-hidden rounded-t-2xl">
+                <div className="relative aspect-square w-full bg-muted/50 overflow-hidden rounded-t-2xl">
                     {product.image_url && (
                         <Image
                             src={product.image_url}
                             alt={product.name}
                             fill
                             className="object-contain p-4 transition-transform duration-300 group-hover:scale-105"
-                            sizes="(max-width: 768px) 80vw, 30vw"
+                            sizes="(max-width: 768px) 50vw, 30vw"
                             data-ai-hint="medical test kit"
                             placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(250, 188))}`}
                         />
@@ -72,15 +72,15 @@ export function ProductCard({ product }: { product: Product; }) {
                 </div>
             </Link>
 
-            <CardContent className="flex flex-grow flex-col justify-between p-6 text-left">
+            <CardContent className="flex flex-grow flex-col justify-between p-4 text-left">
                 <div className="flex-grow">
                      <Link href={`/products/${product.id}`} className="block" passHref>
-                        <h3 className="text-lg font-bold text-foreground leading-tight hover:text-primary transition-colors">{product.name}</h3>
+                        <h3 className="text-base font-bold text-foreground leading-tight hover:text-primary transition-colors">{product.name}</h3>
                     </Link>
-                    {product.description && <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{product.description}</p>}
+                    {product.description && <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{product.description}</p>}
                 </div>
                 
-                <div className="mt-6 flex items-center justify-between">
+                <div className="mt-4 flex flex-col items-start justify-between gap-3">
                     <div className="text-left">
                          <Link href={`/products/${product.id}`} className="block" passHref>
                             <p className="font-bold text-lg text-foreground">
@@ -89,15 +89,15 @@ export function ProductCard({ product }: { product: Product; }) {
                         </Link>
                     </div>
                     
-                    <div className="w-auto text-right">
+                    <div className="w-full">
                        
                            <>
                                 {!isMounted ? (
-                                    <Button disabled className="w-[120px]">
+                                    <Button disabled className="w-full">
                                         Add to cart
                                     </Button>
                                 ) : isInCart ? (
-                                    <div className="flex h-10 items-center justify-between rounded-full border bg-background p-1 shadow-sm w-[120px]">
+                                    <div className="flex h-10 items-center justify-between rounded-full border bg-background p-1 shadow-sm w-full">
                                         <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-primary" onClick={(e) => {e.stopPropagation(); updateQuantity(product.id, quantity - 1)}}>
                                             {quantity === 1 ? <Trash2 className="h-4 w-4" /> : <Minus className="h-4 w-4" />}
                                         </Button>
@@ -107,7 +107,7 @@ export function ProductCard({ product }: { product: Product; }) {
                                         </Button>
                                     </div>
                                 ) : (
-                                    <Button onClick={(e) => {e.stopPropagation(); addItem(product)}} className="w-[120px]">
+                                    <Button onClick={(e) => {e.stopPropagation(); addItem(product)}} className="w-full">
                                         Add to cart
                                     </Button>
                                 )}
