@@ -1,26 +1,57 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { ProductCard } from '../(components)/product-card';
-import type { WellnessProduct } from '@/lib/data';
-import { wellnessProducts } from '@/lib/data';
+import type { Product } from '@/lib/data';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { motion } from 'framer-motion';
+import { getSupabaseClient } from '@/lib/supabase';
 
-const brands = ['All', ...Array.from(new Set(wellnessProducts.map(p => p.brand || ''))).filter(Boolean)];
-const categories = ['All', 'Condoms', 'Contraception', 'Personal Care'];
+async function getWellnessProducts(): Promise<Product[]> {
+    const supabase = getSupabaseClient();
+    const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('category', 'Wellness')
+        .order('id', { ascending: true });
+
+    if (error) {
+        console.error("Error fetching wellness products:", error);
+        return [];
+    }
+    return data.map(p => ({
+        ...p,
+        price_ghs: Number(p.price_ghs),
+        student_price_ghs: p.student_price_ghs ? Number(p.student_price_ghs) : null,
+    }));
+}
+
 
 export default function WellnessPage() {
+    const [wellnessProducts, setWellnessProducts] = useState<Product[]>([]);
     const [categoryFilter, setCategoryFilter] = useState('All');
     const [brandFilter, setBrandFilter] = useState('All');
 
-    const filteredProducts = wellnessProducts.filter(product => {
-        const categoryMatch = categoryFilter === 'All' || product.category === categoryFilter;
-        const brandMatch = brandFilter === 'All' || product.brand === brandFilter;
-        return categoryMatch && brandMatch;
-    });
+    useEffect(() => {
+        const fetchProducts = async () => {
+            const products = await getWellnessProducts();
+            setWellnessProducts(products);
+        }
+        fetchProducts();
+    }, []);
+
+    const brands = useMemo(() => ['All', ...Array.from(new Set(wellnessProducts.map(p => p.brand || ''))).filter(Boolean)], [wellnessProducts]);
+    const categories = useMemo(() => ['All', ...Array.from(new Set(wellnessProducts.map(p => p.sub_category || ''))).filter(Boolean)], [wellnessProducts]);
+
+    const filteredProducts = useMemo(() => {
+        return wellnessProducts.filter(product => {
+            const categoryMatch = categoryFilter === 'All' || product.sub_category === categoryFilter;
+            const brandMatch = brandFilter === 'All' || product.brand === brandFilter;
+            return categoryMatch && brandMatch;
+        });
+    }, [wellnessProducts, categoryFilter, brandFilter]);
 
   return (
     <div className="bg-background">

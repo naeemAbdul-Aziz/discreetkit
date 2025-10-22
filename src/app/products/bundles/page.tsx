@@ -17,36 +17,26 @@ async function getBundles(): Promise<Product[]> {
     const { data, error } = await supabase
         .from('products')
         .select('*')
-        .in('id', [3, 7, 8, 15]) // Fetch Couple, Weekend, All-in-One, and Safe & Sound bundles
+        .eq('category', 'Bundle')
         .order('id', { ascending: true });
 
     if (error) {
         console.error("Error fetching bundles:", error);
         return [];
     }
-    return data.map(p => {
-        let imageUrl = p.image_url;
-        if (p.id === 3) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413735/couple_bundle_rfbpn0.png';
-        if (p.id === 7) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413627/weekend_bundle_t8cfxp.png';
-        if (p.id === 8) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png';
-        if (p.id === 15) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png';
-
-        return {
-          ...p,
-          image_url: imageUrl,
-          price_ghs: Number(p.price_ghs),
-          student_price_ghs: p.student_price_ghs ? Number(p.student_price_ghs) : null,
-          savings_ghs: p.savings_ghs ? Number(p.savings_ghs) : null,
-          brand: p.brand || 'DiscreetKit',
-        };
-    });
+    return data.map(p => ({
+        ...p,
+        price_ghs: Number(p.price_ghs),
+        student_price_ghs: p.student_price_ghs ? Number(p.student_price_ghs) : null,
+        savings_ghs: p.savings_ghs ? Number(p.savings_ghs) : null,
+    }));
 }
 
 export default async function BundlesPage() {
     const bundles = await getBundles();
 
     const productsByBrand = bundles.reduce((acc, product) => {
-        const brand = product.brand || 'Other Brands';
+        const brand = product.brand || 'DiscreetKit';
         if (!acc[brand]) {
             acc[brand] = [];
         }

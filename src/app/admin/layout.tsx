@@ -4,13 +4,19 @@
  *              shell for all users, making the section publicly accessible.
  */
 import { AdminShell } from '@/app/admin/(components)/admin-shell';
+import { getSession } from '@/lib/session';
+import { redirect } from 'next/navigation';
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // The session check has been removed to make the admin section public.
+  const session = await getSession();
+  if (!session) {
+    redirect('/admin/login');
+  }
+
   return (
     <AdminShell>
       {children}

@@ -4,15 +4,12 @@
 import { useState, useMemo, useEffect } from 'react';
 import { ProductCard } from './(components)/product-card';
 import type { Product } from '@/lib/data';
-import { wellnessProducts } from '@/lib/data';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { getSupabaseClient } from '@/lib/supabase';
-import { allTestKits } from './test-kits/page';
 import { Separator } from '@/components/ui/separator';
-import { medications } from '@/lib/medications';
 
 const ITEMS_PER_PAGE = 12;
 
@@ -27,24 +24,12 @@ async function getProducts(): Promise<Product[]> {
         console.error("Error fetching products:", error);
         return [];
     }
-    return products.map(p => {
-        let imageUrl = p.image_url;
-        if (p.id === 1) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png';
-        if (p.id === 2) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759404957/discreetkit_pregnancy_cujiod.png';
-        if (p.id === 3) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413735/couple_bundle_rfbpn0.png';
-        if (p.id === 7) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413627/weekend_bundle_t8cfxp.png';
-        if (p.id === 8) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png';
-        if (p.id === 14) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759404957/discreetkit_pregnancy_cujiod.png';
-        if (p.id === 15) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png';
-        
-        return {
-            ...p,
-            image_url: imageUrl,
-            price_ghs: Number(p.price_ghs),
-            student_price_ghs: p.student_price_ghs ? Number(p.student_price_ghs) : null,
-            savings_ghs: p.savings_ghs ? Number(p.savings_ghs) : null,
-        };
-    });
+    return products.map(p => ({
+        ...p,
+        price_ghs: Number(p.price_ghs),
+        student_price_ghs: p.student_price_ghs ? Number(p.student_price_ghs) : null,
+        savings_ghs: p.savings_ghs ? Number(p.savings_ghs) : null,
+    }));
 }
 
 
@@ -59,39 +44,23 @@ export default function ProductsPage() {
     
     useEffect(() => {
         const fetchProducts = async () => {
-            const dbProducts = await getProducts();
-            const products = [...dbProducts, ...wellnessProducts, ...allTestKits, ...medications].sort((a, b) => a.id - b.id);
-            const uniqueProducts = Array.from(new Map(products.map(p => [p.id, p])).values());
-            setAllProducts(uniqueProducts);
+            const products = await getProducts();
+            setAllProducts(products);
             setIsLoading(false);
         }
         fetchProducts();
     }, []);
 
-    const screeningKitIds = [1, 2, 14, 17, 18];
-    const bundleIds = [3, 7, 8, 15];
-    const medicationIds = medications.map(m => m.id);
-
-    const categories = ['All', 'Test Kits', 'Medication', 'Bundles', 'Wellness'];
-    const wellnessCategories = ['All', 'Condoms', 'Contraception', 'Personal Care'];
+    const categories = useMemo(() => ['All', ...Array.from(new Set(allProducts.map(p => p.category).filter(Boolean))) as string[]], [allProducts]);
+    const wellnessCategories = useMemo(() => ['All', ...Array.from(new Set(allProducts.filter(p => p.category === 'Wellness').map(p => p.sub_category).filter(Boolean))) as string[]], [allProducts]);
     const brands = useMemo(() => ['All', ...Array.from(new Set(allProducts.map(p => p.brand || 'DiscreetKit'))).filter(Boolean)], [allProducts]);
     
     const filteredProducts = useMemo(() => {
         return allProducts.filter(product => {
-            let categoryMatch = categoryFilter === 'All';
-            if (categoryFilter === 'Test Kits') {
-                categoryMatch = screeningKitIds.includes(product.id)
-            } else if (categoryFilter === 'Bundles') {
-                categoryMatch = bundleIds.includes(product.id)
-            } else if (categoryFilter === 'Medication') {
-                categoryMatch = medicationIds.includes(product.id);
-            } else if (categoryFilter === 'Wellness') {
-                const isWellnessProduct = !screeningKitIds.includes(product.id) && !bundleIds.includes(product.id) && !medicationIds.includes(product.id);
-                if (wellnessCategoryFilter === 'All') {
-                    categoryMatch = isWellnessProduct;
-                } else {
-                    categoryMatch = isWellnessProduct && product.category === wellnessCategoryFilter;
-                }
+            let categoryMatch = categoryFilter === 'All' || product.category === categoryFilter;
+
+            if (categoryFilter === 'Wellness' && wellnessCategoryFilter !== 'All') {
+                categoryMatch = product.category === 'Wellness' && product.sub_category === wellnessCategoryFilter;
             }
             
             const brandMatch = brandFilter === 'All' || (product.brand || 'DiscreetKit') === brandFilter;
@@ -251,4 +220,3 @@ export default function ProductsPage() {
     </div>
   );
 }
-    

@@ -1,10 +1,34 @@
 
+import { getSupabaseClient } from '@/lib/supabase';
 import { ProductCard } from '../(components)/product-card';
-import { medications } from '@/lib/medications';
+import type { Product } from '@/lib/data';
 import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
-export default function MedicationPage() {
+async function getMedications(): Promise<Product[]> {
+    const supabase = getSupabaseClient();
+    const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('category', 'Medication')
+        .order('id', { ascending: true });
+
+    if (error) {
+        console.error("Error fetching medications:", error);
+        return [];
+    }
+    return data.map(p => ({
+        ...p,
+        price_ghs: Number(p.price_ghs),
+        student_price_ghs: p.student_price_ghs ? Number(p.student_price_ghs) : null,
+        savings_ghs: p.savings_ghs ? Number(p.savings_ghs) : null,
+    }));
+}
+
+
+export default async function MedicationPage() {
+    const medications = await getMedications();
+    
     return (
         <div className="bg-background">
             <div className="container mx-auto px-4 py-12 md:px-6 md:py-24">

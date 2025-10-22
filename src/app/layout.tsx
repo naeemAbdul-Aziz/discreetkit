@@ -10,6 +10,21 @@ import { Chatbot } from '@/components/chatbot';
 import NextTopLoader from 'nextjs-toploader';
 import { ClientLayout } from './client-layout';
 import { TourProvider } from '@/components/tour-provider';
+import { Manrope } from 'next/font/google';
+
+const fontBody = Manrope({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-body',
+});
+
+const fontHeadline = Manrope({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-headline',
+  weight: ['700', '800'],
+});
+
 
 const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758105183/discreetkit_logo_1_dc765q.png';
 
@@ -89,11 +104,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${fontBody.variable} ${fontHeadline.variable}`}>
        <head>
           <meta name="theme-color" content="#ffffff" />
-          {/* load the 'satoshi' font from fontshare. */}
-          <link href="https://api.fontshare.com/v2/css?f[]=satoshi@1,900,700,500,301,701,300,501,401,901,400,2&display=swap" rel="stylesheet" />
       </head>
       <body className={cn('min-h-screen bg-background font-body antialiased')}>
         {/* top loading bar for page transitions. */}
