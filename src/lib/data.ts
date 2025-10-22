@@ -23,29 +23,18 @@ export type Product = {
     is_student_product?: boolean;
 }
 
-export type OrderStatus = 'pending_payment' | 'received' | 'processing' | 'out_for_delivery' | 'completed';
-
-
 export type Order = {
     id: number;
     code: string;
-    created_at?: string;
-    email?: string;
-    status: OrderStatus;
+    status: 'pending_payment' | 'received' | 'processing' | 'out_for_delivery' | 'completed';
     items: CartItem[];
-    deliveryArea: string;
     delivery_area: string;
-    deliveryAddressNote: string | null;
     delivery_address_note: string | null;
-    isStudent: boolean;
+    is_student: boolean;
     subtotal: number;
     student_discount: number;
-    studentDiscount: number;
     delivery_fee: number;
-    deliveryFee: number;
     total_price: number;
-    totalPrice: number;
-    pharmacy_id?: number | null;
     events: {
         status: string;
         note: string;
@@ -103,16 +92,6 @@ export type DiscountLocation = {
     id: number;
     campus: string;
 }
-
-export type Pharmacy = {
-  id: number;
-  name: string;
-  location: string;
-  contact_person?: string | null;
-  phone_number?: string | null;
-  email?: string | null;
-};
-
 
 export const DELIVERY_FEES = {
     standard: 20.00,
@@ -299,38 +278,38 @@ export const faqItems: FaqItem[] = [
 export const testimonials: Testimonial[] = [
   {
     quote: "The entire process was so simple and private. I got my package the next day in a plain box. It's a huge relief to have a service like this in Ghana.",
-    name: "Satisfied Customer",
+    name: "Ama K.",
     role: "University of Ghana Student",
-    avatar: "https://i.pravatar.cc/150?img=1"
+    avatar: "https://images.unsplash.com/photo-1596495577886-d9256242498b?w=150&h=150&fit=crop&q=75"
   },
   {
     quote: "DiscreetKit is a game-changer. I was worried about going to a pharmacy, but this was completely anonymous. The tracking code gave me peace of mind.",
-    name: "Happy User",
+    name: "David A.",
     role: "Young Professional, Osu",
-    avatar: "https://i.pravatar.cc/150?img=2"
+    avatar: "https://images.unsplash.com/photo-1584012961505-507d844cc8a0?w=150&h=150&fit=crop&q=75"
   },
   {
     quote: "As a student leader, I see the need for this every day. It's a responsible, safe, and judgment-free way for young people to take control of their health.",
-    name: "Student Rep",
-    role: "UPSA",
-    avatar: "https://i.pravatar.cc/150?img=3"
+    name: "Fatima S.",
+    role: "Student Rep, UPSA",
+    avatar: "https://images.unsplash.com/photo-1610476034959-548995964893?w=150&h=150&fit=crop&q=75"
   },
   {
     quote: "The instructions were so easy to follow. I had my result in 15 minutes. Knowing my status privately has lifted a huge weight off my shoulders.",
-    name: "Relieved Customer",
+    name: "Michael B.",
     role: "GIMPA Graduate",
-    avatar: "https://i.pravatar.cc/150?img=4"
+    avatar: "https://images.unsplash.com/photo-1607990281513-2c3f162de8ac?w=150&h=150&fit=crop&q=75"
   },
     {
     quote: "I ordered the couple's bundle with my partner. It helped us have an open conversation and support each other through the process. Highly recommend.",
-    name: "A Private Couple",
-    role: "Accra",
-    avatar: "https://i.pravatar.cc/150?img=5"
+    name: "Esi & Kofi",
+    role: "Couple, Accra",
+    avatar: "https://images.unsplash.com/photo-1541533848316-f333b210a501?w=150&h=150&fit=crop&q=75"
   },
     {
     quote: "Fast, professional, and exactly as advertised. The package was so discreet, even I wasn't sure what it was at first. 10/10 service.",
-    name: "Confident Customer",
+    name: "Josephine O.",
     role: "Entrepreneur, East Legon",
-    avatar: "https://i.pravatar.cc/150?img=6"
+    avatar: "https://images.unsplash.com/photo-1580852300021-3349a882d385?w=150&h=150&fit=crop&q=75"
   },
 ];

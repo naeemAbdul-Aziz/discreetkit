@@ -8,9 +8,13 @@ import './globals.css';
 import { cn } from '@/lib/utils';
 import { Chatbot } from '@/components/chatbot';
 import NextTopLoader from 'nextjs-toploader';
-import { ClientLayout } from './client-layout';
 import { TourProvider } from '@/components/tour-provider';
 import { Manrope } from 'next/font/google';
+import { Header } from '@/components/header';
+import { Footer } from '@/components/footer';
+import { FloatingShopButton } from '@/components/quick-shop-banner';
+import { Toaster } from "@/components/ui/toaster";
+
 
 const fontBody = Manrope({
   subsets: ['latin'],
@@ -52,6 +56,7 @@ export const metadata: Metadata = {
       'Postpill delivery', 
       'confidential health products', 
       'anonymous testing Accra', 
+      'geo',
       'student health services', 
       'UG Legon delivery', 
       'UPSA health',
@@ -122,7 +127,13 @@ export default function RootLayout({
           shadow="0 0 10px hsl(var(--primary)),0 0 5px hsl(var(--primary))"
         />
         <TourProvider>
-          <ClientLayout>{children}</ClientLayout>
+           <div className="relative flex min-h-dvh flex-col bg-background">
+              <Header />
+              <main className="flex-1">{children}</main>
+              <Footer />
+              <FloatingShopButton />
+              <Toaster />
+            </div>
         </TourProvider>
         <Chatbot />
       </body>

@@ -5,20 +5,10 @@ import type { Product } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { ProductDetailContent } from './(components)/product-detail-content';
-import { wellnessProducts } from '@/lib/data';
-import { allTestKits } from '../test-kits/page';
-import { medications } from '@/lib/medications';
 
 
 async function getProduct(id: string): Promise<Product | null> {
     const numericId = Number(id);
-    
-    // Combine all static product lists
-    const allStaticProducts = [...wellnessProducts, ...allTestKits, ...medications];
-    const localProduct = allStaticProducts.find(p => p.id === numericId);
-    if (localProduct) {
-        return localProduct;
-    }
     
     // If not found in static lists, check the database
     const supabase = getSupabaseClient();
@@ -99,5 +89,3 @@ export default async function ProductDetailPageWrapper({ params: { id } }: { par
 
   return <ProductDetailContent product={product} relatedProducts={relatedProducts} />;
 }
-
-    

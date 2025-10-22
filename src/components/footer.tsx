@@ -78,7 +78,6 @@ export function Footer() {
       { href: '/partner-care', label: 'Our Partners' },
       { href: '/#faq', label: 'FAQ' },
       { href: '/#contact', label: 'Contact Us' },
-      { href: '/admin', label: 'Admin' },
     ],
     legal: [
       { href: '/privacy', label: 'Privacy Policy' },
