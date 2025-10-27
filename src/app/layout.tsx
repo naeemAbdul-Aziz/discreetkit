@@ -31,6 +31,8 @@ const fontHeadline = Manrope({
 
 
 const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1761571651/Artboard_2_jibbuj.svg';
+const socialImageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1761571650/Artboard_1_p7j6j3.png';
+
 
 let metadataBase: URL;
 try {
@@ -70,7 +72,7 @@ export const metadata: Metadata = {
     description: '100% private, anonymous, and secure delivery of self-test kits and wellness products in Ghana.',
     images: [
       {
-        url: logoUrl,
+        url: socialImageUrl,
         width: 1200,
         height: 630,
         alt: 'DiscreetKit Ghana Logo',
@@ -82,7 +84,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'DiscreetKit Ghana: Confidential Health Products Delivered',
     description: '100% private, anonymous, and secure delivery of self-test kits and wellness products in Ghana.',
-    images: [logoUrl],
+    images: [socialImageUrl],
   },
   icons: {
     icon: logoUrl,
