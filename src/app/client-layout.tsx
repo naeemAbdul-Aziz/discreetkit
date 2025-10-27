@@ -17,20 +17,13 @@ export function ClientLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const isAdminPage = pathname.startsWith('/admin');
-
-  // For admin pages, we render children directly without the main layout
-  if (isAdminPage) {
-    return <>{children}</>;
-  }
-
+  
   return (
     <div className="relative flex min-h-dvh flex-col bg-background">
       <Header />
       <main className="flex-1">{children}</main>
       <Footer />
       <FloatingShopButton />
-      {/* The Toaster is now here, so it only renders on non-admin pages */}
       <Toaster />
     </div>
   );

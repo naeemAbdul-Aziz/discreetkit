@@ -42,7 +42,7 @@ const statusMap: Record<OrderStatus, { icon: React.ElementType; label: string; d
   },
   received: {
     icon: Package,
-    label: 'Received',
+    label: 'Order Received',
     description: 'We have your order and are preparing it.',
   },
   processing: {

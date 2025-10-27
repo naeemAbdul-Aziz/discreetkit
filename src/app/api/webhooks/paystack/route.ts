@@ -35,7 +35,7 @@ export async function POST(req: Request) {
 
   // 3. Handle the 'charge.success' event
   if (event.event === 'charge.success') {
-    const {reference, status, amount, currency} = event.data;
+    const {reference, status, amount} = event.data;
 
     if (status === 'success') {
       try {
@@ -43,7 +43,7 @@ export async function POST(req: Request) {
         // Find the order using the reference code
         const {data: order, error: findError} = await supabaseAdmin
           .from('orders')
-          .select('id, status, total_price')
+          .select('id, status')
           .eq('code', reference)
           .single();
 
@@ -53,20 +53,20 @@ export async function POST(req: Request) {
           return new NextResponse('Order not found', {status: 200});
         }
         
-        // Only update if the order is still marked as 'received'
-        if (order.status === 'received') {
-            const {error: updateError} = await supabaseAdmin
-                .from('order_events')
-                .insert({
-                    order_id: order.id,
-                    status: 'Payment Confirmed',
-                    note: `Successfully received GHS ${(amount / 100).toFixed(2)}.`,
+        // Only update if the order is still marked as 'pending_payment'
+        if (order.status === 'pending_payment') {
+            const { error: updateError } = await supabaseAdmin
+              .from('orders')
+              .update({ status: 'received' })
+              .eq('id', order.id);
+            
+            if (updateError) throw updateError;
+            
+            await supabaseAdmin.from('order_events').insert({
+                order_id: order.id,
+                status: 'Payment Confirmed',
+                note: `Successfully received GHS ${(amount / 100).toFixed(2)}.`,
             });
-
-            if (updateError) {
-                console.error(`Webhook Error: Failed to add payment event for order ${order.id}.`, updateError);
-                // Don't throw, as we still want to give value to the customer.
-            }
         }
 
       } catch (err) {

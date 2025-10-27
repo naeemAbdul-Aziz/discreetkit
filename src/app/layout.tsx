@@ -1,4 +1,5 @@
 
+
 /**
  * @file layout.tsx
  * @description the root layout for the entire application. it sets up the main html structure,
@@ -11,10 +12,7 @@ import { Chatbot } from '@/components/chatbot';
 import NextTopLoader from 'nextjs-toploader';
 import { TourProvider } from '@/components/tour-provider';
 import { Manrope } from 'next/font/google';
-import { Header } from '@/components/header';
-import { Footer } from '@/components/footer';
-import { FloatingShopButton } from '@/components/quick-shop-banner';
-import { Toaster } from "@/components/ui/toaster";
+import { ClientLayout } from './client-layout';
 
 
 const fontBody = Manrope({
@@ -59,8 +57,7 @@ export const metadata: Metadata = {
       'emergency contraception Ghana', 
       'Postpill delivery', 
       'confidential health products', 
-      'anonymous testing Accra', 
-      'geo',
+      'anonymous testing Accra',
       'student health services', 
       'UG Legon delivery', 
       'UPSA health',
@@ -89,9 +86,9 @@ export const metadata: Metadata = {
     images: [socialImageUrl],
   },
   icons: {
-    icon: logoUrl,
-    shortcut: logoPngUrl,
-    apple: logoPngUrl,
+    icon: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1761573359/Artboard_3_b2vstg.svg',
+    shortcut: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1761573359/Artboard_3_b2vstg.png',
+    apple: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1761573359/Artboard_3_b2vstg.png',
   },
 };
 
@@ -131,13 +128,7 @@ export default function RootLayout({
           shadow="0 0 10px hsl(var(--primary)),0 0 5px hsl(var(--primary))"
         />
         <TourProvider>
-           <div className="relative flex min-h-dvh flex-col bg-background">
-              <Header />
-              <main className="flex-1">{children}</main>
-              <Footer />
-              <FloatingShopButton />
-              <Toaster />
-            </div>
+           <ClientLayout>{children}</ClientLayout>
         </TourProvider>
         <Chatbot />
       </body>

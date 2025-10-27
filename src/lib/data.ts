@@ -24,17 +24,17 @@ export type Product = {
 }
 
 export type Order = {
-    id: number;
+    id: string;
     code: string;
     status: 'pending_payment' | 'received' | 'processing' | 'out_for_delivery' | 'completed';
     items: CartItem[];
-    delivery_area: string;
-    delivery_address_note: string | null;
-    is_student: boolean;
+    deliveryArea: string;
+    deliveryAddressNote: string | null;
+    isStudent: boolean;
     subtotal: number;
-    student_discount: number;
-    delivery_fee: number;
-    total_price: number;
+    studentDiscount: number;
+    deliveryFee: number;
+    totalPrice: number;
     events: {
         status: string;
         note: string;
@@ -92,6 +92,9 @@ export type DiscountLocation = {
     id: number;
     campus: string;
 }
+
+export type OrderStatus = 'pending_payment' | 'received' | 'processing' | 'out_for_delivery' | 'completed';
+
 
 export const DELIVERY_FEES = {
     standard: 20.00,
