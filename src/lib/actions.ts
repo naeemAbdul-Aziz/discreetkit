@@ -8,12 +8,44 @@
 'use server';
 
 import {z} from 'zod';
-import {generateTrackingCode, type Order} from './data';
+import {generateTrackingCode, type Order, type Product, type Pharmacy, type Suggestion, type OrderStatus, type Customer} from './data';
 import {answerQuestions} from '@/ai/flows/answer-questions';
 import {revalidatePath} from 'next/cache';
 import {type CartItem} from '@/hooks/use-cart';
 import {getSupabaseAdminClient} from './supabase';
 import {redirect} from 'next/navigation';
+import { getSession, login as sessionLogin, logout as sessionLogout } from './session';
+
+
+// --- Authentication Actions ---
+
+/**
+ * Handles the admin login process.
+ * Verifies credentials against environment variables and creates a session.
+ */
+export async function login(prevState: any, formData: FormData) {
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+
+  // In a real application, you'd hash the password and compare it.
+  if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+    await sessionLogin({ email });
+    redirect('/admin/dashboard');
+  }
+
+  return { message: 'Invalid email or password.' };
+}
+
+/**
+ * Logs out the admin user and destroys the session.
+ */
+export async function logout() {
+    await sessionLogout();
+    redirect('/admin/login');
+}
+
+
+// --- Order Actions ---
 
 const orderSchema = z.object({
   cartItems: z.string().min(1, 'Cart cannot be empty.'),
@@ -321,4 +353,350 @@ export async function saveSuggestion(prevState: any, formData: FormData) {
             success: false,
         };
     }
+}
+
+
+// --- Admin-specific Actions ---
+
+/**
+ * Fetches all orders for the admin dashboard.
+ */
+export async function getAdminOrders(): Promise<Order[]> {
+    const supabase = getSupabaseAdminClient();
+    const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .order('created_at', { ascending: false });
+    
+    if (error) {
+        console.error('Error fetching admin orders:', error);
+        return [];
+    }
+    return data;
+}
+
+/**
+ * Fetches all products for the admin dashboard.
+ */
+export async function getAdminProducts(): Promise<Product[]> {
+    const supabase = getSupabaseAdminClient();
+    const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('id');
+    
+    if (error) {
+        console.error('Error fetching admin products:', error);
+        return [];
+    }
+    return data;
+}
+
+/**
+ * Fetches a single product by its ID.
+ */
+export async function getProductById(id: number): Promise<Product | null> {
+    const supabase = getSupabaseAdminClient();
+    const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('id', id)
+        .single();
+    
+    if (error) {
+        console.error('Error fetching product by ID:', error);
+        return null;
+    }
+    return data;
+}
+
+/**
+ * Updates the status of an order.
+ */
+export async function updateOrderStatus(
+    { id, status }: { id: number; status: OrderStatus }
+) {
+    try {
+        const supabase = getSupabaseAdminClient();
+        const { error } = await supabase
+            .from('orders')
+            .update({ status })
+            .eq('id', id);
+        
+        if (error) throw error;
+
+        // Add a corresponding event
+        await supabase.from('order_events').insert({
+            order_id: id,
+            status: `Status changed to: ${status.replace(/_/g, ' ')}`,
+            note: 'Updated via admin dashboard.'
+        });
+
+        revalidatePath('/admin/orders');
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, message: error.message };
+    }
+}
+
+
+const productFormSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(3, 'Name must be at least 3 characters long.'),
+  description: z.string().optional(),
+  price_ghs: z.coerce.number().min(0, 'Price must be a positive number.'),
+  category: z.string({ required_error: 'Category is required.' }),
+  sub_category: z.string().optional(),
+  brand: z.string().optional(),
+  stock_level: z.coerce
+    .number()
+    .int('Stock must be a whole number.')
+    .min(0, 'Stock cannot be negative.'),
+  image_url: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
+  requires_prescription: z.boolean().default(false),
+  is_student_product: z.boolean().default(false),
+  usage_instructions: z.string().optional(),
+  in_the_box: z.string().optional(),
+});
+
+
+/**
+ * Creates or updates a product in the database.
+ */
+export async function saveProduct(prevState: any, formData: FormData) {
+  const is_student_product = formData.get('is_student_product') === 'on';
+  const requires_prescription = formData.get('requires_prescription') === 'on';
+
+  const validatedFields = productFormSchema.safeParse({
+    ...Object.fromEntries(formData.entries()),
+    is_student_product,
+    requires_prescription,
+  });
+
+  if (!validatedFields.success) {
+    return {
+        message: 'Invalid data provided.',
+        errors: validatedFields.error.flatten().fieldErrors,
+        success: false,
+    };
+  }
+  
+  const { id, usage_instructions, in_the_box, ...productData } = validatedFields.data;
+  
+  const finalProductData = {
+    ...productData,
+    usage_instructions: usage_instructions ? usage_instructions.split('\n').filter(line => line.trim() !== '') : [],
+    in_the_box: in_the_box ? in_the_box.split('\n').filter(line => line.trim() !== '') : [],
+  }
+  
+  try {
+    const supabase = getSupabaseAdminClient();
+    let error;
+
+    if (id) {
+      // Update existing product
+      ({ error } = await supabase.from('products').update(finalProductData).eq('id', id));
+    } else {
+      // Create new product
+      ({ error } = await supabase.from('products').insert(finalProductData));
+    }
+
+    if (error) throw error;
+
+    revalidatePath('/admin/products');
+    return { success: true, message: `Product ${id ? 'updated' : 'created'} successfully.` };
+  } catch (err: any) {
+    return { success: false, message: err.message };
+  }
+}
+
+/**
+ * Updates a single field of a product (e.g., price or stock).
+ */
+export async function updateProductField({ id, field, value }: { id: number, field: 'price_ghs' | 'stock_level', value: number | string }) {
+    try {
+        const supabase = getSupabaseAdminClient();
+        const { error } = await supabase
+            .from('products')
+            .update({ [field]: value })
+            .eq('id', id);
+
+        if (error) throw error;
+        revalidatePath('/admin/products');
+        return { success: true };
+    } catch (err: any) {
+        return { success: false, message: err.message };
+    }
+}
+
+export async function updateProductCategory({ id, category }: { id: number, category: string }) {
+    try {
+        const supabase = getSupabaseAdminClient();
+        const { error } = await supabase
+            .from('products')
+            .update({ category })
+            .eq('id', id);
+
+        if (error) throw error;
+        revalidatePath('/admin/products');
+        return { success: true };
+    } catch (err: any) {
+        return { success: false, message: err.message };
+    }
+}
+
+
+/**
+ * Fetches all pharmacies for the admin dashboard.
+ */
+export async function getAdminPharmacies(): Promise<Pharmacy[]> {
+    const supabase = getSupabaseAdminClient();
+    const { data, error } = await supabase.from('pharmacies').select('*').order('name');
+    
+    if (error) {
+        console.error('Error fetching pharmacies:', error);
+        return [];
+    }
+    return data;
+}
+
+const pharmacySchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(3, 'Name is required.'),
+  location: z.string().min(3, 'Location is required.'),
+  contact_person: z.string().optional(),
+  phone_number: z.string().optional(),
+  email: z.string().email().optional().or(z.literal('')),
+});
+
+/**
+ * Creates or updates a pharmacy partner.
+ */
+export async function savePharmacy(prevState: any, formData: FormData) {
+  const validatedFields = pharmacySchema.safeParse(Object.fromEntries(formData.entries()));
+
+  if (!validatedFields.success) {
+    return { message: 'Invalid data.', success: false };
+  }
+  
+  const { id, ...pharmacyData } = validatedFields.data;
+
+  try {
+    const supabase = getSupabaseAdminClient();
+    let error;
+
+    if (id) {
+      ({ error } = await supabase.from('pharmacies').update(pharmacyData).eq('id', id));
+    } else {
+      ({ error } = await supabase.from('pharmacies').insert(pharmacyData));
+    }
+
+    if (error) throw error;
+
+    revalidatePath('/admin/pharmacies');
+    return { success: true, message: `Pharmacy ${id ? 'updated' : 'added'}.` };
+  } catch (err: any) {
+    return { success: false, message: err.message };
+  }
+}
+
+export async function deletePharmacy(id: number) {
+    try {
+        const supabase = getSupabaseAdminClient();
+        const { error } = await supabase.from('pharmacies').delete().eq('id', id);
+        if (error) throw error;
+        revalidatePath('/admin/pharmacies');
+        return { success: true };
+    } catch (err: any) {
+        return { success: false, message: err.message };
+    }
+}
+
+/**
+ * Assigns an order to a specific pharmacy.
+ */
+export async function assignOrderToPharmacy({ orderId, pharmacyId }: { orderId: number, pharmacyId: number | null }) {
+    try {
+        const supabase = getSupabaseAdminClient();
+        const { error } = await supabase
+            .from('orders')
+            .update({ pharmacy_id: pharmacyId === 0 ? null : pharmacyId })
+            .eq('id', orderId);
+        
+        if (error) throw error;
+        revalidatePath('/admin/orders');
+        return { success: true };
+    } catch (err: any) {
+        return { success: false, message: err.message };
+    }
+}
+
+
+/**
+ * Fetches all product suggestions.
+ */
+export async function getAdminSuggestions(): Promise<Suggestion[]> {
+    const supabase = getSupabaseAdminClient();
+    const { data, error } = await supabase.from('suggestions').select('*').order('created_at', { ascending: false });
+    
+    if (error) {
+        console.error('Error fetching suggestions:', error);
+        return [];
+    }
+    return data;
+}
+
+export async function deleteSuggestion(id: number) {
+    try {
+        const supabase = getSupabaseAdminClient();
+        const { error } = await supabase.from('suggestions').delete().eq('id', id);
+        if (error) throw error;
+        revalidatePath('/admin/suggestions');
+        return { success: true };
+    } catch (err: any) {
+        return { success: false, message: err.message };
+    }
+}
+
+
+/**
+ * Fetches aggregated customer data.
+ */
+export async function getAdminCustomers(): Promise<Customer[]> {
+    const supabase = getSupabaseAdminClient();
+    const { data, error } = await supabase
+        .from('orders')
+        .select('email, total_price, created_at')
+        .order('created_at', { ascending: true });
+        
+    if (error || !data) {
+        console.error('Error fetching customer data:', error);
+        return [];
+    }
+
+    const customerMap = new Map<string, { total_spent: number; total_orders: number; first_order_date: string; last_order_date: string }>();
+
+    for (const order of data) {
+        if (order.email) {
+            const customer = customerMap.get(order.email) || {
+                total_spent: 0,
+                total_orders: 0,
+                first_order_date: order.created_at,
+                last_order_date: order.created_at,
+            };
+
+            customer.total_spent += order.total_price;
+            customer.total_orders += 1;
+            customer.last_order_date = order.created_at;
+            
+            customerMap.set(order.email, customer);
+        }
+    }
+    
+    const customers: Customer[] = [];
+    customerMap.forEach((value, key) => {
+        customers.push({ email: key, ...value });
+    });
+
+    return customers.sort((a, b) => new Date(b.last_order_date).getTime() - new Date(a.last_order_date).getTime());
 }
