@@ -1,3 +1,4 @@
+
 /**
  * @file layout.tsx
  * @description the root layout for the entire application. it sets up the main html structure,
@@ -60,7 +61,7 @@ export const metadata: Metadata = {
       'confidential health products', 
       'anonymous testing Accra', 
       'geo',
-      'student health services',
+      'student health services', 
       'UG Legon delivery', 
       'UPSA health',
       'discreet delivery',
@@ -89,7 +90,7 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: logoUrl,
-    shortcut: logoUrl,
+    shortcut: logoPngUrl,
     apple: logoPngUrl,
   },
 };
