@@ -49,6 +49,16 @@ export async function createOrderAction(prevState: any, formData: FormData) {
       authorization_url: null,
     };
   }
+  
+  const cartItems: CartItem[] = JSON.parse(validatedFields.data.cartItems);
+  if (cartItems.length === 0) {
+      return {
+          errors: { cartItems: ['Your cart is empty. Please add at least one item.'] },
+          message: 'Your cart is empty.',
+          success: false,
+          authorization_url: null,
+      };
+  }
 
   const {deliveryArea, otherDeliveryArea} = validatedFields.data;
   if (deliveryArea === 'Other' && (!otherDeliveryArea || otherDeliveryArea.length < 3)) {
@@ -62,10 +72,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
 
   try {
     const supabaseAdmin = getSupabaseAdminClient();
-    const cartItems: CartItem[] = JSON.parse(validatedFields.data.cartItems);
-    if (cartItems.length === 0) {
-      return {message: 'Your cart is empty.', success: false, authorization_url: null};
-    }
+    
 
     const code = generateTrackingCode();
     const finalDeliveryArea =
@@ -184,10 +191,10 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     const paystackData = await paystackResponse.json();
 
     if (!paystackResponse.ok || !paystackData.status) {
-        console.error('Paystack Error:', paystackData);
-        // Attempt to delete the pending order if Paystack fails
+        console.error('Paystack API Error:', paystackData);
+        // Attempt to delete the pending order if Paystack fails to prevent orphaned orders
         await supabaseAdmin.from('orders').delete().eq('id', orderData.id);
-        throw new Error(paystackData.message || 'Failed to initialize payment transaction.');
+        throw new Error(paystackData.message || 'Could not initialize payment. Please try again.');
     }
 
     revalidatePath('/order');
@@ -199,9 +206,9 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     };
 
   } catch (error: any) {
-    console.error('Action Error:', error);
+    console.error('Create Order Action Error:', error);
     return {
-      message: error.message || 'An unexpected error occurred. Please try again.',
+      message: 'An unexpected server error occurred. Please try again later or contact support if the problem persists.',
       success: false,
       authorization_url: null,
     };

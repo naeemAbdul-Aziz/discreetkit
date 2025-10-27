@@ -23,7 +23,6 @@ import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
 import Link from 'next/link';
-import { FileUpload } from './file-upload';
 
 function SubmitButton({ disabled }: { disabled: boolean }) {
   const { pending } = useFormStatus();
@@ -138,18 +137,10 @@ function OrderSummaryCard() {
 const FieldError = ({ message }: { message?: string }) => {
   if (!message) return null;
   return (
-    <div className="relative -mt-2 z-10">
-      <div 
-        className="bg-background border border-destructive text-foreground rounded-lg px-3 py-2 flex items-center gap-2 relative shadow-md"
-      >
-        <div 
-          className="absolute -bottom-2 left-4 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-background"
-        />
-         <div className="absolute -bottom-[9px] left-[15px] w-0 h-0 border-l-[9px] border-l-transparent border-r-[9px] border-r-transparent border-t-[9px] border-t-destructive z-[-1]" />
-        <AlertTriangle className="h-4 w-4 text-amber-500" />
-        <span className="text-sm font-medium">{message}</span>
-      </div>
-    </div>
+    <p className="text-sm font-medium text-destructive mt-2 flex items-center gap-1">
+      <AlertTriangle className="h-4 w-4" />
+      {message}
+    </p>
   );
 };
 
@@ -176,10 +167,7 @@ export function OrderForm() {
   const [showOther, setShowOther] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const [prescriptionFile, setPrescriptionFile] = useState<File | null>(null);
-
-  const containsMedication = items.some(item => item.category === 'Medication');
-
+  
   useEffect(() => {
     setIsMounted(true);
     if (deliveryLocation && discounts.some(d => d.campus === deliveryLocation)) {
@@ -196,6 +184,7 @@ export function OrderForm() {
       otherDeliveryArea?: string[] | undefined;
       phone_masked?: string[] | undefined;
       email?: string[] | undefined;
+      cartItems?: string[] | undefined;
     };
     success: boolean;
     authorization_url: string | null;
@@ -212,11 +201,14 @@ export function OrderForm() {
       // Redirect to Paystack for payment
       window.location.href = state.authorization_url;
     } else if (!state.success && state.message) {
-        toast({
-            title: 'An error occurred',
-            description: state.message,
-            variant: 'destructive',
-        });
+        // Display specific field errors if they exist, otherwise show general message
+        if (!state.errors || Object.keys(state.errors).length === 0) {
+            toast({
+                title: 'An error occurred',
+                description: state.message,
+                variant: 'destructive',
+            });
+        }
     }
   }, [state, toast]);
 
@@ -234,7 +226,7 @@ export function OrderForm() {
     return <OrderFormSkeleton />;
   }
 
-  const isSubmitDisabled = items.length === 0 || !termsAccepted || (containsMedication && !prescriptionFile);
+  const isSubmitDisabled = items.length === 0 || !termsAccepted;
 
   return (
     <>
@@ -259,19 +251,9 @@ export function OrderForm() {
                   </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                  {containsMedication && (
-                    <div className='space-y-2'>
-                        <Label>Prescription Upload *</Label>
-                        <FileUpload onFileSelect={setPrescriptionFile} />
-                        {!prescriptionFile && (
-                          <p className="text-sm text-destructive">A prescription is required for medication items.</p>
-                        )}
-                    </div>
-                  )}
                   <div className="space-y-4">
                       <div className="space-y-2">
                           <Label htmlFor="email">Email Address *</Label>
-                          <FieldError message={state.errors?.email?.[0]} />
                           <div className="relative">
                               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                               <Input 
@@ -282,13 +264,13 @@ export function OrderForm() {
                                   className={cn("pl-10", state.errors?.email && "border-destructive focus-visible:ring-destructive")}
                               />
                           </div>
+                          <FieldError message={state.errors?.email?.[0]} />
                           <p className="text-[0.8rem] text-muted-foreground">
                           For payment confirmation from Paystack. We don't store it.
                           </p>
                       </div>
                       <div className="space-y-2">
                           <Label htmlFor="deliveryArea">Delivery Area / Campus *</Label>
-                          <FieldError message={state.errors?.deliveryArea?.[0]} />
                           <Select name="deliveryArea" onValueChange={handleLocationChange} defaultValue={deliveryLocation || "Other"} disabled={!isMounted}>
                           <SelectTrigger className={cn(state.errors?.deliveryArea && "border-destructive focus-visible:ring-destructive")}>
                               <SelectValue placeholder="Select a location..." />
@@ -300,19 +282,20 @@ export function OrderForm() {
                                   ))}
                           </SelectContent>
                           </Select>
+                          <FieldError message={state.errors?.deliveryArea?.[0]} />
                           <p className="text-[0.8rem] text-muted-foreground">Select a campus for FREE delivery.</p>
                       </div>
 
                       {showOther && (
                           <div className="space-y-2">
                                   <Label htmlFor="otherDeliveryArea">Please Specify Your Location *</Label>
-                                  <FieldError message={state.errors?.otherDeliveryArea?.[0]} />
                               <Input 
                                   id="otherDeliveryArea" 
                                   name="otherDeliveryArea" 
                                   placeholder="e.g., Osu, Airport Area" 
                                   className={cn(state.errors?.otherDeliveryArea && "border-destructive focus-visible:ring-destructive")}
                                   />
+                                <FieldError message={state.errors?.otherDeliveryArea?.[0]} />
                           </div>
                       )}
                       
@@ -331,7 +314,6 @@ export function OrderForm() {
                           <div className="flex items-center gap-2">
                           <Label htmlFor="phone_masked">Contact Number (for delivery rider only) *</Label>
                           </div>
-                           <FieldError message={state.errors?.phone_masked?.[0]} />
                           <Input 
                           id="phone_masked" 
                           name="phone_masked" 
@@ -339,6 +321,7 @@ export function OrderForm() {
                           placeholder="e.g., 024xxxxxxx" 
                           className={cn(state.errors?.phone_masked && "border-destructive focus-visible:ring-destructive")}
                           />
+                          <FieldError message={state.errors?.phone_masked?.[0]} />
                           <p className="text-[0.8rem] text-muted-foreground flex items-center gap-1.5">
                           <ShieldCheck className="h-3.5 w-3.5 text-primary" />
                           This will be masked and is only for the rider to contact you.
