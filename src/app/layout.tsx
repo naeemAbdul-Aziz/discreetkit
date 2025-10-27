@@ -30,7 +30,7 @@ const fontHeadline = Manrope({
 });
 
 
-const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1758105183/discreetkit_logo_1_dc765q.png';
+const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1761571651/Artboard_2_jibbuj.svg';
 
 let metadataBase: URL;
 try {
@@ -73,7 +73,7 @@ export const metadata: Metadata = {
         url: logoUrl,
         width: 1200,
         height: 630,
-        alt: 'DiscreetKit Ghana Logo over a discreet package',
+        alt: 'DiscreetKit Ghana Logo',
       },
     ],
     siteName: 'DiscreetKit Ghana',
