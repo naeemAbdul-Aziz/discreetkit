@@ -31,6 +31,7 @@ const fontHeadline = Manrope({
 
 
 const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1761571651/Artboard_2_jibbuj.svg';
+const logoPngUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1761571651/Artboard_2_i7o0go.png';
 const socialImageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1761571650/Artboard_1_p7j6j3.png';
 
 
@@ -59,7 +60,7 @@ export const metadata: Metadata = {
       'confidential health products', 
       'anonymous testing Accra', 
       'geo',
-      'student health services', 
+      'student health services',
       'UG Legon delivery', 
       'UPSA health',
       'discreet delivery',
@@ -75,7 +76,7 @@ export const metadata: Metadata = {
         url: socialImageUrl,
         width: 1200,
         height: 630,
-        alt: 'DiscreetKit Ghana Logo',
+        alt: 'DiscreetKit Ghana - Skip the Awkward',
       },
     ],
     siteName: 'DiscreetKit Ghana',
@@ -89,7 +90,7 @@ export const metadata: Metadata = {
   icons: {
     icon: logoUrl,
     shortcut: logoUrl,
-    apple: logoUrl,
+    apple: logoPngUrl,
   },
 };
 
