@@ -1,3 +1,4 @@
+
 /**
  * @file This file sets up the Supabase clients for server-side and client-side use.
  *
@@ -8,7 +9,6 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { createServerClient, type CookieOptions, createBrowserClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
-import { cookies } from 'next/headers';
 
 
 // These are the public-facing variables, safe to be exposed in the browser.
@@ -31,6 +31,7 @@ export function getSupabaseClient(): SupabaseClient {
 
 // --- This is for SERVER Components and SERVER ACTIONS ---
 export async function createSupabaseServerClient() {
+  const { cookies } = await import('next/headers');
   const cookieStore = cookies();
   return createServerClient(
     supabaseUrl,
