@@ -1,13 +1,12 @@
 /**
- * @file src/app/(admin)/login/page.tsx
- * @description This page provides the login interface for staff members
- *              to access the protected admin portal. It uses Supabase
- *              for email/password authentication.
+ * @file src/app/(portal)/login/page.tsx
+ * @description This page provides the unified login interface for all portal users
+ *              (Admins, Pharmacy staff, etc.). It uses Supabase for
+ *              email/password authentication and will handle role-based redirection.
  */
 'use client';
 
-import { useActionState, useState } from 'react';
-import { useFormStatus } from 'react-dom';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,11 +17,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { getSupabaseClient } from '@/lib/supabase';
-import { useToast } from '@/hooks/use-toast';
-import { useEffect, useRef } from 'react';
-import { Loader2 } from 'lucide-react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -35,6 +29,9 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Loader2, Package2 } from 'lucide-react';
+import { getSupabaseClient } from '@/lib/supabase';
+import { useToast } from '@/hooks/use-toast';
 
 const loginSchema = z.object({
   email: z.string().email({
@@ -45,22 +42,7 @@ const loginSchema = z.object({
   }),
 });
 
-function SubmitButton() {
-  const { pending } = useFormStatus();
-  return (
-    <Button type="submit" className="w-full" disabled={pending}>
-      {pending ? (
-        <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Signing In...
-        </>
-      ) : (
-        'Sign In'
-      )}
-    </Button>
-  );
-}
-
-export default function AdminLoginPage() {
+export default function UnifiedLoginPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [error, setError] = useState<string | null>(null);
@@ -76,27 +58,49 @@ export default function AdminLoginPage() {
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
     setError(null);
     const supabase = getSupabaseClient();
-    const { error } = await supabase.auth.signInWithPassword(values);
+    const { error: signInError, data } = await supabase.auth.signInWithPassword(values);
 
-    if (error) {
-      setError(error.message);
-    } else {
-      toast({
-        title: 'Login Successful',
-        description: 'Redirecting to your dashboard...',
-      });
-      router.push('/dashboard');
-      router.refresh(); // Ensure the layout re-evaluates auth state
+    if (signInError) {
+      setError(signInError.message);
+    } else if (data.user) {
+        // --- Role-Based Redirect Logic (Placeholder) ---
+        // In the next step, we will query the 'profiles' table to get the user's role.
+        // const { data: profile, error: profileError } = await supabase
+        //   .from('profiles')
+        //   .select('role')
+        //   .eq('id', data.user.id)
+        //   .single();
+        
+        // let role = profile?.role || 'admin'; // Default to admin for now
+
+        // For now, we'll just redirect to the admin dashboard.
+        const role = 'admin'; 
+        
+        toast({
+            title: 'Login Successful',
+            description: `Redirecting to ${role} dashboard...`,
+        });
+
+        if (role === 'pharmacy') {
+            router.push('/pharmacy/dashboard');
+        } else {
+            router.push('/admin/dashboard');
+        }
+        router.refresh(); // Ensure the layout re-evaluates auth state
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-muted/40 p-4">
+      <div className="mb-8 flex items-center gap-2 text-foreground">
+        <Package2 className="h-8 w-8" />
+        <h1 className="text-2xl font-semibold">DiscreetKit Portal</h1>
+      </div>
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Admin Portal</CardTitle>
+          <CardTitle className="text-2xl font-bold">Sign In</CardTitle>
           <CardDescription>
-            Enter your credentials to access the dashboard.
+            Enter your credentials to access your dashboard.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -110,7 +114,7 @@ export default function AdminLoginPage() {
                     <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="admin@discreetkit.com"
+                        placeholder="staff@discreetkit.com"
                         {...field}
                       />
                     </FormControl>
