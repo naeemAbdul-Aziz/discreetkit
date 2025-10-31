@@ -6,6 +6,8 @@
  * 2. `getSupabaseAdminClient`: Creates a new server-only admin client. This should only be called within server actions or API routes.
  */
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 
 // These are the public-facing variables, safe to be exposed in the browser.
 const supabaseUrl = "https://xffvvxdtfsxfnkowgdzu.supabase.co";
@@ -40,6 +42,32 @@ export function getSupabaseAdminClient(): SupabaseClient {
       },
     });
 }
+
+/**
+ * Creates a Supabase client for use in Server Actions and Route Handlers.
+ * It reads cookies from the incoming request to manage the user's session.
+ */
+export async function createSupabaseServerClient() {
+  const cookieStore = cookies();
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          cookieStore.set({ name, value, ...options })
+        },
+        remove(name: string, options: CookieOptions) {
+          cookieStore.set({ name, value: '', ...options })
+        },
+      },
+    }
+  );
+}
+
 
 // For convenience, export a pre-instantiated version for the client-side.
 export const supabase = getSupabaseClient();
