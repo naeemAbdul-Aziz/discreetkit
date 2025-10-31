@@ -14,6 +14,8 @@ import { Button } from '@/components/ui/button';
 import { useFormStatus } from 'react-dom';
 import { login } from '@/lib/actions';
 import Image from 'next/image';
+import { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 
 const SubmitButton = () => {
     const { pending } = useFormStatus();
@@ -25,6 +27,9 @@ const SubmitButton = () => {
 };
 
 const LoginForm = () => {
+    const [showPassword, setShowPassword] = useState(false);
+    const togglePasswordVisibility = () => setShowPassword(!showPassword);
+
   return (
     <form action={login} className="space-y-4">
       <div className="space-y-2">
@@ -33,7 +38,24 @@ const LoginForm = () => {
       </div>
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
-        <Input id="password" name="password" type="password" required />
+        <div className="relative">
+             <Input 
+                id="password" 
+                name="password" 
+                type={showPassword ? 'text' : 'password'} 
+                required 
+            />
+            <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground"
+                onClick={togglePasswordVisibility}
+            >
+                {showPassword ? <EyeOff /> : <Eye />}
+                <span className="sr-only">{showPassword ? 'Hide password' : 'Show password'}</span>
+            </Button>
+        </div>
       </div>
       <SubmitButton />
     </form>
