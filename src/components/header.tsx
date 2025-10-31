@@ -8,7 +8,7 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose, SheetDescription } from '@/components/ui/sheet';
 import { Menu, ShoppingCart, Loader2, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -189,12 +189,15 @@ export function Header() {
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-full max-w-sm">
-                   <SheetHeader className="flex flex-row justify-between items-center">
-                     <SheetTitle className="text-left">
-                       <Link href="/" onClick={() => setMobileMenuOpen(false)} aria-label="DiscreetKit Homepage">
-                        <Logo />
-                      </Link>
-                     </SheetTitle>
+                   <SheetHeader className="flex flex-row justify-between items-center text-left">
+                     <div>
+                        <SheetTitle>
+                            <Link href="/" onClick={() => setMobileMenuOpen(false)} aria-label="DiscreetKit Homepage">
+                                <Logo />
+                            </Link>
+                        </SheetTitle>
+                        <SheetDescription className="sr-only">Main menu for site navigation.</SheetDescription>
+                     </div>
                      <SheetClose asChild>
                         <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full">
                             <X className="h-6 w-6" />

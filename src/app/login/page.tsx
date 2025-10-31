@@ -73,6 +73,7 @@ export default function LoginPage() {
             width={48}
             height={48}
             className="mb-2"
+            style={{ height: 'auto' }}
           />
           <CardTitle className="text-2xl font-bold">Portal Login</CardTitle>
           <CardDescription>

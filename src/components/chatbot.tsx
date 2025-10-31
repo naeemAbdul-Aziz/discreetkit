@@ -74,7 +74,7 @@ setInput('');
     <>
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetContent className="flex w-full flex-col sm:max-w-md p-0">
-          <SheetHeader className="p-6">
+          <SheetHeader className="p-6 pb-4">
             <SheetTitle className="flex items-center gap-2">
                 <Bot /> Pacely
             </SheetTitle>
