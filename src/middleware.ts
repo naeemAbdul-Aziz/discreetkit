@@ -66,9 +66,11 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const { pathname } = request.nextUrl;
+  const isAdminRoute = pathname.startsWith('/dashboard') || pathname.startsWith('/orders') || pathname.startsWith('/products') || pathname.startsWith('/analytics');
 
-  // If user is not signed in and tries to access a protected /admin route, redirect to login
-  if (!user && pathname.startsWith('/admin')) {
+
+  // If user is not signed in and tries to access a protected admin route, redirect to login
+  if (!user && isAdminRoute) {
     const url = new URL(request.url);
     url.pathname = '/login';
     return NextResponse.redirect(url);
@@ -87,7 +89,10 @@ export async function middleware(request: NextRequest) {
 // Define which routes the middleware should apply to.
 export const config = {
   matcher: [
-    '/admin/:path*',
+    '/dashboard/:path*',
+    '/orders/:path*',
+    '/products/:path*',
+    '/analytics/:path*',
     '/login',
   ],
 };
