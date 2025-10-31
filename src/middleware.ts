@@ -1,100 +1,46 @@
-// src/middleware.ts
-import { NextResponse, type NextRequest } from 'next/server';
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
+// src/middleware.ts (FIXED)
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { createSupabaseMiddlewareClient } from './lib/supabase'; // <-- Import the correct client
+
+const PROTECTED_ROUTES = ['/admin', '/pharmacy'];
+const LOGIN_ROUTE = '/login';
 
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value;
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value,
-            ...options,
-          });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          });
-          response.cookies.set({
-            name,
-            value,
-            ...options,
-          });
-        },
-        remove(name: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value: '',
-            ...options,
-          });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          });
-          response.cookies.set({
-            name,
-            value: '',
-            ...options,
-          });
-        },
-      },
-    }
-  );
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
   const { pathname } = request.nextUrl;
 
-  // Define protected routes
-  const isProtectedRoute =
-    pathname.startsWith('/admin') || pathname.startsWith('/pharmacy');
+  // 1. Create a Supabase client and response object
+  const { supabase, response } = createSupabaseMiddlewareClient(request);
 
-  // If user is not signed in and tries to access a protected route, redirect to login
-  if (!user && isProtectedRoute) {
+  // 2. Get the session. This also refreshes the token if needed.
+  const { data: { session } } = await supabase.auth.getSession();
+
+  // 3. If user is not logged in and tries to access a protected route
+  if (!session && PROTECTED_ROUTES.some(prefix => pathname.startsWith(prefix))) {
+    // Redirect to login, but include the page they were trying to visit
     const url = request.nextUrl.clone();
-    url.pathname = '/login';
+    url.pathname = LOGIN_ROUTE;
+    url.searchParams.set('redirect_to', pathname);
     return NextResponse.redirect(url);
   }
 
-  // If user is signed in and tries to access the login page, redirect them to a default dashboard
-  if (user && pathname === '/login') {
-    // For now, default redirect to admin dashboard. This will be updated with role-based logic.
+  // 4. If user IS logged in and tries to access the login page
+  if (session && pathname === LOGIN_ROUTE) {
+    // Redirect them to their main dashboard
+    // We can add role-based logic here later
     const url = request.nextUrl.clone();
     url.pathname = '/admin/dashboard';
     return NextResponse.redirect(url);
   }
 
+  // 5. Allow the request and pass the Supabase-enhanced response
+  // This is crucial for passing the refreshed auth cookie
   return response;
 }
 
-// Define which routes the middleware should apply to.
+// Config (your existing config is correct)
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - fonts/ (font files)
-     * - images/ (image files)
-     */
-    '/((?!api|_next/static|_next/image|favicon.ico|fonts/.*|images/.*).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 };

@@ -1,16 +1,44 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
+import { usePathname, useRouter } from "next/navigation"
+import {
+  Bell,
+  CircleUser,
+  Home,
+  LineChart,
+  Menu,
+  Package,
+  Package2,
+  ShoppingCart,
+  Users,
+} from "lucide-react"
 import { Slot } from "@radix-ui/react-slot"
-import { VariantProps, cva } from "class-variance-authority"
+import { cva, type VariantProps } from "class-variance-authority"
 import { PanelLeft } from "lucide-react"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import { Sheet, SheetContent } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Tooltip,
@@ -18,6 +46,31 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { Toaster } from "@/components/ui/toaster"
+import { getSupabaseClient } from "@/lib/supabase"
+import type { User } from "@supabase/supabase-js"
+
+const adminNavLinks = [
+  { href: "/admin/dashboard", icon: Home, label: "Dashboard" },
+  { href: "/admin/orders", icon: ShoppingCart, label: "Orders" },
+  { href: "/admin/products", icon: Package, label: "Products" },
+  { href: "/admin/customers", icon: Users, label: "Customers" },
+  { href: "/admin/analytics", icon: LineChart, label: "Analytics" },
+]
+
+const pharmacyNavLinks = [
+  { href: "/pharmacy/dashboard", icon: Home, label: "Dashboard" },
+  { href: "/pharmacy/orders", icon: ShoppingCart, label: "Assigned Orders" },
+]
+
+const getNavLinks = (role: string | null) => {
+  // In a real app, role would be fetched from user profile
+  if (role === "pharmacy") {
+    return pharmacyNavLinks
+  }
+  // Default to admin
+  return adminNavLinks
+}
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
@@ -734,6 +787,155 @@ const SidebarMenuSubButton = React.forwardRef<
   )
 })
 SidebarMenuSubButton.displayName = "SidebarMenuSubButton"
+
+export const AdminShell = ({
+  user,
+  children,
+}: {
+  user: User
+  children: React.ReactNode
+}) => {
+  const pathname = usePathname()
+  const router = useRouter()
+  // This is a placeholder for the user's role
+  const userRole = "admin"
+
+  const handleSignOut = async () => {
+    const supabase = getSupabaseClient()
+    await supabase.auth.signOut()
+    router.push("/login")
+  }
+
+  const navLinks = getNavLinks(userRole)
+  const currentPage =
+    navLinks.find((link) => pathname.startsWith(link.href))?.label || "Portal"
+
+  return (
+    <SidebarProvider>
+      <Sidebar
+        collapsible="icon"
+        className="border-r bg-muted/40"
+        variant="sidebar"
+      >
+        <SidebarHeader>
+          <SidebarMenuButton
+            tooltip="DiscreetKit Portal"
+            className="group/logo pointer-events-none h-10 justify-center !p-2 text-xl font-bold group-data-[collapsible=icon]:hidden"
+            asChild
+          >
+            <Link
+              href="/"
+              className="flex items-center gap-2 font-semibold !text-primary"
+            >
+              <Package2 className="h-6 w-6" />
+              <span className="duration-200 group-data-[collapsible=icon]:opacity-0">
+                DiscreetKit
+              </span>
+            </Link>
+          </SidebarMenuButton>
+        </SidebarHeader>
+
+        <SidebarContent>
+          <SidebarMenu>
+            {navLinks.map((link) => (
+              <SidebarMenuItem key={link.href}>
+                <SidebarMenuButton
+                  asChild
+                  tooltip={link.label}
+                  isActive={pathname.startsWith(link.href)}
+                  size="lg"
+                >
+                  <Link href={link.href}>
+                    <link.icon className="h-5 w-5" />
+                    <span className="duration-200 group-data-[collapsible=icon]:opacity-0">
+                      {link.label}
+                    </span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarContent>
+
+        <SidebarFooter>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-2 px-2"
+              >
+                <CircleUser className="h-5 w-5" />
+                <div className="flex flex-col items-start duration-200 group-data-[collapsible=icon]:opacity-0">
+                  <span className="text-xs">{user.email}</span>
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>{user?.email || "My Account"}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>Settings</DropdownMenuItem>
+              <DropdownMenuItem>Support</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleSignOut}>Logout</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </SidebarFooter>
+      </Sidebar>
+
+      <SidebarInset>
+        <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                className="shrink-0 md:hidden"
+              >
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Toggle navigation menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="flex flex-col">
+              <nav className="grid gap-2 text-lg font-medium">
+                <Link
+                  href="#"
+                  className="mb-4 flex items-center gap-2 text-lg font-semibold"
+                >
+                  <Package2 className="h-6 w-6" />
+                  <span className="sr-only">DiscreetKit</span>
+                </Link>
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground ${
+                      pathname.startsWith(link.href)
+                        ? "bg-muted text-foreground"
+                        : ""
+                    }`}
+                  >
+                    <link.icon className="h-5 w-5" />
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
+            </SheetContent>
+          </Sheet>
+
+          <div className="w-full flex-1">
+            <h1 className="text-lg font-semibold md:text-2xl">{currentPage}</h1>
+          </div>
+        </header>
+
+        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+          {children}
+        </main>
+      </SidebarInset>
+
+      <Toaster />
+    </SidebarProvider>
+  )
+}
 
 export {
   Sidebar,

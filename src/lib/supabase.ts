@@ -6,7 +6,8 @@
  * 2. `getSupabaseAdminClient`: Creates a new server-only admin client. This should only be called within server actions or API routes.
  */
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { type CookieOptions } from '@supabase/ssr';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { NextResponse, type NextRequest } from 'next/server';
 
 // These are the public-facing variables, safe to be exposed in the browser.
 const supabaseUrl = "https://xffvvxdtfsxfnkowgdzu.supabase.co";
@@ -48,7 +49,6 @@ export function getSupabaseAdminClient(): SupabaseClient {
  */
 export async function createSupabaseServerClient() {
   const { cookies } = await import('next/headers');
-  const { createServerClient } = await import('@supabase/ssr');
   const cookieStore = cookies();
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -67,6 +67,70 @@ export async function createSupabaseServerClient() {
       },
     }
   );
+}
+
+
+/**
+ * Creates a Supabase client for use in Next.js middleware.
+ * It handles session management and cookie passing.
+ */
+export function createSupabaseMiddlewareClient(request: NextRequest) {
+  // Create an unmodified response
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  });
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return request.cookies.get(name)?.value;
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          // If the cookie is set, update the request and response
+          request.cookies.set({
+            name,
+            value,
+            ...options,
+          });
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          });
+          response.cookies.set({
+            name,
+            value,
+            ...options,
+          });
+        },
+        remove(name: string, options: CookieOptions) {
+          // If the cookie is removed, update the request and response
+          request.cookies.set({
+            name,
+            value: '',
+            ...options,
+          });
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          });
+          response.cookies.set({
+            name,
+            value: '',
+            ...options,
+          });
+        },
+      },
+    }
+  );
+
+  return { supabase, response };
 }
 
 
