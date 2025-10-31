@@ -1,3 +1,4 @@
+
 /**
  * @file src/app/(portal)/login/page.tsx
  * @description This page provides the unified login interface for all portal users
@@ -86,7 +87,6 @@ export default function UnifiedLoginPage() {
         } else {
             router.push('/admin/dashboard');
         }
-        router.refresh(); // Ensure the layout re-evaluates auth state
     }
   };
 
