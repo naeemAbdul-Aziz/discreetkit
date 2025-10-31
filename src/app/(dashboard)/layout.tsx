@@ -1,5 +1,5 @@
 /**
- * @file src/app/(portal)/layout.tsx
+ * @file src/app/(dashboard)/layout.tsx
  * @description The root layout for the combined Admin and Pharmacy portals.
  *              It features a mobile-first, responsive design with a slide-out
  *              drawer for mobile and a persistent sidebar for desktop.
@@ -65,7 +65,7 @@ const getNavLinks = (role: string | null) => {
     return adminNavLinks;
 }
 
-export default function PortalLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -81,14 +81,18 @@ export default function PortalLayout({
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      setUser(user);
-      // In a real implementation, you would fetch the user's role from your 'profiles' table here
-      // For now, we'll use the placeholder 'admin' role
-      // e.g., const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-      // setUserRole(profile?.role || 'admin');
+      if (!user) {
+        router.push('/login');
+      } else {
+        setUser(user);
+        // In a real implementation, you would fetch the user's role from your 'profiles' table here
+        // For now, we'll use the placeholder 'admin' role
+        // e.g., const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+        // setUserRole(profile?.role || 'admin');
+      }
     };
     fetchUser();
-  }, []);
+  }, [router]);
 
   const handleSignOut = async () => {
     const supabase = getSupabaseClient();

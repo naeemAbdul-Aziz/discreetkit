@@ -1,19 +1,11 @@
-
-
-/**
- * @file layout.tsx
- * @description the root layout for the entire application. it sets up the main html structure,
- *              loads fonts, and defines metadata. server-side logic resides here.
- */
-import type { Metadata, Viewport } from 'next';
-import './globals.css';
-import { cn } from '@/lib/utils';
-import { Chatbot } from '@/components/chatbot';
-import NextTopLoader from 'nextjs-toploader';
+// src/app/layout.tsx
+import type { Metadata } from 'next';
+import { Toaster } from '@/components/ui/toaster';
 import { TourProvider } from '@/components/tour-provider';
-import { Manrope } from 'next/font/google';
+import './globals.css';
 import { ClientLayout } from './client-layout';
-
+import { Manrope } from 'next/font/google';
+import { cn } from '@/lib/utils';
 
 const fontBody = Manrope({
   subsets: ['latin'],
@@ -28,11 +20,7 @@ const fontHeadline = Manrope({
   weight: ['700', '800'],
 });
 
-
-const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1761571651/Artboard_2_jibbuj.svg';
-const logoPngUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1761571651/Artboard_2_i7o0go.png';
 const socialImageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1761571650/Artboard_1_p7j6j3.png';
-
 
 let metadataBase: URL;
 try {
@@ -41,7 +29,6 @@ try {
   metadataBase = new URL('https://discreetkit.com');
 }
 
-// metadata for seo and social sharing.
 export const metadata: Metadata = {
   metadataBase,
   title: {
@@ -92,45 +79,21 @@ export const metadata: Metadata = {
   },
 };
 
-// viewport settings for responsive design.
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1.0,
-  maximumScale: 1.0,
-  userScalable: false,
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#ffffff' }, 
-  ],
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${fontBody.variable} ${fontHeadline.variable}`}>
+    <html lang="en" suppressHydrationWarning>
        <head>
           <meta name="theme-color" content="#ffffff" />
       </head>
-      <body className={cn('min-h-screen bg-background font-body antialiased')}>
-        {/* top loading bar for page transitions. */}
-        <NextTopLoader
-          color="hsl(var(--primary))"
-          initialPosition={0.08}
-          crawlSpeed={200}
-          height={3}
-          crawl={true}
-          showSpinner={false}
-          easing="ease"
-          speed={200}
-          shadow="0 0 10px hsl(var(--primary)),0 0 5px hsl(var(--primary))"
-        />
+      <body className={cn('min-h-screen bg-background font-body antialiased', fontBody.variable, fontHeadline.variable)}>
         <TourProvider>
-           <ClientLayout>{children}</ClientLayout>
+          {children}
+          <Toaster />
         </TourProvider>
-        <Chatbot />
       </body>
     </html>
   );

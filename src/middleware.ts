@@ -1,10 +1,4 @@
-/**
- * @file middleware.ts
- * @description This middleware protects the /admin and /pharmacy routes by ensuring
- *              that only authenticated staff members can access them.
- *              It checks for a valid session and redirects to the login
- *              page if the user is not authenticated.
- */
+// src/middleware.ts
 import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 
@@ -73,18 +67,15 @@ export async function middleware(request: NextRequest) {
 
   // If user is not signed in and tries to access a protected route, redirect to login
   if (!user && isProtectedRoute) {
-    const url = new URL(request.url);
+    const url = request.nextUrl.clone();
     url.pathname = '/login';
-    // Optional: add a redirect query param
-    // url.searchParams.set('redirectedFrom', pathname);
     return NextResponse.redirect(url);
   }
 
   // If user is signed in and tries to access the login page, redirect them to a default dashboard
-  // Note: We'll add role-based redirection logic here in a future step.
   if (user && pathname === '/login') {
-    // For now, default redirect to admin dashboard. This will be updated.
-    const url = new URL(request.url);
+    // For now, default redirect to admin dashboard. This will be updated with role-based logic.
+    const url = request.nextUrl.clone();
     url.pathname = '/admin/dashboard';
     return NextResponse.redirect(url);
   }
@@ -94,5 +85,16 @@ export async function middleware(request: NextRequest) {
 
 // Define which routes the middleware should apply to.
 export const config = {
-  matcher: ['/admin/:path*', '/pharmacy/:path*', '/login'],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - fonts/ (font files)
+     * - images/ (image files)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|fonts/.*|images/.*).*)',
+  ],
 };
