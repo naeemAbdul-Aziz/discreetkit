@@ -1,5 +1,5 @@
 /**
- * @file src/app/(portal)/admin/dashboard/page.tsx
+ * @file src/app/(dashboard)/admin/dashboard/page.tsx
  * @description The main dashboard page for administrators, showing full-access
  *              metrics and data.
  */

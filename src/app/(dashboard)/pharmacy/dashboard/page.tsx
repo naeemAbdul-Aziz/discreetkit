@@ -1,5 +1,5 @@
 /**
- * @file src/app/(portal)/pharmacy/dashboard/page.tsx
+ * @file src/app/(dashboard)/pharmacy/dashboard/page.tsx
  * @description The main dashboard page for pharmacy partners, showing a
  *              restricted view of assigned orders and relevant stats.
  */

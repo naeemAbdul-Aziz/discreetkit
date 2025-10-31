@@ -6,14 +6,14 @@
  */
 
 import dynamic from 'next/dynamic';
-import { Hero } from './components/hero';
-import { ClosingCta } from './components/closing-cta';
+import { Hero } from '@/app/(home)/components/hero';
+import { ClosingCta } from '@/app/(home)/components/closing-cta';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { getSupabaseClient } from '@/lib/supabase';
 import type { Product } from '@/lib/data';
-import { ProductSelector } from './components/product-selector';
-import { FeaturedFavoritesSection } from './components/featured-favorites';
+import { ProductSelector } from '@/app/(home)/components/product-selector';
+import { FeaturedFavoritesSection } from '@/app/(home)/components/featured-favorites';
 
 // fetches all products from the supabase database.
 async function getProducts(): Promise<Product[]> {
@@ -91,31 +91,31 @@ const LoadingSkeleton = ({ height }: { height: string }) => (
 // dynamically import components to enable code splitting and improve performance.
 // this means components are only loaded when they are needed.
 const PartnerLogos = dynamic(
-  () => import('./components/partner-logos').then((mod) => mod.PartnerLogos),
+  () => import('@/app/(home)/components/partner-logos').then((mod) => mod.PartnerLogos),
   { loading: () => <LoadingSkeleton height={componentMap.PartnerLogos.height} /> }
 );
 const ProductBenefits = dynamic(
-  () => import('./components/product-benefits').then((mod) => mod.ProductBenefits),
+  () => import('@/app/(home)/components/product-benefits').then((mod) => mod.ProductBenefits),
   { loading: () => <LoadingSkeleton height={componentMap.ProductBenefits.height} /> }
 );
 const HowItWorks = dynamic(
-  () => import('./components/how-it-works').then((mod) => mod.HowItWorks),
+  () => import('@/app/(home)/components/how-it-works').then((mod) => mod.HowItWorks),
   { loading: () => <LoadingSkeleton height={componentMap.HowItWorks.height} /> }
 );
 const OurVision = dynamic(
-  () => import('./components/our-vision').then((mod) => mod.OurVision),
+  () => import('@/app/(home)/components/our-vision').then((mod) => mod.OurVision),
   { loading: () => <LoadingSkeleton height={componentMap.OurVision.height} /> }
 );
 const Testimonials = dynamic(
-  () => import('./components/testimonials').then((mod) => mod.Testimonials),
+  () => import('@/app/(home)/components/testimonials').then((mod) => mod.Testimonials),
   { loading: () => <LoadingSkeleton height={componentMap.Testimonials.height} /> }
 );
 const Faq = dynamic(
-  () => import('./components/faq').then((mod) => mod.Faq),
+  () => import('@/app/(home)/components/faq').then((mod) => mod.Faq),
   { loading: () => <LoadingSkeleton height={componentMap.Faq.height} /> }
 );
 const ContactUs = dynamic(
-  () => import('./components/contact-us').then((mod) => mod.ContactUs),
+  () => import('@/app/(home)/components/contact-us').then((mod) => mod.ContactUs),
   { loading: () => <LoadingSkeleton height={componentMap.ContactUs.height} /> }
 );
 

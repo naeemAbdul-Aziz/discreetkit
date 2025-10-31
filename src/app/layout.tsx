@@ -3,7 +3,6 @@ import type { Metadata } from 'next';
 import { Toaster } from '@/components/ui/toaster';
 import { TourProvider } from '@/components/tour-provider';
 import './globals.css';
-import { ClientLayout } from './client-layout';
 import { Manrope } from 'next/font/google';
 import { cn } from '@/lib/utils';
 

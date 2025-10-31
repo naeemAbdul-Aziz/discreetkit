@@ -13,7 +13,8 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { getOrderAction } from '@/lib/actions';
-import { type Order, type OrderStatus } from '@/lib/data';
+import { type Order } from '@/lib/data';
+import type { OrderStatus } from '@/lib/data';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   AlertCircle,
@@ -173,7 +174,7 @@ function Tracker() {
 
       {error && (
         <Alert variant="warning" className="mt-4">
-          <AlertTriangle className="h-4 w-4" />
+          <AlertCircle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
