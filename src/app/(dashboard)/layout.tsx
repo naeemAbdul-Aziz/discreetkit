@@ -25,7 +25,6 @@ export default async function DashboardLayout({
   }
 
   // 4. Pass the user to the AdminShell (so you can display email, name, etc.)
-  // You may need to update your AdminShell component to accept a 'user' prop
   return (
     <AdminShell user={user}> 
       {children}
