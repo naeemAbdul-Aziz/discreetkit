@@ -114,7 +114,6 @@ const SidebarProvider = React.forwardRef<
       open: openProp,
       onOpenChange: setOpenProp,
       className,
-      style,
       children,
       ...props
     },
@@ -186,15 +185,8 @@ const SidebarProvider = React.forwardRef<
       <SidebarContext.Provider value={contextValue}>
         <TooltipProvider delayDuration={0}>
           <div
-            style={
-              {
-                "--sidebar-width": SIDEBAR_WIDTH,
-                "--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
-                ...style,
-              } as React.CSSProperties
-            }
             className={cn(
-              "group/sidebar-wrapper flex min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar",
+              "dk-sidebar-vars group/sidebar-wrapper flex min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar",
               className
             )}
             ref={ref}
@@ -814,8 +806,8 @@ export const AdminShell = ({
     <SidebarProvider>
       <Sidebar
         collapsible="icon"
-        className="border-r bg-muted/40"
-        variant="sidebar"
+        className="border-r bg-gradient-to-b from-muted/50 to-background/30 backdrop-blur supports-[backdrop-filter]:bg-background/40"
+        variant="inset"
       >
         <SidebarHeader>
           <SidebarMenuButton
@@ -835,7 +827,7 @@ export const AdminShell = ({
           </SidebarMenuButton>
         </SidebarHeader>
 
-        <SidebarContent>
+        <SidebarContent className="px-2 py-3 gap-3">
           <SidebarMenu>
             {navLinks.map((link) => (
               <SidebarMenuItem key={link.href}>
@@ -844,8 +836,9 @@ export const AdminShell = ({
                   tooltip={link.label}
                   isActive={pathname.startsWith(link.href)}
                   size="lg"
+                  className="rounded-xl px-3"
                 >
-                  <Link href={link.href}>
+                  <Link href={link.href} aria-current={pathname.startsWith(link.href) ? 'page' : undefined}>
                     <link.icon className="h-5 w-5" />
                     <span className="duration-200 group-data-[collapsible=icon]:opacity-0">
                       {link.label}
@@ -883,7 +876,7 @@ export const AdminShell = ({
       </Sidebar>
 
       <SidebarInset>
-        <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
+        <header className="flex h-14 items-center gap-4 border-b bg-background/60 backdrop-blur px-4 lg:h-[60px] lg:px-6">
           <Sheet>
             <SheetTrigger asChild>
               <Button
@@ -927,7 +920,7 @@ export const AdminShell = ({
           </div>
         </header>
 
-        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-8 lg:p-8">
           {children}
         </main>
       </SidebarInset>

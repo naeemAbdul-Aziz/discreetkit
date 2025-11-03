@@ -92,6 +92,7 @@ export function ProductCard({ product }: { product: Product; }) {
                             <Button 
                                 size="icon" 
                                 className={cn("h-9 w-9 rounded-full transition-all", isInCart && "bg-green-600 hover:bg-green-700")} 
+                                aria-label={isInCart ? `Added ${product.name} to cart` : `Add ${product.name} to cart`}
                                 onClick={(e) => {e.stopPropagation(); addItem(product)}}
                             >
                                 {isInCart ? <Check /> : <Plus />}

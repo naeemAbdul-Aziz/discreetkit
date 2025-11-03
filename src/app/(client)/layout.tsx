@@ -10,6 +10,7 @@ import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { FloatingShopButton } from '@/components/quick-shop-banner';
 import { Chatbot } from '@/components/chatbot';
+import { useEffect, useState } from 'react';
 
 export default function ClientLayout({
   children,
@@ -31,6 +32,28 @@ export default function ClientLayout({
       <Footer />
       <FloatingShopButton />
       <Chatbot />
+      <CartAnnouncer />
+    </div>
+  );
+}
+
+function CartAnnouncer() {
+  const [message, setMessage] = useState<string | null>(null);
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { type: 'add' | 'remove'; productName?: string };
+      if (!detail) return;
+      const text = detail.type === 'add' ? `${detail.productName || 'Item'} added to cart` : `${detail.productName || 'Item'} removed from cart`;
+      setMessage(text);
+      const t = setTimeout(() => setMessage(null), 2000);
+      return () => clearTimeout(t);
+    };
+    window.addEventListener('cart:announce', handler as EventListener);
+    return () => window.removeEventListener('cart:announce', handler as EventListener);
+  }, []);
+  return (
+    <div aria-live="polite" aria-atomic="true" className="sr-only">
+      {message}
     </div>
   );
 }

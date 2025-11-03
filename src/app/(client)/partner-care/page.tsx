@@ -9,7 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Phone, MessageSquare, Globe, ArrowDown } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import { HowItWorksPartner } from './(components)/how-it-works';
+import { HowItWorksPartner } from '@/app/partner-care/(components)/how-it-works';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import { useState, useEffect, useCallback } from 'react';
 import type { EmblaCarouselType } from 'embla-carousel';
@@ -90,8 +90,8 @@ export default function PartnerCarePage() {
                         </Button>
                     </div>
                 </div>
-                <div className="relative h-64 md:h-full w-full md:absolute md:right-0 md:top-0 md:w-1/2">
-                     <div className="absolute inset-0 bg-primary z-0 hidden md:block" style={{clipPath: 'polygon(25% 0, 100% 0, 100% 100%, 0% 100%)'}}></div>
+             <div className="relative h-64 md:h-full w-full md:absolute md:right-0 md:top-0 md:w-1/2">
+                 <div className="absolute inset-0 bg-primary z-0 hidden md:block [clip-path:polygon(25%_0,100%_0,100%_100%,0%_100%)]"></div>
                      <Image
                         src="https://images.unsplash.com/photo-1550831107-1553da8c8464?q=80&w=800&fit=crop"
                         alt="A friendly healthcare professional in a clinical setting."

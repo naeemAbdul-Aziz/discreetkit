@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/hooks/use-cart';
 import { Suspense } from 'react';
-import { CartView } from './(components)/cart-view';
+import { CartView } from '@/app/cart/(components)/cart-view';
 import { ArrowRight, Loader2 } from 'lucide-react';
 
 function CartPageContents() {

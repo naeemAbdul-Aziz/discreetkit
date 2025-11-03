@@ -1,6 +1,6 @@
 
 import { getSupabaseClient } from '@/lib/supabase';
-import { ProductCard } from '../(components)/product-card';
+import { ProductCard } from '../../../products/(components)/product-card';
 import type { Product } from '@/lib/data';
 import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -50,7 +50,7 @@ export default async function MedicationPage() {
                         </AlertDescription>
                     </Alert>
 
-                    <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-3">
+                    <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
                         {medications.map((product) => (
                             <ProductCard key={product.id} product={product} />
                         ))}

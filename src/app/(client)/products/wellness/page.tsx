@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { ProductCard } from '../(components)/product-card';
+import { ProductCard } from '../../../products/(components)/product-card';
 import type { Product } from '@/lib/data';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -99,7 +99,7 @@ export default function WellnessPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
-                className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4"
+                className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4"
             >
                 {filteredProducts.length > 0 ? (
                     filteredProducts.map((product) => (

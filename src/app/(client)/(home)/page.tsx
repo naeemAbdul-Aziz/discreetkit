@@ -14,6 +14,7 @@ import { getSupabaseClient } from '@/lib/supabase';
 import type { Product } from '@/lib/data';
 import { ProductSelector } from '@/app/(home)/components/product-selector';
 import { FeaturedFavoritesSection } from '@/app/(home)/components/featured-favorites';
+ 
 
 // fetches all products from the supabase database.
 async function getProducts(): Promise<Product[]> {

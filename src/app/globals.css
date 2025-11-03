@@ -38,6 +38,11 @@
 
     --radius: 0.8rem;
   }
+  /* Sidebar CSS variables to avoid inline styles */
+  .dk-sidebar-vars {
+    --sidebar-width: 16rem; /* matches SIDEBAR_WIDTH */
+    --sidebar-width-icon: 3rem; /* matches SIDEBAR_WIDTH_ICON */
+  }
 }
 
 @layer base {

@@ -32,7 +32,7 @@ export function getSupabaseClient(): SupabaseClient {
 // --- This is for SERVER Components and SERVER ACTIONS ---
 export async function createSupabaseServerClient() {
   const { cookies } = await import('next/headers');
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   return createServerClient(
     supabaseUrl,
     supabaseAnonKey,
