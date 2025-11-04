@@ -67,7 +67,7 @@ export function HowItWorks() {
                         src={step.imageUrl}
                         alt={step.title}
                         fill
-                        sizes="100vw"
+                        sizes="(max-width: 768px) 80vw, 33vw"
                         className="object-cover"
                         data-ai-hint={step.imageHint}
                         placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
@@ -126,7 +126,7 @@ export function HowItWorks() {
                   src={step.imageUrl}
                   alt={step.title}
                   fill
-                  sizes="(max-width: 768px) 100vw, 50vw"
+                  sizes="50vw"
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                   data-ai-hint={step.imageHint}
                   placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 600))}`}
