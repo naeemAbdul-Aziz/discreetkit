@@ -140,13 +140,13 @@ export function ProductSelector() {
                                 <CarouselItem key={category.name} className="basis-4/5 md:basis-1/2">
                                     <div className="p-1 h-full">
                                         <Link href={category.href} className="h-full block group">
-                                            <Card className="h-full flex flex-col rounded-2xl bg-card overflow-hidden">
-                                                <div className="relative aspect-square w-full bg-muted/50 rounded-t-2xl overflow-hidden">
+                                            <Card className="h-full flex flex-col rounded-3xl bg-card overflow-hidden">
+                                                <div className="relative aspect-square w-full bg-muted/50 rounded-t-3xl overflow-hidden">
                                                     <Image
                                                         src={category.image_url}
                                                         alt={category.name}
                                                         fill
-                                                        className="object-contain p-4 transition-transform duration-300 group-hover:scale-105"
+                                                        className="object-contain p-4"
                                                         sizes="(max-width: 768px) 80vw, 50vw"
                                                         data-ai-hint={category.image_hint}
                                                         placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
@@ -201,13 +201,13 @@ export function ProductSelector() {
                             className="h-full"
                         >
                             <Link href={category.href} className="h-full block group">
-                                <Card className="h-full flex flex-col rounded-2xl bg-card overflow-hidden">
-                                     <div className="relative aspect-square w-full bg-muted/50 rounded-t-2xl overflow-hidden">
+                                <Card className="h-full flex flex-col rounded-3xl bg-card overflow-hidden">
+                                     <div className="relative aspect-square w-full bg-muted/50 rounded-t-3xl overflow-hidden">
                                         <Image
                                             src={category.image_url}
                                             alt={category.name}
                                             fill
-                                            className="object-contain p-4 transition-transform duration-300 group-hover:scale-105"
+                                            className="object-contain p-4"
                                             sizes="25vw"
                                             data-ai-hint={category.image_hint}
                                             placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}

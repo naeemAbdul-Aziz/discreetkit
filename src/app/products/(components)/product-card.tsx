@@ -47,15 +47,15 @@ export function ProductCard({ product }: { product: Product; }) {
     const savings = product.savings_ghs;
 
     return (
-        <Card className="h-full flex flex-col rounded-2xl overflow-hidden group bg-card">
+        <Card className="h-full flex flex-col rounded-3xl overflow-hidden group bg-card">
             <Link href={`/products/${product.id}`} className="block" passHref>
-                <div className="relative aspect-square w-full bg-muted/50 overflow-hidden rounded-t-2xl">
+                <div className="relative aspect-square w-full bg-muted/50 overflow-hidden rounded-t-3xl">
                     {product.image_url && (
                         <Image
                             src={product.image_url}
                             alt={product.name}
                             fill
-                            className="object-contain p-4 transition-transform duration-300 group-hover:scale-105"
+                            className="object-contain p-4"
                             sizes="(max-width: 768px) 50vw, 30vw"
                             data-ai-hint="medical test kit"
                             placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(250, 188))}`}

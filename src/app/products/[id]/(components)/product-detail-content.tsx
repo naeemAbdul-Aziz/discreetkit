@@ -44,7 +44,7 @@ export function ProductDetailContent({ product, relatedProducts }: { product: Pr
         <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-start">
             {/* Left Column: Image and Details */}
             <div className="space-y-8">
-                <div className="relative aspect-square w-full rounded-2xl bg-muted/50 p-8 overflow-hidden">
+                <div className="relative aspect-square w-full rounded-3xl bg-muted/50 p-8 overflow-hidden">
                     {product.image_url && (
                         <Image
                             src={product.image_url}
