@@ -1,3 +1,4 @@
+
 import { NextResponse } from 'next/server';
 import { createSupabaseServerClient, getSupabaseAdminClient } from '@/lib/supabase';
 
@@ -61,7 +62,7 @@ export async function GET() {
     const revenueSeries = Array.from(seriesMap.entries()).map(([date, amount]) => ({ date, amount }));
 
     // Table rows: top 10 most recent orders
-    const table = (recentOrders ?? []).slice(0, 10).map((o: any) => ({
+    const table = (recentOrders ?? []).filter(o => o.status !== 'pending_payment').slice(0, 10).map((o: any) => ({
       id: o.id,
       code: o.code,
       status: o.status,
