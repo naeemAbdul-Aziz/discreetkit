@@ -281,25 +281,25 @@ export const faqItems: FaqItem[] = [
 export const testimonials: Testimonial[] = [
   {
     quote: "The entire process was so simple and private. I got my package the next day in a plain box. It's a huge relief to have a service like this in Ghana.",
-    name: "Ama K.",
+    name: "Ama Konadu",
     role: "University of Ghana Student",
     avatar: "https://images.unsplash.com/photo-1596495577886-d9256242498b?w=150&h=150&fit=crop&q=75"
   },
   {
     quote: "DiscreetKit is a game-changer. I was worried about going to a pharmacy, but this was completely anonymous. The tracking code gave me peace of mind.",
-    name: "David A.",
+    name: "David Adjei",
     role: "Young Professional, Osu",
     avatar: "https://images.unsplash.com/photo-1584012961505-507d844cc8a0?w=150&h=150&fit=crop&q=75"
   },
   {
     quote: "As a student leader, I see the need for this every day. It's a responsible, safe, and judgment-free way for young people to take control of their health.",
-    name: "Fatima S.",
+    name: "Fatima Seidu",
     role: "Student Rep, UPSA",
     avatar: "https://images.unsplash.com/photo-1610476034959-548995964893?w=150&h=150&fit=crop&q=75"
   },
   {
     quote: "The instructions were so easy to follow. I had my result in 15 minutes. Knowing my status privately has lifted a huge weight off my shoulders.",
-    name: "Michael B.",
+    name: "Michael Boateng",
     role: "GIMPA Graduate",
     avatar: "https://images.unsplash.com/photo-1607990281513-2c3f162de8ac?w=150&h=150&fit=crop&q=75"
   },
@@ -311,8 +311,9 @@ export const testimonials: Testimonial[] = [
   },
     {
     quote: "Fast, professional, and exactly as advertised. The package was so discreet, even I wasn't sure what it was at first. 10/10 service.",
-    name: "Josephine O.",
+    name: "Josephine Owusu",
     role: "Entrepreneur, East Legon",
     avatar: "https://images.unsplash.com/photo-1580852300021-3349a882d385?w=150&h=150&fit=crop&q=75"
   },
 ];
+
