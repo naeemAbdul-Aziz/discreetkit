@@ -48,57 +48,61 @@ export function HowItWorks() {
         </div>
 
         {/* Mobile Layout: Vertical Timeline */}
-        <div className="md:hidden relative pl-8">
-            <div className="absolute left-8 top-5 h-full w-0.5 bg-border -translate-x-1/2" aria-hidden="true" />
-            <div className="space-y-12">
-                {steps.map((step) => (
-                    <div key={step.number} className="relative">
-                        <div className="absolute -left-8 top-0 h-10 w-10 bg-background flex items-center justify-center -translate-x-1/2">
-                             <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary bg-background font-bold text-primary z-10">
-                                0{step.number}
-                            </div>
-                        </div>
-                        <div className="space-y-4">
-                            <h3 className="text-2xl font-bold text-foreground pt-1">{step.title}</h3>
-                            <div className="relative aspect-[4/3] w-full max-w-sm rounded-xl overflow-hidden shadow-md">
-                                <Image
-                                    src={step.imageUrl}
-                                    alt={step.title}
-                                    fill
-                                    sizes="100vw"
-                                    className="object-cover"
-                                    data-ai-hint={step.imageHint}
-                                    placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
-                                />
-                            </div>
-                            <p className="text-base text-muted-foreground">
-                                {step.description}
-                            </p>
-                            {step.details && (
-                                <ul className="space-y-3 text-muted-foreground">
-                                    {step.details.map((detail, i) => (
-                                        <li key={i} className="flex items-start gap-3">
-                                            <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                                            <span className="text-base">{detail}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                            {step.number === 4 && (
-                                <div className="pt-4">
-                                    <Button asChild variant="secondary" size="lg">
-                                    <Link href="/partner-care">
-                                        Meet Our Support Partner
-                                        <ArrowRight />
-                                    </Link>
-                                    </Button>
-                                </div>
-                            )}
-                        </div>
+        <div className="md:hidden">
+          <div className="relative">
+            {/* The vertical connecting line */}
+            <div className="absolute left-5 top-0 h-full w-0.5 bg-border -translate-x-1/2" aria-hidden="true" />
+            <div className="space-y-16">
+              {steps.map((step) => (
+                <div key={step.number} className="relative flex items-start gap-4">
+                  {/* The step number circle */}
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-primary bg-background font-bold text-primary z-10 flex-shrink-0">
+                    0{step.number}
+                  </div>
+                  {/* The content */}
+                  <div className="flex-1 pt-1 space-y-4">
+                    <h3 className="text-2xl font-bold text-foreground">{step.title}</h3>
+                    <div className="relative aspect-[4/3] w-full max-w-sm rounded-xl overflow-hidden shadow-md">
+                      <Image
+                        src={step.imageUrl}
+                        alt={step.title}
+                        fill
+                        sizes="100vw"
+                        className="object-cover"
+                        data-ai-hint={step.imageHint}
+                        placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
+                      />
                     </div>
-                ))}
+                    <p className="text-base text-muted-foreground">
+                      {step.description}
+                    </p>
+                    {step.details && (
+                      <ul className="space-y-3 text-muted-foreground">
+                        {step.details.map((detail, i) => (
+                          <li key={i} className="flex items-start gap-3">
+                            <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                            <span className="text-base">{detail}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    {step.number === 4 && (
+                      <div className="pt-4">
+                        <Button asChild variant="secondary" size="lg">
+                          <Link href="/partner-care">
+                            Meet Our Support Partner
+                            <ArrowRight />
+                          </Link>
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
+          </div>
         </div>
+
 
         {/* Desktop Layout: Alternating Grid */}
         <div className="hidden md:block space-y-16 md:space-y-24 max-w-5xl mx-auto">
