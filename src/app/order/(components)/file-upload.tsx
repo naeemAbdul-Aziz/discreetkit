@@ -3,7 +3,7 @@
 
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { UploadCloud, File, X, Loader2 } from 'lucide-react';
+import { UploadCloud, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 
@@ -127,6 +127,8 @@ export function FileUpload({ onFileSelect, className }: FileUploadProps) {
         type="file"
         accept="image/png, image/jpeg"
         className="hidden"
+        aria-label="Upload prescription image"
+        title="Upload image"
         onChange={(e) => handleFileChange(e.target.files ? e.target.files[0] : null)}
       />
     </div>

@@ -55,6 +55,14 @@ const nextConfig: NextConfig = {
       }
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: '/favicon.ico',
+        destination: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1761573359/Artboard_3_b2vstg.png',
+      },
+    ];
+  },
 };
 
 export default nextConfig;

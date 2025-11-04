@@ -12,8 +12,44 @@ import {generateTrackingCode, type Order} from './data';
 import {answerQuestions} from '@/ai/flows/answer-questions';
 import {revalidatePath} from 'next/cache';
 import {type CartItem} from '@/hooks/use-cart';
-import {getSupabaseAdminClient} from './supabase';
+import {getSupabaseAdminClient, createSupabaseServerClient} from './supabase';
 import {redirect} from 'next/navigation';
+
+
+const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1, { message: 'Password is required.' }),
+});
+
+export async function login(formData: FormData) {
+  'use server';
+  const supabase = await createSupabaseServerClient();
+  
+  const parsed = loginSchema.safeParse(Object.fromEntries(formData));
+  
+  if (!parsed.success) {
+    const errorMessage = parsed.error.errors.map(e => e.message).join(', ');
+    redirect(`/login?error=${encodeURIComponent(errorMessage)}`);
+    return;
+  }
+
+  const { email, password } = parsed.data;
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (error) {
+    console.error('Login error:', error.message);
+    redirect('/login?error=Invalid credentials. Please try again.');
+    return;
+  }
+
+  // --- On success, redirect to the admin dashboard. ---
+  redirect('/admin/dashboard');
+}
+
 
 const orderSchema = z.object({
   cartItems: z.string().min(1, 'Cart cannot be empty.'),

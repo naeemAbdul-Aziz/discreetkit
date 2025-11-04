@@ -1,38 +1,30 @@
-
-
-/**
- * @file layout.tsx
- * @description the root layout for the entire application. it sets up the main html structure,
- *              loads fonts, and defines metadata. server-side logic resides here.
- */
-import type { Metadata, Viewport } from 'next';
-import './globals.css';
-import { cn } from '@/lib/utils';
-import { Chatbot } from '@/components/chatbot';
-import NextTopLoader from 'nextjs-toploader';
+// src/app/layout.tsx
+import type { Metadata } from 'next';
+import { Toaster } from '@/components/ui/toaster';
 import { TourProvider } from '@/components/tour-provider';
-import { Manrope } from 'next/font/google';
-import { ClientLayout } from './client-layout';
+import './globals.css';
+import localFont from 'next/font/local';
+import { cn } from '@/lib/utils';
 
-
-const fontBody = Manrope({
-  subsets: ['latin'],
-  display: 'swap',
+const fontBody = localFont({
+  src: [
+    { path: './fonts/Satoshi-Variable.woff2', weight: '100 900', style: 'normal' },
+  ],
   variable: '--font-body',
-});
-
-const fontHeadline = Manrope({
-  subsets: ['latin'],
   display: 'swap',
-  variable: '--font-headline',
-  weight: ['700', '800'],
+  fallback: ['system-ui', 'Segoe UI', 'Arial'],
 });
 
+const fontHeadline = localFont({
+  src: [
+    { path: './fonts/Satoshi-Variable.woff2', weight: '700 900', style: 'normal' },
+  ],
+  variable: '--font-headline',
+  display: 'swap',
+  fallback: ['system-ui', 'Segoe UI', 'Arial'],
+});
 
-const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1761571651/Artboard_2_jibbuj.svg';
-const logoPngUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1761571651/Artboard_2_i7o0go.png';
 const socialImageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1761571650/Artboard_1_p7j6j3.png';
-
 
 let metadataBase: URL;
 try {
@@ -41,7 +33,6 @@ try {
   metadataBase = new URL('https://discreetkit.com');
 }
 
-// metadata for seo and social sharing.
 export const metadata: Metadata = {
   metadataBase,
   title: {
@@ -92,45 +83,28 @@ export const metadata: Metadata = {
   },
 };
 
-// viewport settings for responsive design.
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1.0,
-  maximumScale: 1.0,
-  userScalable: false,
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#ffffff' }, 
-  ],
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${fontBody.variable} ${fontHeadline.variable}`}>
-       <head>
-          <meta name="theme-color" content="#ffffff" />
+    <html lang="en" suppressHydrationWarning>
+      <head>
+         <meta name="theme-color" content="#ffffff" />
+         <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
+         <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
+         <link rel="preconnect" href="https://api.paystack.co" crossOrigin="anonymous" />
+         <link rel="preconnect" href={process.env.NEXT_PUBLIC_SUPABASE_URL || ''} crossOrigin="anonymous" />
       </head>
-      <body className={cn('min-h-screen bg-background font-body antialiased')}>
-        {/* top loading bar for page transitions. */}
-        <NextTopLoader
-          color="hsl(var(--primary))"
-          initialPosition={0.08}
-          crawlSpeed={200}
-          height={3}
-          crawl={true}
-          showSpinner={false}
-          easing="ease"
-          speed={200}
-          shadow="0 0 10px hsl(var(--primary)),0 0 5px hsl(var(--primary))"
-        />
+      <body className={cn('min-h-screen bg-background font-body antialiased', fontBody.variable, fontHeadline.variable)}>
+        <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground">Skip to content</a>
         <TourProvider>
-           <ClientLayout>{children}</ClientLayout>
+          <main id="main" role="main">
+            {children}
+          </main>
+          <Toaster />
         </TourProvider>
-        <Chatbot />
       </body>
     </html>
   );

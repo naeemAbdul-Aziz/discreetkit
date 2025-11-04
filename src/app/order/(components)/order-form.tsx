@@ -4,7 +4,6 @@
 import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { createOrderAction } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -44,6 +43,19 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
         </>
       )}
     </Button>
+  );
+}
+
+function FormPendingOverlay() {
+  const { pending } = useFormStatus();
+  if (!pending) return null;
+  return (
+    <div className="absolute inset-0 z-20 bg-background/60 backdrop-blur-[1px] flex items-center justify-center rounded-2xl">
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        Confirming order…
+      </div>
+    </div>
   );
 }
 
@@ -146,7 +158,6 @@ const FieldError = ({ message }: { message?: string }) => {
 
 
 export function OrderForm() {
-  const router = useRouter();
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -177,19 +188,24 @@ export function OrderForm() {
     }
   }, [deliveryLocation]);
 
-  const initialState: {
-    message: string | null;
-    errors?: {
-      deliveryArea?: string[] | undefined;
-      otherDeliveryArea?: string[] | undefined;
-      phone_masked?: string[] | undefined;
-      email?: string[] | undefined;
-      cartItems?: string[] | undefined;
-    };
+  type CreateOrderState = {
+    message: string;
     success: boolean;
     authorization_url: string | null;
-  } = { message: null, errors: {}, success: false, authorization_url: null };
-  const [state, dispatch] = useActionState(createOrderAction, initialState);
+    errors?: Record<string, string[]>;
+  };
+
+  const initialState: CreateOrderState = {
+    message: '',
+    errors: {},
+    success: false,
+    authorization_url: null,
+  };
+
+  const [state, dispatch] = useActionState<CreateOrderState, FormData>(
+    createOrderAction as unknown as (state: CreateOrderState, payload: FormData) => Promise<CreateOrderState>,
+    initialState
+  );
 
   useEffect(() => {
     if (state.success && state.authorization_url) {
@@ -236,7 +252,8 @@ export function OrderForm() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 md:gap-12 md:items-start mt-8">
         {/* Left Column: Form */}
-        <form ref={formRef} action={dispatch} className="space-y-8">
+        <form ref={formRef} action={dispatch} className="space-y-8 relative">
+          <FormPendingOverlay />
           <input type="hidden" name="cartItems" value={JSON.stringify(items)} />
           <input type="hidden" name="subtotal" value={subtotal} />
           <input type="hidden" name="studentDiscount" value={studentDiscount} />

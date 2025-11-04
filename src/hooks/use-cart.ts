@@ -87,12 +87,19 @@ export const useCart = create<CartState>()(
 
         const { totalItems, subtotal, studentDiscount, deliveryFee, totalPrice, isStudent } = calculateTotals(updatedItems, get().deliveryLocation);
         set({ items: updatedItems, totalItems, subtotal, studentDiscount, deliveryFee, totalPrice, isStudent });
+        try {
+          window.dispatchEvent(new CustomEvent('cart:announce', { detail: { type: 'add', productName: product.name } }));
+        } catch {}
       },
 
       removeItem: (productId) => {
+        const current = get().items.find(i => i.id === productId);
         const updatedItems = get().items.filter((item) => item.id !== productId);
         const { totalItems, subtotal, studentDiscount, deliveryFee, totalPrice, isStudent } = calculateTotals(updatedItems, get().deliveryLocation);
         set({ items: updatedItems, totalItems, subtotal, studentDiscount, deliveryFee, totalPrice, isStudent });
+        try {
+          window.dispatchEvent(new CustomEvent('cart:announce', { detail: { type: 'remove', productName: current?.name } }));
+        } catch {}
       },
 
       updateQuantity: (productId, quantity) => {

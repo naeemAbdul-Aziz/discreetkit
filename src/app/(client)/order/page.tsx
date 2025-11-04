@@ -1,0 +1,103 @@
+
+'use client';
+
+import { Suspense } from 'react';
+import { CheckCircle } from 'lucide-react';
+import { OrderForm } from '@/app/order/(components)/order-form';
+import { cn } from '@/lib/utils';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+
+const steps = [
+  { name: 'Your Cart', status: 'complete' },
+  { name: 'Delivery & Payment', status: 'current' },
+  { name: 'Confirmation', status: 'upcoming' },
+];
+
+function OrderPageLoading() {
+  return (
+    <div className="space-y-8 animate-pulse">
+      <Card className="bg-card shadow-sm rounded-2xl">
+        <CardHeader>
+          <div className="h-7 w-1/2 bg-muted rounded" />
+          <div className="h-4 w-3/4 bg-muted rounded" />
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <div className="h-4 w-1/4 bg-muted rounded" />
+              <div className="h-10 w-full bg-muted rounded-md" />
+            </div>
+            <div className="space-y-2">
+              <div className="h-4 w-1/3 bg-muted rounded" />
+              <div className="h-20 w-full bg-muted rounded-md" />
+            </div>
+            <div className="space-y-2">
+              <div className="h-4 w-1/2 bg-muted rounded" />
+              <div className="h-10 w-full bg-muted rounded-md" />
+            </div>
+          </div>
+          <Separator />
+          <div className="space-y-4">
+            <div className="h-6 w-1/3 bg-muted rounded" />
+            <div className="h-10 w-full bg-muted rounded-md" />
+          </div>
+        </CardContent>
+      </Card>
+      <div className="h-11 w-full bg-primary/50 rounded-md" />
+    </div>
+  );
+}
+
+export default function OrderPage() {
+  return (
+    <div className="bg-background">
+      <div className="container mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-24">
+        <div className="text-center">
+            <h1 className="font-headline text-3xl font-bold md:text-4xl">Complete Your Order</h1>
+            <p className="mt-2 text-base text-muted-foreground md:text-lg">
+                Secure, private, and straightforward.
+            </p>
+        </div>
+
+        {/* Stepper */}
+        <nav aria-label="Progress" className="my-12 max-w-md mx-auto">
+            <ol role="list" className="grid grid-cols-3">
+                {steps.map((step, stepIdx) => (
+                <li key={step.name} className="relative">
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center w-full">
+                             {stepIdx > 0 && (
+                                 <div className={cn("flex-1 h-0.5", step.status === 'complete' || step.status === 'current' ? 'bg-primary' : 'bg-border')} />
+                             )}
+                            {step.status === 'complete' ? (
+                                <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                                    <CheckCircle className="h-5 w-5" />
+                                </div>
+                            ) : step.status === 'current' ? (
+                                <div className="relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary bg-background">
+                                    <span className="h-2.5 w-2.5 rounded-full bg-primary" aria-hidden="true" />
+                                </div>
+                            ) : (
+                                <div className="relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-border bg-background" />
+                            )}
+                             {stepIdx < steps.length - 1 && (
+                                <div className={cn("flex-1 h-0.5", step.status === 'complete' ? 'bg-primary' : 'bg-border')} />
+                             )}
+                        </div>
+                    </div>
+                    <div className="absolute top-10 w-max text-center left-1/2 -translate-x-1/2">
+                        <p className={cn("text-xs font-medium", step.status === 'current' ? 'text-primary' : 'text-muted-foreground', step.status === 'complete' ? 'text-foreground' : '')}>{step.name}</p>
+                    </div>
+                </li>
+                ))}
+            </ol>
+        </nav>
+
+        <Suspense fallback={<OrderPageLoading />}>
+          <OrderForm />
+        </Suspense>
+      </div>
+    </div>
+  );
+}

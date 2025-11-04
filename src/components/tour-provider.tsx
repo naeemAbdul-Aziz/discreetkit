@@ -36,11 +36,12 @@ const TOUR_STEPS: Step[] = [
     placement: 'top',
     title: 'Ask Pacely AI',
   },
+  // Anchor to a stable wrapper instead of the floating button to avoid overlap on mobile
   {
-    target: '.fixed.bottom-6.right-6',
-    content: 'Ready to begin? You can always use this button to jump straight to our products.',
-    placement: 'left',
-    title: 'Shop Anytime',
+    target: '#products',
+    content: 'When you are ready, scroll to products to start your order. The floating button is also available, but we keep this view clear on mobile.',
+    placement: 'top',
+    title: 'Start Shopping',
   },
   {
     target: 'body',
@@ -132,6 +133,12 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
         showProgress
         showSkipButton
         callback={handleJoyrideCallback}
+        scrollToFirstStep
+        disableOverlayClose
+        disableScrollParentFix
+        hideCloseButton
+        spotlightClicks
+        locale={{ next: 'Next', back: 'Back', skip: 'Skip', last: 'Done' }}
         styles={{
           options: {
             arrowColor: 'hsl(var(--card))',
@@ -143,7 +150,7 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
           tooltip: {
             borderRadius: 'var(--radius)',
             padding: 0,
-            width: '320px',
+            width: 'min(90vw, 340px)',
           },
           tooltipContainer: {
             textAlign: 'left',

@@ -5,6 +5,7 @@
  */
 
 import Image from 'next/image';
+import { Marquee } from '@/components/ui/marquee';
 
 // partner data, including names and logo urls.
 const partners = [
@@ -16,25 +17,27 @@ const partners = [
 
 export function PartnerLogos() {
   return (
-    <section className="py-12 md:py-16 bg-background">
+    <section className="py-12 md:py-16 bg-background" aria-labelledby="partners-heading">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center">
-            <h2 className="text-lg font-semibold tracking-tight text-foreground">
+            <h2 id="partners-heading" className="text-lg font-semibold tracking-tight text-foreground">
                 In Partnership With Trusted Health Providers
             </h2>
         </div>
-        <div className="mt-8 grid grid-cols-2 items-center justify-items-center gap-x-8 gap-y-10 sm:grid-cols-4">
-          {partners.map((partner) => (
-            <div key={partner.name} className="relative h-12 w-36">
-              <Image
-                src={partner.logoUrl}
-                alt={`${partner.name} logo`}
-                fill
-                className="object-contain grayscale transition-all duration-300 hover:grayscale-0"
-                sizes="(max-width: 768px) 50vw, 25vw"
-              />
-            </div>
-          ))}
+        <div className="mt-8" role="region" aria-label="Partner logos carousel" aria-roledescription="carousel">
+          <Marquee ariaLabel="Trusted partners">
+            {partners.map((partner) => (
+              <div key={partner.name} className="relative h-10 w-28 md:h-12 md:w-36" aria-label={partner.name}>
+                <Image
+                  src={partner.logoUrl}
+                  alt={`${partner.name} logo`}
+                  fill
+                  className="object-contain grayscale transition-all duration-300 hover:grayscale-0"
+                  sizes="(max-width: 768px) 30vw, 15vw"
+                />
+              </div>
+            ))}
+          </Marquee>
         </div>
       </div>
     </section>
