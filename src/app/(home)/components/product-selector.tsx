@@ -141,7 +141,7 @@ export function ProductSelector() {
                                     <div className="p-1 h-full">
                                         <Link href={category.href} className="h-full block group">
                                             <Card className="h-full flex flex-col rounded-2xl bg-card overflow-hidden">
-                                                <div className="relative aspect-square w-full bg-muted/50">
+                                                <div className="relative aspect-square w-full bg-muted/50 rounded-t-2xl overflow-hidden">
                                                     <Image
                                                         src={category.image_url}
                                                         alt={category.name}
@@ -202,7 +202,7 @@ export function ProductSelector() {
                         >
                             <Link href={category.href} className="h-full block group">
                                 <Card className="h-full flex flex-col rounded-2xl bg-card overflow-hidden">
-                                     <div className="relative aspect-square w-full bg-muted/50">
+                                     <div className="relative aspect-square w-full bg-muted/50 rounded-t-2xl overflow-hidden">
                                         <Image
                                             src={category.image_url}
                                             alt={category.name}
