@@ -1,27 +1,20 @@
+
 /**
  * @file favorite-product-card.tsx
- * @description A detailed product card for the featured favorites section,
- *              including social proof and an urgency meter.
+ * @description A simplified product card for the featured products section.
  */
 
 'use client';
 
-import { useState } from 'react';
 import type { Product } from '@/lib/data';
-import { useCart } from '@/hooks/use-cart';
 import { Card, CardContent } from '@/components/ui/card';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Star, Flame, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 
 type FeaturedProduct = Product & {
-  stock_level: number;
-  review_count: number;
-  rating_avg: number;
-  benefit: string;
+  badge: string;
 };
 
 const shimmer = (w: number, h: number) => `
@@ -44,98 +37,38 @@ const toBase64 = (str: string) =>
     : window.btoa(str);
 
 export function FavoriteProductCard({ product }: { product: FeaturedProduct }) {
-  const { addItem } = useCart();
-  const [isAdded, setIsAdded] = useState(false);
-
-  const stockLevel = product.stock_level;
-  const isOutOfStock = stockLevel === 0;
-
-  // Badge Logic
-  let badge: { text: string; variant: 'destructive' | 'accent' } | null = null;
-  if (stockLevel > 0 && stockLevel <= 9) {
-    badge = { text: 'Selling Out', variant: 'destructive' };
-  } else if (stockLevel >= 10 && stockLevel <= 45) {
-    badge = { text: 'Low Stock', variant: 'accent' };
-  }
-  
-  // Urgency Meter Logic
-  let urgency: { text: string; color: string; percentage: number } | null = null;
-  if (stockLevel > 0 && stockLevel <= 15) {
-    urgency = { text: `Selling Out! Only ${stockLevel} left!`, color: 'bg-destructive', percentage: (stockLevel / 15) * 100 };
-  } else if (stockLevel > 15 && stockLevel <= 45) {
-    urgency = { text: `Low Stock! Only ${stockLevel} left.`, color: 'bg-amber-500', percentage: (stockLevel / 45) * 100 };
-  }
-
-
-  const handleAddToCart = () => {
-    addItem(product);
-    setIsAdded(true);
-    setTimeout(() => setIsAdded(false), 2000);
-  };
+  const isPopular = product.badge === 'Popular';
 
   return (
-    <Card className="group flex h-full flex-col overflow-hidden rounded-2xl transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-sm">
-      <div className="relative aspect-square w-full overflow-hidden bg-muted/50">
-        <Link href={`/products/${product.id}`} className="block h-full w-full">
-          {product.image_url && (
-            <Image
-              src={product.image_url}
-              alt={product.name}
-              fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-              sizes="(max-width: 768px) 100vw, 50vw"
-              placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
-            />
-          )}
-        </Link>
-         {badge && !isOutOfStock && (
-            <Badge variant={badge.variant} className="absolute left-3 top-3 flex items-center gap-1.5 shadow-lg">
-                <Flame className="h-3 w-3"/> 
-                {badge.text}
+    <Card className="group flex h-full flex-col overflow-hidden rounded-2xl transition-all hover:-translate-y-1 hover:shadow-lg bg-card border-border">
+       <Link href={`/products/${product.id}`} className="block h-full w-full">
+        <div className="relative aspect-square w-full overflow-hidden bg-muted/30">
+            {product.image_url && (
+              <Image
+                src={product.image_url}
+                alt={product.name}
+                fill
+                className="object-contain p-4 transition-transform duration-300 group-hover:scale-105"
+                sizes="(max-width: 768px) 50vw, 25vw"
+                placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
+              />
+            )}
+        </div>
+
+        <CardContent className="flex flex-grow flex-col justify-between p-4">
+          <div>
+            <h3 className="font-bold text-base text-foreground truncate">{product.name}</h3>
+            <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{product.description}</p>
+          </div>
+
+          <div className="mt-4 flex items-end justify-between">
+            <p className="text-lg font-bold text-foreground">GHS {product.price_ghs.toFixed(2)}</p>
+            <Badge variant={isPopular ? 'default' : 'secondary'} className={cn(!isPopular && "bg-accent text-accent-foreground")}>
+              {product.badge}
             </Badge>
-        )}
-      </div>
-
-      <div className="flex flex-grow flex-col justify-between p-6">
-        <div>
-          <Link href={`/products/${product.id}`} className="block">
-            <h3 className="font-headline text-xl font-bold text-foreground">{product.name}</h3>
-          </Link>
-
-          <p className="mt-2 text-sm text-muted-foreground">{product.benefit}</p>
-
-        </div>
-
-        <div className="mt-6 space-y-4">
-            {urgency && !isOutOfStock && (
-                <div className="space-y-2">
-                    <p className="text-xs font-semibold text-destructive">{urgency.text}</p>
-                    <div className="relative h-2 w-full overflow-hidden rounded-full bg-muted">
-                        <div className={cn("absolute h-full transition-all", urgency.color)} style={{ width: `${urgency.percentage}%` }}/>
-                    </div>
-                </div>
-            )}
-          
-          <p className="text-2xl font-bold text-foreground">GHS {product.price_ghs.toFixed(2)}</p>
-
-          <Button 
-            size="lg" 
-            className={cn("w-full transition-all", isAdded && 'bg-green-600 hover:bg-green-700')}
-            onClick={handleAddToCart}
-            disabled={isOutOfStock || isAdded}
-          >
-            {isOutOfStock ? (
-                "Out of Stock"
-            ) : isAdded ? (
-                <>
-                    <Check className="mr-2 h-5 w-5" /> Added!
-                </>
-            ) : (
-                "Grab Yours Now"
-            )}
-          </Button>
-        </div>
-      </div>
+          </div>
+        </CardContent>
+      </Link>
     </Card>
   );
 }

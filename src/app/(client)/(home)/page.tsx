@@ -75,7 +75,6 @@ const componentMap = {
   FeaturedFavorites: { height: '600px'},
   ProductBenefits: { height: '100px' },
   HowItWorks: { height: '800px' },
-  OurVision: { height: '800px' },
   Testimonials: { height: '500px' },
   Faq: { height: '600px' },
   ContactUs: { height: '600px' },
@@ -102,10 +101,6 @@ const ProductBenefits = dynamic(
 const HowItWorks = dynamic(
   () => import('@/app/(home)/components/how-it-works').then((mod) => mod.HowItWorks),
   { loading: () => <LoadingSkeleton height={componentMap.HowItWorks.height} /> }
-);
-const OurVision = dynamic(
-  () => import('@/app/(home)/components/our-vision').then((mod) => mod.OurVision),
-  { loading: () => <LoadingSkeleton height={componentMap.OurVision.height} /> }
 );
 const Testimonials = dynamic(
   () => import('@/app/(home)/components/testimonials').then((mod) => mod.Testimonials),
@@ -135,13 +130,13 @@ export default async function Home() {
   const coupleBundle = products.find(p => p.id === 3);
   const allInOneBundle = products.find(p => p.id === 8);
   
-  let featuredProducts: (Product & { stock_level: number; review_count: number; rating_avg: number; benefit: string; })[] = [];
+  let featuredProducts: (Product & { badge: string; })[] = [];
 
   if (allInOneBundle && coupleBundle) {
     featuredProducts = [
-      { ...allInOneBundle, stock_level: 45, review_count: 1245, rating_avg: 4.9, benefit: "Your all-in-one pack for total readiness.", image_url: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1760350373/complete_bundle_z7vti5.png" },
-      { ...coupleBundle, stock_level: 8, review_count: 890, rating_avg: 4.8, benefit: "Test together for mutual support and peace of mind.", image_url: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1760350254/couple_bundle_fe87qy.png" },
-    ].filter(p => p.id !== undefined) as (Product & { stock_level: number; review_count: number; rating_avg: number; benefit: string; })[];
+      { ...allInOneBundle, badge: "Popular" },
+      { ...coupleBundle, badge: "New" },
+    ].filter(p => p.id !== undefined) as (Product & { badge: string; })[];
   }
   
   return (
@@ -170,10 +165,6 @@ export default async function Home() {
 
       <SectionWrapper>
         <HowItWorks />
-      </SectionWrapper>
-
-      <SectionWrapper>
-        <OurVision />
       </SectionWrapper>
 
       <SectionWrapper>
