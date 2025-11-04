@@ -42,7 +42,7 @@ export function FavoriteProductCard({ product }: { product: FeaturedProduct }) {
   return (
     <Card className="group flex h-full flex-col overflow-hidden rounded-2xl transition-all hover:-translate-y-1 hover:shadow-lg bg-card border-border">
        <Link href={`/products/${product.id}`} className="block h-full w-full">
-        <div className="relative aspect-square w-full overflow-hidden bg-muted/30">
+        <div className="relative aspect-video w-full overflow-hidden bg-muted/30">
             {product.image_url && (
               <Image
                 src={product.image_url}
@@ -53,6 +53,9 @@ export function FavoriteProductCard({ product }: { product: FeaturedProduct }) {
                 placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
               />
             )}
+             <Badge variant={isPopular ? 'default' : 'secondary'} className={cn("absolute top-3 left-3", !isPopular && "bg-accent text-accent-foreground")}>
+              {product.badge}
+            </Badge>
         </div>
 
         <CardContent className="flex flex-grow flex-col justify-between p-4">
@@ -63,9 +66,6 @@ export function FavoriteProductCard({ product }: { product: FeaturedProduct }) {
 
           <div className="mt-4 flex items-end justify-between">
             <p className="text-lg font-bold text-foreground">GHS {product.price_ghs.toFixed(2)}</p>
-            <Badge variant={isPopular ? 'default' : 'secondary'} className={cn(!isPopular && "bg-accent text-accent-foreground")}>
-              {product.badge}
-            </Badge>
           </div>
         </CardContent>
       </Link>

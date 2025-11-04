@@ -21,14 +21,14 @@ export function FeaturedFavoritesSection({ products }: { products: FeaturedProdu
       <div className="container mx-auto max-w-6xl px-4 md:px-6">
         <div className="flex items-center justify-between mb-8">
           <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            Featured Products
+            Popular Combo Deals
           </h2>
-          <Link href="/products" className="text-sm font-semibold text-primary hover:underline">
-            View All
+          <Link href="/products/bundles" className="text-sm font-semibold text-primary hover:underline">
+            View All Bundles
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {products.map((product) => (
             <FavoriteProductCard key={product.id} product={product} />
           ))}
