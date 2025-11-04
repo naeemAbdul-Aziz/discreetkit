@@ -15,63 +15,106 @@ export default function TermsOfServicePage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-3xl font-headline">Terms of Service</CardTitle>
-        <p className="text-muted-foreground">Last updated: {new Date().toLocaleDateString()}</p>
+        <CardTitle className="text-3xl font-headline">Terms of Service — Access DiscreetKit Ltd</CardTitle>
+        <p className="text-muted-foreground">Effective Date: November 2025</p>
+        <p className="text-muted-foreground">Last Updated: November 2025</p>
       </CardHeader>
       <CardContent className="space-y-6 text-muted-foreground">
         <div className="space-y-2">
             <h2 className="text-xl font-bold text-foreground">1. Acceptance of Terms</h2>
             <p>
-                By accessing and using the DiscreetKit Ghana website (the "Service"), you accept and agree to be bound by the terms and provision of this agreement.
+                By accessing or using the Access DiscreetKit website or services, you agree to be bound by these Terms of Service and our Privacy Policy. If you do not agree, you should not use our platform.
             </p>
         </div>
         <div className="space-y-2">
             <h2 className="text-xl font-bold text-foreground">2. Service Description</h2>
             <p>
-                DiscreetKit provides a platform for the anonymous purchase and discreet delivery of health products, including but not limited to self-test kits and wellness items. The products sold are for informational and personal use only.
+                Access DiscreetKit is an online facilitation service that connects users to verified partner pharmacies, hospitals, and delivery services for the purchase and delivery of self-test kits and related health products.
             </p>
-        </div>
-        <div className="space-y-2">
-            <h2 className="text-xl font-bold text-foreground">3. Intended Use and Disclaimer</h2>
             <p>
-                The self-test kits available on our platform are screening tools and are not a substitute for a professional medical diagnosis. A positive result from any test kit must be confirmed by a licensed medical professional. DiscreetKit is not a healthcare provider and does not offer medical advice.
+                We do not manufacture or sell these products directly. All products are provided and dispatched by our authorized partners.
             </p>
         </div>
          <div className="space-y-2">
-            <h2 className="text-xl font-bold text-foreground">4. User Obligations</h2>
+            <h2 className="text-xl font-bold text-foreground">3. Eligibility</h2>
             <p>
-                You agree to provide accurate information for delivery and payment purposes. You must be of legal age to purchase the products offered on this site. You are responsible for the lawful use of the products purchased.
+                To use our platform, you must:
+            </p>
+             <ul className="list-disc list-inside space-y-1 pl-4">
+                <li>Be at least 18 years old, or have parental consent if younger;</li>
+                <li>Provide accurate and truthful information during ordering;</li>
+                <li>Agree to use our services responsibly and lawfully.</li>
+            </ul>
+        </div>
+        <div className="space-y-2">
+            <h2 className="text-xl font-bold text-foreground">4. Ordering and Payment</h2>
+             <ul className="list-disc list-inside space-y-1 pl-4">
+                <li>You agree to pay all applicable fees for products or services you request.</li>
+                <li>Orders are only processed after full payment confirmation.</li>
+                <li>Payment is processed securely through authorized payment gateways (e.g., Paystack, Flutterwave).</li>
+                <li>Orders are non-refundable once dispatched, except for defective or incorrect items.</li>
+            </ul>
+        </div>
+        <div className="space-y-2">
+            <h2 className="text-xl font-bold text-foreground">5. Delivery and Pickup</h2>
+            <p>
+                Deliveries are handled by our courier or partner pharmacies. Orders are shipped in unbranded, discreet packaging. Estimated delivery times are indicated at checkout but may vary.
             </p>
         </div>
         <div className="space-y-2">
-            <h2 className="text-xl font-bold text-foreground">5. Payments, Refunds, and Returns</h2>
+            <h2 className="text-xl font-bold text-foreground">6. Privacy and Data Protection</h2>
             <p>
-                All payments are processed securely through Paystack. Due to the medical and personal nature of our products, all sales are final. We cannot accept returns or offer refunds. If a product arrives damaged, please contact us with your order code within 48 hours of delivery for a potential replacement.
-            </p>
-        </div>
-        <div className="space-y-2">
-            <h2 className="text-xl font-bold text-foreground">6. Anonymity and Data</h2>
-            <p>
-                We are committed to protecting your anonymity. Please refer to our Privacy Policy for detailed information on how we collect, use, and delete your data.
+                Your use of our services is subject to our Privacy Policy, which outlines how we collect and protect your information. We take confidentiality seriously and comply with Ghana’s Data Protection Act (Act 843).
             </p>
         </div>
         <div className="space-y-2">
             <h2 className="text-xl font-bold text-foreground">7. Limitation of Liability</h2>
             <p>
-                DiscreetKit shall not be liable for any indirect, incidental, special, consequential, or exemplary damages, including but not limited to, damages for health outcomes, emotional distress, or other intangible losses resulting from the use of our service or products.
+                Access DiscreetKit Ltd is not liable for:
             </p>
+            <ul className="list-disc list-inside space-y-1 pl-4">
+                <li>Any misuse of the products after delivery;</li>
+                <li>Delays caused by third-party delivery services or partners;</li>
+                <li>Inaccurate information provided by the user;</li>
+                <li>Any indirect, incidental, or consequential damages arising from the use of our platform.</li>
+            </ul>
         </div>
         <div className="space-y-2">
-            <h2 className="text-xl font-bold text-foreground">8. Changes to Terms</h2>
+            <h2 className="text-xl font-bold text-foreground">8. Medical Disclaimer</h2>
             <p>
-                We reserve the right to modify these terms from time to time at our sole discretion. Your continued use of the Service after any such changes constitutes your acceptance of the new terms.
+                Access DiscreetKit Ltd is not a medical service provider. We provide access to self-test kits and connect users to licensed healthcare professionals when needed. Always consult a qualified medical professional for medical advice or follow-up care.
             </p>
         </div>
          <div className="space-y-2">
-            <h2 className="text-xl font-bold text-foreground">9. Contact Information</h2>
+            <h2 className="text-xl font-bold text-foreground">9. Intellectual Property</h2>
             <p>
-                For any questions regarding these terms, please contact us at support@discreetkit.com.
+                All content on our website — logos, text, graphics, and software — is owned by Access DiscreetKit Ltd. You may not reproduce or use it without our written consent.
             </p>
+        </div>
+        <div className="space-y-2">
+            <h2 className="text-xl font-bold text-foreground">10. Suspension or Termination</h2>
+            <p>
+                We may suspend or terminate user access if:
+            </p>
+            <ul className="list-disc list-inside space-y-1 pl-4">
+                <li>Fraudulent, abusive, or illegal activity is detected;</li>
+                <li>There is a breach of these Terms.</li>
+            </ul>
+        </div>
+        <div className="space-y-2">
+            <h2 className="text-xl font-bold text-foreground">11. Governing Law</h2>
+            <p>
+                These Terms are governed by the laws of the Republic of Ghana. Any disputes will be resolved under the jurisdiction of Ghanaian courts.
+            </p>
+        </div>
+        <div className="space-y-2">
+            <h2 className="text-xl font-bold text-foreground">12. Contact Information</h2>
+             <address className="not-italic">
+                Access DiscreetKit Ltd<br />
+                House No. 57, Kofi Annan East Avenue, Madina, Accra – Ghana<br />
+                Email: <a href="mailto:support@discreetkit.com" className="text-primary hover:underline">support@discreetkit.com</a><br />
+                Phone: <a href="tel:+233203001107" className="text-primary hover:underline">+233 20 300 1107</a>
+            </address>
         </div>
       </CardContent>
     </Card>
