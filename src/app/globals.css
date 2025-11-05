@@ -49,12 +49,14 @@
   * {
     @apply border-border;
   }
+  html, body {
+    @apply bg-background text-foreground;
+  }
   html {
     @apply scroll-smooth;
     font-size: 14px;
   }
   body {
-    @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1, "kern" 1;
     font-kerning: auto;
     font-family: 'Satoshi', sans-serif;

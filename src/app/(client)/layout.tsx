@@ -27,10 +27,8 @@ export default function ClientLayout({
 
   return (
     <div className="flex min-h-dvh flex-col bg-background">
-      <div className="relative flex flex-1 flex-col">
-        <Header />
-        <main className="flex-1">{children}</main>
-      </div>
+      <Header />
+      <main className="flex-1">{children}</main>
       <Footer />
       <FloatingShopButton />
       <Chatbot />
