@@ -824,7 +824,7 @@ export const AdminShell = ({
                 <Image src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1761573359/Artboard_3_b2vstg.png" alt="DiscreetKit icon" fill />
               </div>
               <div className="duration-200 group-data-[collapsible=icon]:opacity-0">
-                <Image src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762345271/Artboard_2_3_fvyg9i.png" alt="DiscreetKit Logo" width={110} height={26} />
+                <Image src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762345271/Artboard_2_3_fvyg9i.png" alt="DiscreetKit Logo" width={110} height={26} style={{ width: 'auto' }}/>
               </div>
             </Link>
           </SidebarMenuButton>
