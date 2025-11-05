@@ -30,6 +30,7 @@ export function Footer() {
         width={140}
         height={32}
         className="brightness-0 invert"
+        style={{ width: 'auto' }}
     />
 );
 
