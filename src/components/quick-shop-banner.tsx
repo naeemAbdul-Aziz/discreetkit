@@ -43,7 +43,7 @@ export function FloatingShopButton() {
           transition={{ type: 'spring', stiffness: 260, damping: 20 }}
           className="fixed bottom-6 right-6 z-50"
         >
-            <Button asChild size="lg" className="h-14 rounded-full shadow-2xl pl-5 pr-6">
+            <Button asChild variant="accent" size="lg" className="h-14 rounded-full shadow-2xl pl-5 pr-6">
               <Link href="/products" aria-label="shop all products">
                 <ShoppingBag className="h-6 w-6" />
                 <span className="ml-2 font-bold">Shop Now</span>
