@@ -1,3 +1,4 @@
+
 /**
  * @file footer.tsx
  * @description the main site footer, including navigation links, social media,
