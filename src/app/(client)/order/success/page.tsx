@@ -6,7 +6,8 @@ import { Suspense, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle2, Copy, Truck, Home, Plus, Loader2, Check, AlertCircle } from 'lucide-react';
+import { CheckCircle2, Copy, Truck, Home, Plus, Check, AlertCircle } from 'lucide-react';
+import { BrandSpinner } from '@/components/brand-spinner';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
@@ -42,7 +43,7 @@ function SuccessContent() {
     return (
         <Card className="w-full max-w-lg text-center">
             <CardHeader className="items-center">
-                <Loader2 className="h-16 w-16 animate-spin text-primary" />
+                <BrandSpinner size="lg" />
                 <CardTitle className="mt-4 text-3xl">Verifying Payment...</CardTitle>
                 <CardDescription className="max-w-md">
                     Please wait a moment while we confirm your transaction. Do not close this page.
@@ -137,7 +138,7 @@ function SuccessContent() {
 function SuccessPageLoading() {
     return (
         <div className="flex h-64 items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            <BrandSpinner size="md" />
         </div>
     )
 }

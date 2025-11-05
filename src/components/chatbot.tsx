@@ -11,7 +11,8 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetClose } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Bot, Loader2, Send, User, X } from 'lucide-react';
+import { Bot, Send, User, X } from 'lucide-react';
+import { BrandSpinner } from '@/components/brand-spinner';
 import { handleChat } from '@/lib/actions';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { cn } from '@/lib/utils';
@@ -113,7 +114,7 @@ setInput('');
                             <AvatarFallback><Bot size={20} /></AvatarFallback>
                         </Avatar>
                         <div className="max-w-[80%] rounded-lg p-3 text-sm bg-muted flex items-center">
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Thinking...
+                            <BrandSpinner size="sm" /> Thinking...
                         </div>
                     </div>
                 )}
@@ -129,7 +130,7 @@ setInput('');
                 disabled={isPending}
               />
               <Button type="submit" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8" disabled={isPending || !input.trim()}>
-                {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                {isPending ? <BrandSpinner size="sm" /> : <Send className="h-4 w-4" />}
                 <span className="sr-only">Send Message</span>
               </Button>
             </div>

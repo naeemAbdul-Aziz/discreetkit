@@ -9,7 +9,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose, SheetDescription } from '@/components/ui/sheet';
-import { Menu, ShoppingCart, Loader2, X } from 'lucide-react';
+import { Menu, ShoppingCart, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
@@ -17,6 +17,7 @@ import { useCart } from '@/hooks/use-cart';
 import { Separator } from './ui/separator';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import { BrandSpinner } from '@/components/brand-spinner';
 
 // define navigation links for easy management.
 const navLinks = [
@@ -43,7 +44,7 @@ function CartLink() {
   if (!isMounted) {
     return (
       <Button variant="ghost" size="icon" className="relative" disabled aria-label="loading cart">
-          <Loader2 className="h-5 w-5 animate-spin" />
+          <BrandSpinner size="sm" />
       </Button>
     )
   }

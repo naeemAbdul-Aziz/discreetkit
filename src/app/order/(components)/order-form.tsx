@@ -11,7 +11,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ShieldCheck, ArrowRight, GraduationCap, AlertTriangle, Lock, Mail } from 'lucide-react';
+import { ShieldCheck, ArrowRight, GraduationCap, AlertTriangle, Lock, Mail } from 'lucide-react';
+import { BrandSpinner } from '@/components/brand-spinner';
 import { ChatTrigger } from '@/components/chat-trigger';
 import { useCart } from '@/hooks/use-cart';
 import { discounts } from '@/lib/data';
@@ -33,7 +34,7 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
         disabled={pending || disabled}>
       {pending ? (
         <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          <BrandSpinner size="sm" />
           Processing...
         </>
       ) : (
@@ -52,7 +53,7 @@ function FormPendingOverlay() {
   return (
   <div className="absolute inset-0 z-20 bg-background/60 backdrop-blur-[1px] flex items-center justify-center rounded-3xl">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Loader2 className="h-4 w-4 animate-spin" />
+  <BrandSpinner size="sm" />
         Confirming order…
       </div>
     </div>

@@ -12,7 +12,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Mail, MapPin, ArrowRight, Loader2, Lightbulb } from 'lucide-react';
+import { Mail, MapPin, ArrowRight, Lightbulb } from 'lucide-react';
+import { BrandSpinner } from '@/components/brand-spinner';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -135,7 +136,7 @@ export function ContactUs() {
                     <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
                         {isLoading ? (
                             <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                <BrandSpinner size="sm" />
                                 Sending...
                             </>
                         ) : (

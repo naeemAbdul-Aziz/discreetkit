@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useCart } from '@/hooks/use-cart';
 import { Suspense } from 'react';
 import { CartView } from '@/app/cart/(components)/cart-view';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 function CartPageContents() {
     const { totalItems } = useCart();

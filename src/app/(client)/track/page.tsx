@@ -18,7 +18,6 @@ import type { OrderStatus } from '@/lib/data';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   AlertCircle,
-  Loader2,
   Package,
   Search,
   Truck,
@@ -28,6 +27,7 @@ import {
   MapPin,
   ClipboardList,
 } from 'lucide-react';
+import { BrandSpinner } from '@/components/brand-spinner';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 import { getSupabaseClient } from '@/lib/supabase';
@@ -158,8 +158,8 @@ function Tracker() {
             <Button type="submit" disabled={isPending || !code}>
               {isPending ? (
                 <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Tracking...
+                    <BrandSpinner size="sm" />
+                    <span className="ml-2">Tracking...</span>
                 </>
               ) : (
                 <>
@@ -184,7 +184,7 @@ function Tracker() {
   <Card className="mt-4 rounded-3xl">
           <CardContent className="pt-6">
             <div className="flex items-center justify-center space-x-2">
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              <BrandSpinner size="md" />
               <p className="text-muted-foreground">Searching for your order...</p>
             </div>
           </CardContent>
@@ -347,7 +347,7 @@ function Tracker() {
 function TrackPageLoading() {
   return (
     <div className="flex h-64 items-center justify-center">
-      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      <BrandSpinner size="lg" />
     </div>
   );
 }

@@ -12,7 +12,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Check, Lightbulb, Loader2, Send } from 'lucide-react';
+import { ArrowRight, Check, Lightbulb, Send } from 'lucide-react';
+import { BrandSpinner } from '@/components/brand-spinner';
 import { motion } from 'framer-motion';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import { cn } from '@/lib/utils';
@@ -263,7 +264,7 @@ export function ProductSelector() {
                                         required
                                     />
                                     <Button type="submit" disabled={isPending} className="w-full sm:w-auto">
-                                        {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Send className="mr-2 h-4 w-4" /> Suggest</>}
+                                        {isPending ? <BrandSpinner size="sm" /> : <><Send className="mr-2 h-4 w-4" /> Suggest</>}
                                     </Button>
                                 </form>
                             </div>
