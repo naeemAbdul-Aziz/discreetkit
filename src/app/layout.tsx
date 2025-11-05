@@ -92,7 +92,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-         <meta name="theme-color" content="#ffffff" />
+         <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+         <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1c2121" />
          <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
          <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
          <link rel="preconnect" href="https://api.paystack.co" crossOrigin="anonymous" />
