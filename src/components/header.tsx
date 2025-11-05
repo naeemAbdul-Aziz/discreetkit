@@ -79,15 +79,10 @@ export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [showPromoBanner, setShowPromoBanner] = useState(false);
   
   // handle scroll and mount state.
   useEffect(() => {
     setIsMounted(true);
-    
-    if (sessionStorage.getItem('promoBannerDismissed') !== 'true') {
-        setShowPromoBanner(true);
-    }
     
     const handleScroll = () => {
       const currentY = window.scrollY;
@@ -96,11 +91,6 @@ export function Header() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-  
-  const handleDismissBanner = () => {
-    setShowPromoBanner(false);
-    sessionStorage.setItem('promoBannerDismissed', 'true');
-  }
 
   // reusable navlink component for desktop.
   const NavLink = ({ href, label, onClick }: { href: string; label: string; onClick?: () => void }) => (
@@ -134,8 +124,7 @@ export function Header() {
   if (!isMounted) {
     return (
         <>
-         <div className="bg-primary p-2 text-center text-sm text-primary-foreground h-[40px]"></div>
-     <header className={cn('sticky top-0 z-50 w-full p-2')}>
+     <header className={cn('fixed top-0 left-0 right-0 z-50 w-full p-2')}>
        <div className="container mx-auto flex h-14 max-w-7xl items-center justify-between rounded-3xl border-border/40 bg-background/95"></div>
          </header>
         </>
@@ -144,25 +133,7 @@ export function Header() {
 
   return (
     <>
-      {/* top promotional bar */}
-      {showPromoBanner && (
-        <div className="w-full z-[40] flex h-10 items-center justify-center bg-muted px-10 text-center text-sm text-foreground">
-          <span>
-            Free Delivery on UG Campus!{' '}
-            <Link href="/products" className="font-semibold underline">
-              Shop Now
-            </Link>
-          </span>
-          <button
-            onClick={handleDismissBanner}
-            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-foreground/70 transition-colors hover:bg-foreground/10 hover:text-foreground"
-            aria-label="Dismiss promotional banner"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-      )}
-      <header className={cn('sticky top-0 z-50 w-full p-2')}>
+  <header className={cn('fixed top-0 left-0 right-0 z-50 w-full p-2')}>
         <motion.div
           initial={{ y: -8, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}

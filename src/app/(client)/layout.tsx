@@ -26,7 +26,7 @@ export default function ClientLayout({
   }
 
   return (
-    <div className="flex min-h-dvh flex-col bg-background">
+    <div className="flex min-h-dvh flex-col bg-background pt-[72px]">
       <Header />
       <main className="flex-1">{children}</main>
       <Footer />
