@@ -34,14 +34,13 @@ const TOUR_STEPS: Step[] = [
     target: '#ask-pacely-cta',
     content: 'Have questions? Our friendly AI assistant, Pacely, can help you with information about products, privacy, and more.',
     placement: 'top',
-    title: 'Ask Pacely AI',
+    title: 'Your AI Assistant',
   },
-  // Anchor to a stable wrapper instead of the floating button to avoid overlap on mobile
   {
-    target: '#products',
-    content: 'When you are ready, scroll to products to start your order. The floating button is also available, but we keep this view clear on mobile.',
-    placement: 'top',
-    title: 'Start Shopping',
+    target: '#cart-icon',
+    content: "When you're ready to order, you can always view your cart and check out from here.",
+    placement: 'bottom',
+    title: 'View Your Cart',
   },
   {
     target: 'body',
