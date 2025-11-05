@@ -74,8 +74,7 @@ export function Header() {
   const [isMounted, setIsMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showPromoBanner, setShowPromoBanner] = useState(false);
-  // header should remain visible while scrolling; no hide-on-scroll behavior
-
+  
   // handle scroll and mount state.
   useEffect(() => {
     setIsMounted(true);
