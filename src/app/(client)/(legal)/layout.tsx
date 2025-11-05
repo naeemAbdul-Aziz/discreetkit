@@ -1,19 +1,25 @@
-/**
- * @file layout.tsx
- * @description the shared layout for all legal pages (e.g., privacy, terms).
- *              it provides a consistent background and padding.
- */
+// src/app/(client)/layout.tsx (FIXED)
+import { Footer } from '@/components/footer';
+import { Header } from '@/components/header';
+import { ChatTrigger } from '@/components/chat-trigger';
+import { Chatbot } from '@/components/chatbot';
 
-export default function LegalLayout({
+export default function ClientLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-muted">
-      <div className="container mx-auto max-w-4xl px-4 py-12 md:py-24">
+    <div className="flex flex-col min-h-screen">
+      <Header />
+      
+      <main className="flex-1 overflow-y-auto">
         {children}
-      </div>
+        <Footer />
+      </main>
+      
+      <ChatTrigger />
+      <Chatbot />
     </div>
   );
 }

@@ -26,9 +26,11 @@ export default function ClientLayout({
   }
 
   return (
-    <div className="relative flex min-h-dvh flex-col bg-background overflow-hidden">
-      <Header />
-      <main className="flex-1">{children}</main>
+    <div className="flex min-h-dvh flex-col bg-background">
+      <div className="relative flex flex-1 flex-col">
+        <Header />
+        <main className="flex-1">{children}</main>
+      </div>
       <Footer />
       <FloatingShopButton />
       <Chatbot />
