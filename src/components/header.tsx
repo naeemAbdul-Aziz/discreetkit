@@ -146,7 +146,7 @@ export function Header() {
     <>
       {/* top promotional bar */}
       {showPromoBanner && (
-        <div className="fixed inset-x-0 top-0 z-[60] flex h-10 items-center justify-center bg-primary px-10 text-center text-sm text-primary-foreground">
+        <div className="w-full z-[40] flex h-10 items-center justify-center bg-muted px-10 text-center text-sm text-foreground">
           <span>
             Free Delivery on UG Campus!{' '}
             <Link href="/products" className="font-semibold underline">
@@ -155,14 +155,14 @@ export function Header() {
           </span>
           <button
             onClick={handleDismissBanner}
-            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-primary-foreground/80 transition-colors hover:bg-primary/50 hover:text-primary-foreground"
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-foreground/70 transition-colors hover:bg-foreground/10 hover:text-foreground"
             aria-label="Dismiss promotional banner"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
       )}
-      <header className={cn('sticky z-50 w-full p-2 transition-[top]', showPromoBanner ? 'top-10' : 'top-0')}>
+      <header className={cn('sticky top-0 z-50 w-full p-2')}>
         <motion.div
           initial={{ y: -8, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
