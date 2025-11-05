@@ -7,6 +7,19 @@ import { createSupabaseMiddlewareClient } from './lib/supabase'; // <-- Import t
 const PROTECTED_ROUTES = ['/admin', '/pharmacy'];
 const LOGIN_ROUTE = '/login';
 
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  ],
+};
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -38,12 +51,3 @@ export async function middleware(request: NextRequest) {
   // This is crucial for passing the refreshed auth cookie
   return response;
 }
-
-// Config (your existing config is correct)
-export const config = {
-  matcher: [
-    '/admin/:path*',
-    '/pharmacy/:path*',
-    '/login',
-  ],
-};

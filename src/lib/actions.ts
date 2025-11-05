@@ -9,7 +9,8 @@
 
 import {z} from 'zod';
 import {generateTrackingCode, type Order} from './data';
-import {answerQuestions} from '@/ai/flows/answer-questions';
+// Temporarily using fallback to fix build issues
+import {answerQuestions} from '@/ai/flows/answer-questions-fallback';
 import {revalidatePath} from 'next/cache';
 import {type CartItem} from '@/hooks/use-cart';
 import {getSupabaseAdminClient, createSupabaseServerClient} from './supabase';
@@ -295,12 +296,12 @@ export async function getOrderAction(code: string): Promise<Order | null> {
       deliveryFee: order.delivery_fee,
       totalPrice: order.total_price,
       events: order.order_events
-        .map(e => ({
+        .map((e:any) => ({
           status: e.status,
           note: e.note ?? '',
           date: new Date(e.created_at),
         }))
-        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+        .sort((a:any, b:any) => new Date(b.date).getTime() - new Date(a.date).getTime()),
     };
   } catch (error) {
     console.error('Action Error in getOrderAction:', error);

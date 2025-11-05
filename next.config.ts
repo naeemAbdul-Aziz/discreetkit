@@ -9,6 +9,39 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  experimental: {
+    serverComponentsExternalPackages: ['genkit', '@genkit-ai/core', '@genkit-ai/googleai'],
+  },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        os: false,
+        path: false,
+        crypto: false,
+        stream: false,
+        buffer: false,
+        util: false,
+        url: false,
+        querystring: false,
+      };
+    }
+    
+    // Exclude problematic packages from bundling
+    config.externals = config.externals || [];
+    config.externals.push({
+      'react-joyride': 'react-joyride',
+      '@genkit-ai/core': '@genkit-ai/core',
+      '@genkit-ai/googleai': '@genkit-ai/googleai',
+      'genkit': 'genkit',
+      '@opentelemetry/sdk-node': 'commonjs @opentelemetry/sdk-node',
+      'handlebars': 'commonjs handlebars',
+      'dotprompt': 'commonjs dotprompt',
+    });
+    
+    return config;
+  },
   images: {
     remotePatterns: [
       {
