@@ -49,6 +49,7 @@ import {
 import { Toaster } from "@/components/ui/toaster"
 import { getSupabaseClient } from "@/lib/supabase"
 import type { User } from "@supabase/supabase-js"
+import Image from 'next/image';
 
 const adminNavLinks = [
   { href: "/admin/dashboard", icon: Home, label: "Dashboard" },
@@ -819,10 +820,12 @@ export const AdminShell = ({
               href="/"
               className="flex items-center gap-2 font-semibold !text-primary"
             >
-              <Package2 className="h-6 w-6" />
-              <span className="duration-200 group-data-[collapsible=icon]:opacity-0">
-                DiscreetKit
-              </span>
+              <div className="relative h-6 w-6">
+                <Image src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1761573359/Artboard_3_b2vstg.png" alt="DiscreetKit icon" fill />
+              </div>
+              <div className="duration-200 group-data-[collapsible=icon]:opacity-0">
+                <Image src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762345271/Artboard_2_3_fvyg9i.png" alt="DiscreetKit Logo" width={110} height={26} />
+              </div>
             </Link>
           </SidebarMenuButton>
         </SidebarHeader>

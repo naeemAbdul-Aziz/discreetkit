@@ -16,6 +16,7 @@ import { useState, useEffect } from 'react';
 import { useCart } from '@/hooks/use-cart';
 import { Separator } from './ui/separator';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 // define navigation links for easy management.
 const navLinks = [
@@ -63,9 +64,14 @@ function CartLink() {
 
 // a simple component for the site logo.
 const Logo = () => (
-    <span className="font-headline text-2xl font-bold tracking-tight text-primary">
-        DiscreetKit
-    </span>
+    <Image
+        src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762345271/Artboard_2_3_fvyg9i.png"
+        alt="DiscreetKit Logo"
+        width={120}
+        height={28}
+        priority
+        style={{ height: 'auto' }}
+    />
 );
 
 export function Header() {
