@@ -8,6 +8,13 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Fragment } from 'react';
+import { Facebook, Instagram, Twitter } from 'lucide-react';
+
+const socialLinks = [
+  { href: '#', icon: Twitter, 'aria-label': 'Twitter' },
+  { href: '#', icon: Instagram, 'aria-label': 'Instagram' },
+  { href: '#', icon: Facebook, 'aria-label': 'Facebook' },
+];
 
 export function Footer() {
   const nav = [
@@ -24,7 +31,7 @@ export function Footer() {
         alt="DiscreetKit Logo"
         width={140}
         height={32}
-        style={{ width: 'auto' }}
+        style={{ height: 'auto', width: 'auto' }}
     />
   );
 
@@ -59,9 +66,25 @@ export function Footer() {
             </ul>
           </nav>
           
+          {/* Social Links */}
+           <div className="flex items-center justify-center gap-4">
+            {socialLinks.map((social) => (
+              <Link
+                key={social['aria-label']}
+                href={social.href}
+                aria-label={social['aria-label']}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+              >
+                <social.icon className="h-4 w-4" />
+              </Link>
+            ))}
+          </div>
+
           {/* Tagline */}
           <p className="italic text-muted-foreground">
-            Confidential health, delivered discreetly.
+            skip the awkward.
           </p>
           
           {/* Copyright */}
