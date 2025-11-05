@@ -25,7 +25,7 @@ const fontHeadline = localFont({
   fallback: ['system-ui', 'Segoe UI', 'Arial'],
 });
 
-const socialImageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1761571650/Artboard_1_p7j6j3.png';
+const socialImageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762356008/discreetkit_profile_photo_voqfia.png';
 
 let metadataBase: URL;
 try {
@@ -78,9 +78,18 @@ export const metadata: Metadata = {
     images: [socialImageUrl],
   },
   icons: {
-    icon: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1761573359/Artboard_3_b2vstg.svg',
-    shortcut: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1761573359/Artboard_3_b2vstg.png',
-    apple: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1761573359/Artboard_3_b2vstg.png',
+    icon: [
+      { url: socialImageUrl, type: 'image/png', sizes: '16x16' },
+      { url: socialImageUrl, type: 'image/png', sizes: '32x32' },
+      { url: socialImageUrl, type: 'image/png', sizes: '48x48' },
+      { url: socialImageUrl, type: 'image/png', sizes: '96x96' },
+      { url: socialImageUrl, type: 'image/png', sizes: '192x192' },
+      { url: socialImageUrl, type: 'image/png', sizes: '512x512' },
+    ],
+    shortcut: [socialImageUrl],
+    apple: [
+      { url: socialImageUrl, sizes: '180x180' },
+    ],
   },
 };
 
@@ -94,6 +103,7 @@ export default function RootLayout({
       <head>
          <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
          <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+      <link rel="mask-icon" href="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1761571651/Artboard_6_oepbgq.svg" color="#187f76" />
          <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
          <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
          <link rel="preconnect" href="https://api.paystack.co" crossOrigin="anonymous" />

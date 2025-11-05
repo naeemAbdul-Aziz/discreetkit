@@ -59,7 +59,36 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/favicon.ico',
-        destination: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1761573359/Artboard_3_b2vstg.png',
+        destination: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762356008/discreetkit_profile_photo_voqfia.png',
+      },
+      // Common icon aliases browsers request
+      {
+        source: '/apple-touch-icon.png',
+        destination: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762356008/discreetkit_profile_photo_voqfia.png',
+      },
+      {
+        source: '/apple-touch-icon-precomposed.png',
+        destination: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762356008/discreetkit_profile_photo_voqfia.png',
+      },
+      {
+        source: '/android-chrome-192x192.png',
+        destination: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762356008/discreetkit_profile_photo_voqfia.png',
+      },
+      {
+        source: '/android-chrome-512x512.png',
+        destination: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762356008/discreetkit_profile_photo_voqfia.png',
+      },
+      {
+        source: '/icon-192x192.png',
+        destination: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762356008/discreetkit_profile_photo_voqfia.png',
+      },
+      {
+        source: '/icon-512x512.png',
+        destination: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762356008/discreetkit_profile_photo_voqfia.png',
+      },
+      {
+        source: '/mstile-150x150.png',
+        destination: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762356008/discreetkit_profile_photo_voqfia.png',
       },
     ];
   },
