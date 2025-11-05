@@ -38,7 +38,7 @@ export function Footer() {
   return (
     <footer className="border-t bg-card text-card-foreground">
       <div className="container mx-auto px-4 py-12 md:px-6 md:py-16">
-        <div className="flex flex-col items-center justify-center gap-8">
+        <div className="flex flex-col items-center justify-center gap-6">
           
           {/* Logo */}
           <Link href="/" aria-label="DiscreetKit Homepage">
