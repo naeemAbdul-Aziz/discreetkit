@@ -50,7 +50,7 @@ function FormPendingOverlay() {
   const { pending } = useFormStatus();
   if (!pending) return null;
   return (
-    <div className="absolute inset-0 z-20 bg-background/60 backdrop-blur-[1px] flex items-center justify-center rounded-2xl">
+  <div className="absolute inset-0 z-20 bg-background/60 backdrop-blur-[1px] flex items-center justify-center rounded-3xl">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Loader2 className="h-4 w-4 animate-spin" />
         Confirming order…
@@ -86,7 +86,7 @@ function OrderSummaryCard() {
     }
 
     return (
-        <Card className="rounded-2xl">
+  <Card className="rounded-3xl">
             <CardHeader>
                 <CardTitle>Order Summary</CardTitle>
             </CardHeader>
@@ -260,7 +260,7 @@ export function OrderForm() {
           <input type="hidden" name="deliveryFee" value={deliveryFee} />
           <input type="hidden" name="totalPrice" value={totalPrice} />
           
-          <Card className="bg-card rounded-2xl">
+          <Card className="bg-card rounded-3xl">
               <CardHeader>
                   <CardTitle>Delivery & Payment Details</CardTitle>
                   <CardDescription>

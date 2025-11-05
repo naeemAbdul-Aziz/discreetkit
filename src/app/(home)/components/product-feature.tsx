@@ -43,7 +43,7 @@ export function ProductFeature({ product, reverse = false }: { product: Product,
         transition={{ duration: 0.8 }}
     >
       <div className="container mx-auto max-w-5xl px-4 md:px-6">
-        <Card className="overflow-hidden rounded-2xl">
+        <Card className="overflow-hidden rounded-3xl">
           <div className={cn("grid md:grid-cols-2", reverse && "md:grid-flow-row-dense")}>
             <div className={cn("flex flex-col justify-center p-8 text-center md:p-12 md:text-left", reverse && "md:col-start-2")}>
                 <p className="text-sm font-semibold uppercase tracking-wider text-primary">
@@ -64,13 +64,13 @@ export function ProductFeature({ product, reverse = false }: { product: Product,
                     </Button>
                 </div>
             </div>
-            <div className="relative h-64 min-h-[300px] w-full md:h-full bg-muted/50">
+            <div className="relative h-64 min-h-[300px] w-full md:h-full bg-muted/50 rounded-3xl overflow-hidden">
                 {product.image_url && (
                     <Image
                         src={product.image_url}
                         alt={product.name}
                         fill
-                        className="object-contain p-8"
+                        className="object-contain p-8 rounded-3xl"
                         sizes="(max-width: 768px) 100vw, 50vw"
                         placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(600, 400))}`}
                     />

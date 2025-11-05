@@ -135,7 +135,7 @@ export default function PartnerCarePage() {
                         {marieStopesData.services.map((service, index) => (
                         <CarouselItem key={index} className="basis-4/5 sm:basis-1/2 md:basis-1/3">
                             <div className="p-2 h-full">
-                                <Card className="flex flex-col h-full w-full overflow-hidden rounded-2xl bg-card">
+                                <Card className="flex flex-col h-full w-full overflow-hidden rounded-3xl bg-card">
                                     <div className="relative h-[220px] w-full">
                                         <Image
                                             src={service.imageUrl}
@@ -209,7 +209,7 @@ export default function PartnerCarePage() {
             
             <Separator className="my-16 md:my-24" />
 
-             <div id="contact" className="max-w-4xl mx-auto text-center bg-muted p-8 md:p-12 rounded-2xl">
+             <div id="contact" className="max-w-4xl mx-auto text-center bg-muted p-8 md:p-12 rounded-3xl">
                  <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
                     Ready to Take the Next Step?
                 </h2>

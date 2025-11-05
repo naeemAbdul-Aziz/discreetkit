@@ -40,15 +40,15 @@ export function FavoriteProductCard({ product }: { product: FeaturedProduct }) {
   const isPopular = product.badge === 'Popular';
 
   return (
-    <Card className="group flex h-full flex-col overflow-hidden rounded-2xl transition-all hover:-translate-y-1 hover:shadow-lg bg-card border-border">
+    <Card className="group flex h-full flex-col overflow-hidden rounded-3xl bg-card border-border">
        <Link href={`/products/${product.id}`} className="block h-full w-full">
-        <div className="relative aspect-video w-full overflow-hidden bg-muted/30">
+        <div className="relative aspect-video w-full overflow-hidden bg-muted/30 rounded-3xl">
             {product.image_url && (
               <Image
                 src={product.image_url}
                 alt={product.name}
                 fill
-                className="object-contain p-4 transition-transform duration-300 group-hover:scale-105"
+                className="object-contain p-4 rounded-3xl"
                 sizes="(max-width: 768px) 50vw, 25vw"
                 placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
               />

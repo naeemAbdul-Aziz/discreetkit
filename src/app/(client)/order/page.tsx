@@ -17,7 +17,7 @@ const steps = [
 function OrderPageLoading() {
   return (
     <div className="space-y-8 animate-pulse">
-      <Card className="bg-card shadow-sm rounded-2xl">
+  <Card className="bg-card shadow-sm rounded-3xl">
         <CardHeader>
           <div className="h-7 w-1/2 bg-muted rounded" />
           <div className="h-4 w-3/4 bg-muted rounded" />

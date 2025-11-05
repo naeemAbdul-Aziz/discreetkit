@@ -50,7 +50,7 @@ export function ProductDetailContent({ product, relatedProducts }: { product: Pr
                             src={product.image_url}
                             alt={product.name}
                             fill
-                            className="object-contain"
+                            className="object-contain rounded-3xl"
                             sizes="(max-width: 768px) 100vw, 50vw"
                             data-ai-hint="medical test kit"
                             priority

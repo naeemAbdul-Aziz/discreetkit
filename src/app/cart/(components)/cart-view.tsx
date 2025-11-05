@@ -52,8 +52,8 @@ export function CartView() {
     };
     
     if (!isMounted) {
-        return (
-             <Card className="overflow-hidden rounded-2xl animate-pulse">
+       return (
+           <Card className="overflow-hidden rounded-3xl animate-pulse">
                 <CardHeader>
                     <div className="h-9 w-3/5 bg-muted rounded-md" />
                     <div className="h-5 w-4/5 bg-muted rounded-md" />
@@ -84,7 +84,7 @@ export function CartView() {
     }
 
     return (
-        <Card className="overflow-hidden rounded-2xl">
+    <Card className="overflow-hidden rounded-3xl">
             <CardHeader>
                 <CardTitle className="font-headline text-3xl font-bold md:text-4xl">Review Your Cart</CardTitle>
                 <CardDescription>

@@ -37,15 +37,15 @@ export function PartnerReferral() {
   return (
     <section className="py-12 md:py-24">
       <div className="container mx-auto max-w-5xl px-4 md:px-6">
-        <Card className="grid grid-cols-1 rounded-2xl md:grid-cols-2 overflow-hidden">
+  <Card className="grid grid-cols-1 rounded-3xl md:grid-cols-2 overflow-hidden">
             
             {/* image container */}
-            <div className="relative h-64 md:h-auto min-h-[350px]">
+            <div className="relative h-64 md:h-auto min-h-[350px] rounded-3xl overflow-hidden">
               <Image
                   src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=800&fit=crop"
                   alt="a healthcare professional showing information on a tablet to a patient"
                   fill
-                  className="object-cover"
+                  className="object-cover rounded-3xl"
                   sizes="(max-width: 768px) 100vw, 50vw"
                   data-ai-hint="doctor patient tablet"
                   placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 600))}`}

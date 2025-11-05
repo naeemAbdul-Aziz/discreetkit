@@ -160,7 +160,7 @@ export default function ProductsPage() {
             {isLoading ? (
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
                     {Array.from({ length: 8 }).map((_, i) => (
-                        <div key={i} className="rounded-2xl bg-muted h-[300px] animate-pulse" />
+                        <div key={i} className="rounded-3xl bg-muted h-[300px] animate-pulse" />
                     ))}
                 </div>
             ) : (

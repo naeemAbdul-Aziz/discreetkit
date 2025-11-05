@@ -87,7 +87,7 @@ export function ContactUs() {
 
           {/* right column: form */}
           <div>
-            <Card className="rounded-2xl p-4 sm:p-8 bg-card">
+            <Card className="rounded-3xl p-4 sm:p-8 bg-card">
               <CardContent className="p-0">
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-2">

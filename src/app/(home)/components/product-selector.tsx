@@ -141,12 +141,12 @@ export function ProductSelector() {
                                     <div className="p-1 h-full">
                                         <Link href={category.href} className="h-full block group">
                                             <Card className="h-full flex flex-col rounded-3xl bg-card overflow-hidden">
-                                                <div className="relative aspect-square w-full bg-muted/50 rounded-t-3xl overflow-hidden">
+                                                <div className="relative aspect-square w-full bg-muted/50 rounded-3xl overflow-hidden">
                                                     <Image
                                                         src={category.image_url}
                                                         alt={category.name}
                                                         fill
-                                                        className="object-contain p-4"
+                                                        className="object-contain p-4 rounded-3xl"
                                                         sizes="(max-width: 768px) 80vw, 50vw"
                                                         data-ai-hint={category.image_hint}
                                                         placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
@@ -202,12 +202,12 @@ export function ProductSelector() {
                         >
                             <Link href={category.href} className="h-full block group">
                                 <Card className="h-full flex flex-col rounded-3xl bg-card overflow-hidden">
-                                     <div className="relative aspect-square w-full bg-muted/50 rounded-t-3xl overflow-hidden">
+                                     <div className="relative aspect-square w-full bg-muted/50 rounded-3xl overflow-hidden">
                                         <Image
                                             src={category.image_url}
                                             alt={category.name}
                                             fill
-                                            className="object-contain p-4"
+                                            className="object-contain p-4 rounded-3xl"
                                             sizes="25vw"
                                             data-ai-hint={category.image_hint}
                                             placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}

@@ -38,7 +38,7 @@ export function ClosingCta() {
   return (
     <section className="py-12 md:py-24 bg-background">
       <div className="container mx-auto max-w-5xl px-4 md:px-6">
-        <Card className="overflow-hidden rounded-2xl bg-card">
+  <Card className="overflow-hidden rounded-3xl bg-card">
           <div className="grid md:grid-cols-2">
             <div className="flex flex-col justify-center p-8 text-center md:p-12 md:text-left">
               <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
@@ -56,12 +56,12 @@ export function ClosingCta() {
                 </Button>
               </div>
             </div>
-            <div className="relative h-64 min-h-[400px] w-full md:h-full">
+            <div className="relative h-64 min-h-[400px] w-full md:h-full rounded-3xl overflow-hidden">
               <Image
                 src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759593544/closing_cta_b4iufa.png"
                 alt="a person's hands holding a small, discreet package."
                 fill
-                className="object-cover"
+                className="object-cover rounded-3xl"
                 sizes="(max-width: 768px) 100vw, 50vw"
                 data-ai-hint="hands holding package"
                 placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 600))}`}

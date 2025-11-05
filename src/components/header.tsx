@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { useCart } from '@/hooks/use-cart';
 import { Separator } from './ui/separator';
+import { motion } from 'framer-motion';
 
 // define navigation links for easy management.
 const navLinks = [
@@ -73,6 +74,7 @@ export function Header() {
   const [isMounted, setIsMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showPromoBanner, setShowPromoBanner] = useState(false);
+  // header should remain visible while scrolling; no hide-on-scroll behavior
 
   // handle scroll and mount state.
   useEffect(() => {
@@ -83,7 +85,8 @@ export function Header() {
     }
     
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+      const currentY = window.scrollY;
+      setIsScrolled(currentY > 10);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -127,8 +130,8 @@ export function Header() {
     return (
         <>
          <div className="bg-primary p-2 text-center text-sm text-primary-foreground h-[40px]"></div>
-         <header className={cn('sticky top-0 z-50 w-full p-2')}>
-             <div className="container mx-auto flex h-14 max-w-7xl items-center justify-between rounded-2xl border-border/40 bg-background/95"></div>
+     <header className={cn('sticky top-0 z-50 w-full p-2')}>
+       <div className="container mx-auto flex h-14 max-w-7xl items-center justify-between rounded-3xl border-border/40 bg-background/95"></div>
          </header>
         </>
     );
@@ -138,24 +141,29 @@ export function Header() {
     <>
       {/* top promotional bar */}
       {showPromoBanner && (
-        <div className="relative bg-primary p-2 text-center text-sm text-primary-foreground">
+        <div className="fixed inset-x-0 top-0 z-[60] flex h-10 items-center justify-center bg-primary px-10 text-center text-sm text-primary-foreground">
+          <span>
             Free Delivery on UG Campus!{' '}
             <Link href="/products" className="font-semibold underline">
-                Shop Now
+              Shop Now
             </Link>
-            <button 
-                onClick={handleDismissBanner}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary/50 transition-colors"
-                aria-label="Dismiss promotional banner"
-            >
-                <X className="h-4 w-4" />
-            </button>
+          </span>
+          <button
+            onClick={handleDismissBanner}
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-primary-foreground/80 transition-colors hover:bg-primary/50 hover:text-primary-foreground"
+            aria-label="Dismiss promotional banner"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
       )}
-      <header className={cn('sticky top-0 z-50 w-full p-2')}>
-        <div
+      <header className={cn('sticky z-50 w-full p-2 transition-[top]', showPromoBanner ? 'top-10' : 'top-0')}>
+        <motion.div
+          initial={{ y: -8, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.18, ease: 'easeOut' }}
           className={cn(
-            'container mx-auto flex h-14 max-w-7xl items-center justify-between rounded-2xl border-border/40 bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60',
+            'container mx-auto flex h-14 max-w-7xl items-center justify-between rounded-3xl border-border/40 bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60',
             isScrolled ? 'shadow-md' : ''
           )}
         >
@@ -220,7 +228,7 @@ export function Header() {
               </Sheet>
             </div>
           </div>
-        </div>
+        </motion.div>
       </header>
     </>
   );

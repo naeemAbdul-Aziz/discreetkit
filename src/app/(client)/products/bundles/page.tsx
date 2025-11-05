@@ -34,15 +34,8 @@ async function getBundles(): Promise<Product[]> {
 
 export default async function BundlesPage() {
     const bundles = await getBundles();
-
-    const productsByBrand = bundles.reduce((acc, product) => {
-        const brand = product.brand || 'DiscreetKit';
-        if (!acc[brand]) {
-            acc[brand] = [];
-        }
-        acc[brand].push(product);
-        return acc;
-    }, {} as Record<string, Product[]>);
+    // Sort by biggest savings first, then by price as a tiebreaker
+    const sorted = [...bundles].sort((a, b) => (b.savings_ghs || 0) - (a.savings_ghs || 0) || a.price_ghs - b.price_ghs);
 
   return (
     <div className="bg-background">
@@ -57,16 +50,9 @@ export default async function BundlesPage() {
                 </p>
             </div>
 
-            <div className="space-y-12">
-                {Object.entries(productsByBrand).map(([brand, products]) => (
-                    <div key={brand}>
-                        <h2 className="font-headline text-2xl font-bold text-foreground mb-6 border-b pb-2">{brand}</h2>
-                        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
-                            {products.map((product) => (
-                                <ProductCard key={product.id} product={product} />
-                            ))}
-                        </div>
-                    </div>
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
+                {sorted.map((product) => (
+                    <ProductCard key={product.id} product={product} />
                 ))}
             </div>
         </div>

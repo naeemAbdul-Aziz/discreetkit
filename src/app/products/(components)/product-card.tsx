@@ -49,13 +49,13 @@ export function ProductCard({ product }: { product: Product; }) {
     return (
         <Card className="h-full flex flex-col rounded-3xl overflow-hidden group bg-card">
             <Link href={`/products/${product.id}`} className="block" passHref>
-                <div className="relative aspect-square w-full bg-muted/50 overflow-hidden rounded-t-3xl">
+                <div className="relative aspect-square w-full bg-muted/50 overflow-hidden rounded-3xl">
                     {product.image_url && (
                         <Image
                             src={product.image_url}
                             alt={product.name}
                             fill
-                            className="object-contain p-4"
+                            className="object-contain p-4 rounded-3xl"
                             sizes="(max-width: 768px) 50vw, 30vw"
                             data-ai-hint="medical test kit"
                             placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(250, 188))}`}
@@ -72,7 +72,7 @@ export function ProductCard({ product }: { product: Product; }) {
             <CardContent className="flex flex-grow flex-col justify-between p-4 text-left">
                 <div className="flex-grow">
                      <Link href={`/products/${product.id}`} className="block" passHref>
-                        <h3 className="text-base font-bold text-foreground leading-tight hover:text-primary transition-colors line-clamp-2">{product.name}</h3>
+                        <h3 className="text-base font-bold text-foreground leading-tight line-clamp-2">{product.name}</h3>
                     </Link>
                 </div>
                 

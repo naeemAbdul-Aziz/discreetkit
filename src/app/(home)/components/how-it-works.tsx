@@ -13,7 +13,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
 
 const toBase64 = (str: string) =>
   typeof window === 'undefined'
@@ -62,13 +61,13 @@ export function HowItWorks() {
                   {/* The content */}
                   <div className="flex-1 pt-1 space-y-4">
                     <h3 className="text-2xl font-bold text-foreground">{step.title}</h3>
-                    <div className="relative aspect-[4/3] w-full max-w-sm rounded-xl overflow-hidden shadow-md">
+                    <div className="relative aspect-[4/3] w-full max-w-sm rounded-3xl overflow-hidden shadow-md">
                       <Image
                         src={step.imageUrl}
                         alt={step.title}
                         fill
                         sizes="(max-width: 768px) 80vw, 33vw"
-                        className="object-cover"
+                        className="object-cover rounded-3xl"
                         data-ai-hint={step.imageHint}
                         placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
                       />
@@ -107,18 +106,14 @@ export function HowItWorks() {
         {/* Desktop Layout: Alternating Grid */}
         <div className="hidden md:block space-y-16 md:space-y-24 max-w-5xl mx-auto">
           {steps.map((step, index) => (
-            <motion.div
+            <div
               key={step.number}
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
               className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center"
             >
               {/* Image Column */}
               <div
                 className={cn(
-                  'relative aspect-[4/3] w-full rounded-2xl overflow-hidden group',
+                  'relative aspect-[4/3] w-full rounded-3xl overflow-hidden',
                   index % 2 === 1 && 'md:order-last'
                 )}
               >
@@ -127,7 +122,7 @@ export function HowItWorks() {
                   alt={step.title}
                   fill
                   sizes="50vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="object-cover rounded-3xl"
                   data-ai-hint={step.imageHint}
                   placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 600))}`}
                 />
@@ -172,7 +167,7 @@ export function HowItWorks() {
                   </div>
                 )}
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>
