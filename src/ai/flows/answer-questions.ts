@@ -8,9 +8,8 @@
  * - AnswerQuestionsOutput - The return type for the answerQuestions function.
  */
 
-import {ai} from '@/ai/genkit';
-import { googleAI } from '@genkit-ai/googleai';
-import {z} from 'genkit';
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
 import { KNOWLEDGE_BASE } from '../knowledge';
 
 const AnswerQuestionsInputSchema = z.object({
@@ -27,11 +26,17 @@ export async function answerQuestions(input: AnswerQuestionsInput): Promise<Answ
   return answerQuestionsFlow(input);
 }
 
+// Prompt expects both the user query and the injected knowledge base
+const PromptInputSchema = z.object({
+  query: z.string(),
+  knowledge: z.string(),
+});
+
 const prompt = ai.definePrompt({
   name: 'answerQuestionsPrompt',
-  input: {schema: AnswerQuestionsInputSchema},
-  output: {schema: AnswerQuestionsOutputSchema},
-  model: googleAI('gemini-1.5-flash'),
+  input: { schema: PromptInputSchema },
+  output: { schema: AnswerQuestionsOutputSchema },
+  model: 'googleai/gemini-1.5-flash',
   prompt: `You are a helpful, friendly, and stigma-free AI assistant for DiscreetKit Ghana.
 Your primary goal is to answer user questions based *only* on the official information provided in the KNOWLEDGE BASE below.
 Do not invent information or use external knowledge. If the answer is not in the knowledge base, politely state that you don't have that information.
@@ -55,9 +60,9 @@ const answerQuestionsFlow = ai.defineFlow(
     inputSchema: AnswerQuestionsInputSchema,
     outputSchema: AnswerQuestionsOutputSchema,
   },
-  async input => {
-    const {output} = await prompt({
-      ...input,
+  async (input) => {
+    const { output } = await prompt({
+      query: input.query,
       knowledge: KNOWLEDGE_BASE,
     });
     return output!;

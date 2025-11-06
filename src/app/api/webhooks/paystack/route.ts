@@ -7,6 +7,7 @@
 import {NextResponse} from 'next/server';
 import crypto from 'crypto';
 import {getSupabaseAdminClient} from '@/lib/supabase';
+import { paymentDebug } from '@/lib/utils';
 
 export async function POST(req: Request) {
   const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
@@ -26,7 +27,7 @@ export async function POST(req: Request) {
     .digest('hex');
 
   if (hash !== signature) {
-    console.warn('Invalid Paystack webhook signature received.');
+    paymentDebug('Invalid Paystack webhook signature');
     return new NextResponse('Webhook Error: Invalid signature', {status: 400});
   }
 
@@ -40,6 +41,7 @@ export async function POST(req: Request) {
     if (status === 'success') {
       try {
         const supabaseAdmin = getSupabaseAdminClient();
+        paymentDebug('Webhook charge.success received', { reference, amount });
         // Find the order using the reference code
         const {data: order, error: findError} = await supabaseAdmin
           .from('orders')
@@ -48,7 +50,7 @@ export async function POST(req: Request) {
           .single();
 
         if (findError || !order) {
-          console.error(`Webhook Error: Order with reference ${reference} not found.`);
+          paymentDebug('Webhook order not found', { reference });
           // Return 200 so Paystack doesn't retry for a non-existent order
           return new NextResponse('Order not found', {status: 200});
         }
@@ -67,6 +69,7 @@ export async function POST(req: Request) {
                 status: 'Payment Confirmed',
                 note: `Successfully received GHS ${(amount / 100).toFixed(2)}.`,
             });
+            paymentDebug('Webhook updated order to received', { reference, orderId: order.id });
         }
 
       } catch (err) {

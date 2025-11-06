@@ -2,7 +2,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { Suspense, useState, useEffect } from 'react';
+import { Suspense, useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,34 +10,72 @@ import { CheckCircle2, Copy, Truck, Home, Plus, Check, AlertCircle } from 'lucid
 import { BrandSpinner } from '@/components/brand-spinner';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { useCart } from '@/hooks/use-cart';
+import { getOrderAction } from '@/lib/actions';
 
 function SuccessContent() {
   const searchParams = useSearchParams();
   // Paystack returns 'reference' or 'trxref' in the query string
   const code = searchParams.get('reference') || searchParams.get('trxref');
   const { toast } = useToast();
+  const { clearCart } = useCart();
+  const clearedRef = useRef(false);
   const [isCopied, setIsCopied] = useState(false);
   const [isVerifying, setIsVerifying] = useState(true);
   const [paymentStatus, setPaymentStatus] = useState<'success' | 'pending' | 'failed' | null>(null);
+  const [isConfirmed, setIsConfirmed] = useState(false);
 
   useEffect(() => {
-    if (!code) {
-      setIsVerifying(false);
-      setPaymentStatus('failed');
-      return;
-    }
-    
-    // Simulate a short delay to allow webhooks to potentially process first
-    const timer = setTimeout(() => {
-        // In a real app, you might make a fetch request to your backend to get the latest order status.
-        // For now, we'll just assume the webhook will handle it, and this page is for user feedback.
-        // We'll just show the success message based on the redirect.
+    let cancelled = false;
+    const verify = async () => {
+      if (!code) {
         setIsVerifying(false);
-        setPaymentStatus('success'); 
-    }, 2000);
-
-    return () => clearTimeout(timer);
+        setPaymentStatus('failed');
+        return;
+      }
+      try {
+        // Small delay to give webhook a head start
+        await new Promise(r => setTimeout(r, 1000));
+        const res = await fetch(`/api/payment/verify?reference=${encodeURIComponent(code)}`, { cache: 'no-store' });
+        const data = await res.json().catch(() => null);
+        if (cancelled) return;
+        const verifiedOk = res.ok && data?.ok;
+        if (verifiedOk) {
+          setPaymentStatus('success');
+          setIsConfirmed(true);
+        }
+        // If verify did not confirm, double-check order status via action (covers webhook already applied)
+        if (!verifiedOk) {
+          const order = await getOrderAction(code);
+          if (order && order.status !== 'pending_payment') {
+            setPaymentStatus('success');
+            setIsConfirmed(true);
+          } else {
+            // Still show success UX; tracking page is source of truth
+            setPaymentStatus('success');
+          }
+        }
+      } catch (e) {
+        // Fallback: still show success UX, as user reached callback page from gateway
+        setPaymentStatus('success');
+      } finally {
+        if (!cancelled) setIsVerifying(false);
+      }
+    };
+    verify();
+    return () => { cancelled = true };
   }, [code]);
+
+  // Clear the cart once payment is confirmed (verify or webhook path)
+  useEffect(() => {
+    if (paymentStatus === 'success' && isConfirmed && !clearedRef.current) {
+      try {
+        clearCart();
+        clearedRef.current = true;
+        toast({ title: 'Cart cleared', description: 'Your cart has been cleared after successful payment.' });
+      } catch {}
+    }
+  }, [paymentStatus, isConfirmed, clearCart, toast]);
 
   if (isVerifying) {
     return (

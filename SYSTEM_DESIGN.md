@@ -89,6 +89,40 @@ DiscreetKit is a modern web application built on the Jamstack architecture, heav
     *   It cryptographically verifies the webhook signature to ensure it's genuinely from Paystack.
     *   Upon successful verification, it updates the order status in the Supabase database (e.g., from `pending_payment` to `received`) and logs a payment confirmation event in `order_events`.
 
+## Payment Reliability and Verification Fallback
+
+To ensure orders transition out of `pending_payment` even if Paystack webhooks are delayed or misconfigured, the system includes a verification fallback triggered on the user's return to the site:
+
+1. Order creation via `createOrderAction` inserts the order with status `pending_payment` and initializes a Paystack transaction using the order `code` as the Paystack `reference`.
+2. Primary path: Paystack calls our webhook `POST /api/webhooks/paystack`. On `charge.success` with `data.status === 'success'`, we update `orders.status` to `received` (idempotent) and append an `order_events` "Payment Confirmed" entry.
+3. Fallback path: When Paystack redirects the user to `/order/success?reference=...`, the page calls `GET /api/payment/verify?reference=...`. The server verifies the transaction with Paystack's Verify API and, if successful and the order is still `pending_payment`, updates it to `received` and appends the same event. This endpoint is idempotent and safe to retry.
+4. Live updates: The client tracking page subscribes to `orders` updates via Supabase Realtime and refetches the order; the admin dashboard receives an SSE event and refetches metrics and recent orders.
+
+### Configuration Checklist
+
+- `PAYSTACK_SECRET_KEY` must be set for both initializing and verifying transactions.
+- Paystack webhook URL should be configured to: `https://<your-domain>/api/webhooks/paystack`.
+- `NEXT_PUBLIC_SITE_URL` must point to the public base URL used in Paystack callback URLs.
+- Supabase Realtime must be enabled for the `orders` table to support live UI updates.
+
+### Test Steps
+
+1. Place an order and complete a Paystack test payment.
+2. After redirect to `/order/success?reference=...`, the page will call the verify endpoint.
+3. Visit `/track?code=<reference>` and confirm status is `received` with a "Payment Confirmed" event.
+4. Open the admin dashboard; the order should appear in recent orders (pending payments are filtered out).
+
+### Operational Hardening
+
+- Verify endpoint `/api/payment/verify` has a lightweight per-IP+reference rate limit (5 requests/min) to reduce abuse. This is an in-memory limit and acts per instance in serverless.
+- Enable debug logs by setting `PAYMENTS_DEBUG=true` to emit safe, structured messages from both webhook and verify paths. Keep it off in production unless troubleshooting.
+
+### Cart Lifecycle
+
+- The cart is managed client-side via Zustand and persisted to `localStorage`.
+- On the payment success page (`/order/success`), once payment is verified (or already confirmed via webhook), the cart is cleared programmatically to avoid accidental reorders and ensure a clean slate.
+- The clear operation is guarded so it only runs once per success visit.
+
 ### 3.6. AI Chatbot (Genkit)
 
 *   **Framework:** `Firebase Genkit` with the `googleAI` plugin.
@@ -97,6 +131,11 @@ DiscreetKit is a modern web application built on the Jamstack architecture, heav
     *   This flow uses a prompt that is heavily augmented with a **Knowledge Base** (`src/ai/knowledge.ts`) containing official information about DiscreetKit's products, policies, and process.
     *   This "Retrieval-Augmented Generation" (RAG) approach ensures the AI provides answers based on factual data, not external knowledge, preventing hallucinations.
     *   The `handleChat` server action provides the secure interface for the frontend to access this flow.
+
+#### AI Configuration
+
+- Ensure `GOOGLE_GENAI_API_KEY` is configured for the `@genkit-ai/googleai` plugin (see `src/ai/genkit.ts`).
+- During development or when the API key is unavailable, the app currently uses a temporary fallback (`src/ai/flows/answer-questions-fallback.ts`) wired in `src/lib/actions.ts`. You can switch to the full Genkit flow by importing from `src/ai/flows/answer-questions` once the environment is ready.
 
 ### 3.7. SMS Notifications (Arkesel)
 
@@ -108,3 +147,30 @@ DiscreetKit is a modern web application built on the Jamstack architecture, heav
 ---
 
 This modular and secure design allows each part of the system to perform its function independently, ensuring the application is robust, maintainable, and can be scaled effectively in the future.
+
+---
+
+## 4. Current System Structure (key paths)
+
+- Frontend
+    - `src/app/(client)/**` — user-facing routes (home, products, order, track, success)
+    - `src/components/**` — UI components (ShadCN UI based)
+    - `src/hooks/use-cart.ts` — Cart state (Zustand + localStorage)
+
+- Backend/API
+    - `src/lib/actions.ts` — Server Actions (orders, chat, suggestions)
+    - `src/app/api/webhooks/paystack/route.ts` — Paystack webhook handler
+    - `src/app/api/payment/verify/route.ts` — Paystack verify fallback endpoint
+    - `src/app/api/admin/**` — Admin metrics and realtime SSE
+
+- AI
+    - `src/ai/genkit.ts` — Genkit initialization (plugins)
+    - `src/ai/flows/answer-questions.ts` — Primary AI flow (Gemini)
+    - `src/ai/flows/answer-questions-fallback.ts` — Fallback (no external calls)
+    - `src/ai/knowledge.ts` — Static knowledge base content
+
+- Database (Supabase)
+    - `supabase/migrations/**` — Schema and migrations
+
+- Config
+    - `next.config.ts`, `vercel.json`, `tailwind.config.ts`, `tsconfig.json`
