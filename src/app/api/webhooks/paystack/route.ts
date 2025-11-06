@@ -33,6 +33,8 @@ export async function POST(req: Request) {
 
   // 2. Parse the event payload
   const event = JSON.parse(body);
+  const reference = event?.data?.reference;
+  const eventStatus = event?.data?.status;
 
   // 3. Handle the 'charge.success' event
   if (event.event === 'charge.success') {
@@ -41,6 +43,15 @@ export async function POST(req: Request) {
     if (status === 'success') {
       try {
         const supabaseAdmin = getSupabaseAdminClient();
+        // Audit log the webhook payload
+        try {
+          await supabaseAdmin.from('payment_events').insert({
+            source: 'webhook',
+            reference,
+            status,
+            payload: event,
+          });
+        } catch {}
         paymentDebug('Webhook charge.success received', { reference, amount });
         // Find the order using the reference code
         const {data: order, error: findError} = await supabaseAdmin

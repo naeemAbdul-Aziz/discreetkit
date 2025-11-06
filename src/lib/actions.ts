@@ -10,7 +10,20 @@
 import {z} from 'zod';
 import {generateTrackingCode, type Order} from './data';
 // Temporarily using fallback to fix build issues
-import {answerQuestions} from '@/ai/flows/answer-questions-fallback';
+// Use Genkit flow when Google GenAI API key is configured, otherwise fallback
+let _answerQuestions: ((input: { query: string }) => Promise<{ answer: string }>) | null = null;
+async function getAnswerQuestions() {
+  if (_answerQuestions) return _answerQuestions;
+  const hasGenAI = !!process.env.GOOGLE_GENAI_API_KEY;
+  if (hasGenAI) {
+    const mod = await import('@/ai/flows/answer-questions');
+    _answerQuestions = mod.answerQuestions;
+  } else {
+    const mod = await import('@/ai/flows/answer-questions-fallback');
+    _answerQuestions = mod.answerQuestions;
+  }
+  return _answerQuestions;
+}
 import {revalidatePath} from 'next/cache';
 import {type CartItem} from '@/hooks/use-cart';
 import {getSupabaseAdminClient, createSupabaseServerClient} from './supabase';
@@ -322,6 +335,7 @@ export async function handleChat(
 ) {
   'use server';
   try {
+    const answerQuestions = await getAnswerQuestions();
     const result = await answerQuestions({query: message});
     return result.answer;
   } catch (error) {

@@ -2,7 +2,7 @@
 // src/middleware.ts (FIXED)
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { createSupabaseMiddlewareClient } from './lib/supabase'; // <-- Import the correct client
+import { createSupabaseMiddlewareClient } from './lib/supabase-mw'; // edge-safe middleware client
 
 const PROTECTED_ROUTES = ['/admin', '/pharmacy'];
 const LOGIN_ROUTE = '/login';

@@ -1,4 +1,4 @@
-# **App Name**: AnonTest Ghana
+# **App Name**: DiscreetKit
 
 ## Core Features:
 

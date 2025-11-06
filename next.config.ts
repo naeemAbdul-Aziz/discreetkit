@@ -9,9 +9,8 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  experimental: {
-    serverComponentsExternalPackages: ['genkit', '@genkit-ai/core', '@genkit-ai/googleai'],
-  },
+  // Next.js 15: serverComponentsExternalPackages moved to serverExternalPackages
+  serverExternalPackages: ['genkit', '@genkit-ai/core', '@genkit-ai/googleai'],
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -87,6 +86,21 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       }
     ],
+  },
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'no-referrer' },
+          // Keep conservative to avoid breaking embeds; extend as needed
+          { key: 'Permissions-Policy', value: 'geolocation=(), microphone=(), camera=()' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+        ],
+      },
+    ];
   },
   async rewrites() {
     return [

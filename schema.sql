@@ -1,4 +1,7 @@
-http://192.168.137.91:3001-- DiscreetKit Ghana Database Schema
+-- DiscreetKit Ghana Database Schema (snapshot)
+-- NOTE: This file is a generated snapshot for reference/code review.
+-- Do NOT edit by hand. Apply changes via Supabase migrations in `supabase/migrations/`.
+-- You can regenerate this snapshot using `supabase db dump --schema-only` (see docs/MIGRATIONS.md).
 -- This script defines the tables, relationships, and security policies for the application.
 
 -- ----------------------------

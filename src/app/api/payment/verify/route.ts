@@ -10,6 +10,7 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdminClient } from '@/lib/supabase';
 import { paymentDebug, rlAllow } from '@/lib/utils';
+import { rlAllowDistributed } from '@/lib/rate-limit';
 
 export async function GET(req: Request) {
   try {
@@ -21,9 +22,12 @@ export async function GET(req: Request) {
       return NextResponse.json({ ok: false, error: 'Missing reference' }, { status: 400 });
     }
 
-    // Lightweight rate limiting: max 5 requests/min per IP+reference
+    // Rate limiting: prefer distributed limiter if configured, fallback to in-memory
     const key = `${ip}:${reference}`;
-    const { allowed, retryAfterSec } = rlAllow(key, 5, 60_000);
+    const { allowed, retryAfterSec } = await rlAllowDistributed(key, 5, 60).catch(() => {
+      const r = rlAllow(key, 5, 60_000);
+      return { allowed: r.allowed, retryAfterSec: r.retryAfterSec };
+    });
     if (!allowed) {
       paymentDebug('verify rate-limited', { ip, reference });
       return NextResponse.json({ ok: false, error: 'Too Many Requests' }, {
@@ -47,6 +51,17 @@ export async function GET(req: Request) {
       cache: 'no-store',
     });
     const verifyData = await verifyRes.json();
+
+    // Audit log the verify attempt (status will indicate success/failure)
+    try {
+      const supabaseAudit = getSupabaseAdminClient();
+      await supabaseAudit.from('payment_events').insert({
+        source: 'verify',
+        reference,
+        status: verifyData?.data?.status ?? 'unknown',
+        payload: verifyData,
+      });
+    } catch {}
 
     if (!verifyRes.ok || !verifyData?.status) {
       paymentDebug('Paystack verify failed', { reference, statusCode: verifyRes.status, bodyStatus: verifyData?.status });

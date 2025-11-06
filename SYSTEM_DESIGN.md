@@ -76,6 +76,12 @@ DiscreetKit is a modern web application built on the Jamstack architecture, heav
 *   **Security:** Row Level Security (RLS) is enabled on all sensitive tables (like `orders`). This ensures that data can only be accessed via the secure `service_role` key, which is only used within the server-side Server Actions. Public `anon_key` access is restricted.
 *   **Real-time:** Supabase's real-time capabilities are used to listen for database changes, particularly on the admin orders page, allowing the UI to update automatically without needing a manual refresh.
 
+#### Change management
+
+- Migrations in `supabase/migrations/` are the single source of truth for schema changes. Apply using Supabase CLI (`supabase db push`).
+- `schema.sql` is a generated snapshot for code review and reference; do not edit manually.
+- See `docs/MIGRATIONS.md` for the full workflow (creating migrations, pushing changes, and regenerating snapshots).
+
 ### 3.5. Payment Gateway (Paystack)
 
 *   **Role:** Securely handles all payment processing (Mobile Money, Card).
@@ -116,6 +122,20 @@ To ensure orders transition out of `pending_payment` even if Paystack webhooks a
 
 - Verify endpoint `/api/payment/verify` has a lightweight per-IP+reference rate limit (5 requests/min) to reduce abuse. This is an in-memory limit and acts per instance in serverless.
 - Enable debug logs by setting `PAYMENTS_DEBUG=true` to emit safe, structured messages from both webhook and verify paths. Keep it off in production unless troubleshooting.
+- Security headers are set via Next.js `headers()` (HSTS, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, X-Frame-Options). Adjust as needed based on embedding or third-party requirements.
+
+### Scheduled Reconciliation
+
+- Endpoint: `GET /api/payments/reconcile` (Node runtime)
+- Purpose: Re-verify orders stuck in `pending_payment` beyond a threshold (default 10 minutes) using the Paystack Verify API.
+- Auth: Provide either `X-CRON-KEY: <CRON_SECRET>` header or `?secret=<CRON_SECRET>` query param. If `CRON_SECRET` is not set, calls with the `X-Vercel-Cron` header (from Vercel Cron) are allowed.
+- Idempotency: Updates only if the order is still `pending_payment` and appends a standard "Payment Confirmed" event.
+- Scheduling: Configured via `vercel.json` crons (default every 10 minutes). You may adjust the cadence in the Vercel dashboard.
+
+### Distributed Rate Limiting (Optional)
+
+- If `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are set, the app uses an Upstash-backed limiter in `/api/payment/verify`.
+- Fallback: When these env vars are absent, the in-memory limiter is used (per-instance best-effort).
 
 ### Cart Lifecycle
 
