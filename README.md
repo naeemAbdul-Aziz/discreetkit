@@ -144,3 +144,12 @@ These SSE endpoints use the service role only in server code; the service key is
 - Move aggregation to a SQL view with window functions for richer metrics (LTV, average order interval).
 - Add pagination & sorting on the Customers page.
 - Debounce SSE-triggered refetches if write volume becomes high.
+
+## 📱 Mobile form zoom (iOS Safari) fixes
+
+We prevent unwanted zoom when focusing inputs on iOS Safari:
+
+- `layout.tsx` viewport meta adds `maximum-scale=1, user-scalable=no, interactive-widget=resizes-content` and `format-detection` to reduce auto-zoom and auto-linking.
+- `globals.css` enforces `font-size: 16px` on `input/textarea/select` (Safari zooms when <16px) and introduces `.min-h-dvh` and `.vk-safe` helpers for better behavior with the virtual keyboard and safe-area insets.
+
+If you prefer zero linter warnings for `text-size-adjust`, you may remove the standard property; functionality remains via `-webkit-text-size-adjust`.

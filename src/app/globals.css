@@ -61,9 +61,35 @@
     font-kerning: auto;
     font-family: 'Satoshi', sans-serif;
   }
+  /* Dynamic viewport helpers for better VKB behavior */
+  .min-h-dvh { min-height: 100dvh; }
+  /* Add safe-area bottom padding for devices with insets (e.g., iPhone) */
+  .vk-safe { padding-bottom: env(safe-area-inset-bottom); }
+  /* Prevent scroll chaining/bounce when keyboard opens (where supported) */
+  @supports (overscroll-behavior: contain) {
+    .overscroll-contain { overscroll-behavior: contain; }
+  }
+  /* Keep focused fields visible above keyboard */
+  .vk-scroll { scroll-padding-bottom: calc(env(safe-area-inset-bottom) + 6rem); }
+  /* Use dynamic viewport height for better behavior with virtual keyboard */
+  .min-h-dvh { min-height: 100dvh; }
+  /* Add safe-area bottom padding for devices with insets (e.g., iPhone) */
+  .vk-safe { padding-bottom: env(safe-area-inset-bottom); }
   
   /* Ensure form elements and buttons inherit the body font */
   input, button, textarea, select {
     @apply font-body;
+  }
+
+  /* Prevent iOS Safari focus-zoom by ensuring inputs are 16px+ */
+  input, textarea, select {
+    font-size: 16px; /* Safari zooms if < 16px */
+    line-height: 1.4;
+    /* Intentionally no text-size-adjust; 16px base prevents zoom on iOS */
+  }
+
+  /* Improve tap responsiveness on touch devices */
+  a, button {
+    touch-action: manipulation;
   }
 }

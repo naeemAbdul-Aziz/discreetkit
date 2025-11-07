@@ -100,8 +100,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <head>
+      {/* Prevent iOS Safari focus zoom and improve VKB behavior */}
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
+      <meta name="format-detection" content="telephone=no,email=no,address=no" />
          <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       <link rel="mask-icon" href="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1761571651/Artboard_6_oepbgq.svg" color="#187f76" />
          <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
@@ -112,7 +114,7 @@ export default function RootLayout({
       <body className={cn('min-h-screen bg-background font-body antialiased', fontBody.variable, fontHeadline.variable)}>
         <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground">Skip to content</a>
         <TourProvider>
-          <main id="main" role="main">
+          <main id="main" role="main" className="min-h-dvh vk-safe">
             {children}
           </main>
           <Toaster />
