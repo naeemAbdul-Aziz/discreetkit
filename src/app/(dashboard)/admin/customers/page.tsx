@@ -10,7 +10,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSSE } from '@/hooks/use-sse';
 import { Input } from '@/components/ui/input';
 
-type CustomerRow = { email: string; totalSpent: number; orders: number; firstOrder: string; lastOrder: string };
+type CustomerRow = { identifier: string; email?: string | null; totalSpent: number; orders: number; firstOrder: string; lastOrder: string };
 
 export default function AdminCustomersPage() {
   const [rows, setRows] = useState<CustomerRow[] | null>(null);
@@ -39,7 +39,7 @@ export default function AdminCustomersPage() {
     if (!rows) return null;
     const s = q.trim().toLowerCase();
     if (!s) return rows;
-    return rows.filter(r => r.email.toLowerCase().includes(s));
+    return rows.filter(r => ((r.email ?? r.identifier).toLowerCase().includes(s)));
   }, [rows, q]);
 
   return (
@@ -72,8 +72,8 @@ export default function AdminCustomersPage() {
               </TableHeader>
               <TableBody>
                 {filtered.map((c) => (
-                  <TableRow key={c.email}>
-                    <TableCell className="font-medium">{c.email}</TableCell>
+                  <TableRow key={c.identifier}>
+                    <TableCell className="font-medium">{c.email ?? c.identifier}</TableCell>
                     <TableCell>{c.orders}</TableCell>
                     <TableCell>{c.totalSpent.toFixed(2)}</TableCell>
                     <TableCell>{new Date(c.firstOrder).toLocaleDateString()}</TableCell>

@@ -94,3 +94,53 @@ The application will now be accessible via your ngrok URL, and Paystack will be 
 ## 📦 Deployment
 
 This project is optimized for deployment on Vercel or Firebase App Hosting. Simply connect your Git repository and configure the environment variables in the hosting provider's dashboard. Remember to set `NEXT_PUBLIC_SITE_URL` to your actual production domain.
+
+## 🧩 Admin Dashboard Data Integrity & Realtime
+
+The admin dashboard pages (`/admin/dashboard`, `/admin/orders`, `/admin/products`, `/admin/customers`) rely on:
+
+- Server-side aggregation via the `orders` table (there is currently no dedicated `customers` table).
+- Fallback identifier logic when `email` is missing (uses `phone_masked` then `code`).
+- Server-Sent Events (SSE) endpoints under `/api/admin/realtime/*` that subscribe to changes on underlying tables.
+
+### Customers Aggregation Changes
+
+Previously, the Customers page grouped only by `email`, so orders without an email produced an empty list. The API route `src/app/api/admin/customers/route.ts` now:
+
+- Selects `email`, `phone_masked`, and `code`.
+- Chooses a stable `identifier` fallback (`email || phone_masked || code`).
+- Aggregates totals, first/last order timestamps, and order counts.
+
+### Performance Enhancements
+
+Migration `20251107130000_customer_enhancements.sql` adds helpful indexes:
+
+```sql
+CREATE INDEX IF NOT EXISTS orders_email_idx ON public.orders(email);
+CREATE INDEX IF NOT EXISTS orders_created_at_idx ON public.orders(created_at);
+```
+
+If you want a pure SQL approach later, uncomment the view definition inside that migration and update the API to query it directly (note: Realtime does not emit events for views—keep listening to `orders`).
+
+### Realtime Flow
+
+Each page sets up an SSE subscription and refetches its data on any relevant change:
+
+- Orders: `/api/admin/realtime/orders`
+- Products: `/api/admin/realtime/products`
+- Customers: `/api/admin/realtime/customers` (listens to `orders` changes)
+
+These SSE endpoints use the service role only in server code; the service key is never sent to the browser.
+
+### Troubleshooting Empty Customers
+
+1. Ensure new orders capture at least one of: `email`, `phone_masked`, or `code`.
+2. Verify the migration ran (indexes speed up aggregation).
+3. Confirm RLS policies allow the service role full access (policies included in schema migrations).
+4. Check browser Network tab: `/api/admin/customers` should return JSON with `identifier` keys.
+
+### Future Improvements
+
+- Move aggregation to a SQL view with window functions for richer metrics (LTV, average order interval).
+- Add pagination & sorting on the Customers page.
+- Debounce SSE-triggered refetches if write volume becomes high.
