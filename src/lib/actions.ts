@@ -134,7 +134,7 @@ export async function sendOrderConfirmationSMS(orderId: string): Promise<void> {
     }
 
     const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${order.code}`;
-    const confirmationMessage = `Great news! Your DiscreetKit order ${order.code} payment has been confirmed. We're now preparing your package for discreet delivery. Track progress: ${trackingUrl}`;
+    const confirmationMessage = `Payment for order ${order.code} confirmed. We're now preparing your package for discreet delivery. Track: ${trackingUrl}`;
     
     await sendSMS(order.phone_masked, confirmationMessage);
   } catch (error) {
@@ -159,7 +159,7 @@ export async function sendShippingNotificationSMS(orderId: string): Promise<void
     }
 
     const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${order.code}`;
-    const shippingMessage = `Your DiscreetKit order ${order.code} has been shipped! Your package is now on its way for discreet delivery. Track: ${trackingUrl}`;
+    const shippingMessage = `Your order ${order.code} has been shipped. Your package is on the way for discreet delivery. Track: ${trackingUrl}`;
     
     await sendSMS(order.phone_masked, shippingMessage);
   } catch (error) {
@@ -183,7 +183,7 @@ export async function sendDeliveryNotificationSMS(orderId: string): Promise<void
       return;
     }
 
-    const deliveredMessage = `Great news! Your DiscreetKit order ${order.code} has been delivered successfully. Thank you for choosing us for your health needs. Need support? We're here to help.`;
+    const deliveredMessage = `Your order ${order.code} has been delivered successfully. Thank you for choosing DiscreetKit for your health needs. Need support? We're here to help.`;
     
     await sendSMS(order.phone_masked, deliveredMessage);
   } catch (error) {
@@ -326,7 +326,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
      
     // 3. Send initial SMS Notification
     const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${code}`;
-    const initialSmsMessage = `Your DiscreetKit order ${code} has been received! We'll notify you once payment is confirmed and we start preparing your package. Track: ${trackingUrl}`;
+    const initialSmsMessage = `Your order ${code} is received. We'll notify you once payment is processed. Track status: ${trackingUrl}`;
     
     await sendSMS(validatedFields.data.phone_masked, initialSmsMessage);
 

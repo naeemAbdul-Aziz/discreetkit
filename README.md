@@ -47,11 +47,15 @@ PAYSTACK_SECRET_KEY="your-paystack-secret-key"
 # Arkesel SMS (Replace with your V2 API key from arkesel.com)
 ARKESEL_API_KEY="your-arkesel-api-key"
 
+# Arkesel SMS (Replace with your API key from arkesel.com)
+ARKESEL_API_KEY="your-arkesel-api-key"
+ARKESEL_SENDER_ID="DiscreetKit"
+
 # Genkit (Google AI - Replace with your own key)
 GEMINI_API_KEY="your-google-ai-api-key"
 
-# Site URL (IMPORTANT: Use ngrok for local development with Paystack)
-NEXT_PUBLIC_SITE_URL="https://your-ngrok-tunnel-url.ngrok-free.app"
+# Site URL (Production: discreetkit.shop | Local: use ngrok for Paystack webhooks)
+NEXT_PUBLIC_SITE_URL="https://discreetkit.shop"
 ```
 
 ### 4. Set Up Ngrok for Local Development

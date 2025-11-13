@@ -43,13 +43,13 @@ export async function POST(req: NextRequest) {
     const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${order.code}`;
     switch (type) {
       case 'confirmation':
-        message = `Test: Your DiscreetKit order ${order.code} payment has been confirmed. Track: ${trackingUrl}`;
+        message = `Test: Payment for order ${order.code} confirmed. We're now preparing your package for discreet delivery. Track: ${trackingUrl}`;
         break;
       case 'shipping':
-        message = `Test: Your DiscreetKit order ${order.code} has been shipped. Track: ${trackingUrl}`;
+        message = `Test: Your order ${order.code} has been shipped. Your package is on the way for discreet delivery. Track: ${trackingUrl}`;
         break;
       case 'delivery':
-        message = `Test: Your DiscreetKit order ${order.code} has been delivered.`;
+        message = `Test: Your order ${order.code} has been delivered successfully. Thank you for choosing DiscreetKit for your health needs.`;
         break;
       default:
         return NextResponse.json({ error: 'Invalid SMS type. Use: confirmation, shipping, or delivery' }, { status: 400 });
