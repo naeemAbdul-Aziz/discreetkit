@@ -25,11 +25,13 @@ The sender ID "DiscreetKit" has been whitelisted with Arkesel for your account.
 
 ### Core SMS Function (`src/lib/actions.ts`)
 ```typescript
-async function sendSMS(phone: string, message: string): Promise<boolean>
+async function sendSMS(phone: string, message: string): Promise<{ok: boolean; recipient: string; status?: number; body?: any; error?: string}>
 ```
 - Handles phone number formatting (adds 233 prefix for Ghana numbers)
-- Uses Arkesel v2 API endpoint: `https://sms.arkesel.com/api/v2/sms/send`
-- Returns boolean indicating success/failure
+- Uses Arkesel API endpoint: `https://sms.arkesel.com/sms/api` with GET method
+- Follows official Arkesel documentation format with query parameters
+- Automatically adds `use_case=promotional` for Nigerian numbers (234xxxxxxxx)
+- Returns detailed response object with success status and API response
 - Includes comprehensive error handling and logging
 
 ### Notification Functions

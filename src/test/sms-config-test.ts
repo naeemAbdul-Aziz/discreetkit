@@ -13,11 +13,18 @@ function formatPhone(phone: string): string {
   return phone.startsWith('0') ? `233${phone.substring(1)}` : phone;
 }
 
-const testPhones = ['0241234567', '233241234567', '0501234567'];
+const testPhones = ['0241234567', '233241234567', '0501234567', '2349544919953'];
 console.log('\n📱 Phone Number Formatting Test:');
 testPhones.forEach(phone => {
-  console.log(`${phone} → ${formatPhone(phone)}`);
+  const formatted = formatPhone(phone);
+  const useCase = formatted.startsWith('234') ? ' (use_case: promotional)' : '';
+  console.log(`${phone} → ${formatted}${useCase}`);
 });
+
+console.log('\n📡 API Configuration:');
+console.log('- Endpoint: https://sms.arkesel.com/sms/api');
+console.log('- Method: GET with query parameters');
+console.log('- Authentication: api_key parameter');
 
 console.log('\n✅ Configuration test complete!');
 console.log('💡 Use /api/test/sms endpoint to test actual SMS sending');

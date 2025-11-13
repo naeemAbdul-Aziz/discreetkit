@@ -30,44 +30,89 @@ import {getSupabaseAdminClient, createSupabaseServerClient} from './supabase';
 import {redirect} from 'next/navigation';
 
 // SMS utility function
-async function sendSMS(phone: string, message: string): Promise<boolean> {
-  const arkeselApiKey = process.env.ARKESEL_API_KEY;
-  
+export async function sendSMS(phone: string, message: string): Promise<{ ok: boolean; recipient: string; status?: number; body?: any; error?: string }> {
+  let arkeselApiKey = process.env.ARKESEL_API_KEY;
+  // Trim accidental quotes from env var (some deploy UIs add quotes)
+  if (typeof arkeselApiKey === 'string') arkeselApiKey = arkeselApiKey.replace(/^"|"$/g, '').trim();
+
+  console.log('sendSMS called — phone:', phone, 'messagePreview:', message?.slice(0, 120));
+  console.log('Arkesel key present:', !!arkeselApiKey, 'key length:', (arkeselApiKey || '').length);
+
   if (!arkeselApiKey || arkeselApiKey.length === 0) {
-    console.log('SMS not sent: Arkesel API key not configured');
-    return false;
+    const msg = 'SMS not sent: Arkesel API key not configured';
+    console.warn(msg);
+    return { ok: false, recipient: phone, error: msg };
   }
 
   // Format phone number for Ghana (add 233 prefix if starts with 0)
   const recipient = phone.startsWith('0') ? `233${phone.substring(1)}` : phone;
+  const senderId = process.env.ARKESEL_SENDER_ID || 'DiscreetKit';
+
+  console.log('Arkesel SMS - recipient:', recipient, 'sender:', senderId, 'messagePreview:', message.slice(0, 50) + '...');
 
   try {
-    const smsResponse = await fetch('https://sms.arkesel.com/api/v2/sms/send', {
-      method: 'POST',
+    // Build URL with query parameters as per Arkesel documentation
+    const url = new URL('https://sms.arkesel.com/sms/api');
+    url.searchParams.append('action', 'send-sms');
+    url.searchParams.append('api_key', arkeselApiKey);
+    url.searchParams.append('to', recipient);
+    url.searchParams.append('from', senderId);
+    url.searchParams.append('sms', message);
+    
+    // Add use_case for Nigerian numbers (2349xxxxxxxx)
+    if (recipient.startsWith('234')) {
+      url.searchParams.append('use_case', 'promotional');
+    }
+
+    console.log('Arkesel API URL (without key):', url.toString().replace(/api_key=[^&]+/, 'api_key=***'));
+
+    const response = await fetch(url.toString(), {
+      method: 'GET',
       headers: {
-        'Authorization': `Bearer ${arkeselApiKey}`,
-        'Content-Type': 'application/json',
         'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        sender: process.env.ARKESEL_SENDER_ID || 'DiscreetKit',
-        message: message,
-        recipients: [recipient],
-        sandbox: false
-      })
+      }
     });
 
-    if (!smsResponse.ok) {
-      const errorData = await smsResponse.json();
-      console.warn('Arkesel SMS API Error:', errorData);
-      return false;
-    } else {
-      console.log('Successfully sent SMS notification via Arkesel to:', recipient);
-      return true;
+    let responseBody: any;
+    try {
+      responseBody = await response.json();
+    } catch {
+      responseBody = await response.text();
     }
-  } catch (smsError) {
+
+    console.log('Arkesel response status:', response.status, 'body:', responseBody);
+
+    if (!response.ok) {
+      console.warn('Arkesel SMS API Error:', { status: response.status, body: responseBody });
+      return { 
+        ok: false, 
+        recipient, 
+        status: response.status, 
+        body: responseBody, 
+        error: `Arkesel API returned ${response.status}: ${JSON.stringify(responseBody)}` 
+      };
+    }
+
+    // Check if the response indicates success
+    const isSuccess = responseBody?.code === 'ok' || responseBody?.message?.toLowerCase().includes('success');
+    
+    if (!isSuccess) {
+      console.warn('Arkesel SMS failed based on response:', responseBody);
+      return { 
+        ok: false, 
+        recipient, 
+        status: response.status, 
+        body: responseBody, 
+        error: `SMS failed: ${responseBody?.message || 'Unknown error'}` 
+      };
+    }
+
+    console.log('Successfully sent SMS notification via Arkesel to:', recipient, 'response:', responseBody);
+    return { ok: true, recipient, status: response.status, body: responseBody };
+
+  } catch (smsError: any) {
     console.error('Failed to send SMS notification:', smsError);
-    return false;
+    return { ok: false, recipient, error: String(smsError) };
   }
 }
 

@@ -4,7 +4,8 @@
  * Should be removed or secured in production
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { sendOrderConfirmationSMS, sendShippingNotificationSMS, sendDeliveryNotificationSMS } from '@/lib/actions';
+import { getSupabaseAdminClient } from '@/lib/supabase';
+import { sendSMS } from '@/lib/actions';
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,26 +15,53 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Order ID required' }, { status: 400 });
     }
 
-    let result = false;
+    const supabase = getSupabaseAdminClient();
+    // Fetch order and call sendSMS directly to return debug info
+    // Try to find by id first, otherwise allow looking up by code (tracking code)
+    let { data: order, error } = await supabase
+      .from('orders')
+      .select('id, code, phone_masked')
+      .eq('id', orderId)
+      .single();
+
+    if (error || !order) {
+      // attempt lookup by code (human-facing tracking code)
+      const res = await supabase
+        .from('orders')
+        .select('id, code, phone_masked')
+        .eq('code', orderId)
+        .single();
+      order = res.data;
+      error = res.error;
+    }
+
+    if (error || !order) {
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+    }
+
+    let message = '';
+    const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${order.code}`;
     switch (type) {
       case 'confirmation':
-        await sendOrderConfirmationSMS(orderId);
+        message = `Test: Your DiscreetKit order ${order.code} payment has been confirmed. Track: ${trackingUrl}`;
         break;
       case 'shipping':
-        await sendShippingNotificationSMS(orderId);
+        message = `Test: Your DiscreetKit order ${order.code} has been shipped. Track: ${trackingUrl}`;
         break;
       case 'delivery':
-        await sendDeliveryNotificationSMS(orderId);
+        message = `Test: Your DiscreetKit order ${order.code} has been delivered.`;
         break;
       default:
         return NextResponse.json({ error: 'Invalid SMS type. Use: confirmation, shipping, or delivery' }, { status: 400 });
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      message: `${type} SMS sent successfully`,
-      orderId 
-    });
+    const sendResult = await sendSMS(order.phone_masked, message);
+
+    if (!sendResult.ok) {
+      return NextResponse.json({ error: 'Failed to send SMS', detail: sendResult }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true, orderId, sendResult });
 
   } catch (error) {
     console.error('SMS test error:', error);
