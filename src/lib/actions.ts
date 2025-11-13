@@ -29,6 +29,123 @@ import {type CartItem} from '@/hooks/use-cart';
 import {getSupabaseAdminClient, createSupabaseServerClient} from './supabase';
 import {redirect} from 'next/navigation';
 
+// SMS utility function
+async function sendSMS(phone: string, message: string): Promise<boolean> {
+  const arkeselApiKey = process.env.ARKESEL_API_KEY;
+  
+  if (!arkeselApiKey || arkeselApiKey.length === 0) {
+    console.log('SMS not sent: Arkesel API key not configured');
+    return false;
+  }
+
+  // Format phone number for Ghana (add 233 prefix if starts with 0)
+  const recipient = phone.startsWith('0') ? `233${phone.substring(1)}` : phone;
+
+  try {
+    const smsResponse = await fetch('https://sms.arkesel.com/api/v2/sms/send', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${arkeselApiKey}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        sender: process.env.ARKESEL_SENDER_ID || 'DiscreetKit',
+        message: message,
+        recipients: [recipient],
+        sandbox: false
+      })
+    });
+
+    if (!smsResponse.ok) {
+      const errorData = await smsResponse.json();
+      console.warn('Arkesel SMS API Error:', errorData);
+      return false;
+    } else {
+      console.log('Successfully sent SMS notification via Arkesel to:', recipient);
+      return true;
+    }
+  } catch (smsError) {
+    console.error('Failed to send SMS notification:', smsError);
+    return false;
+  }
+}
+
+// Send order confirmation SMS after successful payment
+export async function sendOrderConfirmationSMS(orderId: string): Promise<void> {
+  try {
+    const supabaseAdmin = getSupabaseAdminClient();
+    
+    // Get order details
+    const { data: order, error } = await supabaseAdmin
+      .from('orders')
+      .select('code, phone_masked')
+      .eq('id', orderId)
+      .single();
+
+    if (error || !order) {
+      console.error('Failed to fetch order for SMS confirmation:', error);
+      return;
+    }
+
+    const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${order.code}`;
+    const confirmationMessage = `Great news! Your DiscreetKit order ${order.code} payment has been confirmed. We're now preparing your package for discreet delivery. Track progress: ${trackingUrl}`;
+    
+    await sendSMS(order.phone_masked, confirmationMessage);
+  } catch (error) {
+    console.error('Error sending order confirmation SMS:', error);
+  }
+}
+
+// Send shipping notification SMS
+export async function sendShippingNotificationSMS(orderId: string): Promise<void> {
+  try {
+    const supabaseAdmin = getSupabaseAdminClient();
+    
+    const { data: order, error } = await supabaseAdmin
+      .from('orders')
+      .select('code, phone_masked')
+      .eq('id', orderId)
+      .single();
+
+    if (error || !order) {
+      console.error('Failed to fetch order for shipping SMS:', error);
+      return;
+    }
+
+    const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${order.code}`;
+    const shippingMessage = `Your DiscreetKit order ${order.code} has been shipped! Your package is now on its way for discreet delivery. Track: ${trackingUrl}`;
+    
+    await sendSMS(order.phone_masked, shippingMessage);
+  } catch (error) {
+    console.error('Error sending shipping notification SMS:', error);
+  }
+}
+
+// Send delivery notification SMS
+export async function sendDeliveryNotificationSMS(orderId: string): Promise<void> {
+  try {
+    const supabaseAdmin = getSupabaseAdminClient();
+    
+    const { data: order, error } = await supabaseAdmin
+      .from('orders')
+      .select('code, phone_masked')
+      .eq('id', orderId)
+      .single();
+
+    if (error || !order) {
+      console.error('Failed to fetch order for delivery SMS:', error);
+      return;
+    }
+
+    const deliveredMessage = `Great news! Your DiscreetKit order ${order.code} has been delivered successfully. Thank you for choosing us for your health needs. Need support? We're here to help.`;
+    
+    await sendSMS(order.phone_masked, deliveredMessage);
+  } catch (error) {
+    console.error('Error sending delivery notification SMS:', error);
+  }
+}
+
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -162,50 +279,11 @@ export async function createOrderAction(prevState: any, formData: FormData) {
         note: 'Order placed, awaiting payment confirmation.',
      });
      
-    // 3. Send SMS Notification via Arkesel
-    const arkeselApiKey = process.env.ARKESEL_API_KEY;
-    if (arkeselApiKey && arkeselApiKey !== 'cHNIRlBqdXJncklObmFpelB0R0Q') { // Check against placeholder
-        const recipient = validatedFields.data.phone_masked.startsWith('0') 
-            ? `233${validatedFields.data.phone_masked.substring(1)}` 
-            : validatedFields.data.phone_masked;
-
-        const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${code}`;
-        const smsMessage = `Your DiscreetKit order ${code} has been confirmed. We're now preparing it for its discreet journey to you. Track its progress here: ${trackingUrl}. Should you need any support, remember we're here to help.`;
-
-        try {
-            const smsResponse = await fetch('https://sms.arkesel.com/api/v2/sms/send', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${arkeselApiKey}`,
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    sender: 'Discreet',
-                    message: smsMessage,
-                    recipients: [recipient],
-                    sandbox: false
-                })
-            });
-
-            if (!smsResponse.ok) {
-                const errorData = await smsResponse.json();
-                console.warn('Arkesel SMS API Warning:', errorData);
-            } else {
-                 console.log('Successfully sent SMS notification via Arkesel.');
-            }
-        } catch (smsError) {
-            console.error('Failed to send SMS notification:', smsError);
-        }
-    } else {
-        console.log('--- (Skipping SMS: Arkesel API key not configured or is placeholder) ---');
-        const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${code}`;
-        const smsPayload = {
-          to: `+233${validatedFields.data.phone_masked.slice(1)}`, // Example for Ghana number format
-          message: `Your DiscreetKit order ${code} has been confirmed. We're now preparing it for its discreet journey to you. Track its progress here: ${trackingUrl}. Should you need any support, remember we're here to help.`
-        };
-        console.log('--- Placeholder SMS Payload ---', smsPayload);
-    }
+    // 3. Send initial SMS Notification
+    const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${code}`;
+    const initialSmsMessage = `Your DiscreetKit order ${code} has been received! We'll notify you once payment is confirmed and we start preparing your package. Track: ${trackingUrl}`;
+    
+    await sendSMS(validatedFields.data.phone_masked, initialSmsMessage);
 
 
     // 4. Initialize Paystack Transaction

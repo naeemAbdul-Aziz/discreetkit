@@ -11,6 +11,7 @@ import { NextResponse } from 'next/server';
 import { getSupabaseAdminClient } from '@/lib/supabase';
 import { paymentDebug, rlAllow } from '@/lib/utils';
 import { rlAllowDistributed } from '@/lib/rate-limit';
+import { sendOrderConfirmationSMS } from '@/lib/actions';
 
 export async function GET(req: Request) {
   try {
@@ -105,6 +106,9 @@ export async function GET(req: Request) {
           note: `Successfully received GHS ${((amount ?? 0) / 100).toFixed(2)}.`,
         });
         paymentDebug('Order updated to received via verify', { reference, orderId: order.id });
+
+        // Send SMS confirmation after successful payment
+        await sendOrderConfirmationSMS(order.id);
       }
 
       return NextResponse.json({ ok: true, updated: order.status === 'pending_payment' });
