@@ -3,6 +3,10 @@
 import type { Metadata } from 'next';
 import { Toaster } from '@/components/ui/toaster';
 import { TourProvider } from '@/components/tour-provider';
+import { StructuredData } from '@/components/seo/structured-data';
+import { TrackingScripts } from '@/components/seo/tracking-scripts';
+import { generateMetadata } from '@/lib/seo';
+import seoConfig from '../../.seo-config.json';
 import './globals.css';
 import localFont from 'next/font/local';
 import { cn } from '@/lib/utils';
@@ -25,73 +29,11 @@ const fontHeadline = localFont({
   fallback: ['system-ui', 'Segoe UI', 'Arial'],
 });
 
-const socialImageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762356008/discreetkit_profile_photo_voqfia.png';
-
-let metadataBase: URL;
-try {
-  metadataBase = new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://discreetkit.com');
-} catch (e) {
-  metadataBase = new URL('https://discreetkit.com');
-}
-
-export const metadata: Metadata = {
-  metadataBase,
-  title: {
-    default: 'DiscreetKit Ghana: Confidential Health Products Delivered',
-    template: '%s | DiscreetKit Ghana',
-  },
-  description: 'Order confidential self-test kits for HIV, pregnancy, and more. Get Postpill and wellness products delivered discreetly to your door in Ghana. 100% private, anonymous, and secure.',
-  keywords: [
-      'DiscreetKit', 
-      'self-test kit Ghana', 
-      'at-home HIV test', 
-      'private pregnancy test', 
-      'emergency contraception Ghana', 
-      'Postpill delivery', 
-      'confidential health products', 
-      'anonymous testing Accra',
-      'student health services', 
-      'UG Legon delivery', 
-      'UPSA health',
-      'discreet delivery',
-      'sexual health Ghana'
-  ],
-  openGraph: {
-    type: 'website',
-    url: '/',
-    title: 'DiscreetKit Ghana: Confidential Health Products Delivered',
-    description: '100% private, anonymous, and secure delivery of self-test kits and wellness products in Ghana.',
-    images: [
-      {
-        url: socialImageUrl,
-        width: 1200,
-        height: 630,
-        alt: 'DiscreetKit Ghana - Skip the Awkward',
-      },
-    ],
-    siteName: 'DiscreetKit Ghana',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'DiscreetKit Ghana: Confidential Health Products Delivered',
-    description: '100% private, anonymous, and secure delivery of self-test kits and wellness products in Ghana.',
-    images: [socialImageUrl],
-  },
-  icons: {
-    icon: [
-      { url: socialImageUrl, type: 'image/png', sizes: '16x16' },
-      { url: socialImageUrl, type: 'image/png', sizes: '32x32' },
-      { url: socialImageUrl, type: 'image/png', sizes: '48x48' },
-      { url: socialImageUrl, type: 'image/png', sizes: '96x96' },
-      { url: socialImageUrl, type: 'image/png', sizes: '192x192' },
-      { url: socialImageUrl, type: 'image/png', sizes: '512x512' },
-    ],
-    shortcut: [socialImageUrl],
-    apple: [
-      { url: socialImageUrl, sizes: '180x180' },
-    ],
-  },
-};
+export const metadata: Metadata = generateMetadata({
+  title: seoConfig.pages.home.title,
+  description: seoConfig.pages.home.description,
+  keywords: seoConfig.pages.home.keywords,
+});
 
 export default function RootLayout({
   children,
