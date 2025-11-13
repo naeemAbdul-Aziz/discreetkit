@@ -8,6 +8,7 @@ import {NextResponse} from 'next/server';
 import crypto from 'crypto';
 import {getSupabaseAdminClient} from '@/lib/supabase';
 import { paymentDebug } from '@/lib/utils';
+import { sendOrderConfirmationSMS } from '@/lib/actions';
 
 export async function POST(req: Request) {
   const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
@@ -81,6 +82,9 @@ export async function POST(req: Request) {
                 note: `Successfully received GHS ${(amount / 100).toFixed(2)}.`,
             });
             paymentDebug('Webhook updated order to received', { reference, orderId: order.id });
+
+            // Send SMS confirmation after successful payment
+            await sendOrderConfirmationSMS(order.id);
         }
 
       } catch (err) {

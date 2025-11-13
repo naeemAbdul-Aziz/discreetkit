@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdminClient } from '@/lib/supabase';
 import { paymentDebug } from '@/lib/utils';
+import { sendOrderConfirmationSMS } from '@/lib/actions';
 
 // Node runtime (default) is required; do not export runtime = 'edge'
 
@@ -105,6 +106,10 @@ export async function GET(req: Request) {
           });
           confirmed++;
           paymentDebug('Reconciled order to received', { code: o.code, orderId: current.id });
+          
+          // Send SMS confirmation after successful payment reconciliation
+          await sendOrderConfirmationSMS(current.id);
+          
           results.push({ code: o.code, updated: true });
         } else {
           results.push({ code: o.code, updated: false, reason: 'already-updated' });
