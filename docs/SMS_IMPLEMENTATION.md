@@ -1,6 +1,6 @@
 # SMS Order Confirmation Implementation Guide
 
-This document outlines the complete SMS notification system implemented for DiscreetKit using Arkesel v2 API.
+This document outlines the complete SMS notification system implemented for DiscreetKit using the official Arkesel SMS API.
 
 ## Overview
 
@@ -15,8 +15,9 @@ The SMS system sends notifications at key points in the order lifecycle:
 ### Environment Variables
 ```env
 # Arkesel SMS Configuration
-ARKESEL_API_KEY=cHNIRlBqdXJncklObmFpelB0R0Q
+ARKESEL_API_KEY=your-arkesel-api-key
 ARKESEL_SENDER_ID=DiscreetKit
+NEXT_PUBLIC_SITE_URL=https://discreetkit.shop
 ```
 
 The sender ID "DiscreetKit" has been whitelisted with Arkesel for your account.
@@ -39,22 +40,22 @@ async function sendSMS(phone: string, message: string): Promise<{ok: boolean; re
 #### 1. Initial Order SMS
 **Trigger**: When order is created  
 **Function**: Embedded in `createOrderAction()`  
-**Message**: "Your DiscreetKit order {CODE} has been received! We'll notify you once payment is confirmed..."
+**Message**: "Your order {CODE} is received. We'll notify you once payment is processed. Track status: {URL}"
 
 #### 2. Payment Confirmation SMS  
 **Trigger**: When payment is successful  
 **Function**: `sendOrderConfirmationSMS(orderId: string)`  
-**Message**: "Great news! Your DiscreetKit order {CODE} payment has been confirmed. We're now preparing your package..."
+**Message**: "Payment for order {CODE} confirmed. We're now preparing your package for discreet delivery. Track: {URL}"
 
 #### 3. Shipping Notification SMS
 **Trigger**: When order status changes to 'out_for_delivery'  
 **Function**: `sendShippingNotificationSMS(orderId: string)`  
-**Message**: "Your DiscreetKit order {CODE} has been shipped! Your package is now on its way..."
+**Message**: "Your order {CODE} has been shipped. Your package is on the way for discreet delivery. Track: {URL}"
 
 #### 4. Delivery Confirmation SMS
 **Trigger**: When order status changes to 'completed'  
 **Function**: `sendDeliveryNotificationSMS(orderId: string)`  
-**Message**: "Great news! Your DiscreetKit order {CODE} has been delivered successfully..."
+**Message**: "Your order {CODE} has been delivered successfully. Thank you for choosing DiscreetKit for your health needs. Need support? We're here to help."
 
 ## Integration Points
 

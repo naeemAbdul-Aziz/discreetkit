@@ -159,11 +159,19 @@ To ensure orders transition out of `pending_payment` even if Paystack webhooks a
 
 ### 3.7. SMS Notifications (Arkesel)
 
-*   **Provider:** Arkesel SMS API V2.
+*   **Provider:** Arkesel SMS API (Official Documentation Format).
+*   **API Endpoint:** `https://sms.arkesel.com/sms/api` with GET method and query parameters.
 *   **Flow:**
-    1.  Immediately after an order is successfully created in the `createOrderAction`, a request is made to the Arkesel API.
-    2.  A message containing the order confirmation and unique tracking link is sent to the user's provided phone number.
-    3.  The API key is stored securely in environment variables and is only accessible from the server.
+    1.  **Order Creation:** Immediate SMS with order confirmation and tracking link.
+    2.  **Payment Confirmation:** SMS sent via webhooks, manual verification, or scheduled reconciliation.
+    3.  **Shipping Updates:** SMS when admin marks order as 'out_for_delivery'.
+    4.  **Delivery Confirmation:** SMS when admin marks order as 'completed'.
+*   **Features:**
+    - Ghana phone number formatting (0xxx → 233xxx)
+    - Nigerian number support with `use_case=promotional` parameter
+    - Professional, concise message templates
+    - Comprehensive error handling and logging
+*   **Security:** API key stored securely in environment variables, only accessible from server.
 ---
 
 This modular and secure design allows each part of the system to perform its function independently, ensuring the application is robust, maintainable, and can be scaled effectively in the future.
