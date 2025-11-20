@@ -3,7 +3,7 @@
     "name": "DiscreetKit Ghana",
     "title": "DiscreetKit Ghana: Confidential Health Products Delivered",
     "description": "Order confidential self-test kits for HIV, pregnancy, and more. Get Postpill and wellness products delivered discreetly to your door in Ghana. 100% private, anonymous, and secure.",
-    "url": "https://discreetkit.shop",
+    "url": "https://discreetkit.com",
     "logo": "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762356008/discreetkit_profile_photo_voqfia.png",
     "favicon": "/favicon.ico",
     "themeColor": "#187f76",
@@ -15,7 +15,7 @@
     "type": "HealthAndBeautyBusiness",
     "name": "DiscreetKit Ghana",
     "description": "Leading provider of confidential health products and self-test kits in Ghana",
-    "email": "hello@discreetkit.shop",
+    "email": "hello@discreetkit.com",
     "phone": "+233500000000",
     "address": {
       "streetAddress": "",
@@ -25,10 +25,23 @@
       "addressCountry": "GH"
     },
     "priceRange": "₵₵",
-    "paymentAccepted": ["Cash on Delivery", "Mobile Money", "Credit Card"],
+    "paymentAccepted": [
+      "Cash on Delivery",
+      "Mobile Money",
+      "Credit Card"
+    ],
     "serviceArea": [
-      "Accra", "Kumasi", "Takoradi", "Tamale", "Ho", "Cape Coast",
-      "University of Ghana", "KNUST", "UCC", "UPSA", "GIMPA"
+      "Accra",
+      "Kumasi",
+      "Takoradi",
+      "Tamale",
+      "Ho",
+      "Cape Coast",
+      "University of Ghana",
+      "KNUST",
+      "UCC",
+      "UPSA",
+      "GIMPA"
     ]
   },
   "social": {
@@ -67,32 +80,62 @@
     "home": {
       "title": "DiscreetKit Ghana: Confidential Health Products Delivered",
       "description": "Order confidential self-test kits for HIV, pregnancy, and wellness products. 100% private, anonymous delivery across Ghana. Skip the awkward - we deliver discreetly to universities and homes.",
-      "keywords": ["discreet health products", "confidential self-test kits", "Ghana medical delivery", "university health services"]
+      "keywords": [
+        "discreet health products",
+        "confidential self-test kits",
+        "Ghana medical delivery",
+        "university health services"
+      ]
     },
     "products": {
       "title": "Confidential Health Products & Self-Test Kits | DiscreetKit Ghana",
       "description": "Browse our range of confidential health products including HIV self-test kits, pregnancy tests, emergency contraception, and wellness products. Discreet delivery across Ghana.",
-      "keywords": ["health products Ghana", "self-test kits", "medical supplies", "confidential healthcare"]
+      "keywords": [
+        "health products Ghana",
+        "self-test kits",
+        "medical supplies",
+        "confidential healthcare"
+      ]
     },
     "test-kits": {
       "title": "Self-Test Kits: HIV, Pregnancy & More | DiscreetKit Ghana",
       "description": "Order FDA-approved self-test kits for HIV, pregnancy, and other health conditions. Get accurate, private results at home with discreet delivery across Ghana.",
-      "keywords": ["HIV self-test Ghana", "pregnancy test kit", "at-home medical testing", "confidential health screening"]
+      "keywords": [
+        "HIV self-test Ghana",
+        "pregnancy test kit",
+        "at-home medical testing",
+        "confidential health screening"
+      ]
     },
     "medication": {
       "title": "Emergency Contraception & Medication | DiscreetKit Ghana",
       "description": "Get emergency contraception (Postpill) and essential medications delivered discreetly. 100% confidential service with fast delivery across Ghana.",
-      "keywords": ["emergency contraception Ghana", "postpill delivery", "confidential medication", "private pharmacy"]
+      "keywords": [
+        "emergency contraception Ghana",
+        "postpill delivery",
+        "confidential medication",
+        "private pharmacy"
+      ]
     },
     "wellness": {
       "title": "Wellness Products & Health Supplements | DiscreetKit Ghana",
       "description": "Shop premium wellness products and health supplements delivered discreetly to your door. Quality products for your health and wellbeing in Ghana.",
-      "keywords": ["wellness products Ghana", "health supplements", "nutrition products", "wellness delivery"]
+      "keywords": [
+        "wellness products Ghana",
+        "health supplements",
+        "nutrition products",
+        "wellness delivery"
+      ]
     },
     "partner-care": {
       "title": "Partner Care Services | DiscreetKit Ghana",
       "description": "Supporting relationships with confidential health resources, couple testing kits, and wellness products. Discreet delivery for you and your partner across Ghana.",
-      "keywords": ["couple health testing", "relationship wellness", "partner care Ghana", "confidential couple services"]
+      "keywords": [
+        "couple health testing",
+        "relationship wellness",
+        "partner care Ghana",
+        "confidential couple services"
+      ]
     }
   },
   "tracking": {

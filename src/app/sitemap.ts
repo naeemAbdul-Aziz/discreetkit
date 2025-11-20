@@ -3,7 +3,7 @@ import { MetadataRoute } from 'next';
 import { getSupabaseAdminClient } from '@/lib/supabase';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = 'https://discreetkit.shop';
+  const siteUrl = 'https://discreetkit.com';
   const now = new Date();
 
   // 1. Get all dynamic product pages
@@ -11,7 +11,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { data: products } = await supabase
     .from('products')
     .select('id, updated_at, category, featured');
-  
+
   const productEntries: MetadataRoute.Sitemap = products?.map(({ id, updated_at, featured }) => ({
     url: `${siteUrl}/products/${id}`,
     lastModified: new Date(updated_at),
@@ -22,71 +22,71 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 2. Add all static pages with SEO priorities
   const staticEntries: MetadataRoute.Sitemap = [
     // High priority pages (main landing pages)
-    { 
-      url: siteUrl, 
-      lastModified: now, 
-      changeFrequency: 'weekly', 
-      priority: 1.0 
+    {
+      url: siteUrl,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 1.0
     },
-    { 
-      url: `${siteUrl}/products`, 
-      lastModified: now, 
-      changeFrequency: 'weekly', 
-      priority: 0.9 
+    {
+      url: `${siteUrl}/products`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.9
     },
-    
+
     // Product category pages (medium-high priority)
-    { 
-      url: `${siteUrl}/products/test-kits`, 
-      lastModified: now, 
+    {
+      url: `${siteUrl}/products/test-kits`,
+      lastModified: now,
       changeFrequency: 'weekly',
-      priority: 0.8 
+      priority: 0.8
     },
-    { 
-      url: `${siteUrl}/products/medication`, 
-      lastModified: now, 
+    {
+      url: `${siteUrl}/products/medication`,
+      lastModified: now,
       changeFrequency: 'weekly',
-      priority: 0.8 
+      priority: 0.8
     },
-    { 
-      url: `${siteUrl}/products/wellness`, 
-      lastModified: now, 
+    {
+      url: `${siteUrl}/products/wellness`,
+      lastModified: now,
       changeFrequency: 'weekly',
-      priority: 0.7 
+      priority: 0.7
     },
-    { 
-      url: `${siteUrl}/products/bundles`, 
-      lastModified: now, 
+    {
+      url: `${siteUrl}/products/bundles`,
+      lastModified: now,
       changeFrequency: 'weekly',
-      priority: 0.7 
+      priority: 0.7
     },
-    
+
     // Service pages
-    { 
-      url: `${siteUrl}/partner-care`, 
-      lastModified: now, 
+    {
+      url: `${siteUrl}/partner-care`,
+      lastModified: now,
       changeFrequency: 'monthly',
-      priority: 0.6 
+      priority: 0.6
     },
-    { 
-      url: `${siteUrl}/track`, 
-      lastModified: now, 
+    {
+      url: `${siteUrl}/track`,
+      lastModified: now,
       changeFrequency: 'yearly',
-      priority: 0.5 
+      priority: 0.5
     },
-    
+
     // Legal pages (low priority but important for crawlers)
-    { 
-      url: `${siteUrl}/terms`, 
-      lastModified: now, 
+    {
+      url: `${siteUrl}/terms`,
+      lastModified: now,
       changeFrequency: 'yearly',
-      priority: 0.3 
+      priority: 0.3
     },
-    { 
-      url: `${siteUrl}/privacy`, 
-      lastModified: now, 
+    {
+      url: `${siteUrl}/privacy`,
+      lastModified: now,
       changeFrequency: 'yearly',
-      priority: 0.3 
+      priority: 0.3
     },
   ];
 

@@ -12,7 +12,7 @@ const getSEOConfig = () => {
         name: "DiscreetKit Ghana",
         title: "DiscreetKit Ghana: Confidential Health Products Delivered",
         description: "Order confidential self-test kits for HIV, pregnancy, and more. Get Postpill and wellness products delivered discreetly to your door in Ghana.",
-        url: "https://discreetkit.shop",
+        url: "https://discreetkit.com",
         logo: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762356008/discreetkit_profile_photo_voqfia.png",
         themeColor: "#187f76",
         language: "en",

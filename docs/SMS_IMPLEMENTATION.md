@@ -17,7 +17,7 @@ The SMS system sends notifications at key points in the order lifecycle:
 # Arkesel SMS Configuration
 ARKESEL_API_KEY=your-arkesel-api-key
 ARKESEL_SENDER_ID=DiscreetKit
-NEXT_PUBLIC_SITE_URL=https://discreetkit.shop
+NEXT_PUBLIC_SITE_URL=https://discreetkit.com
 ```
 
 The sender ID "DiscreetKit" has been whitelisted with Arkesel for your account.
