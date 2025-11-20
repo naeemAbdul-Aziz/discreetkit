@@ -3,6 +3,7 @@
 
 import { useEffect } from 'react';
 import Script from 'next/script';
+import seoConfig from '../../../.seo-config.json';
 
 interface TrackingScriptsProps {
   googleAnalytics?: string;
@@ -11,15 +12,27 @@ interface TrackingScriptsProps {
   hotjar?: string;
 }
 
-export function TrackingScripts({
-  googleAnalytics,
-  googleTagManager,
-  facebookPixel,
-  hotjar
-}: TrackingScriptsProps) {
+export function TrackingScripts(props?: TrackingScriptsProps) {
+  // Use props or fall back to environment variables or config
+  const googleAnalytics = props?.googleAnalytics || 
+    process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 
+    seoConfig.tracking.googleAnalytics;
+  
+  const googleTagManager = props?.googleTagManager || 
+    process.env.NEXT_PUBLIC_GTM_ID || 
+    seoConfig.tracking.googleTagManager;
+  
+  const facebookPixel = props?.facebookPixel || 
+    process.env.NEXT_PUBLIC_FB_PIXEL_ID || 
+    seoConfig.tracking.facebookPixel;
+  
+  const hotjar = props?.hotjar || 
+    process.env.NEXT_PUBLIC_HOTJAR_ID || 
+    seoConfig.tracking.hotjar;
+
   return (
     <>
-      {/* Google Analytics */}
+      {/* Google Analytics 4 */}
       {googleAnalytics && (
         <>
           <Script
@@ -34,7 +47,17 @@ export function TrackingScripts({
               gtag('config', '${googleAnalytics}', {
                 page_title: document.title,
                 page_location: window.location.href,
+                send_page_view: true,
+                // Enhanced e-commerce
+                allow_enhanced_conversions: true,
+                // Privacy settings
+                anonymize_ip: true,
+                cookie_flags: 'SameSite=None;Secure'
               });
+              
+              // Enhanced e-commerce settings
+              gtag('set', 'allow_google_signals', true);
+              gtag('set', 'allow_ad_personalization_signals', true);
             `}
           </Script>
         </>

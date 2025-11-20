@@ -5,7 +5,9 @@ import { Toaster } from '@/components/ui/toaster';
 import { TourProvider } from '@/components/tour-provider';
 import { StructuredData } from '@/components/seo/structured-data';
 import { TrackingScripts } from '@/components/seo/tracking-scripts';
-import { generateMetadata } from '@/lib/seo';
+import { PerformanceMonitoring } from '@/components/seo/performance-monitoring';
+import { generateMetadata, generateOrganizationSchema, generateWebsiteSchema } from '@/lib/seo';
+import { generateLocalBusinessSchema, generateMedicalBusinessSchema } from '@/lib/seo/advanced-schemas';
 import seoConfig from '../../.seo-config.json';
 import './globals.css';
 import localFont from 'next/font/local';
@@ -40,18 +42,60 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Generate all structured data schemas
+  const organizationSchema = generateOrganizationSchema();
+  const websiteSchema = generateWebsiteSchema();
+  const localBusinessSchema = generateLocalBusinessSchema();
+  const medicalBusinessSchema = generateMedicalBusinessSchema();
+
   return (
     <html lang="en" suppressHydrationWarning>
     <head>
       {/* Prevent iOS Safari focus zoom and improve VKB behavior */}
       <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
       <meta name="format-detection" content="telephone=no,email=no,address=no" />
-         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+      <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+      
+      {/* Geo-targeting meta tags */}
+      <meta name="geo.region" content="GH" />
+      <meta name="geo.placename" content="Accra" />
+      <meta name="geo.position" content="5.6037;-0.1870" />
+      <meta name="ICBM" content="5.6037, -0.1870" />
+      
+      {/* Mobile app meta tags */}
+      <meta name="mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-title" content="DiscreetKit" />
+      
+      {/* Theme color */}
+      <meta name="theme-color" content="#187f76" />
+      <meta name="msapplication-TileColor" content="#187f76" />
+      
+      {/* Verification meta tags (add your verification codes) */}
+      {/* <meta name="google-site-verification" content="YOUR_VERIFICATION_CODE" /> */}
+      {/* <meta name="msvalidate.01" content="YOUR_BING_VERIFICATION_CODE" /> */}
+      
+      {/* Preconnect to external domains */}
       <link rel="mask-icon" href="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1761571651/Artboard_6_oepbgq.svg" color="#187f76" />
-         <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
-         <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
-         <link rel="preconnect" href="https://api.paystack.co" crossOrigin="anonymous" />
-         <link rel="preconnect" href={process.env.NEXT_PUBLIC_SUPABASE_URL || ''} crossOrigin="anonymous" />
+      <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
+      <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
+      <link rel="preconnect" href="https://api.paystack.co" crossOrigin="anonymous" />
+      <link rel="preconnect" href={process.env.NEXT_PUBLIC_SUPABASE_URL || ''} crossOrigin="anonymous" />
+      <link rel="preconnect" href="https://www.google-analytics.com" crossOrigin="anonymous" />
+      <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
+      
+      {/* DNS prefetch for faster lookups */}
+      <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+      <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+      
+      {/* Structured Data */}
+      <StructuredData data={organizationSchema} />
+      <StructuredData data={websiteSchema} />
+      <StructuredData data={localBusinessSchema} />
+      <StructuredData data={medicalBusinessSchema} />
+      
+      {/* Tracking Scripts */}
+      <TrackingScripts />
       </head>
       <body className={cn('min-h-screen bg-background font-body antialiased', fontBody.variable, fontHeadline.variable)}>
         <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground">Skip to content</a>
@@ -61,6 +105,8 @@ export default function RootLayout({
           </main>
           <Toaster />
         </TourProvider>
+        {/* Performance Monitoring */}
+        <PerformanceMonitoring />
       </body>
     </html>
   );

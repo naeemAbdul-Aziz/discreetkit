@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
-  const siteUrl = 'https://discreetkit.shop';
+  const siteUrl = 'https://discreetkit.com';
 
   return {
     rules: [

@@ -54,8 +54,8 @@ ARKESEL_SENDER_ID="DiscreetKit"
 # Genkit (Google AI - Replace with your own key)
 GEMINI_API_KEY="your-google-ai-api-key"
 
-# Site URL (Production: discreetkit.shop | Local: use ngrok for Paystack webhooks)
-NEXT_PUBLIC_SITE_URL="https://discreetkit.shop"
+# Site URL (Production: discreetkit.com | Local: use ngrok for Paystack webhooks)
+NEXT_PUBLIC_SITE_URL="https://discreetkit.com"
 ```
 
 ### 4. Set Up Ngrok for Local Development
