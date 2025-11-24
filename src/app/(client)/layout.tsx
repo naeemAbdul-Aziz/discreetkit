@@ -8,7 +8,7 @@
 import { usePathname } from 'next/navigation';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
-import { FloatingShopButton } from '@/components/quick-shop-banner';
+
 import { Chatbot } from '@/components/chatbot';
 import { useEffect, useState } from 'react';
 import { MagneticCursor } from '@/components/ui/cursor';
@@ -32,7 +32,7 @@ export default function ClientLayout({
       <Header />
       <div className="flex-1">{children}</div>
       <Footer />
-      <FloatingShopButton />
+
       <Chatbot />
       <CartAnnouncer />
     </div>

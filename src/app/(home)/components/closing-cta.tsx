@@ -1,23 +1,31 @@
 /**
  * @file closing-cta.tsx
- * @description A premium, immersive final call-to-action.
+ * @description A premium, immersive final call-to-action with brand colors.
  */
 
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, ShieldCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { SparklesCore } from '@/components/ui/sparkles';
 
 export function ClosingCta() {
   return (
-    <section className="relative py-24 md:py-32 overflow-hidden">
-      {/* Background Gradient */}
-      <div className="absolute inset-0 bg-foreground text-background">
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-soft-light"></div>
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
+    <section className="relative py-24 md:py-32 overflow-hidden bg-primary">
+      {/* Sparkles Effect - Desktop only */}
+      <div className="absolute inset-0 hidden md:block">
+        <SparklesCore
+          id="cta-sparkles"
+          background="transparent"
+          minSize={0.8}
+          maxSize={2}
+          particleDensity={100}
+          speed={2.5}
+          particleColor="#ffffff"
+          className="w-full h-full opacity-40"
+        />
       </div>
 
       <div className="container relative z-10 mx-auto px-4 md:px-6">
@@ -29,7 +37,7 @@ export function ClosingCta() {
             viewport={{ once: true }}
             className="mb-8 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white/90"
           >
-            <ShieldCheck className="w-4 h-4 text-primary" />
+            <ShieldCheck className="w-4 h-4 text-white" />
             <span className="text-sm font-medium">100% Private & Confidential</span>
           </motion.div>
 
@@ -38,10 +46,10 @@ export function ClosingCta() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="font-headline text-4xl md:text-7xl font-black tracking-tighter text-white mb-8 leading-[0.9]"
+            className="font-headline text-3xl md:text-6xl font-black tracking-tighter text-white mb-6 md:mb-8 leading-[0.9]"
           >
             Your health,<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-300">
+            <span className="text-background">
               on your terms.
             </span>
           </motion.h2>
@@ -51,7 +59,7 @@ export function ClosingCta() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-lg md:text-xl text-white/60 max-w-2xl mb-12 leading-relaxed"
+            className="text-base md:text-lg text-white/80 max-w-2xl mb-8 md:mb-12 leading-relaxed"
           >
             Join thousands of Ghanaians who trust DiscreetKit for their essential health needs. No waiting rooms, no awkward conversations. Just results.
           </motion.p>
@@ -63,13 +71,13 @@ export function ClosingCta() {
             transition={{ delay: 0.3 }}
             className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto"
           >
-            <Button asChild size="lg" className="h-14 px-8 text-lg rounded-full bg-white text-black hover:bg-white/90 hover:scale-105 transition-all duration-300">
+            <Button asChild size="lg" className="h-11 md:h-14 px-5 md:px-8 text-sm md:text-lg rounded-full w-full sm:w-auto bg-white text-primary hover:bg-white/90 hover:scale-105 transition-all duration-300">
               <Link href="/products">
                 Shop Essentials
-                <ArrowRight className="ml-2 w-5 h-5" />
+                <ArrowRight className="ml-2 w-4 h-4 md:w-5 md:h-5" />
               </Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="h-14 px-8 text-lg rounded-full border-white/30 text-white bg-white/5 hover:bg-white/20 hover:text-white backdrop-blur-sm transition-all duration-300">
+            <Button asChild variant="outline" size="lg" className="h-11 md:h-14 px-5 md:px-8 text-sm md:text-lg rounded-full w-full sm:w-auto border-white/30 text-white bg-white/10 hover:bg-white/20 hover:text-white backdrop-blur-sm transition-all duration-300">
               <Link href="/partner-care">
                 Talk to a Professional
               </Link>

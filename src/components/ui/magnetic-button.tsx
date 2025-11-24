@@ -28,9 +28,9 @@ export function MagneticButton({ children, className, variant = 'primary', ...pr
   };
 
   const variants = {
-    primary: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg hover:shadow-xl",
-    outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-    ghost: "hover:bg-accent hover:text-accent-foreground",
+    primary: "bg-primary text-primary-foreground hover:bg-primary/95 shadow-lg hover:shadow-xl transition-all duration-200",
+    outline: "border border-input bg-background hover:bg-muted/70 hover:text-foreground transition-all duration-200",
+    ghost: "hover:bg-muted/60 hover:text-foreground transition-all duration-200",
   };
 
   return (
@@ -47,7 +47,7 @@ export function MagneticButton({ children, className, variant = 'primary', ...pr
     >
       <button
         className={cn(
-          "relative inline-flex items-center justify-center rounded-full px-8 py-4 text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+          "relative inline-flex items-center justify-center rounded-full px-6 py-3 text-base md:text-lg font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
           variants[variant]
         )}
         {...props}

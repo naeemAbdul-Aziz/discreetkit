@@ -38,10 +38,10 @@ export function HowItWorks() {
     <section id="how-it-works" className="py-12 md:py-24 bg-background">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-12 md:mb-16">
-          <h2 className="mt-2 font-headline text-3xl font-bold text-foreground md:text-4xl">
+          <h2 className="mt-2 font-headline text-2xl font-bold text-foreground md:text-3xl">
             A Responsible Path to Your Health Answers
           </h2>
-          <p className="mt-4 max-w-2xl mx-auto text-base text-muted-foreground md:text-lg">
+          <p className="mt-4 max-w-2xl mx-auto text-sm text-muted-foreground md:text-base">
             Get your results in 4 simple, private, and secure steps.
           </p>
         </div>
@@ -60,7 +60,7 @@ export function HowItWorks() {
                   </div>
                   {/* The content */}
                   <div className="flex-1 pt-1 space-y-4">
-                    <h3 className="text-2xl font-bold text-foreground">{step.title}</h3>
+                    <h3 className="text-lg font-bold text-foreground md:text-xl">{step.title}</h3>
                     <div className="relative aspect-[4/3] w-full max-w-sm rounded-3xl overflow-hidden shadow-md">
                       <Image
                         src={step.imageUrl}
@@ -72,7 +72,7 @@ export function HowItWorks() {
                         placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
                       />
                     </div>
-                    <p className="text-base text-muted-foreground">
+                    <p className="text-sm text-muted-foreground md:text-base">
                       {step.description}
                     </p>
                     {step.details && (
@@ -80,7 +80,7 @@ export function HowItWorks() {
                         {step.details.map((detail, i) => (
                           <li key={i} className="flex items-start gap-3">
                             <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                            <span className="text-base">{detail}</span>
+                            <span className="text-sm md:text-base">{detail}</span>
                           </li>
                         ))}
                       </ul>
@@ -136,14 +136,14 @@ export function HowItWorks() {
                 )}
               >
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center justify-center font-headline text-5xl font-bold text-primary/20">
+                  <div className="flex items-center justify-center font-headline text-4xl font-bold text-primary/20">
                     0{step.number}
                   </div>
-                  <h3 className="text-2xl md:text-3xl font-bold text-foreground">
+                  <h3 className="text-xl md:text-2xl font-bold text-foreground">
                     {step.title}
                   </h3>
                 </div>
-                <p className="mt-4 text-base text-muted-foreground md:text-lg">
+                <p className="mt-4 text-sm text-muted-foreground md:text-base">
                   {step.description}
                 </p>
                  {step.details && (
@@ -151,7 +151,7 @@ export function HowItWorks() {
                         {step.details.map((detail, i) => (
                             <li key={i} className="flex items-start gap-3">
                                 <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                                <span className="text-base">{detail}</span>
+                                <span className="text-sm md:text-base">{detail}</span>
                             </li>
                         ))}
                     </ul>

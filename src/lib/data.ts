@@ -128,8 +128,8 @@ export const steps: Step[] = [
     icon: ShoppingCart,
     description: 'Choose the health products that meet your needs. We offer standard and student pricing, with discounts applied automatically for campus deliveries.',
     details: ['Select products from our shop', 'No account or name needed', 'Pay securely with Mobile Money or Card'],
-    imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757952399/medium-shot-woman-laying-couch_ojrtnp.jpg',
-    imageHint: 'woman couch relaxing',
+    imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png',
+    imageHint: 'HIV self-test kit product',
   },
   {
     number: 2,
@@ -137,8 +137,8 @@ export const steps: Step[] = [
     icon: Truck,
     description: 'Your order is packaged in plain, unbranded materials and delivered by a professional rider. We only use your number to coordinate the drop-off.',
     details: ['Plain, unbranded packaging', '24-48 hour delivery in Accra', 'Track your order with an anonymous code'],
-    imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757953240/close-up-delivery-person-giving-parcel-client_al5mjd.jpg',
-    imageHint: 'discreet package delivery',
+    imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759404957/discreetkit_pregnancy_cujiod.png',
+    imageHint: 'pregnancy test kit product',
   },
   {
     number: 3,
@@ -146,8 +146,8 @@ export const steps: Step[] = [
     icon: CheckCircle,
     description: 'For test kits, each kit comes with a simple, visual instruction manual. You can get a clear result in the comfort of your own space in under 20 minutes.',
     details: ['Easy-to-follow visual instructions', 'Results in under 20 minutes', 'WHO-approved for 99% accuracy'],
-    imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757952387/man-being-happy-after-getting-negative-covid-test-result_udxny5.jpg',
-    imageHint: 'man happy result',
+    imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png',
+    imageHint: 'emergency contraception postpill product',
   },
   {
     number: 4,

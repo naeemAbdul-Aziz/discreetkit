@@ -81,15 +81,24 @@
     @apply border-border;
   }
 
+  /* Prevent iOS input zoom by setting minimum font size */
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+
   html {
     @apply scroll-smooth;
-    @apply scroll-smooth;
-    font-size: 14px;
-
-    /* Smaller base for sleek mobile */
+    font-size: 15px;
+    @screen sm {
+      font-size: 15.5px;
+    }
     @screen md {
       font-size: 16px;
-      /* Standard for desktop */
+    }
+    @screen lg {
+      font-size: 17px;
     }
   }
 

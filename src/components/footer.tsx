@@ -55,12 +55,12 @@ export function Footer() {
   const lastName = rest.join(' ') || 'Kit';
 
   return (
-    <footer className="bg-foreground text-background pt-24 pb-12 overflow-hidden">
+    <footer className="bg-muted/30 text-foreground pt-24 pb-12 overflow-hidden border-t border-border">
       <div className="container mx-auto px-6">
         
         {/* Massive Headline */}
-        <div className="mb-24 border-b border-white/10 pb-12">
-          <h2 className="font-headline text-4xl md:text-6xl font-black tracking-tight uppercase opacity-90">
+        <div className="mb-24 border-b border-border pb-12">
+          <h2 className="font-headline text-4xl md:text-6xl font-black tracking-tight uppercase">
             {firstName}<span className="text-primary">{lastName}</span>.
           </h2>
         </div>
@@ -72,16 +72,16 @@ export function Footer() {
             <p className="text-xl md:text-2xl font-medium leading-relaxed max-w-sm mb-8">
               The modern standard for private health delivery. Skip the awkward, stay supported.
             </p>
-            <div className="mb-8 text-white/60">
+            <div className="mb-8 text-muted-foreground">
                 <p>Need help? Email us at:</p>
-                <a href={`mailto:${email}`} className="text-white hover:text-primary transition-colors">{email}</a>
+                <a href={`mailto:${email}`} className="text-foreground hover:text-primary transition-colors">{email}</a>
             </div>
             <div className="flex gap-4">
                {socialLinks.map((social) => (
                  <Link 
                    key={social.label} 
                    href={social.href}
-                   className="h-12 w-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-white hover:text-black transition-colors"
+                   className="h-12 w-12 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
                  >
                    <social.icon className="w-5 h-5" />
                  </Link>
@@ -93,7 +93,7 @@ export function Footer() {
           <div className="md:col-span-8 grid grid-cols-2 md:grid-cols-3 gap-12">
             {footerNav.map((section) => (
               <div key={section.title}>
-                <h3 className="font-bold text-lg mb-6 text-white/40">{section.title}</h3>
+                <h3 className="font-bold text-lg mb-6 text-muted-foreground">{section.title}</h3>
                 <ul className="space-y-4">
                   {section.links.map((link) => (
                     <li key={link.href}>
@@ -110,7 +110,7 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="flex flex-col md:flex-row justify-between items-end pt-8 border-t border-white/10 opacity-40 text-sm">
+        <div className="flex flex-col md:flex-row justify-between items-end pt-8 border-t border-border text-muted-foreground text-sm">
            <p>&copy; {new Date().getFullYear()} {settings?.store_name || 'Access DiscreetKit Ltd.'}</p>
            <p className="mt-2 md:mt-0">Designed with precision in Accra.</p>
         </div>
