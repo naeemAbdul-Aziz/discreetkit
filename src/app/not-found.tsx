@@ -31,11 +31,11 @@ export default function NotFound() {
     <div className="flex min-h-[calc(100dvh-10rem)] items-center justify-center bg-background p-4 text-center">
       <div className="flex flex-col items-center">
         <Image
-          src="https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600&h=450&fit=crop&q=75"
+          src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757953240/close-up-delivery-person-giving-parcel-client_al5mjd.jpg"
           alt="An empty delivery box, symbolizing a page not found."
           width={400}
           height={300}
-          className="max-w-xs object-contain"
+          className="max-w-xs object-cover rounded-3xl"
           data-ai-hint="empty box"
           placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
         />

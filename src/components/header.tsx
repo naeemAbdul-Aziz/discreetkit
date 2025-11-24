@@ -1,9 +1,3 @@
-/**
- * @file header.tsx
- * @description the main site header, including navigation links, the logo,
- *              and the cart icon. it is responsive and handles mobile and desktop layouts.
- */
-
 'use client';
 
 import Link from 'next/link';
@@ -15,11 +9,10 @@ import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { useCart } from '@/hooks/use-cart';
 import { Separator } from './ui/separator';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import { BrandSpinner } from '@/components/brand-spinner';
 
-// define navigation links for easy management.
 const navLinks = [
   { href: '/products/test-kits', label: 'Screening Kits' },
   { href: '/products/bundles', label: 'Bundles' },
@@ -30,13 +23,10 @@ const navLinks = [
   { href: '/track', label: 'Track Order' },
 ];
 
-
-// a client component to display the cart icon with a badge for the number of items.
 function CartLink() {
   const { totalItems } = useCart();
   const [isMounted, setIsMounted] = useState(false);
 
-  // ensure the component is mounted on the client before accessing localstorage via the cart hook.
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -50,11 +40,11 @@ function CartLink() {
   }
 
   return (
-     <Button asChild variant="ghost" size="icon" className="relative" id="cart-icon">
+     <Button asChild variant="ghost" size="icon" className="relative hover:bg-transparent" id="cart-icon">
         <Link href="/cart" aria-label={`open cart with ${totalItems} items`}>
-          <ShoppingCart />
+          <ShoppingCart className="w-5 h-5" />
           {totalItems > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground" aria-hidden="true">
+              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground animate-in zoom-in" aria-hidden="true">
               {totalItems}
               </span>
           )}
@@ -63,7 +53,6 @@ function CartLink() {
   );
 }
 
-// a simple component for the site logo.
 const Logo = () => (
     <Image
         src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762345271/Artboard_2_3_fvyg9i.png"
@@ -77,37 +66,41 @@ const Logo = () => (
 
 export function Header() {
   const pathname = usePathname();
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { scrollY } = useScroll();
   
-  // handle scroll and mount state.
+  const headerWidth = useTransform(scrollY, [0, 100], ["100%", "85%"]);
+  const headerTop = useTransform(scrollY, [0, 100], ["0px", "16px"]);
+  const headerRadius = useTransform(scrollY, [0, 100], ["0px", "9999px"]);
+  const headerBorder = useTransform(scrollY, [0, 100], ["rgba(0,0,0,0)", "rgba(0,0,0,0.05)"]);
+  const headerBackdrop = useTransform(scrollY, [0, 100], ["blur(0px)", "blur(12px)"]);
+  const headerBg = useTransform(scrollY, [0, 100], ["rgba(255,255,255,0)", "rgba(255,255,255,0.8)"]);
+
   useEffect(() => {
     setIsMounted(true);
-    
-    const handleScroll = () => {
-      const currentY = window.scrollY;
-      setIsScrolled(currentY > 10);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // reusable navlink component for desktop.
   const NavLink = ({ href, label, onClick }: { href: string; label: string; onClick?: () => void }) => (
     <Link
       href={href}
       onClick={onClick}
       className={cn(
-        'rounded-full px-3 py-1.5 text-sm transition-colors hover:text-primary',
-        pathname === href ? 'font-semibold text-primary' : 'text-foreground/70'
+        'relative px-3 py-1.5 text-sm font-medium transition-colors hover:text-primary',
+        pathname === href ? 'text-primary' : 'text-muted-foreground'
       )}
     >
       {label}
+      {pathname === href && isMounted && (
+        <motion.div
+          layoutId="navbar-indicator"
+          className="absolute inset-0 rounded-full bg-primary/5 -z-10"
+          transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+        />
+      )}
     </Link>
   );
 
-  // reusable navlink component for the mobile menu.
   const MobileNavLink = ({ href, label, onClick }: { href: string; label: string; onClick?: () => void }) => (
     <Link
         href={href}
@@ -121,40 +114,34 @@ export function Header() {
     </Link>
   );
 
-  // show a skeleton header before the component is mounted to prevent layout shifts.
-  if (!isMounted) {
-    return (
-        <>
-     <header className={cn('fixed top-0 left-0 right-0 z-50 w-full p-2')}>
-       <div className="container mx-auto flex h-14 max-w-7xl items-center justify-between rounded-3xl border-border/40 bg-background/95"></div>
-         </header>
-        </>
-    );
-  }
-
   return (
-    <>
-  <header className={cn('fixed top-0 left-0 right-0 z-50 w-full p-2')}>
-        <motion.div
-          initial={{ y: -8, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.18, ease: 'easeOut' }}
-          className={cn(
-            'container mx-auto flex h-14 max-w-7xl items-center justify-between rounded-3xl border-border/40 bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60',
-            isScrolled ? 'shadow-md' : ''
-          )}
-        >
+    <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pointer-events-none">
+      <motion.header
+        style={{
+          width: isMounted ? headerWidth : "100%",
+          marginTop: isMounted ? headerTop : "0px",
+          borderRadius: isMounted ? headerRadius : "0px",
+          borderColor: isMounted ? headerBorder : "rgba(0,0,0,0)",
+          backdropFilter: isMounted ? headerBackdrop : "blur(0px)",
+          backgroundColor: isMounted ? headerBg : "rgba(255,255,255,0.8)",
+        }}
+        className="pointer-events-auto flex h-16 max-w-7xl items-center justify-between border px-6 transition-all duration-300 bg-white/80 backdrop-blur-sm"
+      >
           {/* desktop navigation */}
-          <nav className="hidden md:flex items-center gap-4">
-            <Link href="/" aria-label="DiscreetKit Homepage" className="mr-4">
+          <nav className="hidden md:flex items-center gap-1">
+            <Link href="/" aria-label="DiscreetKit Homepage" className="mr-6">
               <Logo />
             </Link>
-            {navLinks.map((link) => (
+            {navLinks.slice(0, 4).map((link) => (
               <NavLink key={link.href} {...link} />
             ))}
           </nav>
 
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden md:flex items-center gap-2">
+            {navLinks.slice(4).map((link) => (
+               <NavLink key={link.href} {...link} />
+            ))}
+            <div className="w-px h-6 bg-border mx-2" />
             <CartLink />
           </div>
 
@@ -205,8 +192,7 @@ export function Header() {
               </Sheet>
             </div>
           </div>
-        </motion.div>
-      </header>
-    </>
+      </motion.header>
+    </div>
   );
 }

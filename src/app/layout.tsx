@@ -105,7 +105,6 @@ export default function RootLayout({
           </main>
           <Toaster />
         </TourProvider>
-        {/* Performance Monitoring */}
         <PerformanceMonitoring />
       </body>
     </html>

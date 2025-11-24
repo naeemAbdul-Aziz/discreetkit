@@ -24,7 +24,7 @@ async function getBundles(): Promise<Product[]> {
         console.error("Error fetching bundles:", error);
         return [];
     }
-    return data.map(p => ({
+    return data.map((p: any) => ({
         ...p,
         price_ghs: Number(p.price_ghs),
         student_price_ghs: p.student_price_ghs ? Number(p.student_price_ghs) : null,

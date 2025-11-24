@@ -1,33 +1,37 @@
-/**
- * @file src/app/(dashboard)/layout.tsx
- * @description The root layout for the combined Admin and Pharmacy portals.
- *              It features a mobile-first, responsive design with a slide-out
- *              drawer for mobile and a persistent sidebar for desktop.
- */
-import { AdminShell } from '@/components/ui/sidebar';
-import { createSupabaseServerClient } from '@/lib/supabase'; // <-- Import server client
-import { redirect } from 'next/navigation';
+"use client"
 
-export default async function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  // 1. Create a server client
-  const supabase = await createSupabaseServerClient();
+import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar"
+import * as React from "react"
+import { DashboardSidebar } from "./DashboardSidebar"
 
-  // 2. Get the user
-  const { data: { user } } = await supabase.auth.getUser();
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  // Page title can be derived client-side; keep server layout minimal.
+  const [title, setTitle] = React.useState("Portal")
+  // Defer to client for active route; update title on hydration.
+  React.useEffect(() => {
+    const path = window.location.pathname
+    const map: Record<string, string> = {
+      "/admin": "Overview",
+      "/admin/orders": "Orders",
+      "/admin/products": "Products",
+      "/admin/partners": "Partners",
+      "/admin/settings": "Settings",
+    }
+    const found = Object.entries(map).find(([href]) => path.startsWith(href))?.[1]
+    if (found) setTitle(found)
+  }, [])
 
-  // 3. If no user, redirect to login (this is a redundant safety check)
-  if (!user) {
-    redirect('/login');
-  }
-
-  // 4. Pass the user to the AdminShell (so you can display email, name, etc.)
   return (
-    <AdminShell user={user}> 
-      {children}
-    </AdminShell>
-  );
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full bg-muted/20">
+        <DashboardSidebar />
+        <SidebarInset>
+
+          <div className="flex-1 overflow-auto p-4 md:p-8">
+            {children}
+          </div>
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
+  )
 }

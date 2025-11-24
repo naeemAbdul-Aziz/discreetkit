@@ -29,7 +29,7 @@ async function getProducts(): Promise<Product[]> {
         return [];
     }
     // ensure numeric types are correctly cast from what might be strings in the db.
-    return products.map(p => {
+    return products.map((p: any) => {
       let imageUrl = p.image_url;
       // Only override images for products that exist in the database
       switch (p.id) {
@@ -127,15 +127,17 @@ export default async function Home() {
   // fetch product data on the server.
   const products = await getProducts();
   
+  const hivTest = products.find(p => p.id === 1);
   const coupleBundle = products.find(p => p.id === 3);
   const allInOneBundle = products.find(p => p.id === 8);
   
   let featuredProducts: (Product & { badge: string; })[] = [];
 
-  if (allInOneBundle && coupleBundle) {
+  if (allInOneBundle && coupleBundle && hivTest) {
     featuredProducts = [
       { ...allInOneBundle, badge: "Popular" },
-      { ...coupleBundle, badge: "New" },
+      { ...coupleBundle, badge: "Best Value" },
+      { ...hivTest, badge: "Essential" },
     ].filter(p => p.id !== undefined) as (Product & { badge: string; })[];
   }
   
@@ -148,9 +150,9 @@ export default async function Home() {
       <SectionWrapper>
         <PartnerLogos />
       </SectionWrapper>
-      
+
       <SectionWrapper>
-        <ProductSelector />
+        <HowItWorks />
       </SectionWrapper>
       
       {featuredProducts.length > 0 && (
@@ -158,13 +160,13 @@ export default async function Home() {
           <FeaturedFavoritesSection products={featuredProducts} />
         </SectionWrapper>
       )}
+      
+      <SectionWrapper>
+        <ProductSelector />
+      </SectionWrapper>
 
       <SectionWrapper className="bg-primary">
         <ProductBenefits />
-      </SectionWrapper>
-
-      <SectionWrapper>
-        <HowItWorks />
       </SectionWrapper>
 
       <SectionWrapper>
@@ -175,10 +177,6 @@ export default async function Home() {
         <Faq />
       </SectionWrapper>
       
-      <SectionWrapper>
-        <ContactUs />
-      </SectionWrapper>
-
       <SectionWrapper>
         <ClosingCta />
       </SectionWrapper>

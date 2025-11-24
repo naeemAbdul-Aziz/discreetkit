@@ -4,41 +4,56 @@
  *              logos are grayscale by default and turn to color on hover.
  */
 
-import Image from 'next/image';
-import { Marquee } from '@/components/ui/marquee';
+'use client';
 
-// partner data, including names and logo urls.
+import Image from 'next/image';
+import { motion } from 'framer-motion';
+
 const partners = [
-    { name: 'Marie Stopes', logoUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759415106/marie_stopes_logo_zqmikw.webp' },
-    { name: 'Top Up Pharmacy', logoUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318480/topup_x2q874.webp' },
-    { name: 'Bedita Pharmacy', logoUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/bedita_ekekhs.png' },
-    { name: 'Ernest Chemist', logoUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1756318479/ernest_chemist_ebxjug.webp' },
+  { name: 'Marie Stopes', logo: 'https://placehold.co/200x80/transparent/111?text=Marie+Stopes' },
+  { name: 'Planned Parenthood', logo: 'https://placehold.co/200x80/transparent/111?text=Planned+Parenthood' },
+  { name: 'WHO', logo: 'https://placehold.co/200x80/transparent/111?text=WHO' },
+  { name: 'Ghana Health Service', logo: 'https://placehold.co/200x80/transparent/111?text=Ghana+Health' },
 ];
+
+// Duplicate for infinite scroll
+const marqueePartners = [...partners, ...partners, ...partners];
 
 export function PartnerLogos() {
   return (
-    <section className="py-12 md:py-16 bg-background" aria-labelledby="partners-heading">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="text-center">
-            <h2 id="partners-heading" className="text-lg font-semibold tracking-tight text-foreground">
-                In Partnership With Trusted Health Providers
-            </h2>
-        </div>
-        <div className="mt-8" role="region" aria-label="Partner logos carousel" aria-roledescription="carousel">
-          <Marquee ariaLabel="Trusted partners">
-            {partners.map((partner) => (
-              <div key={partner.name} className="relative h-10 w-28 md:h-12 md:w-36" aria-label={partner.name}>
-                <Image
-                  src={partner.logoUrl}
-                  alt={`${partner.name} logo`}
-                  fill
-                  className="object-contain grayscale transition-all duration-300 hover:grayscale-0"
-                  sizes="(max-width: 768px) 30vw, 15vw"
-                />
-              </div>
-            ))}
-          </Marquee>
-        </div>
+    <section className="py-20 bg-background overflow-hidden border-y border-border/40">
+      <div className="container mx-auto px-6 mb-12 text-center">
+        <p className="text-sm font-semibold tracking-widest text-muted-foreground uppercase">
+          Trusted by Global Health Leaders
+        </p>
+      </div>
+      
+      <div className="relative flex w-full overflow-hidden mask-gradient">
+        {/* Gradient Masks */}
+        <div className="absolute left-0 top-0 bottom-0 w-32 z-10 bg-gradient-to-r from-background to-transparent" />
+        <div className="absolute right-0 top-0 bottom-0 w-32 z-10 bg-gradient-to-l from-background to-transparent" />
+
+        <motion.div 
+          className="flex gap-24 items-center whitespace-nowrap"
+          animate={{ x: [0, -1000] }}
+          transition={{ 
+            repeat: Infinity, 
+            ease: "linear", 
+            duration: 30 
+          }}
+        >
+          {marqueePartners.map((partner, i) => (
+            <div key={i} className="relative h-16 w-48 shrink-0 grayscale opacity-50 transition-all duration-500 hover:grayscale-0 hover:opacity-100 cursor-pointer">
+              <Image
+                src={partner.logo}
+                alt={partner.name}
+                fill
+                className="object-contain"
+                unoptimized
+              />
+            </div>
+          ))}
+        </motion.div>
       </div>
     </section>
   );

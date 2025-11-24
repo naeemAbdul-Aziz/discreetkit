@@ -17,16 +17,16 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 // --- This is for CLIENT Components ---
 // Singleton instance for the public client
-let supabaseInstance: SupabaseClient | null = null;
+let supabaseInstance: any = null;
 /**
  * Returns a singleton instance of the public Supabase client.
  * Safe for client-side use.
  */
-export function getSupabaseClient(): SupabaseClient {
+export function getSupabaseClient() {
   if (!supabaseInstance) {
     supabaseInstance = createBrowserClient(supabaseUrl, supabaseAnonKey);
   }
-  return supabaseInstance;
+  return supabaseInstance!;
 }
 
 // --- This is for SERVER Components and SERVER ACTIONS ---
@@ -112,16 +112,16 @@ export function createSupabaseMiddlewareClient(request: NextRequest) {
  * Creates and returns a new instance of the admin Supabase client.
  * This function should only be called from server-side code (Server Actions, API Routes).
  */
-export function getSupabaseAdminClient(): SupabaseClient {
-    const serviceKey = process.env.SUPABASE_SERVICE_KEY!;
-    
-    // Create a new client each time to ensure it's used in a secure server context.
-    return createClient(supabaseUrl, serviceKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
-    });
+export function getSupabaseAdminClient() {
+  const serviceKey = process.env.SUPABASE_SERVICE_KEY!;
+
+  // Create a new client each time to ensure it's used in a secure server context.
+  return createClient(supabaseUrl, serviceKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
 }
 
 

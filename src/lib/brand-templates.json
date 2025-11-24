@@ -1,0 +1,419 @@
+{
+  "board_resolution": {
+    "title": "SUBMISSION OF BOARD RESOLUTION FOR THE OPENING OF A CORPORATE BANK ACCOUNT",
+    "recipient": {
+      "default": [
+        "The Branch Manager",
+        "Fidelity Bank Ghana Limited",
+        "[Branch Name]",
+        "Accra, Ghana"
+      ]
+    },
+    "salutation": "Dear Sir/Madam,",
+    "body": [
+      "<b>RE: OPENING OF CORPORATE ACCOUNT – {{COMPANY_NAME}}</b>",
+      "We write to inform you that the board of directors of {{COMPANY_NAME}} have resolved on [Date] to open a corporate bank account with Fidelity Bank Ghana LTD.",
+      "<b>It was resolved that:</b>",
+      "1. An account be opened in the name of <b>{{COMPANY_NAME}}</b>.",
+      "2. The authorized signatories to the account shall be:",
+      "   • <b>Naeem Abdul-Aziz (CEO)</b> – Primary Signatory",
+      "   • <b>Benedict Dela Tordzro (COO)</b> – Co-Signatory",
+      "Kindly find attached the Certificate of Incorporation, Company Constitution, and the specific Board Resolution signed by the directors."
+    ],
+    "closing": "Yours faithfully,",
+    "signature": [
+      "",
+      "",
+      "______________________________",
+      "{{DIRECTOR_NAME}}",
+      "{{DIRECTOR_TITLE}}",
+      "{{COMPANY_NAME}}"
+    ]
+  },
+  "partnership_proposal": {
+    "title": "PROPOSAL FOR STRATEGIC FULFILLMENT PARTNERSHIP",
+    "recipient": {
+      "default": [
+        "The Chief Pharmacist / Manager",
+        "[Pharmacy Name]",
+        "[Partner Address]",
+        "Accra, Ghana"
+      ]
+    },
+    "salutation": "Dear Manager,",
+    "body": [
+      "We are writing to propose a strategic partnership between <b>{{COMPANY_NAME}}</b> and <b>[Pharmacy Name]</b>.",
+      "<b>The Invisible Customer:</b>",
+      "Every day, young people walk past your pharmacy, needing HIV tests or contraceptives, but they don't come in. Why? Because they are terrified of being seen. With <b>15,290 new HIV infections</b> last year and <b>60% of users preferring confidential testing</b>, this stigma is blocking millions in sales.",
+      "<b>The Solution: We Bring Them to You.</b>",
+      "DiscreetKit is the digital bridge. We let customers order anonymously online, and we route those orders directly to you. We are the <b>'Uber for Privacy.'</b>",
+      "<b>Partnership Benefits:</b>",
+      "• <b>New Revenue Stream:</b> We capture the 635,000+ tertiary students who are currently too shy to buy. You get the sale; we handle the customer.",
+      "• <b>Zero Logistics:</b> Our unbranded riders handle the pickup and delivery. You just pack the item.",
+      "• <b>Future-Proof:</b> The Govt is rolling out vending machines to fight stigma. Partnering with us puts your pharmacy ahead of the curve.",
+      "We would welcome the opportunity to discuss a commission structure."
+    ],
+    "closing": "Sincerely,",
+    "signature": [
+      "",
+      "",
+      "______________________________",
+      "{{DIRECTOR_NAME}}",
+      "{{DIRECTOR_TITLE}}",
+      "{{COMPANY_NAME}}"
+    ]
+  },
+  "nda": {
+    "title": "NON-DISCLOSURE AGREEMENT (NDA)",
+    "recipient": {
+      "default": [
+        "[Recipient Name]",
+        "[Recipient Title]",
+        "[Recipient Company]",
+        "[Company Address]"
+      ]
+    },
+    "salutation": "Dear [Recipient Name],",
+    "body": [
+      "This Non-Disclosure Agreement ('Agreement') is entered into between {{COMPANY_NAME}} ('Disclosing Party') and [Recipient Company] ('Receiving Party') to protect our proprietary business information.",
+      "<b>1. Confidential Information:</b> This includes our proprietary logistics models, user data privacy protocols, partnership strategies, and unreleased technical architecture.",
+      "<b>2. Obligations:</b> The Receiving Party agrees to maintain this information in strict confidence and shall not disclose, sell, or utilize it for competitive purposes.",
+      "<b>3. Term:</b> This Agreement shall remain in effect for a period of three (3) years from the date of execution.",
+      "<b>4. Data Return:</b> Upon termination of discussions, the Receiving Party agrees to return or destroy all confidential materials within ten (10) days.",
+      "Please indicate your acceptance by signing below."
+    ],
+    "closing": "Yours faithfully,",
+    "signature": [
+      "",
+      "",
+      "______________________________",
+      "{{DIRECTOR_NAME}}",
+      "{{DIRECTOR_TITLE}}",
+      "{{COMPANY_NAME}}",
+      "",
+      "Accepted and Agreed:",
+      "",
+      "______________________________",
+      "[Recipient Name]",
+      "[Recipient Title]",
+      "[Recipient Company]",
+      "",
+      "Date: _______________"
+    ]
+  },
+  "employment_contract": {
+    "title": "CASUAL WORKER ENGAGEMENT LETTER",
+    "recipient": {
+      "default": [
+        "[Worker Name]",
+        "[Worker Address]",
+        "Accra, Ghana"
+      ]
+    },
+    "salutation": "Dear [Worker Name],",
+    "body": [
+      "We are pleased to engage you as a <b>Casual Worker</b> with {{COMPANY_NAME}} under the following terms:",
+      "<b>1. Role & Nature of Engagement:</b> You will serve as <b>[Role]</b>. This is a casual, seasonal engagement to support specific operational needs. It is <b>not</b> a permanent employment contract.",
+      "<b>2. Commencement:</b> This engagement is effective from [Start Date]. As a casual worker, your engagement is tied to available work and may be terminated by either party with [Notice Period] notice.",
+      "<b>3. Remuneration (No Fixed Salary):</b> Please note that there is <b>no monthly salary</b> attached to this role. Compensation is strictly performance-based at a rate of <b>[Rate]</b> per [Unit]. Payments will be processed [Payment Frequency] based on completed tasks.",
+      "<b>4. Confidentiality:</b> You agree to maintain strict confidentiality regarding all company strategies and customer data. Privacy is our core product; any breach here will lead to immediate termination and legal action.",
+      "<b>5. Acceptance:</b> By signing below, you acknowledge that you understand the casual nature of this role and agree to these terms."
+    ],
+    "closing": "Welcome to the team.",
+    "signature": [
+      "",
+      "Yours sincerely,",
+      "",
+      "",
+      "______________________________",
+      "{{DIRECTOR_NAME}}",
+      "{{DIRECTOR_TITLE}}",
+      "{{COMPANY_NAME}}",
+      "",
+      "I accept the terms of this casual engagement:",
+      "",
+      "______________________________",
+      "[Worker Name]",
+      "",
+      "Date: _______________"
+    ]
+  },
+  "investor_brief": {
+    "title": "DISCREETKIT: THE 12.7M GHS OPPORTUNITY",
+    "recipient": {
+      "default": [
+        "[Investor Name]",
+        "[Investment Firm]",
+        "Accra, Ghana"
+      ]
+    },
+    "salutation": "Hi [Investor Name],",
+    "body": [
+      "<b>The Moment of Dread:</b>",
+      "Imagine walking into a quiet pharmacy. You ask for an HIV test. Heads turn. The silence is deafening. That single moment of shame is <b>friction</b>. And right now, that friction is blocking millions in healthcare transactions.",
+      "<b>The 12.7 Million GHS Math:</b>",
+      "Ghana has <b>635,000 tertiary students</b>. They are young, sexually active, and live on their phones. If we capture just 20% of this market buying 2 discreet kits a year, that is <b>GHS 12.7 Million in revenue.</b>",
+      "<b>Why We Win (The Moat):</b>",
+      "Competitors focus on medicine delivery; we focus on <b>dignity</b>. With <b>334,000+ HIV cases</b> and 40% undiagnosed due to fear, the market is screaming for privacy. The Govt is validating us by rolling out vending machines—we are the scalable, digital version of that solution.",
+      "<b>The Model:</b>",
+      "• <b>Asset-Light:</b> We partner with pharmacies. Zero inventory cost.",
+      "• <b>High Trust:</b> 100% unbranded delivery means 80%+ retention.",
+      "• <b>Team:</b> Built by students, for students. Roots in Tech, Law, and Business.",
+      "<b>The Ask:</b>",
+      "We are raising <b>[Investment Amount]</b> to dominate the Accra campus market. We have the tech. We have the team. We just need the fuel."
+    ],
+    "closing": "Let's talk numbers,",
+    "signature": [
+      "",
+      "",
+      "______________________________",
+      "{{DIRECTOR_NAME}}",
+      "{{DIRECTOR_TITLE}}",
+      "{{COMPANY_NAME}}"
+    ]
+  },
+  "contributor_charter": {
+    "title": "ACCESS DISCREETKIT LTD CONTRIBUTOR ENGAGEMENT CHARTER & NDA",
+    "recipient": {
+      "default": [
+        "Date: {{DATE}}",
+        "Name: [Contributor Name]",
+        "Circle: [Circle Name]"
+      ]
+    },
+    "salutation": "",
+    "body": [
+      "<b>1. THE MISSION</b>",
+      "You are joining DiscreetKit at its most critical stage: Day One. We are not just building a delivery service; we are building a privacy infrastructure for health in Ghana. We exist to remove the embarrassment, judgment, and stigma that stops people from getting the care they need. By signing this, you are joining a team that values <b>Speed, Privacy, and Empathy</b> above all else.",
+      "<b>2. THE RELATIONSHIP</b>",
+      "You are joining us as a <b>Voluntary Contributor</b>. We are currently a pre-revenue, bootstrapped startup. This means there is no fixed salary right now. Instead, we offer a platform for you to build high-impact work, gain direct operational experience, and be part of our founding story.",
+      "<b>The Value Exchange (What You Get):</b>",
+      "• <b>Portfolio Rights:</b> You have the explicit right to showcase the work you create here in your personal portfolio (once the product is public).",
+      "• <b>First Right of Hire:</b> As we scale and raise capital, active Contributors get first priority for paid full-time roles.",
+      "• <b>Reference & Reputation:</b> The Founders commit to providing detailed, high-level recommendations and referrals for your future career steps.",
+      "• <b>Commissions:</b> Specific roles (like sales/growth) may be eligible for performance-based commissions as defined in separate memos.",
+      "<b>3. THE CODE OF SILENCE (Confidentiality)</b>",
+      "We deal with sexual health. <b>Privacy is our product.</b>",
+      "• <b>User Data is Sacred:</b> You may never, under any circumstances, share, save, or discuss customer data (names, locations, orders). A breach here is not just a firing offense; it is a legal one under the Data Protection Act, 2012 (Act 843).",
+      "• <b>Trade Secrets:</b> Our strategy, partner lists, code, and unreleased designs are confidential. Keep them inside the Circle.",
+      "<b>4. INTELLECTUAL PROPERTY (Who Owns What)</b>",
+      "To build a company that can scale and protect itself, the company must own what it creates.",
+      "<b>Assignment:</b> Any code, design, copy, or strategy you create specifically for DiscreetKit belongs to <b>Access Discreetkit Ltd</b>.",
+      "<b>Why?</b> Investors and partners require us to have clean ownership of our tech and brand. This protects the platform you are helping to build.",
+      "<b>5. THE \"NO HARD FEELINGS\" CLAUSE</b>",
+      "We respect your time and freedom.",
+      "• <b>Leaving:</b> You can step back at any time. We just ask for a quick heads-up so we can hand over your tasks.",
+      "• <b>Removal:</b> We reserve the right to remove contributors who are inactive or violate our values (especially regarding privacy).",
+      "<b>6. ACCEPTANCE</b>",
+      "I understand that I am contributing to build something meaningful. I agree to keep DiscreetKit’s secrets safe and assign the rights to my contributions to the company."
+    ],
+    "closing": "",
+    "signature": [
+      "Signed:",
+      "",
+      "______________________________",
+      "[Contributor Name]",
+      "",
+      "",
+      "______________________________",
+      "{{DIRECTOR_NAME}}",
+      "CEO, {{COMPANY_NAME}}"
+    ]
+  },
+  "pitch_deck": {
+    "title": "INVESTMENT PITCH DECK",
+    "company": "Access Discreetkit Ltd",
+    "tagline": "Skip the Awkward.",
+    "one_liner": "The Uber for Privacy.",
+    "slides": [
+      {
+        "title": "THE PROBLEM",
+        "headline": "Stigma is Expensive.",
+        "body": [
+          "Young people in Ghana need health products (HIV tests, contraceptives) but are terrified of the 'pharmacy stare.'",
+          "The Data:",
+          "• 40% of HIV-positive individuals remain undiagnosed due to fear.",
+          "• Condom use among youth is falling because purchasing in public is 'embarrassing.'",
+          "• This stigma blocks millions in potential revenue."
+        ]
+      },
+      {
+        "title": "THE OPPORTUNITY",
+        "headline": "Massive Unmet Demand",
+        "body": [
+          "• 334,000+ people living with HIV in Ghana.",
+          "• 15,290 new infections in 2024.",
+          "• 1.7 Million annual HIV tests, yet 60%+ prefer confidential methods.",
+          "Government Validation: The Ghana AIDS Commission's rollout of condom vending machines proves that privacy is the solution."
+        ]
+      },
+      {
+        "title": "THE SOLUTION",
+        "headline": "DiscreetKit: The 'Uber for Privacy.'",
+        "body": [
+          "How it Works:",
+          "1. Order: Customer orders anonymously online (No account needed).",
+          "2. Fulfillment: We route the order to a partner pharmacy.",
+          "3. Delivery: Our riders deliver in 100% unbranded, plain packaging.",
+          "Result: Dignity for the user, revenue for the partner."
+        ]
+      },
+      {
+        "title": "BUSINESS MODEL",
+        "headline": "Asset-Light & Scalable",
+        "body": [
+          "• Zero Inventory Risk: We partner with licensed pharmacies to hold stock.",
+          "• Revenue Streams: Margin on products + Partner commissions + Delivery fees.",
+          "• High Retention: Trust = Loyalty. Global benchmarks show 80%+ retention for privacy-first services."
+        ]
+      },
+      {
+        "title": "THE TEAM",
+        "headline": "Built by Students, For Students",
+        "body": [
+          "• Naeem Abdul-Aziz (CEO): Vision, Investor Relations, Strategy.",
+          "• Benedict Dela Tordzro (COO): Operations, Compliance, Partnerships.",
+          "• Derrick Kwadjo Debrah (CTO): Technology, Product Security, Systems Architecture."
+        ]
+      },
+      {
+        "title": "THE ASK",
+        "headline": "We are raising: GHS 500,000.00",
+        "body": [
+          "Deployment:",
+          "• Market Expansion: Aggressive campus activations at Legon & UPSA.",
+          "• Infrastructure: Setting up the initial delivery fleet.",
+          "• Operations: Securing inventory deposits and custom packaging."
+        ]
+      }
+    ],
+    "signature": [
+      "Signed.",
+      "",
+      "______________________________",
+      "{{DIRECTOR_NAME}}",
+      "{{DIRECTOR_TITLE}}",
+      "{{COMPANY_NAME}}"
+    ]
+  },
+  "company_profile": {
+    "title": "COMPANY PROFILE",
+    "company_name": "Access Discreetkit Ltd",
+    "registration_number": "CS236931025",
+    "tagline": "Skip the awkward.",
+    "sections": [
+      {
+        "heading": "Business Summary",
+        "content": "Access Discreetkit Ltd is a Ghanaian health-tech company building the privacy layer for healthcare delivery. We enable young adults to access sensitive reproductive health products without fear, judgment, or stigma. Incorporated under the Companies Act, 2019 (Act 992)."
+      },
+      {
+        "heading": "Mission",
+        "content": "To remove the social barriers to healthcare by providing a dignified, anonymous, and fast access route to essential products."
+      },
+      {
+        "heading": "Market Opportunity",
+        "content": "The consumer health market is losing revenue to stigma. With 15,290 new HIV infections recorded in 2024 and over 334,000 people living with HIV in Ghana, the need for testing is critical. However, social embarrassment prevents thousands from entering pharmacies. Government data confirms that 60% of users prefer confidential testing. We capture this 'hidden' market."
+      },
+      {
+        "heading": "What We Do",
+        "content": "We operate a digital ordering platform for HIV Self-Test Kits, Pregnancy Test Kits, Emergency Contraceptives, Condoms, and Intimate Care products."
+      },
+      {
+        "heading": "How We Operate",
+        "content": "• No Inventory Risk: We partner with licensed pharmacies to hold stock.\n• Tech-Enabled: Orders are routed via our secure platform.\n• Anonymous Logistics: Delivery is handled by unbranded riders in plain packaging."
+      },
+      {
+        "heading": "Leadership Team",
+        "content": "• Naeem Abdul-Aziz (CEO): Leads strategy and partnerships.\n• Benedict Dela Tordzro (COO): Oversees operations and regulatory compliance.\n• Derrick Kwadjo Debrah (CTO): Manages the technology stack and data security."
+      },
+      {
+        "heading": "Contact Details",
+        "content": "Address: House No 57, Kofi Annan East Ave, Madina, Accra\nPost: P.O. Box LG 918, Legon\nPhone: 0203001107\nEmail: dscreetkit@gmail.com"
+      }
+    ],
+    "signature": [
+      "Signed.",
+      "",
+      "______________________________",
+      "{{DIRECTOR_NAME}}",
+      "{{DIRECTOR_TITLE}}",
+      "{{COMPANY_NAME}}"
+    ]
+  },
+  "brand_and_model_bible": {
+    "title": "THE DISCREETKIT BRAND & OPERATING MODEL BIBLE",
+    "recipient": {
+      "default": [
+        "For Internal Use & Partners",
+        "Strictly Confidential",
+        "Version 1.0"
+      ]
+    },
+    "salutation": "",
+    "body": [
+      "<b>1. WHO WE ARE (AND WHO WE ARE NOT)</b>",
+      "<b>We are NOT a 'Medical Company'.</b> We do not diagnose patients. We do not manufacture drugs. We do not give prescriptions. <b>We do not stock or sell products.</b>",
+      "<b>We ARE a 'Privacy Infrastructure Company'.</b> We are a digital logistics platform. We sell dignity. We sell anonymity. We sell the ability for a young Ghanaian to take control of their health without fear of judgment.",
+      "When you design for us, write for us, or code for us, you are building <b>Trust</b>, not just a shop.",
+      "",
+      "<b>2. THE CORE PROBLEM: THE 'PHARMACY STARE'</b>",
+      "Our entire business exists to solve one specific moment: The moment a young person walks into a pharmacy, asks for an HIV test or condom, and feels the entire room judging them.",
+      "That moment of shame prevents millions of cedis in sales and costs lives (15,000+ new HIV infections last year). We eliminate that moment.",
+      "<b>The Hidden Market:</b> There are 635,000+ tertiary students in Ghana. They need these products but won't buy them publicly. That is a <b>GHS 12.7 Million opportunity</b> walking away from pharmacies every year.",
+      "",
+      "<b>3. OUR OPERATING MODEL: 'THE UBER FOR PRIVACY'</b>",
+      "We are an <b>asset-light logistics platform</b>. We do NOT hold inventory. We do NOT buy stock. We do NOT warehouse products. Here is the flow:",
+      "• <b>Step 1 (The Hook):</b> Customer orders anonymously on our site. No account needed. No name required. No judgment.",
+      "• <b>Step 2 (The Source):</b> We digitally route the order to a trusted Partner Pharmacy nearby. <b>They hold the stock; we hold the customer relationship.</b>",
+      "• <b>Step 3 (The Fulfillment):</b> The pharmacy packs the item. We coordinate the pickup.",
+      "• <b>Step 4 (The Delivery):</b> Our unbranded rider picks it up and delivers in <b>100% plain packaging</b>. No logos. No 'Health' stickers. No branding.",
+      "• <b>Step 5 (The Value):</b> The customer receives it at their hostel/home. Their roommates/parents have no idea what it is. <b>That relief is what they pay for.</b>",
+      "<b>Why Asset-Light Wins:</b>",
+      "• <b>Zero Inventory Risk:</b> We never buy stock upfront. Pharmacies hold inventory; we route demand.",
+      "• <b>Infinite Scalability:</b> We can expand to 100 campuses without warehouses, trucks, or staff.",
+      "• <b>Capital Efficiency:</b> Every cedi raised goes into customer acquisition and tech, not inventory.",
+      "",
+      "<b>4. WHAT WE SELL (AND HOW WE MAKE MONEY)</b>",
+      "We sell <b>privacy as a service</b>. Our revenue comes from three streams:",
+      "• <b>Product Margin:</b> We mark up the pharmacy price to cover logistics and platform costs.",
+      "• <b>Delivery Fees:</b> Customers pay for the convenience of anonymous delivery.",
+      "• <b>Partner Commissions:</b> Pharmacies pay us to access the 'invisible customers' who would never walk through their door.",
+      "We are NOT selling HIV tests. We are selling <b>the ability to order an HIV test without anyone knowing.</b>",
+      "",
+      "<b>5. DESIGN & VOICE GUIDELINES</b>",
+      "• <b>Visuals:</b> Clean, modern, clinical but warm. NO scary medical imagery (syringes, blood). NO overly sexual imagery. Use our Golden-Yellow heart/padlock logo to signify safety and trust.",
+      "• <b>Voice:</b> Direct, non-judgmental, empathetic. We don't say 'infected'; we say 'reactive'. We don't say 'buy now'; we say 'get it discreetly'. We never shame; we empower.",
+      "• <b>Privacy First:</b> Every pixel and every line of code must protect user identity. We delete order data after delivery. Customer anonymity is our core product feature.",
+      "• <b>Packaging:</b> 100% unbranded. Plain brown or white boxes. No logos, no labels, no hints. If someone asks 'What's in the box?', the answer should be 'Could be anything.'",
+      "",
+      "<b>6. WHO WE SERVE</b>",
+      "Our target is <b>18-30 year old Ghanaians</b>, primarily students and young professionals. They:",
+      "• Live on their phones (digital natives).",
+      "• Are sexually active but terrified of public judgment.",
+      "• Have disposable income but no privacy.",
+      "• Trust brands that respect their autonomy.",
+      "We serve the <b>'invisible customer'</b>—the person who needs the product but refuses to buy it publicly.",
+      "",
+      "<b>7. THE GOAL</b>",
+      "We are not just delivering test kits. We are building the infrastructure that allows the next generation of Africans to access healthcare without stigma.",
+      "<b>If we win, we change the culture.</b> We normalize testing. We remove the shame. We save lives.",
+      "This is bigger than commerce. This is a movement.",
+      "",
+      "<b>8. FOR CONTRIBUTORS & PARTNERS</b>",
+      "When you work with us, remember:",
+      "• <b>We are NOT retailers.</b> We are a logistics and privacy platform.",
+      "• <b>We do NOT compete with pharmacies.</b> We bring them customers they would never reach.",
+      "• <b>Privacy is our moat.</b> If we lose customer trust, we lose everything.",
+      "• <b>Speed matters.</b> The longer someone waits for their test, the more anxious they become. Fast delivery = better experience.",
+      "Your job is to protect the user's dignity at every touchpoint. That is the brand."
+    ],
+    "closing": "",
+    "signature": [
+      "",
+      "",
+      "______________________________",
+      "{{DIRECTOR_NAME}}",
+      "CEO, {{COMPANY_NAME}}"
+    ]
+  }
+}

@@ -7,8 +7,9 @@
  */
 'use server';
 
-import {z} from 'zod';
-import {generateTrackingCode, type Order} from './data';
+import { z } from 'zod';
+import { generateTrackingCode, type Order } from './data';
+import { assignPharmacyForDeliveryArea, sendPharmacyOrderNotification } from './notifications';
 // Temporarily using fallback to fix build issues
 // Use Genkit flow when Google GenAI API key is configured, otherwise fallback
 let _answerQuestions: ((input: { query: string }) => Promise<{ answer: string }>) | null = null;
@@ -24,10 +25,10 @@ async function getAnswerQuestions() {
   }
   return _answerQuestions;
 }
-import {revalidatePath} from 'next/cache';
-import {type CartItem} from '@/hooks/use-cart';
-import {getSupabaseAdminClient, createSupabaseServerClient} from './supabase';
-import {redirect} from 'next/navigation';
+import { revalidatePath } from 'next/cache';
+import { type CartItem } from '@/hooks/use-cart';
+import { getSupabaseAdminClient, createSupabaseServerClient } from './supabase';
+import { redirect } from 'next/navigation';
 
 // SMS utility function
 export async function sendSMS(phone: string, message: string): Promise<{ ok: boolean; recipient: string; status?: number; body?: any; error?: string }> {
@@ -58,7 +59,7 @@ export async function sendSMS(phone: string, message: string): Promise<{ ok: boo
     url.searchParams.append('to', recipient);
     url.searchParams.append('from', senderId);
     url.searchParams.append('sms', message);
-    
+
     // Add use_case for Nigerian numbers (2349xxxxxxxx)
     if (recipient.startsWith('234')) {
       url.searchParams.append('use_case', 'promotional');
@@ -84,26 +85,26 @@ export async function sendSMS(phone: string, message: string): Promise<{ ok: boo
 
     if (!response.ok) {
       console.warn('Arkesel SMS API Error:', { status: response.status, body: responseBody });
-      return { 
-        ok: false, 
-        recipient, 
-        status: response.status, 
-        body: responseBody, 
-        error: `Arkesel API returned ${response.status}: ${JSON.stringify(responseBody)}` 
+      return {
+        ok: false,
+        recipient,
+        status: response.status,
+        body: responseBody,
+        error: `Arkesel API returned ${response.status}: ${JSON.stringify(responseBody)}`
       };
     }
 
     // Check if the response indicates success
     const isSuccess = responseBody?.code === 'ok' || responseBody?.message?.toLowerCase().includes('success');
-    
+
     if (!isSuccess) {
       console.warn('Arkesel SMS failed based on response:', responseBody);
-      return { 
-        ok: false, 
-        recipient, 
-        status: response.status, 
-        body: responseBody, 
-        error: `SMS failed: ${responseBody?.message || 'Unknown error'}` 
+      return {
+        ok: false,
+        recipient,
+        status: response.status,
+        body: responseBody,
+        error: `SMS failed: ${responseBody?.message || 'Unknown error'}`
       };
     }
 
@@ -120,7 +121,7 @@ export async function sendSMS(phone: string, message: string): Promise<{ ok: boo
 export async function sendOrderConfirmationSMS(orderId: string): Promise<void> {
   try {
     const supabaseAdmin = getSupabaseAdminClient();
-    
+
     // Get order details
     const { data: order, error } = await supabaseAdmin
       .from('orders')
@@ -135,7 +136,7 @@ export async function sendOrderConfirmationSMS(orderId: string): Promise<void> {
 
     const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${order.code}`;
     const confirmationMessage = `Payment for order ${order.code} confirmed. We're now preparing your package for discreet delivery. Track: ${trackingUrl}`;
-    
+
     await sendSMS(order.phone_masked, confirmationMessage);
   } catch (error) {
     console.error('Error sending order confirmation SMS:', error);
@@ -146,7 +147,7 @@ export async function sendOrderConfirmationSMS(orderId: string): Promise<void> {
 export async function sendShippingNotificationSMS(orderId: string): Promise<void> {
   try {
     const supabaseAdmin = getSupabaseAdminClient();
-    
+
     const { data: order, error } = await supabaseAdmin
       .from('orders')
       .select('code, phone_masked')
@@ -160,7 +161,7 @@ export async function sendShippingNotificationSMS(orderId: string): Promise<void
 
     const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${order.code}`;
     const shippingMessage = `Your order ${order.code} has been shipped. Your package is on the way for discreet delivery. Track: ${trackingUrl}`;
-    
+
     await sendSMS(order.phone_masked, shippingMessage);
   } catch (error) {
     console.error('Error sending shipping notification SMS:', error);
@@ -171,7 +172,7 @@ export async function sendShippingNotificationSMS(orderId: string): Promise<void
 export async function sendDeliveryNotificationSMS(orderId: string): Promise<void> {
   try {
     const supabaseAdmin = getSupabaseAdminClient();
-    
+
     const { data: order, error } = await supabaseAdmin
       .from('orders')
       .select('code, phone_masked')
@@ -184,11 +185,33 @@ export async function sendDeliveryNotificationSMS(orderId: string): Promise<void
     }
 
     const deliveredMessage = `Your order ${order.code} has been delivered successfully. Thank you for choosing DiscreetKit for your health needs. Need support? We're here to help.`;
-    
+
     await sendSMS(order.phone_masked, deliveredMessage);
   } catch (error) {
     console.error('Error sending delivery notification SMS:', error);
   }
+}
+
+// Pharmacy accept/decline actions (server-side helpers)
+export async function recordPharmacyAcknowledgement(orderId: number, decision: 'accepted' | 'declined') {
+  const supabaseAdmin = getSupabaseAdminClient();
+  // Update order ack status
+  const { error: updateError } = await supabaseAdmin
+    .from('orders')
+    .update({ pharmacy_ack_status: decision, pharmacy_ack_at: new Date().toISOString() })
+    .eq('id', orderId);
+  if (updateError) {
+    console.error('Pharmacy ack update error', updateError);
+    return { ok: false };
+  }
+  // Log event
+  const statusText = decision === 'accepted' ? 'Pharmacy Accepted' : 'Pharmacy Declined';
+  await supabaseAdmin.from('order_events').insert({
+    order_id: orderId,
+    status: statusText,
+    note: decision === 'accepted' ? 'Pharmacy confirmed it can fulfill the order.' : 'Pharmacy declined; needs reassignment.'
+  });
+  return { ok: true };
 }
 
 
@@ -200,9 +223,9 @@ const loginSchema = z.object({
 export async function login(formData: FormData) {
   'use server';
   const supabase = await createSupabaseServerClient();
-  
+
   const parsed = loginSchema.safeParse(Object.fromEntries(formData));
-  
+
   if (!parsed.success) {
     const errorMessage = parsed.error.errors.map(e => e.message).join(', ');
     redirect(`/login?error=${encodeURIComponent(errorMessage)}`);
@@ -223,7 +246,7 @@ export async function login(formData: FormData) {
   }
 
   // --- On success, redirect to the admin dashboard. ---
-  redirect('/admin/dashboard');
+  redirect('/admin');
 }
 
 
@@ -261,21 +284,21 @@ export async function createOrderAction(prevState: any, formData: FormData) {
       authorization_url: null,
     };
   }
-  
+
   const cartItems: CartItem[] = JSON.parse(validatedFields.data.cartItems);
   if (cartItems.length === 0) {
-      return {
-          errors: { cartItems: ['Your cart is empty. Please add at least one item.'] },
-          message: 'Your cart is empty.',
-          success: false,
-          authorization_url: null,
-      };
+    return {
+      errors: { cartItems: ['Your cart is empty. Please add at least one item.'] },
+      message: 'Your cart is empty.',
+      success: false,
+      authorization_url: null,
+    };
   }
 
-  const {deliveryArea, otherDeliveryArea} = validatedFields.data;
+  const { deliveryArea, otherDeliveryArea } = validatedFields.data;
   if (deliveryArea === 'Other' && (!otherDeliveryArea || otherDeliveryArea.length < 3)) {
     return {
-      errors: {otherDeliveryArea: ['Please specify your delivery area.']},
+      errors: { otherDeliveryArea: ['Please specify your delivery area.'] },
       message: 'Error: Please specify your delivery area.',
       success: false,
       authorization_url: null,
@@ -284,12 +307,12 @@ export async function createOrderAction(prevState: any, formData: FormData) {
 
   try {
     const supabaseAdmin = getSupabaseAdminClient();
-    
+
 
     const code = generateTrackingCode();
-    const finalDeliveryArea =
-      deliveryArea === 'Other' ? otherDeliveryArea : deliveryArea;
-    
+    const finalDeliveryArea: string =
+      deliveryArea === 'Other' ? (otherDeliveryArea || deliveryArea) : deliveryArea;
+
     const priceDetails = {
       subtotal: parseFloat(validatedFields.data.subtotal),
       student_discount: parseFloat(validatedFields.data.studentDiscount), // This is now the waived delivery fee for students
@@ -297,8 +320,17 @@ export async function createOrderAction(prevState: any, formData: FormData) {
       total_price: parseFloat(validatedFields.data.totalPrice),
     };
 
-    // 1. Insert into orders table with status 'pending_payment'
-    const {data: orderData, error: orderError} = await supabaseAdmin
+    // Attempt pharmacy assignment based on delivery area
+    let assignedPharmacyId: number | null = null;
+    try {
+      assignedPharmacyId = await assignPharmacyForDeliveryArea(finalDeliveryArea);
+    } catch (pharmacyError) {
+      console.warn('Failed to auto-assign pharmacy:', pharmacyError);
+      // Continue without assignment - admin can assign later
+    }
+
+    // 1. Insert into orders table with status 'pending_payment' and optional pharmacy assignment
+    const { data: orderData, error: orderError } = await supabaseAdmin
       .from('orders')
       .insert({
         code,
@@ -308,9 +340,10 @@ export async function createOrderAction(prevState: any, formData: FormData) {
         delivery_address_note: validatedFields.data.deliveryAddressNote,
         phone_masked: validatedFields.data.phone_masked,
         email: validatedFields.data.email,
+        pharmacy_id: assignedPharmacyId, // nullable
         ...priceDetails,
       })
-      .select('id')
+      .select('id, pharmacy_id')
       .single();
 
     if (orderError) throw orderError;
@@ -318,64 +351,69 @@ export async function createOrderAction(prevState: any, formData: FormData) {
       throw new Error('Failed to retrieve order ID after creation.');
 
     // 2. Add an initial "Order Received" event
-     await supabaseAdmin.from('order_events').insert({
-        order_id: orderData.id,
-        status: 'Order Received',
-        note: 'Order placed, awaiting payment confirmation.',
-     });
-     
-    // 3. Send initial SMS Notification
+    await supabaseAdmin.from('order_events').insert({
+      order_id: orderData.id,
+      status: 'Order Received',
+      note: 'Order placed, awaiting payment confirmation.',
+    });
+
+    // 3. Send initial customer SMS Notification
     const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${code}`;
     const initialSmsMessage = `Your order ${code} is received. We'll notify you once payment is processed. Track status: ${trackingUrl}`;
-    
+
     await sendSMS(validatedFields.data.phone_masked, initialSmsMessage);
+
+    // 3b. If pharmacy assigned, send pharmacy notification
+    if (orderData.pharmacy_id) {
+      await sendPharmacyOrderNotification(orderData.id, orderData.pharmacy_id);
+    }
 
 
     // 4. Initialize Paystack Transaction
     const paystackSecretKey = process.env.PAYSTACK_SECRET_KEY;
     if (!paystackSecretKey) {
-        console.error('Paystack secret key is not configured in .env.local');
-        throw new Error('Payment processing is not configured.');
+      console.error('Paystack secret key is not configured in .env.local');
+      throw new Error('Payment processing is not configured.');
     }
-    
+
     const amountInKobo = Math.round(priceDetails.total_price * 100);
 
     const paystackResponse = await fetch('https://api.paystack.co/transaction/initialize', {
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${paystackSecretKey}`,
-            'Content-Type': 'application/json',
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${paystackSecretKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: validatedFields.data.email,
+        amount: amountInKobo,
+        currency: 'GHS',
+        reference: code, // Use our unique order code as the reference
+        metadata: {
+          order_id: orderData.id,
+          tracking_code: code,
+          customer_email: validatedFields.data.email,
         },
-        body: JSON.stringify({
-            email: validatedFields.data.email,
-            amount: amountInKobo,
-            currency: 'GHS',
-            reference: code, // Use our unique order code as the reference
-            metadata: {
-              order_id: orderData.id,
-              tracking_code: code,
-              customer_email: validatedFields.data.email,
-            },
-            // Paystack will redirect to this URL after payment attempt
-            callback_url: `${process.env.NEXT_PUBLIC_SITE_URL}/order/success`
-        })
+        // Paystack will redirect to this URL after payment attempt
+        callback_url: `${process.env.NEXT_PUBLIC_SITE_URL}/order/success`
+      })
     });
 
     const paystackData = await paystackResponse.json();
 
     if (!paystackResponse.ok || !paystackData.status) {
-        console.error('Paystack API Error:', paystackData);
-        // Attempt to delete the pending order if Paystack fails to prevent orphaned orders
-        await supabaseAdmin.from('orders').delete().eq('id', orderData.id);
-        throw new Error(paystackData.message || 'Could not initialize payment. Please try again.');
+      console.error('Paystack API Error:', paystackData);
+      // Attempt to delete the pending order if Paystack fails to prevent orphaned orders
+      await supabaseAdmin.from('orders').delete().eq('id', orderData.id);
+      throw new Error(paystackData.message || 'Could not initialize payment. Please try again.');
     }
 
     revalidatePath('/order');
     return {
-        success: true, 
-        authorization_url: paystackData.data.authorization_url, 
-        message: null, 
-        errors: {}
+      success: true,
+      authorization_url: paystackData.data.authorization_url,
+      message: null,
+      errors: {}
     };
 
   } catch (error: any) {
@@ -397,7 +435,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
 export async function getOrderAction(code: string): Promise<Order | null> {
   try {
     const supabaseAdmin = getSupabaseAdminClient();
-    const {data: order, error} = await supabaseAdmin
+    const { data: order, error } = await supabaseAdmin
       .from('orders')
       .select(
         `
@@ -418,7 +456,7 @@ export async function getOrderAction(code: string): Promise<Order | null> {
     }
 
     const items = order.items as CartItem[];
-    
+
     return {
       id: order.id.toString(),
       code: order.code,
@@ -432,12 +470,12 @@ export async function getOrderAction(code: string): Promise<Order | null> {
       deliveryFee: order.delivery_fee,
       totalPrice: order.total_price,
       events: order.order_events
-        .map((e:any) => ({
+        .map((e: any) => ({
           status: e.status,
           note: e.note ?? '',
           date: new Date(e.created_at),
         }))
-        .sort((a:any, b:any) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+        .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()),
     };
   } catch (error) {
     console.error('Action Error in getOrderAction:', error);
@@ -453,13 +491,13 @@ export async function getOrderAction(code: string): Promise<Order | null> {
  * @returns The AI's response as a string.
  */
 export async function handleChat(
-  history: {role: 'user' | 'model'; parts: string}[],
+  history: { role: 'user' | 'model'; parts: string }[],
   message: string
 ) {
   'use server';
   try {
     const answerQuestions = await getAnswerQuestions();
-    const result = await answerQuestions({query: message});
+    const result = await answerQuestions({ query: message });
     return result.answer;
   } catch (error) {
     console.error('AI Error:', error);
@@ -468,38 +506,38 @@ export async function handleChat(
 }
 
 const suggestionSchema = z.object({
-    suggestion: z.string().min(5, 'Suggestion must be at least 5 characters long.'),
+  suggestion: z.string().min(5, 'Suggestion must be at least 5 characters long.'),
 });
 
 /**
  * Saves a user's product suggestion to the database.
  */
 export async function saveSuggestion(prevState: any, formData: FormData) {
-    const validatedFields = suggestionSchema.safeParse({
-        suggestion: formData.get('suggestion'),
+  const validatedFields = suggestionSchema.safeParse({
+    suggestion: formData.get('suggestion'),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      message: validatedFields.error.flatten().fieldErrors.suggestion?.[0] || 'Invalid input.',
+      success: false,
+    };
+  }
+
+  try {
+    const supabase = getSupabaseAdminClient();
+    const { error } = await supabase.from('suggestions').insert({
+      suggestion: validatedFields.data.suggestion,
     });
 
-    if (!validatedFields.success) {
-        return {
-            message: validatedFields.error.flatten().fieldErrors.suggestion?.[0] || 'Invalid input.',
-            success: false,
-        };
-    }
+    if (error) throw error;
 
-    try {
-        const supabase = getSupabaseAdminClient();
-        const { error } = await supabase.from('suggestions').insert({
-            suggestion: validatedFields.data.suggestion,
-        });
-
-        if (error) throw error;
-
-        revalidatePath('/#products');
-        return { success: true, message: 'Suggestion saved!' };
-    } catch (error: any) {
-        return {
-            message: error.message || 'Failed to save suggestion.',
-            success: false,
-        };
-    }
+    revalidatePath('/#products');
+    return { success: true, message: 'Suggestion saved!' };
+  } catch (error: any) {
+    return {
+      message: error.message || 'Failed to save suggestion.',
+      success: false,
+    };
+  }
 }

@@ -23,14 +23,15 @@ async function getProduct(id: string): Promise<Product | null> {
     };
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const product = await getProduct(params.id);
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const product = await getProduct(id);
   
   if (!product) {
     return generateSEOMetadata({
       title: 'Product Not Found',
       description: 'The product you are looking for could not be found.',
-      url: `/products/${params.id}`,
+      url: `/products/${id}`,
     });
   }
 
@@ -49,8 +50,8 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     title: `${product.name} - Confidential Delivery in Ghana`,
     description: `${product.description || product.name} Order discreetly with fast delivery across Ghana. 100% confidential and anonymous service.`,
     keywords,
-    url: `/products/${params.id}`,
-    type: 'product',
+    url: `/products/${id}`,
+    type: 'website',
     price: product.price_ghs.toString(),
     currency: 'GHS',
     availability: (product.stock_level && product.stock_level > 0) ? 'InStock' : 'OutOfStock',
@@ -60,11 +61,12 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 
 interface ProductLayoutProps {
   children: React.ReactNode;
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function ProductLayout({ children, params }: ProductLayoutProps) {
-  const product = await getProduct(params.id);
+  const { id } = await params;
+  const product = await getProduct(id);
   
   if (!product) {
     return <>{children}</>;

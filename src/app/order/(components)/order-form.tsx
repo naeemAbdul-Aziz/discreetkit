@@ -31,13 +31,10 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
         type="submit" 
         className="w-full" 
         size="lg"
-        disabled={pending || disabled}>
-      {pending ? (
-        <>
-          <BrandSpinner size="sm" />
-          Processing...
-        </>
-      ) : (
+        disabled={disabled}
+        loading={pending}
+    >
+      {pending ? 'Processing...' : (
         <>
           Proceed to Payment
           <ArrowRight />
@@ -251,134 +248,136 @@ export function OrderForm() {
         <ChatTrigger />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 md:gap-12 md:items-start mt-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start mt-8">
         {/* Left Column: Form */}
-        <form ref={formRef} action={dispatch} className="space-y-8 relative">
-          <FormPendingOverlay />
-          <input type="hidden" name="cartItems" value={JSON.stringify(items)} />
-          <input type="hidden" name="subtotal" value={subtotal} />
-          <input type="hidden" name="studentDiscount" value={studentDiscount} />
-          <input type="hidden" name="deliveryFee" value={deliveryFee} />
-          <input type="hidden" name="totalPrice" value={totalPrice} />
-          
-          <Card className="bg-card rounded-3xl">
-              <CardHeader>
-                  <CardTitle>Delivery & Payment Details</CardTitle>
-                  <CardDescription>
-                      We only need a location and contact for the delivery rider. Your details are deleted after delivery.
-                  </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                  <div className="space-y-4">
-                      <div className="space-y-2">
-                          <Label htmlFor="email">Email Address *</Label>
-                          <div className="relative">
-                              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                              <Input 
-                                  id="email" 
-                                  name="email" 
-                                  type="email" 
-                                  placeholder="e.g., yourname@email.com" 
-                                  className={cn("pl-10", state.errors?.email && "border-destructive focus-visible:ring-destructive")}
-                              />
-                          </div>
-                          <FieldError message={state.errors?.email?.[0]} />
-                          <p className="text-[0.8rem] text-muted-foreground">
-                          For payment confirmation from Paystack. We don't store it.
-                          </p>
-                      </div>
-                      <div className="space-y-2">
-                          <Label htmlFor="deliveryArea">Delivery Area / Campus *</Label>
-                          <Select name="deliveryArea" onValueChange={handleLocationChange} defaultValue={deliveryLocation || "Other"} disabled={!isMounted}>
-                          <SelectTrigger className={cn(state.errors?.deliveryArea && "border-destructive focus-visible:ring-destructive")}>
-                              <SelectValue placeholder="Select a location..." />
-                          </SelectTrigger>
-                          <SelectContent>
-                                  <SelectItem value="Other">Other (Standard Delivery)</SelectItem>
-                                  {discounts.map(loc => (
-                                  <SelectItem key={loc.id} value={loc.campus}>{loc.campus}</SelectItem>
-                                  ))}
-                          </SelectContent>
-                          </Select>
-                          <FieldError message={state.errors?.deliveryArea?.[0]} />
-                          <p className="text-[0.8rem] text-muted-foreground">Select a campus for FREE delivery.</p>
-                      </div>
+        <div className="lg:col-span-7">
+          <form ref={formRef} action={dispatch} className="space-y-8 relative">
+            <FormPendingOverlay />
+            <input type="hidden" name="cartItems" value={JSON.stringify(items)} />
+            <input type="hidden" name="subtotal" value={subtotal} />
+            <input type="hidden" name="studentDiscount" value={studentDiscount} />
+            <input type="hidden" name="deliveryFee" value={deliveryFee} />
+            <input type="hidden" name="totalPrice" value={totalPrice} />
+            
+            <Card className="bg-card rounded-3xl border-border/50 shadow-sm">
+                <CardHeader>
+                    <CardTitle>Delivery & Payment Details</CardTitle>
+                    <CardDescription>
+                        We only need a location and contact for the delivery rider. Your details are deleted after delivery.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="email">Email Address *</Label>
+                            <div className="relative">
+                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input 
+                                    id="email" 
+                                    name="email" 
+                                    type="email" 
+                                    placeholder="e.g., yourname@email.com" 
+                                    className={cn("pl-10", state.errors?.email && "border-destructive focus-visible:ring-destructive")}
+                                />
+                            </div>
+                            <FieldError message={state.errors?.email?.[0]} />
+                            <p className="text-[0.8rem] text-muted-foreground">
+                            For payment confirmation from Paystack. We don't store it.
+                            </p>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="deliveryArea">Delivery Area / Campus *</Label>
+                            <Select name="deliveryArea" onValueChange={handleLocationChange} defaultValue={deliveryLocation || "Other"} disabled={!isMounted}>
+                            <SelectTrigger className={cn(state.errors?.deliveryArea && "border-destructive focus-visible:ring-destructive")}>
+                                <SelectValue placeholder="Select a location..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                    <SelectItem value="Other">Other (Standard Delivery)</SelectItem>
+                                    {discounts.map(loc => (
+                                    <SelectItem key={loc.id} value={loc.campus}>{loc.campus}</SelectItem>
+                                    ))}
+                            </SelectContent>
+                            </Select>
+                            <FieldError message={state.errors?.deliveryArea?.[0]} />
+                            <p className="text-[0.8rem] text-muted-foreground">Select a campus for FREE delivery.</p>
+                        </div>
 
-                      {showOther && (
-                          <div className="space-y-2">
-                                  <Label htmlFor="otherDeliveryArea">Please Specify Your Location *</Label>
-                              <Input 
-                                  id="otherDeliveryArea" 
-                                  name="otherDeliveryArea" 
-                                  placeholder="e.g., Osu, Airport Area" 
-                                  className={cn(state.errors?.otherDeliveryArea && "border-destructive focus-visible:ring-destructive")}
-                                  />
-                                <FieldError message={state.errors?.otherDeliveryArea?.[0]} />
-                          </div>
-                      )}
-                      
-                      <div className="space-y-2">
-                          <Label htmlFor="deliveryAddressNote">Additional Notes for Delivery Agent</Label>
-                          <Textarea
-                          id="deliveryAddressNote"
-                          name="deliveryAddressNote"
-                          placeholder="e.g., 'Call upon arrival at the main gate', 'Leave with the security.'"
-                          />
-                          <p className="text-[0.8rem] text-muted-foreground">
-                          Optional notes to help the rider find you.
-                          </p>
-                      </div>
-                      <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                          <Label htmlFor="phone_masked">Contact Number (for delivery rider only) *</Label>
-                          </div>
-                          <Input 
-                          id="phone_masked" 
-                          name="phone_masked" 
-                          type="tel" 
-                          placeholder="e.g., 024xxxxxxx" 
-                          className={cn(state.errors?.phone_masked && "border-destructive focus-visible:ring-destructive")}
-                          />
-                          <FieldError message={state.errors?.phone_masked?.[0]} />
-                          <p className="text-[0.8rem] text-muted-foreground flex items-center gap-1.5">
-                          <ShieldCheck className="h-3.5 w-3.5 text-primary" />
-                          This will be masked and is only for the rider to contact you.
-                          </p>
-                      </div>
-                  </div>
+                        {showOther && (
+                            <div className="space-y-2">
+                                    <Label htmlFor="otherDeliveryArea">Please Specify Your Location *</Label>
+                                <Input 
+                                    id="otherDeliveryArea" 
+                                    name="otherDeliveryArea" 
+                                    placeholder="e.g., Osu, Airport Area" 
+                                    className={cn(state.errors?.otherDeliveryArea && "border-destructive focus-visible:ring-destructive")}
+                                    />
+                                  <FieldError message={state.errors?.otherDeliveryArea?.[0]} />
+                            </div>
+                        )}
+                        
+                        <div className="space-y-2">
+                            <Label htmlFor="deliveryAddressNote">Additional Notes for Delivery Agent</Label>
+                            <Textarea
+                            id="deliveryAddressNote"
+                            name="deliveryAddressNote"
+                            placeholder="e.g., 'Call upon arrival at the main gate', 'Leave with the security.'"
+                            />
+                            <p className="text-[0.8rem] text-muted-foreground">
+                            Optional notes to help the rider find you.
+                            </p>
+                        </div>
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                            <Label htmlFor="phone_masked">Contact Number (for delivery rider only) *</Label>
+                            </div>
+                            <Input 
+                            id="phone_masked" 
+                            name="phone_masked" 
+                            type="tel" 
+                            placeholder="e.g., 024xxxxxxx" 
+                            className={cn(state.errors?.phone_masked && "border-destructive focus-visible:ring-destructive")}
+                            />
+                            <FieldError message={state.errors?.phone_masked?.[0]} />
+                            <p className="text-[0.8rem] text-muted-foreground flex items-center gap-1.5">
+                            <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+                            This will be masked and is only for the rider to contact you.
+                            </p>
+                        </div>
+                    </div>
 
-                  <Separator />
-                  
-                  <div className="items-top flex space-x-2 pt-2">
-                      <Checkbox id="terms" checked={termsAccepted} onCheckedChange={(checked) => setTermsAccepted(checked as boolean)} />
-                      <div className="grid gap-1.5 leading-none">
-                          <label
-                          htmlFor="terms"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                          >
-                          By checking this box, you agree to our{' '}
-                          <Link href="/terms" className="underline text-primary hover:text-primary/80" target="_blank">
-                              Terms and Conditions
-                          </Link>{' '}
-                          and{' '}
-                          <Link href="/privacy" className="underline text-primary hover:text-primary/80" target="_blank">
-                              Privacy Notice
-                          </Link>
-                          .
-                          </label>
-                      </div>
-                  </div>
-              </CardContent>
-          </Card>
-          
-          <SubmitButton disabled={isSubmitDisabled} />
-        </form>
+                    <Separator />
+                    
+                    <div className="items-top flex space-x-2 pt-2">
+                        <Checkbox id="terms" checked={termsAccepted} onCheckedChange={(checked) => setTermsAccepted(checked as boolean)} />
+                        <div className="grid gap-1.5 leading-none">
+                            <label
+                            htmlFor="terms"
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            >
+                            By checking this box, you agree to our{' '}
+                            <Link href="/terms" className="underline text-primary hover:text-primary/80" target="_blank">
+                                Terms and Conditions
+                            </Link>{' '}
+                            and{' '}
+                            <Link href="/privacy" className="underline text-primary hover:text-primary/80" target="_blank">
+                                Privacy Notice
+                            </Link>
+                            .
+                            </label>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+            
+            <SubmitButton disabled={isSubmitDisabled} />
+          </form>
+        </div>
 
         {/* Right Column: Order Summary */}
-        <div className="row-start-1 md:row-auto md:col-start-2">
-            <div className="md:sticky md:top-24 space-y-8">
+        <div className="lg:col-span-5 order-first lg:order-last mb-8 lg:mb-0">
+            <div className="sticky top-24 space-y-6 h-fit">
                 <OrderSummaryCard />
-                 <div className="flex items-center gap-2 rounded-lg bg-muted p-3 text-muted-foreground">
+                 <div className="flex items-center gap-2 rounded-lg bg-muted/50 p-4 text-muted-foreground border border-border/50">
                     <Lock className="h-5 w-5 text-success flex-shrink-0" />
                     <p className="text-xs font-medium">Secured via Paystack. Your privacy is guaranteed.</p>
                 </div>

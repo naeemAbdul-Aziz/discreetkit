@@ -1,5 +1,4 @@
-
-import type {NextConfig} from 'next';
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   productionBrowserSourceMaps: false,
@@ -10,7 +9,21 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   // Next.js 15: serverComponentsExternalPackages moved to serverExternalPackages
-  serverExternalPackages: ['genkit', '@genkit-ai/core', '@genkit-ai/googleai'],
+  serverExternalPackages: [
+    'genkit',
+    '@genkit-ai/core',
+    '@genkit-ai/googleai',
+    '@opentelemetry/sdk-node',
+    'handlebars',
+    'dotprompt',
+    'react-joyride'
+  ],
+  // Turbopack configuration (Next.js 15+)
+  turbopack: {
+    resolveAlias: {
+      // Polyfill or ignore node modules for client-side if needed
+    },
+  },
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -26,7 +39,7 @@ const nextConfig: NextConfig = {
         querystring: false,
       };
     }
-    
+
     // Exclude problematic packages from bundling
     config.externals = config.externals || [];
     config.externals.push({
@@ -38,7 +51,7 @@ const nextConfig: NextConfig = {
       'handlebars': 'commonjs handlebars',
       'dotprompt': 'commonjs dotprompt',
     });
-    
+
     return config;
   },
   images: {
@@ -79,9 +92,15 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
-       {
+      {
         protocol: 'https',
         hostname: 'i.pravatar.cc',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'upload.wikimedia.org',
         port: '',
         pathname: '/**',
       }
