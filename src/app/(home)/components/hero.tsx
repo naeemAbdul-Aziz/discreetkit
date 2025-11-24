@@ -52,15 +52,15 @@ export function Hero() {
               Get the private, personal products you need, delivered securely and supported by experts. Your journey starts here.
             </motion.p>
 
-            <motion.div variants={variants.fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/#products" className="w-full sm:w-auto">
-                <MagneticButton className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 h-14 px-10 text-lg rounded-full shadow-xl shadow-primary/20">
-                  Start Your Order <ArrowRight className="ml-2 w-5 h-5" />
+            <motion.div variants={variants.fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
+              <Link href="/#products" className="w-full sm:w-auto max-w-xs">
+                <MagneticButton className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 h-12 sm:h-14 px-8 sm:px-10 text-base sm:text-lg rounded-full shadow-xl shadow-primary/20">
+                  Start Your Order <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
                 </MagneticButton>
               </Link>
-              <Link href="/#how-it-works" className="w-full sm:w-auto">
-                <MagneticButton variant="outline" className="w-full sm:w-auto h-14 px-10 text-lg rounded-full border-border hover:bg-muted/50">
-                  <Play className="mr-2 w-4 h-4 fill-current" /> Learn How It Works
+              <Link href="/#how-it-works" className="w-full sm:w-auto max-w-xs">
+                <MagneticButton variant="outline" className="w-full sm:w-auto h-12 sm:h-14 px-8 sm:px-10 text-base sm:text-lg rounded-full border-border hover:bg-muted/50">
+                  <Play className="mr-2 w-3 h-3 sm:w-4 sm:h-4 fill-current" /> Learn How It Works
                 </MagneticButton>
               </Link>
             </motion.div>

@@ -5,19 +5,22 @@ import { OverviewChart, StatusChart } from "@/components/admin/charts"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 
+import { DashboardRefresher } from "@/components/admin/dashboard-refresher"
+
 export default async function AdminOverviewPage() {
   const stats = await getDashboardStats()
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between space-y-2">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 space-y-0">
         <div>
           <h2 className="font-headline text-4xl font-black tracking-tighter uppercase">Dashboard</h2>
           <p className="text-muted-foreground mt-1">
             Welcome back! Here&apos;s what&apos;s happening with your store today.
           </p>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-4">
+          <DashboardRefresher />
           <Button asChild>
             <Link href="/admin/products">
                 <Package className="mr-2 h-4 w-4" /> Add Product
