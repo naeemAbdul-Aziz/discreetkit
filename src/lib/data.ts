@@ -165,21 +165,21 @@ export const partnerCareSteps: Step[] = [
     number: 1,
     title: 'Get Your Private Results',
     description: 'Your kit arrives in a plain package. Use the simple instructions to get a clear result in under 20 minutes, in the privacy of your own home.',
-    imageUrl: 'https://images.unsplash.com/photo-1618495034073-404391999866?q=80&w=800&fit=crop',
+    imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757952387/man-being-happy-after-getting-negative-covid-test-result_udxny5.jpg',
     imageHint: 'person holding test',
   },
   {
     number: 2,
     title: 'Contact Our Partner',
     description: "If you need support or a confirmatory test, reach out to Marie Stopes. You can call them toll-free or chat on WhatsApp—it's 100% confidential.",
-    imageUrl: 'https://images.unsplash.com/photo-1614324420919-4235395a3a42?q=80&w=800&fit=crop',
+    imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757955894/counselling_old_lady_modern_xbthvs.jpg',
     imageHint: 'person on phone',
   },
   {
     number: 3,
     title: 'Get the Care You Need',
     description: 'Marie Stopes provides a safe, non-judgmental environment for confirmatory testing, counseling, and other health services to give you peace of mind.',
-    imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=800&fit=crop',
+    imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757955894/counselling_old_lady_modern_xbthvs.jpg',
     imageHint: 'doctor patient tablet',
   },
   {
@@ -211,19 +211,19 @@ export const marieStopesData: MarieStopesData = {
     {
       title: "Confirmatory Testing",
       description: "Get a professional test in a clinical setting to confirm your status and understand your health.",
-      imageUrl: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=800&fit=crop",
+      imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757955894/counselling_old_lady_modern_xbthvs.jpg",
       imageHint: "doctor patient tablet"
     },
     {
       title: "Professional Counselling",
       description: "Speak with a trained professional in a private, non-judgmental space to discuss your results and options.",
-      imageUrl: "https://images.unsplash.com/photo-1544006659-f0b21884ce1d?q=80&w=800&fit=crop",
+      imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757955894/counselling_old_lady_modern_xbthvs.jpg",
       imageHint: "counselor listening patient"
     },
     {
       title: "Contraceptive Services",
       description: "Explore a wide range of modern contraceptive options with expert guidance to fit your lifestyle.",
-      imageUrl: "https://images.unsplash.com/photo-1584515933487-759821d27167?q=80&w=800&fit=crop",
+      imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757953240/close-up-delivery-person-giving-parcel-client_al5mjd.jpg",
       imageHint: "hands holding package"
     },
   ],

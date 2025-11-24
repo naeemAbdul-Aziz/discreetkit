@@ -42,7 +42,7 @@ export function PartnerReferral() {
             {/* image container */}
             <div className="relative h-64 md:h-auto min-h-[350px] rounded-3xl overflow-hidden">
               <Image
-                  src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=800&fit=crop"
+                  src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757955894/counselling_old_lady_modern_xbthvs.jpg"
                   alt="a healthcare professional showing information on a tablet to a patient"
                   fill
                   className="object-cover rounded-3xl"

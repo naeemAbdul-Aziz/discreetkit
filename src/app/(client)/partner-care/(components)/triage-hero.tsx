@@ -108,7 +108,7 @@ export function TriageHero({ onServiceSelect }: TriageHeroProps) {
             className="relative h-[500px] md:h-[700px] w-full rounded-[2.5rem] overflow-hidden shadow-2xl lg:order-last order-first mb-8 lg:mb-0"
           >
              <Image
-                src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=2070&auto=format&fit=crop"
+                src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757955894/counselling_old_lady_modern_xbthvs.jpg"
                 alt="Medical Professional"
                 fill
                 className="object-cover"
