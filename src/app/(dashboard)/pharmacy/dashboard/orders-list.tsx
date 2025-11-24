@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRealtimeOrders } from "@/hooks/use-realtime-orders"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -31,13 +32,16 @@ interface Order {
   pharmacy_ack_status: string
 }
 
-export function OrdersList({ orders }: { orders: Order[] }) {
+export function OrdersList({ orders: initialOrders, pharmacyId }: { orders: Order[], pharmacyId: number }) {
   const { toast } = useToast()
   const router = useRouter()
   const [loading, setLoading] = useState<number | null>(null)
   const [declineDialogOpen, setDeclineDialogOpen] = useState(false)
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null)
   const [declineReason, setDeclineReason] = useState("")
+  const [orders, setOrders] = useState<Order[]>(initialOrders)
+
+  useRealtimeOrders(pharmacyId, setOrders)
 
   const handleAccept = async (orderId: number) => {
     setLoading(orderId)

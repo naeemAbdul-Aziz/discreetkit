@@ -28,72 +28,62 @@ export default async function PharmacyDashboardPage() {
 
   return (
     <>
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold tracking-tight">{pharmacy.name}</h2>
-        <p className="text-muted-foreground">{pharmacy.location}</p>
+      <div className="mb-6 px-2 md:px-0">
+        <h2 className="text-2xl md:text-3xl font-bold tracking-tight break-words">{pharmacy.name}</h2>
+        <p className="text-muted-foreground text-sm md:text-base break-words">{pharmacy.location}</p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
-        <Card>
+      <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-4">
+        <Card className="min-w-0">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">New Assigned Orders</CardTitle>
+            <CardTitle className="text-xs md:text-sm font-medium">New Assigned Orders</CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.pending || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              Awaiting processing
-            </p>
+            <div className="text-lg md:text-2xl font-bold">{stats?.pending || 0}</div>
+            <p className="text-xs text-muted-foreground">Awaiting processing</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="min-w-0">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Processing</CardTitle>
+            <CardTitle className="text-xs md:text-sm font-medium">Processing</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.processing || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              Currently being prepared
-            </p>
+            <div className="text-lg md:text-2xl font-bold">{stats?.processing || 0}</div>
+            <p className="text-xs text-muted-foreground">Currently being prepared</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="min-w-0">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Out for Delivery</CardTitle>
+            <CardTitle className="text-xs md:text-sm font-medium">Out for Delivery</CardTitle>
             <Truck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.outForDelivery || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              On their way to customers
-            </p>
+            <div className="text-lg md:text-2xl font-bold">{stats?.outForDelivery || 0}</div>
+            <p className="text-xs text-muted-foreground">On their way to customers</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="min-w-0">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Completed This Week</CardTitle>
+            <CardTitle className="text-xs md:text-sm font-medium">Completed This Week</CardTitle>
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+{stats?.completedThisWeek || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              Successfully delivered
-            </p>
+            <div className="text-lg md:text-2xl font-bold">+{stats?.completedThisWeek || 0}</div>
+            <p className="text-xs text-muted-foreground">Successfully delivered</p>
           </CardContent>
         </Card>
       </div>
-      
-      <div className="grid gap-4 mt-8">
+
+      <div className="grid gap-4 mt-6 px-2 md:px-0">
         <Card>
           <CardHeader>
-            <CardTitle>Recent Orders</CardTitle>
-            <CardDescription>
-              Orders assigned to your pharmacy
-            </CardDescription>
+            <CardTitle className="text-base md:text-lg">Recent Orders</CardTitle>
+            <CardDescription className="text-xs md:text-sm">Orders assigned to your pharmacy</CardDescription>
           </CardHeader>
-          <CardContent>
-            <OrdersList orders={orders || []} />
+          <CardContent className="p-2 md:p-6">
+            <OrdersList orders={orders || []} pharmacyId={pharmacy.id} />
           </CardContent>
         </Card>
       </div>

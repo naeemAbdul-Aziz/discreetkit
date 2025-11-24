@@ -1,6 +1,6 @@
 'use server'
 
-import { createSupabaseServerClient } from "@/lib/supabase"
+import { createSupabaseServerClient, getSupabaseAdminClient } from "@/lib/supabase"
 
 /**
  * Delivery area to pharmacy mapping
@@ -45,8 +45,7 @@ const DELIVERY_AREA_MAPPING: Record<string, number[]> = {
 /**
  * Auto-assign order to nearest pharmacy based on delivery area
  */
-export async function autoAssignOrder(orderId: number, deliveryArea: string) {
-    const supabase = await createSupabaseServerClient()
+    const supabase = getSupabaseAdminClient()
 
     // Find matching pharmacy IDs for this delivery area
     let pharmacyIds: number[] = []
@@ -86,6 +85,7 @@ export async function autoAssignOrder(orderId: number, deliveryArea: string) {
         .eq('id', orderId)
 
     if (error) {
+        console.error('Order assignment failed:', error.message)
         return { error: error.message }
     }
 
@@ -111,8 +111,7 @@ export async function autoAssignOrder(orderId: number, deliveryArea: string) {
 /**
  * Manually assign order to specific pharmacy (admin override)
  */
-export async function manualAssignOrder(orderId: number, pharmacyId: number) {
-    const supabase = await createSupabaseServerClient()
+    const supabase = getSupabaseAdminClient()
 
     const { error } = await supabase
         .from('orders')
@@ -123,6 +122,7 @@ export async function manualAssignOrder(orderId: number, pharmacyId: number) {
         .eq('id', orderId)
 
     if (error) {
+        console.error('Manual order assignment failed:', error.message)
         return { error: error.message }
     }
 
