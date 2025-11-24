@@ -26,7 +26,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="flex min-h-screen w-full bg-muted/20">
         <DashboardSidebar />
         <SidebarInset>
-
+          <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4 md:hidden">
+            <SidebarTrigger className="-ml-1" />
+            <span className="font-semibold">{title}</span>
+          </header>
           <div className="flex-1 overflow-auto p-4 md:p-8">
             {children}
           </div>
