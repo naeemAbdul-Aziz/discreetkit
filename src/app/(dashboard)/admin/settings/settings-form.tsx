@@ -120,7 +120,7 @@ export function SettingsForm() {
                 onChange={(e) => setFormData({...formData, support_email: e.target.value})}
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
                     <Label htmlFor="phone">Support Phone</Label>
                     <Input 
@@ -153,7 +153,7 @@ export function SettingsForm() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="flex items-center justify-between space-x-2">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 sm:space-x-2">
               <Label htmlFor="new-orders" className="flex flex-col space-y-1">
                 <span>New Orders</span>
                 <span className="font-normal text-muted-foreground">Receive an email when a new order is placed.</span>
@@ -165,7 +165,7 @@ export function SettingsForm() {
               />
             </div>
             <Separator />
-            <div className="flex items-center justify-between space-x-2">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 sm:space-x-2">
               <Label htmlFor="low-stock" className="flex flex-col space-y-1">
                 <span>Low Stock Alerts</span>
                 <span className="font-normal text-muted-foreground">Get notified when products fall below 10 units.</span>
@@ -177,7 +177,7 @@ export function SettingsForm() {
               />
             </div>
             <Separator />
-            <div className="flex items-center justify-between space-x-2">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 sm:space-x-2">
               <Label htmlFor="partner-signup" className="flex flex-col space-y-1">
                 <span>New Partner Signups</span>
                 <span className="font-normal text-muted-foreground">Receive an alert when a pharmacy registers.</span>
@@ -259,7 +259,7 @@ export function SettingsForm() {
                 </div>
             </CardContent>
             <CardFooter>
-                <Button variant="outline" className="w-full">Invite New Admin</Button>
+                <Button variant="outline" className="w-full mt-2 sm:mt-0">Invite New Admin</Button>
             </CardFooter>
         </Card>
       </TabsContent>

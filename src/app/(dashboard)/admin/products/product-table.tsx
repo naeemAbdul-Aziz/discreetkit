@@ -121,7 +121,7 @@ export function ProductTable({ initialProducts }: { initialProducts: Product[] }
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -138,8 +138,8 @@ export function ProductTable({ initialProducts }: { initialProducts: Product[] }
         </Button>
       </div>
 
-      <div className="rounded-md border bg-card">
-        <Table>
+      <div className="rounded-md border bg-card overflow-x-auto">
+        <Table className="min-w-[600px]">
           <TableHeader>
             <TableRow>
               <TableHead className="w-[80px] hidden md:table-cell">Image</TableHead>
@@ -256,7 +256,7 @@ export function ProductTable({ initialProducts }: { initialProducts: Product[] }
 
       {/* Pagination Controls */}
       {filteredProducts.length > pageSize && (
-        <div className="flex items-center justify-between mt-2 gap-2">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-2 gap-2">
           <div className="flex items-center gap-2">
             <span className="text-sm">Rows per page:</span>
             <select
