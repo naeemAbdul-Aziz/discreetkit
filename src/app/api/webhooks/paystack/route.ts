@@ -4,9 +4,9 @@
  * and updates the order status in the database accordingly. This is a critical
  * part of ensuring payment reliability.
  */
-import {NextResponse} from 'next/server';
+import { NextResponse } from 'next/server';
 import crypto from 'crypto';
-import {getSupabaseAdminClient} from '@/lib/supabase';
+import { getSupabaseAdminClient } from '@/lib/supabase';
 import { paymentDebug } from '@/lib/utils';
 import { sendOrderConfirmationSMS } from '@/lib/actions';
 
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
   if (!paystackSecret) {
     console.error('Paystack secret key is not configured.');
-    return new NextResponse('Webhook Error: Server configuration error.', {status: 500});
+    return new NextResponse('Webhook Error: Server configuration error.', { status: 500 });
   }
 
   const signature = req.headers.get('x-paystack-signature');
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
 
   if (hash !== signature) {
     paymentDebug('Invalid Paystack webhook signature');
-    return new NextResponse('Webhook Error: Invalid signature', {status: 400});
+    return new NextResponse('Webhook Error: Invalid signature', { status: 400 });
   }
 
   // 2. Parse the event payload
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
 
   // 3. Handle the 'charge.success' event
   if (event.event === 'charge.success') {
-    const {reference, status, amount} = event.data;
+    const { reference, status, amount } = event.data;
 
     if (status === 'success') {
       try {
@@ -52,10 +52,10 @@ export async function POST(req: Request) {
             status,
             payload: event,
           });
-        } catch {}
+        } catch { }
         paymentDebug('Webhook charge.success received', { reference, amount });
         // Find the order using the reference code
-        const {data: order, error: findError} = await supabaseAdmin
+        const { data: order, error: findError } = await supabaseAdmin
           .from('orders')
           .select('id, status')
           .eq('code', reference)
@@ -64,36 +64,58 @@ export async function POST(req: Request) {
         if (findError || !order) {
           paymentDebug('Webhook order not found', { reference });
           // Return 200 so Paystack doesn't retry for a non-existent order
-          return new NextResponse('Order not found', {status: 200});
+          return new NextResponse('Order not found', { status: 200 });
         }
-        
+
         // Only update if the order is still marked as 'pending_payment'
         if (order.status === 'pending_payment') {
-            const { error: updateError } = await supabaseAdmin
-              .from('orders')
-              .update({ status: 'received' })
-              .eq('id', order.id);
-            
-            if (updateError) throw updateError;
-            
-            await supabaseAdmin.from('order_events').insert({
-                order_id: order.id,
-                status: 'Payment Confirmed',
-                note: `Successfully received GHS ${(amount / 100).toFixed(2)}.`,
-            });
-            paymentDebug('Webhook updated order to received', { reference, orderId: order.id });
+          const { error: updateError } = await supabaseAdmin
+            .from('orders')
+            .update({ status: 'received' })
+            .eq('id', order.id);
 
-            // Send SMS confirmation after successful payment
-            await sendOrderConfirmationSMS(order.id);
+          if (updateError) throw updateError;
+
+          await supabaseAdmin.from('order_events').insert({
+            order_id: order.id,
+            status: 'Payment Confirmed',
+            note: `Successfully received GHS ${(amount / 100).toFixed(2)}.`,
+          });
+          paymentDebug('Webhook updated order to received', { reference, orderId: order.id });
+
+          // Auto-assign pharmacy after payment confirmation
+          try {
+            const { data: orderDetails } = await supabaseAdmin
+              .from('orders')
+              .select('delivery_area')
+              .eq('id', order.id)
+              .single();
+
+            if (orderDetails?.delivery_area) {
+              const { autoAssignOrder } = await import('@/lib/order-assignment');
+              const assignResult = await autoAssignOrder(order.id, orderDetails.delivery_area);
+
+              if (assignResult.success) {
+                paymentDebug('Auto-assigned pharmacy', { orderId: order.id, pharmacyId: assignResult.pharmacyId });
+              } else if (assignResult.requiresManual) {
+                paymentDebug('Manual assignment required', { orderId: order.id, deliveryArea: orderDetails.delivery_area });
+              }
+            }
+          } catch (assignError) {
+            console.warn('Auto-assignment failed, will require manual assignment:', assignError);
+          }
+
+          // Send SMS confirmation after successful payment
+          await sendOrderConfirmationSMS(order.id);
         }
 
       } catch (err) {
         console.error('Webhook processing error:', err);
-        return new NextResponse('Webhook Error: Internal Server Error', {status: 500});
+        return new NextResponse('Webhook Error: Internal Server Error', { status: 500 });
       }
     }
   }
 
   // 4. Acknowledge receipt of the event
-  return new NextResponse('Webhook received', {status: 200});
+  return new NextResponse('Webhook received', { status: 200 });
 }

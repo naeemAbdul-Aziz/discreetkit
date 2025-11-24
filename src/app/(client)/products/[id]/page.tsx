@@ -1,10 +1,9 @@
 
-
 import { getSupabaseClient } from '@/lib/supabase';
 import type { Product } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { ProductDetailContent } from './(components)/product-detail-content';
+import { ProductDetailContent } from '../(components)/product-detail-content';
 
 
 async function getProduct(id: string): Promise<Product | null> {

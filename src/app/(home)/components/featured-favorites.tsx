@@ -6,7 +6,7 @@
 'use client';
 
 import { useRef } from 'react';
-import { ProductCard } from '@/app/products/(components)/product-card';
+import { ProductCard } from '@/app/(client)/products/(components)/product-card';
 import type { Product } from '@/lib/data';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';

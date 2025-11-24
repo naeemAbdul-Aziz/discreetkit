@@ -1,6 +1,6 @@
 
 import { getSupabaseClient } from '@/lib/supabase';
-import { ProductCard } from '../../../products/(components)/product-card';
+import { ProductCard } from '../(components)/product-card';
 import type { Product } from '@/lib/data';
 
 export const dynamic = 'force-dynamic';

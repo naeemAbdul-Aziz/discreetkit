@@ -17,7 +17,7 @@ export function DashboardSidebar() {
   ]), [])
 
   return (
-    <Sidebar variant="inset" collapsible="icon" className="border-r bg-gradient-to-b from-muted/40 to-background/10 backdrop-blur supports-[backdrop-filter]:bg-background/40">
+    <Sidebar variant="inset" collapsible="icon" className="border-r bg-card md:bg-gradient-to-b md:from-muted/40 md:to-background/10 md:backdrop-blur md:supports-[backdrop-filter]:bg-background/40">
       <SidebarHeader className="px-4 py-3 border-b border-border/50">
         <SidebarMenuButton
           asChild

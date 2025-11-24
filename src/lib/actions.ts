@@ -323,13 +323,13 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     // Attempt pharmacy assignment based on delivery area
     let assignedPharmacyId: number | null = null;
     try {
-      assignedPharmacyId = await assignPharmacyForDeliveryArea(finalDeliveryArea);
+      const { autoAssignOrder } = await import('@/lib/order-assignment');
+      // We'll assign after order creation to use the order ID
     } catch (pharmacyError) {
-      console.warn('Failed to auto-assign pharmacy:', pharmacyError);
-      // Continue without assignment - admin can assign later
+      console.warn('Failed to load auto-assignment:', pharmacyError);
     }
 
-    // 1. Insert into orders table with status 'pending_payment' and optional pharmacy assignment
+    // 1. Insert into orders table with status 'pending_payment' (no pharmacy yet)
     const { data: orderData, error: orderError } = await supabaseAdmin
       .from('orders')
       .insert({
@@ -340,7 +340,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
         delivery_address_note: validatedFields.data.deliveryAddressNote,
         phone_masked: validatedFields.data.phone_masked,
         email: validatedFields.data.email,
-        pharmacy_id: assignedPharmacyId, // nullable
+        pharmacy_id: null, // Will be assigned after payment
         ...priceDetails,
       })
       .select('id, pharmacy_id')
@@ -363,10 +363,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
 
     await sendSMS(validatedFields.data.phone_masked, initialSmsMessage);
 
-    // 3b. If pharmacy assigned, send pharmacy notification
-    if (orderData.pharmacy_id) {
-      await sendPharmacyOrderNotification(orderData.id, orderData.pharmacy_id);
-    }
+    // Note: Pharmacy assignment happens AFTER payment confirmation in the webhook
 
 
     // 4. Initialize Paystack Transaction

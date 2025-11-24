@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { ProductCard } from '../../../products/(components)/product-card';
+import { ProductCard } from '../(components)/product-card';
 import type { Product } from '@/lib/data';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';

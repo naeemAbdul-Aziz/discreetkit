@@ -1,6 +1,6 @@
 
 import { getSupabaseClient } from '@/lib/supabase';
-import { ProductCard } from '../../../products/(components)/product-card';
+import { ProductCard } from '../(components)/product-card';
 import type { Product } from '@/lib/data';
 import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';

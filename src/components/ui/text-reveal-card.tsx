@@ -136,26 +136,50 @@ const Stars = () => {
   const randomMove = () => Math.random() * 4 - 2;
   const randomOpacity = () => Math.random();
   const random = () => Math.random();
+
+  const [stars, setStars] = useState<
+    {
+      top: string;
+      left: string;
+      opacity: number;
+      duration: number;
+      initialTop: string;
+      initialLeft: string;
+    }[]
+  >([]);
+
+  useEffect(() => {
+    const generatedStars = [...Array(80)].map(() => ({
+      top: `calc(${random() * 100}% + ${randomMove()}px)`,
+      left: `calc(${random() * 100}% + ${randomMove()}px)`,
+      opacity: randomOpacity(),
+      duration: random() * 10 + 20,
+      initialTop: `${random() * 100}%`,
+      initialLeft: `${random() * 100}%`,
+    }));
+    setStars(generatedStars);
+  }, []);
+
   return (
     <div className="absolute inset-0">
-      {[...Array(80)].map((_, i) => (
+      {stars.map((star, i) => (
         <motion.span
           key={`star-${i}`}
           animate={{
-            top: `calc(${random() * 100}% + ${randomMove()}px)`,
-            left: `calc(${random() * 100}% + ${randomMove()}px)`,
-            opacity: randomOpacity(),
+            top: star.top,
+            left: star.left,
+            opacity: star.opacity,
             scale: [1, 1.2, 0],
           }}
           transition={{
-            duration: random() * 10 + 20,
+            duration: star.duration,
             repeat: Infinity,
             ease: "linear",
           }}
           style={{
             position: "absolute",
-            top: `${random() * 100}%`,
-            left: `${random() * 100}%`,
+            top: star.initialTop,
+            left: star.initialLeft,
             width: `2px`,
             height: `2px`,
             backgroundColor: "hsl(var(--primary))",

@@ -101,11 +101,12 @@ This project is optimized for deployment on Vercel or Firebase App Hosting. Simp
 
 ## 🧩 Admin Dashboard Data Integrity & Realtime
 
-The admin dashboard pages (`/admin/dashboard`, `/admin/orders`, `/admin/products`, `/admin/customers`) rely on:
+The admin dashboard pages (`/admin/dashboard`, `/admin/orders`, `/admin/products`, `/admin/partners`, `/admin/settings`) rely on:
 
 - Server-side aggregation via the `orders` table (there is currently no dedicated `customers` table).
 - Fallback identifier logic when `email` is missing (uses `phone_masked` then `code`).
 - Server-Sent Events (SSE) endpoints under `/api/admin/realtime/*` that subscribe to changes on underlying tables.
+- Partner management with pharmacy-user linking for pharmacy portal access.
 
 ### Customers Aggregation Changes
 

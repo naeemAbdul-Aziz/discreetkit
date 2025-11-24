@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useMemo } from "react"
+import { useRouter } from "next/navigation"
 import {
   Table,
   TableBody,
@@ -26,7 +27,7 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu"
-import { updateOrderStatus, assignPharmacy } from "@/lib/admin-actions"
+import { updateOrderStatus, assignPharmacy, bulkUpdateOrderStatus } from "@/lib/admin-actions"
 import { useToast } from "@/hooks/use-toast"
 
 interface Order {
@@ -47,44 +48,99 @@ interface Pharmacy {
 
 export function OrdersTable({ initialOrders, pharmacies }: { initialOrders: Order[], pharmacies: Pharmacy[] }) {
   const [searchTerm, setSearchTerm] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
+  const [orders, setOrders] = useState<Order[]>(initialOrders)
+  const [filterStatus, setFilterStatus] = useState<string>('all')
+  const [assigningId, setAssigningId] = useState<number | null>(null)
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
+  const [bulkSaving, setBulkSaving] = useState(false)
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
   const { toast } = useToast()
+  const router = useRouter()
 
-  const filteredOrders = initialOrders.filter(o => 
-    o.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (o.email && o.email.toLowerCase().includes(searchTerm.toLowerCase()))
-  )
+  useEffect(() => { const t = setTimeout(()=> setDebouncedSearch(searchTerm),300); return ()=> clearTimeout(t)}, [searchTerm])
+
+  const titleCase = (s:string) => s.replace(/_/g,' ').replace(/\b\w/g,c=> c.toUpperCase())
+
+  const filteredOrders = useMemo(()=> {
+    return orders.filter(o => {
+      const matchesSearch = o.code.toLowerCase().includes(debouncedSearch.toLowerCase()) || (o.email && o.email.toLowerCase().includes(debouncedSearch.toLowerCase()))
+      const matchesFilter = filterStatus==='all' ? true : o.status === filterStatus
+      return matchesSearch && matchesFilter
+    })
+  }, [orders, debouncedSearch, filterStatus])
+
+  // Pagination logic
+  const totalPages = Math.max(1, Math.ceil(filteredOrders.length / pageSize))
+  const paginatedOrders = filteredOrders.slice((page-1)*pageSize, page*pageSize)
 
   const handleStatusChange = async (id: number, status: string) => {
     const res = await updateOrderStatus(id, status)
     if (res.error) {
       toast({ variant: "destructive", title: "Error", description: res.error })
     } else {
-      toast({ title: "Updated", description: `Order status changed to ${status}.` })
+      toast({ title: "Updated", description: `Order status changed to ${titleCase(status)}.` })
+      setOrders(prev => prev.map(o => o.id===id ? { ...o, status } : o))
     }
   }
 
   const handleAssignPharmacy = async (orderId: number, pharmacyId: number) => {
+    setAssigningId(orderId)
     const res = await assignPharmacy(orderId, pharmacyId)
     if (res.error) {
       toast({ variant: "destructive", title: "Error", description: res.error })
     } else {
       toast({ title: "Assigned", description: "Pharmacy assigned successfully." })
+      setOrders(prev => prev.map(o => o.id===orderId ? { ...o, pharmacy_id: pharmacyId, pharmacies: { name: pharmacies.find(p=>p.id===pharmacyId)?.name || '' } } : o))
     }
+    setAssigningId(null)
   }
 
   const getStatusBadge = (status: string) => {
+    const base = titleCase(status)
     switch (status) {
-      case 'completed': return <Badge className="bg-green-500">Completed</Badge>
-      case 'processing': return <Badge className="bg-blue-500">Processing</Badge>
-      case 'out_for_delivery': return <Badge className="bg-purple-500">Delivering</Badge>
-      case 'pending_payment': return <Badge variant="secondary">Pending</Badge>
-      default: return <Badge variant="outline">{status}</Badge>
+      case 'completed': return <Badge className="bg-green-500">{base}</Badge>
+      case 'processing': return <Badge className="bg-blue-500">{base}</Badge>
+      case 'out_for_delivery': return <Badge className="bg-purple-500">{base}</Badge>
+      case 'pending_payment': return <Badge variant="secondary">{base}</Badge>
+      case 'received': return <Badge className="bg-orange-500">{base}</Badge>
+      default: return <Badge variant="outline">{base}</Badge>
     }
   }
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      {selectedIds.size > 0 && (
+        <div className="flex items-center gap-3 p-2 rounded border bg-muted/40">
+          <span className="text-sm">{selectedIds.size} selected</span>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="sm" variant="secondary" disabled={bulkSaving}>Change Status</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              {['pending_payment','received','processing','out_for_delivery','completed'].map(s => (
+                <DropdownMenuItem key={s} disabled={bulkSaving} onClick={async()=> {
+                  setBulkSaving(true)
+                  const res = await bulkUpdateOrderStatus(Array.from(selectedIds), s)
+                  if (res.error) {
+                    toast({ variant:'destructive', title:'Bulk update failed', description: res.error })
+                  } else {
+                    toast({ title:'Bulk Updated', description:`Set ${selectedIds.size} orders to ${titleCase(s)}` })
+                    setOrders(prev => prev.map(o => selectedIds.has(o.id) ? { ...o, status: s } : o))
+                    setSelectedIds(new Set())
+                  }
+                  setBulkSaving(false)
+                }}>
+                  {titleCase(s)}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button size="sm" variant="ghost" onClick={()=> setSelectedIds(new Set())}>Clear</Button>
+        </div>
+      )}
+      <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -95,12 +151,33 @@ export function OrdersTable({ initialOrders, pharmacies }: { initialOrders: Orde
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
+        <div className="flex items-center gap-2 text-sm">
+          {['all','pending_payment','received','processing','out_for_delivery','completed'].map(s => (
+            <Button key={s} variant={filterStatus===s? 'default':'outline'} size="sm" onClick={()=> setFilterStatus(s)}>
+              {s==='all' ? 'All' : titleCase(s)}
+            </Button>
+          ))}
+        </div>
       </div>
 
       <div className="rounded-md border bg-card">
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-8">
+                <input
+                  type="checkbox"
+                  aria-label="Select all"
+                  checked={filteredOrders.length>0 && filteredOrders.every(o=> selectedIds.has(o.id))}
+                  onChange={e=> {
+                    if (e.target.checked) {
+                      setSelectedIds(new Set(filteredOrders.map(o=> o.id)))
+                    } else {
+                      setSelectedIds(new Set())
+                    }
+                  }}
+                  className="h-4 w-4 rounded border" />
+              </TableHead>
               <TableHead>Order ID</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Customer</TableHead>
@@ -111,23 +188,50 @@ export function OrdersTable({ initialOrders, pharmacies }: { initialOrders: Orde
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredOrders.map((order) => (
-              <TableRow key={order.id}>
+            {paginatedOrders.map((order) => (
+              <TableRow key={order.id} className={selectedIds.has(order.id) ? 'bg-muted/30' : ''}>
+                <TableCell>
+                  <input
+                    type="checkbox"
+                    aria-label={`Select order ${order.code}`}
+                    checked={selectedIds.has(order.id)}
+                    onChange={e=> {
+                      setSelectedIds(prev => {
+                        const next = new Set(prev)
+                        if (e.target.checked) next.add(order.id); else next.delete(order.id)
+                        return next
+                      })
+                    }}
+                    className="h-4 w-4 rounded border" />
+                </TableCell>
                 <TableCell className="font-medium">{order.code}</TableCell>
                 <TableCell className="text-muted-foreground text-sm">
-                  {new Date(order.created_at).toLocaleDateString()}
+                  {new Date(order.created_at).toISOString().slice(0, 10)}
                 </TableCell>
                 <TableCell>{order.email || 'Anonymous'}</TableCell>
-                <TableCell>{getStatusBadge(order.status)}</TableCell>
                 <TableCell>
-                  {order.pharmacies?.name ? (
-                    <div className="flex items-center gap-1 text-sm">
-                      <MapPin className="h-3 w-3 text-muted-foreground" />
-                      {order.pharmacies.name}
-                    </div>
-                  ) : (
-                    <span className="text-muted-foreground text-xs italic">Unassigned</span>
-                  )}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="px-2">
+                        {getStatusBadge(order.status)}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start">
+                      {['pending_payment','received','processing','out_for_delivery','completed'].map(s => (
+                        <DropdownMenuItem key={s} onClick={()=> handleStatusChange(order.id, s)}>
+                          {titleCase(s)}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+                <TableCell>
+                  <PharmacyCombobox
+                    pharmacies={pharmacies}
+                    value={order.pharmacy_id}
+                    onAssign={(pid)=> handleAssignPharmacy(order.id, pid)}
+                    loading={assigningId===order.id}
+                  />
                 </TableCell>
                 <TableCell className="text-right">GHS {Number(order.total_price).toFixed(2)}</TableCell>
                 <TableCell>
@@ -175,13 +279,66 @@ export function OrdersTable({ initialOrders, pharmacies }: { initialOrders: Orde
             {filteredOrders.length === 0 && (
               <TableRow>
                 <TableCell colSpan={7} className="h-24 text-center">
-                  No orders found.
+                  <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                    <span className="text-sm">No orders match your criteria.</span>
+                  </div>
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
+
+      {/* Pagination Controls */}
+      {filteredOrders.length > pageSize && (
+        <div className="flex items-center justify-between mt-2 gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-sm">Rows per page:</span>
+            <select
+              className="border rounded px-2 py-1 text-sm"
+              value={pageSize}
+              onChange={e => { setPageSize(Number(e.target.value)); setPage(1) }}
+              title="Rows per page"
+            >
+              {[10, 20, 50, 100].map(size => (
+                <option key={size} value={size}>{size}</option>
+              ))}
+            </select>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="ghost" disabled={page === 1} onClick={() => setPage(p => Math.max(1, p-1))}>&lt;</Button>
+            <span className="text-sm">Page {page} of {totalPages}</span>
+            <Button size="sm" variant="ghost" disabled={page === totalPages} onClick={() => setPage(p => Math.min(totalPages, p+1))}>&gt;</Button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function PharmacyCombobox({ pharmacies, value, onAssign, loading }: { pharmacies: Pharmacy[]; value: number | null; onAssign: (id:number)=>void; loading:boolean }) {
+  const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState('')
+  const filtered = pharmacies.filter(p => p.name.toLowerCase().includes(query.toLowerCase()))
+  const display = value ? pharmacies.find(p=>p.id===value)?.name : 'Unassigned'
+  return (
+    <div className="relative w-40">
+      <Button variant="outline" size="sm" className="w-full justify-start" onClick={()=> setOpen(o=> !o)}>
+        {loading ? 'Assigning...' : display}
+      </Button>
+      {open && (
+        <div className="absolute z-10 mt-1 w-full rounded border bg-popover p-2 shadow">
+          <Input placeholder="Search..." value={query} onChange={e=> setQuery(e.target.value)} className="mb-2 h-8 text-sm" />
+          <div className="max-h-48 overflow-y-auto space-y-1">
+            {filtered.map(p => (
+              <Button key={p.id} variant="ghost" size="sm" className="w-full justify-start" onClick={()=> { onAssign(p.id); setOpen(false) }}>
+                {p.name}
+              </Button>
+            ))}
+            {filtered.length===0 && <div className="text-xs text-muted-foreground px-1">No matches</div>}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

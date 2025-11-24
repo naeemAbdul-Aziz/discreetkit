@@ -59,28 +59,6 @@ DiscreetKit is a modern web application built on the Jamstack architecture, heav
 
 *   **Implementation:** All backend logic is encapsulated within **Next.js Server Actions** located in `src/lib/actions.ts`.
 *   **Security:** This is a critical security feature. Instead of the client making direct requests to the database (which would require exposing sensitive keys), the client invokes a Server Action. This action runs exclusively on the server, where it can safely use admin-level database credentials.
-*   **Core Actions:**
-    *   `createOrderAction`: Validates cart and user details, inserts the order into Supabase, and initiates a payment transaction with Paystack.
-    *   `getOrderAction`: Securely fetches a specific order and its event history for the tracking page.
-    *   `saveSuggestion`: Inserts user product suggestions into the database.
-    *   `handleChat`: Serves as a secure bridge between the client-side chatbot and the server-side Genkit AI flow.
-
-### 3.4. Database (Supabase)
-
-*   **Provider:** Supabase acts as the primary database and backend service.
-*   **Data Models:** The schema (defined in `supabase/migrations/`) includes tables for:
-    *   `products`: The master list of all products, including details, pricing, and categories.
-    *   `orders`: Contains all order information, including items, delivery details, pricing, and the anonymous tracking code.
-    *   `order_events`: A log of status changes for each order (e.g., "Order Received", "Payment Confirmed", "Out for Delivery").
-    *   `suggestions`: Stores product suggestions from users.
-*   **Security:** Row Level Security (RLS) is enabled on all sensitive tables (like `orders`). This ensures that data can only be accessed via the secure `service_role` key, which is only used within the server-side Server Actions. Public `anon_key` access is restricted.
-*   **Real-time:** Supabase's real-time capabilities are used to listen for database changes, particularly on the admin orders page, allowing the UI to update automatically without needing a manual refresh.
-
-#### Change management
-
-- Migrations in `supabase/migrations/` are the single source of truth for schema changes. Apply using Supabase CLI (`supabase db push`).
-- `schema.sql` is a generated snapshot for code review and reference; do not edit manually.
-- See `docs/MIGRATIONS.md` for the full workflow (creating migrations, pushing changes, and regenerating snapshots).
 
 ### 3.5. Payment Gateway (Paystack)
 

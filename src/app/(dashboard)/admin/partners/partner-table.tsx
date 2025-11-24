@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import {
   Table,
   TableBody,
@@ -10,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { MoreHorizontal, Plus, Search, Trash2, Edit, MapPin, Phone } from "lucide-react"
+import { MoreHorizontal, Plus, Search, Trash2, Edit, MapPin, Phone, User, UserCheck } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import {
   DropdownMenu,
@@ -20,6 +21,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Badge } from "@/components/ui/badge"
 import { PartnerSheet } from "./partner-sheet"
 import { deletePharmacy } from "@/lib/admin-actions"
 import { useToast } from "@/hooks/use-toast"
@@ -31,18 +33,26 @@ interface Pharmacy {
   contact_person: string | null
   phone_number: string | null
   email: string | null
+  user: { id: string; email: string } | null
 }
 
 export function PartnerTable({ initialPartners }: { initialPartners: Pharmacy[] }) {
   const [searchTerm, setSearchTerm] = useState("")
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const [selectedPartner, setSelectedPartner] = useState<Pharmacy | null>(null)
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
   const { toast } = useToast()
+  const router = useRouter()
 
   const filteredPartners = initialPartners.filter(p => 
     p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.location.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  // Pagination logic
+  const totalPages = Math.max(1, Math.ceil(filteredPartners.length / pageSize))
+  const paginatedPartners = filteredPartners.slice((page-1)*pageSize, page*pageSize)
 
   const handleEdit = (partner: Pharmacy) => {
     setSelectedPartner(partner)
@@ -62,6 +72,7 @@ export function PartnerTable({ initialPartners }: { initialPartners: Pharmacy[] 
       toast({ variant: "destructive", title: "Error", description: res.error })
     } else {
       toast({ title: "Deleted", description: "Partner removed." })
+      router.refresh() // Refresh to show changes
     }
   }
 
@@ -91,11 +102,12 @@ export function PartnerTable({ initialPartners }: { initialPartners: Pharmacy[] 
               <TableHead>Name</TableHead>
               <TableHead>Location</TableHead>
               <TableHead>Contact</TableHead>
+              <TableHead>User Account</TableHead>
               <TableHead className="w-[50px]"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredPartners.map((partner) => (
+            {paginatedPartners.map((partner) => (
               <TableRow key={partner.id}>
                 <TableCell className="font-medium">
                   {partner.name}
@@ -118,6 +130,22 @@ export function PartnerTable({ initialPartners }: { initialPartners: Pharmacy[] 
                       </div>
                     )}
                   </div>
+                </TableCell>
+                <TableCell>
+                  {partner.user ? (
+                    <div className="flex items-center gap-2">
+                      <Badge variant="default" className="gap-1">
+                        <UserCheck className="h-3 w-3" />
+                        Linked
+                      </Badge>
+                      <span className="text-xs text-muted-foreground">{partner.user.email}</span>
+                    </div>
+                  ) : (
+                    <Badge variant="outline" className="gap-1">
+                      <User className="h-3 w-3" />
+                      No Account
+                    </Badge>
+                  )}
                 </TableCell>
                 <TableCell>
                   <DropdownMenu>
@@ -143,7 +171,7 @@ export function PartnerTable({ initialPartners }: { initialPartners: Pharmacy[] 
             ))}
             {filteredPartners.length === 0 && (
               <TableRow>
-                <TableCell colSpan={4} className="h-24 text-center">
+                <TableCell colSpan={5} className="h-24 text-center">
                   No partners found.
                 </TableCell>
               </TableRow>
@@ -151,6 +179,30 @@ export function PartnerTable({ initialPartners }: { initialPartners: Pharmacy[] 
           </TableBody>
         </Table>
       </div>
+
+      {/* Pagination Controls */}
+      {filteredPartners.length > pageSize && (
+        <div className="flex items-center justify-between mt-2 gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-sm">Rows per page:</span>
+            <select
+              className="border rounded px-2 py-1 text-sm"
+              value={pageSize}
+              onChange={e => { setPageSize(Number(e.target.value)); setPage(1) }}
+              title="Rows per page"
+            >
+              {[10, 20, 50, 100].map(size => (
+                <option key={size} value={size}>{size}</option>
+              ))}
+            </select>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="ghost" disabled={page === 1} onClick={() => setPage(p => Math.max(1, p-1))}>&lt;</Button>
+            <span className="text-sm">Page {page} of {totalPages}</span>
+            <Button size="sm" variant="ghost" disabled={page === totalPages} onClick={() => setPage(p => Math.min(totalPages, p+1))}>&gt;</Button>
+          </div>
+        </div>
+      )}
 
       <PartnerSheet 
         open={isSheetOpen} 

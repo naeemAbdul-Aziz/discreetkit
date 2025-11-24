@@ -1,22 +1,38 @@
-/**
- * @file src/app/(dashboard)/pharmacy/dashboard/page.tsx
- * @description The main dashboard page for pharmacy partners, showing a
- *              restricted view of assigned orders and relevant stats.
- */
-'use client';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Package, Truck, CheckCircle, Clock } from 'lucide-react'
+import { getPharmacyStats, getPharmacyOrders, getCurrentPharmacy } from '@/lib/pharmacy-actions'
+import { OrdersList } from './orders-list'
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Package, Truck, CheckCircle, Clock } from 'lucide-react';
+export default async function PharmacyDashboardPage() {
+  // Get pharmacy info
+  const { pharmacy, error: pharmError } = await getCurrentPharmacy()
+  
+  if (pharmError || !pharmacy) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Card className="max-w-md">
+          <CardHeader>
+            <CardTitle>Access Denied</CardTitle>
+            <CardDescription>
+              {pharmError || "No pharmacy account found for this user."}
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    )
+  }
 
-export default function PharmacyDashboardPage() {
+  // Get stats and recent orders
+  const { stats } = await getPharmacyStats()
+  const { orders } = await getPharmacyOrders()
+
   return (
     <>
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold tracking-tight">{pharmacy.name}</h2>
+        <p className="text-muted-foreground">{pharmacy.location}</p>
+      </div>
+
       <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -24,7 +40,7 @@ export default function PharmacyDashboardPage() {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12</div>
+            <div className="text-2xl font-bold">{stats?.pending || 0}</div>
             <p className="text-xs text-muted-foreground">
               Awaiting processing
             </p>
@@ -36,7 +52,7 @@ export default function PharmacyDashboardPage() {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">5</div>
+            <div className="text-2xl font-bold">{stats?.processing || 0}</div>
             <p className="text-xs text-muted-foreground">
               Currently being prepared
             </p>
@@ -48,8 +64,8 @@ export default function PharmacyDashboardPage() {
             <Truck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">3</div>
-             <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold">{stats?.outForDelivery || 0}</div>
+            <p className="text-xs text-muted-foreground">
               On their way to customers
             </p>
           </CardContent>
@@ -60,26 +76,27 @@ export default function PharmacyDashboardPage() {
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+42</div>
+            <div className="text-2xl font-bold">+{stats?.completedThisWeek || 0}</div>
             <p className="text-xs text-muted-foreground">
               Successfully delivered
             </p>
           </CardContent>
         </Card>
       </div>
-      <div className="grid gap-4">
+      
+      <div className="grid gap-4 mt-8">
         <Card>
           <CardHeader>
-            <CardTitle>Assigned Orders</CardTitle>
+            <CardTitle>Recent Orders</CardTitle>
             <CardDescription>
-              A list of new and ongoing orders assigned to your pharmacy.
+              Orders assigned to your pharmacy
             </CardDescription>
           </CardHeader>
           <CardContent>
-             <p>Assigned orders table will be implemented here.</p>
+            <OrdersList orders={orders || []} />
           </CardContent>
         </Card>
       </div>
     </>
-  );
+  )
 }

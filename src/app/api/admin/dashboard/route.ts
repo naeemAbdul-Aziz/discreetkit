@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseServerClient, getSupabaseAdminClient } from '@/lib/supabase';
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
     // Verify authenticated session
     const supabaseServer = await createSupabaseServerClient();
@@ -11,8 +11,17 @@ export async function GET() {
 
     const supabase = getSupabaseAdminClient();
 
-    const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-    const sinceIso = since.toISOString();
+    // Parse optional date range from query params
+    const url = new URL(req.url);
+    const fromParam = url.searchParams.get('from');
+    const toParam = url.searchParams.get('to');
+    const now = new Date();
+    const defaultFrom = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const from = fromParam ? new Date(fromParam) : defaultFrom;
+    const to = toParam ? new Date(toParam) : now;
+    // Normalize to ISO
+    const fromIso = from.toISOString();
+    const toIso = to.toISOString();
 
     // Fetch last 30 days orders for metrics + full recent list for table
     const { data: recentOrders, error: ordersErr } = await supabase
@@ -23,43 +32,53 @@ export async function GET() {
 
     if (ordersErr) throw ordersErr;
 
-    const { data: last30d, error: lastErr } = await supabase
+    const { data: rangedOrders, error: lastErr } = await supabase
       .from('orders')
       .select('id, total_price, created_at, status, email')
-      .gte('created_at', sinceIso)
+      .gte('created_at', fromIso)
+      .lte('created_at', toIso)
       .order('created_at', { ascending: true });
 
     if (lastErr) throw lastErr;
 
     const includedStatuses = new Set(['received','processing','out_for_delivery','completed']);
-    const last30dFiltered = (last30d ?? []).filter(o => includedStatuses.has(String(o.status)));
+    const rangedFiltered = (rangedOrders ?? []).filter(o => includedStatuses.has(String(o.status)));
 
-    const totalRevenue = last30dFiltered.reduce((sum, o: any) => sum + Number(o.total_price || 0), 0);
-    const totalSales = last30dFiltered.length;
+    const totalRevenue = rangedFiltered.reduce((sum, o: any) => sum + Number(o.total_price || 0), 0);
+    const totalSales = rangedFiltered.length;
     const avgOrderValue = totalSales ? totalRevenue / totalSales : 0;
 
     // Distinct customers based on email (fallback to phone if needed)
-    const newCustomers = new Set((last30dFiltered || [])
+    const newCustomers = new Set((rangedFiltered || [])
       .map((o: any) => o.email)
       .filter(Boolean)
     ).size;
 
     // Build daily revenue series for last 30 days
     const dayMs = 24 * 60 * 60 * 1000;
-    const startDay = new Date(Date.now() - 29 * dayMs); // inclusive
+    const startDay = new Date(from.toISOString().slice(0,10));
+    const endDay = new Date(to.toISOString().slice(0,10));
     const seriesMap = new Map<string, number>();
-    for (let i = 0; i < 30; i++) {
-      const d = new Date(startDay.getTime() + i * dayMs);
+    // Build date keys inclusive of range
+    for (let d = new Date(startDay); d <= endDay; d = new Date(d.getTime() + dayMs)) {
       const key = d.toISOString().slice(0, 10);
       seriesMap.set(key, 0);
     }
-    for (const row of last30dFiltered) {
+    for (const row of rangedFiltered) {
       const key = new Date(row.created_at).toISOString().slice(0, 10);
       if (seriesMap.has(key)) {
         seriesMap.set(key, (seriesMap.get(key) || 0) + Number(row.total_price || 0));
       }
     }
     const revenueSeries = Array.from(seriesMap.entries()).map(([date, amount]) => ({ date, amount }));
+
+    // Status breakdown for donut chart
+    const statusCounts = new Map<string, number>();
+    for (const row of rangedFiltered) {
+      const s = String(row.status);
+      statusCounts.set(s, (statusCounts.get(s) || 0) + 1);
+    }
+    const statusBreakdown = Array.from(statusCounts.entries()).map(([status, count]) => ({ status, count }));
 
     // Table rows: top 10 most recent orders
     const table = (recentOrders ?? []).filter(o => o.status !== 'pending_payment').slice(0, 10).map((o: any) => ({
@@ -79,6 +98,7 @@ export async function GET() {
       },
       recentOrders: table,
       revenueSeries,
+      statusBreakdown,
     }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (e: any) {
     console.error('Dashboard API error:', e);
