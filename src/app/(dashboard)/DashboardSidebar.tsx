@@ -33,7 +33,7 @@ export function DashboardSidebar() {
           </h2>
         </Link>
       </SidebarHeader>
-      <SidebarContent className="flex flex-col items-center py-4 gap-2">
+      <SidebarContent className="flex flex-col py-4 gap-2 px-2 lg:px-4">
         <SidebarMenu>
           {navItems.map(item => {
             const isActive = item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href);
@@ -45,14 +45,16 @@ export function DashboardSidebar() {
                   isActive={isActive}
                   size="lg"
                   className={
-                    `group flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200
+                    `group flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200
                     ${isActive ? 'bg-primary/10 text-primary shadow-sm' : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'}
                     `
                   }
                 >
-                  <Link href={item.href} aria-current={isActive ? 'page' : undefined} className="flex items-center justify-center w-full h-full">
-                    <item.icon className={`h-6 w-6 ${isActive ? 'stroke-[2]' : 'stroke-[1.5] group-hover:stroke-[2]'}`} />
-                    <span className="sr-only">{item.label}</span>
+                  <Link href={item.href} aria-current={isActive ? 'page' : undefined} className="flex items-center gap-3 w-full">
+                    <item.icon className={`h-5 w-5 shrink-0 ${isActive ? 'stroke-[2]' : 'stroke-[1.5] group-hover:stroke-[2]'}`} />
+                    <span className={`hidden lg:inline-block text-sm font-medium ${isActive ? 'font-semibold' : ''}`}>
+                      {item.label}
+                    </span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
