@@ -9,7 +9,7 @@ import Image from "next/image"
 export function DashboardSidebar() {
   const pathname = usePathname()
   const navItems = React.useMemo(() => ([
-    { href: "/admin", label: "Overview", icon: LayoutDashboard },
+    { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
     { href: "/admin/products", label: "Products", icon: Package },
     { href: "/admin/partners", label: "Partners", icon: Users },
@@ -17,8 +17,8 @@ export function DashboardSidebar() {
   ]), [])
 
   return (
-    <Sidebar variant="inset" collapsible="icon" className="border-r bg-card md:bg-gradient-to-b md:from-muted/40 md:to-background/10 md:backdrop-blur md:supports-[backdrop-filter]:bg-background/40">
-      <SidebarHeader className="px-4 py-3 border-b border-border/50">
+    <Sidebar variant="inset" collapsible="icon" className="border-r bg-white shadow-sm">
+      <SidebarHeader className="px-0 py-4 flex justify-center items-center border-b border-border/50">
         <SidebarMenuButton
           asChild
           tooltip="DiscreetKit Portal"
@@ -48,24 +48,32 @@ export function DashboardSidebar() {
           </Link>
         </SidebarMenuButton>
       </SidebarHeader>
-      <SidebarContent className="px-2 py-3">
+      <SidebarContent className="flex flex-col items-center py-4 gap-2">
         <SidebarMenu>
-          {navItems.map(item => (
-            <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton
-                asChild
-                tooltip={item.label}
-                isActive={item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href)}
-                size="lg"
-                className="rounded-xl px-3 data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=true]:font-bold"
-              >
-                <Link href={item.href} aria-current={pathname.startsWith(item.href) ? 'page' : undefined}>
-                  <item.icon className="h-5 w-5" />
-                  <span className="duration-200 group-data-[collapsible=icon]:opacity-0">{item.label}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+          {navItems.map(item => {
+            const isActive = item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href);
+            return (
+              <SidebarMenuItem key={item.href}>
+                <SidebarMenuButton
+                  asChild
+                  tooltip={item.label}
+                  isActive={isActive}
+                  size="lg"
+                  className={
+                    `group flex items-center justify-center w-12 h-12 rounded-full transition-colors duration-200
+                    ${isActive ? 'bg-green-100 text-green-900 shadow-sm' : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'}
+                    `
+                  }
+                  style={{ boxShadow: isActive ? '0 0 0 2px #bbf7d0' : undefined }}
+                >
+                  <Link href={item.href} aria-current={isActive ? 'page' : undefined} className="flex items-center justify-center w-full h-full">
+                    <item.icon className={`h-6 w-6 ${isActive ? 'stroke-[2] text-green-900' : 'stroke-[1.5] text-zinc-600 group-hover:text-zinc-900'}`} />
+                    <span className="sr-only">{item.label}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+          })}
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter className="px-4 py-3 border-t border-border/50">

@@ -78,8 +78,8 @@ export function PartnerTable({ initialPartners }: { initialPartners: Pharmacy[] 
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-        <div className="relative flex-1 max-w-sm">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="relative w-full sm:flex-1 sm:max-w-sm">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
@@ -89,13 +89,91 @@ export function PartnerTable({ initialPartners }: { initialPartners: Pharmacy[] 
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <Button onClick={handleAdd}>
+        <Button onClick={handleAdd} className="w-full sm:w-auto">
           <Plus className="mr-2 h-4 w-4" />
           Add Partner
         </Button>
       </div>
 
-      <div className="rounded-md border bg-card overflow-x-auto">
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-4">
+        {paginatedPartners.map((partner) => (
+          <div key={partner.id} className="rounded-lg border bg-card p-4 space-y-3">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <h3 className="font-semibold text-base">{partner.name}</h3>
+                {partner.email && (
+                  <p className="text-sm text-muted-foreground">{partner.email}</p>
+                )}
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">Open menu</span>
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                  <DropdownMenuItem onClick={() => handleEdit(partner)}>
+                    <Edit className="mr-2 h-4 w-4" /> Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(partner.id)}>
+                    <Trash2 className="mr-2 h-4 w-4" /> Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+            
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-muted-foreground" />
+                <span>{partner.location}</span>
+              </div>
+              
+              {partner.contact_person && (
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4 text-muted-foreground" />
+                  <span>{partner.contact_person}</span>
+                </div>
+              )}
+              
+              {partner.phone_number && (
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4 text-muted-foreground" />
+                  <span>{partner.phone_number}</span>
+                </div>
+              )}
+            </div>
+            
+            <div className="pt-2 border-t">
+              {partner.user ? (
+                <div className="flex items-center gap-2">
+                  <Badge variant="default" className="gap-1">
+                    <UserCheck className="h-3 w-3" />
+                    Linked
+                  </Badge>
+                  <span className="text-xs text-muted-foreground">{partner.user.email}</span>
+                </div>
+              ) : (
+                <Badge variant="outline" className="gap-1">
+                  <User className="h-3 w-3" />
+                  No Account
+                </Badge>
+              )}
+            </div>
+          </div>
+        ))}
+        {filteredPartners.length === 0 && (
+          <div className="rounded-lg border bg-card p-8 text-center text-muted-foreground">
+            No partners found.
+          </div>
+        )}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden md:block rounded-md border bg-card overflow-x-auto">
         <Table className="min-w-[500px]">
           <TableHeader>
             <TableRow>
