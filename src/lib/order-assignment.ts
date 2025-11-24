@@ -45,6 +45,7 @@ const DELIVERY_AREA_MAPPING: Record<string, number[]> = {
 /**
  * Auto-assign order to nearest pharmacy based on delivery area
  */
+export async function autoAssignOrder(orderId: number, deliveryArea: string) {
     const supabase = getSupabaseAdminClient()
 
     // Find matching pharmacy IDs for this delivery area
@@ -108,9 +109,11 @@ const DELIVERY_AREA_MAPPING: Record<string, number[]> = {
     }
 }
 
+
 /**
  * Manually assign order to specific pharmacy (admin override)
  */
+export async function manuallyAssignOrder(orderId: number, pharmacyId: number) {
     const supabase = getSupabaseAdminClient()
 
     const { error } = await supabase

@@ -28,6 +28,7 @@ import {
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu"
 import { updateOrderStatus, assignPharmacy, bulkUpdateOrderStatus } from "@/lib/admin-actions"
+import { useRealtimeOrders } from "@/hooks/use-realtime-orders"
 import { useToast } from "@/hooks/use-toast"
 
 interface Order {
@@ -50,6 +51,10 @@ export function OrdersTable({ initialOrders, pharmacies }: { initialOrders: Orde
   const [searchTerm, setSearchTerm] = useState("")
   const [debouncedSearch, setDebouncedSearch] = useState("")
   const [orders, setOrders] = useState<Order[]>(initialOrders)
+    // Listen for realtime order updates (all pharmacies, so pharmacyId = null)
+    useRealtimeOrders(null, (newOrders) => {
+      setOrders(newOrders)
+    })
   const [filterStatus, setFilterStatus] = useState<string>('all')
   const [assigningId, setAssigningId] = useState<number | null>(null)
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
@@ -92,7 +97,7 @@ export function OrdersTable({ initialOrders, pharmacies }: { initialOrders: Orde
       toast({ variant: "destructive", title: "Error", description: res.error })
     } else {
       toast({ title: "Assigned", description: "Pharmacy assigned successfully." })
-      setOrders(prev => prev.map(o => o.id===orderId ? { ...o, pharmacy_id: pharmacyId, pharmacies: { name: pharmacies.find(p=>p.id===pharmacyId)?.name || '' } } : o))
+      // No need to refresh, realtime will update orders
     }
     setAssigningId(null)
   }

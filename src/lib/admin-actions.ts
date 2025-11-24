@@ -355,7 +355,7 @@ export async function updateOrderStatus(id: number, status: string) {
 }
 
 export async function assignPharmacy(orderId: number, pharmacyId: number) {
-    const supabase = await createSupabaseServerClient()
+    const supabase = getSupabaseAdminClient()
     const { error } = await supabase
         .from('orders')
         .update({ pharmacy_id: pharmacyId, status: 'processing' }) // Auto-move to processing on assignment
