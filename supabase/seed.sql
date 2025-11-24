@@ -74,7 +74,8 @@ CREATE TABLE public.pharmacies (
   location text not null,
   contact_person text,
   phone_number text,
-  email text
+  email text,
+  user_id uuid references auth.users(id) on delete set null
 );
 
 CREATE TABLE public.orders (

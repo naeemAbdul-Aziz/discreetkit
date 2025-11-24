@@ -2,24 +2,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Package, Truck, CheckCircle, Clock } from 'lucide-react'
 import { getPharmacyStats, getPharmacyOrders, getCurrentPharmacy } from '@/lib/pharmacy-actions'
 import { OrdersList } from './orders-list'
+import { redirect } from 'next/navigation'
 
 export default async function PharmacyDashboardPage() {
   // Get pharmacy info
   const { pharmacy, error: pharmError } = await getCurrentPharmacy()
   
+  // SECURITY: Immediately redirect if not authenticated or no pharmacy found
   if (pharmError || !pharmacy) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Card className="max-w-md">
-          <CardHeader>
-            <CardTitle>Access Denied</CardTitle>
-            <CardDescription>
-              {pharmError || "No pharmacy account found for this user."}
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    )
+    redirect('/login')
   }
 
   // Get stats and recent orders
