@@ -1,53 +1,93 @@
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
+import { matchProtectedRoute } from '@/lib/auth/routes'
+import { getUserRoles } from '@/lib/auth/roles'
 
-// src/middleware.ts (FIXED)
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { createSupabaseMiddlewareClient } from './lib/supabase-mw'; // edge-safe middleware client
+export async function middleware(request: NextRequest) {
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  })
 
-const PROTECTED_ROUTES = ['/admin', '/pharmacy'];
-const LOGIN_ROUTE = '/login';
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return request.cookies.get(name)?.value
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          request.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+        },
+        remove(name: string, options: CookieOptions) {
+          request.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+        },
+      },
+    }
+  )
+
+  const { data: { user } } = await supabase.auth.getUser()
+
+  // Data-driven RBAC check
+  const route = matchProtectedRoute(request.nextUrl.pathname)
+  if (route && route.roles) {
+    // Require auth
+    if (!user) {
+      console.log('[middleware] No user, redirecting to /login')
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
+    // Fetch user roles and verify
+    const roles = await getUserRoles(supabase as any, user.id)
+    console.log(`[middleware] User: ${user.email} (${user.id}), Roles:`, roles)
+    const authorized = roles.some(r => route.roles!.includes(r))
+    console.log(`[middleware] Route: ${request.nextUrl.pathname}, Required:`, route.roles, 'Authorized:', authorized)
+    if (!authorized) {
+      return NextResponse.redirect(new URL('/unauthorized', request.url))
+    }
+  }
+
+  return response
+}
 
 export const config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
-     * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * Feel free to modify this pattern to include more paths.
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
-};
-
-export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-
-  // 1. Create a Supabase client and response object
-  const { supabase, response } = createSupabaseMiddlewareClient(request);
-
-  // 2. Get the session. This also refreshes the token if needed.
-  const { data: { session } } = await supabase.auth.getSession();
-
-  // 3. If user is not logged in and tries to access a protected route
-  if (!session && PROTECTED_ROUTES.some(prefix => pathname.startsWith(prefix))) {
-    // Redirect to login, but include the page they were trying to visit
-    const url = request.nextUrl.clone();
-    url.pathname = LOGIN_ROUTE;
-    url.searchParams.set('redirect_to', pathname);
-    return NextResponse.redirect(url);
-  }
-
-  // 4. If user IS logged in and tries to access the login page
-  if (session && pathname === LOGIN_ROUTE) {
-    // Redirect them to their main dashboard
-    // We can add role-based logic here later
-    const url = request.nextUrl.clone();
-    url.pathname = '/admin/dashboard';
-    return NextResponse.redirect(url);
-  }
-
-  // 5. Allow the request and pass the Supabase-enhanced response
-  // This is crucial for passing the refreshed auth cookie
-  return response;
 }

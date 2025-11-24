@@ -1,7 +1,7 @@
 // app/(client)/(home)/layout.tsx
 import type { Metadata } from 'next';
-import { generateMetadata } from '@/lib/seo';
-import { SEOFAQ, commonFAQs } from '@/components/seo/seo-faq';
+import { generateMetadata, generateFAQSchema } from '@/lib/seo';
+import { faqItems } from '@/lib/data';
 import { SEOContent, seoContentBlocks, localSEOContent } from '@/components/seo/seo-content';
 import { StructuredData } from '@/components/seo/structured-data';
 
@@ -22,13 +22,11 @@ export default function HomeLayout({ children }: HomeLayoutProps) {
       {/* Main page content */}
       {children}
       
-      {/* SEO Enhancement: FAQ Section */}
-      <section className="container mx-auto px-4 py-16">
-        <SEOFAQ 
-          faqs={commonFAQs.slice(0, 6)} // Show first 6 FAQs on homepage
-          className="max-w-4xl mx-auto"
-        />
-      </section>
+      {/* SEO Enhancement: FAQ Schema (Hidden) */}
+      <StructuredData 
+        data={generateFAQSchema(faqItems.slice(0, 6))} 
+        includeDefaults={false} 
+      />
 
       {/* SEO Enhancement: Hidden content for better keyword targeting */}
       <SEOContent 

@@ -5,43 +5,67 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%; /* Pure White */
-    --foreground: 20 14% 20%; /* Dark Charcoal */
+    /* Premium Clinical Palette */
+    --background: 0 0% 98%; /* #FAFAFA - Warm Paper White */
+    --foreground: 0 0% 7%; /* #111111 - Soft Black */
 
-    --card: 35 33% 97%; /* Soft Cream */
-    --card-foreground: 20 14% 20%;
+    --card: 0 0% 100%; /* Pure White */
+    --card-foreground: 0 0% 7%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 20 14% 20%;
+    --popover-foreground: 0 0% 7%;
 
-    --primary: 175 65% 30%; /* Deep Teal Green */
+    /* Deep Emerald & Electric Lime */
+    --primary: 164 67% 18%; /* #0F4C3A - Trust/Medical */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 175 50% 45%; /* Lighter Teal for secondary elements */
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 78 100% 69%; /* #D4FF5F - Modern/Action */
+    --secondary-foreground: 164 67% 18%;
 
-    --muted: 35 33% 94%; /* Slightly darker cream for muted backgrounds */
-    --muted-foreground: 20 10% 40%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 40%;
 
-    --accent: 25 80% 65%; /* Muted Peach/Orange */
+    --accent: 25 80% 65%; /* Keep the peach for warmth */
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 75% 50%; /* Bold Alert Red */
-    --destructive-foreground: 0 0% 100%;
-    
-    --success: 140 60% 40%; /* Keep the existing clear green for success states */
-    --success-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 35 20% 88%;
-    --input: 35 20% 88%;
-    --ring: 175 65% 35%;
+    --border: 0 0% 92%;
+    --input: 0 0% 92%;
+    --ring: 164 67% 18%;
 
-    --radius: 0.8rem;
+    --radius: 1rem; /* Slightly rounder for modern feel */
   }
-  /* Sidebar CSS variables to avoid inline styles */
-  .dk-sidebar-vars {
-    --sidebar-width: 16rem; /* matches SIDEBAR_WIDTH */
-    --sidebar-width-icon: 3rem; /* matches SIDEBAR_WIDTH_ICON */
+
+  .dark {
+    --background: 0 0% 2%; /* #050505 - Deep Void */
+    --foreground: 0 0% 98%;
+
+    --card: 0 0% 4%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 0 0% 4%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 164 67% 18%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 78 100% 69%;
+    --secondary-foreground: 164 67% 18%;
+
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 60%;
+
+    --accent: 25 80% 65%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 12%;
+    --input: 0 0% 12%;
+    --ring: 164 67% 18%;
   }
 }
 
@@ -49,47 +73,40 @@
   * {
     @apply border-border;
   }
-  html, body {
-    @apply bg-background text-foreground;
-  }
   html {
     @apply scroll-smooth;
-    font-size: 14px;
+    font-size: 16px; /* Base size up */
   }
   body {
-    font-feature-settings: "rlig" 1, "calt" 1, "kern" 1;
-    font-kerning: auto;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
     font-family: 'Satoshi', sans-serif;
   }
-  /* Dynamic viewport helpers for better VKB behavior */
-  .min-h-dvh { min-height: 100dvh; }
-  /* Add safe-area bottom padding for devices with insets (e.g., iPhone) */
-  .vk-safe { padding-bottom: env(safe-area-inset-bottom); }
-  /* Prevent scroll chaining/bounce when keyboard opens (where supported) */
-  @supports (overscroll-behavior: contain) {
-    .overscroll-contain { overscroll-behavior: contain; }
-  }
-  /* Keep focused fields visible above keyboard */
-  .vk-scroll { scroll-padding-bottom: calc(env(safe-area-inset-bottom) + 6rem); }
-  /* Use dynamic viewport height for better behavior with virtual keyboard */
-  .min-h-dvh { min-height: 100dvh; }
-  /* Add safe-area bottom padding for devices with insets (e.g., iPhone) */
-  .vk-safe { padding-bottom: env(safe-area-inset-bottom); }
   
-  /* Ensure form elements and buttons inherit the body font */
-  input, button, textarea, select {
-    @apply font-body;
+  /* Noise Texture Utility */
+  .bg-noise {
+    position: relative;
+  }
+  .bg-noise::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 50;
+    opacity: 0.4;
+    mix-blend-mode: overlay;
   }
 
-  /* Prevent iOS Safari focus-zoom by ensuring inputs are 16px+ */
-  input, textarea, select {
-    font-size: 16px; /* Safari zooms if < 16px */
-    line-height: 1.4;
-    /* Intentionally no text-size-adjust; 16px base prevents zoom on iOS */
+  /* Hide scrollbar for clean horizontal scrolls */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
-
-  /* Improve tap responsiveness on touch devices */
-  a, button {
-    touch-action: manipulation;
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }

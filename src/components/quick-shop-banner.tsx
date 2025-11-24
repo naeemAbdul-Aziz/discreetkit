@@ -28,8 +28,8 @@ export function FloatingShopButton() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Do not show the button on cart or order pages to avoid distraction during checkout.
-  if (pathname.startsWith('/cart') || pathname.startsWith('/order')) {
+  // Do not show the button on cart, order, or partner-care pages.
+  if (pathname.startsWith('/cart') || pathname.startsWith('/order') || pathname.startsWith('/partner-care')) {
     return null;
   }
 
@@ -41,9 +41,9 @@ export function FloatingShopButton() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-          className="fixed bottom-6 right-6 z-50"
+          className="fixed bottom-4 left-4 right-4 md:left-auto md:bottom-6 md:right-6 z-50"
         >
-            <Button asChild variant="accent" size="lg" className="h-14 rounded-full shadow-2xl pl-5 pr-6">
+            <Button asChild variant="accent" size="lg" className="w-full md:w-auto h-14 rounded-full shadow-2xl pl-5 pr-6">
               <Link href="/products" aria-label="shop all products">
                 <ShoppingBag className="h-6 w-6" />
                 <span className="ml-2 font-bold">Shop Now</span>

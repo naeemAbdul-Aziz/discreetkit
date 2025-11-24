@@ -114,7 +114,7 @@ function Tracker() {
           table: 'orders',
           filter: `id=eq.${order.id}`,
         },
-        (payload) => {
+        (payload: any) => {
           // When an update is received, re-fetch the order data to get events
           startTransition(async () => {
               const result = await getOrderAction(order.code);

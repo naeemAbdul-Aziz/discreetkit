@@ -191,6 +191,13 @@ const SidebarProvider = React.forwardRef<
               className
             )}
             ref={ref}
+            style={
+              {
+                "--sidebar-width": SIDEBAR_WIDTH,
+                "--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
+                ...props.style,
+              } as React.CSSProperties
+            }
             {...props}
           >
             {children}

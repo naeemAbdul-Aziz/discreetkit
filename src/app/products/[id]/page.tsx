@@ -41,7 +41,7 @@ async function getRelatedProducts(currentProductId: number): Promise<Product[]> 
         return [];
     }
     // Map over related products to update images and cast numeric types
-    return data.map(p => {
+    return data.map((p: any) => {
         let imageUrl = p.image_url;
         if (p.id === 1) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759406841/discreetkit_hiv_i3fqmu.png';
         if (p.id === 2) imageUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759404957/discreetkit_pregnancy_cujiod.png';
@@ -69,7 +69,8 @@ async function getRelatedProducts(currentProductId: number): Promise<Product[]> 
 }
 
 
-export default async function ProductDetailPageWrapper({ params: { id } }: { params: { id: string } }) {
+export default async function ProductDetailPageWrapper({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const product = await getProduct(id);
   
   if (!product) {

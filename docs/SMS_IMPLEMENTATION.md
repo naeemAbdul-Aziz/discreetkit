@@ -163,3 +163,32 @@ Enable debug logging by checking console logs for:
 3. **Multi-language**: Support for local languages
 4. **SMS Analytics**: Delivery rates and customer engagement metrics
 5. **Two-way SMS**: Allow customers to reply for support
+6. **Pharmacy Assignment Notifications**: Automated SMS to assigned pharmacy (implemented in Phase 1 RBAC scaffold)
+
+## Pharmacy Notifications (New)
+
+When an order is created, the system attempts to auto-assign a pharmacy matching the `delivery_area` (`pharmacies.location ILIKE delivery_area`). If a match is found:
+
+1. Order row receives `pharmacy_id`.
+2. A row is created in `pharmacy_notifications` with status `pending`.
+3. SMS is sent to the pharmacy contact number: `New order CODE for AREA. Total: GHS TOTAL. Review & accept: <admin orders link>`.
+4. Notification row updated to `sent` or `failed` with audit fields (`attempts`, `last_error`, `sent_at`).
+
+### Tables Added
+`pharmacy_notifications` (order_id, pharmacy_id, status, attempts, last_error, sent_at, created_at)
+
+### Core Functions
+- `assignPharmacyForDeliveryArea(area)` → heuristic match
+- `sendPharmacyOrderNotification(orderId, pharmacyId)` → fetch details, send SMS, log result
+
+### API Endpoint
+`POST /api/admin/pharmacies/notify` with JSON `{ "orderId": 123 }` retries or manually triggers a pharmacy SMS for an already assigned order.
+
+### Failure Handling
+- Failed sends keep `status=failed`; future retry overwrites `last_error` and increments `attempts`.
+- No blocking of customer flow if pharmacy notification fails.
+
+### Extensibility Ideas
+- Replace area heuristic with explicit assignment rules table.
+- Add WhatsApp template messaging via Business API (pending approval) reusing notification row schema.
+- Queue retries via Redis (Upstash) if delivery failures spike.

@@ -11,6 +11,7 @@ import { Footer } from '@/components/footer';
 import { FloatingShopButton } from '@/components/quick-shop-banner';
 import { Chatbot } from '@/components/chatbot';
 import { useEffect, useState } from 'react';
+import { MagneticCursor } from '@/components/ui/cursor';
 
 export default function ClientLayout({
   children,
@@ -27,8 +28,9 @@ export default function ClientLayout({
 
   return (
     <div className="flex min-h-dvh vk-safe overscroll-contain vk-scroll flex-col bg-background pt-20 md:pt-24">
+      <MagneticCursor />
       <Header />
-      <main className="flex-1">{children}</main>
+      <div className="flex-1">{children}</div>
       <Footer />
       <FloatingShopButton />
       <Chatbot />

@@ -24,7 +24,7 @@ async function getProducts(): Promise<Product[]> {
         console.error("Error fetching products:", error);
         return [];
     }
-    return products.map(p => ({
+    return products.map((p: any) => ({
         ...p,
         price_ghs: Number(p.price_ghs),
         student_price_ghs: p.student_price_ghs ? Number(p.student_price_ghs) : null,
@@ -51,9 +51,9 @@ export default function ProductsPage() {
         fetchProducts();
     }, []);
 
-    const categories = useMemo(() => ['All', ...Array.from(new Set(allProducts.map(p => p.category).filter(Boolean))) as string[]], [allProducts]);
-    const wellnessCategories = useMemo(() => ['All', ...Array.from(new Set(allProducts.filter(p => p.category === 'Wellness').map(p => p.sub_category).filter(Boolean))) as string[]], [allProducts]);
-    const brands = useMemo(() => ['All', ...Array.from(new Set(allProducts.map(p => p.brand || 'DiscreetKit'))).filter(Boolean)], [allProducts]);
+    const categories = useMemo(() => ['All', ...Array.from(new Set(allProducts.map((p: Product) => p.category).filter(Boolean))) as string[]], [allProducts]);
+    const wellnessCategories = useMemo(() => ['All', ...Array.from(new Set(allProducts.filter((p: Product) => p.category === 'Wellness').map((p: Product) => p.sub_category).filter(Boolean))) as string[]], [allProducts]);
+    const brands = useMemo(() => ['All', ...Array.from(new Set(allProducts.map((p: Product) => p.brand || 'DiscreetKit'))).filter(Boolean)], [allProducts]);
     
     const filteredProducts = useMemo(() => {
         return allProducts.filter(product => {

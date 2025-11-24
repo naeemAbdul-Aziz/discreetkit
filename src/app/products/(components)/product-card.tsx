@@ -1,9 +1,7 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Plus, Check } from 'lucide-react';
@@ -11,6 +9,7 @@ import { useCart } from '@/hooks/use-cart';
 import type { Product } from '@/lib/data';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { hover } from '@/lib/motion';
 
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -43,64 +42,77 @@ export function ProductCard({ product }: { product: Product; }) {
 
     const quantity = isMounted ? getItemQuantity(product.id) : 0;
     const isInCart = quantity > 0;
-    
     const savings = product.savings_ghs;
 
     return (
-        <Card className="h-full flex flex-col rounded-3xl overflow-hidden group bg-card">
-            <Link href={`/products/${product.id}`} className="block" passHref>
-                <div className="relative aspect-square w-full bg-muted/50 overflow-hidden rounded-3xl">
+        <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            whileHover="scale"
+            variants={hover as any}
+            className="group relative flex flex-col h-full"
+        >
+            <Link href={`/products/${product.id}`} className="block h-full" passHref>
+                <div className="relative aspect-square w-full overflow-hidden rounded-[2rem] bg-white shadow-xl shadow-black/5 transition-shadow duration-500 group-hover:shadow-2xl group-hover:shadow-primary/10">
+                    {/* Background Gradient Blob */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 opacity-50" />
+                    
                     {product.image_url && (
-                        <Image
-                            src={product.image_url}
-                            alt={product.name}
-                            fill
-                            className="object-contain p-4 rounded-3xl"
-                            sizes="(max-width: 768px) 50vw, 30vw"
-                            data-ai-hint="medical test kit"
-                            placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(250, 188))}`}
-                        />
+                        <motion.div 
+                            className="relative w-full h-full p-6"
+                            whileHover={{ scale: 1.05 }}
+                            transition={{ duration: 0.4 }}
+                        >
+                            <Image
+                                src={product.image_url}
+                                alt={product.name}
+                                fill
+                                className="object-contain drop-shadow-lg"
+                                sizes="(max-width: 768px) 50vw, 30vw"
+                                placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(250, 188))}`}
+                            />
+                        </motion.div>
                     )}
+
                     {savings && savings > 0 && (
-                        <Badge variant="accent" className="absolute top-3 left-3 shadow-lg">
+                        <Badge variant="accent" className="absolute top-4 left-4 shadow-sm backdrop-blur-md bg-accent/90 text-white border-0">
                             Save GHS {savings.toFixed(2)}
                         </Badge>
                     )}
+
+                    {/* Quick Add Button - Slides up on hover */}
+                    <div className="absolute bottom-4 right-4 translate-y-12 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                        <button
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                addItem(product);
+                            }}
+                            className={cn(
+                                "flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
+                                isInCart 
+                                    ? "bg-success text-success-foreground hover:bg-success/90" 
+                                    : "bg-primary text-primary-foreground hover:bg-primary/90"
+                            )}
+                            aria-label={isInCart ? "In cart" : "Add to cart"}
+                        >
+                            {isInCart ? <Check className="h-5 w-5" /> : <Plus className="h-6 w-6" />}
+                        </button>
+                    </div>
                 </div>
             </Link>
 
-            <CardContent className="flex flex-grow flex-col justify-between p-4 text-left">
-                <div className="flex-grow">
-                     <Link href={`/products/${product.id}`} className="block" passHref>
-                        <h3 className="text-base font-bold text-foreground leading-tight line-clamp-2">{product.name}</h3>
-                    </Link>
-                </div>
-                
-                <div className="mt-2 flex items-end justify-between gap-2">
-                     <Link href={`/products/${product.id}`} className="block" passHref>
-                        <p className="font-bold text-lg text-foreground">
-                            GHS {product.price_ghs.toFixed(2)}
-                        </p>
-                    </Link>
-                    
-                    <div className="flex-shrink-0">
-                        {!isMounted ? (
-                            <Button size="icon" className="h-9 w-9 rounded-full" disabled>
-                                <Plus />
-                            </Button>
-                        ) : (
-                            <Button 
-                                size="icon" 
-                                className={cn("h-9 w-9 rounded-full transition-all", isInCart && "bg-green-600 hover:bg-green-700")} 
-                                aria-label={isInCart ? `Added ${product.name} to cart` : `Add ${product.name} to cart`}
-                                onClick={(e) => {e.stopPropagation(); addItem(product)}}
-                            >
-                                {isInCart ? <Check /> : <Plus />}
-                            </Button>
-                        )}
-                    </div>
-                </div>
-            </CardContent>
-        </Card>
+            <div className="mt-4 px-2">
+                <Link href={`/products/${product.id}`} className="block group-hover:text-primary transition-colors duration-300">
+                    <h3 className="text-lg font-bold text-foreground leading-tight line-clamp-2 tracking-tight">
+                        {product.name}
+                    </h3>
+                </Link>
+                <p className="mt-1 font-medium text-muted-foreground">
+                    GHS {product.price_ghs.toFixed(2)}
+                </p>
+            </div>
+        </motion.div>
     );
 }

@@ -1,7 +1,6 @@
 /**
  * @file closing-cta.tsx
- * @description a final call-to-action component at the bottom of the page,
- *              prompting users to proceed to the shop.
+ * @description A premium, immersive final call-to-action.
  */
 
 'use client';
@@ -9,66 +8,75 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-
-// a shimmer effect for image placeholders to improve loading perception.
-const shimmer = (w: number, h: number) => `
-<svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <defs>
-    <linearGradient id="g">
-      <stop stop-color="#f0f0f0" offset="20%" />
-      <stop stop-color="#e0e0e0" offset="50%" />
-      <stop stop-color="#f0f0f0" offset="70%" />
-    </linearGradient>
-  </defs>
-  <rect width="${w}" height="${h}" fill="#f0f0f0" />
-  <rect id="r" width="${w}" height="${h}" fill="url(#g)" />
-  <animate xlink:href="#r" attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite"  />
-</svg>`;
-
-// converts the shimmer svg to a base64 string for the placeholder.
-const toBase64 = (str: string) =>
-  typeof window === 'undefined'
-    ? Buffer.from(str).toString('base64')
-    : window.btoa(str);
-
+import { ArrowRight, ShieldCheck } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export function ClosingCta() {
   return (
-    <section className="py-12 md:py-24 bg-background">
-      <div className="container mx-auto max-w-5xl px-4 md:px-6">
-  <Card className="overflow-hidden rounded-3xl bg-card">
-          <div className="grid md:grid-cols-2">
-            <div className="flex flex-col justify-center p-8 text-center md:p-12 md:text-left">
-              <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                Stop Waiting. Start Knowing.
-              </h2>
-              <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground md:mx-0">
-                Your journey to <strong>peace of mind</strong> is private, fast, and fully supported. Take control of your health today—<strong>securely and confidentially.</strong>
-              </p>
-              <div className="mt-8 flex justify-center md:justify-start">
-                <Button asChild size="lg">
-                  <Link href="/cart">
-                    Start My Private Order
-                    <ArrowRight />
-                  </Link>
-                </Button>
-              </div>
-            </div>
-            <div className="relative h-64 min-h-[400px] w-full md:h-full rounded-3xl overflow-hidden">
-              <Image
-                src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759593544/closing_cta_b4iufa.png"
-                alt="a person's hands holding a small, discreet package."
-                fill
-                className="object-cover rounded-3xl"
-                sizes="(max-width: 768px) 100vw, 50vw"
-                data-ai-hint="hands holding package"
-                placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 600))}`}
-              />
-            </div>
-          </div>
-        </Card>
+    <section className="relative py-24 md:py-32 overflow-hidden">
+      {/* Background Gradient */}
+      <div className="absolute inset-0 bg-foreground text-background">
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-soft-light"></div>
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
+      </div>
+
+      <div className="container relative z-10 mx-auto px-4 md:px-6">
+        <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-8 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white/90"
+          >
+            <ShieldCheck className="w-4 h-4 text-primary" />
+            <span className="text-sm font-medium">100% Private & Confidential</span>
+          </motion.div>
+
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="font-headline text-4xl md:text-7xl font-black tracking-tighter text-white mb-8 leading-[0.9]"
+          >
+            Your health,<br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-300">
+              on your terms.
+            </span>
+          </motion.h2>
+
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="text-lg md:text-xl text-white/60 max-w-2xl mb-12 leading-relaxed"
+          >
+            Join thousands of Ghanaians who trust DiscreetKit for their essential health needs. No waiting rooms, no awkward conversations. Just results.
+          </motion.p>
+
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+            className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto"
+          >
+            <Button asChild size="lg" className="h-14 px-8 text-lg rounded-full bg-white text-black hover:bg-white/90 hover:scale-105 transition-all duration-300">
+              <Link href="/products">
+                Shop Essentials
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="h-14 px-8 text-lg rounded-full border-white/30 text-white bg-white/5 hover:bg-white/20 hover:text-white backdrop-blur-sm transition-all duration-300">
+              <Link href="/partner-care">
+                Talk to a Professional
+              </Link>
+            </Button>
+          </motion.div>
+
+        </div>
       </div>
     </section>
   );
