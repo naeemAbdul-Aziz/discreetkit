@@ -2,11 +2,13 @@
 import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar"
 import { LayoutDashboard, ShoppingBag, Users, Settings, LogOut, Package } from "lucide-react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import * as React from "react"
+import { getSupabaseClient } from "@/lib/supabase"
 
 export function DashboardSidebar() {
   const pathname = usePathname()
+  const router = useRouter()
   const navItems = React.useMemo(() => ([
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
@@ -14,6 +16,12 @@ export function DashboardSidebar() {
     { href: "/admin/partners", label: "Partners", icon: Users },
     { href: "/admin/settings", label: "Settings", icon: Settings },
   ]), [])
+
+  const handleSignOut = async () => {
+    const supabase = getSupabaseClient()
+    await supabase.auth.signOut()
+    router.push("/login")
+  }
 
   return (
     <Sidebar variant="inset" collapsible="icon" className="border-r bg-white shadow-sm">
@@ -55,7 +63,11 @@ export function DashboardSidebar() {
       <SidebarFooter className="px-4 py-3 border-t border-border/50">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton className="text-destructive hover:text-destructive hover:bg-destructive/10" size="lg">
+            <SidebarMenuButton 
+              onClick={handleSignOut}
+              className="text-destructive hover:text-destructive hover:bg-destructive/10" 
+              size="lg"
+            >
               <LogOut className="h-5 w-5" />
               <span className="duration-200 group-data-[collapsible=icon]:opacity-0">Sign Out</span>
             </SidebarMenuButton>
