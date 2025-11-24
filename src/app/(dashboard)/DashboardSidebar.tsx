@@ -4,7 +4,6 @@ import { LayoutDashboard, ShoppingBag, Users, Settings, LogOut, Package } from "
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import * as React from "react"
-import Image from "next/image"
 
 export function DashboardSidebar() {
   const pathname = usePathname()
@@ -18,35 +17,13 @@ export function DashboardSidebar() {
 
   return (
     <Sidebar variant="inset" collapsible="icon" className="border-r bg-white shadow-sm">
-      <SidebarHeader className="px-0 py-4 flex justify-center items-center border-b border-border/50">
-        <SidebarMenuButton
-          asChild
-          tooltip="DiscreetKit Portal"
-          className="pointer-events-none h-16 justify-start !p-2 group-data-[collapsible=icon]:justify-center hover:bg-transparent"
-        >
-          <Link href="/" className="flex items-center">
-            {/* Icon for collapsed state */}
-            <div className="relative h-10 w-10 shrink-0 hidden group-data-[collapsible=icon]:block">
-                 <Image 
-                    src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1761571651/Artboard_6_oepbgq.svg" 
-                    alt="DK" 
-                    fill 
-                    className="object-contain" 
-                />
-            </div>
-            
-            {/* Full Logo for expanded state */}
-            <div className="relative h-10 w-48 group-data-[collapsible=icon]:hidden">
-                <Image 
-                    src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762345271/Artboard_2_3_fvyg9i.png" 
-                    alt="DiscreetKit" 
-                    fill 
-                    className="object-contain object-left" 
-                    priority
-                />
-            </div>
-          </Link>
-        </SidebarMenuButton>
+      <SidebarHeader className="px-4 py-6 flex justify-center items-center border-b border-border/50">
+        <Link href="/" className="flex items-center">
+          {/* DiscreetKit Wordmark - Hidden on mobile, shown on desktop */}
+          <h2 className="hidden md:block font-headline text-2xl font-black tracking-tight uppercase">
+            Discreet<span className="text-primary">Kit</span>.
+          </h2>
+        </Link>
       </SidebarHeader>
       <SidebarContent className="flex flex-col items-center py-4 gap-2">
         <SidebarMenu>
@@ -60,14 +37,13 @@ export function DashboardSidebar() {
                   isActive={isActive}
                   size="lg"
                   className={
-                    `group flex items-center justify-center w-12 h-12 rounded-full transition-colors duration-200
-                    ${isActive ? 'bg-green-100 text-green-900 shadow-sm' : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'}
+                    `group flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200
+                    ${isActive ? 'bg-primary/10 text-primary shadow-sm' : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'}
                     `
                   }
-                  style={{ boxShadow: isActive ? '0 0 0 2px #bbf7d0' : undefined }}
                 >
                   <Link href={item.href} aria-current={isActive ? 'page' : undefined} className="flex items-center justify-center w-full h-full">
-                    <item.icon className={`h-6 w-6 ${isActive ? 'stroke-[2] text-green-900' : 'stroke-[1.5] text-zinc-600 group-hover:text-zinc-900'}`} />
+                    <item.icon className={`h-6 w-6 ${isActive ? 'stroke-[2]' : 'stroke-[1.5] group-hover:stroke-[2]'}`} />
                     <span className="sr-only">{item.label}</span>
                   </Link>
                 </SidebarMenuButton>
@@ -79,7 +55,7 @@ export function DashboardSidebar() {
       <SidebarFooter className="px-4 py-3 border-t border-border/50">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton className="text-destructive hover:text-destructive" size="lg">
+            <SidebarMenuButton className="text-destructive hover:text-destructive hover:bg-destructive/10" size="lg">
               <LogOut className="h-5 w-5" />
               <span className="duration-200 group-data-[collapsible=icon]:opacity-0">Sign Out</span>
             </SidebarMenuButton>
