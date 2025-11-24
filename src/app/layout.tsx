@@ -68,8 +68,8 @@ export default function RootLayout({
       <meta name="apple-mobile-web-app-title" content="DiscreetKit" />
       
       {/* Theme color */}
-      <meta name="theme-color" content="#187f76" />
-      <meta name="msapplication-TileColor" content="#187f76" />
+      <meta name="theme-color" content="#ffffff" />
+      <meta name="msapplication-TileColor" content="#ffffff" />
       
       {/* Verification meta tags (add your verification codes) */}
       {/* <meta name="google-site-verification" content="YOUR_VERIFICATION_CODE" /> */}

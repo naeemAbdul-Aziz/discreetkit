@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,26 +5,32 @@
 @layer base {
   :root {
     /* Premium Clinical Palette */
-    --background: 0 0% 98%; /* #FAFAFA - Warm Paper White */
-    --foreground: 0 0% 7%; /* #111111 - Soft Black */
+    --background: 0 0% 98%;
+    /* #FAFAFA - Warm Paper White */
+    --foreground: 0 0% 7%;
+    /* #111111 - Soft Black */
 
-    --card: 0 0% 100%; /* Pure White */
+    --card: 0 0% 100%;
+    /* Pure White */
     --card-foreground: 0 0% 7%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 7%;
 
     /* Deep Emerald & Electric Lime */
-    --primary: 164 67% 18%; /* #0F4C3A - Trust/Medical */
+    --primary: 164 67% 18%;
+    /* #0F4C3A - Trust/Medical */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 78 100% 69%; /* #D4FF5F - Modern/Action */
+    --secondary: 78 100% 69%;
+    /* #D4FF5F - Modern/Action */
     --secondary-foreground: 164 67% 18%;
 
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 40%;
 
-    --accent: 25 80% 65%; /* Keep the peach for warmth */
+    --accent: 25 80% 65%;
+    /* Keep the peach for warmth */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
@@ -35,11 +40,13 @@
     --input: 0 0% 92%;
     --ring: 164 67% 18%;
 
-    --radius: 1rem; /* Slightly rounder for modern feel */
+    --radius: 1rem;
+    /* Slightly rounder for modern feel */
   }
 
   .dark {
-    --background: 0 0% 2%; /* #050505 - Deep Void */
+    --background: 0 0% 2%;
+    /* #050505 - Deep Void */
     --foreground: 0 0% 98%;
 
     --card: 0 0% 4%;
@@ -73,20 +80,30 @@
   * {
     @apply border-border;
   }
+
   html {
     @apply scroll-smooth;
-    font-size: 16px; /* Base size up */
+    @apply scroll-smooth;
+    font-size: 14px;
+
+    /* Smaller base for sleek mobile */
+    @screen md {
+      font-size: 16px;
+      /* Standard for desktop */
+    }
   }
+
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
     font-family: 'Satoshi', sans-serif;
   }
-  
+
   /* Noise Texture Utility */
   .bg-noise {
     position: relative;
   }
+
   .bg-noise::before {
     content: "";
     position: absolute;
@@ -105,6 +122,7 @@
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;

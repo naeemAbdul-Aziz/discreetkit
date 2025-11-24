@@ -21,11 +21,11 @@ export function Hero() {
 
   return (
     <section ref={containerRef} className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-background pt-24 md:pt-32">
-      {/* Background Atmosphere */}
-      <div className="absolute inset-0 z-0">
+      {/* Background Atmosphere - Removed for cleaner look */}
+      {/* <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-noise opacity-30 mix-blend-soft-light" />
         <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-secondary/20 blur-[120px] rounded-full animate-pulse" />
-      </div>
+      </div> */}
 
       <div className="container relative z-10 px-4 md:px-6">
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
