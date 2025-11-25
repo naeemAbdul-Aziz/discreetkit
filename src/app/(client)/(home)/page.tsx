@@ -201,10 +201,6 @@ export default async function Home() {
           <DeliveryMap />
         </div>
       </SectionWrapper>
-      
-      <SectionWrapper>
-        <PartnerReferral />
-      </SectionWrapper>
 
       <SectionWrapper>
         <Faq />
