@@ -13,7 +13,7 @@ interface MapProps {
 
 export default function WorldMap({
   dots = [],
-  lineColor = "#10b981", // Emerald-500
+  lineColor = "#0ea5e9", // Sky-500 (Bright Blue)
 }: MapProps) {
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -45,10 +45,9 @@ export default function WorldMap({
   };
 
   return (
-    <div className="w-full h-full bg-[#020617] rounded-3xl overflow-hidden relative border border-slate-800 shadow-2xl">
-      {/* Premium Grid Background */}
-      <div className="absolute inset-0 opacity-20 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] [background-size:24px_24px]"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_800px_at_50%_200px,#1e293b,transparent)] opacity-50"></div>
+    <div className="w-full h-full bg-white rounded-3xl overflow-hidden relative border border-slate-100 shadow-xl">
+      {/* Dotted Background (Light Theme) */}
+      <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:20px_20px] opacity-70"></div>
       
       {/* Map SVG */}
       <svg
@@ -79,7 +78,7 @@ export default function WorldMap({
                 strokeWidth="1.5"
                 strokeDasharray="4 4"
                 initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: 0.4 }}
+                animate={{ pathLength: 1, opacity: 0.3 }}
                 transition={{
                   duration: 2,
                   delay: i * 0.2,
@@ -92,11 +91,10 @@ export default function WorldMap({
                 stroke={lineColor}
                 strokeWidth="2"
                 strokeDasharray="8 8"
-                filter="url(#glow)"
                 initial={{ strokeDashoffset: 0 }}
                 animate={{ strokeDashoffset: -32 }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                opacity="0.8"
+                opacity="1"
               />
             </g>
           );
@@ -115,12 +113,12 @@ export default function WorldMap({
               cy={point.y}
               r="8"
               fill={lineColor}
-              initial={{ opacity: 0.5, scale: 1 }}
+              initial={{ opacity: 0.3, scale: 1 }}
               animate={{ opacity: 0, scale: 2.5 }}
               transition={{ duration: 2, repeat: Infinity }}
             />
             {/* Core Dot */}
-            <circle cx={point.x} cy={point.y} r="3" fill="#fff" className="stroke-slate-900 stroke-2" />
+            <circle cx={point.x} cy={point.y} r="4" fill={lineColor} className="stroke-white stroke-2" />
             
             {/* Label */}
             {point.label && (
@@ -128,7 +126,7 @@ export default function WorldMap({
                 x={point.x} 
                 y={point.y + 20} 
                 textAnchor="middle" 
-                className="text-[10px] font-bold fill-slate-400 uppercase tracking-widest font-mono" 
+                className="text-[10px] font-bold fill-slate-500 uppercase tracking-widest font-mono" 
                 style={{ fontSize: '10px' }}
                >
                 {point.label}
@@ -138,18 +136,18 @@ export default function WorldMap({
         ))}
       </svg>
 
-      {/* Live Status Panel (Restored & Elevated) */}
-      <div className="absolute top-6 left-6 bg-slate-950/80 backdrop-blur-md p-4 rounded-2xl border border-slate-800 shadow-2xl z-20">
+      {/* Live Status Panel (Light Theme) */}
+      <div className="absolute top-6 left-6 bg-white/90 backdrop-blur-md p-4 rounded-2xl border border-slate-100 shadow-lg z-20">
         <div className="flex items-center gap-3 mb-2">
             <div className="relative flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
             </div>
-            <span className="text-xs font-black text-white uppercase tracking-widest">DiscreetNet™ Live</span>
+            <span className="text-xs font-black text-slate-800 uppercase tracking-widest">DiscreetNet™ Live</span>
         </div>
-        <div className="space-y-1 pl-6 border-l border-slate-800">
-            <p className="text-[10px] text-slate-500 font-mono uppercase tracking-wider">Active Routes</p>
-            <p className="text-lg font-bold text-white leading-none">{dots.length}</p>
+        <div className="space-y-1 pl-6 border-l border-slate-200">
+            <p className="text-[10px] text-slate-400 font-mono uppercase tracking-wider">Active Routes</p>
+            <p className="text-lg font-bold text-slate-900 leading-none">{dots.length}</p>
         </div>
       </div>
     </div>
