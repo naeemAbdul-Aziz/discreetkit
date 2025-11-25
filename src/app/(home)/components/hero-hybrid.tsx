@@ -40,7 +40,7 @@ export function HeroHybrid() {
             <motion.div variants={variants.fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
               <Button asChild size="lg" className="h-11 md:h-14 px-6 md:px-10 text-base md:text-lg rounded-full w-full sm:w-auto shadow-xl hover:scale-105 transition-all duration-300">
                 <Link href="/#products">
-                  Start Your Order
+                  Order Anonymously
                   <ArrowRight className="ml-2 w-4 h-4 md:w-5 md:h-5" />
                 </Link>
               </Button>

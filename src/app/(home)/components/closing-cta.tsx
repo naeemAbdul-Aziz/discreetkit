@@ -14,8 +14,18 @@ import { SparklesCore } from '@/components/ui/sparkles';
 export function ClosingCta() {
   return (
     <section className="relative py-24 md:py-32 overflow-hidden bg-primary">
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-primary/90 mix-blend-multiply z-10" />
+        <img 
+          src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop" 
+          alt="Abstract Background" 
+          className="w-full h-full object-cover opacity-50"
+        />
+      </div>
+
       {/* Sparkles Effect - Desktop only */}
-      <div className="absolute inset-0 hidden md:block">
+      <div className="absolute inset-0 hidden md:block z-10">
         <SparklesCore
           id="cta-sparkles"
           background="transparent"
