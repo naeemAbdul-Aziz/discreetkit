@@ -41,11 +41,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <DashboardSidebar />
         </div>
         <SidebarInset>
-          {/* Mobile Header with SidebarTrigger */}
-          <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4 md:hidden">
-            <SidebarTrigger className="-ml-1" />
-            <span className="font-semibold">{title}</span>
-          </header>
           <div className="flex-1 w-full overflow-auto p-4 md:p-8 pb-20 md:pb-8">
             {children}
           </div>
