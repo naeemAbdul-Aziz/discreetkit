@@ -24,19 +24,7 @@ export function ClosingCta() {
         />
       </div>
 
-      {/* Sparkles Effect - Desktop only */}
-      <div className="absolute inset-0 hidden md:block z-10">
-        <SparklesCore
-          id="cta-sparkles"
-          background="transparent"
-          minSize={0.8}
-          maxSize={2}
-          particleDensity={100}
-          speed={2.5}
-          particleColor="#ffffff"
-          className="w-full h-full opacity-40"
-        />
-      </div>
+      {/* Sparkles Effect Removed for Professional Tone */}
 
       <div className="container relative z-10 mx-auto px-4 md:px-6">
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
@@ -55,12 +43,12 @@ export function ClosingCta() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
             className="font-headline text-3xl md:text-6xl font-black tracking-tighter text-white mb-6 md:mb-8 leading-[0.9]"
           >
-            Your health,<br />
+            The Infrastructure<br />
             <span className="text-background">
-              on your terms.
+              of Privacy.
             </span>
           </motion.h2>
 
@@ -71,7 +59,7 @@ export function ClosingCta() {
             transition={{ delay: 0.2 }}
             className="text-base md:text-lg text-white/80 max-w-2xl mb-8 md:mb-12 leading-relaxed"
           >
-            Join thousands of Ghanaians who trust DiscreetKit for their essential health needs. No waiting rooms, no awkward conversations. Just results.
+            No account needed. No data stored. Just the essential health products you need, delivered without a trace.
           </motion.p>
 
           <motion.div 

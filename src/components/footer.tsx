@@ -16,27 +16,6 @@ const footerNav = [
   {
     title: 'Shop',
     links: [
-      { href: '/products/test-kits', label: 'Test Kits' },
-      { href: '/products/bundles', label: 'Bundles' },
-      { href: '/products/wellness', label: 'Wellness' },
-      { href: '/products/medication', label: 'Medication' },
-    ]
-  },
-  {
-    title: 'Company',
-    links: [
-      { href: '/about', label: 'About Us' },
-      { href: '/partner-care', label: 'Partner Care' },
-      { href: '/careers', label: 'Careers' },
-      { href: '/contact', label: 'Contact' },
-    ]
-  },
-  {
-    title: 'Support',
-    links: [
-      { href: '/track', label: 'Track Order' },
-      { href: '/#faq', label: 'FAQ' },
-      { href: '/privacy', label: 'Privacy Policy' },
       { href: '/terms', label: 'Terms of Service' },
     ]
   }

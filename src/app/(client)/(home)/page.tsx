@@ -120,6 +120,10 @@ const DeliveryMap = dynamic(
 const PrivacyReveal = dynamic(
   () => import('@/app/(home)/components/privacy-reveal').then((mod) => mod.PrivacyReveal)
 );
+const PartnerReferral = dynamic(
+  () => import('@/app/(home)/components/partner-referral').then((mod) => mod.PartnerReferral),
+  { loading: () => <LoadingSkeleton height={componentMap.PartnerReferral.height} /> }
+);
 
 
 // a wrapper component to provide consistent styling for page sections.
@@ -198,6 +202,10 @@ export default async function Home() {
         </div>
       </SectionWrapper>
       
+      <SectionWrapper>
+        <PartnerReferral />
+      </SectionWrapper>
+
       <SectionWrapper>
         <Faq />
       </SectionWrapper>

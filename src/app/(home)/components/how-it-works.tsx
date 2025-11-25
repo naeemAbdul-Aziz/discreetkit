@@ -8,6 +8,9 @@
 'use client';
 
 import { steps } from '@/lib/data';
+// Note: Steps data is imported. We should update the data source if possible, 
+// but for now we will override the display logic or ensure the data file is updated.
+// Actually, let's check if we can update the data file directly.
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';

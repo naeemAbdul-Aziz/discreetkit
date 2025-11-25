@@ -113,6 +113,9 @@ export async function sendSMS(phone: string, message: string): Promise<{ ok: boo
 
   } catch (smsError: any) {
     console.error('Failed to send SMS notification:', smsError);
+    if (smsError.response) {
+      console.error('SMS Error Response Body:', await smsError.response.text().catch(() => 'No body'));
+    }
     return { ok: false, recipient, error: String(smsError) };
   }
 }
@@ -265,7 +268,7 @@ const orderSchema = z.object({
   cartItems: z.string().min(1, 'Cart cannot be empty.'),
   deliveryArea: z.string().min(3, 'Delivery area is required.'),
   deliveryAddressNote: z.string().optional(),
-  phone_masked: z.string().min(10, 'A valid phone number is required.'),
+  phone_masked: z.string().regex(/^0\d{9}$/, 'Phone number must be exactly 10 digits and start with 0 (e.g., 0201234567).'),
   otherDeliveryArea: z.string().optional(),
   subtotal: z.string(),
   studentDiscount: z.string(),

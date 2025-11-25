@@ -12,6 +12,7 @@ import { Separator } from './ui/separator';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import { BrandSpinner } from '@/components/brand-spinner';
+import { TrustBadge } from '@/components/trust-badge';
 
 const navLinks = [
   { href: '/products/test-kits', label: 'Screening Kits' },
@@ -132,6 +133,9 @@ export function Header() {
             <Link href="/" aria-label="DiscreetKit Homepage" className="mr-6">
               <Logo />
             </Link>
+            <div className="mr-6 hidden xl:block">
+              <TrustBadge />
+            </div>
             {navLinks.slice(0, 4).map((link) => (
               <NavLink key={link.href} {...link} />
             ))}

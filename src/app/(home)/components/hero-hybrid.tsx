@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { ArrowRight, Play } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { SparklesCore } from '@/components/ui/sparkles';
 import { variants } from '@/lib/motion';
 
 export function HeroHybrid() {
@@ -54,7 +53,7 @@ export function HeroHybrid() {
       <motion.div 
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+        transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
         className="w-full pl-4 md:pl-10"
       >
         <Carousel items={cards} />
@@ -85,6 +84,7 @@ const DummyContent = () => {
                 src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=2070&auto=format&fit=crop"
                 alt="Medical kit"
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover rounded-xl"
               />
             </div>
@@ -98,19 +98,19 @@ const DummyContent = () => {
 const data = [
   {
     category: "Intimacy",
-    title: "Nights To Remember.",
+    title: "Intimacy Essentials.",
     src: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1764078634/the_weekend_szdgv5.jpg",
     content: <DummyContent />,
   },
   {
     category: "Essentials",
-    title: "Pure. Smooth. Yours.",
+    title: "Personal Care.",
     src: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413266/lube_ysdpst.png",
     content: <DummyContent />,
   },
   {
     category: "Peace of Mind",
-    title: "Never Caught Off Guard.",
+    title: "Preparedness Kits.",
     src: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1764078617/prepared_for_anything_l6arrq.jpg",
     content: <DummyContent />,
   },
