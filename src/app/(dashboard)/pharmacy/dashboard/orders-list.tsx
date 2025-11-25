@@ -5,7 +5,7 @@ import { useRealtimeOrders } from "@/hooks/use-realtime-orders"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { CheckCircle, XCircle, Truck, Package } from "lucide-react"
+import { CheckCircle, XCircle, Truck, Package, Eye } from "lucide-react"
 import { acceptOrder, declineOrder, updatePharmacyOrderStatus } from "@/lib/pharmacy-actions"
 import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
@@ -20,6 +20,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Textarea } from "@/components/ui/textarea"
+import { OrderDetailsSheet } from "./order-details-sheet"
 
 interface Order {
   id: number
@@ -40,8 +41,15 @@ export function OrdersList({ orders: initialOrders, pharmacyId }: { orders: Orde
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null)
   const [declineReason, setDeclineReason] = useState("")
   const [orders, setOrders] = useState<Order[]>(initialOrders)
+  const [detailsSheetOpen, setDetailsSheetOpen] = useState(false)
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
 
   useRealtimeOrders(pharmacyId, setOrders)
+
+  const handleViewDetails = (order: Order) => {
+    setSelectedOrder(order)
+    setDetailsSheetOpen(true)
+  }
 
   const handleAccept = async (orderId: number) => {
     setLoading(orderId)
@@ -96,6 +104,20 @@ export function OrdersList({ orders: initialOrders, pharmacyId }: { orders: Orde
     setLoading(null)
   }
 
+  const handleMarkCompleted = async (orderId: number) => {
+    setLoading(orderId)
+    const res = await updatePharmacyOrderStatus(orderId, 'completed')
+    
+    if (res.error) {
+      toast({ variant: "destructive", title: "Error", description: res.error })
+    } else {
+      toast({ title: "Order Completed", description: "Order marked as completed" })
+      router.refresh()
+    }
+    setLoading(null)
+    setDetailsSheetOpen(false)
+  }
+
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { variant: any; label: string }> = {
       received: { variant: "secondary", label: "New" },
@@ -124,7 +146,7 @@ export function OrdersList({ orders: initialOrders, pharmacyId }: { orders: Orde
           const itemCount = Array.isArray(items) ? items.length : 0
 
           return (
-            <Card key={order.id} className="p-4">
+            <Card key={order.id} className="p-4 hover:shadow-md transition-shadow cursor-pointer" onClick={() => handleViewDetails(order)}>
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
@@ -140,7 +162,16 @@ export function OrdersList({ orders: initialOrders, pharmacyId }: { orders: Orde
                   </div>
                 </div>
 
-                <div className="flex gap-2 flex-wrap">
+                <div className="flex gap-2 flex-wrap" onClick={(e) => e.stopPropagation()}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleViewDetails(order)}
+                  >
+                    <Eye className="h-4 w-4 mr-1" />
+                    View Details
+                  </Button>
+                  
                   {order.status === 'received' && order.pharmacy_ack_status === 'pending' && (
                     <>
                       <Button
@@ -170,7 +201,18 @@ export function OrdersList({ orders: initialOrders, pharmacyId }: { orders: Orde
                       disabled={loading === order.id}
                     >
                       <Truck className="h-4 w-4 mr-1" />
-                      Mark Out for Delivery
+                      Out for Delivery
+                    </Button>
+                  )}
+
+                  {order.status === 'out_for_delivery' && (
+                    <Button
+                      size="sm"
+                      onClick={() => handleMarkCompleted(order.id)}
+                      disabled={loading === order.id}
+                    >
+                      <CheckCircle className="h-4 w-4 mr-1" />
+                      Mark Completed
                     </Button>
                   )}
                 </div>
@@ -207,6 +249,17 @@ export function OrdersList({ orders: initialOrders, pharmacyId }: { orders: Orde
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <OrderDetailsSheet
+        order={selectedOrder}
+        open={detailsSheetOpen}
+        onOpenChange={setDetailsSheetOpen}
+        onAccept={() => selectedOrder && handleAccept(selectedOrder.id)}
+        onDecline={() => selectedOrder && handleDeclineClick(selectedOrder.id)}
+        onMarkOutForDelivery={() => selectedOrder && handleMarkOutForDelivery(selectedOrder.id)}
+        onMarkCompleted={() => selectedOrder && handleMarkCompleted(selectedOrder.id)}
+        loading={loading === selectedOrder?.id}
+      />
     </>
   )
 }

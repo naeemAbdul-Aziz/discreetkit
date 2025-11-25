@@ -356,14 +356,69 @@ export async function updateOrderStatus(id: number, status: string) {
 
 export async function assignPharmacy(orderId: number, pharmacyId: number) {
     const supabase = getSupabaseAdminClient()
+
+    // Get order and pharmacy details for notifications
+    const { data: order } = await supabase
+        .from('orders')
+        .select('code, delivery_area, items, total_price')
+        .eq('id', orderId)
+        .single()
+
+    const { data: pharmacy } = await supabase
+        .from('pharmacies')
+        .select('name, phone_number, email')
+        .eq('id', pharmacyId)
+        .single()
+
+    // Assign pharmacy and update status
     const { error } = await supabase
         .from('orders')
-        .update({ pharmacy_id: pharmacyId, status: 'processing' }) // Auto-move to processing on assignment
+        .update({
+            pharmacy_id: pharmacyId,
+            status: 'received', // Set to received, pharmacy will move to processing on accept
+            pharmacy_ack_status: 'pending'
+        })
         .eq('id', orderId)
 
     if (error) return { error: error.message }
 
+    // Send notifications to pharmacy (SMS + Email)
+    if (order && pharmacy) {
+        try {
+            const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items
+            const itemCount = Array.isArray(items) ? items.length : 0
+
+            const { notifyPharmacyOfAssignment } = await import('@/lib/pharmacy-notifications')
+
+            // Send notifications asynchronously (don't block the response)
+            notifyPharmacyOfAssignment({
+                pharmacyId,
+                pharmacyName: pharmacy.name,
+                pharmacyPhone: pharmacy.phone_number,
+                pharmacyEmail: pharmacy.email,
+                orderId,
+                orderCode: order.code,
+                deliveryArea: order.delivery_area,
+                itemCount,
+                totalPrice: order.total_price,
+            }).catch(err => {
+                console.error('[assignPharmacy] Notification error:', err)
+            })
+
+            // Log assignment event
+            await supabase.from('order_events').insert({
+                order_id: orderId,
+                status: 'Assigned to Pharmacy',
+                note: `Order assigned to ${pharmacy.name}. Notifications sent.`
+            })
+        } catch (notifError) {
+            console.error('[assignPharmacy] Failed to send notifications:', notifError)
+            // Don't fail the assignment if notifications fail
+        }
+    }
+
     revalidatePath('/admin/orders')
+    revalidatePath('/pharmacy/dashboard')
     return { success: true }
 }
 

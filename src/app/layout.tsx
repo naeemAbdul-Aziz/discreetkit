@@ -37,6 +37,8 @@ export const metadata: Metadata = generateMetadata({
   keywords: seoConfig.pages.home.keywords,
 });
 
+import { MagneticCursor } from '@/components/magnetic-cursor';
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -99,6 +101,7 @@ export default function RootLayout({
       </head>
       <body className={cn('min-h-screen bg-background font-body antialiased', fontBody.variable, fontHeadline.variable)}>
         <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground">Skip to content</a>
+        <MagneticCursor />
         <TourProvider>
           <main id="main" role="main" className="min-h-dvh vk-safe">
             {children}

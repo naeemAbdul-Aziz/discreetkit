@@ -6,7 +6,7 @@
  */
 
 import dynamic from 'next/dynamic';
-import { Hero } from '@/app/(home)/components/hero';
+import { HeroHybrid } from '@/app/(home)/components/hero-hybrid';
 import { ClosingCta } from '@/app/(home)/components/closing-cta';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
@@ -150,7 +150,7 @@ export default async function Home() {
   return (
     <div className="flex flex-col">
       <SectionWrapper>
-        <Hero />
+        <HeroHybrid />
       </SectionWrapper>
 
       {/* Products immediately after hero - Apple-style */}
