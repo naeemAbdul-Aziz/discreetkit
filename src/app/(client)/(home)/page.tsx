@@ -10,7 +10,7 @@ import { HeroHybrid } from '@/app/(home)/components/hero-hybrid';
 import { ClosingCta } from '@/app/(home)/components/closing-cta';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
-import { getSupabaseClient } from '@/lib/supabase';
+import { createSupabaseServerClient } from '@/lib/supabase';
 import type { Product } from '@/lib/data';
 import { ProductSelector } from '@/app/(home)/components/product-selector';
 import { FeaturedFavoritesSection } from '@/app/(home)/components/featured-favorites';
@@ -18,7 +18,7 @@ import { FeaturedFavoritesSection } from '@/app/(home)/components/featured-favor
 
 // fetches all products from the supabase database.
 async function getProducts(): Promise<Product[]> {
-    const supabase = getSupabaseClient();
+    const supabase = await createSupabaseServerClient();
     const { data: products, error } = await supabase
         .from('products')
         .select('*')
