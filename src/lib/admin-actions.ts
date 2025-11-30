@@ -514,7 +514,10 @@ export async function getPharmacyProducts(pharmacyId: number) {
         .order('created_at', { ascending: false })
 
     if (error) throw new Error(error.message)
-    return data || []
+
+    // Filter out any pharmacy_products where the parent product might have been deleted
+    // (orphaned records) to prevent UI crashes
+    return (data || []).filter((item: any) => item.products !== null)
 }
 
 export async function upsertPharmacyProduct(data: PharmacyProductFormValues) {
@@ -540,7 +543,7 @@ export async function updatePharmacyProductStock(
     stockLevel: number
 ) {
     const supabase = await createSupabaseServerClient()
-    
+
     const { error } = await supabase
         .from('pharmacy_products')
         .update({
@@ -583,7 +586,7 @@ export async function bulkAssignProductsToPharmacy(
 
 export async function deletePharmacyProduct(pharmacyId: number, productId: number) {
     const supabase = await createSupabaseServerClient()
-    
+
     const { error } = await supabase
         .from('pharmacy_products')
         .delete()

@@ -27,7 +27,6 @@ import {
   Package, 
   Plus, 
   Search, 
-  Edit, 
   Trash2, 
   PackagePlus 
 } from "lucide-react"
@@ -68,7 +67,6 @@ export function PharmacyInventoryManager({
 }) {
   const [products, setProducts] = useState<PharmacyProduct[]>(initialProducts)
   const [searchTerm, setSearchTerm] = useState("")
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isBulkDialogOpen, setIsBulkDialogOpen] = useState(false)
   const [availableProducts, setAvailableProducts] = useState<Product[]>([])
   const [selectedProducts, setSelectedProducts] = useState<number[]>([])
@@ -77,8 +75,8 @@ export function PharmacyInventoryManager({
   const router = useRouter()
 
   const filteredProducts = products.filter(p => 
-    p.products.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.products.category.toLowerCase().includes(searchTerm.toLowerCase())
+    p.products?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    p.products?.category?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   const fetchAvailableProducts = async () => {
@@ -334,18 +332,18 @@ export function PharmacyInventoryManager({
               <TableRow key={product.id} className="hover:bg-muted/5">
                 <TableCell>
                     <div className="flex flex-col">
-                        <span className="font-medium">{product.products.name}</span>
-                        {product.products.image_url && (
+                        <span className="font-medium">{product.products?.name || 'Unknown Product'}</span>
+                        {product.products?.image_url && (
                             <span className="text-xs text-muted-foreground mt-0.5">Has Image</span>
                         )}
                     </div>
                 </TableCell>
                 <TableCell>
                     <Badge variant="secondary" className="rounded-full font-normal">
-                        {product.products.category}
+                        {product.products?.category || 'Uncategorized'}
                     </Badge>
                 </TableCell>
-                <TableCell>GHS {product.products.price_ghs.toFixed(2)}</TableCell>
+                <TableCell>GHS {product.products?.price_ghs?.toFixed(2) || '0.00'}</TableCell>
                 <TableCell>
                     <div className="flex items-center space-x-2">
                         <Button 
