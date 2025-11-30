@@ -37,7 +37,7 @@ interface Product {
   status?: 'active' | 'draft' | 'archived'
 }
 
-export function ProductTable({ initialProducts }: { initialProducts: Product[] }) {
+export function ProductTable({ initialProducts, categories = [] }: { initialProducts: Product[], categories?: any[] }) {
   const dropdownMenuId = useId();
   const [searchTerm, setSearchTerm] = useState("")
   const [debouncedSearch, setDebouncedSearch] = useState("")
@@ -66,10 +66,10 @@ export function ProductTable({ initialProducts }: { initialProducts: Product[] }
   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / pageSize))
   const paginatedProducts = filteredProducts.slice((page-1)*pageSize, page*pageSize)
 
-  // Unique categories for dropdown
-  const categories = useMemo(() => {
-    return Array.from(new Set(products.map(p => p.category).filter(Boolean)))
-  }, [products])
+  // Use passed categories or fallback to unique existing ones if empty (though we should always have passed ones now)
+  const categoryOptions = categories.length > 0 
+    ? categories.map(c => c.name) 
+    : Array.from(new Set(products.map(p => p.category).filter(Boolean)))
 
   const statusOptions: Product['status'][] = ['active','draft','archived']
 
@@ -177,7 +177,7 @@ export function ProductTable({ initialProducts }: { initialProducts: Product[] }
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="start" className="max-h-64 overflow-y-auto" aria-labelledby={categoryMenuId}>
-                        {categories.map(cat => (
+                        {categoryOptions.map(cat => (
                           <DropdownMenuItem key={cat} onClick={() => handleInlineUpdate(product.id,'category',cat)}>
                             {cat}
                           </DropdownMenuItem>
@@ -282,6 +282,7 @@ export function ProductTable({ initialProducts }: { initialProducts: Product[] }
         open={isSheetOpen} 
         onOpenChange={setIsSheetOpen} 
         product={selectedProduct} 
+        categories={categories}
       />
     </div>
   )

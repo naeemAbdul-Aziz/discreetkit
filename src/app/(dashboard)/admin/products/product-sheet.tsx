@@ -44,10 +44,11 @@ type FormValues = z.infer<typeof formSchema>
 interface ProductSheetProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  product?: any // Allow any to handle database nulls vs zod undefined
+  product?: any
+  categories?: any[]
 }
 
-export function ProductSheet({ open, onOpenChange, product }: ProductSheetProps) {
+export function ProductSheet({ open, onOpenChange, product, categories = [] }: ProductSheetProps) {
   const { toast } = useToast()
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -136,11 +137,14 @@ export function ProductSheet({ open, onOpenChange, product }: ProductSheetProps)
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Testing">Testing</SelectItem>
-                  <SelectItem value="Contraception">Contraception</SelectItem>
-                  <SelectItem value="Protection">Protection</SelectItem>
-                  <SelectItem value="Wellness">Wellness</SelectItem>
-                  <SelectItem value="Menstrual Care">Menstrual Care</SelectItem>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat.id} value={cat.name}>
+                      {cat.name}
+                    </SelectItem>
+                  ))}
+                  {categories.length === 0 && (
+                     <SelectItem value="Uncategorized" disabled>No categories found</SelectItem>
+                  )}
                 </SelectContent>
               </Select>
               {form.formState.errors.category && <p className="text-sm text-destructive">{form.formState.errors.category.message}</p>}

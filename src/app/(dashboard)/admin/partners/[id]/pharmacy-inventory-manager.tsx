@@ -270,24 +270,32 @@ export function PharmacyInventoryManager({
                   />
                 </div>
                 <div className="max-h-96 overflow-y-auto border rounded-lg">
-                  {availableProducts.map((product) => (
-                    <div key={product.id} className="flex items-center p-3 border-b last:border-b-0">
-                      <Checkbox
-                        checked={selectedProducts.includes(product.id)}
-                        onCheckedChange={(checked) => {
-                          if (checked) {
-                            setSelectedProducts([...selectedProducts, product.id])
-                          } else {
-                            setSelectedProducts(selectedProducts.filter(id => id !== product.id))
-                          }
-                        }}
-                      />
-                      <div className="ml-3 flex-1">
-                        <p className="font-medium">{product.name}</p>
-                        <p className="text-sm text-muted-foreground">{product.category} • GHS {product.price_ghs}</p>
+                  {availableProducts.length === 0 ? (
+                      <div className="p-8 text-center text-muted-foreground">
+                          <Package className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                          <p>No available products found to assign.</p>
+                          <p className="text-xs mt-1">All global products may already be assigned.</p>
                       </div>
-                    </div>
-                  ))}
+                  ) : (
+                      availableProducts.map((product) => (
+                        <div key={product.id} className="flex items-center p-3 border-b last:border-b-0">
+                          <Checkbox
+                            checked={selectedProducts.includes(product.id)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setSelectedProducts([...selectedProducts, product.id])
+                              } else {
+                                setSelectedProducts(selectedProducts.filter(id => id !== product.id))
+                              }
+                            }}
+                          />
+                          <div className="ml-3 flex-1">
+                            <p className="font-medium">{product.name}</p>
+                            <p className="text-sm text-muted-foreground">{product.category} • GHS {product.price_ghs}</p>
+                          </div>
+                        </div>
+                      ))
+                  )}
                 </div>
                 <div className="flex justify-between items-center pt-4">
                   <p className="text-sm text-muted-foreground">

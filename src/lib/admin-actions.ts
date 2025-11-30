@@ -756,3 +756,79 @@ export async function deleteServiceArea(id: number) {
     if (error) return { error: error.message }
     return { success: true }
 }
+
+// --- Category Management ---
+
+export async function getCategories() {
+    const supabase = await createSupabaseServerClient()
+    const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name')
+
+    if (error) throw new Error(error.message)
+    return data || []
+}
+
+export async function addCategory(data: { name: string; description?: string; image_url?: string }) {
+    const supabase = getSupabaseAdminClient()
+    const slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
+
+    const { data: newCategory, error } = await supabase
+        .from('categories')
+        .insert({ ...data, slug })
+        .select()
+        .single()
+
+    if (error) return { error: error.message }
+    revalidatePath('/admin/categories')
+    revalidatePath('/admin/products')
+    return { success: true, data: newCategory }
+}
+
+export async function updateCategory(id: number, data: { name: string; description?: string; image_url?: string }) {
+    const supabase = getSupabaseAdminClient()
+    const slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
+
+    // 1. Get the old category name first
+    const { data: oldCategory } = await supabase
+        .from('categories')
+        .select('name')
+        .eq('id', id)
+        .single()
+
+    // 2. Update the category
+    const { error } = await supabase
+        .from('categories')
+        .update({ ...data, slug })
+        .eq('id', id)
+
+    if (error) return { error: error.message }
+
+    // 3. If name changed, sync all products that used the old name
+    if (oldCategory && oldCategory.name !== data.name) {
+        const { error: syncError } = await supabase
+            .from('products')
+            .update({ category: data.name })
+            .eq('category', oldCategory.name)
+
+        if (syncError) console.error('Failed to sync products category:', syncError)
+    }
+
+    revalidatePath('/admin/categories')
+    revalidatePath('/admin/products')
+    return { success: true }
+}
+
+export async function deleteCategory(id: number) {
+    const supabase = getSupabaseAdminClient()
+    const { error } = await supabase
+        .from('categories')
+        .delete()
+        .eq('id', id)
+
+    if (error) return { error: error.message }
+    revalidatePath('/admin/categories')
+    revalidatePath('/admin/products')
+    return { success: true }
+}

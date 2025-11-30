@@ -25,7 +25,7 @@ export function DashboardRefresher() {
     const interval = setInterval(() => {
       router.refresh();
       setLastRefreshed(new Date());
-    }, 60000);
+    }, 300000);
 
     return () => clearInterval(interval);
   }, [router]);

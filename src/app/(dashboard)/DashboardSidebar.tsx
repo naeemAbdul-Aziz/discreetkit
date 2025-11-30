@@ -1,6 +1,6 @@
 "use client"
 import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar"
-import { LayoutDashboard, ShoppingBag, Users, Settings, LogOut, Package } from "lucide-react"
+import { LayoutDashboard, ShoppingBag, Users, Settings, LogOut, Package, Layers } from "lucide-react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import * as React from "react"
@@ -13,6 +13,7 @@ export function DashboardSidebar() {
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
     { href: "/admin/products", label: "Products", icon: Package },
+    { href: "/admin/categories", label: "Categories", icon: Layers },
     { href: "/admin/partners", label: "Partners", icon: Users },
     { href: "/admin/settings", label: "Settings", icon: Settings },
   ]), [])

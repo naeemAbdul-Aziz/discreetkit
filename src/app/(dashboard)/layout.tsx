@@ -29,6 +29,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { href: "/admin", label: "Overview", icon: Home },
     { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
     { href: "/admin/products", label: "Products", icon: Package },
+    { href: "/admin/categories", label: "Categories", icon: Package },
     { href: "/admin/partners", label: "Partners", icon: Users },
     { href: "/admin/settings", label: "Settings", icon: Settings },
   ];
