@@ -720,3 +720,39 @@ export async function getPharmacyAnalytics(pharmacyId: number) {
         }, {} as Record<string, number>) || {}
     }
 }
+
+export async function getServiceAreas(pharmacyId: number) {
+    const supabase = await createSupabaseServerClient()
+    const { data, error } = await supabase
+        .from('pharmacy_service_areas')
+        .select('*')
+        .eq('pharmacy_id', pharmacyId)
+        .order('area_name')
+
+    if (error) throw new Error(error.message)
+    return data || []
+}
+
+export async function addServiceArea(data: { pharmacy_id: number; area_name: string; delivery_fee: number; max_delivery_time_hours: number }) {
+    const supabase = getSupabaseAdminClient()
+    const { data: newArea, error } = await supabase
+        .from('pharmacy_service_areas')
+        .insert(data)
+        .select()
+        .single()
+
+    if (error) return { error: error.message }
+    revalidatePath(`/admin/partners/${data.pharmacy_id}`)
+    return { data: newArea }
+}
+
+export async function deleteServiceArea(id: number) {
+    const supabase = getSupabaseAdminClient()
+    const { error } = await supabase
+        .from('pharmacy_service_areas')
+        .delete()
+        .eq('id', id)
+
+    if (error) return { error: error.message }
+    return { success: true }
+}

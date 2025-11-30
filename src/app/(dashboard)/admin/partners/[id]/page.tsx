@@ -1,4 +1,5 @@
-import { getPharmacies, getPharmacyProducts, getPharmacyAnalytics } from "@/lib/admin-actions"
+import { getPharmacies, getPharmacyProducts, getPharmacyAnalytics, getServiceAreas } from "@/lib/admin-actions"
+import { ServiceAreaManager } from "./service-area-manager"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, AlertCircle } from "lucide-react"
 import Link from "next/link"
@@ -34,10 +35,11 @@ export default async function PharmacyDetailsPage({ params }: PharmacyDetailsPag
       )
     }
 
-    // Get pharmacy analytics and products
-    const [analytics, products] = await Promise.all([
+    // Get pharmacy analytics, products, and service areas
+    const [analytics, products, serviceAreas] = await Promise.all([
       getPharmacyAnalytics(pharmacyId),
-      getPharmacyProducts(pharmacyId)
+      getPharmacyProducts(pharmacyId),
+      getServiceAreas(pharmacyId)
     ])
 
     return (
@@ -93,6 +95,11 @@ export default async function PharmacyDetailsPage({ params }: PharmacyDetailsPag
                   Manage Inventory
               </Link>
           </Button>
+        </div>
+
+        {/* Service Area Manager */}
+        <div className="p-6 border rounded-xl bg-card shadow-sm">
+            <ServiceAreaManager pharmacyId={pharmacyId} initialAreas={serviceAreas} />
         </div>
       </div>
     )

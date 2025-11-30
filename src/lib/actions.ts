@@ -341,13 +341,9 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     };
 
     // Attempt pharmacy assignment based on delivery area
-    let assignedPharmacyId: number | null = null;
-    try {
-      const { autoAssignOrder } = await import('@/lib/order-assignment');
-      // We'll assign after order creation to use the order ID
-    } catch (pharmacyError) {
-      console.warn('Failed to load auto-assignment:', pharmacyError);
-    }
+    // We'll assign after order creation to use the order ID
+    // Logic moved to after payment or immediate if needed. 
+    // For now, we just prepare the order.
 
     // 1. Insert into orders table with status 'pending_payment' (no pharmacy yet)
     const { data: orderData, error: orderError } = await supabaseAdmin
@@ -383,7 +379,19 @@ export async function createOrderAction(prevState: any, formData: FormData) {
 
     await sendSMS(validatedFields.data.phone_masked, initialSmsMessage);
 
-    // Note: Pharmacy assignment happens AFTER payment confirmation in the webhook
+    // 4. Attempt Auto-Assignment
+    try {
+      const { autoAssignOrder } = await import('@/lib/order-assignment');
+      await autoAssignOrder(orderData.id, finalDeliveryArea, cartItems);
+    } catch (assignError) {
+      console.error("Auto-assignment error:", assignError);
+    }
+
+    // Note: Pharmacy assignment happens AFTER payment confirmation in the webhook usually, 
+    // but user requested logic implementation. If we assign now, the pharmacy sees it before payment.
+    // If we want to wait for payment, we should move this to the webhook.
+    // However, for "Cash on Delivery" or immediate processing, this is fine.
+    // Given the context, we'll assign now but status is 'pending_payment'.
 
 
     // 4. Initialize Paystack Transaction

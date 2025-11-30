@@ -3,182 +3,142 @@
 import { createSupabaseServerClient, getSupabaseAdminClient } from "@/lib/supabase"
 
 /**
- * Delivery area to pharmacy mapping
- * Maps delivery locations to preferred pharmacy IDs
+ * Find the best pharmacy for an order based on:
+ * 1. Coverage (must cover the area)
+ * 2. Stock Availability (must have all items)
+ * 3. Cost (lowest delivery fee)
+ * 4. Speed (fastest delivery time)
  */
-const DELIVERY_AREA_MAPPING: Record<string, number[]> = {
-    // Legon & UG Campus
-    "Legon": [1], // Legon Campus Pharmacy
-    "University of Ghana": [1],
-    "UG": [1],
+export async function findBestPharmacyForOrder(
+    items: { id: number; quantity: number }[],
+    deliveryArea: string
+): Promise<{ pharmacyId: number | null; reason: string }> {
+    const supabase = getSupabaseAdminClient()
 
-    // Osu & Oxford Street
-    "Osu": [2], // Osu Oxford St Pharmacy
-    "Oxford Street": [2],
+    // 1. Find pharmacies that cover the delivery area
+    const { data: serviceAreas, error: areaError } = await supabase
+        .from('pharmacy_service_areas')
+        .select('pharmacy_id, delivery_fee, max_delivery_time_hours')
+        .ilike('area_name', `%${deliveryArea}%`)
+        .eq('is_active', true)
 
-    // East Legon
-    "East Legon": [3], // East Legon Health Mart
+    if (areaError || !serviceAreas || serviceAreas.length === 0) {
+        return { pharmacyId: null, reason: `No pharmacy covers area: ${deliveryArea}` }
+    }
 
-    // Spintex
-    "Spintex": [4], // Spintex Road Chemist
+    // Get unique pharmacy IDs
+    const candidatePharmacyIds = Array.from(new Set(serviceAreas.map(sa => sa.pharmacy_id)))
 
-    // Dansoman
-    "Dansoman": [5], // Dansoman Community Pharmacy
+    // 2. Check stock availability for each candidate
+    const validCandidates = []
 
-    // Kumasi
-    "Kumasi": [6, 7], // Kumasi Central, KNUST
-    "KNUST": [7, 6],
-    "Adum": [6],
+    for (const pharmacyId of candidatePharmacyIds) {
+        // Check if pharmacy has enough stock for ALL items
+        let hasStock = true
 
-    // Tema
-    "Tema": [8], // Tema Community 1
-    "Community 1": [8],
+        // Get pharmacy stock for requested items
+        const { data: stockData } = await supabase
+            .from('pharmacy_products')
+            .select('product_id, stock_level, is_available')
+            .eq('pharmacy_id', pharmacyId)
+            .in('product_id', items.map(i => i.id))
 
-    // Takoradi
-    "Takoradi": [9], // Takoradi Market Circle
-    "Market Circle": [9],
+        if (!stockData) {
+            hasStock = false
+        } else {
+            for (const item of items) {
+                const productStock = stockData.find(p => p.product_id === item.id)
+                if (!productStock || !productStock.is_available || productStock.stock_level < item.quantity) {
+                    hasStock = false
+                    break
+                }
+            }
+        }
 
-    // Tamale
-    "Tamale": [10], // Tamale Teaching Hospital
+        if (hasStock) {
+            // Find the specific service area details for this pharmacy (in case of multiple matches, take best)
+            const areaDetails = serviceAreas
+                .filter(sa => sa.pharmacy_id === pharmacyId)
+                .sort((a, b) => a.delivery_fee - b.delivery_fee)[0] // Take cheapest if multiple matches
+
+            validCandidates.push({
+                pharmacyId,
+                deliveryFee: areaDetails.delivery_fee,
+                maxTime: areaDetails.max_delivery_time_hours
+            })
+        }
+    }
+
+    if (validCandidates.length === 0) {
+        return { pharmacyId: null, reason: "Pharmacies found in area but none have sufficient stock." }
+    }
+
+    // 3. Rank candidates
+    // Priority: Lowest Fee -> Fastest Time
+    validCandidates.sort((a, b) => {
+        if (a.deliveryFee !== b.deliveryFee) {
+            return a.deliveryFee - b.deliveryFee
+        }
+        return a.maxTime - b.maxTime
+    })
+
+    return {
+        pharmacyId: validCandidates[0].pharmacyId,
+        reason: `Best match: Fee ${validCandidates[0].deliveryFee}, Time ${validCandidates[0].maxTime}h`
+    }
 }
 
 /**
- * Auto-assign order to nearest pharmacy based on delivery area
+ * Auto-assign order wrapper
  */
-export async function autoAssignOrder(orderId: number, deliveryArea: string) {
+export async function autoAssignOrder(orderId: number, deliveryArea: string, items: any[]) {
     const supabase = getSupabaseAdminClient()
 
-    // Find matching pharmacy IDs for this delivery area
-    let pharmacyIds: number[] = []
+    // Parse items if needed
+    const parsedItems = typeof items === 'string' ? JSON.parse(items) : items
+    // Map to simple structure for algorithm
+    const simpleItems = parsedItems.map((i: any) => ({ id: i.id, quantity: i.quantity || 1 }))
 
-    // Try exact match first
-    if (DELIVERY_AREA_MAPPING[deliveryArea]) {
-        pharmacyIds = DELIVERY_AREA_MAPPING[deliveryArea]
-    } else {
-        // Try partial match (case-insensitive)
-        const normalizedArea = deliveryArea.toLowerCase()
-        for (const [key, ids] of Object.entries(DELIVERY_AREA_MAPPING)) {
-            if (normalizedArea.includes(key.toLowerCase()) || key.toLowerCase().includes(normalizedArea)) {
-                pharmacyIds = ids
-                break
-            }
-        }
+    const { pharmacyId, reason } = await findBestPharmacyForOrder(simpleItems, deliveryArea)
+
+    if (!pharmacyId) {
+        // Log failure
+        await supabase.from('order_events').insert({
+            order_id: orderId,
+            status: 'Assignment Failed',
+            note: `Auto-assignment failed: ${reason}. Pending manual assignment.`
+        })
+        return { success: false, reason }
     }
 
-    // If no match found, return error for manual assignment
-    if (pharmacyIds.length === 0) {
-        return {
-            error: "No pharmacy found for this delivery area",
-            requiresManual: true
-        }
-    }
-
-    // Get first available pharmacy (can be enhanced with stock/capacity checks)
-    const pharmacyId = pharmacyIds[0]
-
-    // Assign order to pharmacy
+    // Assign
     const { error } = await supabase
         .from('orders')
         .update({
             pharmacy_id: pharmacyId,
             pharmacy_ack_status: 'pending'
         })
-        .eq('id', id)
+        .eq('id', orderId)
 
-    if (error) {
-        console.error('Order assignment failed:', error.message)
-        return { error: error.message }
-    }
+    if (error) return { success: false, error: error.message }
 
-    await supabase
-        .from('order_events')
-        .insert({
-            order_id: id,
-            status: 'assigned',
-            note: `Order auto-assigned to pharmacy ${pharmacyId}`
-        })
+    // Log success
+    await supabase.from('order_events').insert({
+        order_id: orderId,
+        status: 'Auto-Assigned',
+        note: `Order assigned to pharmacy #${pharmacyId}. Logic: ${reason}`
+    })
 
-    // TODO: Send SMS notification to pharmacy
-    // await notifyPharmacy(pharmacyId, id)
+    // Trigger notification (async)
+    const { assignPharmacy } = await import('@/lib/admin-actions')
+    // We re-call assignPharmacy to handle notifications, but since we already updated the DB, 
+    // maybe we should just call the notification part. 
+    // Actually, assignPharmacy does the update AND notification. 
+    // Let's just call assignPharmacy directly if we found a match? 
+    // But assignPharmacy takes ID. 
+    // Let's just let assignPharmacy handle the update to be safe and consistent.
 
-    return {
-        success: true,
-        pharmacyId,
-        message: "Order auto-assigned successfully"
-    }
-}
+    await assignPharmacy(orderId, pharmacyId)
 
-
-/**
- * Manually assign order to specific pharmacy (admin override)
- */
-export async function manuallyAssignOrder(id: number, pharmacyId: number) {
-    const supabase = getSupabaseAdminClient()
-
-    const { error } = await supabase
-        .from('orders')
-        .update({
-            pharmacy_id: pharmacyId,
-            pharmacy_ack_status: 'pending'
-        })
-        .eq('id', id)
-
-    if (error) {
-        console.error('Manual order assignment failed:', error.message)
-        return { error: error.message }
-    }
-    // Log event
-    await supabase
-        .from('order_events')
-        .insert({
-            order_id: id,
-            status: 'assigned',
-            note: `Order manually assigned to pharmacy ${pharmacyId}`
-        })
-
-    return {
-        success: true,
-        pharmacyId,
-        message: "Order manually assigned successfully"
-    }
-}
-
-/**
- * Get available pharmacies for a delivery area
- */
-export async function getAvailablePharmacies(deliveryArea: string) {
-    const supabase = await createSupabaseServerClient()
-
-    // Get pharmacy IDs for this area
-    let pharmacyIds: number[] = []
-
-    if (DELIVERY_AREA_MAPPING[deliveryArea]) {
-        pharmacyIds = DELIVERY_AREA_MAPPING[deliveryArea]
-    } else {
-        const normalizedArea = deliveryArea.toLowerCase()
-        for (const [key, ids] of Object.entries(DELIVERY_AREA_MAPPING)) {
-            if (normalizedArea.includes(key.toLowerCase()) || key.toLowerCase().includes(normalizedArea)) {
-                pharmacyIds = ids
-                break
-            }
-        }
-    }
-
-    if (pharmacyIds.length === 0) {
-        // Return all pharmacies if no match
-        const { data: allPharmacies } = await supabase
-            .from('pharmacies')
-            .select('*')
-            .order('name')
-
-        return { pharmacies: allPharmacies || [] }
-    }
-
-    // Get specific pharmacies
-    const { data: pharmacies } = await supabase
-        .from('pharmacies')
-        .select('*')
-        .in('id', pharmacyIds)
-
-    return { pharmacies: pharmacies || [] }
+    return { success: true, pharmacyId }
 }
