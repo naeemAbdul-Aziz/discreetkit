@@ -48,7 +48,7 @@ export async function middleware(request: NextRequest) {
         if (url.pathname === '/') {
             url.pathname = '/admin/dashboard';
         } else {
-            if (!url.pathname.startsWith('/admin')) {
+            if (!url.pathname.startsWith('/admin') && !url.pathname.startsWith('/login')) {
                 url.pathname = `/admin${url.pathname}`;
             }
         }
@@ -58,7 +58,7 @@ export async function middleware(request: NextRequest) {
         if (url.pathname === '/') {
             url.pathname = '/pharmacy/dashboard';
         } else {
-            if (!url.pathname.startsWith('/pharmacy')) {
+            if (!url.pathname.startsWith('/pharmacy') && !url.pathname.startsWith('/login')) {
                 url.pathname = `/pharmacy${url.pathname}`;
             }
         }

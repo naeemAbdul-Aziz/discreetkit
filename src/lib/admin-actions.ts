@@ -761,13 +761,35 @@ export async function deleteServiceArea(id: number) {
 
 export async function getCategories() {
     const supabase = await createSupabaseServerClient()
-    const { data, error } = await supabase
+
+    // Fetch categories
+    const { data: categories, error } = await supabase
         .from('categories')
         .select('*')
         .order('name')
 
     if (error) throw new Error(error.message)
-    return data || []
+
+    // Fetch product counts for each category
+    const { data: productCounts, error: countError } = await supabase
+        .from('products')
+        .select('category')
+
+    if (countError) throw new Error(countError.message)
+
+    // Calculate counts
+    const counts: Record<string, number> = {}
+    productCounts?.forEach((p: any) => {
+        if (p.category) {
+            counts[p.category] = (counts[p.category] || 0) + 1
+        }
+    })
+
+    // Merge counts into categories
+    return (categories || []).map(cat => ({
+        ...cat,
+        productCount: counts[cat.name] || 0
+    }))
 }
 
 export async function addCategory(data: { name: string; description?: string; image_url?: string }) {
@@ -822,6 +844,26 @@ export async function updateCategory(id: number, data: { name: string; descripti
 
 export async function deleteCategory(id: number) {
     const supabase = getSupabaseAdminClient()
+
+    // Get category name to check for products
+    const { data: category } = await supabase
+        .from('categories')
+        .select('name')
+        .eq('id', id)
+        .single()
+
+    if (category) {
+        // Check if products exist
+        const { count } = await supabase
+            .from('products')
+            .select('*', { count: 'exact', head: true })
+            .eq('category', category.name)
+
+        if (count && count > 0) {
+            return { error: `Cannot delete category "${category.name}" because it contains ${count} products. Please reassign them first.` }
+        }
+    }
+
     const { error } = await supabase
         .from('categories')
         .delete()

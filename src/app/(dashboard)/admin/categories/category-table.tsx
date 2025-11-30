@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Edit, Plus, Search, Trash2 } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
 import { CategoryDialog } from "./category-dialog"
 import { deleteCategory } from "@/lib/admin-actions"
 import { useToast } from "@/hooks/use-toast"
@@ -100,6 +101,7 @@ export function CategoryTable({ initialCategories }: CategoryTableProps) {
               <TableHead>Name</TableHead>
               <TableHead>Slug</TableHead>
               <TableHead>Description</TableHead>
+              <TableHead>Products</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -109,7 +111,13 @@ export function CategoryTable({ initialCategories }: CategoryTableProps) {
                 <TableCell className="font-medium">{category.name}</TableCell>
                 <TableCell>{category.slug}</TableCell>
                 <TableCell>{category.description}</TableCell>
+                <TableCell>
+                  <Badge variant="secondary" className="rounded-full">
+                    {category.productCount || 0}
+                  </Badge>
+                </TableCell>
                 <TableCell className="text-right space-x-2">
+                  {/* Future: Add Manage Products button here */}
                   <Button
                     variant="ghost"
                     size="icon"
@@ -130,7 +138,7 @@ export function CategoryTable({ initialCategories }: CategoryTableProps) {
             ))}
             {filteredCategories.length === 0 && (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                   No categories found.
                 </TableCell>
               </TableRow>

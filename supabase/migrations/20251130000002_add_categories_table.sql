@@ -18,13 +18,15 @@ CREATE POLICY "Public read access" ON public.categories FOR SELECT USING (true);
 CREATE POLICY "Admin full access" ON public.categories FOR ALL USING (auth.role() = 'service_role');
 
 -- Seed initial categories from existing hardcoded values
-INSERT INTO public.categories (name, slug) VALUES
-    ('Testing', 'testing'),
-    ('Contraception', 'contraception'),
-    ('Protection', 'protection'),
-    ('Wellness', 'wellness'),
-    ('Menstrual Care', 'menstrual-care')
-ON CONFLICT (name) DO NOTHING;
+-- Seed initial categories from existing hardcoded values
+INSERT INTO public.categories (name, slug, description) VALUES
+    ('Testing', 'testing', 'Reliable and discreet testing kits for your peace of mind.'),
+    ('Contraception', 'contraception', 'Safe and effective contraceptive options.'),
+    ('Protection', 'protection', 'High-quality protection products for safety.'),
+    ('Wellness', 'wellness', 'General wellness products for your daily health.'),
+    ('Menstrual Care', 'menstrual-care', 'Essential menstrual care products for comfort.')
+ON CONFLICT (name) DO UPDATE
+SET description = EXCLUDED.description;
 
 -- Optional: Add foreign key to products (soft migration for now)
 -- We won't enforce FK yet to avoid breaking existing data if there are mismatches,
