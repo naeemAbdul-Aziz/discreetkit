@@ -17,7 +17,7 @@ interface PharmacyNotificationData {
     pharmacyName: string;
     pharmacyPhone: string;
     pharmacyEmail: string;
-    id: number;
+    orderId: number;
     orderCode: string;
     deliveryArea: string;
     itemCount: number;
@@ -40,7 +40,7 @@ export async function sendPharmacyOrderSMS(data: PharmacyNotificationData) {
         const supabase = getSupabaseAdminClient();
 
         await supabase.from('pharmacy_notifications').insert({
-            order_id: data.id,
+            order_id: data.orderId,
             pharmacy_id: data.pharmacyId,
             status: result.ok ? 'sent' : 'failed',
             attempts: 1,
@@ -71,7 +71,7 @@ export async function sendPharmacyOrderEmail(data: PharmacyNotificationData) {
 
         // Log email attempt
         await logEmailNotification(
-            data.id,
+            data.orderId,
             data.pharmacyId,
             'assigned',
             result.success,
