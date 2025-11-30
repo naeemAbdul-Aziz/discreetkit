@@ -76,3 +76,8 @@ CREATE TRIGGER pharmacy_products_update_timestamp
     BEFORE UPDATE ON public.pharmacy_products
     FOR EACH ROW
     EXECUTE FUNCTION update_pharmacy_product_timestamp();
+
+-- 6. Seed Data
+INSERT INTO public.pharmacies (name, location, contact_person, phone_number, email)
+VALUES ('BeyBee Pharmacy', 'East Legon, Accra-Ghana', 'Darline', '0203001107', 'naeemabdulaziz202@gmail.com')
+ON CONFLICT DO NOTHING;

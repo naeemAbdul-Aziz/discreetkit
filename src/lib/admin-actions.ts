@@ -209,6 +209,9 @@ export async function createPharmacyWithUser(data: PharmacyFormValues) {
         if (validated.user_email && validated.user_password) {
             // Use admin client for user creation
             const adminSupabase = getSupabaseAdminClient();
+            let userId = null;
+
+            // Try to create the user
             const { data: authData, error: authError } = await adminSupabase.auth.admin.createUser({
                 email: validated.user_email,
                 password: validated.user_password,
@@ -216,30 +219,65 @@ export async function createPharmacyWithUser(data: PharmacyFormValues) {
             });
 
             if (authError) {
-                // Rollback pharmacy creation
-                await supabase.from('pharmacies').delete().eq('id', pharmacy.id);
-                return { error: `Failed to create user: ${authError.message}` };
+                // If user already exists, try to find them
+                if (authError.message.includes("already registered") || authError.status === 422) {
+                    console.log(`User ${validated.user_email} already exists, attempting to link...`);
+
+                    // List users to find the existing one (Supabase Admin API doesn't have getUserByEmail)
+                    // We fetch a reasonable number of users. In production with thousands of users, 
+                    // this might need a more robust search or direct DB query if possible.
+                    const { data: listData, error: listError } = await adminSupabase.auth.admin.listUsers({
+                        perPage: 1000
+                    });
+
+                    if (listError) {
+                        await supabase.from('pharmacies').delete().eq('id', pharmacy.id);
+                        return { error: `Failed to list users to find existing account: ${listError.message}` };
+                    }
+
+                    const existingUser = listData.users.find(u => u.email?.toLowerCase() === validated.user_email?.toLowerCase());
+
+                    if (existingUser) {
+                        userId = existingUser.id;
+                    } else {
+                        await supabase.from('pharmacies').delete().eq('id', pharmacy.id);
+                        return { error: "User exists but could not be found in user list." };
+                    }
+                } else {
+                    // Real error
+                    await supabase.from('pharmacies').delete().eq('id', pharmacy.id);
+                    return { error: `Failed to create user: ${authError.message}` };
+                }
+            } else {
+                userId = authData.user.id;
             }
 
-            // Assign pharmacy role
-            const { data: roleData } = await supabase
-                .from('roles')
-                .select('id')
-                .eq('name', 'pharmacy')
-                .single();
+            if (userId) {
+                // Assign pharmacy role
+                const { data: roleData } = await supabase
+                    .from('roles')
+                    .select('id')
+                    .eq('name', 'pharmacy')
+                    .single();
 
-            if (roleData) {
-                await supabase.from('user_roles').insert({
-                    user_id: authData.user.id,
-                    role_id: roleData.id,
-                });
+                if (roleData) {
+                    // Check if role already assigned
+                    const { error: roleAssignError } = await supabase.from('user_roles').insert({
+                        user_id: userId,
+                        role_id: roleData.id,
+                    });
+                    // Ignore duplicate key error if role already exists
+                    if (roleAssignError && !roleAssignError.message.includes('duplicate key')) {
+                        console.error("Error assigning role:", roleAssignError);
+                    }
+                }
+
+                // Link user to pharmacy
+                await supabase
+                    .from('pharmacies')
+                    .update({ user_id: userId })
+                    .eq('id', pharmacy.id);
             }
-
-            // Link user to pharmacy
-            await supabase
-                .from('pharmacies')
-                .update({ user_id: authData.user.id })
-                .eq('id', pharmacy.id);
         }
 
         revalidatePath('/admin/partners')
@@ -254,6 +292,7 @@ export async function linkPharmacyUser(pharmacyId: number, userEmail: string, pa
     // Use admin client for user creation
     const adminSupabase = getSupabaseAdminClient();
     const supabase = getSupabaseAdminClient();
+    let userId = null;
 
     // Create user
     const { data: authData, error: authError } = await adminSupabase.auth.admin.createUser({
@@ -262,29 +301,58 @@ export async function linkPharmacyUser(pharmacyId: number, userEmail: string, pa
         email_confirm: true,
     });
 
-    if (authError) return { error: authError.message };
+    if (authError) {
+        // If user already exists, try to find them
+        if (authError.message.includes("already registered") || authError.status === 422) {
+            console.log(`User ${userEmail} already exists, attempting to link...`);
 
-    // Assign pharmacy role
-    const { data: roleData } = await supabase
-        .from('roles')
-        .select('id')
-        .eq('name', 'pharmacy')
-        .single();
+            const { data: listData, error: listError } = await adminSupabase.auth.admin.listUsers({
+                perPage: 1000
+            });
 
-    if (roleData) {
-        await supabase.from('user_roles').insert({
-            user_id: authData.user.id,
-            role_id: roleData.id,
-        })
+            if (listError) return { error: `Failed to find existing user: ${listError.message}` };
+
+            const existingUser = listData.users.find(u => u.email?.toLowerCase() === userEmail.toLowerCase());
+
+            if (existingUser) {
+                userId = existingUser.id;
+            } else {
+                return { error: "User exists but could not be found." };
+            }
+        } else {
+            return { error: authError.message };
+        }
+    } else {
+        userId = authData.user.id;
     }
 
-    // Link to pharmacy
-    const { error } = await supabase
-        .from('pharmacies')
-        .update({ user_id: authData.user.id })
-        .eq('id', pharmacyId)
+    if (userId) {
+        // Assign pharmacy role
+        const { data: roleData } = await supabase
+            .from('roles')
+            .select('id')
+            .eq('name', 'pharmacy')
+            .single();
 
-    if (error) return { error: error.message }
+        if (roleData) {
+            const { error: roleAssignError } = await supabase.from('user_roles').insert({
+                user_id: userId,
+                role_id: roleData.id,
+            });
+            // Ignore duplicate key error
+            if (roleAssignError && !roleAssignError.message.includes('duplicate key')) {
+                console.error("Error assigning role:", roleAssignError);
+            }
+        }
+
+        // Link to pharmacy
+        const { error } = await supabase
+            .from('pharmacies')
+            .update({ user_id: userId })
+            .eq('id', pharmacyId)
+
+        if (error) return { error: error.message }
+    }
 
     revalidatePath('/admin/partners')
     return { success: true }

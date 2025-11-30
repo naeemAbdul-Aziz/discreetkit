@@ -114,9 +114,7 @@ const ContactUs = dynamic(
   () => import('@/app/(home)/components/contact-us').then((mod) => mod.ContactUs),
   { loading: () => <LoadingSkeleton height={componentMap.ContactUs.height} /> }
 );
-const DeliveryMap = dynamic(
-  () => import('@/app/(home)/components/delivery-map').then((mod) => mod.DeliveryMap)
-);
+
 const PrivacyReveal = dynamic(
   () => import('@/app/(home)/components/privacy-reveal').then((mod) => mod.PrivacyReveal)
 );
@@ -188,20 +186,6 @@ export default async function Home() {
         <Testimonials />
       </SectionWrapper>
       
-      <SectionWrapper className="bg-muted/30">
-        <div className="container mx-auto px-4 md:px-6 py-12 md:py-24">
-          <div className="text-center mb-12">
-            <h2 className="font-headline text-2xl font-bold text-foreground md:text-3xl">
-              Fast, Discreet Delivery Across Ghana
-            </h2>
-            <p className="mt-4 max-w-2xl mx-auto text-sm text-muted-foreground md:text-base">
-              We deliver to major cities with secure, unmarked packaging.
-            </p>
-          </div>
-          <DeliveryMap />
-        </div>
-      </SectionWrapper>
-
       <SectionWrapper>
         <Faq />
       </SectionWrapper>
