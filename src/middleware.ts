@@ -20,7 +20,7 @@ export async function middleware(request: NextRequest) {
     if ((isAdminSubdomain || isPharmacySubdomain || isAdminPath || isPharmacyPath) && !user) {
         if (!url.pathname.startsWith('/login')) {
             // Preserve return URL for post-login redirect
-            const loginUrl = new URL('/login', process.env.NEXT_PUBLIC_SITE_URL || 'https://discreetkit.shop');
+            const loginUrl = new URL('/login', process.env.NEXT_PUBLIC_SITE_URL || 'https://discreetkit.com');
             loginUrl.searchParams.set('redirect_to', url.href);
             return NextResponse.redirect(loginUrl);
         }

@@ -249,6 +249,12 @@ export async function login(formData: FormData) {
   }
 
   if (authData.user) {
+    // Check for redirect_to parameter
+    const redirectTo = formData.get('redirect_to') as string | null;
+    if (redirectTo) {
+      redirect(redirectTo);
+    }
+
     // Fetch user roles to determine redirect destination
     const { getUserRoles } = await import('@/lib/auth/roles');
     const roles = await getUserRoles(supabase, authData.user.id);

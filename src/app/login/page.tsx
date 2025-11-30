@@ -14,6 +14,7 @@ import { useState } from 'react';
 import { Eye, EyeOff, Lock, Mail, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 
 const SubmitButton = () => {
     const { pending } = useFormStatus();
@@ -28,9 +29,12 @@ const SubmitButton = () => {
 const LoginForm = () => {
     const [showPassword, setShowPassword] = useState(false);
     const togglePasswordVisibility = () => setShowPassword(!showPassword);
+    const searchParams = useSearchParams();
+    const redirectTo = searchParams.get('redirect_to');
 
   return (
     <form action={login} className="space-y-6">
+      {redirectTo && <input type="hidden" name="redirect_to" value={redirectTo} />}
       <div className="space-y-2">
         <Label htmlFor="email" className="text-sm font-medium text-foreground/80">Email Address</Label>
         <div className="relative group">

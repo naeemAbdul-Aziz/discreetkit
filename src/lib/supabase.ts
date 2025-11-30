@@ -43,7 +43,14 @@ export async function createSupabaseServerClient() {
         },
         set(name: string, value: string, options: CookieOptions) {
           try {
-            cookieStore.set({ name, value, ...options })
+            cookieStore.set({
+              name,
+              value,
+              ...options,
+              domain: process.env.NEXT_PUBLIC_COOKIE_DOMAIN || '.discreetkit.com',
+              sameSite: 'lax',
+              secure: process.env.NODE_ENV === 'production'
+            })
           } catch (error) {
             // The `set` cookie method throws when trying to set a cookie in a Server Action.
             // This is expected, and can be safely ignored.
@@ -81,23 +88,43 @@ export function createSupabaseMiddlewareClient(request: NextRequest) {
         },
         set(name: string, value: string, options: CookieOptions) {
           // If the cookie is set, update the request and response
-          request.cookies.set({ name, value, ...options, });
+          request.cookies.set({
+            name,
+            value,
+          });
           response = NextResponse.next({
             request: {
               headers: request.headers,
             },
           });
-          response.cookies.set({ name, value, ...options, });
+          response.cookies.set({
+            name,
+            value,
+            ...options,
+            domain: process.env.NEXT_PUBLIC_COOKIE_DOMAIN || '.discreetkit.com',
+            sameSite: 'lax',
+            secure: process.env.NODE_ENV === 'production'
+          });
         },
         remove(name: string, options: CookieOptions) {
           // If the cookie is removed, update the request and response
-          request.cookies.set({ name, value: '', ...options, });
+          request.cookies.set({
+            name,
+            value: '',
+          });
           response = NextResponse.next({
             request: {
               headers: request.headers,
             },
           });
-          response.cookies.set({ name, value: '', ...options, });
+          response.cookies.set({
+            name,
+            value: '',
+            ...options,
+            domain: process.env.NEXT_PUBLIC_COOKIE_DOMAIN || '.discreetkit.com',
+            sameSite: 'lax',
+            secure: process.env.NODE_ENV === 'production'
+          });
         },
       },
     }
