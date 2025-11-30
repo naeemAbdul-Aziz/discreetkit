@@ -316,26 +316,79 @@ export function PharmacyInventoryManager({
         />
       </div>
 
-      <div className="border rounded-lg overflow-hidden">
+      <div className="border rounded-xl overflow-hidden shadow-sm bg-white dark:bg-card">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Product</TableHead>
+            <TableRow className="bg-muted/50 hover:bg-muted/50">
+              <TableHead className="w-[300px]">Product</TableHead>
               <TableHead>Category</TableHead>
               <TableHead>Global Price</TableHead>
               <TableHead>Stock Level</TableHead>
               <TableHead>Reorder Level</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredProducts.map((product) => (
-              <TableRow key={product.id}>
+              <TableRow key={product.id} className="hover:bg-muted/5">
                 <TableCell>
+                    <div className="flex flex-col">
+                        <span className="font-medium">{product.products.name}</span>
+                        {product.products.image_url && (
+                            <span className="text-xs text-muted-foreground mt-0.5">Has Image</span>
+                        )}
+                    </div>
+                </TableCell>
+                <TableCell>
+                    <Badge variant="secondary" className="rounded-full font-normal">
+                        {product.products.category}
+                    </Badge>
+                </TableCell>
+                <TableCell>GHS {product.products.price_ghs.toFixed(2)}</TableCell>
+                <TableCell>
+                    <div className="flex items-center space-x-2">
+                        <Button 
+                            variant="outline" 
+                            size="icon" 
+                            className="h-6 w-6 rounded-full"
+                            onClick={() => updateStock(product.product_id, Math.max(0, product.stock_level - 1))}
+                        >
+                            -
+                        </Button>
+                        <span className={`w-8 text-center font-medium ${product.stock_level <= product.reorder_level ? 'text-orange-600' : ''}`}>
+                            {product.stock_level}
+                        </span>
+                        <Button 
+                            variant="outline" 
+                            size="icon" 
+                            className="h-6 w-6 rounded-full"
+                            onClick={() => updateStock(product.product_id, product.stock_level + 1)}
+                        >
+                            +
+                        </Button>
+                    </div>
+                </TableCell>
+                <TableCell>
+                    <span className="text-muted-foreground">{product.reorder_level}</span>
+                </TableCell>
+                <TableCell>
+                    <div className="flex items-center space-x-2">
+                        <Checkbox 
+                            id={`available-${product.id}`}
+                            checked={product.is_available}
+                            onCheckedChange={(checked) => toggleAvailability(product.product_id, checked as boolean)}
+                        />
+                        <Label htmlFor={`available-${product.id}`} className="text-sm font-normal cursor-pointer">
+                            {product.is_available ? 'Available' : 'Unavailable'}
+                        </Label>
+                    </div>
+                </TableCell>
+                <TableCell className="text-right">
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-full h-8 w-8 p-0"
                     onClick={() => removeProduct(product.product_id)}
                   >
                     <Trash2 className="h-4 w-4" />

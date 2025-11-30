@@ -79,11 +79,20 @@ export default async function PharmacyDetailsPage({ params }: PharmacyDetailsPag
         </div>
       </div>
 
-      {/* Inventory Management */}
-      <PharmacyInventoryManager 
-        pharmacyId={pharmacyId} 
-        initialProducts={products}
-      />
+      {/* Inventory Management Link */}
+      <div className="flex items-center justify-between p-6 border rounded-xl bg-card shadow-sm">
+        <div>
+            <h3 className="text-lg font-semibold">Inventory Management</h3>
+            <p className="text-muted-foreground text-sm mt-1">
+                Manage product stock levels, availability, and assignments for this pharmacy.
+            </p>
+        </div>
+        <Button asChild size="lg" className="rounded-full px-6">
+            <Link href={`/admin/partners/${pharmacyId}/inventory`}>
+                Manage Inventory
+            </Link>
+        </Button>
+      </div>
     </div>
   )
 }

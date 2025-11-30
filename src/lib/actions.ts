@@ -260,9 +260,9 @@ export async function login(formData: FormData) {
     const roles = await getUserRoles(supabase, authData.user.id);
 
     if (roles.includes('admin')) {
-      redirect(process.env.NEXT_PUBLIC_ADMIN_URL || '/admin');
+      redirect(process.env.NEXT_PUBLIC_ADMIN_URL || '/admin/dashboard');
     } else if (roles.includes('pharmacy')) {
-      redirect(process.env.NEXT_PUBLIC_PHARMACY_URL || '/pharmacy');
+      redirect(process.env.NEXT_PUBLIC_PHARMACY_URL || '/pharmacy/dashboard');
     } else {
       redirect('/');
     }

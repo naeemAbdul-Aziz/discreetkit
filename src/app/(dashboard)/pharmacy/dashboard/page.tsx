@@ -98,58 +98,58 @@ export default function PharmacyDashboardPage() {
   }
 
   return (
-    <>
-      <div className="mb-6 px-2 md:px-0">
-        <h2 className="text-2xl md:text-3xl font-bold tracking-tight break-words">{data.pharmacy.name}</h2>
-        <p className="text-muted-foreground text-sm md:text-base break-words">{data.pharmacy.location}</p>
+    <div className="p-8 max-w-7xl mx-auto space-y-8">
+      <div className="mb-6">
+        <h2 className="text-3xl font-bold tracking-tight break-words">{data.pharmacy.name}</h2>
+        <p className="text-muted-foreground text-base break-words mt-1">{data.pharmacy.location}</p>
       </div>
 
-      <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-4">
-        <Card className="min-w-0">
+      <div className="grid gap-6 grid-cols-2 sm:grid-cols-2 md:grid-cols-4">
+        <Card className="min-w-0 shadow-sm hover:shadow-md transition-all duration-200 border-border/60">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs md:text-sm font-medium">New Assigned Orders</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">New Assigned Orders</CardTitle>
+            <Package className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-lg md:text-2xl font-bold">{data.stats.pending}</div>
-            <p className="text-xs text-muted-foreground">Awaiting processing</p>
+            <div className="text-3xl font-bold tracking-tight">{data.stats.pending}</div>
+            <p className="text-xs text-muted-foreground mt-1">Awaiting processing</p>
           </CardContent>
         </Card>
-        <Card className="min-w-0">
+        <Card className="min-w-0 shadow-sm hover:shadow-md transition-all duration-200 border-border/60">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs md:text-sm font-medium">Processing</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Processing</CardTitle>
+            <Clock className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-lg md:text-2xl font-bold">{data.stats.processing}</div>
-            <p className="text-xs text-muted-foreground">Currently being prepared</p>
+            <div className="text-3xl font-bold tracking-tight">{data.stats.processing}</div>
+            <p className="text-xs text-muted-foreground mt-1">Currently being prepared</p>
           </CardContent>
         </Card>
-        <Card className="min-w-0">
+        <Card className="min-w-0 shadow-sm hover:shadow-md transition-all duration-200 border-border/60">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs md:text-sm font-medium">Out for Delivery</CardTitle>
-            <Truck className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Out for Delivery</CardTitle>
+            <Truck className="h-4 w-4 text-orange-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-lg md:text-2xl font-bold">{data.stats.outForDelivery}</div>
-            <p className="text-xs text-muted-foreground">Being delivered</p>
+            <div className="text-3xl font-bold tracking-tight">{data.stats.outForDelivery}</div>
+            <p className="text-xs text-muted-foreground mt-1">Being delivered</p>
           </CardContent>
         </Card>
-        <Card className="min-w-0">
+        <Card className="min-w-0 shadow-sm hover:shadow-md transition-all duration-200 border-border/60">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs md:text-sm font-medium">Accepted Orders</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Accepted Orders</CardTitle>
+            <CheckCircle className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-lg md:text-2xl font-bold">{data.stats.accepted}</div>
-            <p className="text-xs text-muted-foreground">Total accepted</p>
+            <div className="text-3xl font-bold tracking-tight">{data.stats.accepted}</div>
+            <p className="text-xs text-muted-foreground mt-1">Total accepted</p>
           </CardContent>
         </Card>
       </div>
 
-      <div className="mt-6">
+      <div className="mt-8">
         <OrdersList orders={data.recentOrders} onOrderUpdate={() => window.location.reload()} />
       </div>
-    </>
+    </div>
   );
 }

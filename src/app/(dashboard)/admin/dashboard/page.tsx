@@ -96,189 +96,241 @@ export default function AdminDashboardPage() {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-4">
-        <div className="text-sm text-muted-foreground">Showing data from {from.toLocaleDateString()} to {to.toLocaleDateString()}</div>
-        <div className="flex items-center gap-2">
-          <label htmlFor="range" className="text-sm">Range</label>
-          <select id="range" className="border rounded px-2 py-1 text-sm" value={rangePreset} onChange={e => setRangePreset(e.target.value as any)} title="Select date range">
-            <option value="7d">Last 7 days</option>
-            <option value="30d">Last 30 days</option>
-            <option value="90d">Last 90 days</option>
-          </select>
+      <div className="p-8 max-w-7xl mx-auto space-y-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+            <p className="text-muted-foreground mt-1">Showing data from {from.toLocaleDateString()} to {to.toLocaleDateString()}</p>
+          </div>
+          <div className="flex items-center gap-3 bg-card p-1 rounded-lg border shadow-sm">
+            <label htmlFor="range" className="text-sm font-medium px-2">Range</label>
+            <select 
+                id="range" 
+                className="bg-transparent text-sm font-medium focus:outline-none cursor-pointer" 
+                value={rangePreset} 
+                onChange={e => setRangePreset(e.target.value as any)} 
+                title="Select date range"
+            >
+              <option value="7d">Last 7 days</option>
+              <option value="30d">Last 30 days</option>
+              <option value="90d">Last 90 days</option>
+            </select>
+          </div>
         </div>
-      </div>
 
-      <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <Skeleton className="h-7 w-40" />
-            ) : (
-              <div className="text-2xl font-bold">GHS {data?.metrics.totalRevenue.toFixed(2)}</div>
-            )}
-            <p className="text-xs text-muted-foreground">Updated live</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
-            <CreditCard className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <Skeleton className="h-7 w-24" />
-            ) : (
-              <div className="text-2xl font-bold">{data?.metrics.totalSales}</div>
-            )}
-            <p className="text-xs text-muted-foreground">Orders in selected range</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg. Order Value</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <Skeleton className="h-7 w-28" />
-            ) : (
-              <div className="text-2xl font-bold">GHS {data?.metrics.avgOrderValue.toFixed(2)}</div>
-            )}
-            <p className="text-xs text-muted-foreground">Computed from selected range</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">New Customers</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <Skeleton className="h-7 w-20" />
-            ) : (
-              <div className="text-2xl font-bold">+{data?.metrics.newCustomers}</div>
-            )}
-            <p className="text-xs text-muted-foreground">Selected range</p>
-          </CardContent>
-        </Card>
-      </div>
-      <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
-        <Card className="xl:col-span-2">
-          <CardHeader>
-            <CardTitle>Recent Orders</CardTitle>
-            <CardDescription>A list of the most recent orders.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="space-y-2">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <Skeleton key={i} className="h-10 w-full" />
-                ))}
-              </div>
-            ) : (
-              <div className="overflow-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Code</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Total (GHS)</TableHead>
-                      <TableHead>Created</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {data?.recentOrders.map((o) => (
-                      <TableRow
-                        key={o.id}
-                        className="cursor-pointer hover:bg-muted/40 transition"
-                        onClick={() => { setSelectedOrder(o); setDrawerOpen(true); }}
-                        tabIndex={0}
-                        aria-label={`View order ${o.code}`}
-                      >
-                        <TableCell>{o.code}</TableCell>
-                        <TableCell className="capitalize">{String(o.status).replace('_',' ')}</TableCell>
-                        <TableCell>{o.total_price.toFixed(2)}</TableCell>
-                        <TableCell>{new Date(o.created_at).toLocaleString()}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Revenue Chart</CardTitle>
-             <CardDescription>Revenue in selected range.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <Skeleton className="h-[220px] w-full" />
-            ) : (
-              <div className="h-[220px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={series}>
-                    <defs>
-                      <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.4}/>
-                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.05}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
-                    <XAxis dataKey="date" tick={{ fontSize: 12 }} minTickGap={16} />
-                    <YAxis tick={{ fontSize: 12 }} width={60} />
-                    <Tooltip formatter={(v) => [`GHS ${(Number(v)||0).toFixed(2)}`, 'Revenue']} />
-                    <Area type="monotone" dataKey="amount" stroke="hsl(var(--primary))" fillOpacity={1} fill="url(#revenueGradient)" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Orders by Status</CardTitle>
-            <CardDescription>Distribution in selected range.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <Skeleton className="h-[220px] w-full" />
-            ) : (
-              <div className="space-y-3">
-                <div className="flex flex-wrap gap-2">
-                  {breakdown.map((b, idx) => (
-                    <button
-                      key={b.status}
-                      onClick={() => setActiveStatuses(s => s.includes(b.status) ? s.filter(x=>x!==b.status) : [...s, b.status])}
-                      className={`text-xs px-2 py-1 rounded border transition ${activeStatuses.includes(b.status) ? 'bg-primary/10 border-primary text-primary' : 'bg-muted border-muted-foreground/20 text-muted-foreground'}`}
-                      title={`Toggle ${b.status}`}
-                    >
-                      <span className={`inline-block w-2 h-2 mr-2 rounded-full ${colorClasses[idx % colorClasses.length]}`} aria-hidden />
-                      {b.status.replace(/_/g,' ')} ({b.count})
-                    </button>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <Card className="shadow-sm hover:shadow-md transition-all duration-200 border-border/60">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Revenue</CardTitle>
+              <DollarSign className="h-4 w-4 text-primary" />
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <Skeleton className="h-8 w-32" />
+              ) : (
+                <div className="text-3xl font-bold tracking-tight">GHS {data?.metrics.totalRevenue.toFixed(2)}</div>
+              )}
+              <p className="text-xs text-muted-foreground mt-1">Updated live</p>
+            </CardContent>
+          </Card>
+          <Card className="shadow-sm hover:shadow-md transition-all duration-200 border-border/60">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Sales</CardTitle>
+              <CreditCard className="h-4 w-4 text-primary" />
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <Skeleton className="h-8 w-24" />
+              ) : (
+                <div className="text-3xl font-bold tracking-tight">{data?.metrics.totalSales}</div>
+              )}
+              <p className="text-xs text-muted-foreground mt-1">Orders in selected range</p>
+            </CardContent>
+          </Card>
+          <Card className="shadow-sm hover:shadow-md transition-all duration-200 border-border/60">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Avg. Order Value</CardTitle>
+              <Activity className="h-4 w-4 text-primary" />
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <Skeleton className="h-8 w-28" />
+              ) : (
+                <div className="text-3xl font-bold tracking-tight">GHS {data?.metrics.avgOrderValue.toFixed(2)}</div>
+              )}
+              <p className="text-xs text-muted-foreground mt-1">Computed from selected range</p>
+            </CardContent>
+          </Card>
+          <Card className="shadow-sm hover:shadow-md transition-all duration-200 border-border/60">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">New Customers</CardTitle>
+              <Users className="h-4 w-4 text-primary" />
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <Skeleton className="h-8 w-20" />
+              ) : (
+                <div className="text-3xl font-bold tracking-tight">+{data?.metrics.newCustomers}</div>
+              )}
+              <p className="text-xs text-muted-foreground mt-1">Selected range</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
+          <Card className="xl:col-span-2 shadow-sm border-border/60">
+            <CardHeader>
+              <CardTitle>Recent Orders</CardTitle>
+              <CardDescription>A list of the most recent orders.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <div className="space-y-3">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Skeleton key={i} className="h-12 w-full rounded-lg" />
                   ))}
                 </div>
-                <div className="h-[220px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Tooltip formatter={(v, n) => [String(v), 'Orders']} />
-                      <Pie data={filteredBreakdown} dataKey="count" nameKey="status" innerRadius={40} outerRadius={80} paddingAngle={2}>
-                        {filteredBreakdown.map((entry, idx) => (
-                          <Cell key={`cell-${entry.status}`} fill={colors[idx % colors.length]} />
-                        ))}
-                      </Pie>
-                    </PieChart>
-                  </ResponsiveContainer>
+              ) : (
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-muted/50">
+                        <TableHead>Code</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Total (GHS)</TableHead>
+                        <TableHead>Created</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {data?.recentOrders.map((o) => (
+                        <TableRow
+                          key={o.id}
+                          className="cursor-pointer hover:bg-muted/50 transition-colors"
+                          onClick={() => { setSelectedOrder(o); setDrawerOpen(true); }}
+                          tabIndex={0}
+                          aria-label={`View order ${o.code}`}
+                        >
+                          <TableCell className="font-medium">{o.code}</TableCell>
+                          <TableCell className="capitalize">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground`}>
+                                {String(o.status).replace('_',' ')}
+                            </span>
+                          </TableCell>
+                          <TableCell>{o.total_price.toFixed(2)}</TableCell>
+                          <TableCell className="text-muted-foreground">{new Date(o.created_at).toLocaleDateString()}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+              )}
+            </CardContent>
+          </Card>
+          
+          <div className="space-y-8">
+            <Card className="shadow-sm border-border/60">
+                <CardHeader>
+                <CardTitle>Revenue Chart</CardTitle>
+                <CardDescription>Revenue trend over time.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                {loading ? (
+                    <Skeleton className="h-[250px] w-full" />
+                ) : (
+                    <div className="h-[250px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={series}>
+                        <defs>
+                            <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.0}/>
+                            </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.1} />
+                        <XAxis 
+                            dataKey="date" 
+                            tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} 
+                            tickLine={false}
+                            axisLine={false}
+                            minTickGap={20} 
+                        />
+                        <YAxis 
+                            tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} 
+                            tickLine={false}
+                            axisLine={false}
+                            width={40}
+                            tickFormatter={(value) => `${value/1000}k`}
+                        />
+                        <Tooltip 
+                            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                            formatter={(v) => [`GHS ${(Number(v)||0).toFixed(2)}`, 'Revenue']} 
+                        />
+                        <Area 
+                            type="monotone" 
+                            dataKey="amount" 
+                            stroke="hsl(var(--primary))" 
+                            strokeWidth={2}
+                            fillOpacity={1} 
+                            fill="url(#revenueGradient)" 
+                        />
+                        </AreaChart>
+                    </ResponsiveContainer>
+                    </div>
+                )}
+                </CardContent>
+            </Card>
+
+            <Card className="shadow-sm border-border/60">
+                <CardHeader>
+                <CardTitle>Orders by Status</CardTitle>
+                <CardDescription>Current distribution.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                {loading ? (
+                    <Skeleton className="h-[250px] w-full" />
+                ) : (
+                    <div className="space-y-4">
+                    <div className="flex flex-wrap gap-2 justify-center">
+                        {breakdown.map((b, idx) => (
+                        <button
+                            key={b.status}
+                            onClick={() => setActiveStatuses(s => s.includes(b.status) ? s.filter(x=>x!==b.status) : [...s, b.status])}
+                            className={`text-xs px-2.5 py-1 rounded-full border transition-all ${activeStatuses.includes(b.status) ? 'bg-primary/10 border-primary/20 text-primary font-medium' : 'bg-muted/50 border-transparent text-muted-foreground hover:bg-muted'}`}
+                        >
+                            <span className={`inline-block w-1.5 h-1.5 mr-1.5 rounded-full ${colorClasses[idx % colorClasses.length]}`} aria-hidden />
+                            {b.status.replace(/_/g,' ')} <span className="opacity-70 ml-0.5">({b.count})</span>
+                        </button>
+                        ))}
+                    </div>
+                    <div className="h-[200px] w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                            <Tooltip 
+                                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                                formatter={(v, n) => [String(v), 'Orders']} 
+                            />
+                            <Pie 
+                                data={filteredBreakdown} 
+                                dataKey="count" 
+                                nameKey="status" 
+                                innerRadius={60} 
+                                outerRadius={80} 
+                                paddingAngle={4}
+                                stroke="none"
+                            >
+                            {filteredBreakdown.map((entry, idx) => (
+                                <Cell key={`cell-${entry.status}`} fill={colors[idx % colors.length]} />
+                            ))}
+                            </Pie>
+                        </PieChart>
+                        </ResponsiveContainer>
+                    </div>
+                    </div>
+                )}
+                </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
       <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
         <DrawerContent>
