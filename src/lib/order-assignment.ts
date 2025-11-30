@@ -83,24 +83,23 @@ export async function autoAssignOrder(orderId: number, deliveryArea: string) {
             pharmacy_id: pharmacyId,
             pharmacy_ack_status: 'pending'
         })
-        .eq('id', orderId)
+        .eq('id', id)
 
     if (error) {
         console.error('Order assignment failed:', error.message)
         return { error: error.message }
     }
 
-    // Log event
     await supabase
         .from('order_events')
         .insert({
-            order_id: orderId,
+            order_id: id,
             status: 'assigned',
             note: `Order auto-assigned to pharmacy ${pharmacyId}`
         })
 
     // TODO: Send SMS notification to pharmacy
-    // await notifyPharmacy(pharmacyId, orderId)
+    // await notifyPharmacy(pharmacyId, id)
 
     return {
         success: true,
@@ -113,7 +112,7 @@ export async function autoAssignOrder(orderId: number, deliveryArea: string) {
 /**
  * Manually assign order to specific pharmacy (admin override)
  */
-export async function manuallyAssignOrder(orderId: number, pharmacyId: number) {
+export async function manuallyAssignOrder(id: number, pharmacyId: number) {
     const supabase = getSupabaseAdminClient()
 
     const { error } = await supabase
@@ -122,23 +121,26 @@ export async function manuallyAssignOrder(orderId: number, pharmacyId: number) {
             pharmacy_id: pharmacyId,
             pharmacy_ack_status: 'pending'
         })
-        .eq('id', orderId)
+        .eq('id', id)
 
     if (error) {
         console.error('Manual order assignment failed:', error.message)
         return { error: error.message }
     }
-
     // Log event
     await supabase
         .from('order_events')
         .insert({
-            order_id: orderId,
+            order_id: id,
             status: 'assigned',
             note: `Order manually assigned to pharmacy ${pharmacyId}`
         })
 
-    return { success: true }
+    return {
+        success: true,
+        pharmacyId,
+        message: "Order manually assigned successfully"
+    }
 }
 
 /**

@@ -28,7 +28,8 @@ const getSEOConfig = () => {
         twitter: "@DiscreetKitGH"
       },
       keywords: {
-        primary: ["discreet health products Ghana", "confidential self-test kits"]
+        primary: ["discreet health products Ghana", "confidential self-test kits"],
+        secondary: ["HIV test kit Ghana", "pregnancy test Ghana", "STI testing", "sexual health", "postpill Ghana", "discreet delivery Ghana"]
       }
     };
   }
@@ -270,6 +271,96 @@ export function generateFAQSchema(faqs: { question: string; answer: string }[]) 
         '@type': 'Answer',
         text: faq.answer
       }
+    }))
+  };
+}
+
+export function generateReviewSchema({
+  productName,
+  reviews = [],
+  aggregateRating
+}: {
+  productName: string;
+  reviews?: Array<{
+    author: string;
+    rating: number;
+    reviewBody: string;
+    datePublished: string;
+  }>;
+  aggregateRating?: {
+    ratingValue: number;
+    reviewCount: number;
+  };
+}) {
+  const schema: any = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: productName,
+  };
+
+  if (reviews.length > 0) {
+    schema.review = reviews.map(review => ({
+      '@type': 'Review',
+      author: {
+        '@type': 'Person',
+        name: review.author
+      },
+      reviewRating: {
+        '@type': 'Rating',
+        ratingValue: review.rating,
+        bestRating: 5
+      },
+      reviewBody: review.reviewBody,
+      datePublished: review.datePublished
+    }));
+  }
+
+  if (aggregateRating) {
+    schema.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: aggregateRating.ratingValue,
+      reviewCount: aggregateRating.reviewCount,
+      bestRating: 5,
+      worstRating: 1
+    };
+  }
+
+  return schema;
+}
+
+export function generateHowToSchema({
+  name,
+  description,
+  steps,
+  totalTime,
+  supply = []
+}: {
+  name: string;
+  description: string;
+  steps: Array<{
+    name: string;
+    text: string;
+    image?: string;
+  }>;
+  totalTime?: string;
+  supply?: string[];
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name,
+    description,
+    totalTime,
+    supply: supply.map(item => ({
+      '@type': 'HowToSupply',
+      name: item
+    })),
+    step: steps.map((step, index) => ({
+      '@type': 'HowToStep',
+      position: index + 1,
+      name: step.name,
+      text: step.text,
+      ...(step.image && { image: step.image })
     }))
   };
 }

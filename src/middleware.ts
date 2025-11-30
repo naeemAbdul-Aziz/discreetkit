@@ -1,32 +1,63 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { createSupabaseMiddlewareClient, getUserRoles } from '@/lib/supabase';
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
+    // 1. Initialize Supabase and check auth
+    const { supabase, response } = createSupabaseMiddlewareClient(request);
+    const { data: { user } } = await supabase.auth.getUser();
+
     const url = request.nextUrl;
     const hostname = request.headers.get('host') || '';
 
-    // Check for admin subdomain (admin.discreetkit.com or admin.localhost:3000)
-    if (hostname.startsWith('admin.')) {
-        // If root path, rewrite to /admin/dashboard
+    // 2. Define protected domains/paths
+    const isAdminSubdomain = hostname.startsWith('admin.');
+    const isPharmacySubdomain = hostname.startsWith('pharmacy.');
+    const isAdminPath = url.pathname.startsWith('/admin');
+    const isPharmacyPath = url.pathname.startsWith('/pharmacy');
+
+    // 3. Auth Protection: Redirect to login if not authenticated
+    if ((isAdminSubdomain || isPharmacySubdomain || isAdminPath || isPharmacyPath) && !user) {
+        if (!url.pathname.startsWith('/login')) {
+            // Preserve return URL for post-login redirect
+            const loginUrl = new URL('/login', process.env.NEXT_PUBLIC_SITE_URL || 'https://discreetkit.shop');
+            loginUrl.searchParams.set('redirect_to', url.href);
+            return NextResponse.redirect(loginUrl);
+        }
+    }
+
+    // 4. Role-based protection for admin and pharmacy
+    if (user && (isAdminSubdomain || isAdminPath)) {
+        const roles = await getUserRoles(supabase, user.id);
+        if (!roles.includes('admin')) {
+            // Redirect to unauthorized page (same host if possible)
+            url.pathname = '/unauthorized';
+            return NextResponse.redirect(url);
+        }
+    }
+    if (user && (isPharmacySubdomain || isPharmacyPath)) {
+        const roles = await getUserRoles(supabase, user.id);
+        if (!roles.includes('pharmacy')) {
+            url.pathname = '/unauthorized';
+            return NextResponse.redirect(url);
+        }
+    }
+
+    // 5. Subdomain Rewrites
+    if (isAdminSubdomain) {
         if (url.pathname === '/') {
             url.pathname = '/admin/dashboard';
         } else {
-            // Otherwise, rewrite to /admin/[path]
-            // Ensure we don't double-prefix if the path already starts with /admin (unlikely but safe)
             if (!url.pathname.startsWith('/admin')) {
                 url.pathname = `/admin${url.pathname}`;
             }
         }
         return NextResponse.rewrite(url);
     }
-
-    // Check for pharmacy subdomain (pharmacy.discreetkit.com or pharmacy.localhost:3000)
-    if (hostname.startsWith('pharmacy.')) {
-        // If root path, rewrite to /pharmacy/dashboard
+    if (isPharmacySubdomain) {
         if (url.pathname === '/') {
             url.pathname = '/pharmacy/dashboard';
         } else {
-            // Otherwise, rewrite to /pharmacy/[path]
             if (!url.pathname.startsWith('/pharmacy')) {
                 url.pathname = `/pharmacy${url.pathname}`;
             }
@@ -34,8 +65,8 @@ export function middleware(request: NextRequest) {
         return NextResponse.rewrite(url);
     }
 
-    // Default behavior for main domain (discreetkit.com)
-    return NextResponse.next();
+    // Default behavior
+    return response;
 }
 
 export const config = {

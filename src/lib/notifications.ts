@@ -5,14 +5,14 @@ import { sendSMS } from './actions'
  * Sends a notification SMS to the assigned pharmacy for a given order.
  * Creates/updates a pharmacy_notifications row for auditing.
  */
-export async function sendPharmacyOrderNotification(orderId: number, pharmacyId: number) {
+export async function sendPharmacyOrderNotification(id: number, pharmacyId: number) {
   const supabase = getSupabaseAdminClient()
 
   // Fetch order & pharmacy details
   const { data: order, error: orderError } = await supabase
     .from('orders')
     .select('id, code, delivery_area, subtotal, total_price, pharmacy_id')
-    .eq('id', orderId)
+    .eq('id', id)
     .single()
   if (orderError || !order) {
     console.error('Pharmacy notify: order fetch error', orderError)

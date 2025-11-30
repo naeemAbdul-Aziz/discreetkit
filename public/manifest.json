@@ -1,7 +1,7 @@
 {
-  "name": "DiscreetKit Ghana",
+  "name": "DiscreetKit Ghana - Confidential Health Products",
   "short_name": "DiscreetKit",
-  "description": "Confidential health products delivered discreetly across Ghana",
+  "description": "Order confidential self-test kits for HIV, pregnancy, and more. Get wellness products delivered discreetly to your door in Ghana.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -9,7 +9,7 @@
   "orientation": "portrait",
   "scope": "/",
   "lang": "en",
-  "categories": ["health", "medical", "shopping"],
+  "categories": ["health", "medical", "wellness", "shopping"],
   "icons": [
     {
       "src": "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762356008/discreetkit_profile_photo_voqfia.png",
@@ -24,6 +24,44 @@
       "purpose": "any"
     }
   ],
+  "shortcuts": [
+    {
+      "name": "Browse Products",
+      "short_name": "Products",
+      "description": "Browse all health products",
+      "url": "/products",
+      "icons": [
+        {
+          "src": "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762356008/discreetkit_profile_photo_voqfia.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Track Order",
+      "short_name": "Track",
+      "description": "Track your order status",
+      "url": "/track",
+      "icons": [
+        {
+          "src": "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762356008/discreetkit_profile_photo_voqfia.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Contact Support",
+      "short_name": "Support",
+      "description": "Get help and support",
+      "url": "/partner-care",
+      "icons": [
+        {
+          "src": "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762356008/discreetkit_profile_photo_voqfia.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
   "screenshots": [
     {
       "src": "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762356008/discreetkit_profile_photo_voqfia.png",
@@ -31,5 +69,7 @@
       "type": "image/png",
       "form_factor": "wide"
     }
-  ]
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
 }

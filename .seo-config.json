@@ -16,7 +16,7 @@
     "name": "DiscreetKit Ghana",
     "description": "Leading provider of confidential health products and self-test kits in Ghana",
     "email": "hello@discreetkit.com",
-    "phone": "+233500000000",
+    "phone": "+233203001107",
     "address": {
       "streetAddress": "",
       "addressLocality": "Accra",
@@ -26,7 +26,6 @@
     },
     "priceRange": "₵₵",
     "paymentAccepted": [
-      "Cash on Delivery",
       "Mobile Money",
       "Credit Card"
     ],
@@ -45,10 +44,10 @@
     ]
   },
   "social": {
-    "twitter": "@DiscreetKitGH",
-    "instagram": "@DiscreetKitGH",
-    "facebook": "DiscreetKitGhana",
-    "linkedin": "company/discreetkit-ghana"
+    "twitter": "@DiscreetKit",
+    "instagram": "@DiscreetKit",
+    "facebook": "DiscreetKit",
+    "linkedin": "company/discreetkit"
   },
   "keywords": {
     "primary": [

@@ -1,27 +1,107 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Package, Truck, CheckCircle, Clock } from 'lucide-react'
-import { getPharmacyStats, getPharmacyOrders, getCurrentPharmacy } from '@/lib/pharmacy-actions'
-import { OrdersList } from './orders-list'
-import { redirect } from 'next/navigation'
+'use client';
 
-export default async function PharmacyDashboardPage() {
-  // Get pharmacy info
-  const { pharmacy, error: pharmError } = await getCurrentPharmacy()
-  
-  // SECURITY: Immediately redirect if not authenticated or no pharmacy found
-  if (pharmError || !pharmacy) {
-    redirect('/login')
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Package, Truck, CheckCircle, Clock, AlertCircle } from 'lucide-react'
+import { OrdersList } from './orders-list'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Skeleton } from '@/components/ui/skeleton'
+
+type PharmacyData = {
+  pharmacy: { id: number; name: string; location: string };
+  stats: { pending: number; accepted: number; processing: number; outForDelivery: number };
+  recentOrders: any[];
+  statusBreakdown: { status: string; count: number }[];
+};
+
+export default function PharmacyDashboardPage() {
+  const router = useRouter();
+  const [data, setData] = useState<PharmacyData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setError(null);
+        const res = await fetch('/api/pharmacy/dashboard', { cache: 'no-store' });
+        
+        if (res.status === 401) {
+          router.push('/login');
+          return;
+        }
+        
+        if (res.status === 403) {
+          router.push('/unauthorized');
+          return;
+        }
+        
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
+          throw new Error(errorData.error || 'Failed to load dashboard');
+        }
+        
+        const json = await res.json();
+        setData(json);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load dashboard');
+        console.error('[PharmacyDashboard] Error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+    
+    // Refresh every 30 seconds for real-time updates
+    const interval = setInterval(loadData, 30000);
+    return () => clearInterval(interval);
+  }, [router]);
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="mb-6 px-2 md:px-0">
+          <Skeleton className="h-8 w-48 mb-2" />
+          <Skeleton className="h-4 w-32" />
+        </div>
+        <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i} className="min-w-0">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-4" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-6 w-8 mb-1" />
+                <Skeleton className="h-3 w-20" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
   }
 
-  // Get stats and recent orders
-  const { stats } = await getPharmacyStats()
-  const { orders } = await getPharmacyOrders()
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (!data) {
+    return null;
+  }
 
   return (
     <>
       <div className="mb-6 px-2 md:px-0">
-        <h2 className="text-2xl md:text-3xl font-bold tracking-tight break-words">{pharmacy.name}</h2>
-        <p className="text-muted-foreground text-sm md:text-base break-words">{pharmacy.location}</p>
+        <h2 className="text-2xl md:text-3xl font-bold tracking-tight break-words">{data.pharmacy.name}</h2>
+        <p className="text-muted-foreground text-sm md:text-base break-words">{data.pharmacy.location}</p>
       </div>
 
       <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-4">
@@ -31,7 +111,7 @@ export default async function PharmacyDashboardPage() {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-lg md:text-2xl font-bold">{stats?.pending || 0}</div>
+            <div className="text-lg md:text-2xl font-bold">{data.stats.pending}</div>
             <p className="text-xs text-muted-foreground">Awaiting processing</p>
           </CardContent>
         </Card>
@@ -41,7 +121,7 @@ export default async function PharmacyDashboardPage() {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-lg md:text-2xl font-bold">{stats?.processing || 0}</div>
+            <div className="text-lg md:text-2xl font-bold">{data.stats.processing}</div>
             <p className="text-xs text-muted-foreground">Currently being prepared</p>
           </CardContent>
         </Card>
@@ -51,33 +131,25 @@ export default async function PharmacyDashboardPage() {
             <Truck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-lg md:text-2xl font-bold">{stats?.outForDelivery || 0}</div>
-            <p className="text-xs text-muted-foreground">On their way to customers</p>
+            <div className="text-lg md:text-2xl font-bold">{data.stats.outForDelivery}</div>
+            <p className="text-xs text-muted-foreground">Being delivered</p>
           </CardContent>
         </Card>
         <Card className="min-w-0">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs md:text-sm font-medium">Completed This Week</CardTitle>
+            <CardTitle className="text-xs md:text-sm font-medium">Accepted Orders</CardTitle>
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-lg md:text-2xl font-bold">+{stats?.completedThisWeek || 0}</div>
-            <p className="text-xs text-muted-foreground">Successfully delivered</p>
+            <div className="text-lg md:text-2xl font-bold">{data.stats.accepted}</div>
+            <p className="text-xs text-muted-foreground">Total accepted</p>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid gap-4 mt-6 px-2 md:px-0">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base md:text-lg">Recent Orders</CardTitle>
-            <CardDescription className="text-xs md:text-sm">Orders assigned to your pharmacy</CardDescription>
-          </CardHeader>
-          <CardContent className="p-2 md:p-6">
-            <OrdersList orders={orders || []} pharmacyId={pharmacy.id} />
-          </CardContent>
-        </Card>
+      <div className="mt-6">
+        <OrdersList orders={data.recentOrders} onOrderUpdate={() => window.location.reload()} />
       </div>
     </>
-  )
+  );
 }

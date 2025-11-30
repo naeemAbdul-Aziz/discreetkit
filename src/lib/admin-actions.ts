@@ -481,3 +481,172 @@ export async function updateStoreSettings(data: SettingsFormValues) {
     revalidatePath('/admin/settings')
     return { success: true }
 }
+
+// --- Pharmacy Products Management ---
+
+const pharmacyProductSchema = z.object({
+    pharmacy_id: z.number(),
+    product_id: z.number(),
+    stock_level: z.number().min(0),
+    reorder_level: z.number().min(0).default(10),
+    pharmacy_price_ghs: z.number().min(0).optional(),
+    is_available: z.boolean().default(true),
+})
+
+export type PharmacyProductFormValues = z.infer<typeof pharmacyProductSchema>
+
+export async function getPharmacyProducts(pharmacyId: number) {
+    const supabase = await createSupabaseServerClient()
+    const { data, error } = await supabase
+        .from('pharmacy_products')
+        .select(`
+            *,
+            products (
+                id,
+                name,
+                category,
+                price_ghs,
+                image_url,
+                requires_prescription
+            )
+        `)
+        .eq('pharmacy_id', pharmacyId)
+        .order('created_at', { ascending: false })
+
+    if (error) throw new Error(error.message)
+    return data || []
+}
+
+export async function upsertPharmacyProduct(data: PharmacyProductFormValues) {
+    const supabase = await createSupabaseServerClient()
+    const validated = pharmacyProductSchema.parse(data)
+
+    const { error } = await supabase
+        .from('pharmacy_products')
+        .upsert({
+            ...validated,
+            last_updated: new Date().toISOString()
+        })
+
+    if (error) return { error: error.message }
+
+    revalidatePath(`/admin/partners/${validated.pharmacy_id}`)
+    return { success: true }
+}
+
+export async function updatePharmacyProductStock(
+    pharmacyId: number,
+    productId: number,
+    stockLevel: number
+) {
+    const supabase = await createSupabaseServerClient()
+    
+    const { error } = await supabase
+        .from('pharmacy_products')
+        .update({
+            stock_level: stockLevel,
+            last_updated: new Date().toISOString()
+        })
+        .eq('pharmacy_id', pharmacyId)
+        .eq('product_id', productId)
+
+    if (error) return { error: error.message }
+
+    revalidatePath(`/admin/partners/${pharmacyId}`)
+    return { success: true }
+}
+
+export async function bulkAssignProductsToPharmacy(
+    pharmacyId: number,
+    productIds: number[],
+    defaultStockLevel: number = 0
+) {
+    const supabase = await createSupabaseServerClient()
+
+    const pharmacyProducts = productIds.map(productId => ({
+        pharmacy_id: pharmacyId,
+        product_id: productId,
+        stock_level: defaultStockLevel,
+        reorder_level: 10,
+        is_available: true
+    }))
+
+    const { error } = await supabase
+        .from('pharmacy_products')
+        .upsert(pharmacyProducts, { onConflict: 'pharmacy_id,product_id' })
+
+    if (error) return { error: error.message }
+
+    revalidatePath(`/admin/partners/${pharmacyId}`)
+    return { success: true }
+}
+
+export async function deletePharmacyProduct(pharmacyId: number, productId: number) {
+    const supabase = await createSupabaseServerClient()
+    
+    const { error } = await supabase
+        .from('pharmacy_products')
+        .delete()
+        .eq('pharmacy_id', pharmacyId)
+        .eq('product_id', productId)
+
+    if (error) return { error: error.message }
+
+    revalidatePath(`/admin/partners/${pharmacyId}`)
+    return { success: true }
+}
+
+// --- Enhanced Order Management ---
+
+export async function reassignOrder(orderId: number, newPharmacyId: number) {
+    const supabase = await createSupabaseServerClient()
+
+    // Update order
+    const { error: orderError } = await supabase
+        .from('orders')
+        .update({
+            pharmacy_id: newPharmacyId,
+            pharmacy_ack_status: 'pending'
+        })
+        .eq('id', orderId)
+
+    if (orderError) return { error: orderError.message }
+
+    // Log event
+    await supabase
+        .from('order_events')
+        .insert({
+            order_id: orderId,
+            status: 'reassigned',
+            note: `Order reassigned to pharmacy ${newPharmacyId}`
+        })
+
+    revalidatePath('/admin/orders')
+    return { success: true }
+}
+
+export async function getPharmacyAnalytics(pharmacyId: number) {
+    const supabase = await createSupabaseServerClient()
+
+    // Get order stats
+    const { data: orderStats } = await supabase
+        .from('orders')
+        .select('status, total_price')
+        .eq('pharmacy_id', pharmacyId)
+
+    // Get product count
+    const { data: productCount } = await supabase
+        .from('pharmacy_products')
+        .select('id')
+        .eq('pharmacy_id', pharmacyId)
+
+    return {
+        totalOrders: orderStats?.length || 0,
+        totalRevenue: orderStats?.reduce((sum, order) => sum + (order.total_price || 0), 0) || 0,
+        productCount: productCount?.length || 0,
+        ordersByStatus: orderStats?.reduce((acc, order) => {
+            acc[order.status] = (acc[order.status] || 0) + 1
+            return acc
+        }, {} as Record<string, number>) || {}
+    }
+}

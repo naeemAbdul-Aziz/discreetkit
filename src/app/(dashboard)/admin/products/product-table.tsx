@@ -115,8 +115,8 @@ export function ProductTable({ initialProducts }: { initialProducts: Product[] }
 
   const getStatus = (stock: number) => {
     if (stock === 0) return { label: "Out of Stock", variant: "destructive" as const }
-    if (stock < 10) return { label: "Low Stock", variant: "secondary" as const }
-    return { label: "Active", variant: "default" as const }
+    if (stock < 10) return { label: "Low Stock", variant: "warning" as const }
+    return { label: "Active", variant: "success" as const }
   }
 
   return (

@@ -106,6 +106,20 @@ export function createSupabaseMiddlewareClient(request: NextRequest) {
   return { supabase, response };
 }
 
+/**
+ * Fetches an array of role names for a given user id using the provided Supabase client.
+ * Used in middleware for role-based access control.
+ */
+export async function getUserRoles(supabase: any, userId: string): Promise<string[]> {
+  if (!userId) return [];
+  const { data, error } = await supabase
+    .from('user_roles')
+    .select('roles(name)')
+    .eq('user_id', userId);
+  if (error || !data) return [];
+  // data: [{ roles: { name: 'admin' } }, ...]
+  return data.map((r: any) => r.roles?.name).filter(Boolean);
+}
 
 // --- This is for ADMIN-LEVEL Server Actions ---
 /**

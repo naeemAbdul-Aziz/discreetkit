@@ -1,6 +1,6 @@
 
 import { NextResponse } from 'next/server';
-import { createSupabaseServerClient, getSupabaseAdminClient } from '@/lib/supabase';
+import { createSupabaseServerClient, getSupabaseAdminClient, getUserRoles } from '@/lib/supabase';
 
 export async function GET(req: Request) {
   try {
@@ -8,6 +8,12 @@ export async function GET(req: Request) {
     const supabaseServer = await createSupabaseServerClient();
     const { data: { user } } = await supabaseServer.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    // Check admin role
+    const roles = await getUserRoles(supabaseServer, user.id);
+    if (!roles.includes('admin')) {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    }
 
     const supabase = getSupabaseAdminClient();
 

@@ -6,13 +6,15 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, CreditCard, Activity, Users } from 'lucide-react';
+import { DollarSign, CreditCard, Activity, Users, AlertCircle } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, AreaChart, Area, PieChart, Pie, Cell } from 'recharts';
 import { useEffect, useMemo, useState } from 'react';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerClose } from '@/components/ui/drawer';
 import { useSSE } from '@/hooks/use-sse';
+import { useRouter } from 'next/navigation';
 
 type RecentOrder = { id: number; code: string; status: string; total_price: number; created_at: string };
 type DashboardData = {
@@ -23,8 +25,10 @@ type DashboardData = {
 };
 
 export default function AdminDashboardPage() {
+  const router = useRouter();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [rangePreset, setRangePreset] = useState<'7d'|'30d'|'90d'>('30d');
   const [from, to] = useMemo(() => {
     const now = new Date();
@@ -37,11 +41,30 @@ export default function AdminDashboardPage() {
     let timer: any;
     const load = async () => {
       try {
+        setError(null);
         const params = new URLSearchParams({ from: from.toISOString(), to: to.toISOString() });
         const res = await fetch(`/api/admin/dashboard?${params.toString()}`, { cache: 'no-store' });
-        if (!res.ok) throw new Error('Failed to load dashboard');
+        
+        if (res.status === 401) {
+          router.push('/login');
+          return;
+        }
+        
+        if (res.status === 403) {
+          router.push('/unauthorized');
+          return;
+        }
+        
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
+          throw new Error(errorData.error || 'Failed to load dashboard');
+        }
+        
         const json = await res.json();
         setData(json);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load dashboard');
+        console.error('[AdminDashboard] Error:', err);
       } finally {
         setLoading(false);
       }

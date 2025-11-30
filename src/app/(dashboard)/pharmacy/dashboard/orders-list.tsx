@@ -1,14 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRealtimeOrders } from "@/hooks/use-realtime-orders"
+import { useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { CheckCircle, XCircle, Truck, Package, Eye } from "lucide-react"
-import { acceptOrder, declineOrder, updatePharmacyOrderStatus } from "@/lib/pharmacy-actions"
 import { useToast } from "@/hooks/use-toast"
-import { useRouter } from "next/navigation"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,103 +24,109 @@ interface Order {
   code: string
   created_at: string
   status: string
-  delivery_area: string
+  pharmacy_ack_status?: string
   total_price: number
   items: any
-  pharmacy_ack_status: string
+  delivery_area?: string
 }
 
-export function OrdersList({ orders: initialOrders, pharmacyId }: { orders: Order[], pharmacyId: number }) {
+interface OrdersListProps {
+  orders: Order[]
+  onOrderUpdate?: () => void
+}
+
+export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
   const { toast } = useToast()
-  const router = useRouter()
   const [loading, setLoading] = useState<number | null>(null)
   const [declineDialogOpen, setDeclineDialogOpen] = useState(false)
-  const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null)
+  const [selectedId, setSelectedId] = useState<number | null>(null)
   const [declineReason, setDeclineReason] = useState("")
-  const [orders, setOrders] = useState<Order[]>(initialOrders)
   const [detailsSheetOpen, setDetailsSheetOpen] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
-
-  useRealtimeOrders(pharmacyId, setOrders)
 
   const handleViewDetails = (order: Order) => {
     setSelectedOrder(order)
     setDetailsSheetOpen(true)
   }
 
-  const handleAccept = async (orderId: number) => {
-    setLoading(orderId)
-    const res = await acceptOrder(orderId)
+  const handleOrderAction = async (id: number, action: string, data: any = {}) => {
+    setLoading(id)
     
-    if (res.error) {
-      toast({ variant: "destructive", title: "Error", description: res.error })
-    } else {
-      toast({ title: "Order Accepted", description: "Order moved to processing" })
-      router.refresh()
+    try {
+      const res = await fetch(`/api/pharmacy/orders/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, ...data })
+      })
+      
+      const result = await res.json()
+      
+      if (!res.ok) {
+        throw new Error(result.error || 'Failed to update order')
+      }
+      
+      toast({ 
+        title: "Success", 
+        description: "Order updated successfully" 
+      })
+      
+      onOrderUpdate?.()
+    } catch (error) {
+      toast({ 
+        variant: "destructive", 
+        title: "Error", 
+        description: error instanceof Error ? error.message : 'Failed to update order'
+      })
+    } finally {
+      setLoading(null)
     }
-    setLoading(null)
   }
 
-  const handleDeclineClick = (orderId: number) => {
-    setSelectedOrderId(orderId)
+  const handleAccept = async (id: number) => {
+    await handleOrderAction(id, 'acknowledge', { pharmacy_ack_status: 'accepted' })
+  }
+
+  const handleDeclineClick = (id: number) => {
+    setSelectedId(id)
     setDeclineDialogOpen(true)
   }
 
   const handleDeclineConfirm = async () => {
-    if (!selectedOrderId || !declineReason.trim()) {
+    if (!selectedId || !declineReason.trim()) {
       toast({ variant: "destructive", title: "Error", description: "Please provide a reason" })
       return
     }
 
-    setLoading(selectedOrderId)
-    const res = await declineOrder(selectedOrderId, declineReason)
+    await handleOrderAction(selectedId, 'acknowledge', { 
+      pharmacy_ack_status: 'declined',
+      note: declineReason 
+    })
     
-    if (res.error) {
-      toast({ variant: "destructive", title: "Error", description: res.error })
-    } else {
-      toast({ title: "Order Declined", description: "Order unassigned from your pharmacy" })
-      router.refresh()
-    }
-    
-    setLoading(null)
     setDeclineDialogOpen(false)
     setDeclineReason("")
-    setSelectedOrderId(null)
+    setSelectedId(null)
   }
 
-  const handleMarkOutForDelivery = async (orderId: number) => {
-    setLoading(orderId)
-    const res = await updatePharmacyOrderStatus(orderId, 'out_for_delivery')
-    
-    if (res.error) {
-      toast({ variant: "destructive", title: "Error", description: res.error })
-    } else {
-      toast({ title: "Status Updated", description: "Order marked as out for delivery" })
-      router.refresh()
-    }
-    setLoading(null)
+  const handleMarkOutForDelivery = async (id: number) => {
+    await handleOrderAction(id, 'update_status', { status: 'out_for_delivery' })
   }
 
-  const handleMarkCompleted = async (orderId: number) => {
-    setLoading(orderId)
-    const res = await updatePharmacyOrderStatus(orderId, 'completed')
-    
-    if (res.error) {
-      toast({ variant: "destructive", title: "Error", description: res.error })
-    } else {
-      toast({ title: "Order Completed", description: "Order marked as completed" })
-      router.refresh()
-    }
-    setLoading(null)
+  const handleMarkCompleted = async (id: number) => {
+    await handleOrderAction(id, 'update_status', { status: 'completed' })
     setDetailsSheetOpen(false)
   }
 
-  const getStatusBadge = (status: string) => {
-    const variants: Record<string, { variant: any; label: string }> = {
-      received: { variant: "secondary", label: "New" },
-      processing: { variant: "default", label: "Processing" },
-      out_for_delivery: { variant: "default", label: "Out for Delivery" },
-      completed: { variant: "outline", label: "Completed" }
+  const getStatusBadge = (status: string, ackStatus?: string) => {
+    if (status === 'received' && ackStatus === 'pending') {
+      return <Badge variant="info" className="gap-1"><div className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse" />New Assignment</Badge>
+    }
+    
+    const variants: Record<string, { variant: "secondary" | "default" | "destructive" | "outline" | "success" | "warning" | "info" | "neutral"; label: string; icon?: any }> = {
+      received: { variant: "secondary", label: "Received" },
+      processing: { variant: "info", label: "Processing" },
+      out_for_delivery: { variant: "warning", label: "Out for Delivery" },
+      completed: { variant: "success", label: "Completed" },
+      cancelled: { variant: "destructive", label: "Cancelled" }
     }
     const config = variants[status] || { variant: "secondary", label: status }
     return <Badge variant={config.variant}>{config.label}</Badge>
@@ -141,20 +144,21 @@ export function OrdersList({ orders: initialOrders, pharmacyId }: { orders: Orde
   return (
     <>
       <div className="space-y-4">
+        <h3 className="text-lg font-semibold mb-4">Recent Orders</h3>
         {orders.map((order) => {
           const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items
           const itemCount = Array.isArray(items) ? items.length : 0
 
           return (
-            <Card key={order.id} className="p-4 hover:shadow-md transition-shadow cursor-pointer" onClick={() => handleViewDetails(order)}>
+            <Card key={order.id} className="p-4 hover:shadow-md transition-shadow">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="font-mono font-semibold">{order.code}</span>
-                    {getStatusBadge(order.status)}
+                    {getStatusBadge(order.status, order.pharmacy_ack_status)}
                   </div>
                   <div className="text-sm text-muted-foreground space-y-1">
-                    <p>Delivery: {order.delivery_area}</p>
+                    <p>Delivery: {order.delivery_area || 'Not specified'}</p>
                     <p>Items: {itemCount} • Total: GHS {order.total_price.toFixed(2)}</p>
                     <p className="text-xs">
                       {new Date(order.created_at).toLocaleString()}
@@ -162,7 +166,7 @@ export function OrdersList({ orders: initialOrders, pharmacyId }: { orders: Orde
                   </div>
                 </div>
 
-                <div className="flex gap-2 flex-wrap" onClick={(e) => e.stopPropagation()}>
+                <div className="flex gap-2 flex-wrap">
                   <Button
                     size="sm"
                     variant="outline"
@@ -239,7 +243,7 @@ export function OrdersList({ orders: initialOrders, pharmacyId }: { orders: Orde
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => {
               setDeclineReason("")
-              setSelectedOrderId(null)
+              setSelectedId(null)
             }}>
               Cancel
             </AlertDialogCancel>

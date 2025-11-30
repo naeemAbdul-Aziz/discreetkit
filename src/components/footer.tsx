@@ -16,7 +16,24 @@ const footerNav = [
   {
     title: 'Shop',
     links: [
+      { href: '/products', label: 'All Products' },
+      { href: '/products/test-kits', label: 'Test Kits' },
+      { href: '/products/bundles', label: 'Bundles' },
+      { href: '/track', label: 'Track Order' },
+    ]
+  },
+  {
+    title: 'Support',
+    links: [
+      { href: '/partner-care', label: 'Customer Care' },
+      { href: '/partner-with-us', label: 'Partner With Us' },
+    ]
+  },
+  {
+    title: 'Legal',
+    links: [
       { href: '/terms', label: 'Terms of Service' },
+      { href: '/privacy', label: 'Privacy Policy' },
     ]
   }
 ];

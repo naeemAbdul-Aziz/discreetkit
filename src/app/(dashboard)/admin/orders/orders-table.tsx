@@ -81,35 +81,66 @@ export function OrdersTable({ initialOrders, pharmacies }: { initialOrders: Orde
   const paginatedOrders = filteredOrders.slice((page-1)*pageSize, page*pageSize)
 
   const handleStatusChange = async (id: number, status: string) => {
-    const res = await updateOrderStatus(id, status)
-    if (res.error) {
-      toast({ variant: "destructive", title: "Error", description: res.error })
-    } else {
-      toast({ title: "Updated", description: `Order status changed to ${titleCase(status)}.` })
-      setOrders(prev => prev.map(o => o.id===id ? { ...o, status } : o))
+    try {
+      const res = await updateOrderStatus(id, status)
+      if (res.error) {
+        toast({ variant: "destructive", title: "Error", description: res.error })
+      } else {
+        toast({ title: "Status Updated", description: `Order status changed to ${status}` })
+        setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o))
+      }
+    } catch (error) {
+      toast({ variant: "destructive", title: "Error", description: "Failed to update status" })
     }
   }
 
-  const handleAssignPharmacy = async (orderId: number, pharmacyId: number) => {
-    setAssigningId(orderId)
-    const res = await assignPharmacy(orderId, pharmacyId)
-    if (res.error) {
-      toast({ variant: "destructive", title: "Error", description: res.error })
-    } else {
-      toast({ title: "Assigned", description: "Pharmacy assigned successfully." })
-      // No need to refresh, realtime will update orders
+  const handleAssignPharmacy = async (id: number, pharmacyId: number) => {
+    setAssigningId(id)
+    try {
+      const response = await fetch(`/api/admin/orders/${id}/reassign`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pharmacy_id: pharmacyId })
+      })
+
+      if (!response.ok) throw new Error('Failed to reassign order')
+
+      const result = await response.json()
+      
+      toast({ 
+        title: "Reassigned", 
+        description: result.message || "Order reassigned successfully." 
+      })
+      
+      // Update local state immediately
+      setOrders(prev => prev.map(o => 
+        o.id === id 
+          ? { 
+              ...o, 
+              pharmacy_id: pharmacyId, 
+              pharmacies: pharmacies.find(p => p.id === pharmacyId) || null 
+            } 
+          : o
+      ))
+    } catch (error: any) {
+      toast({ 
+        variant: "destructive", 
+        title: "Error", 
+        description: error.message || "Failed to reassign order" 
+      })
+    } finally {
+      setAssigningId(null)
     }
-    setAssigningId(null)
   }
 
   const getStatusBadge = (status: string) => {
     const base = titleCase(status)
     switch (status) {
-      case 'completed': return <Badge className="bg-green-500">{base}</Badge>
-      case 'processing': return <Badge className="bg-blue-500">{base}</Badge>
-      case 'out_for_delivery': return <Badge className="bg-purple-500">{base}</Badge>
-      case 'pending_payment': return <Badge variant="secondary">{base}</Badge>
-      case 'received': return <Badge className="bg-orange-500">{base}</Badge>
+      case 'completed': return <Badge variant="success">{base}</Badge>
+      case 'processing': return <Badge variant="info">{base}</Badge>
+      case 'out_for_delivery': return <Badge variant="warning">{base}</Badge>
+      case 'pending_payment': return <Badge variant="warning">{base}</Badge>
+      case 'received': return <Badge variant="secondary">{base}</Badge>
       default: return <Badge variant="outline">{base}</Badge>
     }
   }
@@ -264,12 +295,15 @@ export function OrdersTable({ initialOrders, pharmacies }: { initialOrders: Orde
                       </DropdownMenuSub>
 
                       <DropdownMenuSub>
-                        <DropdownMenuSubTrigger>Assign Pharmacy</DropdownMenuSubTrigger>
+                        <DropdownMenuSubTrigger>
+                          {order.pharmacy_id ? 'Reassign Pharmacy' : 'Assign Pharmacy'}
+                        </DropdownMenuSubTrigger>
                         <DropdownMenuSubContent>
                           <DropdownMenuRadioGroup value={order.pharmacy_id?.toString()} onValueChange={(val) => handleAssignPharmacy(order.id, parseInt(val))}>
                             {pharmacies.map(p => (
                               <DropdownMenuRadioItem key={p.id} value={p.id.toString()}>
                                 {p.name}
+                                {order.pharmacy_id === p.id && " (Current)"}
                               </DropdownMenuRadioItem>
                             ))}
                           </DropdownMenuRadioGroup>

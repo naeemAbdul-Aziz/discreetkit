@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import {
   Table,
   TableBody,
@@ -11,7 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { MoreHorizontal, Plus, Search, Trash2, Edit, MapPin, Phone, User, UserCheck } from "lucide-react"
+import { MoreHorizontal, Plus, Search, Trash2, Edit, MapPin, Phone, User, UserCheck, Package } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import {
   DropdownMenu,
@@ -150,14 +151,14 @@ export function PartnerTable({ initialPartners }: { initialPartners: Pharmacy[] 
             <div className="pt-2 border-t">
               {partner.user ? (
                 <div className="flex items-center gap-2">
-                  <Badge variant="default" className="gap-1">
+                  <Badge variant="success" className="gap-1">
                     <UserCheck className="h-3 w-3" />
                     Linked
                   </Badge>
                   <span className="text-xs text-muted-foreground">{partner.user.email}</span>
                 </div>
               ) : (
-                <Badge variant="outline" className="gap-1">
+                <Badge variant="neutral" className="gap-1">
                   <User className="h-3 w-3" />
                   No Account
                 </Badge>
@@ -212,14 +213,14 @@ export function PartnerTable({ initialPartners }: { initialPartners: Pharmacy[] 
                 <TableCell>
                   {partner.user ? (
                     <div className="flex items-center gap-2">
-                      <Badge variant="default" className="gap-1">
+                      <Badge variant="success" className="gap-1">
                         <UserCheck className="h-3 w-3" />
                         Linked
                       </Badge>
                       <span className="text-xs text-muted-foreground">{partner.user.email}</span>
                     </div>
                   ) : (
-                    <Badge variant="outline" className="gap-1">
+                    <Badge variant="neutral" className="gap-1">
                       <User className="h-3 w-3" />
                       No Account
                     </Badge>
@@ -235,8 +236,13 @@ export function PartnerTable({ initialPartners }: { initialPartners: Pharmacy[] 
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                      <DropdownMenuItem asChild>
+                        <Link href={`/admin/partners/${partner.id}`}>
+                          <Package className="mr-2 h-4 w-4" /> Manage Inventory
+                        </Link>
+                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleEdit(partner)}>
-                        <Edit className="mr-2 h-4 w-4" /> Edit
+                        <Edit className="mr-2 h-4 w-4" /> Edit Details
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(partner.id)}>

@@ -23,6 +23,7 @@ import { Bell, Lock, Store } from "lucide-react"
 import { useState, useEffect } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { getStoreSettings, updateStoreSettings, type SettingsFormValues } from "@/lib/admin-actions"
+import { Badge } from "@/components/ui/badge"
 
 export function SettingsForm() {
     const { toast } = useToast()
@@ -234,9 +235,9 @@ export function SettingsForm() {
                 <div className="space-y-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                            <Badge variant="icon" className="h-8 w-8 text-sm">
                                 NA
-                            </div>
+                            </Badge>
                             <div>
                                 <p className="text-sm font-medium">Naeem Aziz (You)</p>
                                 <p className="text-xs text-muted-foreground">Super Admin</p>
@@ -246,9 +247,9 @@ export function SettingsForm() {
                     </div>
                      <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground font-bold">
+                            <Badge variant="neutral" className="h-8 w-8 p-0 grid place-items-center rounded-full">
                                 DK
-                            </div>
+                            </Badge>
                             <div>
                                 <p className="text-sm font-medium">Support Team</p>
                                 <p className="text-xs text-muted-foreground">Editor</p>

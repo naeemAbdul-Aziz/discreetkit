@@ -110,7 +110,7 @@ export async function getPharmacyStats() {
 /**
  * Accept an order (pharmacy acknowledges and starts processing)
  */
-export async function acceptOrder(orderId: number) {
+export async function acceptOrder(id: number) {
     const supabase = await createSupabaseServerClient()
 
     // Get current pharmacy
@@ -127,7 +127,7 @@ export async function acceptOrder(orderId: number) {
             pharmacy_ack_status: 'accepted',
             pharmacy_ack_at: new Date().toISOString()
         })
-        .eq('id', orderId)
+        .eq('id', id)
         .eq('pharmacy_id', pharmacy.id) // Security: only update own orders
 
     if (error) {
@@ -138,7 +138,7 @@ export async function acceptOrder(orderId: number) {
     await supabase
         .from('order_events')
         .insert({
-            order_id: orderId,
+            order_id: id,
             status: 'processing',
             note: `Order accepted by ${pharmacy.name}`
         })
@@ -150,7 +150,7 @@ export async function acceptOrder(orderId: number) {
 /**
  * Decline an order
  */
-export async function declineOrder(orderId: number, reason: string) {
+export async function declineOrder(id: number, reason: string) {
     const supabase = await createSupabaseServerClient()
 
     // Get current pharmacy
@@ -167,7 +167,7 @@ export async function declineOrder(orderId: number, reason: string) {
             pharmacy_ack_status: 'declined',
             pharmacy_ack_at: new Date().toISOString()
         })
-        .eq('id', orderId)
+        .eq('id', id)
         .eq('pharmacy_id', pharmacy.id) // Security: only update own orders
 
     if (error) {
@@ -178,7 +178,7 @@ export async function declineOrder(orderId: number, reason: string) {
     await supabase
         .from('order_events')
         .insert({
-            order_id: orderId,
+            order_id: id,
             status: 'declined',
             note: `Order declined by ${pharmacy.name}: ${reason}`
         })
@@ -190,7 +190,7 @@ export async function declineOrder(orderId: number, reason: string) {
 /**
  * Update order status (processing → out_for_delivery)
  */
-export async function updatePharmacyOrderStatus(orderId: number, status: 'out_for_delivery' | 'completed') {
+export async function updatePharmacyOrderStatus(id: number, status: 'out_for_delivery' | 'completed') {
     const supabase = await createSupabaseServerClient()
 
     // Get current pharmacy
@@ -203,7 +203,7 @@ export async function updatePharmacyOrderStatus(orderId: number, status: 'out_fo
     const { error } = await supabase
         .from('orders')
         .update({ status })
-        .eq('id', orderId)
+        .eq('id', id)
         .eq('pharmacy_id', pharmacy.id) // Security: only update own orders
 
     if (error) {
@@ -215,7 +215,7 @@ export async function updatePharmacyOrderStatus(orderId: number, status: 'out_fo
     await supabase
         .from('order_events')
         .insert({
-            order_id: orderId,
+            order_id: id,
             status,
             note: `Order marked as ${statusText} by ${pharmacy.name}`
         })

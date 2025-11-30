@@ -39,14 +39,14 @@ export function OrderDetailsSheet({
   const itemsArray = Array.isArray(items) ? items : []
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, { className: string; label: string }> = {
-      received: { className: "bg-orange-500", label: "New" },
-      processing: { className: "bg-blue-500", label: "Processing" },
-      out_for_delivery: { className: "bg-purple-500", label: "Out for Delivery" },
-      completed: { className: "bg-green-500", label: "Completed" }
+    const variants: Record<string, { variant: "secondary" | "default" | "destructive" | "outline" | "success" | "warning" | "info" | "neutral"; label: string }> = {
+      received: { variant: "secondary", label: "New" },
+      processing: { variant: "info", label: "Processing" },
+      out_for_delivery: { variant: "warning", label: "Out for Delivery" },
+      completed: { variant: "success", label: "Completed" }
     }
-    const config = variants[status] || { className: "bg-gray-500", label: status }
-    return <Badge className={config.className}>{config.label}</Badge>
+    const config = variants[status] || { variant: "neutral", label: status }
+    return <Badge variant={config.variant}>{config.label}</Badge>
   }
 
   return (

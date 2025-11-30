@@ -61,6 +61,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7
     },
 
+    // Legal and info pages (important for trust/SEO)
+    {
+      url: `${siteUrl}/privacy`,
+      lastModified: now,
+      changeFrequency: 'yearly',
+      priority: 0.4
+    },
+    {
+      url: `${siteUrl}/terms`,
+      lastModified: now,
+      changeFrequency: 'yearly',
+      priority: 0.4
+    },
+
     // Service pages
     {
       url: `${siteUrl}/partner-care`,
@@ -75,18 +89,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.5
     },
 
-    // Legal pages (low priority but important for crawlers)
+    // Location-specific landing pages (for local SEO)
     {
-      url: `${siteUrl}/terms`,
+      url: `${siteUrl}/locations/accra`,
       lastModified: now,
-      changeFrequency: 'yearly',
-      priority: 0.3
+      changeFrequency: 'monthly',
+      priority: 0.7
     },
     {
-      url: `${siteUrl}/privacy`,
+      url: `${siteUrl}/locations/kumasi`,
       lastModified: now,
-      changeFrequency: 'yearly',
-      priority: 0.3
+      changeFrequency: 'monthly',
+      priority: 0.7
+    },
+    {
+      url: `${siteUrl}/locations/university-of-ghana`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7
     },
   ];
 
