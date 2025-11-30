@@ -1,5 +1,8 @@
-
 'use server'
+
+import { createSupabaseServerClient, getSupabaseAdminClient } from "@/lib/supabase"
+import { revalidatePath } from "next/cache"
+import { z } from "zod"
 
 export async function getProducts() {
     const supabase = await createSupabaseServerClient();
@@ -10,10 +13,6 @@ export async function getProducts() {
     if (error) throw new Error(error.message);
     return data;
 }
-
-import { createSupabaseServerClient, getSupabaseAdminClient } from "@/lib/supabase"
-import { revalidatePath } from "next/cache"
-import { z } from "zod"
 
 // Schema for product validation
 const productSchema = z.object({
