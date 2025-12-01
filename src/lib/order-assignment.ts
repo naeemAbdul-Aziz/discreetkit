@@ -16,13 +16,19 @@ export async function findBestPharmacyForOrder(
     const supabase = getSupabaseAdminClient()
 
     // 1. Find pharmacies that cover the delivery area
+    console.log(`[findBestPharmacyForOrder] Searching for pharmacies in area: ${deliveryArea}`);
     const { data: serviceAreas, error: areaError } = await supabase
         .from('pharmacy_service_areas')
         .select('pharmacy_id, delivery_fee, max_delivery_time_hours')
         .ilike('area_name', `%${deliveryArea}%`)
         .eq('is_active', true)
 
+    if (areaError) {
+        console.error('[findBestPharmacyForOrder] Error fetching service areas:', areaError);
+    }
+
     if (areaError || !serviceAreas || serviceAreas.length === 0) {
+        console.warn(`[findBestPharmacyForOrder] No service areas found matching: ${deliveryArea}`);
         return { pharmacyId: null, reason: `No pharmacy covers area: ${deliveryArea}` }
     }
 
@@ -66,10 +72,13 @@ export async function findBestPharmacyForOrder(
                 deliveryFee: areaDetails.delivery_fee,
                 maxTime: areaDetails.max_delivery_time_hours
             })
+        } else {
+            console.log(`[findBestPharmacyForOrder] Pharmacy #${pharmacyId} covers area but lacks stock.`);
         }
     }
 
     if (validCandidates.length === 0) {
+        console.warn(`[findBestPharmacyForOrder] Pharmacies found in area but none have sufficient stock.`);
         return { pharmacyId: null, reason: "Pharmacies found in area but none have sufficient stock." }
     }
 
@@ -81,6 +90,8 @@ export async function findBestPharmacyForOrder(
         }
         return a.maxTime - b.maxTime
     })
+
+    console.log(`[findBestPharmacyForOrder] Found ${validCandidates.length} valid candidates for area ${deliveryArea}. Best match: Pharmacy #${validCandidates[0].pharmacyId}`);
 
     return {
         pharmacyId: validCandidates[0].pharmacyId,

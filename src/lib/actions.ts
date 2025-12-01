@@ -147,7 +147,7 @@ export async function sendOrderConfirmationSMS(orderId: string): Promise<void> {
     const confirmationMessage = `Payment for order ${order.code} confirmed. We're now preparing your package for discreet delivery. Track: ${trackingUrl}`;
 
     const result = await sendSMS(order.phone_masked, confirmationMessage);
-    
+
     if (!result.ok) {
       console.error('SMS sending failed for order confirmation:', { orderId, code: order.code, error: result.error });
     } else {
@@ -402,13 +402,13 @@ export async function createOrderAction(prevState: any, formData: FormData) {
 
     await sendSMS(validatedFields.data.phone_masked, initialSmsMessage);
 
-    // 4. Attempt Auto-Assignment
-    try {
-      const { autoAssignOrder } = await import('@/lib/order-assignment');
-      await autoAssignOrder(orderData.id, finalDeliveryArea, cartItems);
-    } catch (assignError) {
-      console.error("Auto-assignment error:", assignError);
-    }
+    // 4. Auto-Assignment skipped here. Will be handled by webhook after payment.
+    // try {
+    //   const { autoAssignOrder } = await import('@/lib/order-assignment');
+    //   await autoAssignOrder(orderData.id, finalDeliveryArea, cartItems);
+    // } catch (assignError) {
+    //   console.error("Auto-assignment error:", assignError);
+    // }
 
     // Note: Pharmacy assignment happens AFTER payment confirmation in the webhook usually, 
     // but user requested logic implementation. If we assign now, the pharmacy sees it before payment.

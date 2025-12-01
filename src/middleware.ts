@@ -31,9 +31,9 @@ export async function middleware(request: NextRequest) {
         const roles = await getUserRoles(supabase, user.id);
         const userEmail = user.email?.toLowerCase() || '';
         const adminWhitelist = (process.env.ADMIN_EMAIL_WHITELIST || '')
-          .split(',')
-          .map(e => e.trim().toLowerCase())
-          .filter(Boolean);
+            .split(',')
+            .map(e => e.trim().toLowerCase())
+            .filter(Boolean);
         const isWhitelistedAdmin = adminWhitelist.includes(userEmail);
         if (!roles.includes('admin') && !isWhitelistedAdmin) {
             // If they are a pharmacy user, redirect to pharmacy portal
@@ -50,14 +50,14 @@ export async function middleware(request: NextRequest) {
         const roles = await getUserRoles(supabase, user.id);
         const userEmail = user.email?.toLowerCase() || '';
         const pharmacyWhitelist = (process.env.PHARMACY_EMAIL_WHITELIST || '')
-          .split(',')
-          .map(e => e.trim().toLowerCase())
-          .filter(Boolean);
+            .split(',')
+            .map(e => e.trim().toLowerCase())
+            .filter(Boolean);
         const isWhitelistedPharmacy = pharmacyWhitelist.includes(userEmail);
         if (!roles.includes('pharmacy') && !isWhitelistedPharmacy) {
             // If they are an admin, redirect to admin portal
             if (roles.includes('admin')) {
-                const adminUrl = new URL('/admin/dashboard', process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.discreetkit.com');
+                const adminUrl = new URL('/admin', process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.discreetkit.com');
                 return NextResponse.redirect(adminUrl);
             }
             // Otherwise, unauthorized — redirect to main site's unauthorized page
@@ -69,7 +69,7 @@ export async function middleware(request: NextRequest) {
     // 5. Subdomain Rewrites
     if (isAdminSubdomain) {
         if (url.pathname === '/') {
-            url.pathname = '/admin/dashboard';
+            url.pathname = '/admin';
         } else {
             // Do not force-prefix certain global routes
             const exemptPaths = ['/login', '/unauthorized', '/robots.txt', '/sitemap.xml'];

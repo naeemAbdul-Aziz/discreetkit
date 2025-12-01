@@ -734,6 +734,7 @@ export async function getServiceAreas(pharmacyId: number) {
 }
 
 export async function addServiceArea(data: { pharmacy_id: number; area_name: string; delivery_fee: number; max_delivery_time_hours: number }) {
+    console.log('[addServiceArea] Attempting to add area:', data);
     const supabase = getSupabaseAdminClient()
     const { data: newArea, error } = await supabase
         .from('pharmacy_service_areas')
@@ -741,7 +742,11 @@ export async function addServiceArea(data: { pharmacy_id: number; area_name: str
         .select()
         .single()
 
-    if (error) return { error: error.message }
+    if (error) {
+        console.error('[addServiceArea] Error adding area:', error);
+        return { error: error.message }
+    }
+    console.log('[addServiceArea] Successfully added area:', newArea);
     revalidatePath(`/admin/partners/${data.pharmacy_id}`)
     return { data: newArea }
 }
