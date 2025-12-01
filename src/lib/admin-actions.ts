@@ -154,6 +154,28 @@ export async function getPharmacies() {
     }));
 }
 
+export async function searchPharmacies(query: string) {
+    const supabase = await createSupabaseServerClient()
+
+    let queryBuilder = supabase
+        .from('pharmacies')
+        .select('id, name')
+        .limit(20)
+
+    if (query) {
+        queryBuilder = queryBuilder.ilike('name', `%${query}%`)
+    }
+
+    const { data, error } = await queryBuilder.order('name')
+
+    if (error) {
+        console.error('Error searching pharmacies:', error)
+        return []
+    }
+
+    return data || []
+}
+
 export async function upsertPharmacy(data: PharmacyFormValues) {
     const supabase = await createSupabaseServerClient()
     const validated = pharmacySchema.parse(data)

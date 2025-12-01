@@ -73,16 +73,18 @@ export default function AdminDashboardPage() {
     // Fallback polling if SSE disconnects
     timer = setInterval(load, 60000);
     return () => { clearInterval(timer) };
-  }, [from, to]);
+  }, [from, to, router]);
 
   // Realtime: refresh metrics on order changes
-  useSSE('/api/admin/realtime/orders', { onMessage: () => {
+  const handleRealtimeMessage = useMemo(() => () => {
     const params = new URLSearchParams({ from: from.toISOString(), to: to.toISOString() });
     fetch(`/api/admin/dashboard?${params.toString()}`, { cache: 'no-store' })
       .then(r => r.ok ? r.json() : null)
       .then(json => json && setData(json))
       .catch(() => {});
-  }});
+  }, [from, to]);
+
+  useSSE('/api/admin/realtime/orders', { onMessage: handleRealtimeMessage });
 
   const series = useMemo(() => data?.revenueSeries ?? [], [data]);
   const breakdown = useMemo(() => data?.statusBreakdown ?? [], [data]);

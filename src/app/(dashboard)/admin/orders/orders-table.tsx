@@ -47,7 +47,9 @@ interface Pharmacy {
   name: string
 }
 
-export function OrdersTable({ initialOrders, pharmacies }: { initialOrders: Order[], pharmacies: Pharmacy[] }) {
+import { searchPharmacies } from "@/lib/admin-actions"
+
+export function OrdersTable({ initialOrders }: { initialOrders: Order[] }) {
   const [searchTerm, setSearchTerm] = useState("")
   const [debouncedSearch, setDebouncedSearch] = useState("")
   const [orders, setOrders] = useState<Order[]>(initialOrders)
@@ -94,7 +96,7 @@ export function OrdersTable({ initialOrders, pharmacies }: { initialOrders: Orde
     }
   }
 
-  const handleAssignPharmacy = async (id: number, pharmacyId: number) => {
+  const handleAssignPharmacy = async (id: number, pharmacyId: number, pharmacyName: string) => {
     setAssigningId(id)
     try {
       const response = await fetch(`/api/admin/orders/${id}/reassign`, {
@@ -118,7 +120,7 @@ export function OrdersTable({ initialOrders, pharmacies }: { initialOrders: Orde
           ? { 
               ...o, 
               pharmacy_id: pharmacyId, 
-              pharmacies: pharmacies.find(p => p.id === pharmacyId) || null 
+              pharmacies: { name: pharmacyName } 
             } 
           : o
       ))
@@ -263,9 +265,9 @@ export function OrdersTable({ initialOrders, pharmacies }: { initialOrders: Orde
                 </TableCell>
                 <TableCell>
                   <PharmacyCombobox
-                    pharmacies={pharmacies}
+                    initialName={order.pharmacies?.name}
                     value={order.pharmacy_id}
-                    onAssign={(pid)=> handleAssignPharmacy(order.id, pid)}
+                    onAssign={(pid, pname)=> handleAssignPharmacy(order.id, pid, pname)}
                     loading={assigningId===order.id}
                   />
                 </TableCell>
@@ -298,15 +300,16 @@ export function OrdersTable({ initialOrders, pharmacies }: { initialOrders: Orde
                         <DropdownMenuSubTrigger>
                           {order.pharmacy_id ? 'Reassign Pharmacy' : 'Assign Pharmacy'}
                         </DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent>
-                          <DropdownMenuRadioGroup value={order.pharmacy_id?.toString()} onValueChange={(val) => handleAssignPharmacy(order.id, parseInt(val))}>
-                            {pharmacies.map(p => (
-                              <DropdownMenuRadioItem key={p.id} value={p.id.toString()}>
-                                {p.name}
-                                {order.pharmacy_id === p.id && " (Current)"}
-                              </DropdownMenuRadioItem>
-                            ))}
-                          </DropdownMenuRadioGroup>
+                        <DropdownMenuSubContent className="p-0">
+                           <div className="p-2">
+                               <PharmacyCombobox 
+                                   initialName={order.pharmacies?.name}
+                                   value={order.pharmacy_id}
+                                   onAssign={(pid, pname) => handleAssignPharmacy(order.id, pid, pname)}
+                                   loading={assigningId === order.id}
+                                   inDropdown={true}
+                               />
+                           </div>
                         </DropdownMenuSubContent>
                       </DropdownMenuSub>
 
@@ -355,26 +358,56 @@ export function OrdersTable({ initialOrders, pharmacies }: { initialOrders: Orde
   )
 }
 
-function PharmacyCombobox({ pharmacies, value, onAssign, loading }: { pharmacies: Pharmacy[]; value: number | null; onAssign: (id:number)=>void; loading:boolean }) {
+function PharmacyCombobox({ initialName, value, onAssign, loading, inDropdown }: { initialName?: string; value: number | null; onAssign: (id:number, name: string)=>void; loading:boolean; inDropdown?: boolean }) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
-  const filtered = pharmacies.filter(p => p.name.toLowerCase().includes(query.toLowerCase()))
-  const display = value ? pharmacies.find(p=>p.id===value)?.name : 'Unassigned'
+  const [results, setResults] = useState<{id: number, name: string}[]>([])
+  const [searching, setSearching] = useState(false)
+  
+  // Debounce search
+  useEffect(() => {
+      const timer = setTimeout(async () => {
+          if (open) {
+              setSearching(true)
+              try {
+                  const data = await searchPharmacies(query)
+                  setResults(data)
+              } catch (e) {
+                  console.error(e)
+              } finally {
+                  setSearching(false)
+              }
+          }
+      }, 300)
+      return () => clearTimeout(timer)
+  }, [query, open])
+
+  const display = value ? (initialName || 'Assigned') : 'Unassigned'
+  
   return (
-    <div className="relative w-40">
-      <Button variant="outline" size="sm" className="w-full justify-start" onClick={()=> setOpen(o=> !o)}>
-        {loading ? 'Assigning...' : display}
-      </Button>
-      {open && (
-        <div className="absolute z-10 mt-1 w-full rounded border bg-popover p-2 shadow">
-          <Input placeholder="Search..." value={query} onChange={e=> setQuery(e.target.value)} className="mb-2 h-8 text-sm" />
+    <div className="relative w-40" onClick={(e) => inDropdown && e.stopPropagation()}>
+      {!inDropdown && (
+          <Button variant="outline" size="sm" className="w-full justify-start" onClick={()=> setOpen(o=> !o)}>
+            {loading ? 'Assigning...' : display}
+          </Button>
+      )}
+      {(open || inDropdown) && (
+        <div className={inDropdown ? "" : "absolute z-10 mt-1 w-full rounded border bg-popover p-2 shadow"}>
+          <Input 
+            placeholder="Search pharmacy..." 
+            value={query} 
+            onChange={e=> setQuery(e.target.value)} 
+            className="mb-2 h-8 text-sm"
+            autoFocus 
+          />
           <div className="max-h-48 overflow-y-auto space-y-1">
-            {filtered.map(p => (
-              <Button key={p.id} variant="ghost" size="sm" className="w-full justify-start" onClick={()=> { onAssign(p.id); setOpen(false) }}>
+            {searching && <div className="text-xs text-muted-foreground px-1">Searching...</div>}
+            {!searching && results.map(p => (
+              <Button key={p.id} variant="ghost" size="sm" className="w-full justify-start" onClick={()=> { onAssign(p.id, p.name); setOpen(false) }}>
                 {p.name}
               </Button>
             ))}
-            {filtered.length===0 && <div className="text-xs text-muted-foreground px-1">No matches</div>}
+            {!searching && results.length===0 && <div className="text-xs text-muted-foreground px-1">No matches</div>}
           </div>
         </div>
       )}

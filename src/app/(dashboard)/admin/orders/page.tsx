@@ -1,12 +1,9 @@
-import { getOrders, getPharmacies } from "@/lib/admin-actions"
+import { getOrders } from "@/lib/admin-actions"
 import { OrdersTable } from "./orders-table"
 import { Breadcrumbs } from "@/components/ui/breadcrumbs"
 
 export default async function OrdersPage() {
-  const [orders, pharmacies] = await Promise.all([
-    getOrders(),
-    getPharmacies()
-  ])
+  const orders = await getOrders()
 
   return (
     <div className="space-y-8">
@@ -18,7 +15,7 @@ export default async function OrdersPage() {
         <h2 className="text-3xl font-bold tracking-tight">Orders</h2>
         <p className="text-muted-foreground">Manage customer orders and pharmacy assignments.</p>
       </div>
-      <OrdersTable initialOrders={orders} pharmacies={pharmacies} />
+      <OrdersTable initialOrders={orders} />
     </div>
   )
 }
