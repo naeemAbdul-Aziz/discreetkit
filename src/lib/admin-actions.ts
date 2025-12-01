@@ -422,7 +422,7 @@ export async function getOrders() {
     if (error) throw new Error(error.message)
 
     // Normalize data to ensure pharmacies is an object or null, not an array
-    const normalizedOrders = data.map((order: any) => ({
+    const normalizedOrders = (data || []).map((order: any) => ({
         ...order,
         pharmacies: Array.isArray(order.pharmacies) ? order.pharmacies[0] || null : order.pharmacies
     }))
@@ -443,25 +443,7 @@ export async function updateOrderStatus(id: number, status: string) {
     return { success: true }
 }
 
-export async function assignPharmacy(orderId: number, pharmacyId: number) {
-    const supabase = await createSupabaseServerClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return { error: 'Unauthorized' }
-
-    // Check admin role
-    const { getUserRoles } = await import('@/lib/supabase')
-    const supabaseAdmin = getSupabaseAdminClient()
-    const roles = await getUserRoles(supabaseAdmin, user.id)
-    const userEmail = user.email?.toLowerCase() || ''
-    const adminWhitelist = (process.env.ADMIN_EMAIL_WHITELIST || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
-
-    if (!roles.includes('admin') && !adminWhitelist.includes(userEmail)) {
-        return { error: 'Unauthorized: Admin access required' }
-    }
-
-    // Use admin client for the operation
-    // const supabase = getSupabaseAdminClient() // Already have supabaseAdmin
-
+export async function assignPharmacyInternal(supabaseAdmin: any, orderId: number, pharmacyId: number) {
     // Get order and pharmacy details for notifications
     const { data: order } = await supabaseAdmin
         .from('orders')
@@ -495,8 +477,8 @@ export async function assignPharmacy(orderId: number, pharmacyId: number) {
 
             const { notifyPharmacyOfAssignment } = await import('@/lib/pharmacy-notifications')
 
-            // Send notifications asynchronously (don't block the response)
-            notifyPharmacyOfAssignment({
+            // Await notifications to ensure they are sent
+            await notifyPharmacyOfAssignment({
                 pharmacyId,
                 pharmacyName: pharmacy.name,
                 pharmacyPhone: pharmacy.phone_number,
@@ -506,8 +488,6 @@ export async function assignPharmacy(orderId: number, pharmacyId: number) {
                 deliveryArea: order.delivery_area,
                 itemCount,
                 totalPrice: order.total_price,
-            }).catch(err => {
-                console.error('[assignPharmacy] Notification error:', err)
             })
 
             // Log assignment event
@@ -525,6 +505,25 @@ export async function assignPharmacy(orderId: number, pharmacyId: number) {
     revalidatePath('/admin/orders')
     revalidatePath('/pharmacy/dashboard')
     return { success: true }
+}
+
+export async function assignPharmacy(orderId: number, pharmacyId: number) {
+    const supabase = await createSupabaseServerClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { error: 'Unauthorized' }
+
+    // Check admin role
+    const { getUserRoles } = await import('@/lib/supabase')
+    const supabaseAdmin = getSupabaseAdminClient()
+    const roles = await getUserRoles(supabaseAdmin, user.id)
+    const userEmail = user.email?.toLowerCase() || ''
+    const adminWhitelist = (process.env.ADMIN_EMAIL_WHITELIST || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
+
+    if (!roles.includes('admin') && !adminWhitelist.includes(userEmail)) {
+        return { error: 'Unauthorized: Admin access required' }
+    }
+
+    return await assignPharmacyInternal(supabaseAdmin, orderId, pharmacyId)
 }
 
 // Bulk update order statuses

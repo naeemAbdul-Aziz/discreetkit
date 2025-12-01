@@ -141,15 +141,10 @@ export async function autoAssignOrder(orderId: number, deliveryArea: string, ite
     })
 
     // Trigger notification (async)
-    const { assignPharmacy } = await import('@/lib/admin-actions')
-    // We re-call assignPharmacy to handle notifications, but since we already updated the DB, 
-    // maybe we should just call the notification part. 
-    // Actually, assignPharmacy does the update AND notification. 
-    // Let's just call assignPharmacy directly if we found a match? 
-    // But assignPharmacy takes ID. 
-    // Let's just let assignPharmacy handle the update to be safe and consistent.
+    const { assignPharmacyInternal } = await import('@/lib/admin-actions')
 
-    await assignPharmacy(orderId, pharmacyId)
+    // Use internal function to bypass auth check (since this runs in webhook/background)
+    await assignPharmacyInternal(supabase, orderId, pharmacyId)
 
     return { success: true, pharmacyId }
 }

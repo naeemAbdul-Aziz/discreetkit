@@ -48,7 +48,7 @@ export async function POST(req: Request) {
   // 3. Handle payment success events
   // Paystack sends 'charge.success' for successful payments
   // We also handle the status field as a fallback
-  const isPaymentSuccess = eventType === 'charge.success' || 
+  const isPaymentSuccess = eventType === 'charge.success' ||
     (eventType?.includes('success') && eventStatus === 'success');
 
   if (isPaymentSuccess) {
@@ -56,7 +56,7 @@ export async function POST(req: Request) {
 
     if (status === 'success') {
       const supabaseAdmin = getSupabaseAdminClient();
-      
+
       try {
         // Audit log the webhook payload
         try {
@@ -69,9 +69,9 @@ export async function POST(req: Request) {
         } catch (auditError) {
           console.warn('Failed to log payment event:', auditError);
         }
-        
+
         paymentDebug('Webhook payment success received', { reference, amount, eventType });
-        
+
         // Find the order using the reference code
         const { data: order, error: findError } = await supabaseAdmin
           .from('orders')
@@ -104,18 +104,14 @@ export async function POST(req: Request) {
             status: 'Payment Confirmed',
             note: `Successfully received GHS ${(amount / 100).toFixed(2)}.`,
           });
-          
+
           paymentDebug('Webhook updated order to received', { reference, orderId: order.id });
 
           // Send SMS confirmation after successful payment
-          // This MUST happen before auto-assignment to ensure customer is notified
-          try {
-            await sendOrderConfirmationSMS(order.id);
-            paymentDebug('SMS confirmation sent', { orderId: order.id });
-          } catch (smsError) {
-            // Log but don't fail the webhook - SMS failure shouldn't block payment confirmation
-            console.error('Failed to send SMS confirmation:', smsError);
-          }
+          // NON-BLOCKING:
+          sendOrderConfirmationSMS(order.id)
+            .then(() => paymentDebug('SMS confirmation sent', { orderId: order.id }))
+            .catch(smsError => console.error('Failed to send SMS confirmation:', smsError));
 
           // Auto-assign pharmacy after payment confirmation
           // This is isolated so failures don't affect payment confirmation or SMS
@@ -127,7 +123,7 @@ export async function POST(req: Request) {
                 .select('items')
                 .eq('id', order.id)
                 .single();
-              
+
               if (orderWithItems?.items) {
                 const { autoAssignOrder } = await import('@/lib/order-assignment');
                 const assignResult = await autoAssignOrder(order.id, order.delivery_area, orderWithItems.items as any[]);

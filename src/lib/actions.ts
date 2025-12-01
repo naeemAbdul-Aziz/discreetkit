@@ -400,7 +400,9 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${code}`;
     const initialSmsMessage = `Your order ${code} is received. We'll notify you once payment is processed. Track status: ${trackingUrl}`;
 
-    await sendSMS(validatedFields.data.phone_masked, initialSmsMessage);
+    // FIRE AND FORGET: Don't await this. Let it run in background to speed up order creation.
+    sendSMS(validatedFields.data.phone_masked, initialSmsMessage)
+      .catch(err => console.error('Background SMS failed:', err));
 
     // 4. Auto-Assignment skipped here. Will be handled by webhook after payment.
     // try {

@@ -12,14 +12,13 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { MoreHorizontal, Search, Truck, CheckCircle, XCircle, MapPin } from "lucide-react"
+import { MoreHorizontal, Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
   DropdownMenuSub,
   DropdownMenuSubTrigger,
@@ -27,121 +26,82 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu"
-import { updateOrderStatus, assignPharmacy, bulkUpdateOrderStatus } from "@/lib/admin-actions"
-import { useRealtimeOrders } from "@/hooks/use-realtime-orders"
 import { useToast } from "@/hooks/use-toast"
+import { assignPharmacy, bulkUpdateOrderStatus, searchPharmacies } from "@/lib/admin-actions"
 
-interface Order {
-  id: number
-  code: string
-  created_at: string
-  status: string
-  total_price: number
-  email: string | null
-  pharmacy_id: number | null
-  pharmacies: { name: string } | null
-}
+// Helper
+const titleCase = (s: string) => s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
 
-interface Pharmacy {
-  id: number
-  name: string
-}
-
-import { searchPharmacies } from "@/lib/admin-actions"
-
-export function OrdersTable({ initialOrders }: { initialOrders: Order[] }) {
+export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
+  const router = useRouter()
+  const { toast } = useToast()
+  const [orders, setOrders] = useState(initialOrders)
   const [searchTerm, setSearchTerm] = useState("")
-  const [debouncedSearch, setDebouncedSearch] = useState("")
-  const [orders, setOrders] = useState<Order[]>(initialOrders)
-    // Listen for realtime order updates (all pharmacies, so pharmacyId = null)
-    useRealtimeOrders(null, (newOrders) => {
-      setOrders(newOrders)
-    })
-  const [filterStatus, setFilterStatus] = useState<string>('all')
-  const [assigningId, setAssigningId] = useState<number | null>(null)
+  const [filterStatus, setFilterStatus] = useState("all")
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
   const [bulkSaving, setBulkSaving] = useState(false)
+  const [assigningId, setAssigningId] = useState<number | null>(null)
+  
+  // Pagination
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const { toast } = useToast()
-  const router = useRouter()
 
-  useEffect(() => { const t = setTimeout(()=> setDebouncedSearch(searchTerm),300); return ()=> clearTimeout(t)}, [searchTerm])
-
-  const titleCase = (s:string) => s.replace(/_/g,' ').replace(/\b\w/g,c=> c.toUpperCase())
-
-  const filteredOrders = useMemo(()=> {
+  // Filter logic
+  const filteredOrders = useMemo(() => {
     return orders.filter(o => {
-      const matchesSearch = o.code.toLowerCase().includes(debouncedSearch.toLowerCase()) || (o.email && o.email.toLowerCase().includes(debouncedSearch.toLowerCase()))
-      const matchesFilter = filterStatus==='all' ? true : o.status === filterStatus
-      return matchesSearch && matchesFilter
+      const matchesSearch = o.code.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                            (o.email || '').toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesStatus = filterStatus === 'all' || o.status === filterStatus
+      return matchesSearch && matchesStatus
     })
-  }, [orders, debouncedSearch, filterStatus])
+  }, [orders, searchTerm, filterStatus])
 
-  // Pagination logic
-  const totalPages = Math.max(1, Math.ceil(filteredOrders.length / pageSize))
-  const paginatedOrders = filteredOrders.slice((page-1)*pageSize, page*pageSize)
+  const totalPages = Math.ceil(filteredOrders.length / pageSize)
+  const paginatedOrders = filteredOrders.slice((page - 1) * pageSize, page * pageSize)
 
-  const handleStatusChange = async (id: number, status: string) => {
-    try {
-      const res = await updateOrderStatus(id, status)
+  const handleStatusChange = async (orderId: number, newStatus: string) => {
+      // Optimistic update
+      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o))
+      
+      const res = await bulkUpdateOrderStatus([orderId], newStatus)
       if (res.error) {
-        toast({ variant: "destructive", title: "Error", description: res.error })
+          toast({ variant: 'destructive', title: 'Update failed', description: res.error })
+          // Revert
+          router.refresh()
       } else {
-        toast({ title: "Status Updated", description: `Order status changed to ${status}` })
-        setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o))
+          toast({ title: 'Status Updated', description: `Order status changed to ${titleCase(newStatus)}` })
       }
-    } catch (error) {
-      toast({ variant: "destructive", title: "Error", description: "Failed to update status" })
-    }
   }
 
-  const handleAssignPharmacy = async (id: number, pharmacyId: number, pharmacyName: string) => {
-    setAssigningId(id)
-    try {
-      const response = await fetch(`/api/admin/orders/${id}/reassign`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pharmacy_id: pharmacyId })
-      })
-
-      if (!response.ok) throw new Error('Failed to reassign order')
-
-      const result = await response.json()
-      
-      toast({ 
-        title: "Reassigned", 
-        description: result.message || "Order reassigned successfully." 
-      })
-      
-      // Update local state immediately
-      setOrders(prev => prev.map(o => 
-        o.id === id 
-          ? { 
-              ...o, 
-              pharmacy_id: pharmacyId, 
-              pharmacies: { name: pharmacyName } 
-            } 
-          : o
-      ))
-    } catch (error: any) {
-      toast({ 
-        variant: "destructive", 
-        title: "Error", 
-        description: error.message || "Failed to reassign order" 
-      })
-    } finally {
-      setAssigningId(null)
-    }
+  const handleAssignPharmacy = async (orderId: number, pharmacyId: number, pharmacyName: string) => {
+      setAssigningId(orderId)
+      try {
+          const res = await assignPharmacy(orderId, pharmacyId)
+          if (res.success) {
+              toast({ title: 'Pharmacy Assigned', description: `Order assigned to ${pharmacyName}` })
+              setOrders(prev => prev.map(o => o.id === orderId ? { 
+                  ...o, 
+                  pharmacy_id: pharmacyId, 
+                  pharmacies: { name: pharmacyName },
+                  status: o.status === 'pending_payment' ? 'received' : o.status 
+              } : o))
+          } else {
+              toast({ variant: 'destructive', title: 'Assignment Failed', description: res.error })
+          }
+      } catch (e) {
+          toast({ variant: 'destructive', title: 'Error', description: 'Failed to assign pharmacy' })
+      } finally {
+          setAssigningId(null)
+      }
   }
 
   const getStatusBadge = (status: string) => {
     const base = titleCase(status)
     switch (status) {
-      case 'completed': return <Badge variant="success">{base}</Badge>
-      case 'processing': return <Badge variant="info">{base}</Badge>
-      case 'out_for_delivery': return <Badge variant="warning">{base}</Badge>
-      case 'pending_payment': return <Badge variant="warning">{base}</Badge>
+      case 'completed': return <Badge className="bg-green-600 hover:bg-green-700">{base}</Badge>
+      case 'processing': return <Badge className="bg-blue-600 hover:bg-blue-700">{base}</Badge>
+      case 'out_for_delivery': return <Badge className="bg-yellow-600 hover:bg-yellow-700">{base}</Badge>
+      case 'pending_payment': return <Badge className="bg-orange-500 hover:bg-orange-600">{base}</Badge>
       case 'received': return <Badge variant="secondary">{base}</Badge>
       default: return <Badge variant="outline">{base}</Badge>
     }

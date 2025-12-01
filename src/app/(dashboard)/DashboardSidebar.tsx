@@ -26,7 +26,14 @@ export function DashboardSidebar() {
             { href: "/", label: "Dashboard", icon: LayoutDashboard },
         ]
     }
-    return [
+    
+    // Check if we are on admin subdomain
+    let isAdminSubdomain = false;
+    if (typeof window !== 'undefined') {
+        isAdminSubdomain = window.location.hostname.startsWith('admin.');
+    }
+
+    const baseItems = [
         { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
         { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
         { href: "/admin/products", label: "Products", icon: Package },
@@ -34,6 +41,16 @@ export function DashboardSidebar() {
         { href: "/admin/partners", label: "Partners", icon: Users },
         { href: "/admin/settings", label: "Settings", icon: Settings },
     ]
+
+    // If on admin subdomain, strip /admin prefix to avoid double nesting in middleware
+    if (isAdminSubdomain) {
+        return baseItems.map(item => ({
+            ...item,
+            href: item.href === '/admin' ? '/' : item.href.replace('/admin', '')
+        }))
+    }
+
+    return baseItems
   }, [isPharmacy])
 
   const handleSignOut = async () => {
@@ -55,7 +72,11 @@ export function DashboardSidebar() {
       <SidebarContent className="flex flex-col py-4 gap-2 px-2 lg:px-4">
         <SidebarMenu>
           {navItems.map(item => {
-            const isActive = item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href);
+            // Updated active logic to handle both / and /admin when using subdomains
+            const isActive = item.href === "/admin" 
+                ? (pathname === "/admin" || pathname === "/") 
+                : pathname.startsWith(item.href);
+            
             return (
               <SidebarMenuItem key={item.href}>
                 <SidebarMenuButton
