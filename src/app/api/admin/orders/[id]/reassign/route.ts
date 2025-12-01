@@ -1,27 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createSupabaseServerClient, getSupabaseAdminClient } from '@/lib/supabase'
-import { getUserRoles } from '@/lib/supabase'
+import { createSupabaseServerClient, getSupabaseAdminClient, getUserRoles } from '@/lib/supabase'
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    // 1. Auth Check
     const supabaseServer = await createSupabaseServerClient()
     const { data: { user } } = await supabaseServer.auth.getUser()
-    
+
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const roles = await getUserRoles(supabaseServer, user.id)
-    const isAdmin = roles.includes('admin')
-    
+    // 2. Role/Whitelist Check
+    const supabaseAdmin = getSupabaseAdminClient()
+    const roles = await getUserRoles(supabaseAdmin, user.id)
+
+    const userEmail = user.email?.toLowerCase() || ''
+    const adminWhitelist = (process.env.ADMIN_EMAIL_WHITELIST || '')
+      .split(',')
+      .map(e => e.trim().toLowerCase())
+      .filter(Boolean)
+    const isWhitelisted = adminWhitelist.includes(userEmail)
+
+    const isAdmin = roles.includes('admin') || isWhitelisted
+
     if (!isAdmin) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
+    // 3. Parse Inputs
     const orderId = parseInt(params.id)
+    if (isNaN(orderId)) {
+      return NextResponse.json({ error: 'Invalid Order ID' }, { status: 400 })
+    }
+
     const body = await request.json()
     const { pharmacy_id } = body
 
@@ -32,8 +47,9 @@ export async function PUT(
       )
     }
 
-    const supabase = getSupabaseAdminClient()
-    
+    // 4. Perform Update
+    const supabase = supabaseAdmin // Use admin client
+
     // Get current order details for logging
     const { data: currentOrder } = await supabase
       .from('orders')
@@ -61,7 +77,7 @@ export async function PUT(
         note: `Order reassigned from pharmacy ${currentOrder?.pharmacy_id || 'none'} to pharmacy ${pharmacy_id}`
       })
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
       message: 'Order successfully reassigned'
     })

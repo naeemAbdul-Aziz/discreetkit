@@ -422,23 +422,39 @@ export async function updateOrderStatus(id: number, status: string) {
 }
 
 export async function assignPharmacy(orderId: number, pharmacyId: number) {
-    const supabase = getSupabaseAdminClient()
+    const supabase = await createSupabaseServerClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { error: 'Unauthorized' }
+
+    // Check admin role
+    const { getUserRoles } = await import('@/lib/supabase')
+    const supabaseAdmin = getSupabaseAdminClient()
+    const roles = await getUserRoles(supabaseAdmin, user.id)
+    const userEmail = user.email?.toLowerCase() || ''
+    const adminWhitelist = (process.env.ADMIN_EMAIL_WHITELIST || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
+
+    if (!roles.includes('admin') && !adminWhitelist.includes(userEmail)) {
+        return { error: 'Unauthorized: Admin access required' }
+    }
+
+    // Use admin client for the operation
+    // const supabase = getSupabaseAdminClient() // Already have supabaseAdmin
 
     // Get order and pharmacy details for notifications
-    const { data: order } = await supabase
+    const { data: order } = await supabaseAdmin
         .from('orders')
         .select('code, delivery_area, items, total_price')
         .eq('id', orderId)
         .single()
 
-    const { data: pharmacy } = await supabase
+    const { data: pharmacy } = await supabaseAdmin
         .from('pharmacies')
         .select('name, phone_number, email')
         .eq('id', pharmacyId)
         .single()
 
     // Assign pharmacy and update status
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
         .from('orders')
         .update({
             pharmacy_id: pharmacyId,
@@ -473,7 +489,7 @@ export async function assignPharmacy(orderId: number, pharmacyId: number) {
             })
 
             // Log assignment event
-            await supabase.from('order_events').insert({
+            await supabaseAdmin.from('order_events').insert({
                 order_id: orderId,
                 status: 'Assigned to Pharmacy',
                 note: `Order assigned to ${pharmacy.name}. Notifications sent.`

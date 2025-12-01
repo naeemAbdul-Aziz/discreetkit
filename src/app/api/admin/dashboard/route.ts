@@ -10,12 +10,23 @@ export async function GET(req: Request) {
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     // Check admin role
-    const roles = await getUserRoles(supabaseServer, user.id);
-    if (!roles.includes('admin')) {
+    // Check admin role (using Admin Client to bypass RLS on user_roles)
+    const supabaseAdmin = getSupabaseAdminClient();
+    const roles = await getUserRoles(supabaseAdmin, user.id);
+
+    // Check whitelist
+    const userEmail = user.email?.toLowerCase() || '';
+    const adminWhitelist = (process.env.ADMIN_EMAIL_WHITELIST || '')
+      .split(',')
+      .map(e => e.trim().toLowerCase())
+      .filter(Boolean);
+    const isWhitelisted = adminWhitelist.includes(userEmail);
+
+    if (!roles.includes('admin') && !isWhitelisted) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
-    const supabase = getSupabaseAdminClient();
+    const supabase = supabaseAdmin; // Use the same admin client for data fetching
 
     // Parse optional date range from query params
     const url = new URL(req.url);
@@ -47,7 +58,7 @@ export async function GET(req: Request) {
 
     if (lastErr) throw lastErr;
 
-    const includedStatuses = new Set(['received','processing','out_for_delivery','completed']);
+    const includedStatuses = new Set(['received', 'processing', 'out_for_delivery', 'completed']);
     const rangedFiltered = (rangedOrders ?? []).filter(o => includedStatuses.has(String(o.status)));
 
     const totalRevenue = rangedFiltered.reduce((sum, o: any) => sum + Number(o.total_price || 0), 0);
@@ -62,8 +73,8 @@ export async function GET(req: Request) {
 
     // Build daily revenue series for last 30 days
     const dayMs = 24 * 60 * 60 * 1000;
-    const startDay = new Date(from.toISOString().slice(0,10));
-    const endDay = new Date(to.toISOString().slice(0,10));
+    const startDay = new Date(from.toISOString().slice(0, 10));
+    const endDay = new Date(to.toISOString().slice(0, 10));
     const seriesMap = new Map<string, number>();
     // Build date keys inclusive of range
     for (let d = new Date(startDay); d <= endDay; d = new Date(d.getTime() + dayMs)) {
