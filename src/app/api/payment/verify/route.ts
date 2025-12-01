@@ -89,6 +89,8 @@ export async function GET(req: Request) {
         return NextResponse.json({ ok: false, error: 'Order not found' }, { status: 404 });
       }
 
+      let wasUpdated = false;
+      
       if (order.status === 'pending_payment') {
         const { error: updateError } = await supabase
           .from('orders')
@@ -105,13 +107,23 @@ export async function GET(req: Request) {
           status: 'Payment Confirmed',
           note: `Successfully received GHS ${((amount ?? 0) / 100).toFixed(2)}.`,
         });
+        
+        wasUpdated = true;
         paymentDebug('Order updated to received via verify', { reference, orderId: order.id });
 
         // Send SMS confirmation after successful payment
-        await sendOrderConfirmationSMS(order.id);
+        try {
+          await sendOrderConfirmationSMS(order.id);
+          paymentDebug('SMS confirmation sent via verify', { orderId: order.id });
+        } catch (smsError) {
+          // Log but don't fail the request - SMS failure shouldn't block payment confirmation
+          console.error('Failed to send SMS confirmation on verify:', smsError);
+        }
+      } else {
+        paymentDebug('Order already processed on verify', { reference, orderId: order.id, status: order.status });
       }
 
-      return NextResponse.json({ ok: true, updated: order.status === 'pending_payment' });
+      return NextResponse.json({ ok: true, updated: wasUpdated, status: order.status });
     }
 
     // Not success – leave order unchanged

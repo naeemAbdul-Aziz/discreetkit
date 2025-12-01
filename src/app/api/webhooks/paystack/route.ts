@@ -36,14 +36,24 @@ export async function POST(req: Request) {
   const event = JSON.parse(body);
   const reference = event?.data?.reference;
   const eventStatus = event?.data?.status;
+  const eventType = event?.event;
 
-  // 3. Handle the 'charge.success' event
-  if (event.event === 'charge.success') {
+  // Log all webhook events for debugging
+  paymentDebug('Webhook received', { eventType, reference, status: eventStatus });
+
+  // 3. Handle payment success events
+  // Paystack sends 'charge.success' for successful payments
+  // We also handle the status field as a fallback
+  const isPaymentSuccess = eventType === 'charge.success' || 
+    (eventType?.includes('success') && eventStatus === 'success');
+
+  if (isPaymentSuccess) {
     const { reference, status, amount } = event.data;
 
     if (status === 'success') {
+      const supabaseAdmin = getSupabaseAdminClient();
+      
       try {
-        const supabaseAdmin = getSupabaseAdminClient();
         // Audit log the webhook payload
         try {
           await supabaseAdmin.from('payment_events').insert({
@@ -52,12 +62,16 @@ export async function POST(req: Request) {
             status,
             payload: event,
           });
-        } catch { }
-        paymentDebug('Webhook charge.success received', { reference, amount });
+        } catch (auditError) {
+          console.warn('Failed to log payment event:', auditError);
+        }
+        
+        paymentDebug('Webhook payment success received', { reference, amount, eventType });
+        
         // Find the order using the reference code
         const { data: order, error: findError } = await supabaseAdmin
           .from('orders')
-          .select('id, status')
+          .select('id, status, delivery_area')
           .eq('code', reference)
           .single();
 
@@ -69,51 +83,77 @@ export async function POST(req: Request) {
 
         // Only update if the order is still marked as 'pending_payment'
         if (order.status === 'pending_payment') {
+          // Update order status first
           const { error: updateError } = await supabaseAdmin
             .from('orders')
             .update({ status: 'received' })
             .eq('id', order.id);
 
-          if (updateError) throw updateError;
+          if (updateError) {
+            console.error('Failed to update order status:', updateError);
+            throw updateError;
+          }
 
+          // Log the payment confirmation event
           await supabaseAdmin.from('order_events').insert({
             order_id: order.id,
             status: 'Payment Confirmed',
             note: `Successfully received GHS ${(amount / 100).toFixed(2)}.`,
           });
+          
           paymentDebug('Webhook updated order to received', { reference, orderId: order.id });
 
-          // Auto-assign pharmacy after payment confirmation
+          // Send SMS confirmation after successful payment
+          // This MUST happen before auto-assignment to ensure customer is notified
           try {
-            const { data: orderDetails } = await supabaseAdmin
-              .from('orders')
-              .select('delivery_area')
-              .eq('id', order.id)
-              .single();
-
-            if (orderDetails?.delivery_area) {
-              const { autoAssignOrder } = await import('@/lib/order-assignment');
-              const assignResult = await autoAssignOrder(order.id, orderDetails.delivery_area);
-
-              if (assignResult.success) {
-                paymentDebug('Auto-assigned pharmacy', { orderId: order.id, pharmacyId: assignResult.pharmacyId });
-              } else if (assignResult.requiresManual) {
-                paymentDebug('Manual assignment required', { orderId: order.id, deliveryArea: orderDetails.delivery_area });
-              }
-            }
-          } catch (assignError) {
-            console.warn('Auto-assignment failed, will require manual assignment:', assignError);
+            await sendOrderConfirmationSMS(order.id);
+            paymentDebug('SMS confirmation sent', { orderId: order.id });
+          } catch (smsError) {
+            // Log but don't fail the webhook - SMS failure shouldn't block payment confirmation
+            console.error('Failed to send SMS confirmation:', smsError);
           }
 
-          // Send SMS confirmation after successful payment
-          await sendOrderConfirmationSMS(order.id);
+          // Auto-assign pharmacy after payment confirmation
+          // This is isolated so failures don't affect payment confirmation or SMS
+          if (order.delivery_area) {
+            try {
+              // Get order items for auto-assignment
+              const { data: orderWithItems } = await supabaseAdmin
+                .from('orders')
+                .select('items')
+                .eq('id', order.id)
+                .single();
+              
+              if (orderWithItems?.items) {
+                const { autoAssignOrder } = await import('@/lib/order-assignment');
+                const assignResult = await autoAssignOrder(order.id, order.delivery_area, orderWithItems.items as any[]);
+
+                if (assignResult.success) {
+                  paymentDebug('Auto-assigned pharmacy', { orderId: order.id, pharmacyId: assignResult.pharmacyId });
+                } else {
+                  paymentDebug('Manual assignment required', { orderId: order.id, deliveryArea: order.delivery_area, reason: assignResult.reason || assignResult.error });
+                }
+              }
+            } catch (assignError) {
+              // Log and continue - admin will handle manual assignment
+              console.warn('Auto-assignment failed, requires manual assignment:', assignError);
+              paymentDebug('Auto-assignment failed', { orderId: order.id, error: String(assignError) });
+            }
+          }
+        } else {
+          paymentDebug('Order already processed', { reference, orderId: order.id, currentStatus: order.status });
         }
 
       } catch (err) {
         console.error('Webhook processing error:', err);
         return new NextResponse('Webhook Error: Internal Server Error', { status: 500 });
       }
+    } else {
+      paymentDebug('Webhook received non-success status', { reference, status });
     }
+  } else {
+    // Log unhandled events for monitoring
+    paymentDebug('Webhook event not handled', { eventType, reference });
   }
 
   // 4. Acknowledge receipt of the event

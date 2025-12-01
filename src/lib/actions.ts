@@ -137,10 +137,22 @@ export async function sendOrderConfirmationSMS(orderId: string): Promise<void> {
       return;
     }
 
+    // Defensive check: ensure phone number exists
+    if (!order.phone_masked || order.phone_masked.trim() === '') {
+      console.warn('SMS not sent: phone_masked is missing for order', { orderId, code: order.code });
+      return;
+    }
+
     const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${order.code}`;
     const confirmationMessage = `Payment for order ${order.code} confirmed. We're now preparing your package for discreet delivery. Track: ${trackingUrl}`;
 
-    await sendSMS(order.phone_masked, confirmationMessage);
+    const result = await sendSMS(order.phone_masked, confirmationMessage);
+    
+    if (!result.ok) {
+      console.error('SMS sending failed for order confirmation:', { orderId, code: order.code, error: result.error });
+    } else {
+      console.log('Order confirmation SMS sent successfully:', { orderId, code: order.code, recipient: result.recipient });
+    }
   } catch (error) {
     console.error('Error sending order confirmation SMS:', error);
   }

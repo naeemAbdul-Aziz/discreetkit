@@ -35,29 +35,54 @@ function SuccessContent() {
       }
       try {
         // Small delay to give webhook a head start
-        await new Promise(r => setTimeout(r, 1000));
+        await new Promise(r => setTimeout(r, 1500));
+        
+        // First, try to verify the payment with Paystack
         const res = await fetch(`/api/payment/verify?reference=${encodeURIComponent(code)}`, { cache: 'no-store' });
         const data = await res.json().catch(() => null);
+        
         if (cancelled) return;
+        
+        // Check if verification was successful
         const verifiedOk = res.ok && data?.ok;
+        
         if (verifiedOk) {
+          // Payment verified successfully
           setPaymentStatus('success');
           setIsConfirmed(true);
+        } else {
+          // Verification failed or returned error - check order status directly
+          // This covers the case where webhook already processed the payment
+          const order = await getOrderAction(code);
+          
+          if (order) {
+            if (order.status !== 'pending_payment') {
+              // Payment was already confirmed (likely by webhook)
+              setPaymentStatus('success');
+              setIsConfirmed(true);
+            } else {
+              // Payment is still pending - show pending status
+              setPaymentStatus('pending');
+            }
+          } else {
+            // Order not found
+            setPaymentStatus('failed');
+          }
         }
-        // If verify did not confirm, double-check order status via action (covers webhook already applied)
-        if (!verifiedOk) {
+      } catch (e) {
+        console.error('Payment verification error:', e);
+        // On error, check order status as fallback
+        try {
           const order = await getOrderAction(code);
           if (order && order.status !== 'pending_payment') {
             setPaymentStatus('success');
             setIsConfirmed(true);
           } else {
-            // Still show success UX; tracking page is source of truth
-            setPaymentStatus('success');
+            setPaymentStatus('pending');
           }
+        } catch {
+          setPaymentStatus('pending');
         }
-      } catch (e) {
-        // Fallback: still show success UX, as user reached callback page from gateway
-        setPaymentStatus('success');
       } finally {
         if (!cancelled) setIsVerifying(false);
       }
@@ -108,6 +133,41 @@ function SuccessContent() {
               Place a New Order
             </Link>
           </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (paymentStatus === 'pending') {
+    return (
+      <Card className="w-full max-w-lg text-center">
+        <CardHeader className="items-center">
+            <AlertCircle className="h-16 w-16 text-yellow-500" />
+            <CardTitle className="mt-4 text-2xl">Payment Pending</CardTitle>
+            <CardDescription className="max-w-md">
+                Your payment is still being processed. This usually takes a few moments. Please check your order status using the tracking code below, or contact support if the issue persists.
+            </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <p className="text-sm text-muted-foreground">Your Tracking Code:</p>
+            <div className="mt-2 flex items-center justify-center rounded-lg border bg-muted p-3">
+              <p className="text-xl font-bold tracking-widest text-foreground">{code}</p>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <Button asChild className="w-full">
+              <Link href={`/track?code=${code}`}>
+                <Truck />
+                Check Order Status
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="w-full">
+              <Link href="/partner-care">
+                Contact Support
+              </Link>
+            </Button>
+          </div>
         </CardContent>
       </Card>
     );

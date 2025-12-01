@@ -108,7 +108,12 @@ export async function GET(req: Request) {
           paymentDebug('Reconciled order to received', { code: o.code, orderId: current.id });
           
           // Send SMS confirmation after successful payment reconciliation
-          await sendOrderConfirmationSMS(current.id);
+          try {
+            await sendOrderConfirmationSMS(current.id);
+            paymentDebug('SMS confirmation sent via reconcile', { orderId: current.id });
+          } catch (smsError) {
+            console.error('Failed to send SMS confirmation on reconcile:', smsError);
+          }
           
           results.push({ code: o.code, updated: true });
         } else {
