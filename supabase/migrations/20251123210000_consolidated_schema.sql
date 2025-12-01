@@ -243,18 +243,6 @@ ALTER TABLE public.pharmacies ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.pharmacy_products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.pharmacy_service_areas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.order_events ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.pharmacy_notifications ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.suggestions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.payment_events ENABLE ROW LEVEL SECURITY;
-
--- 8.1 ROLES & SETTINGS
-CREATE POLICY "Public read access" ON public.roles FOR SELECT USING (true);
-CREATE POLICY "Public read access" ON public.store_settings FOR SELECT USING (true);
-CREATE POLICY "Admin full access" ON public.store_settings FOR ALL USING (auth.role() = 'service_role');
-
--- 8.2 CATEGORIES & PRODUCTS
-CREATE POLICY "Public read access" ON public.categories FOR SELECT USING (true);
 CREATE POLICY "Admin full access" ON public.categories FOR ALL USING (auth.role() = 'service_role');
 
 CREATE POLICY "Public read access" ON public.products FOR SELECT USING (true);

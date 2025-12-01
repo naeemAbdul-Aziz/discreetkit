@@ -143,7 +143,12 @@ export async function getUserRoles(supabase: any, userId: string): Promise<strin
     .from('user_roles')
     .select('roles(name)')
     .eq('user_id', userId);
-  if (error || !data) return [];
+
+  if (error) {
+    console.error('[getUserRoles] Error fetching roles:', error);
+    return [];
+  }
+  if (!data) return [];
   // data: [{ roles: { name: 'admin' } }, ...]
   return data.map((r: any) => r.roles?.name).filter(Boolean);
 }

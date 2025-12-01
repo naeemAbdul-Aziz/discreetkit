@@ -27,10 +27,16 @@ export async function middleware(request: NextRequest) {
     }
 
     // 4. Role-based protection for admin and pharmacy
+    // 4. Role-based protection for admin and pharmacy
     if (user && (isAdminSubdomain || isAdminPath)) {
         const roles = await getUserRoles(supabase, user.id);
         if (!roles.includes('admin')) {
-            // Redirect to unauthorized page (same host if possible)
+            // If they are a pharmacy user, redirect to pharmacy portal
+            if (roles.includes('pharmacy')) {
+                const pharmacyUrl = new URL('/pharmacy/dashboard', process.env.NEXT_PUBLIC_PHARMACY_URL || 'https://pharmacy.discreetkit.com');
+                return NextResponse.redirect(pharmacyUrl);
+            }
+            // Otherwise, unauthorized
             url.pathname = '/unauthorized';
             return NextResponse.redirect(url);
         }
@@ -38,6 +44,11 @@ export async function middleware(request: NextRequest) {
     if (user && (isPharmacySubdomain || isPharmacyPath)) {
         const roles = await getUserRoles(supabase, user.id);
         if (!roles.includes('pharmacy')) {
+            // If they are an admin, redirect to admin portal
+            if (roles.includes('admin')) {
+                const adminUrl = new URL('/admin/dashboard', process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.discreetkit.com');
+                return NextResponse.redirect(adminUrl);
+            }
             url.pathname = '/unauthorized';
             return NextResponse.redirect(url);
         }
