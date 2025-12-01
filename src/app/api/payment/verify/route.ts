@@ -37,7 +37,11 @@ export async function GET(req: Request) {
       });
     }
 
-    const paystackSecretKey = process.env.PAYSTACK_SECRET_KEY;
+    // Sanitize secret key (some platforms add quotes)
+    let paystackSecretKey = process.env.PAYSTACK_SECRET_KEY;
+    if (typeof paystackSecretKey === 'string') {
+      paystackSecretKey = paystackSecretKey.replace(/^"|"$/g, '').trim();
+    }
     if (!paystackSecretKey) {
       console.error('PAYSTACK_SECRET_KEY is not configured');
       return NextResponse.json({ ok: false, error: 'Server not configured' }, { status: 500 });

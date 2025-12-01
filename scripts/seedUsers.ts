@@ -1,7 +1,9 @@
+import 'dotenv/config'
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY!
+// Use server-side service role key
+const supabaseKey = (process.env.SUPABASE_SERVICE_KEY || process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY)!;
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 async function ensureRole(name: string): Promise<string> {
@@ -46,9 +48,7 @@ async function main() {
 
   // Pharmacies (add/edit as needed)
   const pharmacies = [
-    { email: 'pharmacy1@example.com', password: 'PharmacyPass1' },
-    { email: 'pharmacy2@example.com', password: 'PharmacyPass2' },
-    // Add more pharmacies here
+    { email: 'beybeepharmacy@gmail.com', password: 'DiscreetKitAdmin2k25' },
   ]
   const pharmacyRoleId = await ensureRole('pharmacy')
   for (const { email, password } of pharmacies) {

@@ -11,7 +11,11 @@ import { paymentDebug } from '@/lib/utils';
 import { sendOrderConfirmationSMS } from '@/lib/actions';
 
 export async function POST(req: Request) {
-  const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
+  // Sanitize secret key (some platforms add quotes)
+  let paystackSecret = process.env.PAYSTACK_SECRET_KEY as string | undefined;
+  if (typeof paystackSecret === 'string') {
+    paystackSecret = paystackSecret.replace(/^"|"$/g, '').trim();
+  }
 
   if (!paystackSecret) {
     console.error('Paystack secret key is not configured.');

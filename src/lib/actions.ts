@@ -270,10 +270,21 @@ export async function login(formData: FormData) {
     // Fetch user roles to determine redirect destination
     const { getUserRoles } = await import('@/lib/auth/roles');
     const roles = await getUserRoles(supabase, authData.user.id);
+    const email = authData.user.email?.toLowerCase() || '';
+    const adminWhitelist = (process.env.ADMIN_EMAIL_WHITELIST || '')
+      .split(',')
+      .map(e => e.trim().toLowerCase())
+      .filter(Boolean);
+    const pharmacyWhitelist = (process.env.PHARMACY_EMAIL_WHITELIST || '')
+      .split(',')
+      .map(e => e.trim().toLowerCase())
+      .filter(Boolean);
+    const isAdmin = roles.includes('admin') || adminWhitelist.includes(email);
+    const isPharmacy = roles.includes('pharmacy') || pharmacyWhitelist.includes(email);
 
-    if (roles.includes('admin')) {
+    if (isAdmin) {
       redirect(process.env.NEXT_PUBLIC_ADMIN_URL || '/admin/dashboard');
-    } else if (roles.includes('pharmacy')) {
+    } else if (isPharmacy) {
       redirect(process.env.NEXT_PUBLIC_PHARMACY_URL || '/pharmacy/dashboard');
     } else {
       redirect('/');

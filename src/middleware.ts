@@ -27,30 +27,42 @@ export async function middleware(request: NextRequest) {
     }
 
     // 4. Role-based protection for admin and pharmacy
-    // 4. Role-based protection for admin and pharmacy
     if (user && (isAdminSubdomain || isAdminPath)) {
         const roles = await getUserRoles(supabase, user.id);
-        if (!roles.includes('admin')) {
+        const userEmail = user.email?.toLowerCase() || '';
+        const adminWhitelist = (process.env.ADMIN_EMAIL_WHITELIST || '')
+          .split(',')
+          .map(e => e.trim().toLowerCase())
+          .filter(Boolean);
+        const isWhitelistedAdmin = adminWhitelist.includes(userEmail);
+        if (!roles.includes('admin') && !isWhitelistedAdmin) {
             // If they are a pharmacy user, redirect to pharmacy portal
             if (roles.includes('pharmacy')) {
                 const pharmacyUrl = new URL('/pharmacy/dashboard', process.env.NEXT_PUBLIC_PHARMACY_URL || 'https://pharmacy.discreetkit.com');
                 return NextResponse.redirect(pharmacyUrl);
             }
-            // Otherwise, unauthorized
-            url.pathname = '/unauthorized';
-            return NextResponse.redirect(url);
+            // Otherwise, unauthorized — redirect to main site's unauthorized page
+            const unauthorizedUrl = new URL('/unauthorized', process.env.NEXT_PUBLIC_SITE_URL || 'https://discreetkit.com');
+            return NextResponse.redirect(unauthorizedUrl);
         }
     }
     if (user && (isPharmacySubdomain || isPharmacyPath)) {
         const roles = await getUserRoles(supabase, user.id);
-        if (!roles.includes('pharmacy')) {
+        const userEmail = user.email?.toLowerCase() || '';
+        const pharmacyWhitelist = (process.env.PHARMACY_EMAIL_WHITELIST || '')
+          .split(',')
+          .map(e => e.trim().toLowerCase())
+          .filter(Boolean);
+        const isWhitelistedPharmacy = pharmacyWhitelist.includes(userEmail);
+        if (!roles.includes('pharmacy') && !isWhitelistedPharmacy) {
             // If they are an admin, redirect to admin portal
             if (roles.includes('admin')) {
                 const adminUrl = new URL('/admin/dashboard', process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.discreetkit.com');
                 return NextResponse.redirect(adminUrl);
             }
-            url.pathname = '/unauthorized';
-            return NextResponse.redirect(url);
+            // Otherwise, unauthorized — redirect to main site's unauthorized page
+            const unauthorizedUrl = new URL('/unauthorized', process.env.NEXT_PUBLIC_SITE_URL || 'https://discreetkit.com');
+            return NextResponse.redirect(unauthorizedUrl);
         }
     }
 
@@ -59,7 +71,10 @@ export async function middleware(request: NextRequest) {
         if (url.pathname === '/') {
             url.pathname = '/admin/dashboard';
         } else {
-            if (!url.pathname.startsWith('/admin') && !url.pathname.startsWith('/login')) {
+            // Do not force-prefix certain global routes
+            const exemptPaths = ['/login', '/unauthorized', '/robots.txt', '/sitemap.xml'];
+            const isExempt = exemptPaths.some((p) => url.pathname.startsWith(p));
+            if (!url.pathname.startsWith('/admin') && !isExempt) {
                 url.pathname = `/admin${url.pathname}`;
             }
         }
@@ -69,7 +84,10 @@ export async function middleware(request: NextRequest) {
         if (url.pathname === '/') {
             url.pathname = '/pharmacy/dashboard';
         } else {
-            if (!url.pathname.startsWith('/pharmacy') && !url.pathname.startsWith('/login')) {
+            // Do not force-prefix certain global routes
+            const exemptPaths = ['/login', '/unauthorized', '/robots.txt', '/sitemap.xml'];
+            const isExempt = exemptPaths.some((p) => url.pathname.startsWith(p));
+            if (!url.pathname.startsWith('/pharmacy') && !isExempt) {
                 url.pathname = `/pharmacy${url.pathname}`;
             }
         }

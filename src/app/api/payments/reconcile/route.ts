@@ -30,7 +30,11 @@ export async function GET(req: Request) {
     return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
   }
 
-  const paystackSecretKey = process.env.PAYSTACK_SECRET_KEY;
+  // Sanitize secret key (some platforms add quotes)
+  let paystackSecretKey = process.env.PAYSTACK_SECRET_KEY as string | undefined;
+  if (typeof paystackSecretKey === 'string') {
+    paystackSecretKey = paystackSecretKey.replace(/^"|"$/g, '').trim();
+  }
   if (!paystackSecretKey) {
     return NextResponse.json({ ok: false, error: 'Missing PAYSTACK_SECRET_KEY' }, { status: 500 });
   }

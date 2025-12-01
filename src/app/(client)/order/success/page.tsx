@@ -38,7 +38,11 @@ function SuccessContent() {
         await new Promise(r => setTimeout(r, 1500));
         
         // First, try to verify the payment with Paystack
-        const res = await fetch(`/api/payment/verify?reference=${encodeURIComponent(code)}`, { cache: 'no-store' });
+        // Add a hard timeout so UI never hangs in Verifying state
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+        const res = await fetch(`/api/payment/verify?reference=${encodeURIComponent(code)}`, { cache: 'no-store', signal: controller.signal });
+        clearTimeout(timeoutId);
         const data = await res.json().catch(() => null);
         
         if (cancelled) return;
