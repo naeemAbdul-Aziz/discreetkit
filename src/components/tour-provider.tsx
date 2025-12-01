@@ -19,8 +19,11 @@ export function TourProvider({ children }: TourProviderProps) {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Only show on home page for first-time users
-    if (pathname === '/' && typeof window !== 'undefined' && !localStorage.getItem('tour-completed')) {
+    // Only show on home page for first-time users, and NOT on subdomains
+    const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+    const isSubdomain = hostname.startsWith('admin.') || hostname.startsWith('pharmacy.');
+
+    if (pathname === '/' && !isSubdomain && typeof window !== 'undefined' && !localStorage.getItem('tour-completed')) {
       const timer = setTimeout(() => {
         setShowWelcome(true);
       }, 1000);

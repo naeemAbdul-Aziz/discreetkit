@@ -9,14 +9,32 @@ import { getSupabaseClient } from "@/lib/supabase"
 export function DashboardSidebar() {
   const pathname = usePathname()
   const router = useRouter()
-  const navItems = React.useMemo(() => ([
-    { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
-    { href: "/admin/products", label: "Products", icon: Package },
-    { href: "/admin/categories", label: "Categories", icon: Layers },
-    { href: "/admin/partners", label: "Partners", icon: Users },
-    { href: "/admin/settings", label: "Settings", icon: Settings },
-  ]), [])
+  const [isPharmacy, setIsPharmacy] = React.useState(false)
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+       const hostname = window.location.hostname
+       if (hostname.startsWith('pharmacy.') || pathname.startsWith('/pharmacy')) {
+         setIsPharmacy(true)
+       }
+    }
+  }, [pathname])
+
+  const navItems = React.useMemo(() => {
+    if (isPharmacy) {
+        return [
+            { href: "/", label: "Dashboard", icon: LayoutDashboard },
+        ]
+    }
+    return [
+        { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+        { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
+        { href: "/admin/products", label: "Products", icon: Package },
+        { href: "/admin/categories", label: "Categories", icon: Layers },
+        { href: "/admin/partners", label: "Partners", icon: Users },
+        { href: "/admin/settings", label: "Settings", icon: Settings },
+    ]
+  }, [isPharmacy])
 
   const handleSignOut = async () => {
     const supabase = getSupabaseClient()

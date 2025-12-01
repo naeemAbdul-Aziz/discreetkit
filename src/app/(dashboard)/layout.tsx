@@ -24,15 +24,32 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (found) setTitle(found)
   }, [])
 
-  const isMobile = useIsMobile();
-  const navItems = [
-    { href: "/admin", label: "Overview", icon: Home },
-    { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
-    { href: "/admin/products", label: "Products", icon: Package },
-    { href: "/admin/categories", label: "Categories", icon: Package },
-    { href: "/admin/partners", label: "Partners", icon: Users },
-    { href: "/admin/settings", label: "Settings", icon: Settings },
-  ];
+  const [isPharmacy, setIsPharmacy] = React.useState(false)
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+       const hostname = window.location.hostname
+       if (hostname.startsWith('pharmacy.') || window.location.pathname.startsWith('/pharmacy')) {
+         setIsPharmacy(true)
+       }
+    }
+  }, [])
+
+  const navItems = React.useMemo(() => {
+    if (isPharmacy) {
+        return [
+            { href: "/", label: "Dashboard", icon: Home },
+        ]
+    }
+    return [
+        { href: "/admin", label: "Overview", icon: Home },
+        { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
+        { href: "/admin/products", label: "Products", icon: Package },
+        { href: "/admin/categories", label: "Categories", icon: Package },
+        { href: "/admin/partners", label: "Partners", icon: Users },
+        { href: "/admin/settings", label: "Settings", icon: Settings },
+    ]
+  }, [isPharmacy])
 
   return (
     <SidebarProvider>
