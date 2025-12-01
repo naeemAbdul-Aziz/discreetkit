@@ -24,6 +24,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (found) setTitle(found)
   }, [])
 
+  const isMobile = useIsMobile();
   const [isPharmacy, setIsPharmacy] = React.useState(false)
 
   React.useEffect(() => {
