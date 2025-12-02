@@ -22,6 +22,7 @@ export default function PharmacyDashboardPage() {
   const [data, setData] = useState<PharmacyData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [dataLoaded, setDataLoaded] = useState(false);
 
   const loadData = async () => {
     try {
@@ -47,9 +48,11 @@ export default function PharmacyDashboardPage() {
       
       const json = await res.json();
       setData(json);
+      setDataLoaded(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load dashboard');
       console.error('[PharmacyDashboard] Error:', err);
+      setDataLoaded(false);
     } finally {
       setLoading(false);
     }
@@ -59,8 +62,9 @@ export default function PharmacyDashboardPage() {
     loadData();
   }, [router]);
 
-  // Real-time updates via SSE
-  useSSE('/api/pharmacy/realtime', {
+  // Real-time updates via SSE - only connect if initial load succeeded
+  // This prevents infinite connection loops if auth/network is broken
+  useSSE(dataLoaded ? '/api/pharmacy/realtime' : '', {
     onMessage: (event) => {
       try {
         const msg = JSON.parse(event.data);
