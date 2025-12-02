@@ -73,7 +73,7 @@ export function DashboardSidebar() {
         <SidebarMenu>
           {navItems.map(item => {
             // Updated active logic to handle both / and /admin when using subdomains
-            const isActive = item.href === "/admin" 
+            const isActive = item.href === "/admin" || item.href === "/"
                 ? (pathname === "/admin" || pathname === "/") 
                 : pathname.startsWith(item.href);
             

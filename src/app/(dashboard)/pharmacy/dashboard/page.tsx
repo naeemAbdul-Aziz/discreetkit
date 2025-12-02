@@ -15,49 +15,64 @@ type PharmacyData = {
   statusBreakdown: { status: string; count: number }[];
 };
 
+import { useSSE } from '@/hooks/use-sse'
+
 export default function PharmacyDashboardPage() {
   const router = useRouter();
   const [data, setData] = useState<PharmacyData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setError(null);
-        const res = await fetch('/api/pharmacy/dashboard', { cache: 'no-store' });
-        
-        if (res.status === 401) {
-          router.push('/login');
-          return;
-        }
-        
-        if (res.status === 403) {
-          router.push('/unauthorized');
-          return;
-        }
-        
-        if (!res.ok) {
-          const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
-          throw new Error(errorData.error || 'Failed to load dashboard');
-        }
-        
-        const json = await res.json();
-        setData(json);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load dashboard');
-        console.error('[PharmacyDashboard] Error:', err);
-      } finally {
+  const loadData = async () => {
+    try {
+      setError(null);
+      const res = await fetch('/api/pharmacy/dashboard', { cache: 'no-store' });
+      
+      if (res.status === 401) {
         setLoading(false);
+        router.push('/login');
+        return;
       }
-    };
+      
+      if (res.status === 403) {
+        setLoading(false);
+        router.push('/unauthorized');
+        return;
+      }
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(errorData.error || 'Failed to load dashboard');
+      }
+      
+      const json = await res.json();
+      setData(json);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load dashboard');
+      console.error('[PharmacyDashboard] Error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     loadData();
-    
-    // Refresh every 30 seconds for real-time updates
-    const interval = setInterval(loadData, 30000);
-    return () => clearInterval(interval);
   }, [router]);
+
+  // Real-time updates via SSE
+  useSSE('/api/pharmacy/realtime', {
+    onMessage: (event) => {
+      try {
+        const msg = JSON.parse(event.data);
+        if (msg.type === 'orders') {
+          // Refresh data on order updates
+          loadData();
+        }
+      } catch (e) {
+        console.error('SSE parse error', e);
+      }
+    }
+  });
 
   if (loading) {
     return (
