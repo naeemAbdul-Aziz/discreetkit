@@ -81,11 +81,28 @@ export async function GET(req: Request) {
     if (status === 'success') {
       const supabase = getSupabaseAdminClient();
 
-      const { data: order, error: findError } = await supabase
-        .from('orders')
-        .select('id, status')
-        .eq('code', reference)
-        .single();
+      // Try multiple keys: direct code match, Paystack reference, and metadata.order_code
+      let order: { id: number; status: string } | null = null;
+      let findError: any = null;
+      const tryFetch = async (code: string | null | undefined) => {
+        if (!code) return null;
+        const { data, error } = await supabase
+          .from('orders')
+          .select('id, status')
+          .eq('code', code)
+          .single();
+        if (!error && data) return data as any;
+        return null;
+      };
+
+      order = await tryFetch(reference);
+      if (!order) {
+        order = await tryFetch(data?.reference);
+      }
+      if (!order) {
+        const metaOrderCode = typeof data?.metadata === 'object' ? (data.metadata.order_code || data.metadata.code) : undefined;
+        order = await tryFetch(metaOrderCode);
+      }
 
       if (findError || !order) {
         // Not fatal for client UX; just report not found
@@ -117,7 +134,7 @@ export async function GET(req: Request) {
 
         // Send SMS confirmation after successful payment
         try {
-          await sendOrderConfirmationSMS(order.id);
+          await sendOrderConfirmationSMS(String(order.id));
           paymentDebug('SMS confirmation sent via verify', { orderId: order.id });
         } catch (smsError) {
           // Log but don't fail the request - SMS failure shouldn't block payment confirmation

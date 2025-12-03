@@ -33,6 +33,7 @@ export function getSupabaseClient() {
 export async function createSupabaseServerClient() {
   const { cookies } = await import('next/headers');
   const cookieStore = await cookies();
+  const cookieDomain = process.env.NEXT_PUBLIC_COOKIE_DOMAIN;
   return createServerClient(
     supabaseUrl,
     supabaseAnonKey,
@@ -47,7 +48,7 @@ export async function createSupabaseServerClient() {
               name,
               value,
               ...options,
-              domain: process.env.NEXT_PUBLIC_COOKIE_DOMAIN || '.discreetkit.com',
+              ...(cookieDomain ? { domain: cookieDomain } : {}),
               sameSite: 'lax',
               secure: process.env.NODE_ENV === 'production'
             })
@@ -58,7 +59,7 @@ export async function createSupabaseServerClient() {
         },
         remove(name: string, options: CookieOptions) {
           try {
-            cookieStore.set({ name, value: '', ...options })
+            cookieStore.set({ name, value: '', ...options, ...(cookieDomain ? { domain: cookieDomain } : {}) })
           } catch (error) {
             // The `delete` cookie method throws when trying to delete a cookie in a Server Action.
             // This is expected, and can be safely ignored.
@@ -78,6 +79,7 @@ export function createSupabaseMiddlewareClient(request: NextRequest) {
     },
   });
 
+  const cookieDomain = process.env.NEXT_PUBLIC_COOKIE_DOMAIN;
   const supabase = createServerClient(
     supabaseUrl,
     supabaseAnonKey,
@@ -101,7 +103,7 @@ export function createSupabaseMiddlewareClient(request: NextRequest) {
             name,
             value,
             ...options,
-            domain: process.env.NEXT_PUBLIC_COOKIE_DOMAIN || '.discreetkit.com',
+            ...(cookieDomain ? { domain: cookieDomain } : {}),
             sameSite: 'lax',
             secure: process.env.NODE_ENV === 'production'
           });
@@ -121,7 +123,7 @@ export function createSupabaseMiddlewareClient(request: NextRequest) {
             name,
             value: '',
             ...options,
-            domain: process.env.NEXT_PUBLIC_COOKIE_DOMAIN || '.discreetkit.com',
+            ...(cookieDomain ? { domain: cookieDomain } : {}),
             sameSite: 'lax',
             secure: process.env.NODE_ENV === 'production'
           });
