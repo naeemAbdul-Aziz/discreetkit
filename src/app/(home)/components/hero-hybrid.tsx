@@ -56,7 +56,7 @@ export function HeroHybrid() {
         transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
         className="w-full"
       >
-        <Carousel items={cards} marquee={true} speed={100} />
+        <Carousel items={cards} marquee={true} speed={150} />
       </motion.div>
     </section>
   );
@@ -123,7 +123,7 @@ const data = [
   {
     category: "Feminine Hygiene",
     title: "Period Care.",
-    src: "https://i.ibb.co/qLgxY5st/self-care-purple.jpg",
+    src: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1764756036/self_care_green_purple_fy6cyv.png",
     content: <DummyContent />,
   },
 ];

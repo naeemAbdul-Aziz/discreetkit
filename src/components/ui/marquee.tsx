@@ -26,15 +26,15 @@ export function Marquee({ children, pauseOnHover = true, speed = 40, ariaLabel }
       onMouseLeave={() => pauseOnHover && setIsPaused(false)}
     >
       <div
-        className="flex min-w-full items-center gap-8"
+        className="flex min-w-full items-center"
         style={{
           animation: `marquee-scroll ${duration}s linear infinite`,
           animationPlayState: isPaused ? 'paused' as const : 'running' as const,
         }}
       >
         {/* Duplicate content for seamless loop */}
-        <div className="flex items-center gap-8" aria-hidden="true">{children}</div>
-        <div className="flex items-center gap-8" aria-hidden="true">{children}</div>
+        <div className="flex items-center gap-4 pr-4" aria-hidden="true">{children}</div>
+        <div className="flex items-center gap-4 pr-4" aria-hidden="true">{children}</div>
       </div>
       <style jsx>{`
         @keyframes marquee-scroll {
