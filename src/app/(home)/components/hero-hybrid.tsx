@@ -56,7 +56,7 @@ export function HeroHybrid() {
         transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
         className="w-full"
       >
-        <Carousel items={cards} />
+        <Carousel items={cards} marquee={true} speed={30} />
       </motion.div>
     </section>
   );
@@ -121,9 +121,9 @@ const data = [
     content: <DummyContent />,
   },
   {
-    category: "Self Care",
-    title: "Know Your Body.",
-    src: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=2080&auto=format&fit=crop",
+    category: "Feminine Hygiene",
+    title: "Period Care.",
+    src: "https://i.ibb.co/qLgxY5st/self-care-purple.jpg",
     content: <DummyContent />,
   },
 ];

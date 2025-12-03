@@ -15,10 +15,13 @@ import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import Image, { ImageProps } from "next/image";
 import { useOutsideClick } from "@/hooks/use-outside-click";
+import { Marquee } from "./marquee";
 
 interface CarouselProps {
   items: JSX.Element[];
   initialScroll?: number;
+  marquee?: boolean;
+  speed?: number;
 }
 
 type Card = {
@@ -36,7 +39,7 @@ export const CarouselContext = createContext<{
   currentIndex: 0,
 });
 
-export const Carousel = ({ items, initialScroll = 0 }: CarouselProps) => {
+export const Carousel = ({ items, initialScroll = 0, marquee = false, speed }: CarouselProps) => {
   const carouselRef = React.useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
   const [canScrollRight, setCanScrollRight] = React.useState(true);
@@ -86,6 +89,43 @@ export const Carousel = ({ items, initialScroll = 0 }: CarouselProps) => {
     return window && window.innerWidth < 768;
   };
 
+  if (marquee) {
+    return (
+      <CarouselContext.Provider
+        value={{ onCardClose: handleCardClose, currentIndex }}
+      >
+        <div className="relative w-full overflow-hidden">
+          <Marquee pauseOnHover speed={speed}>
+            <div className="flex flex-row justify-start gap-4 pl-4 md:pl-6 max-w-7xl mx-auto">
+              {items.map((item, index) => (
+                <motion.div
+                  initial={{
+                    opacity: 0,
+                    y: 20,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    y: 0,
+                    transition: {
+                      duration: 0.5,
+                      delay: 0.2 * index,
+                      ease: "easeOut",
+                      once: true,
+                    },
+                  }}
+                  key={"card" + index}
+                  className="rounded-3xl"
+                >
+                  {item}
+                </motion.div>
+              ))}
+            </div>
+          </Marquee>
+        </div>
+      </CarouselContext.Provider>
+    );
+  }
+
   return (
     <CarouselContext.Provider
       value={{ onCardClose: handleCardClose, currentIndex }}
@@ -96,12 +136,10 @@ export const Carousel = ({ items, initialScroll = 0 }: CarouselProps) => {
           ref={carouselRef}
           onScroll={checkScrollability}
         >
-          {/* Removed old incorrect gradient div */}
-
           <div
             className={cn(
               "flex flex-row justify-start gap-4 pl-4 md:pl-6",
-              "max-w-7xl mx-auto" 
+              "max-w-7xl mx-auto"
             )}
           >
             {items.map((item, index) => (
