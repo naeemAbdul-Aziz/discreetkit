@@ -14,6 +14,9 @@ export function HeroHybrid() {
   const cards = data.map((card, index) => (
     <Card key={card.src} card={card} index={index} />
   ));
+  
+  // Duplicate cards to ensure infinite scroll has enough content
+  const carouselItems = [...cards, ...cards];
 
   return (
     <section ref={containerRef} className="relative w-full flex flex-col overflow-hidden bg-background pt-20 md:pt-32 pb-12 md:pb-20">
@@ -56,7 +59,7 @@ export function HeroHybrid() {
         transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
         className="w-full"
       >
-        <Carousel items={cards} marquee={true} />
+        <Carousel items={carouselItems} marquee={true} />
       </motion.div>
     </section>
   );

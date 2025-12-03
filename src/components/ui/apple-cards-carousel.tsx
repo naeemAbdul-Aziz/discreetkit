@@ -301,9 +301,10 @@ export const Card = ({
             </motion.p>
             
             {/* Subtle Plus Icon */}
-            <div className="bg-white/20 backdrop-blur-md p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            {/* Subtle Plus Icon Removed */}
+            {/* <div className="bg-white/20 backdrop-blur-md p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <IconPlus className="w-4 h-4 text-white" />
-            </div>
+            </div> */}
           </div>
           
           <motion.p
