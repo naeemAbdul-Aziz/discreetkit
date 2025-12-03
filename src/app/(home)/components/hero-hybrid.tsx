@@ -105,7 +105,7 @@ const data = [
   {
     category: "Essentials",
     title: "Personal Care.",
-    src: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759413266/lube_ysdpst.png",
+    src: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1764757042/personal_care_ygnnrq.jpg",
     content: <DummyContent />,
   },
   {

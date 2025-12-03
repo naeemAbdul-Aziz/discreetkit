@@ -27,7 +27,16 @@ export default function PharmacyDashboardPage() {
   const loadData = async () => {
     try {
       setError(null);
-      const res = await fetch('/api/pharmacy/dashboard', { cache: 'no-store' });
+      
+      // Create a timeout promise
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Request timed out')), 15000)
+      );
+      
+      const fetchPromise = fetch('/api/pharmacy/dashboard', { cache: 'no-store' });
+      
+      // Race fetch against timeout
+      const res = await Promise.race([fetchPromise, timeoutPromise]) as Response;
       
       if (res.status === 401) {
         setLoading(false);
@@ -105,9 +114,17 @@ export default function PharmacyDashboardPage() {
 
   if (error) {
     return (
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>{error}</AlertDescription>
+      <Alert variant="destructive" className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </div>
+        <button 
+          onClick={() => { setLoading(true); loadData(); }}
+          className="px-3 py-1 text-sm bg-destructive-foreground/10 hover:bg-destructive-foreground/20 rounded-md transition-colors"
+        >
+          Retry
+        </button>
       </Alert>
     );
   }
