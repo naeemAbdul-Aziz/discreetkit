@@ -180,6 +180,7 @@ export const Carousel = ({ items, initialScroll = 0, marquee = false, speed }: C
         </div>
         <div className="flex justify-end gap-2 mr-10">
           <button
+            title="Scroll left"
             className="relative z-40 h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center disabled:opacity-50"
             onClick={scrollLeft}
             disabled={!canScrollLeft}
@@ -187,6 +188,7 @@ export const Carousel = ({ items, initialScroll = 0, marquee = false, speed }: C
             <IconArrowLeft className="h-6 w-6 text-gray-500" />
           </button>
           <button
+            title="Scroll right"
             className="relative z-40 h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center disabled:opacity-50"
             onClick={scrollRight}
             disabled={!canScrollRight}
@@ -261,6 +263,7 @@ export const Card = ({
               className="max-w-4xl w-full bg-white dark:bg-neutral-900 h-full md:h-auto md:max-h-[85vh] overflow-y-auto z-[60] p-6 md:p-12 md:rounded-[2rem] font-sans relative shadow-[0_20px_50px_rgba(0,0,0,0.15)] flex flex-col border border-neutral-100 dark:border-neutral-800"
             >
               <button
+                title="Close card"
                 className="absolute top-6 right-6 bg-neutral-100/50 dark:bg-neutral-800/50 hover:bg-neutral-200 dark:hover:bg-neutral-700 backdrop-blur-md h-10 w-10 rounded-full flex items-center justify-center transition-all duration-200 z-50 group"
                 onClick={handleClose}
               >
@@ -319,6 +322,7 @@ export const Card = ({
           alt={card.title}
           fill
           className="object-cover absolute z-10 inset-0"
+          style={{ objectPosition: 'center 55%' }}
         />
       </motion.button>
     </>
