@@ -57,7 +57,7 @@ export function HeroHybrid() {
         transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
         className="w-full"
       >
-        <Marquee speed={40} pauseOnHover={true}>
+        <Marquee speed={80} pauseOnHover={true}>
           {cards}
         </Marquee>
       </motion.div>
