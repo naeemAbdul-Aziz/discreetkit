@@ -12,6 +12,7 @@ import { steps } from '@/lib/data';
 // but for now we will override the display logic or ensure the data file is updated.
 // Actually, let's check if we can update the data file directly.
 import { Button } from '@/components/ui/button';
+import { StickyScroll } from '@/components/ui/sticky-scroll-reveal';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
@@ -105,73 +106,24 @@ export function HowItWorks() {
           </div>
         </div>
 
-
-        {/* Desktop Layout: Alternating Grid */}
-        <div className="hidden md:block space-y-16 md:space-y-24 max-w-5xl mx-auto">
-          {steps.map((step, index) => (
-            <div
-              key={step.number}
-              className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center"
-            >
-              {/* Image Column */}
-              <div
-                className={cn(
-                  'relative aspect-[4/3] w-full rounded-3xl overflow-hidden',
-                  index % 2 === 1 && 'md:order-last'
-                )}
-              >
-                <Image
-                  src={step.imageUrl}
-                  alt={step.title}
-                  fill
-                  sizes="50vw"
-                  className="object-cover rounded-3xl"
-                  data-ai-hint={step.imageHint}
-                  placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(800, 600))}`}
-                />
-              </div>
-
-              {/* Text Content Column */}
-              <div
-                className={cn(
-                  'flex flex-col justify-center',
-                  index % 2 === 1 && 'md:order-first'
-                )}
-              >
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center justify-center font-headline text-4xl font-bold text-primary/20">
-                    0{step.number}
-                  </div>
-                  <h3 className="text-xl md:text-2xl font-bold text-foreground">
-                    {step.title}
-                  </h3>
+        {/* Desktop Layout: Sticky Scroll */}
+        <div className="hidden md:block w-full max-w-6xl mx-auto">
+          <StickyScroll 
+            content={steps.map((step) => ({
+              title: step.title,
+              description: step.description,
+              content: (
+                <div className="h-full w-full flex items-center justify-center text-white relative">
+                  <Image
+                    src={step.imageUrl}
+                    alt={step.title}
+                    fill
+                    className="h-full w-full object-cover"
+                  />
                 </div>
-                <p className="mt-4 text-sm text-muted-foreground md:text-base">
-                  {step.description}
-                </p>
-                 {step.details && (
-                    <ul className="mt-4 space-y-3 text-muted-foreground">
-                        {step.details.map((detail, i) => (
-                            <li key={i} className="flex items-start gap-3">
-                                <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                                <span className="text-sm md:text-base">{detail}</span>
-                            </li>
-                        ))}
-                    </ul>
-                )}
-                {step.number === 4 && (
-                  <div className="mt-8">
-                    <Button asChild variant="secondary" size="lg">
-                      <Link href="/partner-care">
-                        Meet Our Support Partner
-                        <ArrowRight />
-                      </Link>
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
+              ),
+            }))} 
+          />
         </div>
       </div>
     </section>

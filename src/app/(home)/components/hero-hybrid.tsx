@@ -1,6 +1,7 @@
 "use client";
 import React, { useRef } from "react";
-import { Carousel, Card } from "@/components/ui/apple-cards-carousel";
+import { Card } from "@/components/ui/apple-cards-carousel";
+import { Marquee } from "@/components/ui/marquee";
 import Image from "next/image";
 import Link from 'next/link';
 import { ArrowRight, Play } from 'lucide-react';
@@ -56,7 +57,9 @@ export function HeroHybrid() {
         transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
         className="w-full"
       >
-        <Carousel items={cards} marquee={true} speed={150} />
+        <Marquee speed={40} pauseOnHover={true}>
+          {cards}
+        </Marquee>
       </motion.div>
     </section>
   );
