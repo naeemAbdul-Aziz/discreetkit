@@ -11,21 +11,6 @@
     /* #111111 - Soft Black */
 
     --card: 0 0% 100%;
-    /* Pure White */
-    --card-foreground: 0 0% 7%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 7%;
-
-    /* Deep Emerald & Electric Lime */
-    --primary: 164 67% 18%;
-    /* #0F4C3A - Trust/Medical */
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 78 100% 69%;
-    /* #D4FF5F - Modern/Action */
-    --secondary-foreground: 164 67% 18%;
-
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 40%;
 
@@ -91,12 +76,15 @@
   html {
     @apply scroll-smooth;
     font-size: 15px;
+
     @screen sm {
       font-size: 15.5px;
     }
+
     @screen md {
       font-size: 16px;
     }
+
     @screen lg {
       font-size: 17px;
     }

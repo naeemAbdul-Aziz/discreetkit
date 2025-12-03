@@ -253,32 +253,34 @@ export const Card = ({
               className="bg-black/80 backdrop-blur-lg h-full w-full fixed inset-0"
             />
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
               ref={containerRef}
               layoutId={layout ? `card-${card.title}` : undefined}
-              className="max-w-5xl w-full bg-white dark:bg-neutral-900 h-full md:h-fit md:max-h-[90%] overflow-y-auto z-[60] p-4 md:p-10 md:rounded-3xl font-sans relative shadow-2xl flex flex-col"
+              className="max-w-4xl w-full bg-white dark:bg-neutral-900 h-full md:h-auto md:max-h-[85vh] overflow-y-auto z-[60] p-6 md:p-12 md:rounded-[2rem] font-sans relative shadow-[0_20px_50px_rgba(0,0,0,0.15)] flex flex-col border border-neutral-100 dark:border-neutral-800"
             >
               <button
-                className="sticky top-4 right-4 ml-auto bg-black/50 hover:bg-black/70 backdrop-blur-md h-8 w-8 rounded-full flex items-center justify-center transition-colors z-50"
+                className="absolute top-6 right-6 bg-neutral-100/50 dark:bg-neutral-800/50 hover:bg-neutral-200 dark:hover:bg-neutral-700 backdrop-blur-md h-10 w-10 rounded-full flex items-center justify-center transition-all duration-200 z-50 group"
                 onClick={handleClose}
               >
-                <IconX className="h-5 w-5 text-white" />
+                <IconX className="h-5 w-5 text-neutral-500 group-hover:text-neutral-900 dark:text-neutral-400 dark:group-hover:text-white transition-colors" />
               </button>
               <motion.p
                 layoutId={layout ? `category-${card.title}` : undefined}
-                className="text-base font-medium text-black dark:text-white mt-4 md:mt-0"
+                className="text-sm font-bold text-primary uppercase tracking-wider mb-2"
               >
                 {card.category}
               </motion.p>
               <motion.h2
                 layoutId={layout ? `title-${card.title}` : undefined}
-                className="text-2xl md:text-5xl font-semibold text-neutral-700 mt-2 dark:text-white"
+                className="text-3xl md:text-5xl font-bold text-neutral-900 dark:text-white mb-6 leading-tight"
               >
                 {card.title}
               </motion.h2>
-              <div className="py-6 md:py-10">{card.content}</div>
+              <div className="prose prose-lg dark:prose-invert max-w-none text-neutral-600 dark:text-neutral-300">
+                {card.content}
+              </div>
             </motion.div>
           </div>
         )}

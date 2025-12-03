@@ -12,6 +12,9 @@ export const StickyScroll = ({
     title: string;
     description: string;
     content?: React.ReactNode | any;
+    step?: number;
+    details?: string[];
+    cta?: React.ReactNode;
   }[];
   contentClassName?: string;
 }) => {
@@ -48,28 +51,43 @@ export const StickyScroll = ({
         <div className="max-w-2xl">
           {content.map((item, index) => (
             <div key={item.title + index} className="my-20">
-              <motion.h2
-                initial={{
-                  opacity: 0,
-                }}
-                animate={{
-                  opacity: activeCard === index ? 1 : 0.3,
-                }}
-                className="text-2xl font-bold text-foreground"
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: activeCard === index ? 1 : 0.3 }}
+                className="flex items-center gap-4 mb-4"
               >
-                {item.title}
-              </motion.h2>
-              <motion.p
-                initial={{
-                  opacity: 0,
-                }}
-                animate={{
-                  opacity: activeCard === index ? 1 : 0.3,
-                }}
-                className="text-kg text-muted-foreground max-w-sm mt-10"
+                {item.step && (
+                  <span className="text-4xl font-bold text-primary/20 font-headline">
+                    0{item.step}
+                  </span>
+                )}
+                <h2 className="text-2xl font-bold text-foreground">
+                  {item.title}
+                </h2>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: activeCard === index ? 1 : 0.3 }}
               >
-                {item.description}
-              </motion.p>
+                <p className="text-kg text-muted-foreground max-w-sm">
+                  {item.description}
+                </p>
+                {item.details && (
+                  <ul className="mt-4 space-y-2">
+                    {item.details.map((detail, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
+                        {detail}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {item.cta && (
+                  <div className="mt-6">
+                    {item.cta}
+                  </div>
+                )}
+              </motion.div>
             </div>
           ))}
           <div className="h-40" />
