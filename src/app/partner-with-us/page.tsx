@@ -35,7 +35,7 @@ export default function PartnerPage() {
               className="text-4xl md:text-7xl font-bold tracking-tight text-white mb-8 leading-[1.1]"
             >
               The Invisible Customer is <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-[#187f76]">
                 Your Biggest Opportunity.
               </span>
             </motion.h1>
@@ -137,7 +137,7 @@ export default function PartnerPage() {
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto bg-gradient-to-br from-emerald-900/20 to-slate-900 border border-emerald-500/20 rounded-3xl p-12 text-center relative overflow-hidden">
             <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-64 h-64 bg-[#187f76]/10 rounded-full blur-3xl" />
             
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 relative z-10">
               Ready to Capture the Invisible Market?

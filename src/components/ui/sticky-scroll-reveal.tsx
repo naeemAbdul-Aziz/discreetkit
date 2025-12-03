@@ -72,11 +72,11 @@ export const StickyScroll = ({
                   {item.description}
                 </p>
                 {item.details && (
-                  <ul className="mt-4 space-y-2">
+                  <ul className="mt-4 space-y-3">
                     {item.details.map((detail, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
-                        {detail}
+                      <li key={i} className="flex items-start gap-3 text-sm md:text-base text-muted-foreground">
+                        <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                        <span>{detail}</span>
                       </li>
                     ))}
                   </ul>
@@ -94,7 +94,8 @@ export const StickyScroll = ({
       </div>
       <div
         className={cn(
-          "hidden lg:block h-60 w-80 rounded-md bg-background sticky top-10 overflow-hidden border border-border",
+          "hidden lg:block sticky top-10 overflow-hidden border border-border rounded-xl bg-background",
+          "aspect-[4/3] w-[520px] max-w-[60vw]",
           contentClassName
         )}
       >
@@ -103,3 +104,18 @@ export const StickyScroll = ({
     </motion.div>
   );
 };
+
+const CheckCircle = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={cn("h-5 w-5", className)}
+  >
+    <path
+      fillRule="evenodd"
+      d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.06-1.06l-3.25 3.25-1.5-1.5a.75.75 0 00-1.06 1.06l2 2a.75.75 0 001.06 0l3.75-3.75z"
+      clipRule="evenodd"
+    />
+  </svg>
+);
