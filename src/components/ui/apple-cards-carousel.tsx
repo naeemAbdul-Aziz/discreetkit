@@ -96,7 +96,7 @@ export const Carousel = ({ items, initialScroll = 0, marquee = false, speed }: C
       >
         <div className="relative w-full overflow-hidden">
           <Marquee pauseOnHover speed={speed}>
-            <div className="flex flex-row justify-start gap-4 pl-4 md:pl-6 max-w-7xl mx-auto">
+            <div className="flex flex-row justify-start gap-4">
               {items.map((item, index) => (
                 <motion.div
                   initial={{

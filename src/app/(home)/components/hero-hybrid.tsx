@@ -56,7 +56,7 @@ export function HeroHybrid() {
         transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
         className="w-full"
       >
-        <Carousel items={cards} marquee={true} speed={30} />
+        <Carousel items={cards} marquee={true} speed={100} />
       </motion.div>
     </section>
   );
