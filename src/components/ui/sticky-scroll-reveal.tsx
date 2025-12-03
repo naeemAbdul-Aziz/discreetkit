@@ -44,7 +44,7 @@ export const StickyScroll = ({
 
   return (
     <motion.div
-      className="h-[30rem] overflow-y-auto flex justify-center relative space-x-10 rounded-md p-10 no-scrollbar"
+      className="h-[30rem] overflow-y-auto flex justify-center relative space-x-10 rounded-md p-10 no-scrollbar overscroll-y-contain"
       ref={ref}
     >
       <div className="div relative flex items-start px-4">

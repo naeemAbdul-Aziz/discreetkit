@@ -23,7 +23,9 @@
 
     --border: 0 0% 92%;
     --input: 0 0% 92%;
-    --ring: 164 67% 18%;
+    --ring: 189 94% 43%;
+    --primary: 189 94% 43%;
+    --primary-foreground: 0 0% 100%;
 
     --radius: 1rem;
     /* Slightly rounder for modern feel */
@@ -40,7 +42,7 @@
     --popover: 0 0% 4%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 164 67% 18%;
+    --primary: 189 94% 43%;
     --primary-foreground: 0 0% 98%;
 
     --secondary: 78 100% 69%;
@@ -57,7 +59,7 @@
 
     --border: 0 0% 12%;
     --input: 0 0% 12%;
-    --ring: 164 67% 18%;
+    --ring: 189 94% 43%;
   }
 }
 

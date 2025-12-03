@@ -91,7 +91,7 @@ export function HowItWorks() {
                     )}
                     {step.number === 4 && (
                       <div className="pt-4">
-                        <Button asChild variant="secondary" size="lg">
+                        <Button asChild size="lg">
                           <Link href="/partner-care">
                             Meet Our Support Partner
                             <ArrowRight />
@@ -115,7 +115,7 @@ export function HowItWorks() {
               step: step.number,
               details: step.details,
               cta: step.number === 4 ? (
-                <Button asChild variant="secondary" size="lg">
+                <Button asChild size="lg">
                   <Link href="/partner-care">
                     Meet Our Support Partner
                     <ArrowRight className="ml-2 h-4 w-4" />
