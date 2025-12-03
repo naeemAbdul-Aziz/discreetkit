@@ -62,68 +62,127 @@ export function HeroHybrid() {
   );
 }
 
-const DummyContent = () => {
-  return (
-    <>
-      {[...new Array(1)].map((_, index) => {
-        return (
-          <div
-            key={"dummy-content" + index}
-            className="bg-[#F5F5F7] dark:bg-neutral-800 p-8 md:p-14 rounded-3xl mb-4"
-          >
-            <p className="text-neutral-600 dark:text-neutral-400 text-base md:text-2xl font-sans max-w-3xl mx-auto">
-              <span className="font-bold text-neutral-700 dark:text-neutral-200">
-                Your health is personal.
-              </span>{" "}
-              We believe in providing discreet, professional care that fits your lifestyle. 
-              Whether it's for daily wellness or specific needs, our kits are curated 
-              by experts to ensure you get exactly what you need, when you need it.
-            </p>
-            <div className="relative h-64 w-full mt-10">
-               <Image
-                src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=2070&auto=format&fit=crop"
-                alt="Medical kit"
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className="object-cover rounded-xl"
-              />
-            </div>
-          </div>
-        );
-      })}
-    </>
-  );
-};
-
 const data = [
   {
     category: "Intimacy",
     title: "Intimacy Essentials.",
     src: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1764078634/the_weekend_szdgv5.jpg",
-    content: <DummyContent />,
+    content: (
+      <div className="bg-[#F5F5F7] dark:bg-neutral-800 p-8 md:p-14 rounded-3xl mb-4">
+        <p className="text-neutral-600 dark:text-neutral-400 text-base md:text-2xl font-sans max-w-3xl mx-auto">
+          <span className="font-bold text-neutral-700 dark:text-neutral-200">
+            Enhance your connection.
+          </span>{" "}
+          From protection to pleasure, our intimacy kits are curated to ensure safety and satisfaction. 
+          Discreetly delivered, so you can focus on the moment without any awkward pharmacy runs.
+        </p>
+        <div className="relative h-64 w-full mt-10">
+          <Image
+            src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1764078634/the_weekend_szdgv5.jpg"
+            alt="Intimacy Essentials"
+            fill
+            className="object-cover rounded-xl"
+          />
+        </div>
+      </div>
+    ),
   },
   {
     category: "Essentials",
     title: "Personal Care.",
-    src: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1764757042/personal_care_ygnnrq.jpg",
-    content: <DummyContent />,
+    src: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1764757548/personal_care_jfoz28.jpg",
+    content: (
+      <div className="bg-[#F5F5F7] dark:bg-neutral-800 p-8 md:p-14 rounded-3xl mb-4">
+        <p className="text-neutral-600 dark:text-neutral-400 text-base md:text-2xl font-sans max-w-3xl mx-auto">
+          <span className="font-bold text-neutral-700 dark:text-neutral-200">
+            Everyday confidence.
+          </span>{" "}
+          Stay fresh and confident with our premium personal care selection. 
+          We stock high-quality essentials that you use daily, delivered right to your door 
+          in unbranded packaging.
+        </p>
+        <div className="relative h-64 w-full mt-10">
+          <Image
+            src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1764757548/personal_care_jfoz28.jpg"
+            alt="Personal Care"
+            fill
+            className="object-cover rounded-xl"
+          />
+        </div>
+      </div>
+    ),
   },
   {
     category: "Peace of Mind",
     title: "Preparedness Kits.",
     src: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1764078617/prepared_for_anything_l6arrq.jpg",
-    content: <DummyContent />,
+    content: (
+      <div className="bg-[#F5F5F7] dark:bg-neutral-800 p-8 md:p-14 rounded-3xl mb-4">
+        <p className="text-neutral-600 dark:text-neutral-400 text-base md:text-2xl font-sans max-w-3xl mx-auto">
+          <span className="font-bold text-neutral-700 dark:text-neutral-200">
+            Ready for anything.
+          </span>{" "}
+          Accidents happen, but panic doesn't have to. Our preparedness kits include 
+          emergency contraception and other urgent care items, so you have them 
+          <i>before</i> you need them.
+        </p>
+        <div className="relative h-64 w-full mt-10">
+          <Image
+            src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1764078617/prepared_for_anything_l6arrq.jpg"
+            alt="Preparedness Kits"
+            fill
+            className="object-cover rounded-xl"
+          />
+        </div>
+      </div>
+    ),
   },
   {
     category: "Expert Access",
     title: "Real Doctors. Zero Judgement.",
     src: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757955894/pyschologist_old_lady_cdm0ej.jpg",
-    content: <DummyContent />,
+    content: (
+      <div className="bg-[#F5F5F7] dark:bg-neutral-800 p-8 md:p-14 rounded-3xl mb-4">
+        <p className="text-neutral-600 dark:text-neutral-400 text-base md:text-2xl font-sans max-w-3xl mx-auto">
+          <span className="font-bold text-neutral-700 dark:text-neutral-200">
+            Professional advice, privately.
+          </span>{" "}
+          Skip the waiting room. Consult with licensed medical professionals online 
+          for prescriptions and health advice. It's safe, secure, and completely confidential.
+        </p>
+        <div className="relative h-64 w-full mt-10">
+          <Image
+            src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757955894/pyschologist_old_lady_cdm0ej.jpg"
+            alt="Doctor Consultation"
+            fill
+            className="object-cover rounded-xl"
+          />
+        </div>
+      </div>
+    ),
   },
   {
     category: "Feminine Hygiene",
     title: "Period Care.",
     src: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1764756036/self_care_green_purple_fy6cyv.png",
-    content: <DummyContent />,
+    content: (
+      <div className="bg-[#F5F5F7] dark:bg-neutral-800 p-8 md:p-14 rounded-3xl mb-4">
+        <p className="text-neutral-600 dark:text-neutral-400 text-base md:text-2xl font-sans max-w-3xl mx-auto">
+          <span className="font-bold text-neutral-700 dark:text-neutral-200">
+            Comfort when you need it.
+          </span>{" "}
+          We offer a range of feminine hygiene products designed for comfort and reliability. 
+          Get your monthly essentials delivered discreetly, so you never have to worry about running out.
+        </p>
+        <div className="relative h-64 w-full mt-10">
+          <Image
+            src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1764756036/self_care_green_purple_fy6cyv.png"
+            alt="Period Care"
+            fill
+            className="object-cover rounded-xl"
+          />
+        </div>
+      </div>
+    ),
   },
 ];

@@ -10,12 +10,14 @@ import {
   IconArrowLeft,
   IconArrowRight,
   IconX,
+  IconPlus,
 } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import Image, { ImageProps } from "next/image";
 import { useOutsideClick } from "@/hooks/use-outside-click";
-import { Marquee } from "./marquee";
+import useEmblaCarousel from "embla-carousel-react";
+import AutoScroll from "embla-carousel-auto-scroll";
 
 interface CarouselProps {
   items: JSX.Element[];
@@ -89,36 +91,48 @@ export const Carousel = ({ items, initialScroll = 0, marquee = false, speed }: C
     return window && window.innerWidth < 768;
   };
 
+  const [emblaRef] = useEmblaCarousel(
+    { loop: true, dragFree: true },
+    [
+      AutoScroll({
+        playOnInit: true,
+        speed: speed ? speed / 100 : 1, // Adjust speed scaling as needed
+        stopOnInteraction: false,
+        stopOnMouseEnter: true,
+      }),
+    ]
+  );
+
   if (marquee) {
     return (
       <CarouselContext.Provider
         value={{ onCardClose: handleCardClose, currentIndex }}
       >
-        <div className="relative w-full overflow-hidden">
-          <Marquee pauseOnHover speed={speed}>
+        <div className="relative w-full overflow-hidden" ref={emblaRef}>
+          <div className="flex touch-pan-y">
             {items.map((item, index) => (
               <motion.div
-                  initial={{
-                    opacity: 0,
-                    y: 20,
-                  }}
-                  animate={{
-                    opacity: 1,
-                    y: 0,
-                    transition: {
-                      duration: 0.5,
-                      delay: 0.2 * index,
-                      ease: "easeOut",
-                      once: true,
-                    },
-                  }}
-                  key={"card" + index}
-                  className="rounded-3xl"
-                >
-                  {item}
-                </motion.div>
-              ))}
-          </Marquee>
+                initial={{
+                  opacity: 0,
+                  y: 20,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                  transition: {
+                    duration: 0.5,
+                    delay: 0.2 * index,
+                    ease: "easeOut",
+                    once: true,
+                  },
+                }}
+                key={"card" + index}
+                className="flex-[0_0_auto] pl-4"
+              >
+                {item}
+              </motion.div>
+            ))}
+          </div>
         </div>
       </CarouselContext.Provider>
     );
@@ -230,40 +244,41 @@ export const Card = ({
     <>
       <AnimatePresence>
         {open && (
-          <div className="fixed inset-0 z-50 h-screen overflow-hidden">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-10">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              onClick={handleClose}
               className="bg-black/80 backdrop-blur-lg h-full w-full fixed inset-0"
             />
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
               ref={containerRef}
               layoutId={layout ? `card-${card.title}` : undefined}
-              className="max-w-5xl mx-auto bg-white dark:bg-neutral-900 h-fit  z-[60] my-10 p-4 md:p-10 rounded-3xl font-sans relative"
+              className="max-w-5xl w-full bg-white dark:bg-neutral-900 max-h-[90vh] overflow-y-auto z-[60] p-4 md:p-10 rounded-3xl font-sans relative shadow-2xl"
             >
               <button
-                className="sticky top-4 h-8 w-8 right-0 ml-auto bg-black dark:bg-white rounded-full flex items-center justify-center"
+                className="sticky top-0 right-0 ml-auto bg-black/50 hover:bg-black/70 backdrop-blur-md h-8 w-8 rounded-full flex items-center justify-center transition-colors z-50"
                 onClick={handleClose}
               >
-                <IconX className="h-6 w-6 text-neutral-100 dark:text-neutral-900" />
+                <IconX className="h-5 w-5 text-white" />
               </button>
               <motion.p
                 layoutId={layout ? `category-${card.title}` : undefined}
-                className="text-base font-medium text-black dark:text-white"
+                className="text-base font-medium text-black dark:text-white mt-4 md:mt-0"
               >
                 {card.category}
               </motion.p>
               <motion.h2
                 layoutId={layout ? `title-${card.title}` : undefined}
-                className="text-2xl md:text-5xl font-semibold text-neutral-700 mt-4 dark:text-white"
+                className="text-2xl md:text-5xl font-semibold text-neutral-700 mt-2 dark:text-white"
               >
                 {card.title}
               </motion.h2>
-              <div className="py-10">{card.content}</div>
+              <div className="py-6 md:py-10">{card.content}</div>
             </motion.div>
           </div>
         )}
@@ -271,16 +286,24 @@ export const Card = ({
       <motion.button
         layoutId={layout ? `card-${card.title}` : undefined}
         onClick={handleOpen}
-        className="rounded-3xl bg-gray-100 dark:bg-neutral-900 h-80 w-56 md:h-[40rem] md:w-96 overflow-hidden flex flex-col items-start justify-start relative z-10"
+        className="rounded-3xl bg-gray-100 dark:bg-neutral-900 h-80 w-56 md:h-[40rem] md:w-96 overflow-hidden flex flex-col items-start justify-start relative z-10 group"
       >
         <div className="absolute h-full top-0 inset-x-0 bg-gradient-to-b from-black/50 via-transparent to-transparent z-30 pointer-events-none" />
-        <div className="relative z-40 p-8">
-          <motion.p
-            layoutId={layout ? `category-${card.category}` : undefined}
-            className="text-white text-sm md:text-base font-medium font-sans text-left"
-          >
-            {card.category}
-          </motion.p>
+        <div className="relative z-40 p-8 w-full">
+          <div className="flex justify-between items-start w-full">
+            <motion.p
+              layoutId={layout ? `category-${card.category}` : undefined}
+              className="text-white text-sm md:text-base font-medium font-sans text-left"
+            >
+              {card.category}
+            </motion.p>
+            
+            {/* Subtle Plus Icon */}
+            <div className="bg-white/20 backdrop-blur-md p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <IconPlus className="w-4 h-4 text-white" />
+            </div>
+          </div>
+          
           <motion.p
             layoutId={layout ? `title-${card.title}` : undefined}
             className="text-white text-xl md:text-3xl font-semibold max-w-xs text-left [text-wrap:balance] font-sans mt-2"
