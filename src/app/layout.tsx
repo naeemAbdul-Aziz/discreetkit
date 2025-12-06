@@ -6,8 +6,15 @@ import { TourProvider } from '@/components/tour-provider';
 import { StructuredData } from '@/components/seo/structured-data';
 import { TrackingScripts } from '@/components/seo/tracking-scripts';
 import { PerformanceMonitoring } from '@/components/seo/performance-monitoring';
-import { generateMetadata, generateOrganizationSchema, generateWebsiteSchema } from '@/lib/seo';
-import { generateLocalBusinessSchema, generateMedicalBusinessSchema } from '@/lib/seo/advanced-schemas';
+import { generateMetadata } from '@/lib/seo';
+import { 
+  generateEnhancedOrganizationSchema,
+  generateEnhancedWebsiteSchema,
+  generateLocalBusinessSchema, 
+  generateMedicalBusinessSchema,
+  generateServiceSchema,
+  generateMainFAQSchema
+} from '@/lib/seo/advanced-schemas';
 import seoConfig from '../../.seo-config.json';
 import './globals.css';
 import localFont from 'next/font/local';
@@ -44,11 +51,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Generate all structured data schemas
-  const organizationSchema = generateOrganizationSchema();
-  const websiteSchema = generateWebsiteSchema();
+  // Generate all enhanced structured data schemas for premium Google search results
+  const organizationSchema = generateEnhancedOrganizationSchema();
+  const websiteSchema = generateEnhancedWebsiteSchema();
   const localBusinessSchema = generateLocalBusinessSchema();
   const medicalBusinessSchema = generateMedicalBusinessSchema();
+  const serviceSchema = generateServiceSchema();
+  const faqSchema = generateMainFAQSchema();
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -90,11 +99,13 @@ export default function RootLayout({
       <link rel="dns-prefetch" href="https://res.cloudinary.com" />
       <link rel="dns-prefetch" href="https://www.google-analytics.com" />
       
-      {/* Structured Data */}
+      {/* Structured Data for Premium Google Search Results */}
       <StructuredData data={organizationSchema} />
       <StructuredData data={websiteSchema} />
       <StructuredData data={localBusinessSchema} />
       <StructuredData data={medicalBusinessSchema} />
+      <StructuredData data={serviceSchema} />
+      <StructuredData data={faqSchema} />
       
       {/* Tracking Scripts */}
       <TrackingScripts />

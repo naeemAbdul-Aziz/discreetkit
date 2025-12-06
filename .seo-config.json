@@ -1,8 +1,8 @@
 {
   "site": {
     "name": "DiscreetKit Ghana",
-    "title": "DiscreetKit Ghana: Confidential Health Products Delivered",
-    "description": "Order confidential self-test kits for HIV, pregnancy, and more. Get Postpill and wellness products delivered discreetly to your door in Ghana. 100% private, anonymous, and secure.",
+    "title": "DiscreetKit Ghana - Confidential Health Products Delivered Discreetly",
+    "description": "Order HIV self-test kits, pregnancy tests, emergency contraception (Postpill), and wellness products with 100% anonymous delivery across Ghana. No accounts, no judgment, complete privacy. Serving Accra, Kumasi, UG Legon, KNUST & more.",
     "url": "https://discreetkit.com",
     "logo": "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762356008/discreetkit_profile_photo_voqfia.png",
     "favicon": "/favicon.ico",
@@ -14,7 +14,7 @@
   "business": {
     "type": "HealthAndBeautyBusiness",
     "name": "DiscreetKit Ghana",
-    "description": "Leading provider of confidential health products and self-test kits in Ghana",
+    "description": "Privacy infrastructure platform for confidential health products and self-test kits in Ghana. We sell dignity, anonymity, and the ability to access healthcare without stigma.",
     "email": "hello@discreetkit.com",
     "phone": "+233203001107",
     "address": {
@@ -27,7 +27,8 @@
     "priceRange": "₵₵",
     "paymentAccepted": [
       "Mobile Money",
-      "Credit Card"
+      "Credit Card",
+      "Debit Card"
     ],
     "serviceArea": [
       "Accra",
@@ -40,7 +41,8 @@
       "KNUST",
       "UCC",
       "UPSA",
-      "GIMPA"
+      "GIMPA",
+      "Wisconsin International University College"
     ]
   },
   "social": {
@@ -52,19 +54,24 @@
   "keywords": {
     "primary": [
       "discreet health products Ghana",
-      "confidential self-test kits",
+      "confidential self-test kits Ghana",
       "private HIV testing Ghana",
-      "anonymous pregnancy test",
-      "emergency contraception delivery",
-      "student health services Ghana"
+      "anonymous pregnancy test Ghana",
+      "emergency contraception delivery Ghana",
+      "postpill delivery Ghana",
+      "student health services Ghana",
+      "discreet delivery Ghana"
     ],
     "secondary": [
-      "at-home medical tests",
-      "postpill delivery Ghana",
-      "sexual health products",
+      "at-home medical tests Ghana",
+      "sexual health products Ghana",
       "university health delivery",
-      "confidential healthcare",
-      "anonymous wellness products"
+      "confidential healthcare Ghana",
+      "anonymous wellness products",
+      "HIV self-test kit Ghana",
+      "pregnancy test kit Ghana",
+      "condom delivery Ghana",
+      "private pharmacy Ghana"
     ],
     "location": [
       "Accra health products",
@@ -72,68 +79,96 @@
       "UG Legon health services",
       "KNUST student health",
       "UPSA medical supplies",
-      "Ghana university delivery"
+      "Ghana university delivery",
+      "Accra discreet delivery",
+      "Kumasi confidential health"
+    ],
+    "longTail": [
+      "where to buy HIV test kit in Ghana",
+      "how to get postpill discreetly in Ghana",
+      "anonymous pregnancy test delivery Accra",
+      "confidential STI testing Ghana",
+      "discreet health products for students Ghana",
+      "private HIV testing at home Ghana",
+      "emergency contraception same day delivery Ghana",
+      "buy condoms anonymously Ghana"
     ]
   },
   "pages": {
     "home": {
-      "title": "DiscreetKit Ghana: Confidential Health Products Delivered",
-      "description": "Order confidential self-test kits for HIV, pregnancy, and wellness products. 100% private, anonymous delivery across Ghana. Skip the awkward - we deliver discreetly to universities and homes.",
+      "title": "DiscreetKit Ghana - Confidential Health Products Delivered Discreetly",
+      "description": "Order HIV self-test kits, pregnancy tests, emergency contraception, and wellness products with 100% anonymous delivery. No accounts, no judgment. Serving Accra, Kumasi, UG Legon, KNUST & universities across Ghana.",
       "keywords": [
-        "discreet health products",
+        "discreet health products Ghana",
         "confidential self-test kits",
-        "Ghana medical delivery",
-        "university health services"
+        "anonymous health delivery Ghana",
+        "university health services Ghana",
+        "private HIV testing Ghana",
+        "emergency contraception Ghana"
       ]
     },
     "products": {
       "title": "Confidential Health Products & Self-Test Kits | DiscreetKit Ghana",
-      "description": "Browse our range of confidential health products including HIV self-test kits, pregnancy tests, emergency contraception, and wellness products. Discreet delivery across Ghana.",
+      "description": "Browse our range of confidential health products: HIV self-test kits, pregnancy tests, emergency contraception (Postpill), condoms, and wellness products. 100% discreet delivery across Ghana.",
       "keywords": [
         "health products Ghana",
-        "self-test kits",
-        "medical supplies",
-        "confidential healthcare"
+        "self-test kits Ghana",
+        "medical supplies Ghana",
+        "confidential healthcare products",
+        "discreet medical delivery"
       ]
     },
     "test-kits": {
       "title": "Self-Test Kits: HIV, Pregnancy & More | DiscreetKit Ghana",
-      "description": "Order FDA-approved self-test kits for HIV, pregnancy, and other health conditions. Get accurate, private results at home with discreet delivery across Ghana.",
+      "description": "Order WHO-approved self-test kits for HIV (99% accurate), pregnancy, and other health conditions. Get accurate, private results at home with anonymous delivery across Ghana.",
       "keywords": [
         "HIV self-test Ghana",
-        "pregnancy test kit",
-        "at-home medical testing",
-        "confidential health screening"
+        "pregnancy test kit Ghana",
+        "at-home medical testing Ghana",
+        "confidential health screening",
+        "WHO-approved HIV test kit"
       ]
     },
     "medication": {
       "title": "Emergency Contraception & Medication | DiscreetKit Ghana",
-      "description": "Get emergency contraception (Postpill) and essential medications delivered discreetly. 100% confidential service with fast delivery across Ghana.",
+      "description": "Get emergency contraception (Postpill - Postinor 2, Lydia) and essential medications delivered discreetly within 24-48 hours. 100% confidential service across Ghana.",
       "keywords": [
         "emergency contraception Ghana",
-        "postpill delivery",
-        "confidential medication",
-        "private pharmacy"
+        "postpill delivery Ghana",
+        "Postinor 2 Ghana",
+        "confidential medication delivery",
+        "private pharmacy Ghana"
       ]
     },
     "wellness": {
       "title": "Wellness Products & Health Supplements | DiscreetKit Ghana",
-      "description": "Shop premium wellness products and health supplements delivered discreetly to your door. Quality products for your health and wellbeing in Ghana.",
+      "description": "Shop premium wellness products, condoms, lubricants, and health supplements delivered discreetly. Quality products for your health and wellbeing in Ghana.",
       "keywords": [
         "wellness products Ghana",
-        "health supplements",
-        "nutrition products",
-        "wellness delivery"
+        "health supplements Ghana",
+        "condom delivery Ghana",
+        "lubricant delivery Ghana",
+        "wellness delivery Ghana"
       ]
     },
     "partner-care": {
       "title": "Partner Care Services | DiscreetKit Ghana",
-      "description": "Supporting relationships with confidential health resources, couple testing kits, and wellness products. Discreet delivery for you and your partner across Ghana.",
+      "description": "Supporting relationships with confidential health resources, couple testing kits (Support Bundle), and wellness products. Discreet delivery for you and your partner across Ghana.",
       "keywords": [
-        "couple health testing",
-        "relationship wellness",
+        "couple health testing Ghana",
+        "relationship wellness Ghana",
         "partner care Ghana",
-        "confidential couple services"
+        "confidential couple services",
+        "couple HIV testing Ghana"
+      ]
+    },
+    "track": {
+      "title": "Track Your Order | DiscreetKit Ghana",
+      "description": "Track your anonymous order with complete privacy. Enter your order code to see real-time delivery status.",
+      "keywords": [
+        "track order Ghana",
+        "anonymous order tracking",
+        "delivery status Ghana"
       ]
     }
   },
@@ -142,5 +177,28 @@
     "googleTagManager": "",
     "facebookPixel": "",
     "hotjar": ""
+  },
+  "seo": {
+    "siteName": "DiscreetKit Ghana",
+    "siteTagline": "Skip the awkward. We deliver discreetly.",
+    "defaultImage": "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762356008/discreetkit_profile_photo_voqfia.png",
+    "twitterHandle": "@DiscreetKit",
+    "facebookAppId": "",
+    "googleSiteVerification": "",
+    "bingSiteVerification": "",
+    "locale": "en_GH",
+    "localeAlternate": [
+      "en"
+    ],
+    "canonicalBaseUrl": "https://discreetkit.com"
+  },
+  "features": {
+    "enableSitelinks": true,
+    "enableSearchBox": true,
+    "enableBreadcrumbs": true,
+    "enableFAQ": true,
+    "enableReviews": false,
+    "enableLocalBusiness": true,
+    "enableMedicalBusiness": true
   }
 }
