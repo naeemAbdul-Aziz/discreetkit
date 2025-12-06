@@ -238,7 +238,7 @@ export function PartnerTable({ initialPartners }: { initialPartners: Pharmacy[] 
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
                       <DropdownMenuItem asChild>
                         <Link href={`/admin/partners/${partner.id}`}>
-                          <Package className="mr-2 h-4 w-4" /> Manage Inventory
+                          <Package className="mr-2 h-4 w-4" /> Manage Pharmacy
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleEdit(partner)}>

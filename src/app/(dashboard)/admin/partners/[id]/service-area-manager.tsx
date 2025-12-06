@@ -23,7 +23,9 @@ import {
 } from "@/components/ui/dialog"
 import { Plus, Trash2, MapPin, Clock, DollarSign } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { addServiceArea, deleteServiceArea } from "@/lib/admin-actions"
+import { addServiceArea, deleteServiceArea, toggleServiceAreaStatus } from "@/lib/admin-actions"
+import { Badge } from "@/components/ui/badge"
+import { Switch } from "@/components/ui/switch"
 
 interface ServiceArea {
     id: number
@@ -48,6 +50,7 @@ export function ServiceAreaManager({ pharmacyId, initialAreas }: ServiceAreaMana
         area_name: "",
         delivery_fee: "15",
         max_delivery_time_hours: "24",
+        is_active: true
     })
 
     const handleAddArea = async () => {
@@ -67,12 +70,14 @@ export function ServiceAreaManager({ pharmacyId, initialAreas }: ServiceAreaMana
                 area_name: formData.area_name,
                 delivery_fee: parseFloat(formData.delivery_fee),
                 max_delivery_time_hours: parseInt(formData.max_delivery_time_hours),
+                is_active: formData.is_active,
             })
 
             if (result.error) throw new Error(result.error)
             if (result.data) {
                 setAreas([...areas, result.data])
-                setFormData({ area_name: "", delivery_fee: "15", max_delivery_time_hours: "24" })
+                setAreas([...areas, result.data])
+                setFormData({ area_name: "", delivery_fee: "15", max_delivery_time_hours: "24", is_active: true })
                 setIsDialogOpen(false)
                 toast({
                     title: "Success",
@@ -104,6 +109,25 @@ export function ServiceAreaManager({ pharmacyId, initialAreas }: ServiceAreaMana
             })
         } catch (error: any) {
             toast({
+                title: "Error",
+                description: error.message,
+                variant: "destructive",
+            })
+        }
+    }
+
+    const handleToggleStatus = async (id: number, currentStatus: boolean) => {
+        try {
+            const result = await toggleServiceAreaStatus(id, !currentStatus)
+            if (result.error) throw new Error(result.error)
+            
+            setAreas(areas.map(a => a.id === id ? { ...a, is_active: !currentStatus } : a))
+            toast({
+                title: "Success",
+                description: `Service area ${!currentStatus ? 'activated' : 'deactivated'}`,
+            })
+        } catch (error: any) {
+             toast({
                 title: "Error",
                 description: error.message,
                 variant: "destructive",
@@ -175,6 +199,14 @@ export function ServiceAreaManager({ pharmacyId, initialAreas }: ServiceAreaMana
                                     </div>
                                 </div>
                             </div>
+                            <div className="flex items-center space-x-2">
+                                <Switch
+                                    id="active"
+                                    checked={formData.is_active}
+                                    onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+                                />
+                                <Label htmlFor="active">Active Service Area</Label>
+                            </div>
                         </div>
                         <DialogFooter>
                             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
@@ -191,6 +223,7 @@ export function ServiceAreaManager({ pharmacyId, initialAreas }: ServiceAreaMana
                     <TableHeader>
                         <TableRow>
                             <TableHead>Area Name</TableHead>
+                            <TableHead>Status</TableHead>
                             <TableHead>Delivery Fee</TableHead>
                             <TableHead>Max Time</TableHead>
                             <TableHead className="w-[100px]"></TableHead>
@@ -207,8 +240,17 @@ export function ServiceAreaManager({ pharmacyId, initialAreas }: ServiceAreaMana
                             areas.map((area) => (
                                 <TableRow key={area.id}>
                                     <TableCell className="font-medium">{area.area_name}</TableCell>
-                                    <TableCell>GHS {area.delivery_fee.toFixed(2)}</TableCell>
-                                    <TableCell>{area.max_delivery_time_hours} hours</TableCell>
+                                    <TableCell>
+                                        <Badge 
+                                            variant={area.is_active ? "success" : "secondary"} 
+                                            className="cursor-pointer"
+                                            onClick={() => handleToggleStatus(area.id, area.is_active)}
+                                        >
+                                            {area.is_active ? "Active" : "Inactive"}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell><Badge variant="outline">GHS {area.delivery_fee.toFixed(2)}</Badge></TableCell>
+                                    <TableCell><Badge variant="secondary" className="font-mono">{area.max_delivery_time_hours}h</Badge></TableCell>
                                     <TableCell>
                                         <Button
                                             variant="ghost"

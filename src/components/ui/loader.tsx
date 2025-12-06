@@ -1,10 +1,11 @@
 "use client";
 import React from "react";
 import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
-export const LoaderOne = () => {
+export const LoaderOne = ({ className }: { className?: string }) => {
   return (
-    <div className="flex items-center justify-center w-full h-full min-h-[400px]">
+    <div className={cn("flex items-center justify-center w-full h-full min-h-[400px]", className)}>
       <div className="relative flex items-center justify-center">
         {/* Outer ring */}
         <motion.div

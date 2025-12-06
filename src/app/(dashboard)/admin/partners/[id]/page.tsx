@@ -5,11 +5,10 @@ import { ArrowLeft, AlertCircle } from "lucide-react"
 import Link from "next/link"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
-interface PharmacyDetailsPageProps {
-  params: { id: string }
-}
 
-export default async function PharmacyDetailsPage({ params }: PharmacyDetailsPageProps) {
+
+export default async function PharmacyDetailsPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const pharmacyId = parseInt(params.id)
   
   try {
