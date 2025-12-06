@@ -5,9 +5,7 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  // eslint config removed (unsupported in Next.js 16)
   // Next.js 15: serverComponentsExternalPackages moved to serverExternalPackages
   serverExternalPackages: [
     'genkit',
