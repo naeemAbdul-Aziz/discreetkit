@@ -248,7 +248,7 @@ export function OrderForm() {
         <ChatTrigger />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start mt-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-start mt-4 lg:mt-8">
         {/* Left Column: Form */}
         <div className="lg:col-span-7">
           <form ref={formRef} action={dispatch} className="space-y-8 relative">
@@ -374,7 +374,7 @@ export function OrderForm() {
         </div>
 
         {/* Right Column: Order Summary */}
-        <div className="lg:col-span-5 order-first lg:order-last mb-8 lg:mb-0">
+        <div className="lg:col-span-5 order-first lg:order-last">
             <div className="sticky top-24 space-y-6 h-fit">
                 <OrderSummaryCard />
                  <div className="flex items-center gap-2 rounded-lg bg-muted/50 p-4 text-muted-foreground border border-border/50">

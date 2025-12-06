@@ -14,7 +14,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Bot, Send, User, X } from 'lucide-react';
 import { BrandSpinner } from '@/components/brand-spinner';
 import { handleChat } from '@/lib/actions';
-import { Avatar, AvatarFallback } from './ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { cn } from '@/lib/utils';
 import { useChatbot } from '@/hooks/use-chatbot';
 
@@ -77,7 +77,11 @@ setInput('');
         <SheetContent className="flex w-full flex-col sm:max-w-md p-0">
           <SheetHeader className="p-6 pb-4">
             <SheetTitle className="flex items-center gap-2">
-                <Bot /> Pacely
+                <Avatar className="h-8 w-8 border border-border">
+                    <AvatarImage src="/pacely-avatar.png" alt="Pacely" />
+                     <AvatarFallback><Bot size={20} /></AvatarFallback>
+                </Avatar>
+                Pacely
             </SheetTitle>
             <SheetDescription>
               Your friendly AI assistant for questions about DiscreetKit.
@@ -93,7 +97,8 @@ setInput('');
                 {history.map((msg, index) => (
                   <div key={index} className={cn("flex items-start gap-3", msg.role === 'user' ? "justify-end" : "justify-start")}>
                     {msg.role === 'model' && (
-                        <Avatar className="h-8 w-8">
+                        <Avatar className="h-8 w-8 border border-border">
+                            <AvatarImage src="/pacely-avatar.png" alt="Pacely" />
                             <AvatarFallback><Bot size={20} /></AvatarFallback>
                         </Avatar>
                     )}
@@ -110,7 +115,8 @@ setInput('');
                 {/* show a loading indicator while the ai is "thinking". */}
                 {isPending && (
                     <div className="flex items-start gap-3 justify-start">
-                        <Avatar className="h-8 w-8">
+                        <Avatar className="h-8 w-8 border border-border">
+                            <AvatarImage src="/pacely-avatar.png" alt="Pacely" />
                             <AvatarFallback><Bot size={20} /></AvatarFallback>
                         </Avatar>
                         <div className="max-w-[80%] rounded-lg p-3 text-sm bg-muted flex items-center">

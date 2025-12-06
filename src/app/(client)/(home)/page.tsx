@@ -102,10 +102,7 @@ const HowItWorks = dynamic(
   () => import('@/app/(home)/components/how-it-works').then((mod) => mod.HowItWorks),
   { loading: () => <LoadingSkeleton height={componentMap.HowItWorks.height} /> }
 );
-const Testimonials = dynamic(
-  () => import('@/app/(home)/components/testimonials').then((mod) => mod.Testimonials),
-  { loading: () => <LoadingSkeleton height={componentMap.Testimonials.height} /> }
-);
+
 const Faq = dynamic(
   () => import('@/app/(home)/components/faq').then((mod) => mod.Faq),
   { loading: () => <LoadingSkeleton height={componentMap.Faq.height} /> }
@@ -121,6 +118,11 @@ const PrivacyReveal = dynamic(
 const PartnerReferral = dynamic(
   () => import('@/app/(home)/components/partner-referral').then((mod) => mod.PartnerReferral),
   { loading: () => <LoadingSkeleton height={componentMap.PartnerReferral.height} /> }
+);
+
+const AnonymousReviewsSection = dynamic(
+    () => import('@/app/(home)/components/anonymous-reviews-section').then((mod) => mod.AnonymousReviewsSection),
+    { loading: () => <LoadingSkeleton height="400px" /> }
 );
 
 
@@ -182,8 +184,10 @@ export default async function Home() {
         <ProductBenefits />
       </SectionWrapper>
 
-      <SectionWrapper>
-        <Testimonials />
+
+
+      <SectionWrapper className="bg-muted/30">
+        <AnonymousReviewsSection />
       </SectionWrapper>
       
       <SectionWrapper>
