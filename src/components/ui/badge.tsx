@@ -11,18 +11,20 @@ const badgeVariants = cva(
         default:
           "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
         secondary:
-          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+          "border-transparent bg-purple-500/15 text-purple-700 hover:bg-purple-500/25 dark:bg-purple-500/20 dark:text-purple-300",
         destructive:
-          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-        outline: "text-foreground",
+          "border-transparent bg-red-500/15 text-red-700 hover:bg-red-500/25 dark:bg-red-500/20 dark:text-red-300",
+        outline: "text-foreground border-border",
         success:
-          "border-transparent bg-green-500/15 text-green-700 hover:bg-green-500/25 dark:text-green-400",
+          "border-transparent bg-emerald-500/15 text-emerald-700 hover:bg-emerald-500/25 dark:bg-emerald-500/20 dark:text-emerald-300",
         warning:
-          "border-transparent bg-yellow-500/15 text-yellow-700 hover:bg-yellow-500/25 dark:text-yellow-400",
+          "border-transparent bg-amber-500/15 text-amber-700 hover:bg-amber-500/25 dark:bg-amber-500/20 dark:text-amber-300",
+        pending:
+          "border-transparent bg-orange-500/15 text-orange-700 hover:bg-orange-500/25 dark:bg-orange-500/20 dark:text-orange-300",
         info:
-          "border-transparent bg-blue-500/15 text-blue-700 hover:bg-blue-500/25 dark:text-blue-400",
+          "border-transparent bg-blue-500/15 text-blue-700 hover:bg-blue-500/25 dark:bg-blue-500/20 dark:text-blue-300",
         neutral:
-          "border-transparent bg-gray-500/15 text-gray-700 hover:bg-gray-500/25 dark:text-gray-400",
+          "border-transparent bg-slate-500/15 text-slate-700 hover:bg-slate-500/25 dark:bg-slate-500/20 dark:text-slate-300",
         icon:
           "p-1.5 rounded-full aspect-square grid place-items-center border-transparent bg-primary/10 text-primary hover:bg-primary/20",
       },

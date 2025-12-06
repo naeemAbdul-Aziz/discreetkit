@@ -123,8 +123,8 @@ export default function AdminDashboardPage() {
       return data.statusBreakdown.filter(s => activeStatuses.includes(s.status));
   }, [data, activeStatuses]);
 
-  const colors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
-  const colorClasses = ['bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-orange-500', 'bg-purple-500'];
+  const colors = ['#f97316', '#3b82f6', '#a855f7', '#f59e0b', '#10b981'];
+  const colorClasses = ['bg-orange-500', 'bg-blue-500', 'bg-purple-500', 'bg-amber-500', 'bg-emerald-500'];
 
   if (loading) {
       return (

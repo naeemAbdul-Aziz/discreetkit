@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { MoreHorizontal, Search } from "lucide-react"
+import { MoreHorizontal, Search, Clock, Package, Truck, CheckCircle, CreditCard } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import {
   DropdownMenu,
@@ -98,12 +98,43 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
   const getStatusBadge = (status: string) => {
     const base = titleCase(status)
     switch (status) {
-      case 'completed': return <Badge className="bg-green-600 hover:bg-green-700">{base}</Badge>
-      case 'processing': return <Badge className="bg-blue-600 hover:bg-blue-700">{base}</Badge>
-      case 'out_for_delivery': return <Badge className="bg-yellow-600 hover:bg-yellow-700">{base}</Badge>
-      case 'pending_payment': return <Badge className="bg-orange-500 hover:bg-orange-600">{base}</Badge>
-      case 'received': return <Badge variant="secondary">{base}</Badge>
-      default: return <Badge variant="outline">{base}</Badge>
+      case 'completed': 
+        return (
+          <Badge variant="success" className="gap-1">
+            <CheckCircle className="h-3 w-3" />
+            {base}
+          </Badge>
+        )
+      case 'processing': 
+        return (
+          <Badge variant="secondary" className="gap-1">
+            <Package className="h-3 w-3" />
+            {base}
+          </Badge>
+        )
+      case 'out_for_delivery': 
+        return (
+          <Badge variant="warning" className="gap-1">
+            <Truck className="h-3 w-3" />
+            {base}
+          </Badge>
+        )
+      case 'pending_payment': 
+        return (
+          <Badge variant="pending" className="gap-1">
+            <CreditCard className="h-3 w-3" />
+            {base}
+          </Badge>
+        )
+      case 'received': 
+        return (
+          <Badge variant="info" className="gap-1">
+            <Clock className="h-3 w-3" />
+            {base}
+          </Badge>
+        )
+      default: 
+        return <Badge variant="outline">{base}</Badge>
     }
   }
 

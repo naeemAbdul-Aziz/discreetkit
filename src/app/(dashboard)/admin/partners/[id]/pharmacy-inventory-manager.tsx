@@ -28,7 +28,9 @@ import {
   Plus, 
   Search, 
   Trash2, 
-  PackagePlus 
+  PackagePlus,
+  AlertTriangle,
+  FileText
 } from "lucide-react"
 
 interface PharmacyProduct {
@@ -339,44 +341,65 @@ export function PharmacyInventoryManager({
             {filteredProducts.map((product) => (
               <TableRow key={product.id} className="hover:bg-muted/5">
                 <TableCell>
-                    <div className="flex flex-col">
-                        <span className="font-medium">{product.products?.name || 'Unknown Product'}</span>
+                    <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2">
+                            <span className="font-medium">{product.products?.name || 'Unknown Product'}</span>
+                            {product.products?.requires_prescription && (
+                                <Badge variant="info" className="gap-1 text-[10px] px-1.5 py-0">
+                                    <FileText className="h-2.5 w-2.5" />
+                                    Rx
+                                </Badge>
+                            )}
+                        </div>
                         {product.products?.image_url && (
-                            <span className="text-xs text-muted-foreground mt-0.5">Has Image</span>
+                            <span className="text-xs text-muted-foreground">Has Image</span>
                         )}
                     </div>
                 </TableCell>
                 <TableCell>
-                    <Badge variant="secondary" className="rounded-full font-normal">
+                    <Badge variant="neutral" className="rounded-full font-normal">
                         {product.products?.category || 'Uncategorized'}
                     </Badge>
                 </TableCell>
-                <TableCell>GHS {product.products?.price_ghs?.toFixed(2) || '0.00'}</TableCell>
+                <TableCell className="font-medium">GHS {product.products?.price_ghs?.toFixed(2) || '0.00'}</TableCell>
                 <TableCell>
-                    <div className="flex items-center space-x-2">
-                        <Button 
-                            variant="outline" 
-                            size="icon" 
-                            className="h-6 w-6 rounded-full"
-                            onClick={() => updateStock(product.product_id, Math.max(0, product.stock_level - 1))}
-                        >
-                            -
-                        </Button>
-                        <span className={`w-8 text-center font-medium ${product.stock_level <= product.reorder_level ? 'text-orange-600' : ''}`}>
-                            {product.stock_level}
-                        </span>
-                        <Button 
-                            variant="outline" 
-                            size="icon" 
-                            className="h-6 w-6 rounded-full"
-                            onClick={() => updateStock(product.product_id, product.stock_level + 1)}
-                        >
-                            +
-                        </Button>
+                    <div className="flex items-center gap-2">
+                        <div className="flex items-center space-x-2">
+                            <Button 
+                                variant="outline" 
+                                size="icon" 
+                                className="h-6 w-6 rounded-full"
+                                onClick={() => updateStock(product.product_id, Math.max(0, product.stock_level - 1))}
+                            >
+                                -
+                            </Button>
+                            <span className="w-10 text-center font-medium">
+                                {product.stock_level}
+                            </span>
+                            <Button 
+                                variant="outline" 
+                                size="icon" 
+                                className="h-6 w-6 rounded-full"
+                                onClick={() => updateStock(product.product_id, product.stock_level + 1)}
+                            >
+                                +
+                            </Button>
+                        </div>
+                        {product.stock_level === 0 ? (
+                            <Badge variant="destructive" className="gap-1 text-[10px] px-1.5 py-0">
+                                <AlertTriangle className="h-2.5 w-2.5" />
+                                Out
+                            </Badge>
+                        ) : product.stock_level <= product.reorder_level ? (
+                            <Badge variant="warning" className="gap-1 text-[10px] px-1.5 py-0">
+                                <AlertTriangle className="h-2.5 w-2.5" />
+                                Low
+                            </Badge>
+                        ) : null}
                     </div>
                 </TableCell>
                 <TableCell>
-                    <span className="text-muted-foreground">{product.reorder_level}</span>
+                    <span className="text-sm text-muted-foreground">{product.reorder_level}</span>
                 </TableCell>
                 <TableCell>
                     <div className="flex items-center space-x-2">
@@ -386,7 +409,11 @@ export function PharmacyInventoryManager({
                             onCheckedChange={(checked) => toggleAvailability(product.product_id, checked as boolean)}
                         />
                         <Label htmlFor={`available-${product.id}`} className="text-sm font-normal cursor-pointer">
-                            {product.is_available ? 'Available' : 'Unavailable'}
+                            {product.is_available ? (
+                                <span className="text-emerald-600 dark:text-emerald-400">Available</span>
+                            ) : (
+                                <span className="text-slate-500">Unavailable</span>
+                            )}
                         </Label>
                     </div>
                 </TableCell>
