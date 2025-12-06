@@ -1,43 +1,26 @@
-
 'use server';
-/**
- * @fileOverview An AI chatbot assistant for answering user questions about our products, the ordering process, and available locations.
- *
- * - answerQuestions - A function that handles the question answering process.
- * - AnswerQuestionsInput - The input type for the answerQuestions function.
- * - AnswerQuestionsOutput - The return type for the answerQuestions function.
- */
 
-import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
+import { openai } from '@/ai/openai';
 import { KNOWLEDGE_BASE } from '../knowledge';
 
-const AnswerQuestionsInputSchema = z.object({
-  query: z.string().describe('The user question about our health products, the ordering process, or available locations.'),
-});
-export type AnswerQuestionsInput = z.infer<typeof AnswerQuestionsInputSchema>;
+export type AnswerQuestionsInput = {
+  query: string;
+};
 
-const AnswerQuestionsOutputSchema = z.object({
-  answer: z.string().describe('The answer to the user question.'),
-});
-export type AnswerQuestionsOutput = z.infer<typeof AnswerQuestionsOutputSchema>;
+export type AnswerQuestionsOutput = {
+  answer: string;
+};
 
-export async function answerQuestions(input: AnswerQuestionsInput): Promise<AnswerQuestionsOutput> {
-  return answerQuestionsFlow(input);
-}
-
-// Prompt expects both the user query and the injected knowledge base
-const PromptInputSchema = z.object({
-  query: z.string(),
-  knowledge: z.string(),
-});
-
-const prompt = ai.definePrompt({
-  name: 'answerQuestionsPrompt',
-  input: { schema: PromptInputSchema },
-  output: { schema: AnswerQuestionsOutputSchema },
-  model: 'googleai/gemini-1.5-flash',
-  prompt: `You are a helpful, friendly, and stigma-free AI assistant for DiscreetKit Ghana.
+export async function answerQuestions(
+  input: AnswerQuestionsInput
+): Promise<AnswerQuestionsOutput> {
+  try {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'system',
+          content: `You are a helpful, friendly, and stigma-free AI assistant for DiscreetKit Ghana.
 Your primary goal is to answer user questions based *only* on the official information provided in the KNOWLEDGE BASE below.
 Do not invent information or use external knowledge. If the answer is not in the knowledge base, politely state that you don't have that information.
 
@@ -45,26 +28,27 @@ Keep your answers concise, reassuring, and tailored to university students and y
 
 ---
 KNOWLEDGE BASE:
-{{{knowledge}}}
----
-
-User Question:
-"{{query}}"
-
-Answer the user's question based on the knowledge base.`,
-});
-
-const answerQuestionsFlow = ai.defineFlow(
-  {
-    name: 'answerQuestionsFlow',
-    inputSchema: AnswerQuestionsInputSchema,
-    outputSchema: AnswerQuestionsOutputSchema,
-  },
-  async (input) => {
-    const { output } = await prompt({
-      query: input.query,
-      knowledge: KNOWLEDGE_BASE,
+${KNOWLEDGE_BASE}
+---`,
+        },
+        {
+          role: 'user',
+          content: input.query,
+        },
+      ],
+      temperature: 0.7,
+      max_tokens: 500,
     });
-    return output!;
+
+    const answer = completion.choices[0]?.message?.content ||
+      "I'm sorry, I couldn't generate a response. Please try again.";
+
+    return { answer };
+  } catch (error) {
+    console.error('OpenAI API error:', error);
+    // Fallback to simple response
+    return {
+      answer: "I'm here to help! For detailed information about our products, pricing, and services, please browse our website or contact our support team.",
+    };
   }
-);
+}

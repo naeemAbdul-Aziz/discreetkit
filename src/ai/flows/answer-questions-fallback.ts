@@ -1,6 +1,6 @@
 /**
- * @file Simple answer function that doesn't use Genkit
- * @description Temporary fallback for AI functionality
+ * @file Simple answer function that doesn't use AI
+ * @description Fallback for AI functionality when OpenAI is not configured
  */
 'use server';
 
@@ -15,9 +15,9 @@ export type AnswerQuestionsOutput = {
 export async function answerQuestions(input: AnswerQuestionsInput): Promise<AnswerQuestionsOutput> {
   // Temporary fallback responses for common questions
   const query = input.query.toLowerCase();
-  
+
   let answer = "I'm here to help! For detailed information about our products, pricing, and services, please browse our website or contact our support team.";
-  
+
   if (query.includes('product') || query.includes('test') || query.includes('kit')) {
     answer = "We offer a wide range of confidential test kits and wellness products. You can browse our products section to see our full catalog, including test kits, medications, and wellness bundles.";
   } else if (query.includes('order') || query.includes('buy') || query.includes('purchase')) {
@@ -29,6 +29,6 @@ export async function answerQuestions(input: AnswerQuestionsInput): Promise<Answ
   } else if (query.includes('support') || query.includes('help') || query.includes('contact')) {
     answer = "Our partner care team is here to help! You can reach us through the Partner Care section of our website or contact our support team directly for assistance.";
   }
-  
+
   return { answer };
 }

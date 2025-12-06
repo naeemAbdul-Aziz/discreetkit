@@ -10,13 +10,12 @@
 import { z } from 'zod';
 import { generateTrackingCode, type Order } from './data';
 import { assignPharmacyForDeliveryArea, sendPharmacyOrderNotification } from './notifications';
-// Temporarily using fallback to fix build issues
-// Use Genkit flow when Google GenAI API key is configured, otherwise fallback
+// Use OpenAI when API key is configured, otherwise fallback
 let _answerQuestions: ((input: { query: string }) => Promise<{ answer: string }>) | null = null;
 async function getAnswerQuestions() {
   if (_answerQuestions) return _answerQuestions;
-  const hasGenAI = !!process.env.GOOGLE_GENAI_API_KEY;
-  if (hasGenAI) {
+  const hasOpenAI = !!process.env.OPENAI_API_KEY;
+  if (hasOpenAI) {
     const mod = await import('@/ai/flows/answer-questions');
     _answerQuestions = mod.answerQuestions;
   } else {
@@ -534,7 +533,7 @@ export async function getOrderAction(code: string): Promise<Order | null> {
 }
 
 /**
- * Handles the AI chat interaction by calling the Genkit flow.
+ * Handles the AI chat interaction by calling the OpenAI API.
  *
  * @param history - The current chat history.
  * @param message - The new message from the user.
