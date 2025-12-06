@@ -25,75 +25,66 @@ function SuccessContent() {
   const [paymentStatus, setPaymentStatus] = useState<'success' | 'pending' | 'failed' | null>(null);
   const [isConfirmed, setIsConfirmed] = useState(false);
 
+  // Polling logic for "instant" confirmation
   useEffect(() => {
-    let cancelled = false;
-    const verify = async () => {
-      if (!code) {
-        setIsVerifying(false);
-        setPaymentStatus('failed');
-        return;
-      }
+    let active = true;
+    let attempts = 0;
+    const maxAttempts = 20; // 20 * 3s = 60 seconds max polling
+
+    const checkStatus = async () => {
+      if (!active || !code || isConfirmed || attempts >= maxAttempts) return;
+
       try {
-        // Small delay to give webhook a head start
-        await new Promise(r => setTimeout(r, 1500));
+        // We only check the Order status from DB, as verifying with Paystack repeatedly might be rate-limited
+        // or unnecessary if the webhook already fired.
+        const order = await getOrderAction(code);
         
-        // First, try to verify the payment with Paystack
-        // Add a hard timeout so UI never hangs in Verifying state
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000);
-        const res = await fetch(`/api/payment/verify?reference=${encodeURIComponent(code)}`, { cache: 'no-store', signal: controller.signal });
-        clearTimeout(timeoutId);
-        const data = await res.json().catch(() => null);
-        
-        if (cancelled) return;
-        
-        // Check if verification was successful
-        const verifiedOk = res.ok && data?.ok;
-        
-        if (verifiedOk) {
-          // Payment verified successfully
+        if (order && order.status !== 'pending_payment') {
           setPaymentStatus('success');
           setIsConfirmed(true);
-        } else {
-          // Verification failed or returned error - check order status directly
-          // This covers the case where webhook already processed the payment
-          const order = await getOrderAction(code);
-          
-          if (order) {
-            if (order.status !== 'pending_payment') {
-              // Payment was already confirmed (likely by webhook)
-              setPaymentStatus('success');
-              setIsConfirmed(true);
-            } else {
-              // Payment is still pending - show pending status
-              setPaymentStatus('pending');
-            }
-          } else {
-            // Order not found
-            setPaymentStatus('failed');
-          }
+          return; // Stop polling
         }
-      } catch (e) {
-        console.error('Payment verification error:', e);
-        // On error, check order status as fallback
-        try {
-          const order = await getOrderAction(code);
-          if (order && order.status !== 'pending_payment') {
-            setPaymentStatus('success');
-            setIsConfirmed(true);
-          } else {
-            setPaymentStatus('pending');
-          }
-        } catch {
-          setPaymentStatus('pending');
-        }
-      } finally {
-        if (!cancelled) setIsVerifying(false);
+      } catch (err) {
+        console.error('Polling error:', err);
+      }
+
+      attempts++;
+      if (active && !isConfirmed && attempts < maxAttempts) {
+        setTimeout(checkStatus, 3000); // Poll every 3 seconds
+      } else if (attempts >= maxAttempts && !isConfirmed && paymentStatus !== 'success') {
+         // Stop verifying spinner if we time out, show pending state
+         setIsVerifying(false);
+         if (!paymentStatus) setPaymentStatus('pending');
       }
     };
-    verify();
-    return () => { cancelled = true };
-  }, [code]);
+
+    const initialVerify = async () => {
+        try {
+            // First check: Verify with Paystack API (once)
+            const safeCode = code || '';
+            const res = await fetch(`/api/payment/verify?reference=${encodeURIComponent(safeCode)}`, { cache: 'no-store' });
+            const data = await res.json().catch(() => null);
+
+            if (res.ok && data?.ok) {
+                setPaymentStatus('success');
+                setIsConfirmed(true);
+                setIsVerifying(false); // Done
+                return;
+            }
+        } catch (e) {
+            console.warn('Initial verify failed, falling back to polling', e);
+        }
+        
+        // If API verify failed/pending, start polling DB
+        checkStatus();
+    }
+
+    if (code && !isConfirmed) {
+        initialVerify();
+    }
+
+    return () => { active = false; };
+  }, [code, isConfirmed]); // Dependencies: if code changes or confirmed, reset/stop
 
   // Clear the cart once payment is confirmed (verify or webhook path)
   useEffect(() => {
@@ -165,6 +156,14 @@ function SuccessContent() {
                 <Truck />
                 Check Order Status
               </Link>
+            </Button>
+            <Button 
+                variant="secondary" 
+                className="w-full"
+                onClick={() => window.location.reload()}
+            >
+                <CheckCircle2 className="mr-2 h-4 w-4" />
+                I've Paid, Check Again
             </Button>
             <Button asChild variant="outline" className="w-full">
               <Link href="/partner-care">
