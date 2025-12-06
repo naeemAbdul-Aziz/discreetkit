@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServerClient, getUserRoles } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
+import { sendShippingNotificationSMS, sendDeliveryNotificationSMS } from '@/lib/actions';
 
 export async function PATCH(
   request: NextRequest,
@@ -85,6 +86,13 @@ export async function PATCH(
         status: updateData.status || 'acknowledged',
         note: `Pharmacy ${action}: ${pharmacy_ack_status || status}`
       });
+
+    // Trigger SMS notifications if status changed
+    if (updateData.status === 'out_for_delivery') {
+      sendShippingNotificationSMS(id).catch(err => console.error('Failed to send shipping SMS:', err));
+    } else if (updateData.status === 'completed') {
+      sendDeliveryNotificationSMS(id).catch(err => console.error('Failed to send delivery SMS:', err));
+    }
 
     revalidatePath('/pharmacy/dashboard');
 

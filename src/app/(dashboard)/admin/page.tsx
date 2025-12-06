@@ -18,7 +18,7 @@ import { useRouter } from 'next/navigation';
 
 type RecentOrder = { id: number; code: string; status: string; total_price: number; created_at: string };
 type DashboardData = {
-  metrics: { totalRevenue: number; totalSales: number; avgOrderValue: number; newCustomers: number };
+  metrics: { totalRevenue: number; totalSales: number; avgOrderValue: number; newCustomers: number; activeOrders: number };
   recentOrders: RecentOrder[];
   revenueSeries: { date: string; amount: number }[];
   statusBreakdown?: { status: string; count: number }[];
@@ -47,6 +47,9 @@ export default function AdminDashboardPage() {
         const totalRevenue = orders.reduce((sum: number, o: any) => sum + (o.total_price || 0), 0);
         const totalSales = orders.length;
         const avgOrderValue = totalSales > 0 ? totalRevenue / totalSales : 0;
+        
+        // Active orders (processing or out_for_delivery)
+        const activeOrders = orders.filter((o: any) => ['processing', 'out_for_delivery'].includes(o.status)).length;
         
         // New customers (unique emails in period) - simplified for now
         const uniqueCustomers = new Set(orders.map((o: any) => o.email)).size;
@@ -85,7 +88,7 @@ export default function AdminDashboardPage() {
         const statusBreakdown = Object.entries(statusCounts).map(([status, count]) => ({ status, count }));
 
         setData({
-            metrics: { totalRevenue, totalSales, avgOrderValue, newCustomers: uniqueCustomers },
+            metrics: { totalRevenue, totalSales, avgOrderValue, newCustomers: uniqueCustomers, activeOrders },
             recentOrders,
             revenueSeries,
             statusBreakdown
@@ -172,7 +175,7 @@ export default function AdminDashboardPage() {
               <Activity className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">+{data.recentOrders.filter(o => o.status === 'processing').length}</div>
+              <div className="text-2xl font-bold">+{data.metrics.activeOrders}</div>
               <p className="text-xs text-muted-foreground">Processing orders</p>
             </CardContent>
           </Card>

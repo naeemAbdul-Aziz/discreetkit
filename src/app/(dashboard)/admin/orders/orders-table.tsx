@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useToast } from "@/hooks/use-toast"
 import { assignPharmacy, bulkUpdateOrderStatus, searchPharmacies } from "@/lib/admin-actions"
+import { getSupabaseClient } from "@/lib/supabase"
 
 // Helper
 const titleCase = (s: string) => s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
@@ -56,8 +57,66 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
     })
   }, [orders, searchTerm, filterStatus])
 
+
   const totalPages = Math.ceil(filteredOrders.length / pageSize)
   const paginatedOrders = filteredOrders.slice((page - 1) * pageSize, page * pageSize)
+
+  // Realtime Subscription
+  useEffect(() => {
+    const supabase = getSupabaseClient()
+    const channel = supabase
+      .channel('admin-orders-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'orders' },
+        (payload: any) => {
+          // Handle UPDATE
+          if (payload.eventType === 'UPDATE') {
+            const updatedOrder = payload.new
+            setOrders(prev => prev.map(o => {
+               if (o.id === updatedOrder.id) {
+                   // Create a merged object retaining the existing 'pharmacies' join 
+                   // unless we want to re-fetch. For status updates, this is sufficient.
+                   return { 
+                       ...o, 
+                       ...updatedOrder, 
+                       // Ensure nested object is preserved if not in payload
+                       pharmacies: o.pharmacies 
+                   }
+               }
+               return o
+            }))
+            toast({
+                title: "Order Updated",
+                description: `Order ${updatedOrder.code || ''} status changed to ${updatedOrder.status}`,
+            })
+          } 
+          // Handle INSERT (New Order)
+          else if (payload.eventType === 'INSERT') {
+             // For new orders, we usually need the joined data. 
+             // We can either trigger a re-fetch of the page or just add it optimistically.
+             // Given the 'pharmacies' join complication, a simple router.refresh() 
+             // is the most robust way to get the full data structure, 
+             // but user might lose scroll position. 
+             // Let's add it to the top locally with null pharmacy if unknown.
+             const newOrder = {
+                 ...payload.new,
+                 pharmacies: null
+             }
+             setOrders(prev => [newOrder, ...prev])
+             toast({
+                 title: "New Order Received",
+                 description: `Order ${newOrder.code} has been placed.`,
+             })
+          }
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [])
 
   const handleStatusChange = async (orderId: number, newStatus: string) => {
       // Optimistic update
@@ -262,7 +321,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                     loading={assigningId===order.id}
                   />
                 </TableCell>
-                <TableCell className="text-right">GHS {Number(order.total_price).toFixed(2)}</TableCell>
+                <TableCell className="text-right">GHS {Number(order.total_price || 0).toFixed(2)}</TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

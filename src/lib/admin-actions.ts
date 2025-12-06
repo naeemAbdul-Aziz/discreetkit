@@ -439,6 +439,13 @@ export async function updateOrderStatus(id: number, status: string) {
 
     if (error) return { error: error.message }
 
+    // Trigger SMS notifications asynchronously
+    if (status === 'out_for_delivery') {
+        sendShippingNotificationSMS(String(id)).catch(console.error)
+    } else if (status === 'completed') {
+        sendDeliveryNotificationSMS(String(id)).catch(console.error)
+    }
+
     revalidatePath('/admin/orders')
     return { success: true }
 }
@@ -526,6 +533,8 @@ export async function assignPharmacy(orderId: number, pharmacyId: number) {
     return await assignPharmacyInternal(supabaseAdmin, orderId, pharmacyId)
 }
 
+import { sendShippingNotificationSMS, sendDeliveryNotificationSMS } from "@/lib/actions"
+
 // Bulk update order statuses
 export async function bulkUpdateOrderStatus(ids: number[], status: string) {
     const allowed = ['pending_payment', 'received', 'processing', 'out_for_delivery', 'completed']
@@ -539,6 +548,14 @@ export async function bulkUpdateOrderStatus(ids: number[], status: string) {
         .update({ status })
         .in('id', ids)
     if (error) return { error: error.message }
+
+    // Trigger SMS notifications asynchronously
+    if (status === 'out_for_delivery') {
+        ids.forEach(id => sendShippingNotificationSMS(String(id)).catch(console.error))
+    } else if (status === 'completed') {
+        ids.forEach(id => sendDeliveryNotificationSMS(String(id)).catch(console.error))
+    }
+
     revalidatePath('/admin/orders')
     return { success: true }
 }
