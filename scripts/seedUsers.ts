@@ -38,25 +38,100 @@ async function ensureUserRole(userId: string, roleId: string): Promise<void> {
   if (insertErr) throw insertErr
 }
 
+/**
+ * Automatically link pharmacy user to a pharmacy based on email pattern
+ * Searches for pharmacy name in email (e.g., beybeepharmacy@gmail.com → BeyBee Pharmacy)
+ */
+async function autoLinkPharmacy(userId: string, email: string): Promise<void> {
+  try {
+    // Extract potential pharmacy name from email (before @)
+    const emailPrefix = email.split('@')[0].toLowerCase()
+
+    // Common patterns: "pharmacyname@...", "pharmacynamepharmacy@..."
+    const searchTerm = emailPrefix.replace('pharmacy', '').trim()
+
+    if (!searchTerm) {
+      console.log(`   ⚠️  Cannot auto-link ${email}: no identifiable pharmacy name in email`)
+      return
+    }
+
+    // Search for pharmacy with similar name
+    const { data: pharmacies, error } = await supabase
+      .from('pharmacies')
+      .select('id, name, user_id')
+      .ilike('name', `%${searchTerm}%`)
+
+    if (error) {
+      console.error(`   ❌ Error searching pharmacies:`, error)
+      return
+    }
+
+    if (!pharmacies || pharmacies.length === 0) {
+      console.log(`   ⚠️  No pharmacy found matching "${searchTerm}" for ${email}`)
+      console.log(`   💡 Create pharmacy via admin panel, then run: npx tsx scripts/linkPharmacyUsers.ts`)
+      return
+    }
+
+    // If multiple matches, use the first unlinked one, or the first one
+    const targetPharmacy = pharmacies.find(p => !p.user_id) || pharmacies[0]
+
+    if (targetPharmacy.user_id && targetPharmacy.user_id !== userId) {
+      console.log(`   ⚠️  Pharmacy "${targetPharmacy.name}" already linked to another user`)
+      return
+    }
+
+    if (targetPharmacy.user_id === userId) {
+      console.log(`   ✅ Already linked to "${targetPharmacy.name}"`)
+      return
+    }
+
+    // Link the pharmacy
+    const { error: updateError } = await supabase
+      .from('pharmacies')
+      .update({ user_id: userId })
+      .eq('id', targetPharmacy.id)
+
+    if (updateError) {
+      console.error(`   ❌ Error linking pharmacy:`, updateError)
+      return
+    }
+
+    console.log(`   🔗 Auto-linked to pharmacy: "${targetPharmacy.name}"`)
+  } catch (err) {
+    console.error(`   ❌ Auto-link error:`, err)
+  }
+}
+
 async function main() {
+  console.log('🌱 Seeding users...\n')
+
   // Admin
   const adminEmail = 'naeemabdulaziz202@gmail.com'
   const adminPassword = 'DiscreetKitAdmin2k25'
   const adminRoleId = await ensureRole('admin')
   const adminUserId = await ensureUser(adminEmail, adminPassword)
   await ensureUserRole(adminUserId, adminRoleId)
+  console.log(`✅ Admin: ${adminEmail}`)
 
   // Pharmacies (add/edit as needed)
   const pharmacies = [
     { email: 'beybeepharmacy@gmail.com', password: 'DiscreetKitAdmin2k25' },
   ]
+
   const pharmacyRoleId = await ensureRole('pharmacy')
+
+  console.log('\n📦 Creating pharmacy users...')
   for (const { email, password } of pharmacies) {
     const userId = await ensureUser(email, password)
     await ensureUserRole(userId, pharmacyRoleId)
+    console.log(`✅ Pharmacy user: ${email}`)
+
+    // Automatically link to pharmacy
+    await autoLinkPharmacy(userId, email)
   }
 
-  console.log('Seeding complete.')
+  console.log('\n✨ Seeding complete!')
 }
 
 main().catch(console.error)
+
