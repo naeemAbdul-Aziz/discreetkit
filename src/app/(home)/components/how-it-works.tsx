@@ -109,6 +109,7 @@ export function HowItWorks() {
         {/* Desktop Layout: Sticky Scroll Reveal */}
         <div className="hidden md:block">
           <StickyScroll 
+            contentClassName="aspect-square w-full max-w-[500px]"
             content={steps.map((step) => ({
               title: step.title,
               description: step.description,
@@ -123,12 +124,12 @@ export function HowItWorks() {
                 </Button>
               ) : undefined,
               content: (
-                <div className="h-full w-full flex items-center justify-center text-white relative">
+                <div className="h-full w-full flex items-center justify-center relative p-10">
                   <Image
                     src={step.imageUrl}
                     alt={step.title}
                     fill
-                    className="h-full w-full object-cover"
+                    className="object-contain"
                   />
                 </div>
               ),
