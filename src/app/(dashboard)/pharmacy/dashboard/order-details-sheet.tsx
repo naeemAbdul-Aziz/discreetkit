@@ -115,7 +115,7 @@ export function OrderDetailsSheet({
                     <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
                   </div>
                   <p className="font-semibold text-sm">
-                    GHS {(Number(item.price || 0) * Number(item.quantity || 1)).toFixed(2)}
+                    GHS {(Number(item.price_ghs || item.price || 0) * Number(item.quantity || 1)).toFixed(2)}
                   </p>
                 </div>
               ))}

@@ -1,225 +1,213 @@
-'use server'
 
-import { createSupabaseServerClient } from "@/lib/supabase"
-import { revalidatePath } from "next/cache"
+'use server';
 
-/**
- * Get the current logged-in pharmacy user's pharmacy record
- */
-export async function getCurrentPharmacy() {
-    const supabase = await createSupabaseServerClient()
+import { createSupabaseServerClient, getUserRoles } from './supabase';
+import { revalidatePath } from 'next/cache';
+import { z } from 'zod';
 
-    // Get current user
-    const { data: { user }, error: userError } = await supabase.auth.getUser()
-    if (userError || !user) {
-        return { error: "Not authenticated" }
-    }
+// --- SERVICE AREAS ---
 
-    // Get pharmacy linked to this user
-    const { data: pharmacy, error } = await supabase
+export async function getPharmacyServiceAreas() {
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return [];
+
+    // Get pharmacy ID
+    const { data: pharmacy } = await supabase
         .from('pharmacies')
-        .select('*')
+        .select('id')
         .eq('user_id', user.id)
-        .single()
+        .single();
 
-    if (error) {
-        return { error: "Pharmacy not found for this user" }
-    }
+    if (!pharmacy) return [];
 
-    return { pharmacy }
-}
-
-/**
- * Get orders assigned to the current pharmacy
- */
-export async function getPharmacyOrders(status?: string) {
-    const supabase = await createSupabaseServerClient()
-
-    // Get current pharmacy
-    const { pharmacy, error: pharmError } = await getCurrentPharmacy()
-    if (pharmError || !pharmacy) {
-        return { error: pharmError || "Pharmacy not found" }
-    }
-
-    // Build query
-    let query = supabase
-        .from('orders')
+    const { data: areas } = await supabase
+        .from('pharmacy_service_areas')
         .select('*')
         .eq('pharmacy_id', pharmacy.id)
-        .order('created_at', { ascending: false })
+        .order('created_at', { ascending: false });
 
-    // Filter by status if provided
-    if (status) {
-        query = query.eq('status', status)
-    }
-
-    const { data: orders, error } = await query
-
-    if (error) {
-        return { error: error.message }
-    }
-
-    return { orders }
+    return areas || [];
 }
 
-/**
- * Get pharmacy dashboard stats
- */
-export async function getPharmacyStats() {
-    const supabase = await createSupabaseServerClient()
+const serviceAreaSchema = z.object({
+    areaName: z.string().min(2, 'Area name is required'),
+    deliveryFee: z.number().min(0, 'Fee cannot be negative'),
+    maxDeliveryTime: z.number().min(1, 'Delivery time must be at least 1 hour')
+});
 
-    // Get current pharmacy
-    const { pharmacy, error: pharmError } = await getCurrentPharmacy()
-    if (pharmError || !pharmacy) {
-        return { error: pharmError || "Pharmacy not found" }
+export async function addServiceArea(prevState: any, formData: FormData) {
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { success: false, message: 'Unauthorized' };
+
+    const { data: pharmacy } = await supabase
+        .from('pharmacies')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+    if (!pharmacy) return { success: false, message: 'Pharmacy profile not found' };
+
+    const rawData = {
+        areaName: formData.get('areaName'),
+        deliveryFee: Number(formData.get('deliveryFee')),
+        maxDeliveryTime: Number(formData.get('maxDeliveryTime')) || 24
+    };
+
+    const validated = serviceAreaSchema.safeParse(rawData);
+    if (!validated.success) {
+        return { success: false, message: validated.error.errors[0].message };
     }
 
-    // Get all orders for this pharmacy
-    const { data: orders, error } = await supabase
-        .from('orders')
-        .select('status, created_at, pharmacy_id')
-        .eq('pharmacy_id', pharmacy.id)
+    const { error } = await supabase.from('pharmacy_service_areas').insert({
+        pharmacy_id: pharmacy.id,
+        area_name: validated.data.areaName,
+        delivery_fee: validated.data.deliveryFee,
+        max_delivery_time_hours: validated.data.maxDeliveryTime,
+        is_active: true
+    });
 
     if (error) {
-        return { error: error.message }
+        console.error('Add area error:', error);
+        return { success: false, message: 'Failed to add area' };
     }
 
-    // Calculate stats
-    const pending = orders?.filter(o => o.status === 'received' && o.pharmacy_id).length || 0
-    const processing = orders?.filter(o => o.status === 'processing').length || 0
-    const outForDelivery = orders?.filter(o => o.status === 'out_for_delivery').length || 0
-
-    // Completed this week
-    const oneWeekAgo = new Date()
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
-    const completedThisWeek = orders?.filter(o =>
-        o.status === 'completed' &&
-        new Date(o.created_at) >= oneWeekAgo
-    ).length || 0
-
-    return {
-        stats: {
-            pending,
-            processing,
-            outForDelivery,
-            completedThisWeek
-        }
-    }
+    revalidatePath('/pharmacy/settings');
+    return { success: true, message: 'Area added successfully' };
 }
 
-/**
- * Accept an order (pharmacy acknowledges and starts processing)
- */
-export async function acceptOrder(id: number) {
-    const supabase = await createSupabaseServerClient()
-
-    // Get current pharmacy
-    const { pharmacy, error: pharmError } = await getCurrentPharmacy()
-    if (pharmError || !pharmacy) {
-        return { error: pharmError || "Pharmacy not found" }
-    }
-
-    // Update order status to processing
+export async function removeServiceArea(id: number) {
+    const supabase = await createSupabaseServerClient();
     const { error } = await supabase
-        .from('orders')
-        .update({
-            status: 'processing',
-            pharmacy_ack_status: 'accepted',
-            pharmacy_ack_at: new Date().toISOString()
-        })
-        .eq('id', id)
-        .eq('pharmacy_id', pharmacy.id) // Security: only update own orders
+        .from('pharmacy_service_areas')
+        .delete()
+        .eq('id', id);
 
-    if (error) {
-        return { error: error.message }
-    }
-
-    // Log event
-    await supabase
-        .from('order_events')
-        .insert({
-            order_id: id,
-            status: 'processing',
-            note: `Order accepted by ${pharmacy.name}`
-        })
-
-    revalidatePath('/pharmacy/dashboard')
-    return { success: true }
+    if (error) return { success: false, error: error.message };
+    revalidatePath('/pharmacy/settings');
+    return { success: true };
 }
 
-/**
- * Decline an order
- */
-export async function declineOrder(id: number, reason: string) {
-    const supabase = await createSupabaseServerClient()
 
-    // Get current pharmacy
-    const { pharmacy, error: pharmError } = await getCurrentPharmacy()
-    if (pharmError || !pharmacy) {
-        return { error: pharmError || "Pharmacy not found" }
-    }
+// --- INVENTORY ---
 
-    // Update order - unassign pharmacy and set back to received
-    const { error } = await supabase
-        .from('orders')
-        .update({
-            pharmacy_id: null,
-            pharmacy_ack_status: 'declined',
-            pharmacy_ack_at: new Date().toISOString()
-        })
-        .eq('id', id)
-        .eq('pharmacy_id', pharmacy.id) // Security: only update own orders
+export async function getPharmacyInventory() {
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { products: [], pharmacyId: null };
 
-    if (error) {
-        return { error: error.message }
-    }
+    const { data: pharmacy } = await supabase
+        .from('pharmacies')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
 
-    // Log event
-    await supabase
-        .from('order_events')
-        .insert({
-            order_id: id,
-            status: 'declined',
-            note: `Order declined by ${pharmacy.name}: ${reason}`
-        })
+    if (!pharmacy) return { products: [], pharmacyId: null };
 
-    revalidatePath('/pharmacy/dashboard')
-    return { success: true }
+    // Get all global products
+    const { data: products } = await supabase
+        .from('products')
+        .select('*')
+        .order('name');
+
+    // Get pharmacy specific settings (availability, custom price/stock)
+    const { data: pharmacyProducts } = await supabase
+        .from('pharmacy_products')
+        .select('*')
+        .eq('pharmacy_id', pharmacy.id);
+
+    // Merge data
+    const merged = products?.map(p => {
+        const pp = pharmacyProducts?.find(x => x.product_id === p.id);
+        return {
+            ...p,
+            is_available: pp?.is_available ?? false, // Default to false if not in pharmacy_products? Or true? Let's say false/opt-in for now.
+            custom_stock: pp?.stock_level ?? 0,
+            custom_price: pp?.pharmacy_price_ghs ?? p.price_ghs
+        };
+    });
+
+    return { products: merged || [], pharmacyId: pharmacy.id };
 }
 
-/**
- * Update order status (processing → out_for_delivery)
- */
-export async function updatePharmacyOrderStatus(id: number, status: 'out_for_delivery' | 'completed') {
-    const supabase = await createSupabaseServerClient()
+export async function toggleProductAvailability(pharmacyId: number, productId: number, isAvailable: boolean) {
+    const supabase = await createSupabaseServerClient();
 
-    // Get current pharmacy
-    const { pharmacy, error: pharmError } = await getCurrentPharmacy()
-    if (pharmError || !pharmacy) {
-        return { error: pharmError || "Pharmacy not found" }
+    // Upsert into pharmacy_products
+    const { error } = await supabase
+        .from('pharmacy_products')
+        .upsert({
+            pharmacy_id: pharmacyId,
+            product_id: productId,
+            is_available: isAvailable,
+            last_updated: new Date().toISOString()
+        }, { onConflict: 'pharmacy_id, product_id' });
+
+    if (error) return { success: false, error: error.message };
+
+    revalidatePath('/pharmacy/inventory');
+    return { success: true };
+}
+
+export async function updateProductStock(pharmacyId: number, productId: number, stock: number) {
+    const supabase = await createSupabaseServerClient();
+    const { error } = await supabase
+        .from('pharmacy_products')
+        .upsert({
+            pharmacy_id: pharmacyId,
+            product_id: productId,
+            stock_level: stock,
+            last_updated: new Date().toISOString()
+        }, { onConflict: 'pharmacy_id, product_id' });
+
+    if (error) return { success: false, error: error.message };
+    revalidatePath('/pharmacy/inventory');
+    return { success: true };
+}
+
+// --- PRODUCT REQUESTS ---
+
+const requestProductSchema = z.object({
+    productName: z.string().min(3, 'Product name is required'),
+    description: z.string().optional()
+});
+
+export async function requestNewProduct(prevState: any, formData: FormData) {
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { success: false, message: 'Unauthorized' };
+
+    const { data: pharmacy } = await supabase
+        .from('pharmacies')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+    if (!pharmacy) return { success: false, message: 'Pharmacy profile not found' };
+
+    const rawData = {
+        productName: formData.get('productName'),
+        description: formData.get('description')
+    };
+
+    const validated = requestProductSchema.safeParse(rawData);
+    if (!validated.success) {
+        return { success: false, message: validated.error.errors[0].message };
     }
 
-    // Update order status
-    const { error } = await supabase
-        .from('orders')
-        .update({ status })
-        .eq('id', id)
-        .eq('pharmacy_id', pharmacy.id) // Security: only update own orders
+    // Use 'any' cast to bypass strict type checking for the new table
+    const { error } = await (supabase as any).from('product_requests').insert({
+        pharmacy_id: pharmacy.id,
+        product_name: validated.data.productName,
+        description: validated.data.description,
+        status: 'pending'
+    });
 
     if (error) {
-        return { error: error.message }
+        console.error('Request product error:', error);
+        return { success: false, message: 'Failed to submit request' };
     }
 
-    // Log event
-    const statusText = status === 'out_for_delivery' ? 'Out for Delivery' : 'Completed'
-    await supabase
-        .from('order_events')
-        .insert({
-            order_id: id,
-            status,
-            note: `Order marked as ${statusText} by ${pharmacy.name}`
-        })
-
-    revalidatePath('/pharmacy/dashboard')
-    return { success: true }
+    return { success: true, message: 'Product request submitted successfully' };
 }

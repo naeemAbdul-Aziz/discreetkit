@@ -37,7 +37,7 @@ interface OrdersListProps {
 
 export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
   const { toast } = useToast()
-  const [loading, setLoading] = useState<{ id: number; action: string } | null>(null)
+  const [loading, setLoading] = useState<{ id: number; action: string; success?: boolean } | null>(null)
   const [declineDialogOpen, setDeclineDialogOpen] = useState(false)
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [declineReason, setDeclineReason] = useState("")
@@ -78,6 +78,9 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
         title: "Success", 
         description: "Order updated successfully" 
       })
+
+      // Optimistic success state
+      setLoading({ id, action: actionType, success: true })
       
       onOrderUpdate?.()
     } catch (error) {
@@ -86,8 +89,11 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
         title: "Error", 
         description: error instanceof Error ? error.message : 'Failed to update order'
       })
-    } finally {
       setLoading(null)
+    } finally {
+       // We don't verify null here to allow optimistic state to persist until re-render
+       // But to prevent stuck state if parents don't re-render, we clear it after a timeout
+       setTimeout(() => setLoading(null), 2000)
     }
   }
 
@@ -155,6 +161,11 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
       <div className="space-y-4">
         <h3 className="text-lg font-semibold mb-4">Recent Orders</h3>
         {orders.map((order) => {
+          // Check if this order has a pending optimistic update
+          const isOptimisticallyAccepted = loading?.id === order.id && loading?.action === 'accept' && loading?.success;
+          
+          if (isOptimisticallyAccepted) return null; // Hide card momentarily or show updated state? Better to let parent re-render, but we can disable buttons.
+
           const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items
           const itemCount = Array.isArray(items) ? items.length : 0
 
@@ -191,6 +202,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
                         size="sm"
                         onClick={() => handleAccept(order.id)}
                         disabled={loading?.id === order.id}
+                        className={loading?.id === order.id && loading?.action === 'accept' ? 'opacity-100 transition-all' : ''}
                       >
                         {loading?.id === order.id && loading?.action === 'accept' ? (
                            <div className="h-4 w-4 mr-1 animate-spin rounded-full border-2 border-current border-t-transparent" />

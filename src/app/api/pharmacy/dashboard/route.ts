@@ -69,7 +69,8 @@ export async function GET(request: NextRequest) {
       pharmacy_ack_status: order.pharmacy_ack_status,
       total_price: Number(order.total_price),
       created_at: order.created_at,
-      items: order.items
+      items: order.items,
+      delivery_area: order.delivery_area
     }));
 
     // Orders by status for charts
