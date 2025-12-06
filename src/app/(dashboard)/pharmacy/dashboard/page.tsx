@@ -207,7 +207,7 @@ export default function PharmacyDashboardPage() {
       )}
 
       <div className="grid gap-4 md:gap-6 grid-cols-2 md:grid-cols-4">
-        <Card className="shadow-sm hover:shadow-md transition-shadow">
+        <Card className="shadow-none border-border">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">New Orders</CardTitle>
             <Package className="h-4 w-4 text-primary" />
@@ -218,7 +218,7 @@ export default function PharmacyDashboardPage() {
           </CardContent>
         </Card>
         
-        <Card className="shadow-sm hover:shadow-md transition-shadow">
+        <Card className="shadow-none border-border">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Processing</CardTitle>
             <Clock className="h-4 w-4 text-blue-500" />
@@ -229,7 +229,7 @@ export default function PharmacyDashboardPage() {
           </CardContent>
         </Card>
         
-        <Card className="shadow-sm hover:shadow-md transition-shadow">
+        <Card className="shadow-none border-border">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Out for Delivery</CardTitle>
             <Truck className="h-4 w-4 text-orange-500" />
@@ -240,7 +240,7 @@ export default function PharmacyDashboardPage() {
           </CardContent>
         </Card>
         
-        <Card className="shadow-sm hover:shadow-md transition-shadow">
+        <Card className="shadow-none border-border">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Completed</CardTitle>
             <CheckCircle className="h-4 w-4 text-green-500" />

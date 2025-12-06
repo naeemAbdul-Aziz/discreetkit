@@ -124,12 +124,12 @@ export function HowItWorks() {
                 </Button>
               ) : undefined,
               content: (
-                <div className="h-full w-full flex items-center justify-center relative p-10">
+                <div className="h-full w-full flex items-center justify-center relative overflow-hidden rounded-xl">
                   <Image
                     src={step.imageUrl}
                     alt={step.title}
                     fill
-                    className="object-contain"
+                    className="object-cover"
                   />
                 </div>
               ),

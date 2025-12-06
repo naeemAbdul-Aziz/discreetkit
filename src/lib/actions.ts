@@ -284,7 +284,7 @@ export async function login(formData: FormData) {
     if (isAdmin) {
       redirect(process.env.NEXT_PUBLIC_ADMIN_URL || '/admin/dashboard');
     } else if (isPharmacy) {
-      redirect(process.env.NEXT_PUBLIC_PHARMACY_URL || '/pharmacy/dashboard');
+      redirect('/pharmacy/dashboard');
     } else {
       redirect('/');
     }

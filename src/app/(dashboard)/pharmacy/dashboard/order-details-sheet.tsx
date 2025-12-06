@@ -115,7 +115,7 @@ export function OrderDetailsSheet({
                     <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
                   </div>
                   <p className="font-semibold text-sm">
-                    GHS {(item.price * item.quantity).toFixed(2)}
+                    GHS {(Number(item.price || 0) * Number(item.quantity || 1)).toFixed(2)}
                   </p>
                 </div>
               ))}
@@ -128,22 +128,22 @@ export function OrderDetailsSheet({
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Subtotal</span>
-              <span>GHS {order.subtotal?.toFixed(2) || '0.00'}</span>
+              <span>GHS {Number(order.subtotal || 0).toFixed(2)}</span>
             </div>
             {order.student_discount > 0 && (
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Student Discount</span>
-                <span className="text-green-600">-GHS {order.student_discount.toFixed(2)}</span>
+                <span className="text-green-600">-GHS {Number(order.student_discount || 0).toFixed(2)}</span>
               </div>
             )}
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Delivery Fee</span>
-              <span>GHS {order.delivery_fee?.toFixed(2) || '0.00'}</span>
+              <span>GHS {Number(order.delivery_fee || 0).toFixed(2)}</span>
             </div>
             <Separator />
             <div className="flex justify-between font-bold">
               <span>Total</span>
-              <span className="text-lg">GHS {order.total_price.toFixed(2)}</span>
+              <span className="text-lg">GHS {Number(order.total_price || 0).toFixed(2)}</span>
             </div>
           </div>
 

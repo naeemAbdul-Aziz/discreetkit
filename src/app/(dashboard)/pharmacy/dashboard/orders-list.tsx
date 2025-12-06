@@ -150,7 +150,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
           const itemCount = Array.isArray(items) ? items.length : 0
 
           return (
-            <Card key={order.id} className="p-4 hover:shadow-md transition-shadow">
+            <Card key={order.id} className="p-4 shadow-none border-border">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
@@ -159,7 +159,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
                   </div>
                   <div className="text-sm text-muted-foreground space-y-1">
                     <p>Delivery: {order.delivery_area || 'Not specified'}</p>
-                    <p>Items: {itemCount} • Total: GHS {order.total_price.toFixed(2)}</p>
+                    <p>Items: {itemCount} • Total: GHS {Number(order.total_price || 0).toFixed(2)}</p>
                     <p className="text-xs">
                       {new Date(order.created_at).toLocaleString()}
                     </p>

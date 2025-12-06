@@ -71,8 +71,11 @@ export async function PATCH(
       .eq('id', id);
 
     if (updateError) {
-      throw new Error('Failed to update order');
+      console.error('Failed to update order:', updateError);
+      throw new Error(`Failed to update order: ${updateError.message}`);
     }
+
+    console.log(`[Pharmacy Order API] Order ${id} updated: action=${action}, status=${updateData.status}, ack=${updateData.pharmacy_ack_status}`);
 
     // Log the event
     await supabase
