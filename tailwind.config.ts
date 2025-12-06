@@ -17,8 +17,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        body: ['Satoshi', 'sans-serif'],
-        headline: ['Satoshi', 'sans-serif'],
+        body: ['var(--font-body)', 'sans-serif'],
+        headline: ['var(--font-headline)', 'sans-serif'],
       },
       colors: {
         background: 'hsl(var(--background))',

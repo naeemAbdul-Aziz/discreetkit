@@ -25,6 +25,8 @@ const badgeVariants = cva(
           "border-transparent bg-blue-500/15 text-blue-700 hover:bg-blue-500/25 dark:bg-blue-500/20 dark:text-blue-300",
         neutral:
           "border-transparent bg-slate-500/15 text-slate-700 hover:bg-slate-500/25 dark:bg-slate-500/20 dark:text-slate-300",
+        accent:
+          "border-transparent bg-accent text-accent-foreground hover:bg-accent/80",
         icon:
           "p-1.5 rounded-full aspect-square grid place-items-center border-transparent bg-primary/10 text-primary hover:bg-primary/20",
       },

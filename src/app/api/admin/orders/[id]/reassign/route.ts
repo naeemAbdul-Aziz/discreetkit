@@ -3,8 +3,9 @@ import { createSupabaseServerClient, getSupabaseAdminClient, getUserRoles } from
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await context.params;
   try {
     // 1. Auth Check
     const supabaseServer = await createSupabaseServerClient()
@@ -32,7 +33,7 @@ export async function PUT(
     }
 
     // 3. Parse Inputs
-    const orderId = parseInt(params.id)
+    const orderId = parseInt(id)
     if (isNaN(orderId)) {
       return NextResponse.json({ error: 'Invalid Order ID' }, { status: 400 })
     }

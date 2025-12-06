@@ -4,26 +4,27 @@ import { getUserRoles } from '@/lib/supabase'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await context.params;
   try {
     const supabaseServer = await createSupabaseServerClient()
     const { data: { user } } = await supabaseServer.auth.getUser()
-    
+
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const roles = await getUserRoles(supabaseServer, user.id)
     const isAdmin = roles.includes('admin')
-    
+
     if (!isAdmin) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
-    const pharmacyId = parseInt(params.id)
+    const pharmacyId = parseInt(id)
     const body = await request.json()
-    
+
     const { product_ids, default_stock_level = 0, default_reorder_level = 10 } = body
 
     if (!Array.isArray(product_ids) || product_ids.length === 0) {
@@ -34,7 +35,7 @@ export async function POST(
     }
 
     const supabase = getSupabaseAdminClient()
-    
+
     // Prepare bulk insert data
     const pharmacyProducts = product_ids.map((productId: number) => ({
       pharmacy_id: pharmacyId,
@@ -52,10 +53,10 @@ export async function POST(
 
     if (error) throw error
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       assigned: data?.length || 0,
-      message: `${data?.length || 0} products assigned to pharmacy` 
+      message: `${data?.length || 0} products assigned to pharmacy`
     })
   } catch (error: any) {
     console.error('Error bulk assigning products:', error)

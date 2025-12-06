@@ -4,26 +4,27 @@ import { getUserRoles } from '@/lib/supabase'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await context.params;
   try {
     const supabaseServer = await createSupabaseServerClient()
     const { data: { user } } = await supabaseServer.auth.getUser()
-    
+
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const roles = await getUserRoles(supabaseServer, user.id)
     const isAdmin = roles.includes('admin')
-    
+
     if (!isAdmin) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
-    const pharmacyId = parseInt(params.id)
+    const pharmacyId = parseInt(id)
     const supabase = getSupabaseAdminClient()
-    
+
     // Get pharmacy products with product details
     const { data: pharmacyProducts, error } = await supabase
       .from('pharmacy_products')
@@ -55,26 +56,27 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await context.params;
   try {
     const supabaseServer = await createSupabaseServerClient()
     const { data: { user } } = await supabaseServer.auth.getUser()
-    
+
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const roles = await getUserRoles(supabaseServer, user.id)
     const isAdmin = roles.includes('admin')
-    
+
     if (!isAdmin) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
-    const pharmacyId = parseInt(params.id)
+    const pharmacyId = parseInt(id)
     const body = await request.json()
-    
+
     const {
       product_id,
       stock_level,
@@ -91,7 +93,7 @@ export async function POST(
     }
 
     const supabase = getSupabaseAdminClient()
-    
+
     // Insert or update pharmacy product
     const { data, error } = await supabase
       .from('pharmacy_products')

@@ -5,6 +5,7 @@ import React, { useState, useEffect, useTransition, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import {
   Card,
   CardContent,
@@ -252,21 +253,31 @@ function Tracker() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                         {order.items.map((item, i) => (
-                             <div key={item.id + i} className="flex justify-between items-start">
-                                <div className="flex gap-4">
-                                     <div className="relative h-16 w-16 flex-shrink-0 rounded-xl bg-muted border overflow-hidden">
-                                        {item.image_url ? (
-                                             <Image src={item.image_url} alt={item.name} fill className="object-contain p-2" />
-                                        ) : (
-                                            <Package className="h-full w-full p-4 text-muted-foreground/30" />
-                                        )}
-                                    </div>
-                                    <div>
-                                        <p className="font-semibold text-foreground">{item.name}</p>
-                                        <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
-                                    </div>
+                             <div key={item.id + i} className="flex gap-3 items-start">
+                                {/* Image */}
+                                <div className="relative h-12 w-12 flex-shrink-0 rounded-lg bg-muted border overflow-hidden">
+                                    {item.image_url ? (
+                                            <Image src={item.image_url} alt={item.name} fill className="object-contain p-1" />
+                                    ) : (
+                                        <Package className="h-full w-full p-3 text-muted-foreground/30" />
+                                    )}
                                 </div>
-                                <p className="font-medium text-sm">GHS {item.price_ghs.toFixed(2)}</p>
+                                
+                                {/* Details */}
+                                <div className="flex-1 min-w-0">
+                                    <p className="font-medium text-sm text-foreground leading-snug line-clamp-2">
+                                        {item.name}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground mt-0.5">Qty: {item.quantity}</p>
+                                </div>
+
+                                {/* Price */}
+                                <div className="text-right">
+                                    <p className="font-semibold text-sm whitespace-nowrap">
+                                        <span className="text-[10px] text-muted-foreground font-normal mr-1">GHS</span>
+                                        {item.price_ghs.toFixed(2)}
+                                    </p>
+                                </div>
                              </div>
                         ))}
                     </CardContent>
@@ -345,14 +356,13 @@ function Tracker() {
                                         )} />
                                         
                                         <div className="flex flex-col gap-1">
-                                            {/* Badge for status */} // Use inline styles or standard badges
                                             <div className="flex items-center gap-2">
-                                                <span className={cn(
-                                                    "text-sm font-bold",
-                                                    isLatest ? "text-foreground" : "text-muted-foreground"
-                                                )}>
+                                                <Badge 
+                                                    variant={isLatest ? "default" : "secondary"}
+                                                    className={cn("pointer-events-none", !isLatest && "opacity-70")}
+                                                >
                                                     {event.status}
-                                                </span>
+                                                </Badge>
                                             </div>
                                             
                                             {event.note && (

@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server'
 import { getSupabaseAdminClient } from '@/lib/supabase'
 import { recordPharmacyAcknowledgement } from '@/lib/actions'
 
-export async function POST(_req: Request, { params }: { params: { id: string } }) {
-  const id = Number(params.id)
+export async function POST(_req: Request, context: { params: Promise<{ id: string }> }) {
+  const { id: idParam } = await context.params;
+  const id = Number(idParam)
   if (!id) return NextResponse.json({ ok: false, error: 'Invalid order id' }, { status: 400 })
   const supabase = getSupabaseAdminClient()
   const { data: order, error } = await supabase

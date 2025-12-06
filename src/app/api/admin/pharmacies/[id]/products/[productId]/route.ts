@@ -4,27 +4,28 @@ import { getUserRoles } from '@/lib/supabase'
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string; productId: string } }
+  context: { params: Promise<{ id: string; productId: string }> }
 ) {
+  const { id, productId: productIdParam } = await context.params;
   try {
     const supabaseServer = await createSupabaseServerClient()
     const { data: { user } } = await supabaseServer.auth.getUser()
-    
+
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const roles = await getUserRoles(supabaseServer, user.id)
     const isAdmin = roles.includes('admin')
-    
+
     if (!isAdmin) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
-    const pharmacyId = parseInt(params.id)
-    const productId = parseInt(params.productId)
+    const pharmacyId = parseInt(id)
+    const productId = parseInt(productIdParam)
     const body = await request.json()
-    
+
     const {
       stock_level,
       reorder_level,
@@ -33,7 +34,7 @@ export async function PUT(
     } = body
 
     const supabase = getSupabaseAdminClient()
-    
+
     // Update pharmacy product
     const { data, error } = await supabase
       .from('pharmacy_products')
@@ -69,27 +70,28 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string; productId: string } }
+  context: { params: Promise<{ id: string; productId: string }> }
 ) {
+  const { id, productId: productIdParam } = await context.params;
   try {
     const supabaseServer = await createSupabaseServerClient()
     const { data: { user } } = await supabaseServer.auth.getUser()
-    
+
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const roles = await getUserRoles(supabaseServer, user.id)
     const isAdmin = roles.includes('admin')
-    
+
     if (!isAdmin) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
-    const pharmacyId = parseInt(params.id)
-    const productId = parseInt(params.productId)
+    const pharmacyId = parseInt(id)
+    const productId = parseInt(productIdParam)
     const supabase = getSupabaseAdminClient()
-    
+
     // Delete pharmacy product
     const { error } = await supabase
       .from('pharmacy_products')

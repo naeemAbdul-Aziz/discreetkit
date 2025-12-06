@@ -13,7 +13,8 @@ const updateOrderStatusSchema = z.object({
   note: z.string().optional(),
 });
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
   try {
     // Verify authenticated admin
     const supabaseServer = await createSupabaseServerClient();
@@ -21,7 +22,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await req.json();
-    const validatedData = updateOrderStatusSchema.parse({ ...body, id: params.id });
+    const validatedData = updateOrderStatusSchema.parse({ ...body, id: id });
 
     const supabaseAdmin = getSupabaseAdminClient();
 
