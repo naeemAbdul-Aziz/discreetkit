@@ -46,7 +46,7 @@ export function MagneticCursor() {
 
   return (
     <>
-      {/* Main Cursor Dot */}
+      {/* Minimal Cursor Dot */}
       <motion.div
         className="fixed top-0 left-0 pointer-events-none z-[9999] hidden md:block mix-blend-difference"
         style={{
@@ -57,13 +57,12 @@ export function MagneticCursor() {
         }}
       >
         <motion.div
-          className="bg-white rounded-full"
+          className="bg-white rounded-full transition-[width,height,opacity] duration-200 ease-out"
           animate={{
-            width: isHovering ? 64 : 12,
-            height: isHovering ? 64 : 12,
-            opacity: isHovering ? 0.1 : 1,
+            width: isHovering ? 24 : 8,
+            height: isHovering ? 24 : 8,
+            opacity: isHovering ? 0.5 : 1,
           }}
-          transition={{ type: 'spring', damping: 20, stiffness: 300 }}
         />
       </motion.div>
       

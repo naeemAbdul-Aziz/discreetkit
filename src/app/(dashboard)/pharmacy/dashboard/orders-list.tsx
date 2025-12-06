@@ -37,7 +37,7 @@ interface OrdersListProps {
 
 export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
   const { toast } = useToast()
-  const [loading, setLoading] = useState<number | null>(null)
+  const [loading, setLoading] = useState<{ id: number; action: string } | null>(null)
   const [declineDialogOpen, setDeclineDialogOpen] = useState(false)
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [declineReason, setDeclineReason] = useState("")
@@ -50,7 +50,16 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
   }
 
   const handleOrderAction = async (id: number, action: string, data: any = {}) => {
-    setLoading(id)
+    // Only set loading for specific action if it's a button click (not internal)
+    // We map 'acknowledge' -> 'accept'/'decline' based on data for better granularity
+    let actionType = action;
+    if (action === 'acknowledge') {
+      actionType = data.pharmacy_ack_status === 'accepted' ? 'accept' : 'decline';
+    } else if (action === 'update_status') {
+      actionType = data.status;
+    }
+    
+    setLoading({ id, action: actionType })
     
     try {
       const res = await fetch(`/api/pharmacy/orders/${id}`, {
@@ -181,16 +190,20 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
                       <Button
                         size="sm"
                         onClick={() => handleAccept(order.id)}
-                        disabled={loading === order.id}
+                        disabled={loading?.id === order.id}
                       >
-                        <CheckCircle className="h-4 w-4 mr-1" />
+                        {loading?.id === order.id && loading?.action === 'accept' ? (
+                           <div className="h-4 w-4 mr-1 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                        ) : (
+                           <CheckCircle className="h-4 w-4 mr-1" />
+                        )}
                         Accept
                       </Button>
                       <Button
                         size="sm"
                         variant="destructive"
                         onClick={() => handleDeclineClick(order.id)}
-                        disabled={loading === order.id}
+                        disabled={loading?.id === order.id}
                       >
                         <XCircle className="h-4 w-4 mr-1" />
                         Decline
@@ -202,9 +215,13 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
                     <Button
                       size="sm"
                       onClick={() => handleMarkOutForDelivery(order.id)}
-                      disabled={loading === order.id}
+                      disabled={loading?.id === order.id}
                     >
-                      <Truck className="h-4 w-4 mr-1" />
+                      {loading?.id === order.id && loading?.action === 'out_for_delivery' ? (
+                        <div className="h-4 w-4 mr-1 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                      ) : (
+                        <Truck className="h-4 w-4 mr-1" />
+                      )}
                       Out for Delivery
                     </Button>
                   )}
@@ -213,9 +230,13 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
                     <Button
                       size="sm"
                       onClick={() => handleMarkCompleted(order.id)}
-                      disabled={loading === order.id}
+                      disabled={loading?.id === order.id}
                     >
-                      <CheckCircle className="h-4 w-4 mr-1" />
+                      {loading?.id === order.id && loading?.action === 'completed' ? (
+                        <div className="h-4 w-4 mr-1 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                      ) : (
+                        <CheckCircle className="h-4 w-4 mr-1" />
+                      )}
                       Mark Completed
                     </Button>
                   )}
@@ -262,7 +283,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
         onDecline={() => selectedOrder && handleDeclineClick(selectedOrder.id)}
         onMarkOutForDelivery={() => selectedOrder && handleMarkOutForDelivery(selectedOrder.id)}
         onMarkCompleted={() => selectedOrder && handleMarkCompleted(selectedOrder.id)}
-        loading={loading === selectedOrder?.id}
+        loading={loading?.id === selectedOrder?.id}
       />
     </>
   )
