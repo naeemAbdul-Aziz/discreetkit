@@ -210,12 +210,17 @@ export function ProductTable({ initialProducts, categories = [] }: { initialProd
                     />
                   </TableCell>
                   <TableCell className="text-right hidden md:table-cell">
-                    <InlineNumber
-                      value={product.stock_level}
-                      saving={!!saving[product.id]?.stock_level}
-                      warning={product.stock_level < 20}
-                      onCommit={(val) => handleInlineUpdate(product.id,'stock_level',val)}
-                    />
+                    <div className="flex items-center justify-end gap-2">
+                        {product.stock_level === 0 && <Badge variant="destructive" className="h-5 px-1 text-[10px]">Out</Badge>}
+                        {product.stock_level > 0 && product.stock_level < 10 && <Badge variant="warning" className="h-5 px-1 text-[10px]">Low</Badge>}
+                        {product.stock_level >= 10 && <Badge variant="outline" className="h-5 px-1 text-[10px] text-green-600 border-green-200 bg-green-50">In Stock</Badge>}
+                        
+                        <InlineNumber
+                        value={product.stock_level}
+                        saving={!!saving[product.id]?.stock_level}
+                        onCommit={(val) => handleInlineUpdate(product.id,'stock_level',val)}
+                        />
+                    </div>
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>

@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -7,37 +6,23 @@ import type { Product } from '@/lib/data';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { motion } from 'framer-motion';
-import { getSupabaseClient } from '@/lib/supabase';
-
-async function getWellnessProducts(): Promise<Product[]> {
-    const supabase = getSupabaseClient();
-    const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('category', 'Wellness')
-        .order('id', { ascending: true });
-
-    if (error) {
-        console.error("Error fetching wellness products:", error);
-        return [];
-    }
-    return data.map((p: any) => ({
-        ...p,
-        price_ghs: Number(p.price_ghs),
-        student_price_ghs: p.student_price_ghs ? Number(p.student_price_ghs) : null,
-    }));
-}
-
+import { getProductsWithStock } from '@/lib/client-actions';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default function WellnessPage() {
     const [wellnessProducts, setWellnessProducts] = useState<Product[]>([]);
     const [categoryFilter, setCategoryFilter] = useState('All');
     const [brandFilter, setBrandFilter] = useState('All');
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchProducts = async () => {
-            const products = await getWellnessProducts();
+            setIsLoading(true);
+            // Fetch all wellness-relatd categories
+            const products = await getProductsWithStock(['Wellness', 'Contraception', 'Protection', 'Menstrual Care']);
             setWellnessProducts(products);
+            setIsLoading(false);
         }
         fetchProducts();
     }, []);
@@ -54,7 +39,7 @@ export default function WellnessPage() {
     }, [wellnessProducts, categoryFilter, brandFilter]);
 
   return (
-    <div className="bg-background">
+    <div className="bg-background min-h-screen">
       <div className="container mx-auto px-4 py-12 md:px-6 md:py-24">
         <div className="mx-auto max-w-7xl">
             <div className="text-center mb-8">
@@ -106,9 +91,21 @@ export default function WellnessPage() {
                         <ProductCard key={product.id} product={product} />
                     ))
                 ) : (
-                    <div className="col-span-full text-center py-16">
-                        <h3 className="text-xl font-semibold">No Products Found</h3>
-                        <p className="text-muted-foreground mt-2">Try adjusting your filters to find what you're looking for.</p>
+                    <div className="col-span-full flex flex-col items-center justify-center py-20 text-center space-y-4 bg-muted/20 rounded-3xl">
+                        {isLoading ? (
+                            <div className="animate-pulse">Loading wellness products...</div>
+                        ) : (
+                            <>
+                                <div className="text-4xl">🌿</div>
+                                <h3 className="text-xl font-bold">Temporarily Unavailable</h3>
+                                <p className="text-muted-foreground max-w-md">
+                                    We are currently restocking our wellness essentials. Please check back soon.
+                                </p>
+                                <Button asChild variant="outline">
+                                    <Link href="/products">Browse All Products</Link>
+                                </Button>
+                            </>
+                        )}
                     </div>
                 )}
             </motion.div>

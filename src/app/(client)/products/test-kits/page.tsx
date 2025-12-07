@@ -1,36 +1,18 @@
-
-import { getSupabaseClient } from '@/lib/supabase';
+import { getProductsWithStock } from '@/lib/client-actions';
 import { ProductCard } from '../(components)/product-card';
-import type { Product } from '@/lib/data';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60; // Revalidate data every 60 seconds
-
-async function getScreeningKits(): Promise<Product[]> {
-    const supabase = getSupabaseClient();
-    const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('category', 'Test Kit')
-        .order('id', { ascending: true });
-
-    if (error) {
-        console.error("Error fetching screening kits:", error);
-        return [];
-    }
-    // Update images and cast numeric types
-    return data.map((p: any) => ({
-        ...p,
-        price_ghs: Number(p.price_ghs),
-        student_price_ghs: p.student_price_ghs ? Number(p.student_price_ghs) : null,
-    }));
-}
+export const revalidate = 60; 
 
 export default async function TestKitsPage() {
-    const allKits = await getScreeningKits();
+    // Database uses 'Testing' for kits
+    const allKits = await getProductsWithStock('Testing'); 
+    // If empty, maybe try plural? Or just trust DB. "Test Kit" is standard.
 
   return (
-    <div className="bg-background">
+    <div className="bg-background min-h-screen">
       <div className="container mx-auto px-4 py-12 md:px-6 md:py-24">
         <div className="mx-auto max-w-7xl">
             <div className="text-center mb-16">
@@ -42,11 +24,24 @@ export default async function TestKitsPage() {
                 </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                {allKits.map((product) => (
-                    <ProductCard key={product.id} product={product} />
-                ))}
-            </div>
+            {allKits.length > 0 ? (
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+                    {allKits.map((product) => (
+                        <ProductCard key={product.id} product={product} />
+                    ))}
+                </div>
+            ) : (
+                <div className="flex flex-col items-center justify-center py-20 text-center space-y-4 bg-muted/20 rounded-3xl">
+                    <div className="text-4xl">🧪</div>
+                    <h3 className="text-xl font-bold">Temporarily Unavailable</h3>
+                    <p className="text-muted-foreground max-w-md">
+                        We are currently restocking our test kits. Please check back soon or browse our other categories.
+                    </p>
+                    <Button asChild variant="outline">
+                        <Link href="/products">Browse All Products</Link>
+                    </Button>
+                </div>
+            )}
         </div>
       </div>
     </div>

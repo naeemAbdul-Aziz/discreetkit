@@ -1,7 +1,7 @@
-
-import { getSupabaseClient } from '@/lib/supabase';
+import { getProductsWithStock } from '@/lib/client-actions';
 import { ProductCard } from '../(components)/product-card';
-import type { Product } from '@/lib/data';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -12,33 +12,13 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 
-async function getBundles(): Promise<Product[]> {
-    const supabase = getSupabaseClient();
-    const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('category', 'Bundle')
-        .order('id', { ascending: true });
-
-    if (error) {
-        console.error("Error fetching bundles:", error);
-        return [];
-    }
-    return data.map((p: any) => ({
-        ...p,
-        price_ghs: Number(p.price_ghs),
-        student_price_ghs: p.student_price_ghs ? Number(p.student_price_ghs) : null,
-        savings_ghs: p.savings_ghs ? Number(p.savings_ghs) : null,
-    }));
-}
-
 export default async function BundlesPage() {
-    const bundles = await getBundles();
+    const bundles = await getProductsWithStock('Bundles');
     // Sort by biggest savings first, then by price as a tiebreaker
     const sorted = [...bundles].sort((a, b) => (b.savings_ghs || 0) - (a.savings_ghs || 0) || a.price_ghs - b.price_ghs);
 
   return (
-    <div className="bg-background">
+    <div className="bg-background min-h-screen">
       <div className="container mx-auto px-4 py-12 md:px-6 md:py-24">
         <div className="mx-auto max-w-7xl">
             <div className="text-center mb-16">
@@ -50,11 +30,24 @@ export default async function BundlesPage() {
                 </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
-                {sorted.map((product) => (
-                    <ProductCard key={product.id} product={product} />
-                ))}
-            </div>
+            {sorted.length > 0 ? (
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
+                    {sorted.map((product) => (
+                        <ProductCard key={product.id} product={product} />
+                    ))}
+                </div>
+            ) : (
+                <div className="flex flex-col items-center justify-center py-20 text-center space-y-4 bg-muted/20 rounded-3xl">
+                    <div className="text-4xl">📦</div>
+                    <h3 className="text-xl font-bold">Temporarily Unavailable</h3>
+                    <p className="text-muted-foreground max-w-md">
+                        We are putting together new value bundles. Please check back soon for great deals.
+                    </p>
+                    <Button asChild variant="outline">
+                        <Link href="/products">Browse All Products</Link>
+                    </Button>
+                </div>
+            )}
         </div>
       </div>
     </div>
