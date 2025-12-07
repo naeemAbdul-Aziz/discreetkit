@@ -112,7 +112,7 @@ export function ProductCard({ product }: { product: Product; }) {
                         >
                             {isInCart ? <Check className="h-5 w-5" /> : <Plus className="h-6 w-6" />}
                         </button>
-                        </button>
+
                     </div>
                     )}
                 </div>
