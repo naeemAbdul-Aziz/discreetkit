@@ -5,6 +5,8 @@ import { Home, ShoppingBag, Package, Users, Settings, LogOut } from "lucide-reac
 import Link from "next/link"
 import { useIsMobile } from "@/hooks/use-mobile"
 import * as React from "react"
+import { useRouter } from "next/navigation"
+import { getSupabaseClient } from "@/lib/supabase"
 import { DashboardSidebar } from "./DashboardSidebar"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -26,6 +28,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const isMobile = useIsMobile();
   const [isPharmacy, setIsPharmacy] = React.useState(false)
+  const router = useRouter()
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -39,10 +42,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const navItems = React.useMemo(() => {
     if (isPharmacy) {
         return [
-            { href: "/", label: "Dashboard", icon: Home },
+            { href: "/pharmacy/dashboard", label: "Dashboard", icon: Home },
             { href: "/pharmacy/inventory", label: "Inventory", icon: Package },
             { href: "/pharmacy/settings", label: "Settings", icon: Settings },
-            { href: "/login", label: "Logout", icon: LogOut },
+            { href: "__logout__", label: "Logout", icon: LogOut },
         ]
     }
     return [
@@ -54,6 +57,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         { href: "/admin/settings", label: "Settings", icon: Settings },
     ]
   }, [isPharmacy])
+
+  const handleLogout = async () => {
+    const supabase = getSupabaseClient()
+    await supabase.auth.signOut()
+    router.push("/login")
+  }
 
   return (
     <SidebarProvider>
@@ -69,17 +78,33 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {/* Mobile Bottom Navigation */}
           {isMobile && (
             <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-around bg-white border-t border-border shadow md:hidden">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="flex flex-col items-center justify-center flex-1 py-2 text-xs text-muted-foreground hover:text-primary transition-colors"
-                  aria-label={item.label}
-                >
-                  <item.icon className="h-6 w-6 mb-1" />
-                  {item.label}
-                </Link>
-              ))}
+              {navItems.map((item) => {
+                if (item.href === "__logout__") {
+                  return (
+                    <button
+                      key={item.label}
+                      onClick={handleLogout}
+                      className="flex flex-col items-center justify-center flex-1 py-2 text-xs text-muted-foreground hover:text-primary transition-colors"
+                      aria-label={item.label}
+                    >
+                      <item.icon className="h-6 w-6 mb-1" />
+                      {item.label}
+                    </button>
+                  )
+                }
+
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="flex flex-col items-center justify-center flex-1 py-2 text-xs text-muted-foreground hover:text-primary transition-colors"
+                    aria-label={item.label}
+                  >
+                    <item.icon className="h-6 w-6 mb-1" />
+                    {item.label}
+                  </Link>
+                )
+              })}
             </nav>
           )}
         </SidebarInset>

@@ -22,9 +22,11 @@ export function DashboardSidebar() {
 
   const navItems = React.useMemo(() => {
     if (isPharmacy) {
-        return [
-            { href: "/", label: "Dashboard", icon: LayoutDashboard },
-        ]
+      return [
+        { href: "/pharmacy/dashboard", label: "Dashboard", icon: LayoutDashboard },
+        { href: "/pharmacy/inventory", label: "Inventory", icon: Package },
+        { href: "/pharmacy/settings", label: "Settings", icon: Settings },
+      ]
     }
     
     // Check if we are on admin subdomain

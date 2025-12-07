@@ -266,10 +266,38 @@ CREATE POLICY "Pharmacy users can update their products" ON public.pharmacy_prod
     EXISTS (SELECT 1 FROM public.pharmacies p WHERE p.id = pharmacy_id AND p.user_id = auth.uid())
 );
 
+-- Allow pharmacy users to insert their own product overrides (availability/stock/price)
+create policy "Pharmacy users can insert their products" on public.pharmacy_products for insert
+    with check (
+        exists (select 1 from public.pharmacies p where p.id = pharmacy_id and p.user_id = auth.uid())
+    );
+
+-- Allow pharmacy users to remove their overrides if needed
+create policy "Pharmacy users can delete their products" on public.pharmacy_products for delete
+    using (
+        exists (select 1 from public.pharmacies p where p.id = pharmacy_id and p.user_id = auth.uid())
+    );
+
 CREATE POLICY "Admin full access" ON public.pharmacy_service_areas FOR ALL USING (auth.role() = 'service_role');
 CREATE POLICY "Pharmacy users can view their service areas" ON public.pharmacy_service_areas FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.pharmacies p WHERE p.id = pharmacy_id AND p.user_id = auth.uid())
 );
+
+-- Allow pharmacy users to manage their service areas
+create policy "Pharmacy users can insert their service areas" on public.pharmacy_service_areas for insert
+    with check (
+        exists (select 1 from public.pharmacies p where p.id = pharmacy_id and p.user_id = auth.uid())
+    );
+
+create policy "Pharmacy users can update their service areas" on public.pharmacy_service_areas for update
+    using (
+        exists (select 1 from public.pharmacies p where p.id = pharmacy_id and p.user_id = auth.uid())
+    );
+
+create policy "Pharmacy users can delete their service areas" on public.pharmacy_service_areas for delete
+    using (
+        exists (select 1 from public.pharmacies p where p.id = pharmacy_id and p.user_id = auth.uid())
+    );
 
 -- 8.5 ORDERS
 CREATE POLICY "Public read via code" ON public.orders FOR SELECT USING (true);
