@@ -23,6 +23,14 @@ export type Product = {
   is_student_product?: boolean;
 }
 
+export type Category = {
+  id: number;
+  name: string;
+  slug: string;
+  description: string | null;
+  image_url: string | null;
+}
+
 export type Order = {
   id: string;
   code: string;

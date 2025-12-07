@@ -43,6 +43,8 @@ export function ProductCard({ product }: { product: Product; }) {
     const quantity = isMounted ? getItemQuantity(product.id) : 0;
     const isInCart = quantity > 0;
     const savings = product.savings_ghs;
+    const isOutOfStock = product.stock_level !== undefined && product.stock_level <= 0;
+    const isLowStock = product.stock_level !== undefined && product.stock_level > 0 && product.stock_level < 5;
 
     return (
         <motion.div
@@ -61,27 +63,38 @@ export function ProductCard({ product }: { product: Product; }) {
                     {product.image_url && (
                         <motion.div 
                             className="relative w-full h-full p-6"
-                            whileHover={{ scale: 1.05 }}
+                            whileHover={!isOutOfStock ? { scale: 1.05 } : {}}
                             transition={{ duration: 0.4 }}
                         >
                             <Image
                                 src={product.image_url}
                                 alt={product.name}
                                 fill
-                                className="object-contain drop-shadow-lg"
+                                className={cn("object-contain drop-shadow-lg", isOutOfStock && "grayscale opacity-50")}
                                 sizes="(max-width: 768px) 50vw, 30vw"
                                 placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(250, 188))}`}
                             />
                         </motion.div>
                     )}
 
-                    {savings && savings > 0 && (
-                        <Badge variant="accent" className="absolute top-4 left-4 shadow-sm backdrop-blur-md bg-accent/90 text-white border-0">
-                            Save GHS {savings.toFixed(2)}
-                        </Badge>
-                    )}
+
+                    {/* Status Badges */}
+                    <div className="absolute top-4 left-4 flex flex-col gap-2">
+                        {savings && savings > 0 && !isOutOfStock && (
+                            <Badge variant="accent" className="shadow-sm backdrop-blur-md bg-accent/90 text-white border-0">
+                                Save GHS {savings.toFixed(2)}
+                            </Badge>
+                        )}
+                        {isOutOfStock && (
+                            <Badge variant="destructive" className="shadow-sm">Out of Stock</Badge>
+                        )}
+                        {isLowStock && (
+                            <Badge variant="warning" className="shadow-sm bg-yellow-500 text-white border-none">Low Stock</Badge>
+                        )}
+                    </div>
 
                     {/* Quick Add Button - Slides up on hover */}
+                    {!isOutOfStock && (
                     <div className="absolute bottom-4 right-4 translate-y-12 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
                         <button
                             onClick={(e) => {
@@ -99,7 +112,9 @@ export function ProductCard({ product }: { product: Product; }) {
                         >
                             {isInCart ? <Check className="h-5 w-5" /> : <Plus className="h-6 w-6" />}
                         </button>
+                        </button>
                     </div>
+                    )}
                 </div>
             </Link>
 

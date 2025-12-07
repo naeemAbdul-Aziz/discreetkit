@@ -6,12 +6,42 @@ import { z } from "zod"
 
 export async function getProducts() {
     const supabase = await createSupabaseServerClient();
-    const { data, error } = await supabase
+    const { data: products, error } = await supabase
         .from('products')
-        .select('*')
+        .select(`
+            *,
+            pharmacy_products (
+                stock_level,
+                is_available
+            )
+        `)
         .order('created_at', { ascending: false });
+
     if (error) throw new Error(error.message);
-    return data;
+
+    // Aggregate stock from all pharmacies
+    return products.map((product: any) => {
+        const totalStock = product.pharmacy_products
+            ? product.pharmacy_products.reduce((acc: number, curr: any) => {
+                // Only count stock if it's marked as available? 
+                // User requirement "30 49 23 12" implies raw sum.
+                // We'll sum all stock, but maybe we should flag if unavailable.
+                return acc + (curr.stock_level || 0);
+            }, 0)
+            : 0;
+
+        // Use manual stock if no pharmacy stock exists (fallback/hybrid)
+        // Or strictly override? User asked "if 4... will result be total?". Implies override.
+        // We will use totalStock if > 0, otherwise fallback to manual inventory (legacy support)
+        const finalStock = totalStock > 0 ? totalStock : (product.stock_level || 0);
+
+        return {
+            ...product,
+            stock_level: finalStock,
+            // Keep original for debugging if needed
+            manual_stock_level: product.stock_level
+        };
+    });
 }
 
 // Schema for product validation

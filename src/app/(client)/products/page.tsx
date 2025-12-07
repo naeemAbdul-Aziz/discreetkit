@@ -3,7 +3,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { ProductCard } from './(components)/product-card';
-import type { Product } from '@/lib/data';
+import type { Product, Category } from '@/lib/data';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -17,24 +17,59 @@ async function getProducts(): Promise<Product[]> {
     const supabase = getSupabaseClient();
     const { data: products, error } = await supabase
         .from('products')
-        .select('*')
+        .select(`
+            *,
+            pharmacy_products (
+                stock_level,
+                is_available
+            )
+        `)
         .order('id', { ascending: true });
 
     if (error) {
         console.error("Error fetching products:", error);
         return [];
     }
-    return products.map((p: any) => ({
-        ...p,
-        price_ghs: Number(p.price_ghs),
-        student_price_ghs: p.student_price_ghs ? Number(p.student_price_ghs) : null,
-        savings_ghs: p.savings_ghs ? Number(p.savings_ghs) : null,
-    }));
+
+    return products.map((p: any) => {
+        const totalStock = p.pharmacy_products?.reduce((acc: number, curr: any) => {
+             // Only count active stock towards customer availability
+             if (curr.is_available === false) return acc;
+             return acc + (curr.stock_level || 0);
+        }, 0) ?? 0;
+
+        // Fallback logic: If no connected pharmacies have stock, check the central warehouse 'stock_level'
+        // This ensures hybrid models (some items centrally held) still work.
+        const effectiveStock = totalStock > 0 ? totalStock : p.stock_level;
+
+        return {
+            ...p,
+            price_ghs: Number(p.price_ghs),
+            student_price_ghs: p.student_price_ghs ? Number(p.student_price_ghs) : null,
+            savings_ghs: p.savings_ghs ? Number(p.savings_ghs) : null,
+            stock_level: effectiveStock
+        };
+    });
+}
+
+async function getCategories(): Promise<Category[]> {
+    const supabase = getSupabaseClient();
+    const { data: categories, error } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name', { ascending: true });
+
+    if (error) {
+        console.error("Error fetching categories:", error);
+        return [];
+    }
+    return categories;
 }
 
 
 export default function ProductsPage() {
     const [allProducts, setAllProducts] = useState<Product[]>([]);
+    const [allCategories, setAllCategories] = useState<Category[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     const [categoryFilter, setCategoryFilter] = useState('All');
@@ -44,14 +79,17 @@ export default function ProductsPage() {
     
     useEffect(() => {
         const fetchProducts = async () => {
-            const products = await getProducts();
+            const [products, categories] = await Promise.all([getProducts(), getCategories()]);
             setAllProducts(products);
+            setAllCategories(categories);
             setIsLoading(false);
         }
         fetchProducts();
     }, []);
 
-    const categories = useMemo(() => ['All', ...Array.from(new Set(allProducts.map((p: Product) => p.category).filter(Boolean))) as string[]], [allProducts]);
+
+
+    const categories = useMemo(() => ['All', ...allCategories.map(c => c.name)], [allCategories]);
     const wellnessCategories = useMemo(() => ['All', ...Array.from(new Set(allProducts.filter((p: Product) => p.category === 'Wellness').map((p: Product) => p.sub_category).filter(Boolean))) as string[]], [allProducts]);
     const brands = useMemo(() => ['All', ...Array.from(new Set(allProducts.map((p: Product) => p.brand || 'DiscreetKit'))).filter(Boolean)], [allProducts]);
     
