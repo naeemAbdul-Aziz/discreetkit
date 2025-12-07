@@ -17,6 +17,7 @@ import { handleChat } from '@/lib/actions';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { cn } from '@/lib/utils';
 import { useChatbot } from '@/hooks/use-chatbot';
+import { closeButtonClasses } from '@/components/ui/close-button';
 
 // type definition for a chat message.
 type Message = {
@@ -86,7 +87,7 @@ setInput('');
             <SheetDescription>
               Your friendly AI assistant for questions about DiscreetKit.
             </SheetDescription>
-             <SheetClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
+             <SheetClose className={cn("absolute right-4 top-4", closeButtonClasses)}>
               <X className="h-4 w-4" />
               <span className="sr-only">Close</span>
             </SheetClose>

@@ -21,6 +21,7 @@ interface OrderDetailsSheetProps {
   onMarkOutForDelivery?: () => void
   onMarkCompleted?: () => void
   loading?: boolean
+  loadingAction?: string
 }
 
 export function OrderDetailsSheet({
@@ -31,7 +32,8 @@ export function OrderDetailsSheet({
   onDecline,
   onMarkOutForDelivery,
   onMarkCompleted,
-  loading
+  loading,
+  loadingAction
 }: OrderDetailsSheetProps) {
   if (!order) return null
 
@@ -156,18 +158,26 @@ export function OrderDetailsSheet({
                 <Button
                   className="w-full"
                   onClick={onAccept}
-                  disabled={loading}
+                  disabled={loading && loadingAction === 'accept'}
                 >
-                  <CheckCircle className="h-4 w-4 mr-2" />
+                  {loading && loadingAction === 'accept' ? (
+                    <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  ) : (
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                  )}
                   Accept Order
                 </Button>
                 <Button
                   className="w-full"
                   variant="destructive"
                   onClick={onDecline}
-                  disabled={loading}
+                  disabled={loading && loadingAction === 'decline'}
                 >
-                  <XCircle className="h-4 w-4 mr-2" />
+                  {loading && loadingAction === 'decline' ? (
+                    <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  ) : (
+                    <XCircle className="h-4 w-4 mr-2" />
+                  )}
                   Decline Order
                 </Button>
               </>

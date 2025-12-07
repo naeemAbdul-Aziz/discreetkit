@@ -13,6 +13,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import { BrandSpinner } from '@/components/brand-spinner';
 import { TrustBadge } from '@/components/trust-badge';
+import { closeButtonClasses } from '@/components/ui/close-button';
 
 const navLinks = [
   { href: '/products/test-kits', label: 'Screening Kits' },
@@ -175,10 +176,10 @@ export function Header() {
                         <SheetDescription className="sr-only">Main menu for site navigation.</SheetDescription>
                      </div>
                      <SheetClose asChild>
-                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full">
-                            <X className="h-6 w-6" />
-                            <span className="sr-only">Close menu</span>
-                        </Button>
+                      <Button variant="ghost" size="icon" className={cn(closeButtonClasses, "h-10 w-10") }>
+                        <X className="h-6 w-6" />
+                        <span className="sr-only">Close menu</span>
+                      </Button>
                      </SheetClose>
                    </SheetHeader>
                    <Separator className="my-4" />

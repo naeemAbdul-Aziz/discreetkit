@@ -163,6 +163,8 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
         {orders.map((order) => {
           // Check if this order has a pending optimistic update
           const isOptimisticallyAccepted = loading?.id === order.id && loading?.action === 'accept' && loading?.success;
+          const acceptLoading = loading?.id === order.id && loading?.action === 'accept'
+          const declineLoading = loading?.id === order.id && loading?.action === 'decline'
           
           if (isOptimisticallyAccepted) return null; // Hide card momentarily or show updated state? Better to let parent re-render, but we can disable buttons.
 
@@ -201,10 +203,10 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
                       <Button
                         size="sm"
                         onClick={() => handleAccept(order.id)}
-                        disabled={loading?.id === order.id}
-                        className={loading?.id === order.id && loading?.action === 'accept' ? 'opacity-100 transition-all' : ''}
+                        disabled={acceptLoading}
+                        className={acceptLoading ? 'opacity-100 transition-all' : ''}
                       >
-                        {loading?.id === order.id && loading?.action === 'accept' ? (
+                        {acceptLoading ? (
                            <div className="h-4 w-4 mr-1 animate-spin rounded-full border-2 border-current border-t-transparent" />
                         ) : (
                            <CheckCircle className="h-4 w-4 mr-1" />
@@ -215,9 +217,13 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
                         size="sm"
                         variant="destructive"
                         onClick={() => handleDeclineClick(order.id)}
-                        disabled={loading?.id === order.id}
+                        disabled={declineLoading}
                       >
-                        <XCircle className="h-4 w-4 mr-1" />
+                        {declineLoading ? (
+                          <div className="h-4 w-4 mr-1 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                        ) : (
+                          <XCircle className="h-4 w-4 mr-1" />
+                        )}
                         Decline
                       </Button>
                     </>
@@ -296,6 +302,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
         onMarkOutForDelivery={() => selectedOrder && handleMarkOutForDelivery(selectedOrder.id)}
         onMarkCompleted={() => selectedOrder && handleMarkCompleted(selectedOrder.id)}
         loading={loading?.id === selectedOrder?.id}
+        loadingAction={loading?.action}
       />
     </>
   )

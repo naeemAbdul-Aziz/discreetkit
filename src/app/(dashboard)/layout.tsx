@@ -5,7 +5,7 @@ import { Home, ShoppingBag, Package, Users, Settings, LogOut } from "lucide-reac
 import Link from "next/link"
 import { useIsMobile } from "@/hooks/use-mobile"
 import * as React from "react"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { getSupabaseClient } from "@/lib/supabase"
 import { DashboardSidebar } from "./DashboardSidebar"
 
@@ -29,6 +29,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const isMobile = useIsMobile();
   const [isPharmacy, setIsPharmacy] = React.useState(false)
   const router = useRouter()
+  const pathname = usePathname()
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -77,17 +78,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
           {/* Mobile Bottom Navigation */}
           {isMobile && (
-            <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-around bg-white border-t border-border shadow md:hidden">
+            <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-around bg-white/95 backdrop-blur border-t border-border/70 shadow-lg md:hidden px-1 py-1 pb-[calc(env(safe-area-inset-bottom)+6px)]">
               {navItems.map((item) => {
+                const isActive = item.href !== "__logout__" && pathname.startsWith(item.href)
+                const baseClasses = "flex flex-col items-center justify-center flex-1 rounded-xl py-2 text-[11px] font-medium transition-all"
+                const activeClasses = isActive ? "text-primary bg-primary/10 shadow-sm" : "text-muted-foreground hover:text-primary hover:bg-muted/50"
+
                 if (item.href === "__logout__") {
                   return (
                     <button
                       key={item.label}
                       onClick={handleLogout}
-                      className="flex flex-col items-center justify-center flex-1 py-2 text-xs text-muted-foreground hover:text-primary transition-colors"
+                      className={`${baseClasses} ${activeClasses}`}
                       aria-label={item.label}
                     >
-                      <item.icon className="h-6 w-6 mb-1" />
+                      <item.icon className="h-5 w-5 mb-1" />
                       {item.label}
                     </button>
                   )
@@ -97,10 +102,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="flex flex-col items-center justify-center flex-1 py-2 text-xs text-muted-foreground hover:text-primary transition-colors"
+                    className={`${baseClasses} ${activeClasses}`}
                     aria-label={item.label}
                   >
-                    <item.icon className="h-6 w-6 mb-1" />
+                    <item.icon className="h-5 w-5 mb-1" />
                     {item.label}
                   </Link>
                 )
