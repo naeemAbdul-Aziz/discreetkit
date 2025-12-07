@@ -430,6 +430,53 @@ export async function getOrders() {
     return normalizedOrders
 }
 
+export async function getDashboardStats() {
+    const orders = await getOrders();
+
+    // Top Pharmacies by Revenue
+    const pharmacyRevenue: Record<string, number> = {};
+    orders.forEach((o: any) => {
+        if (o.pharmacies?.name) {
+            pharmacyRevenue[o.pharmacies.name] = (pharmacyRevenue[o.pharmacies.name] || 0) + (o.total_price || 0);
+        }
+    });
+
+    const topPharmacies = Object.entries(pharmacyRevenue)
+        .map(([name, revenue]) => ({ name, revenue }))
+        .sort((a, b) => b.revenue - a.revenue)
+        .slice(0, 5); // Top 5
+
+    // Top Products by Quantity Sold
+    const productSales: Record<string, { quantity: number; revenue: number }> = {};
+    orders.forEach((o: any) => {
+        if (o.items) {
+            // items can be JSON string or object
+            let items: any[] = [];
+            try {
+                items = typeof o.items === 'string' ? JSON.parse(o.items) : o.items;
+            } catch (e) { }
+
+            if (Array.isArray(items)) {
+                items.forEach((item) => {
+                    const name = item.name || 'Unknown Product';
+                    if (!productSales[name]) {
+                        productSales[name] = { quantity: 0, revenue: 0 };
+                    }
+                    productSales[name].quantity += (item.quantity || 1);
+                    productSales[name].revenue += (item.price || item.price_ghs || 0) * (item.quantity || 1);
+                });
+            }
+        }
+    });
+
+    const topProducts = Object.entries(productSales)
+        .map(([name, stats]) => ({ name, ...stats }))
+        .sort((a, b) => b.quantity - a.quantity)
+        .slice(0, 5); // Top 5
+
+    return { topPharmacies, topProducts };
+}
+
 export async function updateOrderStatus(id: number, status: string) {
     const supabase = await createSupabaseServerClient()
     const { error } = await supabase

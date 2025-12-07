@@ -22,6 +22,8 @@ type DashboardData = {
   recentOrders: RecentOrder[];
   revenueSeries: { date: string; amount: number }[];
   statusBreakdown?: { status: string; count: number }[];
+  topPharmacies?: { name: string; revenue: number }[];
+  topProducts?: { name: string; quantity: number; revenue: number }[];
 };
 
 export default function AdminDashboardPage() {
@@ -40,8 +42,9 @@ export default function AdminDashboardPage() {
     async function loadData() {
       try {
         setLoading(true);
-        const { getOrders } = await import('@/lib/admin-actions');
+        const { getOrders, getDashboardStats } = await import('@/lib/admin-actions');
         const orders = await getOrders();
+        const stats = await getDashboardStats();
 
         // Calculate metrics
         const totalRevenue = orders.reduce((sum: number, o: any) => sum + (o.total_price || 0), 0);
@@ -91,7 +94,9 @@ export default function AdminDashboardPage() {
             metrics: { totalRevenue, totalSales, avgOrderValue, newCustomers: uniqueCustomers, activeOrders },
             recentOrders,
             revenueSeries,
-            statusBreakdown
+            statusBreakdown,
+            topPharmacies: stats.topPharmacies,
+            topProducts: stats.topProducts
         });
       } catch (err) {
         console.error(err);
@@ -264,6 +269,59 @@ export default function AdminDashboardPage() {
                 </CardContent>
             </Card>
           </div>
+        </div>
+
+        {/* Extended Stats */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Top Performing Pharmacies</CardTitle>
+                    <CardDescription>By total revenue generated</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-4">
+                        {data?.topPharmacies?.length === 0 ? (
+                            <p className="text-sm text-muted-foreground">No data available.</p>
+                        ) : (
+                            data?.topPharmacies?.map((p: any, i: number) => (
+                                <div key={i} className="flex items-center justify-between">
+                                    <div className="flex items-center space-x-2">
+                                        <div className="w-6 text-sm font-medium text-muted-foreground">#{i+1}</div>
+                                        <div className="font-medium text-sm">{p.name}</div>
+                                    </div>
+                                    <div className="font-bold text-sm">GHS {p.revenue.toLocaleString()}</div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Top Selling Products</CardTitle>
+                    <CardDescription>By quantity sold</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-4">
+                         {data?.topProducts?.length === 0 ? (
+                            <p className="text-sm text-muted-foreground">No data available.</p>
+                        ) : (
+                            data?.topProducts?.map((p: any, i: number) => (
+                                <div key={i} className="flex items-center justify-between">
+                                    <div className="flex items-center space-x-2">
+                                        <div className="w-6 text-sm font-medium text-muted-foreground">#{i+1}</div>
+                                         <div className="font-medium text-sm truncate max-w-[200px]" title={p.name}>{p.name}</div>
+                                    </div>
+                                    <div className="text-sm text-muted-foreground">
+                                        {p.quantity} sold <span className="text-xs ml-1">(GHS {p.revenue.toLocaleString()})</span>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
         </div>
       </div>
       <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
