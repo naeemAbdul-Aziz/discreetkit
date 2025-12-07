@@ -35,12 +35,34 @@ export type Order = {
   studentDiscount: number;
   deliveryFee: number;
   totalPrice: number;
+  courierName?: string | null;
+  courierPhone?: string | null;
+  courierTrackingUrl?: string | null;
   events: {
     status: string;
     note: string;
     date: Date;
   }[];
 }
+
+export type OrderStatus = 'pending_payment' | 'received' | 'processing' | 'out_for_delivery' | 'completed';
+
+export const DELIVERY_FEES = {
+  standard: 20.00,
+  campus: 10.00,
+};
+
+export const generateTrackingCode = (): string => {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let result = '';
+  for (let i = 0; i < 9; i++) {
+    if (i > 0 && i % 3 === 0) {
+      result += '-';
+    }
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+};
 
 export type Step = {
   number: number;
@@ -91,34 +113,47 @@ export type ProductBenefit = {
 export type DiscountLocation = {
   id: number;
   campus: string;
+  meetingPoints?: string[];
+  coords?: { lat: number; lng: number };
 }
 
-export type OrderStatus = 'pending_payment' | 'received' | 'processing' | 'out_for_delivery' | 'completed';
-
-
-export const DELIVERY_FEES = {
-  standard: 20.00,
-  campus: 10.00,
-};
-
-export const generateTrackingCode = (): string => {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let result = '';
-  for (let i = 0; i < 9; i++) {
-    if (i > 0 && i % 3 === 0) {
-      result += '-';
-    }
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
-};
-
-
 export const discounts: DiscountLocation[] = [
-  { id: 1, campus: "University of Ghana (Legon)" },
-  { id: 2, campus: "UPSA" },
-  { id: 3, campus: "GIMPA" },
-  { id: 4, campus: "Wisconsin International University College" },
+  {
+    id: 1,
+    campus: "University of Ghana (Legon)",
+    meetingPoints: ["Main Gate", "Night Market", "Volta Hall Gate", "Sarbah Hall Main Gate", "Commonwealth Hall Gate", "Akuafo Hall Gate", "Pentagon Hall Main Gate", "Bani Hall Gate", "Evandy Hall Gate", "TF Hostel Gate", "Balme Library"],
+    coords: { lat: 5.6506, lng: -0.1962 }
+  },
+  {
+    id: 2,
+    campus: "UPSA",
+    meetingPoints: ["Main Entrance", "Hostel A Gate", "Hostel B Gate", "Library Entrance", "Student Center"],
+    coords: { lat: 5.6588, lng: -0.1585 }
+  },
+  {
+    id: 3,
+    campus: "GIMPA",
+    meetingPoints: ["Main Gate", "Law School Entrance", "Greenhill Hostel", "Business School Forecourt"],
+    coords: { lat: 5.6256, lng: -0.2066 }
+  },
+  {
+    id: 4,
+    campus: "Wisconsin International University College",
+    meetingPoints: ["Main Entrance", "Hostel Gate", "Canteen Area"],
+    coords: { lat: 5.6811, lng: -0.1934 }
+  },
+  {
+    id: 5,
+    campus: "Academic City University College",
+    meetingPoints: ["Main Gate", "Student Housing Entrance"],
+    coords: { lat: 5.7001, lng: -0.1776 }
+  },
+  {
+    id: 6,
+    campus: "Lancaster University Ghana",
+    meetingPoints: ["Main Reception", "Car Park"],
+    coords: { lat: 5.6322, lng: -0.1387 }
+  },
 ];
 
 export const steps: Step[] = [

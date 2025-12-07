@@ -164,7 +164,7 @@ export async function sendShippingNotificationSMS(orderId: string): Promise<void
 
     const { data: order, error } = await supabaseAdmin
       .from('orders')
-      .select('code, phone_masked')
+      .select('code, phone_masked, courier_name, courier_phone')
       .eq('id', orderId)
       .single();
 
@@ -174,7 +174,15 @@ export async function sendShippingNotificationSMS(orderId: string): Promise<void
     }
 
     const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${order.code}`;
-    const shippingMessage = `Your order ${order.code} has been shipped. Your package is on the way for discreet delivery. Track: ${trackingUrl}`;
+    let shippingMessage = `Your order ${order.code} has been shipped.`;
+
+    if (order.courier_name) {
+      shippingMessage += ` Rider: ${order.courier_name}`;
+      if (order.courier_phone) shippingMessage += ` (${order.courier_phone})`;
+      shippingMessage += '.';
+    }
+
+    shippingMessage += ` Track: ${trackingUrl}`;
 
     await sendSMS(order.phone_masked, shippingMessage);
   } catch (error) {
@@ -518,6 +526,9 @@ export async function getOrderAction(code: string): Promise<Order | null> {
       studentDiscount: order.student_discount,
       deliveryFee: order.delivery_fee,
       totalPrice: order.total_price,
+      courierName: order.courier_name,
+      courierPhone: order.courier_phone,
+      courierTrackingUrl: order.courier_tracking_url,
       events: order.order_events
         .map((e: any) => ({
           status: e.status,

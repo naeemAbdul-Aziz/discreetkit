@@ -117,7 +117,10 @@ CREATE TABLE public.pharmacies (
     contact_person text,
     phone_number text,
     email text,
-    user_id uuid references auth.users(id) on delete set null
+    user_id uuid references auth.users(id) on delete set null,
+    is_24_7 boolean default false,
+    is_open boolean default true,
+    operating_hours jsonb
 );
 COMMENT ON TABLE public.pharmacies IS 'Partner pharmacies for order fulfillment.';
 CREATE INDEX pharmacies_user_id_idx ON public.pharmacies(user_id);
@@ -173,7 +176,10 @@ CREATE TABLE public.orders (
     total_price numeric(10, 2) not null default 0.00,
     pharmacy_id bigint references public.pharmacies(id) on delete set null,
     pharmacy_ack_status text check (pharmacy_ack_status in ('pending','accepted','declined')) default 'pending',
-    pharmacy_ack_at timestamptz
+    pharmacy_ack_at timestamptz,
+    courier_name text,
+    courier_phone text,
+    courier_tracking_url text
 );
 COMMENT ON TABLE public.orders IS 'Customer orders with fulfillment tracking.';
 CREATE INDEX orders_email_idx ON public.orders(email);

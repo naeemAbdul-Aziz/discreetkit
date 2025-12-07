@@ -11,11 +11,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { ShieldCheck, ArrowRight, GraduationCap, AlertTriangle, Lock, Mail } from 'lucide-react';
+import { ShieldCheck, ArrowRight, GraduationCap, AlertTriangle, Lock, Mail, MapPin, Loader2 } from 'lucide-react';
 import { BrandSpinner } from '@/components/brand-spinner';
 import { ChatTrigger } from '@/components/chat-trigger';
 import { useCart } from '@/hooks/use-cart';
-import { discounts } from '@/lib/data';
+import { discounts, DiscountLocation } from '@/lib/data';
 import Image from 'next/image';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
@@ -177,6 +177,76 @@ export function OrderForm() {
   const [isMounted, setIsMounted] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   
+  // Geolocation State
+  const [locationLoading, setLocationLoading] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
+
+  const handleUseLocation = () => {
+    setLocationLoading(true);
+    setLocationError(null);
+
+    if (!navigator.geolocation) {
+       setLocationError('Geolocation is not supported by this browser.');
+       setLocationLoading(false);
+       return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const { latitude, longitude } = position.coords;
+            
+            // Find nearest campus
+            const MAX_DISTANCE_KM = 5;
+            const nearest = discounts.reduce((acc, loc) => {
+                if (!loc.coords) return acc;
+                const dist = calculateDistance(latitude, longitude, loc.coords.lat, loc.coords.lng);
+                return dist < acc.dist ? { loc, dist } : acc;
+            }, { loc: null as DiscountLocation | null, dist: Infinity });
+
+            if (nearest.loc && nearest.dist <= MAX_DISTANCE_KM) {
+                setDeliveryLocation(nearest.loc.campus);
+                toast({
+                    title: 'Location Found',
+                    description: `You are near ${nearest.loc.campus}. Discount applied!`,
+                });
+            } else {
+                 toast({
+                    title: 'Location Found',
+                    description: 'No specific campus detected nearby. Please select manually.',
+                    variant: 'default'
+                });
+            }
+            setLocationLoading(false);
+        },
+        (error) => {
+            console.error("Geolocation error:", error);
+            let msg = 'Unable to retrieve location.';
+            if (error.code === error.PERMISSION_DENIED) msg = 'Location permission denied.';
+            setLocationError(msg);
+            setLocationLoading(false);
+            toast({
+                title: 'Location Error',
+                description: msg,
+                variant: 'destructive',
+            });
+        }
+    );
+  };
+
+  // Haversine formula for distance in km
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+      const R = 6371; // radius of earth in km
+      const dLat = deg2rad(lat2 - lat1);
+      const dLon = deg2rad(lon2 - lon1);
+      const a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+  }
+  const deg2rad = (deg: number) => deg * (Math.PI/180);
+  
   useEffect(() => {
     setIsMounted(true);
     if (deliveryLocation && discounts.some(d => d.campus === deliveryLocation)) {
@@ -287,22 +357,34 @@ export function OrderForm() {
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="deliveryArea">Delivery Area / Campus *</Label>
-                            <Select name="deliveryArea" onValueChange={handleLocationChange} defaultValue={deliveryLocation || "Other"} disabled={!isMounted}>
-                            <SelectTrigger className={cn(state.errors?.deliveryArea && "border-destructive focus-visible:ring-destructive")}>
-                                <SelectValue placeholder="Select a location..." />
-                            </SelectTrigger>
-                            <SelectContent>
-                                    <SelectItem value="Other">Other (Standard Delivery)</SelectItem>
-                                    {discounts.map(loc => (
-                                    <SelectItem key={loc.id} value={loc.campus}>{loc.campus}</SelectItem>
-                                    ))}
-                            </SelectContent>
-                            </Select>
+                            <div className="flex gap-2">
+                                <Select name="deliveryArea" onValueChange={handleLocationChange} value={deliveryLocation || "Other"} disabled={!isMounted}>
+                                <SelectTrigger className={cn("flex-1", state.errors?.deliveryArea && "border-destructive focus-visible:ring-destructive")}>
+                                    <SelectValue placeholder="Select a location..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                        <SelectItem value="Other">Other (Standard Delivery)</SelectItem>
+                                        {discounts.map(loc => (
+                                        <SelectItem key={loc.id} value={loc.campus}>{loc.campus}</SelectItem>
+                                        ))}
+                                </SelectContent>
+                                </Select>
+                                <Button 
+                                    type="button" 
+                                    variant="outline" 
+                                    size="icon" 
+                                    onClick={handleUseLocation} 
+                                    disabled={locationLoading}
+                                    title="Use my current location"
+                                >
+                                    {locationLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <MapPin className="h-4 w-4" />}
+                                </Button>
+                             </div>
                             <FieldError message={state.errors?.deliveryArea?.[0]} />
                             <p className="text-[0.8rem] text-muted-foreground">Select a campus for FREE delivery.</p>
                         </div>
 
-                        {showOther && (
+                        {showOther ? (
                             <div className="space-y-2">
                                     <Label htmlFor="otherDeliveryArea">Please Specify Your Location *</Label>
                                 <Input 
@@ -312,6 +394,23 @@ export function OrderForm() {
                                     className={cn(state.errors?.otherDeliveryArea && "border-destructive focus-visible:ring-destructive")}
                                     />
                                   <FieldError message={state.errors?.otherDeliveryArea?.[0]} />
+                            </div>
+                        ) : (
+                            <div className="space-y-2">
+                                <Label htmlFor="meetingPoint">Select Pickup / Meeting Point *</Label>
+                                <Select name="otherDeliveryArea">
+                                    <SelectTrigger className={cn(state.errors?.otherDeliveryArea && "border-destructive focus-visible:ring-destructive")}>
+                                        <SelectValue placeholder="Select pickup point..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {discounts.find(d => d.campus === deliveryLocation)?.meetingPoints?.map(point => (
+                                            <SelectItem key={point} value={point}>{point}</SelectItem>
+                                        ))}
+                                        <SelectItem value="Other">Other (Specify in notes)</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <FieldError message={state.errors?.otherDeliveryArea?.[0]} />
+                                <p className="text-[0.8rem] text-muted-foreground">Choose a common spot for easier delivery.</p>
                             </div>
                         )}
                         

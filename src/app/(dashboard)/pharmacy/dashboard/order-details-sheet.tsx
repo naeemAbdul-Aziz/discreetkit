@@ -107,6 +107,35 @@ export function OrderDetailsSheet({
             )}
           </div>
 
+          
+          {/* Status Stepper */}
+          <div className="w-full py-4">
+            <div className="relative flex items-center justify-between w-full">
+              <div className="absolute left-0 top-1/2 w-full h-1 bg-muted -z-10" />
+              <div className={`absolute left-0 top-1/2 h-1 bg-primary -z-10 transition-all duration-500 ease-in-out`}
+                style={{ 
+                  width: order.status === 'completed' ? '100%' : 
+                         order.status === 'out_for_delivery' ? '66%' : 
+                         (order.status === 'processing' && order.pharmacy_ack_status === 'accepted') ? '33%' : '0%' 
+                }} 
+              />
+              
+              {[
+                { id: 'start', label: 'Received', icon: CheckCircle, active: true },
+                { id: 'processing', label: 'Preparing', icon: Package, active: ['processing', 'out_for_delivery', 'completed'].includes(order.status) && (order.status !== 'received' || order.pharmacy_ack_status === 'accepted') },
+                { id: 'delivery', label: 'Delivery', icon: Truck, active: ['out_for_delivery', 'completed'].includes(order.status) },
+                { id: 'end', label: 'Delivered', icon: CheckCircle, active: order.status === 'completed' }
+              ].map((step, idx) => (
+                <div key={idx} className="flex flex-col items-center bg-background px-2">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all ${step.active ? 'bg-primary border-primary text-primary-foreground' : 'bg-muted border-muted-foreground/30 text-muted-foreground'}`}>
+                    <step.icon className="h-4 w-4" />
+                  </div>
+                  <span className={`text-xs mt-2 font-medium ${step.active ? 'text-foreground' : 'text-muted-foreground'}`}>{step.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          
           <Separator />
 
           {/* Order Items */}

@@ -211,78 +211,67 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
                   </div>
                 </div>
 
-                <div className="flex gap-2 flex-wrap">
+                <div className="flex gap-2 flex-wrap items-center">
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => handleViewDetails(order)}
                   >
                     <Eye className="h-4 w-4 mr-1" />
-                    View Details
+                    Details
                   </Button>
                   
-                  {order.status === 'received' && order.pharmacy_ack_status === 'pending' && (
+                  {/* Action Buttons based on Status */}
+                  {order.status === 'received' && order.pharmacy_ack_status === 'pending' ? (
                     <>
                       <Button
                         size="sm"
                         onClick={() => handleAccept(order.id)}
-                        disabled={acceptLoading}
-                        className={acceptLoading ? 'opacity-100 transition-all' : ''}
+                        disabled={acceptLoading || declineLoading}
+                        className="bg-green-600 hover:bg-green-700 text-white"
                       >
-                        {acceptLoading ? (
-                           <div className="h-4 w-4 mr-1 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                        ) : (
-                           <CheckCircle className="h-4 w-4 mr-1" />
-                        )}
+                         {acceptLoading ? <div className="h-4 w-4 mr-1 animate-spin rounded-full border-2 border-white border-t-transparent" /> : <CheckCircle className="h-4 w-4 mr-1" />}
                         Accept
                       </Button>
                       <Button
                         size="sm"
                         variant="destructive"
                         onClick={() => handleDeclineClick(order.id)}
-                        disabled={declineLoading}
+                        disabled={acceptLoading || declineLoading}
                       >
-                        {declineLoading ? (
-                          <div className="h-4 w-4 mr-1 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                        ) : (
-                          <XCircle className="h-4 w-4 mr-1" />
-                        )}
+                         <XCircle className="h-4 w-4 mr-1" />
                         Decline
                       </Button>
                     </>
-                  )}
-
-                  {order.status === 'processing' && (
+                  ) : (order.status === 'processing' && order.pharmacy_ack_status === 'accepted') ? (
                     <Button
                       size="sm"
-                      variant="default"
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
                       onClick={() => handleMarkOutForDelivery(order.id)}
-                      disabled={loading?.id === order.id && loading?.action === 'out_for_delivery'}
+                      disabled={loading?.id === order.id}
                     >
                       {loading?.id === order.id && loading?.action === 'out_for_delivery' ? (
-                        <div className="h-4 w-4 mr-1 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                        <div className="h-4 w-4 mr-1 animate-spin rounded-full border-2 border-white border-t-transparent" />
                       ) : (
                         <Truck className="h-4 w-4 mr-1" />
                       )}
-                      Out for Delivery
+                      Mark Out for Delivery
                     </Button>
-                  )}
-
-                  {order.status === 'out_for_delivery' && (
+                  ) : order.status === 'out_for_delivery' ? (
                     <Button
                       size="sm"
-                      variant="default"
+                      className="bg-green-600 hover:bg-green-700 text-white"
                       onClick={() => handleMarkCompleted(order.id)}
-                      disabled={loading?.id === order.id && loading?.action === 'completed'}
+                      disabled={loading?.id === order.id}
                     >
                       {loading?.id === order.id && loading?.action === 'completed' ? (
-                        <div className="h-4 w-4 mr-1 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                        <div className="h-4 w-4 mr-1 animate-spin rounded-full border-2 border-white border-t-transparent" />
                       ) : (
                         <CheckCircle className="h-4 w-4 mr-1" />
                       )}
-                      Mark Completed
+                      Confirm Delivery
                     </Button>
-                  )}
+                  ) : null}
                 </div>
               </div>
             </Card>

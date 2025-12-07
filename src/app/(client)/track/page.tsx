@@ -381,6 +381,38 @@ function Tracker() {
                     </CardContent>
                 </Card>
 
+                {/* 6. Dispatch Info (New) */}
+                {order.courierName && (
+                   <Card className="rounded-3xl border-primary/20 shadow-sm bg-primary/5">
+                        <CardHeader className="pb-3">
+                            <CardTitle className="text-base flex items-center gap-2 text-primary">
+                                <Truck className="h-4 w-4" /> Dispatch Rider
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="text-sm space-y-3">
+                            <div>
+                                <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Rider Name</p>
+                                <p className="font-medium text-lg">{order.courierName}</p>
+                            </div>
+                            {order.courierPhone && (
+                                <div>
+                                    <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Contact</p>
+                                    <p className="font-medium font-mono">{order.courierPhone}</p>
+                                </div>
+                            )}
+                            {order.courierTrackingUrl && (
+                                <div className="pt-2">
+                                     <a href={order.courierTrackingUrl} target="_blank" rel="noopener noreferrer">
+                                         <Button variant="outline" size="sm" className="w-full gap-2">
+                                             <MapPin className="h-3 w-3" /> Track Live Location
+                                         </Button>
+                                     </a>
+                                </div>
+                            )}
+                        </CardContent>
+                   </Card>
+                )}
+
             </div>
         </div>
       )}

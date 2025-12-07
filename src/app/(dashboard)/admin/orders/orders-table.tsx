@@ -302,6 +302,11 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="sm" className="px-2">
                         {getStatusBadge(order.status)}
+                        {order.status === 'out_for_delivery' && order.courier_name && (
+                            <div className="text-[10px] text-muted-foreground mt-1 text-center truncate max-w-[100px]" title={`Rider: ${order.courier_name} (${order.courier_phone || 'No phone'})`}>
+                                🚚 {order.courier_name}
+                            </div>
+                        )}
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start">
@@ -408,19 +413,30 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
   )
 }
 
-function PharmacyCombobox({ initialName, value, onAssign, loading, inDropdown }: { initialName?: string; value: number | null; onAssign: (id:number, name: string)=>void; loading:boolean; inDropdown?: boolean }) {
+function PharmacyCombobox({ initialName, value, onAssign, loading, inDropdown, deliveryArea }: { initialName?: string; value: number | null; onAssign: (id:number, name: string)=>void; loading:boolean; inDropdown?: boolean; deliveryArea?: string }) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
-  const [results, setResults] = useState<{id: number, name: string}[]>([])
+  const [results, setResults] = useState<{id: number, name: string, recommended?: boolean, is_24_7?: boolean}[]>([])
   const [searching, setSearching] = useState(false)
   
+  // Load initial recommendations on open if query is empty
+    useEffect(() => {
+        if (open && !query && deliveryArea) {
+            setSearching(true)
+            searchPharmacies('', deliveryArea).then(data => {
+                setResults(data)
+                setSearching(false)
+            })
+        }
+    }, [open, query, deliveryArea])
+
   // Debounce search
   useEffect(() => {
       const timer = setTimeout(async () => {
-          if (open) {
+          if (open && query) { 
               setSearching(true)
               try {
-                  const data = await searchPharmacies(query)
+                  const data = await searchPharmacies(query, deliveryArea)
                   setResults(data)
               } catch (e) {
                   console.error(e)
@@ -430,7 +446,7 @@ function PharmacyCombobox({ initialName, value, onAssign, loading, inDropdown }:
           }
       }, 300)
       return () => clearTimeout(timer)
-  }, [query, open])
+  }, [query, open, deliveryArea])
 
   const display = value ? (initialName || 'Assigned') : 'Unassigned'
   
@@ -452,12 +468,21 @@ function PharmacyCombobox({ initialName, value, onAssign, loading, inDropdown }:
           />
           <div className="max-h-48 overflow-y-auto space-y-1">
             {searching && <div className="text-xs text-muted-foreground px-1">Searching...</div>}
+            
             {!searching && results.map(p => (
-              <Button key={p.id} variant="ghost" size="sm" className="w-full justify-start" onClick={()=> { onAssign(p.id, p.name); setOpen(false) }}>
-                {p.name}
+              <Button key={p.id} variant="ghost" size="sm" className="w-full justify-between group" onClick={()=> { onAssign(p.id, p.name); setOpen(false) }}>
+                <span className="truncate mr-2">{p.name}</span>
+                <div className="flex items-center gap-1 shrink-0">
+                    {p.is_24_7 && (
+                        <Badge variant="secondary" className="h-5 text-[10px] px-1 bg-blue-100 text-blue-700 hover:bg-blue-100">24/7</Badge>
+                    )}
+                    {p.recommended && (
+                        <Badge variant="success" className="h-5 text-[10px] px-1 bg-green-100 text-green-700 hover:bg-green-100">Best</Badge>
+                    )}
+                </div>
               </Button>
             ))}
-            {!searching && results.length===0 && <div className="text-xs text-muted-foreground px-1">No matches</div>}
+            {!searching && results.length===0 && <div className="text-xs text-muted-foreground px-1">No matches found</div>}
           </div>
         </div>
       )}

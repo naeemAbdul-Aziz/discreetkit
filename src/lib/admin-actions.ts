@@ -154,26 +154,82 @@ export async function getPharmacies() {
     }));
 }
 
-export async function searchPharmacies(query: string) {
+export async function searchPharmacies(query: string, deliveryArea?: string) {
     const supabase = await createSupabaseServerClient()
+
+    // If deliveryArea is provided, we want to find pharmacies that cover this area first.
+    // However, exact text match on 'area_name' might be tricky if user typed "Legon Campus".
+    // We'll try a flexible approach: 
+    // 1. Get IDs of pharmacies serving the area (if any)
+    // 2. Perform the name search
+    // 3. Mark matches
+
+    let recommendedIds: number[] = [];
+
+    if (deliveryArea) {
+        // Simple case-insensitive match. 
+        // Ideally, we'd use Full Text Search or PostGIS for locations, but this is a text-based start.
+        const { data: areas } = await supabase
+            .from('pharmacy_service_areas')
+            .select('pharmacy_id')
+            .ilike('area_name', `%${deliveryArea}%`) // Partial match
+
+        if (areas) {
+            recommendedIds = areas.map(a => a.pharmacy_id);
+        }
+    }
 
     let queryBuilder = supabase
         .from('pharmacies')
-        .select('id, name')
+        .select('id, name, is_24_7')
         .limit(20)
 
     if (query) {
         queryBuilder = queryBuilder.ilike('name', `%${query}%`)
     }
 
-    const { data, error } = await queryBuilder.order('name')
+    const { data: pharmacies, error } = await queryBuilder.order('name')
 
     if (error) {
         console.error('Error searching pharmacies:', error)
         return []
     }
 
-    return data || []
+    if (!pharmacies) return []
+
+    // If we have recommendations, we might want to ensure they are included or at least marked
+    const result = pharmacies.map(p => ({
+        ...p,
+        recommended: recommendedIds.includes(p.id)
+    }));
+
+    // If we have recommended IDs but they weren't in the top 20 text results, fetch them explicitly?
+    // For now, let's just mark the ones that ARE in the results. 
+    // Refinement: If query is empty but deliveryArea is set, we should return all recommended pharmacies!
+
+    if (!query && deliveryArea && recommendedIds.length > 0) {
+        // Fetch specific recommended pharmacies if no name search was done
+        const { data: recommended } = await supabase
+            .from('pharmacies')
+            .select('id, name, is_24_7')
+            .in('id', recommendedIds);
+
+
+        if (recommended) {
+            // Merge unique
+            const existingIds = new Set(result.map(r => r.id));
+            recommended.forEach(r => {
+                if (!existingIds.has(r.id)) {
+                    result.unshift({ ...r, recommended: true, is_24_7: r.is_24_7 });
+                }
+            });
+        }
+    }
+
+    // Sort: Recommended first
+    result.sort((a, b) => (a.recommended === b.recommended ? 0 : a.recommended ? -1 : 1));
+
+    return result
 }
 
 export async function upsertPharmacy(data: PharmacyFormValues) {
@@ -477,17 +533,26 @@ export async function getDashboardStats() {
     return { topPharmacies, topProducts };
 }
 
-export async function updateOrderStatus(id: number, status: string) {
+export async function updateOrderStatus(id: number, status: string, courierDetails?: { name: string; phone: string; trackingUrl?: string }) {
     const supabase = await createSupabaseServerClient()
+
+    const updatePayload: any = { status }
+    if (courierDetails) {
+        updatePayload.courier_name = courierDetails.name
+        updatePayload.courier_phone = courierDetails.phone
+        updatePayload.courier_tracking_url = courierDetails.trackingUrl
+    }
+
     const { error } = await supabase
         .from('orders')
-        .update({ status })
+        .update(updatePayload)
         .eq('id', id)
 
     if (error) return { error: error.message }
 
     // Trigger SMS notifications asynchronously
     if (status === 'out_for_delivery') {
+        // Pass courier details to SMS if needed (requires updating SMS function too, but for now we just store it)
         sendShippingNotificationSMS(String(id)).catch(console.error)
     } else if (status === 'completed') {
         sendDeliveryNotificationSMS(String(id)).catch(console.error)
