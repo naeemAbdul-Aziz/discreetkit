@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Package, MapPin, Calendar, DollarSign, CheckCircle, XCircle, Truck } from "lucide-react"
+import { OrderMessages } from "@/components/order-messages"
 
 interface OrderDetailsSheetProps {
   order: any | null
@@ -40,12 +41,17 @@ export function OrderDetailsSheet({
   const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items
   const itemsArray = Array.isArray(items) ? items : []
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string, ackStatus?: string) => {
+    // Show "Preparing" when just accepted
+    if (status === 'processing' && ackStatus === 'accepted') {
+      return <Badge variant="success" className="gap-1"><Package className="h-3 w-3" />Preparing Order</Badge>
+    }
+    
     const variants: Record<string, { variant: "secondary" | "default" | "destructive" | "outline" | "success" | "warning" | "info" | "neutral"; label: string }> = {
       received: { variant: "secondary", label: "New" },
-      processing: { variant: "info", label: "Processing" },
+      processing: { variant: "info", label: "Preparing" },
       out_for_delivery: { variant: "warning", label: "Out for Delivery" },
-      completed: { variant: "success", label: "Completed" }
+      completed: { variant: "success", label: "Delivered" }
     }
     const config = variants[status] || { variant: "neutral", label: status }
     return <Badge variant={config.variant}>{config.label}</Badge>
@@ -57,7 +63,7 @@ export function OrderDetailsSheet({
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <span className="font-mono">{order.code}</span>
-            {getStatusBadge(order.status)}
+            {getStatusBadge(order.status, order.pharmacy_ack_status)}
           </SheetTitle>
           <SheetDescription>
             Order details and management
@@ -187,9 +193,13 @@ export function OrderDetailsSheet({
               <Button
                 className="w-full"
                 onClick={onMarkOutForDelivery}
-                disabled={loading}
+                disabled={loading && loadingAction === 'out_for_delivery'}
               >
-                <Truck className="h-4 w-4 mr-2" />
+                {loading && loadingAction === 'out_for_delivery' ? (
+                  <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                ) : (
+                  <Truck className="h-4 w-4 mr-2" />
+                )}
                 Mark Out for Delivery
               </Button>
             )}
@@ -198,13 +208,21 @@ export function OrderDetailsSheet({
               <Button
                 className="w-full"
                 onClick={onMarkCompleted}
-                disabled={loading}
+                disabled={loading && loadingAction === 'completed'}
               >
-                <CheckCircle className="h-4 w-4 mr-2" />
-                Mark as Completed
+                {loading && loadingAction === 'completed' ? (
+                  <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                ) : (
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                )}
+                Confirm Delivery
               </Button>
             )}
           </div>
+
+          {/* Order Messages */}
+          <Separator />
+          <OrderMessages orderId={order.id} userRole="pharmacy" />
         </div>
       </SheetContent>
     </Sheet>

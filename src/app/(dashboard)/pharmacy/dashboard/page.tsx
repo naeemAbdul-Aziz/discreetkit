@@ -14,6 +14,7 @@ type PharmacyData = {
   stats: { pending: number; accepted: number; processing: number; outForDelivery: number };
   recentOrders: any[];
   statusBreakdown: { status: string; count: number }[];
+  _timestamp?: number;
 };
 
 import { useSSE } from '@/hooks/use-sse'
@@ -55,7 +56,7 @@ export default function PharmacyDashboardPage() {
       }
 
       const json = await response.json();
-      setData(json);
+      setData({ ...json, _timestamp: Date.now() }); // Force new reference for re-render
       setDataLoaded(true);
     } catch (err: any) {
       console.error('[PharmacyDashboard] Error:', err);
@@ -253,7 +254,11 @@ export default function PharmacyDashboardPage() {
       </div>
 
       <div className="mt-8">
-        <OrdersList orders={data.recentOrders} onOrderUpdate={() => loadData()} />
+        <OrdersList 
+          key={data._timestamp || 0}
+          orders={data.recentOrders} 
+          onOrderUpdate={() => loadData()} 
+        />
       </div>
     </div>
   );

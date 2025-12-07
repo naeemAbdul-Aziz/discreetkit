@@ -74,15 +74,25 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
         throw new Error(result.error || 'Failed to update order')
       }
       
-      toast({ 
-        title: "Success", 
-        description: "Order updated successfully" 
-      })
-
-      // Optimistic success state
-      setLoading({ id, action: actionType, success: true })
+      // Show specific success message based on action
+      const messages: Record<string, { title: string; description: string }> = {
+        accept: { title: "Order Accepted", description: "You can now prepare this order for delivery" },
+        decline: { title: "Order Declined", description: "The order has been unassigned from your pharmacy" },
+        out_for_delivery: { title: "Out for Delivery", description: "Customer will be notified of the shipment" },
+        completed: { title: "Order Completed", description: "Great job! The order has been marked as delivered" }
+      }
       
+      const message = messages[actionType] || { title: "Success", description: "Order updated successfully" }
+      toast({ 
+        title: message.title, 
+        description: message.description 
+      })
+      
+      // Trigger parent refetch
       onOrderUpdate?.()
+      
+      // Clear loading immediately after parent refetch is triggered
+      setLoading(null)
     } catch (error) {
       toast({ 
         variant: "destructive", 
@@ -90,10 +100,6 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
         description: error instanceof Error ? error.message : 'Failed to update order'
       })
       setLoading(null)
-    } finally {
-       // We don't verify null here to allow optimistic state to persist until re-render
-       // But to prevent stuck state if parents don't re-render, we clear it after a timeout
-       setTimeout(() => setLoading(null), 2000)
     }
   }
 
@@ -132,15 +138,21 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
   }
 
   const getStatusBadge = (status: string, ackStatus?: string) => {
+    // New assignment - needs accept/decline
     if (status === 'received' && ackStatus === 'pending') {
       return <Badge variant="info" className="gap-1"><div className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse" />New Assignment</Badge>
     }
     
+    // Just accepted - preparing order
+    if (status === 'processing' && ackStatus === 'accepted') {
+      return <Badge variant="success" className="gap-1"><Package className="h-3 w-3" />Preparing Order</Badge>
+    }
+    
     const variants: Record<string, { variant: "secondary" | "default" | "destructive" | "outline" | "success" | "warning" | "info" | "neutral"; label: string; icon?: any }> = {
       received: { variant: "secondary", label: "Received" },
-      processing: { variant: "info", label: "Processing" },
+      processing: { variant: "info", label: "Preparing" },
       out_for_delivery: { variant: "warning", label: "Out for Delivery" },
-      completed: { variant: "success", label: "Completed" },
+      completed: { variant: "success", label: "Delivered" },
       cancelled: { variant: "destructive", label: "Cancelled" }
     }
     const config = variants[status] || { variant: "secondary", label: status }
@@ -156,26 +168,37 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
     )
   }
 
+  // Filter out declined orders from the list
+  const activeOrders = orders.filter(o => o.pharmacy_ack_status !== 'declined')
+
+  if (activeOrders.length === 0) {
+    return (
+      <div className="text-center py-12 text-muted-foreground">
+        <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
+        <p>No active orders</p>
+      </div>
+    )
+  }
+
   return (
     <>
       <div className="space-y-4">
         <h3 className="text-lg font-semibold mb-4">Recent Orders</h3>
-        {orders.map((order) => {
-          // Check if this order has a pending optimistic update
-          const isOptimisticallyAccepted = loading?.id === order.id && loading?.action === 'accept' && loading?.success;
+        {activeOrders.map((order) => {
           const acceptLoading = loading?.id === order.id && loading?.action === 'accept'
           const declineLoading = loading?.id === order.id && loading?.action === 'decline'
-          
-          if (isOptimisticallyAccepted) return null; // Hide card momentarily or show updated state? Better to let parent re-render, but we can disable buttons.
 
           const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items
           const itemCount = Array.isArray(items) ? items.length : 0
 
+          const isCompleted = order.status === 'completed'
+          
           return (
-            <Card key={order.id} className="p-4 shadow-none border-border">
+            <Card key={order.id} className={`p-4 shadow-none transition-all ${isCompleted ? 'border-green-200 bg-green-50/30 dark:bg-green-950/10' : 'border-border'}`}>
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
+                    {isCompleted && <CheckCircle className="h-5 w-5 text-green-600 shrink-0" />}
                     <span className="font-mono font-semibold">{order.code}</span>
                     {getStatusBadge(order.status, order.pharmacy_ack_status)}
                   </div>
@@ -232,8 +255,9 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
                   {order.status === 'processing' && (
                     <Button
                       size="sm"
+                      variant="default"
                       onClick={() => handleMarkOutForDelivery(order.id)}
-                      disabled={loading?.id === order.id}
+                      disabled={loading?.id === order.id && loading?.action === 'out_for_delivery'}
                     >
                       {loading?.id === order.id && loading?.action === 'out_for_delivery' ? (
                         <div className="h-4 w-4 mr-1 animate-spin rounded-full border-2 border-current border-t-transparent" />
@@ -247,8 +271,9 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
                   {order.status === 'out_for_delivery' && (
                     <Button
                       size="sm"
+                      variant="default"
                       onClick={() => handleMarkCompleted(order.id)}
-                      disabled={loading?.id === order.id}
+                      disabled={loading?.id === order.id && loading?.action === 'completed'}
                     >
                       {loading?.id === order.id && loading?.action === 'completed' ? (
                         <div className="h-4 w-4 mr-1 animate-spin rounded-full border-2 border-current border-t-transparent" />
