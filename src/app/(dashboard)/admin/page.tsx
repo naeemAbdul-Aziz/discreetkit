@@ -32,16 +32,20 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [rangePreset, setRangePreset] = useState<'7d'|'30d'|'90d'>('30d');
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
   const [from, to] = useMemo(() => {
     const now = new Date();
     const days = rangePreset === '7d' ? 7 : rangePreset === '90d' ? 90 : 30;
     const start = new Date(now.getTime() - (days * 24 * 60 * 60 * 1000));
     return [start, now];
   }, [rangePreset]);
+
   useEffect(() => {
     async function loadData() {
       try {
-        setLoading(true);
+        // Set loading only on first load or manual range change, not background refresh
+        if (refreshTrigger === 0) setLoading(true);
         const { getOrders, getDashboardStats } = await import('@/lib/admin-actions');
         const orders = await getOrders();
         const stats = await getDashboardStats();
@@ -106,7 +110,7 @@ export default function AdminDashboardPage() {
       }
     }
     loadData();
-  }, [rangePreset]);
+  }, [rangePreset, refreshTrigger]);
 
   // SSE for real-time updates
   useSSE('/api/admin/realtime/orders', {
@@ -115,6 +119,11 @@ export default function AdminDashboardPage() {
         const data = JSON.parse(event.data);
         if (data.type === 'orders') {
           router.refresh();
+          // Also re-fetch client-side stats
+          // We need to define loadData outside useEffect or trigger it via a state change
+          // Simplest hack: toggle a dummy state or move loadData out.
+          // Let's increment a refresh counter.
+          setRefreshTrigger(prev => prev + 1);
         }
       } catch (e) {
         console.error('SSE parse error', e);

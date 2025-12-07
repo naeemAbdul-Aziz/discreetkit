@@ -29,14 +29,14 @@ export function AnonymousReviewsSection() {
                     Share Your Story
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md rounded-2xl">
+            <DialogContent className="w-[90vw] max-w-md rounded-2xl md:w-full overflow-y-auto max-h-[85vh]">
                 <DialogHeader>
                     <DialogTitle>Share Your Experience</DialogTitle>
                     <DialogDescription>
                         Your feedback helps our community grow. It is completely anonymous.
                     </DialogDescription>
                 </DialogHeader>
-                <div className="pt-4">
+                <div className="pt-4 pb-2">
                     <ReviewForm />
                 </div>
             </DialogContent>

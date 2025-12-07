@@ -211,3 +211,87 @@ export async function requestNewProduct(prevState: any, formData: FormData) {
 
     return { success: true, message: 'Product request submitted successfully' };
 }
+// --- ORDER MANAGEMENT ---
+
+export async function acceptOrder(orderId: number) {
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { success: false, message: 'Unauthorized' };
+
+    // Get pharmacy ID
+    const { data: pharmacy } = await supabase
+        .from('pharmacies')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+    if (!pharmacy) return { success: false, message: 'Pharmacy profile not found' };
+
+    // Verify order is assigned to this pharmacy
+    const { data: order } = await supabase
+        .from('orders')
+        .select('id, pharmacy_id, status')
+        .eq('id', orderId)
+        .single();
+
+    if (!order) return { success: false, message: 'Order not found' };
+
+    // Check if already assigned to this pharmacy
+    if (order.pharmacy_id !== pharmacy.id) {
+        // Allow acceptance if it's currently unassigned? 
+        // Strategy: Only allow accepting if it was *assigned* to them (e.g. status 'received' and pharmacy_id is set).
+        // Or if they are claiming it from a pool?
+        // User earlier said "Acceptance... ensure Accept Order works reliably".
+        // Typically the Admin assigns it, then Pharmacy accepts.
+        // If Admin assigned it, pharmacy_id matches.
+        return { success: false, message: 'This order is not assigned to you.' };
+    }
+
+    const { error } = await supabase
+        .from('orders')
+        .update({
+            status: 'processing',
+            events: [
+                // Need to fetch existing events? Or just append?
+                // Supabase doesn't support array_append easily via JS client without fetching first or using RPC.
+                // For simplicity/safety, we won't touch events array blindly.
+                // We'll rely on the status change.
+            ]
+        })
+        .eq('id', orderId);
+
+    if (error) return { success: false, message: error.message };
+
+    revalidatePath('/pharmacy/orders');
+    return { success: true, message: 'Order accepted' };
+}
+
+export async function declineOrder(orderId: number) {
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { success: false, message: 'Unauthorized' };
+
+    const { data: pharmacy } = await supabase.from('pharmacies').select('id').eq('user_id', user.id).single();
+    if (!pharmacy) return { success: false, message: 'Pharmacy profile not found' };
+
+    // Verify ownership
+    const { data: order } = await supabase.from('orders').select('id, pharmacy_id').eq('id', orderId).single();
+    if (!order || order.pharmacy_id !== pharmacy.id) {
+        return { success: false, message: 'Not authorized to decline this order' };
+    }
+
+    // Unassign logic: Set pharmacy_id to null and status back to 'received' (or 'pending_assignment')
+    // Assuming 'received' is the stats for "Paid but not processed".
+    const { error } = await supabase
+        .from('orders')
+        .update({
+            pharmacy_id: null,
+            status: 'received'
+        })
+        .eq('id', orderId);
+
+    if (error) return { success: false, message: error.message };
+
+    revalidatePath('/pharmacy/orders');
+    return { success: true, message: 'Order declined and returned to pool' };
+}

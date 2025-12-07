@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { getSupabaseClient } from '@/lib/supabase';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,6 +10,7 @@ import { formatDistanceToNow } from 'date-fns';
 
 type Review = {
   id: number;
+  title?: string;
   content: string;
   author_name: string;
   created_at: string;
@@ -19,6 +20,7 @@ type Review = {
 export function ReviewFeed() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const supabase = getSupabaseClient();
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // 1. Fetch initial reviews
@@ -54,6 +56,38 @@ export function ReviewFeed() {
     };
   }, [supabase]);
 
+  // Auto-slide effect for mobile
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+
+    let intervalId: NodeJS.Timeout;
+    const startAutoScroll = () => {
+        // Only on mobile/tablet? Or general auto-scroll? User said "on mobile... auto sliding".
+        // Checking window width in effect is standard.
+        if (window.innerWidth >= 768) return; 
+
+        intervalId = setInterval(() => {
+            if (!container) return;
+            // Scroll by card width + gap approx
+            const cardWidth = 300; 
+            const maxScroll = container.scrollWidth - container.clientWidth;
+            
+            if (container.scrollLeft >= maxScroll - 10) {
+                // Reset to start
+                container.scrollTo({ left: 0, behavior: 'smooth' });
+            } else {
+                container.scrollBy({ left: cardWidth, behavior: 'smooth' });
+            }
+        }, 4000); // 4 seconds per slide
+    };
+
+    startAutoScroll();
+
+    return () => clearInterval(intervalId);
+  }, [reviews]);
+
+
   // If no reviews yet, show nothing or placeholder?
   // We'll show a placeholder if empty to encourage the first review.
   if (reviews.length === 0) {
@@ -66,24 +100,27 @@ export function ReviewFeed() {
 
   return (
     <div className="relative w-full overflow-hidden py-4 bg-muted/30 rounded-xl">
-      <div className="flex gap-4 overflow-x-auto pb-4 px-4 snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-visible">
+      <div 
+        ref={scrollRef}
+        className="flex gap-4 overflow-x-auto pb-4 px-4 snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-visible no-scrollbar"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }} // Ensure scrollbar is hidden
+      >
         {reviews.map((review) => (
-          <Card key={review.id} className="min-w-[280px] snap-center bg-card/50 backdrop-blur border-none shadow-sm h-full">
-            <CardContent className="p-4 space-y-3">
-              <Quote className="h-4 w-4 text-primary/40" />
-              <p className="text-sm text-foreground/90 line-clamp-4 leading-relaxed">
+          <Card key={review.id} className="min-w-[280px] w-[85vw] md:w-auto snap-center bg-card/50 backdrop-blur border-none shadow-sm h-full">
+            <CardContent className="p-5 space-y-3 flex flex-col h-full">
+              {review.title && (
+                  <h4 className="font-bold text-base text-primary leading-tight">{review.title}</h4>
+              )}
+              {/* <Quote className="h-4 w-4 text-primary/40" /> */}
+              <p className="text-sm text-foreground/90 line-clamp-4 leading-relaxed flex-grow">
                 "{review.content}"
               </p>
-              <div className="flex items-center gap-2 pt-2">
-                <Avatar className="h-6 w-6">
-                  <AvatarFallback className="bg-primary/10 text-primary text-[10px]">
-                    <User size={12} />
-                  </AvatarFallback>
-                </Avatar>
-                <div className="text-xs">
-                    <span className="font-medium text-foreground">{review.author_name || 'Anonymous'}</span>
-                    <span className="text-muted-foreground mx-1">•</span>
-                    <span className="text-muted-foreground">{formatDistanceToNow(new Date(review.created_at), { addSuffix: true })}</span>
+              <div className="flex items-center gap-2 pt-2 mt-auto border-t border-border/50">
+                <div className="text-xs text-muted-foreground">
+                    {/* Completely Anonymous - Just Title or "Community Member" if no title? 
+                        User: "no need to add names - maybe we can keep the titiles"
+                    */} 
+                    <span className="italic">{formatDistanceToNow(new Date(review.created_at), { addSuffix: true })}</span>
                 </div>
               </div>
             </CardContent>
