@@ -38,9 +38,9 @@ export function RankingList({ title, description, items, type }: RankingListProp
                 <div className="flex items-center gap-3 overflow-hidden">
                   <div className={`
                     flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold
-                    ${idx === 0 ? 'bg-amber-100 text-amber-700' : 
-                      idx === 1 ? 'bg-slate-100 text-slate-700' :
-                      idx === 2 ? 'bg-orange-50 text-orange-700' : 'bg-gray-50 text-gray-500'}
+                    ${idx === 0 ? 'bg-amber-100 text-amber-700 ring-1 ring-amber-200' : 
+                      idx === 1 ? 'bg-slate-100 text-slate-700 ring-1 ring-slate-200' :
+                      idx === 2 ? 'bg-orange-50 text-orange-700 ring-1 ring-orange-200' : 'bg-gray-50 text-gray-500'}
                   `}>
                     #{idx + 1}
                   </div>

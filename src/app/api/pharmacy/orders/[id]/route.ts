@@ -39,7 +39,7 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const { action, status, pharmacy_ack_status } = body;
+    const { action, status, pharmacy_ack_status, note } = body;
 
     // Verify order belongs to this pharmacy
     const { data: order, error: orderError } = await supabase
@@ -79,12 +79,17 @@ export async function PATCH(
     console.log(`[Pharmacy Order API] Order ${id} updated: action=${action}, status=${updateData.status}, ack=${updateData.pharmacy_ack_status}`);
 
     // Log the event
+    let eventNote = `Pharmacy ${action}: ${pharmacy_ack_status || status}`;
+    if (note) {
+      eventNote += ` - ${note}`;
+    }
+
     await supabase
       .from('order_events')
       .insert({
         order_id: Number(id),
         status: updateData.status || 'acknowledged',
-        note: `Pharmacy ${action}: ${pharmacy_ack_status || status}`
+        note: eventNote
       });
 
     // Trigger SMS notifications if status changed

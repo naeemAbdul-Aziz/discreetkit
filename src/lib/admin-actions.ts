@@ -506,9 +506,11 @@ export async function getOrders() {
         .from('orders')
         .select(`
             *,
-            pharmacies (name)
+            pharmacies (name),
+            order_events (*)
         `)
         .order('created_at', { ascending: false })
+
 
     if (error) throw new Error(error.message)
 

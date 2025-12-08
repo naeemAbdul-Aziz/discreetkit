@@ -11,20 +11,20 @@ const badgeVariants = cva(
         default:
           "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
         secondary:
-          "border-transparent bg-purple-500/15 text-purple-700 hover:bg-purple-500/25 dark:bg-purple-500/20 dark:text-purple-300",
+          "border-transparent bg-primary/10 text-primary hover:bg-primary/20",
         destructive:
-          "border-transparent bg-red-500/15 text-red-700 hover:bg-red-500/25 dark:bg-red-500/20 dark:text-red-300",
+          "border-transparent bg-destructive/15 text-destructive hover:bg-destructive/25",
         outline: "text-foreground border-border",
         success:
-          "border-transparent bg-emerald-500/15 text-emerald-700 hover:bg-emerald-500/25 dark:bg-emerald-500/20 dark:text-emerald-300",
+          "border-transparent bg-success/15 text-success hover:bg-success/25",
         warning:
-          "border-transparent bg-amber-500/15 text-amber-700 hover:bg-amber-500/25 dark:bg-amber-500/20 dark:text-amber-300",
+          "border-transparent bg-warning/15 text-warning hover:bg-warning/25",
         pending:
           "border-transparent bg-orange-500/15 text-orange-700 hover:bg-orange-500/25 dark:bg-orange-500/20 dark:text-orange-300",
         info:
-          "border-transparent bg-blue-500/15 text-blue-700 hover:bg-blue-500/25 dark:bg-blue-500/20 dark:text-blue-300",
+          "border-transparent bg-info/15 text-info hover:bg-info/25",
         neutral:
-          "border-transparent bg-slate-500/15 text-slate-700 hover:bg-slate-500/25 dark:bg-slate-500/20 dark:text-slate-300",
+          "border-transparent bg-muted text-muted-foreground hover:bg-muted/80",
         accent:
           "border-transparent bg-accent text-accent-foreground hover:bg-accent/80",
         icon:

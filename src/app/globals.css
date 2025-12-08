@@ -30,6 +30,19 @@
     --primary: 175 68% 30%;
     --primary-foreground: 0 0% 100%;
 
+    /* Semantic Status Colors */
+    --success: 142 71% 45%;
+    /* Emerald 600 */
+    --success-foreground: 0 0% 100%;
+
+    --warning: 45 93% 47%;
+    /* Amber 500 */
+    --warning-foreground: 0 0% 100%;
+
+    --info: 199 89% 48%;
+    /* Sky 600 */
+    --info-foreground: 0 0% 100%;
+
     --radius: 1rem;
     /* Slightly rounder for modern feel */
   }
@@ -59,6 +72,19 @@
 
     --destructive: 0 62% 30%;
     --destructive-foreground: 0 0% 98%;
+
+    /* Semantic Status Colors - Dark Mode */
+    --success: 142 71% 45%;
+    /* Emerald 600 - keeping vibrant */
+    --success-foreground: 0 0% 100%;
+
+    --warning: 45 93% 47%;
+    /* Amber 500 */
+    --warning-foreground: 0 0% 100%;
+
+    --info: 199 89% 48%;
+    /* Sky 600 */
+    --info-foreground: 0 0% 100%;
 
     --border: 0 0% 12%;
     --input: 0 0% 12%;

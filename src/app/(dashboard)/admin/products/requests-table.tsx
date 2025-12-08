@@ -119,7 +119,7 @@ export function RequestsTable({ initialRequests, categories = [] }: { initialReq
                     <Badge variant={
                         req.status === 'approved' ? 'success' : 
                         req.status === 'rejected' ? 'destructive' : 
-                        'secondary'
+                        'pending'
                     }>
                         {req.status}
                     </Badge>
