@@ -22,7 +22,7 @@ import {
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { upsertProduct } from "@/lib/admin-actions"
+import { upsertProduct, approveProductRequest } from "@/lib/admin-actions"
 import { useToast } from "@/hooks/use-toast"
 import { useEffect } from "react"
 
@@ -46,9 +46,10 @@ interface ProductSheetProps {
   onOpenChange: (open: boolean) => void
   product?: any
   categories?: any[]
+  requestId?: number // Optional: if present, we are approving a request
 }
 
-export function ProductSheet({ open, onOpenChange, product, categories = [] }: ProductSheetProps) {
+export function ProductSheet({ open, onOpenChange, product, categories = [], requestId }: ProductSheetProps) {
   const { toast } = useToast()
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -84,17 +85,27 @@ export function ProductSheet({ open, onOpenChange, product, categories = [] }: P
 
   async function onSubmit(data: FormValues) {
     try {
-      const res = await upsertProduct(data)
-      if (res.error) {
+      let res: any;
+      if (requestId) {
+        // Approve Request Flow
+        res = await approveProductRequest(requestId, data)
+      } else {
+        // Standard Upsert Flow
+        res = await upsertProduct(data)
+      }
+
+      if (res.error || (res.success === false)) {
         toast({
           variant: "destructive",
           title: "Error",
-          description: res.error,
+          description: res.error || res.message,
         })
       } else {
         toast({
           title: "Success",
-          description: product ? "Product updated successfully." : "Product added successfully.",
+          description: requestId 
+            ? "Request approved and product created." 
+            : product ? "Product updated successfully." : "Product added successfully.",
         })
         onOpenChange(false)
       }

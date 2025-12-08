@@ -1091,3 +1091,86 @@ export async function deleteCategory(id: number) {
     revalidatePath('/admin/products')
     return { success: true }
 }
+// --- Product Requests ---
+
+export async function getProductRequests() {
+    const supabase = await createSupabaseServerClient();
+    const { data: requests, error } = await supabase
+        .from('product_requests')
+        .select(`
+            *,
+            pharmacies (name, location)
+        `)
+        .order('created_at', { ascending: false });
+
+    if (error) throw new Error(error.message);
+
+    // Normalize requests
+    return requests.map((req: any) => ({
+        ...req,
+        pharmacyName: req.pharmacies?.name || 'Unknown Pharmacy',
+        pharmacyLocation: (req.pharmacies?.location || '').split(',')[0] // Shorten location
+    }));
+}
+
+export async function approveProductRequest(requestId: number, productData: ProductFormValues) {
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    const { getUserRoles } = await import('@/lib/supabase')
+    const supabaseAdmin = getSupabaseAdminClient()
+    const roles = await getUserRoles(supabaseAdmin, user?.id || '')
+    if (!roles.includes('admin')) return { success: false, message: 'Unauthorized' }
+
+    // 1. Create the new product
+    const { data: newProduct, error: createError } = await supabase
+        .from('products')
+        .insert({
+            name: productData.name,
+            category: productData.category,
+            price_ghs: productData.price_ghs,
+            stock_level: productData.stock_level,
+            image_url: productData.image_url,
+            description: productData.description,
+            featured: productData.featured || false,
+            requires_prescription: productData.requires_prescription || false,
+            is_student_product: productData.is_student_product || false
+        })
+        .select()
+        .single();
+
+    if (createError) return { success: false, message: createError.message };
+
+    // 2. Update request status
+    const { error: updateError } = await supabase
+        .from('product_requests')
+        .update({ status: 'approved' })
+        .eq('id', requestId);
+
+    if (updateError) {
+        console.error("Failed to update request status after product creation", updateError);
+    }
+
+    revalidatePath('/admin/products');
+    return { success: true, message: 'Product created and request approved' };
+}
+
+export async function rejectProductRequest(requestId: number) {
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    const { getUserRoles } = await import('@/lib/supabase')
+    const supabaseAdmin = getSupabaseAdminClient()
+    const roles = await getUserRoles(supabaseAdmin, user?.id || '')
+    if (!roles.includes('admin')) return { success: false, message: 'Unauthorized' }
+
+    const { error } = await supabase
+        .from('product_requests')
+        .update({ status: 'rejected' })
+        .eq('id', requestId);
+
+    if (error) return { success: false, message: error.message };
+
+    revalidatePath('/admin/products');
+    return { success: true, message: 'Request rejected' };
+}
