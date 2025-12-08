@@ -406,8 +406,22 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                           <div className="relative group cursor-help">
                               <AlertCircle className="h-4 w-4 text-destructive" />
                               <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block w-48 p-2 bg-destructive text-destructive-foreground text-xs rounded shadow-lg z-50 pointer-events-none">
-                                  {order.order_events?.filter((e:any) => e.note?.toLowerCase().includes('decline') || e.status === 'declined' || e.note?.includes('declined'))
-                                      .sort((a:any,b:any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]?.note?.split(' - ')[1] || "Order declined by pharmacy"}
+                                  {(() => {
+                                      const declineEvent = order.order_events?.filter((e:any) => 
+                                          e.note?.toLowerCase().includes('decline') || 
+                                          e.status === 'declined' || 
+                                          (e.note?.includes('Pharmacy') && e.note?.includes('declined'))
+                                      ).sort((a:any,b:any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
+                                      
+                                      if (!declineEvent) return "Order declined by pharmacy";
+                                      
+                                      const note = declineEvent.note || "";
+                                      const prefix = "Pharmacy acknowledge: declined - ";
+                                      if (note.startsWith(prefix)) return note.substring(prefix.length);
+                                      if (note.includes(" - ")) return note.split(" - ").pop();
+                                      
+                                      return note; // Fallback to showing the full note
+                                  })()}
                                   <div className="absolute left-1/2 -translate-x-1/2 top-full w-2 h-2 bg-destructive rotate-45"></div>
                               </div>
                           </div>
