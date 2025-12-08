@@ -407,20 +407,29 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                               <AlertCircle className="h-4 w-4 text-destructive" />
                               <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block w-48 p-2 bg-destructive text-destructive-foreground text-xs rounded shadow-lg z-50 pointer-events-none">
                                   {(() => {
-                                      const declineEvent = order.order_events?.filter((e:any) => 
-                                          e.note?.toLowerCase().includes('decline') || 
-                                          e.status === 'declined' || 
-                                          (e.note?.includes('Pharmacy') && e.note?.includes('declined'))
-                                      ).sort((a:any,b:any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
+                                      // Find the decline event - look for "acknowledge" + "declined" in note
+                                      const declineEvent = order.order_events?.filter((e:any) => {
+                                          const note = e.note?.toLowerCase() || '';
+                                          return note.includes('acknowledge') && note.includes('declined');
+                                      }).sort((a:any,b:any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
                                       
-                                      if (!declineEvent) return "Order declined by pharmacy";
+                                      if (!declineEvent || !declineEvent.note) return "Order declined by pharmacy";
                                       
-                                      const note = declineEvent.note || "";
+                                      const note = declineEvent.note;
+                                      // Extract reason after "Pharmacy acknowledge: declined - "
                                       const prefix = "Pharmacy acknowledge: declined - ";
-                                      if (note.startsWith(prefix)) return note.substring(prefix.length);
-                                      if (note.includes(" - ")) return note.split(" - ").pop();
+                                      if (note.startsWith(prefix)) {
+                                          return note.substring(prefix.length);
+                                      }
                                       
-                                      return note; // Fallback to showing the full note
+                                      // Fallback: try to extract after " - "
+                                      if (note.includes(" - ")) {
+                                          const parts = note.split(" - ");
+                                          return parts[parts.length - 1];
+                                      }
+                                      
+                                      // Last resort: show full note
+                                      return note;
                                   })()}
                                   <div className="absolute left-1/2 -translate-x-1/2 top-full w-2 h-2 bg-destructive rotate-45"></div>
                               </div>
