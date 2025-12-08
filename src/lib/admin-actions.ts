@@ -165,9 +165,14 @@ export async function getPharmacies() {
     const userIds = pharmacies.filter(p => p.user_id).map(p => p.user_id);
     let userMap: Record<string, { id: string; email: string | null }> = {};
     if (userIds.length) {
-        // listUsers does not support filtering; fetch a page large enough then map
-        const perPage = Math.max(userIds.length, 100); // safety upper bound
-        const { data: listData } = await supabase.auth.admin.listUsers({ page: 1, perPage });
+        // Use Admin Client for Auth operations
+        const adminSupabase = getSupabaseAdminClient();
+
+        // listUsers does not support filtering by ID array; fetch a page large enough then map
+        // Increased safety buffer to 1000 to catch users if total user count is moderate
+        const perPage = Math.max(userIds.length * 2, 1000);
+        const { data: listData } = await adminSupabase.auth.admin.listUsers({ page: 1, perPage });
+
         if (listData?.users) {
             for (const u of listData.users) {
                 if (userIds.includes(u.id)) {

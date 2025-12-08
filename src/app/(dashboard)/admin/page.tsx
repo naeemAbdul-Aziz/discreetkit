@@ -5,12 +5,13 @@
  */
 'use client';
 
+import { StatCard } from '@/components/dashboard/stat-card';
+import { RankingList } from '@/components/dashboard/ranking-list';
+import { DollarSign, ShoppingCart, Activity, Users, AlertCircle, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, CreditCard, Activity, Users, AlertCircle } from 'lucide-react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, AreaChart, Area, PieChart, Pie, Cell } from 'recharts';
+import { Tooltip as RechartsTooltip, ResponsiveContainer, XAxis, YAxis, AreaChart, Area, PieChart, Pie, Cell } from 'recharts';
 import { useEffect, useMemo, useState } from 'react';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerClose } from '@/components/ui/drawer';
 import { useSSE } from '@/hooks/use-sse';
@@ -163,52 +164,40 @@ export default function AdminDashboardPage() {
       <div className="space-y-8">
         {/* Metrics Cards */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">GHS {data.metrics.totalRevenue.toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
-              <p className="text-xs text-muted-foreground">+20.1% from last month</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Orders</CardTitle>
-              <CreditCard className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">+{data.metrics.totalSales}</div>
-              <p className="text-xs text-muted-foreground">+180.1% from last month</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Now</CardTitle>
-              <Activity className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">+{data.metrics.activeOrders}</div>
-              <p className="text-xs text-muted-foreground">Processing orders</p>
-            </CardContent>
-          </Card>
-           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Avg. Order Value</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">GHS {data.metrics.avgOrderValue.toFixed(2)}</div>
-              <p className="text-xs text-muted-foreground">+19% from last month</p>
-            </CardContent>
-          </Card>
+          <StatCard
+            title="Total Revenue"
+            value={`GHS ${data.metrics.totalRevenue.toLocaleString(undefined, {minimumFractionDigits: 2})}`}
+            icon={DollarSign}
+            trend={{ value: 20.1, label: "from last month", positive: true }}
+          />
+          <StatCard
+            title="Sales"
+            value={data.metrics.totalSales}
+            icon={ShoppingCart}
+            trend={{ value: 180.1, label: "from last month", positive: true }}
+          />
+          <StatCard
+            title="Active Now"
+            value={data.metrics.activeOrders}
+            icon={Activity}
+            description="Processing orders"
+          />
+           <StatCard
+            title="Avg. Order Value"
+            value={`GHS ${data.metrics.avgOrderValue.toFixed(2)}`}
+            icon={Users}
+            trend={{ value: 19, label: "from last month", positive: true }}
+          />
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-          <Card className="col-span-4">
+          <Card className="col-span-4 border-none shadow-sm bg-gradient-to-br from-white to-gray-50/50">
             <CardHeader>
-              <CardTitle>Overview</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-muted-foreground"/> 
+                Revenue Overview
+              </CardTitle>
+              <CardDescription>Daily revenue over the last 30 days</CardDescription>
             </CardHeader>
             <CardContent className="pl-2">
               <div className="h-[350px] w-full">
@@ -220,40 +209,33 @@ export default function AdminDashboardPage() {
                             <stop offset="95%" stopColor="#8884d8" stopOpacity={0}/>
                         </linearGradient>
                     </defs>
-                    <XAxis dataKey="date" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                    <XAxis dataKey="date" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => new Date(val).getDate().toString()} />
                     <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `GHS${value}`} />
-                    <Tooltip />
-                    <Area type="monotone" dataKey="amount" stroke="#8884d8" fillOpacity={1} fill="url(#colorRevenue)" />
+                    <RechartsTooltip 
+                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                        formatter={(val: number) => [`GHS ${val.toLocaleString()}`, 'Revenue']}
+                        labelFormatter={(label) => new Date(label).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                    />
+                    <Area type="monotone" dataKey="amount" stroke="#8884d8" fillOpacity={1} fill="url(#colorRevenue)" strokeWidth={2} />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
             </CardContent>
           </Card>
+          
           <div className="col-span-3 space-y-4">
-            <Card className="col-span-3">
+            <Card className="h-full border-none shadow-sm">
                 <CardHeader>
                 <CardTitle>Order Status</CardTitle>
-                <CardDescription>Distribution of order statuses</CardDescription>
+                <CardDescription>Real-time order distribution</CardDescription>
                 </CardHeader>
                 <CardContent>
                 {data.statusBreakdown && (
-                    <div className="flex flex-col items-center">
-                    <div className="flex flex-wrap gap-2 justify-center mb-4">
-                        {data.statusBreakdown.map((b, idx) => (
-                        <button
-                            key={b.status}
-                            onClick={() => setActiveStatuses(s => s.includes(b.status) ? s.filter(x=>x!==b.status) : [...s, b.status])}
-                            className={`text-xs px-2.5 py-1 rounded-full border transition-all ${activeStatuses.includes(b.status) ? 'bg-primary/10 border-primary/20 text-primary font-medium' : 'bg-muted/50 border-transparent text-muted-foreground hover:bg-muted'}`}
-                        >
-                            <span className={`inline-block w-1.5 h-1.5 mr-1.5 rounded-full ${colorClasses[idx % colorClasses.length]}`} aria-hidden />
-                            {b.status.replace(/_/g,' ')} <span className="opacity-70 ml-0.5">({b.count})</span>
-                        </button>
-                        ))}
-                    </div>
-                    <div className="h-[200px] w-full">
+                    <div className="flex flex-col items-center justify-center h-full">
+                    <div className="h-[250px] w-full relative">
                         <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
-                            <Tooltip 
+                            <RechartsTooltip 
                                 contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                                 formatter={(v, n) => [String(v), 'Orders']} 
                             />
@@ -261,17 +243,34 @@ export default function AdminDashboardPage() {
                                 data={filteredBreakdown} 
                                 dataKey="count" 
                                 nameKey="status" 
-                                innerRadius={60} 
-                                outerRadius={80} 
+                                innerRadius={80} 
+                                outerRadius={100} 
                                 paddingAngle={4}
                                 stroke="none"
                             >
                             {filteredBreakdown.map((entry, idx) => (
-                                <Cell key={`cell-${entry.status}`} fill={colors[idx % colors.length]} />
+                                <Cell key={`cell-${entry.status}`} fill={colors[idx % colors.length]} className="stroke-background hover:opacity-80 transition-opacity" strokeWidth={2} />
                             ))}
                             </Pie>
                         </PieChart>
                         </ResponsiveContainer>
+                        {/* Center Text */}
+                        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                            <span className="text-3xl font-bold text-foreground">{filteredBreakdown.reduce((acc, curr) => acc + curr.count, 0)}</span>
+                            <span className="text-sm text-muted-foreground uppercase tracking-wider">Orders</span>
+                        </div>
+                    </div>
+                     <div className="flex flex-wrap gap-2 justify-center mt-6">
+                        {data.statusBreakdown.map((b, idx) => (
+                        <button
+                            key={b.status}
+                            onClick={() => setActiveStatuses(s => s.includes(b.status) ? s.filter(x=>x!==b.status) : [...s, b.status])}
+                            className={`text-xs px-2.5 py-1 rounded-full border transition-all ${activeStatuses.includes(b.status) ? 'bg-primary/5 border-primary/20 text-foreground font-medium shadow-sm' : 'bg-transparent border-transparent text-muted-foreground hover:bg-muted'}`}
+                        >
+                            <span className={`inline-block w-2 h-2 mr-2 rounded-full ${colorClasses[idx % colorClasses.length]}`} aria-hidden />
+                            {b.status.replace(/_/g,' ')}
+                        </button>
+                        ))}
                     </div>
                     </div>
                 )}
@@ -280,57 +279,26 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Extended Stats */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
-            <Card>
-                <CardHeader>
-                    <CardTitle>Top Performing Pharmacies</CardTitle>
-                    <CardDescription>By total revenue generated</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="space-y-4">
-                        {data?.topPharmacies?.length === 0 ? (
-                            <p className="text-sm text-muted-foreground">No data available.</p>
-                        ) : (
-                            data?.topPharmacies?.map((p: any, i: number) => (
-                                <div key={i} className="flex items-center justify-between">
-                                    <div className="flex items-center space-x-2">
-                                        <div className="w-6 text-sm font-medium text-muted-foreground">#{i+1}</div>
-                                        <div className="font-medium text-sm">{p.name}</div>
-                                    </div>
-                                    <div className="font-bold text-sm">GHS {p.revenue.toLocaleString()}</div>
-                                </div>
-                            ))
-                        )}
-                    </div>
-                </CardContent>
-            </Card>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle>Top Selling Products</CardTitle>
-                    <CardDescription>By quantity sold</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="space-y-4">
-                         {data?.topProducts?.length === 0 ? (
-                            <p className="text-sm text-muted-foreground">No data available.</p>
-                        ) : (
-                            data?.topProducts?.map((p: any, i: number) => (
-                                <div key={i} className="flex items-center justify-between">
-                                    <div className="flex items-center space-x-2">
-                                        <div className="w-6 text-sm font-medium text-muted-foreground">#{i+1}</div>
-                                         <div className="font-medium text-sm truncate max-w-[200px]" title={p.name}>{p.name}</div>
-                                    </div>
-                                    <div className="text-sm text-muted-foreground">
-                                        {p.quantity} sold <span className="text-xs ml-1">(GHS {p.revenue.toLocaleString()})</span>
-                                    </div>
-                                </div>
-                            ))
-                        )}
-                    </div>
-                </CardContent>
-            </Card>
+            <RankingList 
+                title="Top Performing Pharmacies" 
+                description="By total revenue generated"
+                type="pharmacy"
+                items={(data.topPharmacies || []).map(p => ({
+                    name: p.name,
+                    value: `GHS ${p.revenue.toLocaleString()}`,
+                }))}
+            />
+             <RankingList 
+                title="Top Selling Products" 
+                description="By quantity sold"
+                type="product"
+                items={(data.topProducts || []).map(p => ({
+                    name: p.name,
+                    value: `${p.quantity} sold`,
+                    meta: `GHS ${p.revenue.toLocaleString()}`
+                }))}
+            />
         </div>
       </div>
       <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
