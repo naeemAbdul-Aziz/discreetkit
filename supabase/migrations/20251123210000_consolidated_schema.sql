@@ -591,3 +591,4 @@ INSERT INTO public.store_settings (id) VALUES (1) ON CONFLICT DO NOTHING;
 -- Enable Realtime for relevant tables
 ALTER PUBLICATION supabase_realtime ADD TABLE public.reviews;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.orders;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.order_events;
