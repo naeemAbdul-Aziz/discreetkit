@@ -523,7 +523,7 @@ function PharmacyCombobox({ initialName, value, onAssign, loading, inDropdown, d
   
   // Load initial recommendations on open if query is empty
     useEffect(() => {
-        if (open && !query && deliveryArea) {
+        if (open && !query) {
             setSearching(true)
             searchPharmacies('', deliveryArea).then(data => {
                 setResults(data)
