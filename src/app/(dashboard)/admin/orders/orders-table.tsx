@@ -407,28 +407,31 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                               <AlertCircle className="h-4 w-4 text-destructive" />
                               <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block w-48 p-2 bg-destructive text-destructive-foreground text-xs rounded shadow-lg z-50 pointer-events-none">
                                   {(() => {
-                                      // Find the decline event - look for "acknowledge" + "declined" in note
+                                      // Find the decline event - look for "acknowledge" + "declined" in note OR status "Pharmacy Declined"
                                       const declineEvent = order.order_events?.filter((e:any) => {
-                                          const note = e.note?.toLowerCase() || '';
-                                          return note.includes('acknowledge') && note.includes('declined');
+                                          const note = (e.note || '').toLowerCase();
+                                          const status = (e.status || '').toLowerCase();
+                                          return (note.includes('acknowledge') && note.includes('declined')) || status === 'pharmacy declined';
                                       }).sort((a:any,b:any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
                                       
                                       if (!declineEvent || !declineEvent.note) return "Order declined by pharmacy";
                                       
                                       const note = declineEvent.note;
-                                      // Extract reason after "Pharmacy acknowledge: declined - "
-                                      const prefix = "Pharmacy acknowledge: declined - ";
-                                      if (note.startsWith(prefix)) {
-                                          return note.substring(prefix.length);
-                                      }
                                       
-                                      // Fallback: try to extract after " - "
+                                      // Pattern 1: "Pharmacy acknowledge: declined - [Reason]"
+                                      const prefix1 = "Pharmacy acknowledge: declined - ";
+                                      if (note.includes(prefix1)) {
+                                          return note.split(prefix1)[1];
+                                      }
+
+                                      // Pattern 2: "Pharmacy Declined - [Reason]" (if we used that)
+                                      // Pattern 3: Simple split by " - " if it looks like a structured message
                                       if (note.includes(" - ")) {
                                           const parts = note.split(" - ");
+                                          // Return the last part as the reason
                                           return parts[parts.length - 1];
                                       }
                                       
-                                      // Last resort: show full note
                                       return note;
                                   })()}
                                   <div className="absolute left-1/2 -translate-x-1/2 top-full w-2 h-2 bg-destructive rotate-45"></div>

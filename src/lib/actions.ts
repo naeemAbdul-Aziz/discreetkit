@@ -215,7 +215,7 @@ export async function sendDeliveryNotificationSMS(orderId: string): Promise<void
 }
 
 // Pharmacy accept/decline actions (server-side helpers)
-export async function recordPharmacyAcknowledgement(orderId: number, decision: 'accepted' | 'declined') {
+export async function recordPharmacyAcknowledgement(orderId: number, decision: 'accepted' | 'declined', reason?: string) {
   const supabaseAdmin = getSupabaseAdminClient();
   // Update order ack status
   const { error: updateError } = await supabaseAdmin
@@ -228,10 +228,16 @@ export async function recordPharmacyAcknowledgement(orderId: number, decision: '
   }
   // Log event
   const statusText = decision === 'accepted' ? 'Pharmacy Accepted' : 'Pharmacy Declined';
+
+  let note = decision === 'accepted' ? 'Pharmacy confirmed it can fulfill the order.' : 'Pharmacy declined; needs reassignment.';
+  if (reason) {
+    note = decision === 'accepted' ? note + ` - ${reason}` : `Pharmacy acknowledge: declined - ${reason}`;
+  }
+
   await supabaseAdmin.from('order_events').insert({
     order_id: orderId,
     status: statusText,
-    note: decision === 'accepted' ? 'Pharmacy confirmed it can fulfill the order.' : 'Pharmacy declined; needs reassignment.'
+    note: note
   });
   return { ok: true };
 }

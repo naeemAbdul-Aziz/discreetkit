@@ -15,6 +15,6 @@ export async function POST(_req: Request, context: { params: Promise<{ id: strin
   if (error || !order) return NextResponse.json({ ok: false, error: 'Order not found' }, { status: 404 })
   if (!order.pharmacy_id) return NextResponse.json({ ok: false, error: 'Order has no assigned pharmacy' }, { status: 400 })
   if (order.pharmacy_ack_status === 'declined') return NextResponse.json({ ok: true, already: true })
-  const result = await recordPharmacyAcknowledgement(order.id, 'declined')
+  const result = await recordPharmacyAcknowledgement(order.id, 'declined', 'Manually declined by Admin')
   return NextResponse.json(result)
 }
