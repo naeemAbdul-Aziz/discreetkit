@@ -1,22 +1,20 @@
 /**
  * @file how-it-works.tsx
  * @description a visual step-by-step guide explaining the service process.
- *              it adapts between a vertical timeline for mobile and an alternating
- *              grid for desktop.
+ *              Mobile: vertical timeline.
+ *              Desktop: sticky center image with alternating scrolling text.
  */
 
 'use client';
 
 import { steps } from '@/lib/data';
-// Note: Steps data is imported. We should update the data source if possible, 
-// but for now we will override the display logic or ensure the data file is updated.
-// Actually, let's check if we can update the data file directly.
 import { Button } from '@/components/ui/button';
-import { StickyScroll } from '@/components/ui/sticky-scroll-reveal';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
 
 const toBase64 = (str: string) =>
   typeof window === 'undefined'
@@ -38,10 +36,12 @@ const shimmer = (w: number, h: number) => `
 </svg>`;
 
 export function HowItWorks() {
+  const [activeStep, setActiveStep] = useState(1);
+
   return (
-    <section id="how-it-works" className="py-12 md:py-24 bg-background">
+    <section id="how-it-works" className="py-12 md:py-24 bg-background relative">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="text-center mb-12 md:mb-16">
+        <div className="text-center mb-16 md:mb-32">
           <h2 className="mt-2 font-headline text-2xl font-bold text-foreground md:text-3xl">
             A Responsible Path to Your Health Answers
           </h2>
@@ -50,7 +50,7 @@ export function HowItWorks() {
           </p>
         </div>
 
-        {/* Mobile Layout: Vertical Timeline */}
+        {/* Mobile Layout: Vertical Timeline (Unchanged) */}
         <div className="md:hidden">
           <div className="relative">
             {/* The vertical connecting line */}
@@ -83,7 +83,7 @@ export function HowItWorks() {
                       <ul className="space-y-3 text-muted-foreground">
                         {step.details.map((detail, i) => (
                           <li key={i} className="flex items-start gap-3">
-                            <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                            <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                             <span className="text-sm md:text-base">{detail}</span>
                           </li>
                         ))}
@@ -106,52 +106,103 @@ export function HowItWorks() {
           </div>
         </div>
 
-        {/* Desktop Layout: Sticky Scroll Reveal */}
-        <div className="hidden md:block">
-          <StickyScroll 
-            contentClassName="aspect-square w-full max-w-[500px]"
-            content={steps.map((step) => ({
-              title: step.title,
-              description: step.description,
-              step: step.number,
-              details: step.details,
-              cta: step.number === 4 ? (
-                <Button asChild size="lg">
-                  <Link href="/partner-care">
-                    Meet Our Support Partner
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-              ) : undefined,
-              content: (
-                <div className="h-full w-full flex items-center justify-center relative overflow-hidden rounded-xl">
-                  <Image
-                    src={step.imageUrl}
-                    alt={step.title}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              ),
-            }))} 
-          />
+        {/* Desktop Layout: Sticky Center Image with Alternating Text */}
+        <div className="hidden md:flex relative justify-center">
+          
+          {/* Sticky Image Container */}
+          <div className="w-full relative">
+            
+            {/* The Sticky Image - Centered */}
+            <div className="sticky top-1/2 -translate-y-1/2 h-[50vh] flex items-center justify-center z-10 pointer-events-none mb-[20vh]">
+              <div className="relative w-[400px] h-[500px] rounded-2xl overflow-hidden shadow-2xl border border-border/50 bg-background/50 backdrop-blur-sm">
+                <AnimatePresence mode="wait">
+                  {steps.map((step) => (
+                    step.number === activeStep && (
+                      <motion.div
+                        key={step.number}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 1.05 }}
+                        transition={{ duration: 0.4 }}
+                        className="absolute inset-0"
+                      >
+                         <Image
+                          src={step.imageUrl}
+                          alt={step.title}
+                          fill
+                          className="object-cover"
+                          placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 500))}`}
+                        />
+                      </motion.div>
+                    )
+                  ))}
+                </AnimatePresence>
+              </div>
+            </div>
+
+            {/* Scrollable Text Content */}
+            <div className="relative z-20 -mt-[50vh] pb-[20vh]"> 
+              {steps.map((step, index) => {
+                const isEven = index % 2 === 0; // Left side (Step 1, 3...) - wait, 0 is step 1.
+                // Step 1 (index 0) even -> Left.
+                // Step 2 (index 1) odd -> Right.
+                return (
+                  <motion.div
+                    key={step.number}
+                    className={cn(
+                      "flex min-h-[80vh] items-center pointer-events-auto",
+                      isEven ? "justify-start" : "justify-end"
+                    )}
+                    onViewportEnter={() => setActiveStep(step.number)}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ amount: 0.5, margin: "-100px 0px -100px 0px" }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <div className={cn(
+                      "w-[35%] p-8 rounded-2xl bg-white/80 backdrop-blur-md border border-white/20 shadow-sm dark:bg-black/50 dark:border-white/10",
+                      "hover:shadow-md transition-shadow duration-300",
+                      isEven ? "ml-12 lg:ml-24" : "mr-12 lg:mr-24"
+                    )}>
+                      <div className="flex items-center gap-4 mb-4">
+                        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-xl">
+                          0{step.number}
+                        </span>
+                        <h3 className="text-2xl font-bold text-foreground">{step.title}</h3>
+                      </div>
+                      
+                      <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
+                        {step.description}
+                      </p>
+
+                      {step.details && (
+                        <ul className="space-y-3 mb-6">
+                          {step.details.map((detail, i) => (
+                            <li key={i} className="flex items-start gap-3 text-muted-foreground">
+                              <CheckCircle2 className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                              <span className="text-base">{detail}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+
+                      {step.number === 4 && (
+                         <Button asChild size="lg" className="w-full sm:w-auto">
+                          <Link href="/partner-care">
+                            Meet Our Support Partner
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                          </Link>
+                        </Button>
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+            
+          </div>
         </div>
       </div>
     </section>
   );
 }
-
-const CheckCircle = ({ className }: { className?: string }) => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      className={cn("h-5 w-5", className)}
-    >
-      <path
-        fillRule="evenodd"
-        d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.06-1.06l-3.25 3.25-1.5-1.5a.75.75 0 00-1.06 1.06l2 2a.75.75 0 001.06 0l3.75-3.75z"
-        clipRule="evenodd"
-      />
-    </svg>
-  );
