@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CipherReveal } from "@/components/ui/cipher-reveal";
 import { WaitlistForm } from "@/components/waitlist-form";
+import { Highlighter } from "@/components/ui/highlighter";
 
 import { getSupabaseClient } from "@/lib/supabase";
 
@@ -109,7 +110,9 @@ export default function XPage() {
                         <div className="h-px w-12 bg-border mx-auto mb-6" />
                         <h3 className="font-bold text-lg">What is DiscreetKit?</h3>
                         <p className="text-sm text-muted-foreground leading-relaxed">
-                            The world's first fully anonymous pharmacy. No accounts, no tracking, just results delivered to your door.
+                            The world's first fully <Highlighter active={isRevealed} delay={0.6}>anonymous pharmacy</Highlighter>. 
+                            No accounts, <Highlighter active={isRevealed} delay={0.8}>no tracking</Highlighter>, 
+                            just results delivered to your door.
                         </p>
                         <p className="text-xs text-muted-foreground/60">
                             We only need your phone number to signal when we launch. It is encrypted and never shared.

@@ -1,39 +1,35 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { motion, useInView } from "framer-motion";
-import React, { useRef } from "react";
+import React from "react";
+import { motion } from "framer-motion";
 
 interface HighlighterProps {
   children: React.ReactNode;
-  className?: string;
   active?: boolean;
+  className?: string;
+  delay?: number;
 }
 
-export function Highlighter({
-  children,
-  className,
-  active = true,
+export function Highlighter({ 
+  children, 
+  active = true, 
+  className = "",
+  delay = 0 
 }: HighlighterProps) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-10%" });
-
   return (
-    <span
-      ref={ref}
-      className={cn("relative inline-block px-2 rounded-lg", className)}
-    >
+    <span className={`relative inline-block ${className}`}>
       <motion.span
         initial={{ scaleX: 0 }}
-        animate={isInView && active ? { scaleX: 1 } : {}}
-        transition={{
-          duration: 0.5,
-          ease: "circOut",
-          delay: 0.2,
+        animate={active ? { scaleX: 1 } : { scaleX: 0 }}
+        transition={{ 
+            duration: 0.8, 
+            ease: "circOut", 
+            delay: delay 
         }}
-        className="absolute inset-0 -z-10 h-full w-full origin-left bg-primary/10 rounded-lg skew-y-1 block"
+        style={{ originX: 0 }}
+        className="absolute bottom-0 left-0 right-0 -z-10 h-[0.4em] translate-y-[0px] rotate-[-1deg] bg-primary/20"
       />
-      {children}
+      <span className="relative z-10">{children}</span>
     </span>
   );
 }
