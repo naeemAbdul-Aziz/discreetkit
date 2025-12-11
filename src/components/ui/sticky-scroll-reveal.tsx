@@ -95,7 +95,7 @@ export const StickyScroll = ({
       <div
         className={cn(
           "hidden lg:block sticky top-10 overflow-hidden border border-border rounded-xl bg-background",
-          "aspect-[4/3] w-[520px] max-w-[60vw]",
+          "h-80 w-[30rem]",
           contentClassName
         )}
       >
