@@ -76,7 +76,7 @@ setInput('');
     <>
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetContent className="flex w-full flex-col sm:max-w-md p-0">
-          <SheetHeader className="p-6 pb-4">
+          <SheetHeader className="sticky top-0 z-50 bg-background border-b p-4">
             <SheetTitle className="flex items-center gap-2">
                 <Avatar className="h-8 w-8 border border-border">
                     <AvatarImage src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png" alt="Pacely" />
