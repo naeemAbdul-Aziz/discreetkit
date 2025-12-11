@@ -99,7 +99,7 @@ setInput('');
                   <div key={index} className={cn("flex items-start gap-3", msg.role === 'user' ? "justify-end" : "justify-start")}>
                     {msg.role === 'model' && (
                         <Avatar className="h-8 w-8 border border-border">
-                            <AvatarImage src="/pacely-avatar.png" alt="Pacely" />
+                            <AvatarImage src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png" alt="Pacely" />
                             <AvatarFallback><Bot size={20} /></AvatarFallback>
                         </Avatar>
                     )}
@@ -117,7 +117,7 @@ setInput('');
                 {isPending && (
                     <div className="flex items-start gap-3 justify-start">
                         <Avatar className="h-8 w-8 border border-border">
-                            <AvatarImage src="/pacely-avatar.png" alt="Pacely" />
+                            <AvatarImage src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png" alt="Pacely" />
                             <AvatarFallback><Bot size={20} /></AvatarFallback>
                         </Avatar>
                         <div className="max-w-[80%] rounded-lg p-3 text-sm bg-muted flex items-center">
