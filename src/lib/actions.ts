@@ -11,7 +11,7 @@ import { z } from 'zod';
 import { generateTrackingCode, type Order } from './data';
 import { assignPharmacyForDeliveryArea, sendPharmacyOrderNotification } from './notifications';
 // Use OpenAI when API key is configured, otherwise fallback
-let _answerQuestions: ((input: { query: string }) => Promise<{ answer: string }>) | null = null;
+let _answerQuestions: ((input: { query: string; history: { role: 'user' | 'model'; parts: string }[] }) => Promise<{ answer: string }>) | null = null;
 async function getAnswerQuestions() {
   if (_answerQuestions) return _answerQuestions;
   const hasOpenAI = !!process.env.OPENAI_API_KEY;
@@ -22,6 +22,7 @@ async function getAnswerQuestions() {
     const mod = await import('@/ai/flows/answer-questions-fallback');
     _answerQuestions = mod.answerQuestions;
   }
+  if (!_answerQuestions) throw new Error("Failed to load AI module");
   return _answerQuestions;
 }
 import { revalidatePath } from 'next/cache';
@@ -563,7 +564,7 @@ export async function handleChat(
   'use server';
   try {
     const answerQuestions = await getAnswerQuestions();
-    const result = await answerQuestions({ query: message });
+    const result = await answerQuestions({ query: message, history: history });
     return result.answer;
   } catch (error) {
     console.error('AI Error:', error);

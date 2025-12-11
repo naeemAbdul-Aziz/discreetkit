@@ -6,6 +6,7 @@
 
 export type AnswerQuestionsInput = {
   query: string;
+  history: { role: 'user' | 'model'; parts: string }[];
 };
 
 export type AnswerQuestionsOutput = {

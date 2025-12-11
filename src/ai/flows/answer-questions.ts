@@ -5,6 +5,7 @@ import { KNOWLEDGE_BASE } from '../knowledge';
 
 export type AnswerQuestionsInput = {
   query: string;
+  history: { role: 'user' | 'model'; parts: string }[];
 };
 
 export type AnswerQuestionsOutput = {
@@ -15,12 +16,10 @@ export async function answerQuestions(
   input: AnswerQuestionsInput
 ): Promise<AnswerQuestionsOutput> {
   try {
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content: `You are Pacely, a helpful, empathetic, but stern female AI assistant for DiscreetKit Ghana. Your tone is inviting and understandable (use warm greetings like "Heyy there" where appropriate), but remain firm, professional, and accurate regarding health and service details. You provide a stigma-free environment.
+    const messages: any[] = [
+      {
+        role: 'system',
+        content: `You are Pacely, a helpful, empathetic, but stern female AI assistant for DiscreetKit Ghana. Your tone is inviting and understandable (use warm greetings like "Heyy there" where appropriate), but remain firm, professional, and accurate regarding health and service details. You provide a stigma-free environment.
 Your primary goal is to answer user questions based *only* on the official information provided in the KNOWLEDGE BASE below.
 Do not invent information or use external knowledge. If the answer is not in the knowledge base, politely state that you don't have that information.
 
@@ -30,12 +29,28 @@ Keep your answers concise, reassuring, and tailored to university students and y
 KNOWLEDGE BASE:
 ${KNOWLEDGE_BASE}
 ---`,
-        },
-        {
-          role: 'user',
-          content: input.query,
-        },
-      ],
+      }
+    ];
+
+    // Append history
+    if (input.history && input.history.length > 0) {
+      input.history.forEach(msg => {
+        messages.push({
+          role: msg.role === 'model' ? 'assistant' : 'user',
+          content: msg.parts
+        });
+      });
+    }
+
+    // Append current query
+    messages.push({
+      role: 'user',
+      content: input.query,
+    });
+
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: messages,
       temperature: 0.7,
       max_tokens: 500,
     });
