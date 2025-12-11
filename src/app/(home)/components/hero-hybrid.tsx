@@ -7,6 +7,7 @@ import { ArrowRight, Play } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { variants } from '@/lib/motion';
+import { Highlighter } from '@/components/ui/highlighter';
 
 export function HeroHybrid() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -34,7 +35,7 @@ export function HeroHybrid() {
               variants={variants.fadeUp}
               className="font-headline text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter text-foreground leading-[0.95] mb-8"
             >
-              Get Sorted <span className="text-primary italic font-light">Discreetly.</span>
+              Get Sorted <Highlighter className="text-primary italic font-light">Discreetly.</Highlighter>
             </motion.h1>
  
             {/* Subtext removed for cleaner, image-first approach */}
