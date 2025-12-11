@@ -26,7 +26,6 @@ const footerNav = [
     title: 'Support',
     links: [
       { href: '/partner-care', label: 'Customer Care' },
-      { href: '/partner-with-us', label: 'Partner With Us' },
     ]
   },
   {

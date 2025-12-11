@@ -78,7 +78,6 @@ const componentMap = {
   Testimonials: { height: '500px' },
   Faq: { height: '600px' },
   ContactUs: { height: '600px' },
-  PartnerReferral: { height: '500px' },
 };
 
 // a generic loading skeleton component.
@@ -114,10 +113,6 @@ const ContactUs = dynamic(
 
 const PrivacyReveal = dynamic(
   () => import('@/app/(home)/components/privacy-reveal').then((mod) => mod.PrivacyReveal)
-);
-const PartnerReferral = dynamic(
-  () => import('@/app/(home)/components/partner-referral').then((mod) => mod.PartnerReferral),
-  { loading: () => <LoadingSkeleton height={componentMap.PartnerReferral.height} /> }
 );
 
 const AnonymousReviewsSection = dynamic(

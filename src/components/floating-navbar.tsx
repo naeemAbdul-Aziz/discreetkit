@@ -50,7 +50,6 @@ export function FloatingNavbar({ className }: { className?: string }) {
             <MenuItem setActive={setActive} active={active} item="Company">
             <div className="flex flex-col space-y-4 text-sm">
                 <HoveredLink href="/#how-it-works">How It Works</HoveredLink>
-                <HoveredLink href="/partner-with-us">Become a Partner</HoveredLink>
                 <HoveredLink href="/about">About Us</HoveredLink>
             </div>
             </MenuItem>
