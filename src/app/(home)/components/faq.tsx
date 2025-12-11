@@ -12,34 +12,41 @@ export function Faq() {
   return (
     <section id="faq" className="py-12 md:py-24">
       <div className="container mx-auto max-w-4xl px-4 md:px-6">
-        <div className="text-center">
+        <div className="text-center mb-12">
           <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
             Frequently Asked Questions
           </h2>
           <p className="mt-4 text-base text-muted-foreground">
-            Your questions, answered. If you need more info, Pacely is here to help.
+            Specific answers to your privacy and delivery questions.
           </p>
         </div>
 
-        {/* the chat trigger component allows users to open the chatbot. */}
-        <div className="mt-8">
-            <ChatTrigger />
+        <Accordion type="single" collapsible className="w-full">
+          {faqItems.map((item, index) => (
+            <AccordionItem key={index} value={`item-${index}`}>
+              <AccordionTrigger className="text-left text-base hover:no-underline">
+                {item.question}
+              </AccordionTrigger>
+              <AccordionContent className="text-sm text-muted-foreground">
+                {item.answer}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+
+        {/* Post-FAQ Pacely Trigger */}
+        <div className="mt-16 text-center bg-muted/30 p-8 rounded-2xl border border-border/50">
+          <h3 className="text-lg font-bold text-foreground mb-2">
+            Still have questions?
+          </h3>
+          <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
+            Chat anonymously with Pacely, our AI health assistant. No account needed, no chats saved.
+          </p>
+          <div className="flex justify-center">
+             <ChatTrigger />
+          </div>
         </div>
 
-        <div className="mt-12">
-          <Accordion type="single" collapsible className="w-full">
-            {faqItems.map((item, index) => (
-              <AccordionItem key={index} value={`item-${index}`}>
-                <AccordionTrigger className="text-left text-base hover:no-underline">
-                  {item.question}
-                </AccordionTrigger>
-                <AccordionContent className="text-sm text-muted-foreground">
-                  {item.answer}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </div>
       </div>
     </section>
   );

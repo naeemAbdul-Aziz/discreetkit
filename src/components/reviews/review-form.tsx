@@ -52,12 +52,7 @@ export function ReviewForm() {
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto">
-            <div className="space-y-2">
-                <h3 className="text-lg font-semibold text-center">Share Your Experience</h3>
-                <p className="text-sm text-muted-foreground text-center">
-                    Your feedback helps others. No names are collected.
-                </p>
-            </div>
+            {/* Header removed to avoid duplication in Dialog */}
             
             <div className="space-y-2">
                 <Input
