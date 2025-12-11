@@ -31,7 +31,7 @@ export function Highlighter({
           ease: "circOut",
           delay: 0.2,
         }}
-        className="absolute inset-0 -z-10 h-full w-full origin-left bg-primary/20 rounded-lg skew-y-1 block"
+        className="absolute inset-0 -z-10 h-full w-full origin-left bg-primary/10 rounded-lg skew-y-1 block"
       />
       {children}
     </span>
