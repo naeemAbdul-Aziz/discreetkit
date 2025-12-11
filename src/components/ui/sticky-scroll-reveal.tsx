@@ -22,7 +22,7 @@ export const StickyScroll = ({
   const ref = useRef<any>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ["start start", "end start"],
+    offset: ["start start", "end end"],
   });
   const cardLength = content.length;
 
@@ -36,23 +36,27 @@ export const StickyScroll = ({
         }
         return acc;
       },
-      0
+      0,
     );
     setActiveCard(closestBreakpointIndex);
   });
 
   return (
     <motion.div
-      className="flex justify-center relative space-x-10 rounded-md p-10"
+      className="flex justify-center relative space-x-10 rounded-md"
       ref={ref}
     >
       <div className="div relative flex items-start px-4">
-        <div className="max-w-2xl">
+        <div className="max-w-2xl py-[30vh]"> {/* Start/End padding for centering */}
           {content.map((item, index) => (
-            <div key={item.title + index} className="my-20">
+            <div key={item.title + index} className="my-[30vh] flex flex-col justify-center"> {/* Large spacing */}
               <motion.div
                 initial={{ opacity: 0 }}
-                animate={{ opacity: activeCard === index ? 1 : 0.3 }}
+                animate={{ 
+                  opacity: activeCard === index ? 1 : 0.3,
+                  filter: activeCard === index ? "blur(0px)" : "blur(4px)" // Blur effect
+                }}
+                transition={{ duration: 0.5 }}
                 className="flex items-center gap-4 mb-4"
               >
                 {item.step && (
@@ -66,7 +70,11 @@ export const StickyScroll = ({
               </motion.div>
               <motion.div
                 initial={{ opacity: 0 }}
-                animate={{ opacity: activeCard === index ? 1 : 0.3 }}
+                animate={{ 
+                  opacity: activeCard === index ? 1 : 0.3, 
+                  filter: activeCard === index ? "blur(0px)" : "blur(4px)" // Blur effect 
+                }}
+                transition={{ duration: 0.5 }}
               >
                 <p className="text-kg text-muted-foreground max-w-sm">
                   {item.description}
@@ -89,17 +97,17 @@ export const StickyScroll = ({
               </motion.div>
             </div>
           ))}
-          <div className="h-40" />
         </div>
       </div>
       <div
         className={cn(
-          "hidden lg:block sticky top-10 overflow-hidden border border-border rounded-xl bg-background",
-          "h-80 w-[30rem]",
+          "hidden lg:flex sticky top-0 h-screen w-full flex-col items-center justify-center", // Sticky container
           contentClassName
         )}
       >
-        {content[activeCard].content ?? null}
+        <div className={cn("h-80 w-[30rem] overflow-hidden rounded-xl border border-border bg-background")}>
+           {content[activeCard].content ?? null}
+        </div>
       </div>
     </motion.div>
   );
