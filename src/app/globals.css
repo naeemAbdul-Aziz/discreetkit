@@ -105,11 +105,15 @@
   }
 
   html {
-    @apply scroll-smooth;
     font-size: 15px;
-    /* Scroll stability */
+    /* Native smooth scrolling - better performance than Tailwind's */
+    scroll-behavior: smooth;
+    /* Prevent horizontal scroll */
     overflow-x: hidden;
+    /* Always show scrollbar to prevent layout shift */
     overflow-y: scroll;
+    /* Improve scroll performance */
+    -webkit-overflow-scrolling: touch;
 
     @screen sm {
       font-size: 15.5px;
@@ -127,13 +131,14 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
-    /* Prevent scroll jank */
+    /* Prevent horizontal scroll */
     overflow-x: hidden;
-    position: relative;
-    /* Optimize scroll performance */
-    will-change: scroll-position;
+    /* Better font rendering */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Improve scroll performance */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
   }
 }
 
