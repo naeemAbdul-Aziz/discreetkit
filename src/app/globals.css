@@ -107,6 +107,9 @@
   html {
     @apply scroll-smooth;
     font-size: 15px;
+    /* Scroll stability */
+    overflow-x: hidden;
+    overflow-y: scroll;
 
     @screen sm {
       font-size: 15.5px;
@@ -124,6 +127,12 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    /* Prevent scroll jank */
+    overflow-x: hidden;
+    /* GPU acceleration for smooth scrolling */
+    transform: translateZ(0);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
