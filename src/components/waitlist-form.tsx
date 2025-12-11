@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils";
 
 interface WaitlistFormProps extends HTMLMotionProps<"form"> {}
 
+import { getSupabaseClient } from "@/lib/supabase";
+
 export function WaitlistForm({ className, ...props }: WaitlistFormProps) {
   const [nickname, setNickname] = React.useState("");
   const [phone, setPhone] = React.useState("");
@@ -17,11 +19,23 @@ export function WaitlistForm({ className, ...props }: WaitlistFormProps) {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    
-    setIsLoading(false);
-    setIsSubmitted(true);
+    try {
+        const supabase = getSupabaseClient();
+        const { error } = await supabase
+            .from('waitlist')
+            .insert([{ nickname, phone }]);
+
+        if (error) throw error;
+
+        setIsSubmitted(true);
+    } catch (error) {
+        console.error('Error joining waitlist:', error);
+        // Fail silently or show error? For "hacker" vibe, maybe just a shake?
+        // helping the user is better.
+        alert("Transmission failed. Please try again.");
+    } finally {
+        setIsLoading(false);
+    }
   };
 
   if (isSubmitted) {

@@ -5,10 +5,25 @@ import { motion, AnimatePresence } from "framer-motion";
 import { CipherReveal } from "@/components/ui/cipher-reveal";
 import { WaitlistForm } from "@/components/waitlist-form";
 
+import { getSupabaseClient } from "@/lib/supabase";
+
 export default function XPage() {
   const [isHeld, setIsHeld] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
+  const [count, setCount] = useState("1,247"); // Fallback / Loading state
   const touchStartTime = useRef<number>(0);
+  
+  useEffect(() => {
+    const fetchCount = async () => {
+        const supabase = getSupabaseClient();
+        const { data, error } = await supabase.rpc('get_waitlist_count');
+        if (!error && data !== null) {
+            // Format with commas
+            setCount(data.toLocaleString());
+        }
+    };
+    fetchCount();
+  }, []);
   
   // Haptic feedback function
   const vibrate = (pattern: number | number[]) => {
@@ -27,9 +42,6 @@ export default function XPage() {
   const endInteraction = () => {
     if (isRevealed) return;
     setIsHeld(false);
-    
-    // Check if held long enough to trigger full reveal (optional logic, 
-    // currently we rely on the component's internal timer or user holding it)
   };
 
   // Callback when CipherReveal finishes the animation
@@ -42,7 +54,7 @@ export default function XPage() {
 
   return (
     <div 
-      className="relative flex h-screen w-full flex-col items-center justify-center overflow-hidden bg-background text-foreground"
+      className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-background text-foreground"
       onMouseDown={startInteraction}
       onMouseUp={endInteraction}
       onMouseLeave={endInteraction}
@@ -54,14 +66,14 @@ export default function XPage() {
            style={{ backgroundImage: 'radial-gradient(circle at center, currentColor 1px, transparent 1px)', backgroundSize: '24px 24px' }}
       ></div>
 
-      <div className="z-10 flex flex-col items-center gap-8">
+      <div className="z-10 flex flex-col items-center gap-8 p-6">
         
         {/* The Cipher Display */}
         <div className="cursor-pointer select-none text-center">
             <h1 className="text-6xl font-bold tracking-tighter md:text-8xl">
                 <CipherReveal 
                     text="0x8F..." 
-                    revealText="1,247" 
+                    revealText={count}
                     isRevealing={isHeld || isRevealed} 
                     onRevealComplete={handleRevealComplete}
                     className={isRevealed ? "text-primary" : "text-foreground"}
@@ -79,9 +91,31 @@ export default function XPage() {
         {/* Form Container */}
         <AnimatePresence>
             {isRevealed && (
-                <div className="w-full px-8">
+                <motion.div 
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="w-full"
+                >
                     <WaitlistForm />
-                </div>
+                    
+                    {/* Informative Content */}
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.5 }}
+                        className="mt-12 text-center max-w-md mx-auto space-y-4"
+                    >
+                        <div className="h-px w-12 bg-border mx-auto mb-6" />
+                        <h3 className="font-bold text-lg">What is DiscreetKit?</h3>
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                            The world's first fully anonymous pharmacy. No accounts, no tracking, just results delivered to your door.
+                        </p>
+                        <p className="text-xs text-muted-foreground/60">
+                            We only need your phone number to signal when we launch. It is encrypted and never shared.
+                        </p>
+                    </motion.div>
+                </motion.div>
             )}
         </AnimatePresence>
 

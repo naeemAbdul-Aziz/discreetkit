@@ -23,6 +23,10 @@ export function TourProvider({ children }: TourProviderProps) {
     const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
     const isSubdomain = hostname.startsWith('admin.') || hostname.startsWith('pharmacy.');
 
+    if ((pathname === '/x' || isSubdomain) && typeof window !== 'undefined') {
+      return; 
+    }
+
     if (pathname === '/' && !isSubdomain && typeof window !== 'undefined' && !localStorage.getItem('tour-completed')) {
       const timer = setTimeout(() => {
         setShowWelcome(true);

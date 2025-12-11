@@ -29,6 +29,7 @@ DROP TABLE IF EXISTS public.categories CASCADE;
 DROP TABLE IF EXISTS public.user_roles CASCADE;
 DROP TABLE IF EXISTS public.roles CASCADE;
 DROP TABLE IF EXISTS public.store_settings CASCADE;
+DROP TABLE IF EXISTS public.waitlist CASCADE;
 
 DROP TYPE IF EXISTS public.order_status CASCADE;
 
@@ -592,3 +593,35 @@ INSERT INTO public.store_settings (id) VALUES (1) ON CONFLICT DO NOTHING;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.reviews;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.orders;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.order_events;
+
+-- ==========================================
+-- 11. WAITLIST
+-- ==========================================
+
+-- 11.1 TABLE
+create table if not exists public.waitlist (
+  id uuid default gen_random_uuid() primary key,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  nickname text not null,
+  phone text not null,
+  referral_code text
+);
+COMMENT ON TABLE public.waitlist IS 'Anonymous waitlist for the platform launch.';
+
+-- 11.2 RLS
+alter table public.waitlist enable row level security;
+
+create policy "Enable insert for everyone" 
+  on public.waitlist for insert 
+  with check (true);
+
+-- 11.3 COUNT FUNCTION
+create or replace function get_waitlist_count()
+returns integer
+language sql
+security definer
+as $$
+  select count(*)::integer from public.waitlist;
+$$;
+
+grant execute on function get_waitlist_count to anon, authenticated;
