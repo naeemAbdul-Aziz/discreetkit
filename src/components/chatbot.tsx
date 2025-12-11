@@ -35,7 +35,7 @@ export function Chatbot() {
   // initial message to greet the user.
   const initialMessage: Message = {
       role: 'model',
-      parts: "Hello! I'm Pacely, your friendly assistant. How can I help you today? You can ask about our test kits, the ordering process, or delivery locations."
+      parts: "Heyy there! I'm Pacely, your friendly assistant. I'm here to listen and help you get sorted discreetly. You can ask me about our test kits, ordering process, or delivery locations."
   };
 
   // effect to set the initial message when the chat opens.
@@ -79,7 +79,7 @@ setInput('');
           <SheetHeader className="p-6 pb-4">
             <SheetTitle className="flex items-center gap-2">
                 <Avatar className="h-8 w-8 border border-border">
-                    <AvatarImage src="/pacely-avatar.png" alt="Pacely" />
+                    <AvatarImage src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png" alt="Pacely" />
                      <AvatarFallback><Bot size={20} /></AvatarFallback>
                 </Avatar>
                 Pacely
