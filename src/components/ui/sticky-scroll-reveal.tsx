@@ -47,14 +47,14 @@ export const StickyScroll = ({
       ref={ref}
     >
       <div className="div relative flex items-start px-4">
-        <div className="max-w-2xl py-[30vh]"> {/* Start/End padding for centering */}
+        <div className="max-w-3xl py-[15vh]"> {/* Reduced padding, wider column */}
           {content.map((item, index) => (
-            <div key={item.title + index} className="my-[30vh] flex flex-col justify-center"> {/* Large spacing */}
+            <div key={item.title + index} className="my-[15vh] flex flex-col justify-center"> {/* Reduced spacing */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ 
                   opacity: activeCard === index ? 1 : 0.3,
-                  filter: activeCard === index ? "blur(0px)" : "blur(4px)" // Blur effect
+                  filter: activeCard === index ? "blur(0px)" : "blur(4px)"
                 }}
                 transition={{ duration: 0.5 }}
                 className="flex items-center gap-4 mb-4"
@@ -72,11 +72,11 @@ export const StickyScroll = ({
                 initial={{ opacity: 0 }}
                 animate={{ 
                   opacity: activeCard === index ? 1 : 0.3, 
-                  filter: activeCard === index ? "blur(0px)" : "blur(4px)" // Blur effect 
+                  filter: activeCard === index ? "blur(0px)" : "blur(4px)"
                 }}
                 transition={{ duration: 0.5 }}
               >
-                <p className="text-kg text-muted-foreground max-w-sm">
+                <p className="text-kg text-muted-foreground max-w-xl"> {/* Wider text */}
                   {item.description}
                 </p>
                 {item.details && (
@@ -101,11 +101,11 @@ export const StickyScroll = ({
       </div>
       <div
         className={cn(
-          "hidden lg:flex sticky top-0 h-screen w-full flex-col items-center justify-center", // Sticky container
+          "hidden lg:flex sticky top-0 h-screen w-full flex-col items-center justify-center",
           contentClassName
         )}
       >
-        <div className={cn("h-80 w-[30rem] overflow-hidden rounded-xl border border-border bg-background")}>
+        <div className={cn("h-96 w-[36rem] overflow-hidden rounded-xl border border-border bg-background")}> {/* Larger image */}
            {content[activeCard].content ?? null}
         </div>
       </div>
