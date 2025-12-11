@@ -47,9 +47,9 @@ export const StickyScroll = ({
       ref={ref}
     >
       <div className="div relative flex items-start px-4">
-        <div className="max-w-3xl py-[15vh]"> {/* Reduced padding, wider column */}
+        <div className="max-w-3xl py-[8vh]"> {/* Tighter padding */}
           {content.map((item, index) => (
-            <div key={item.title + index} className="my-[15vh] flex flex-col justify-center"> {/* Reduced spacing */}
+            <div key={item.title + index} className="my-[8vh] flex flex-col justify-center"> {/* Tighter spacing */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ 

@@ -129,8 +129,9 @@
     font-feature-settings: "rlig" 1, "calt" 1;
     /* Prevent scroll jank */
     overflow-x: hidden;
-    /* GPU acceleration for smooth scrolling */
-    transform: translateZ(0);
+    position: relative;
+    /* Optimize scroll performance */
+    will-change: scroll-position;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
