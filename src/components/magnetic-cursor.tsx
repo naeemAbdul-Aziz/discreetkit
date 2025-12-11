@@ -43,7 +43,7 @@ export function MagneticCursor() {
 
 	return (
 		<motion.div
-			className="hidden md:block fixed top-0 left-0 w-8 h-8 rounded-full border border-primary pointer-events-none z-[9999] mix-blend-difference"
+			className="hidden md:block fixed top-0 left-0 w-8 h-8 rounded-full border border-primary pointer-events-none z-[9999]"
 			style={{
 				x: cursorXSpring,
 				y: cursorYSpring,
