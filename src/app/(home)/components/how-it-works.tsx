@@ -63,7 +63,7 @@ export function HowItWorks() {
   }));
 
   return (
-    <section id="how-it-works" className="py-12 md:py-24 bg-background relative">
+    <section id="how-it-works" className="py-12 md:pt-24 md:pb-8 bg-background relative">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-16 md:mb-24">
           <motion.div

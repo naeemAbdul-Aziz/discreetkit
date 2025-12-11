@@ -35,12 +35,12 @@ export function Faq() {
         </Accordion>
 
         {/* Post-FAQ Pacely Trigger */}
-        <div className="mt-16 text-center bg-muted/30 p-8 rounded-2xl border border-border/50">
-          <h3 className="text-lg font-bold text-foreground mb-2">
+        <div className="mt-16 text-center bg-background p-10 md:p-12 rounded-3xl border border-border">
+          <h3 className="text-xl md:text-2xl font-bold text-foreground mb-3">
             Still have questions?
           </h3>
-          <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
-            Chat anonymously with Pacely, our AI health assistant. No account needed, no chats saved.
+          <p className="text-muted-foreground mb-6 max-w-md mx-auto text-sm md:text-base leading-relaxed">
+            Chat <span className="text-foreground font-medium">anonymously</span> with Pacely, our AI health assistant. No account needed, no chats saved.
           </p>
           <div className="flex justify-center">
              <ChatTrigger />
