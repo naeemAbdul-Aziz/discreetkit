@@ -53,8 +53,7 @@ export const StickyScroll = ({
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ 
-                  opacity: activeCard === index ? 1 : 0.3,
-                  filter: activeCard === index ? "blur(0px)" : "blur(4px)"
+                  opacity: activeCard === index ? 1 : 0.3
                 }}
                 transition={{ duration: 0.5 }}
                 className="flex items-center gap-4 mb-4"
@@ -71,8 +70,7 @@ export const StickyScroll = ({
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ 
-                  opacity: activeCard === index ? 1 : 0.3, 
-                  filter: activeCard === index ? "blur(0px)" : "blur(4px)"
+                  opacity: activeCard === index ? 1 : 0.3
                 }}
                 transition={{ duration: 0.5 }}
               >
