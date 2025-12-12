@@ -48,7 +48,7 @@ export function WaitlistForm({ className, onSuccess, ...props }: WaitlistFormPro
       className={cn("flex w-full max-w-sm flex-col gap-4", className)}
       {...props}
     >
-      <div className="space-y-6">
+      <div className="space-y-4">
         <input
           type="text"
           value={nickname}
