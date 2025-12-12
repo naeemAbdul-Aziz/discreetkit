@@ -226,8 +226,28 @@ export default function AccessPage() {
                         <p className="text-sm text-muted-foreground leading-relaxed max-w-sm mx-auto">
                             A fully <Highlighter active={isRevealed} delay={0.6}>anonymous way to shop</Highlighter>. 
                             <br className="hidden sm:block" />
-                            Get the things you feel <Highlighter active={isRevealed} delay={0.8} color="#ef4444">awkward, shy, or judged</Highlighter> buying in a pharmacy delivered to you discreetly.
+                            Get the things you feel <Highlighter active={isRevealed} delay={0.8} color="#ef4444">awkward, shy, or judged</Highlighter> buying in a pharmacy delivered to you discreetly. 
                         </p>
+
+
+
+                        {/* How it Works Micro-Section */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-muted-foreground/80 py-6 border-y border-border/50">
+                            <div className="flex flex-col items-center gap-2">
+                                <span className="font-bold text-foreground">01</span>
+                                <span>Place order anonymously</span>
+                            </div>
+                            <div className="flex flex-col items-center gap-2">
+                                <span className="font-bold text-foreground">02</span>
+                                <span>Routed to nearest partner</span>
+                            </div>
+                            <div className="flex flex-col items-center gap-2">
+                                <span className="font-bold text-foreground">03</span>
+                                <span>Delivered fast & discreet</span>
+                            </div>
+                        </div>
+
+
 
                         <SuggestionForm />
                     </motion.div>
@@ -245,6 +265,17 @@ export default function AccessPage() {
                  <p className="text-sm text-muted-foreground">
                     You're on the list. <br/> We'll text you when we launch.
                  </p>
+                 
+                 {/* Socials */}
+                 <div className="flex justify-center gap-4 py-2">
+                        <a href="https://instagram.com/discreetkit" target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-instagram"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+                        </a>
+                        <a href="https://tiktok.com/@discreetkit" target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
+                        </a>
+                 </div>
+
                  <SuggestionForm />
                  
                  <motion.div
