@@ -78,10 +78,14 @@ function SuggestionForm() {
   );
 }
 
+import { NumberTicker } from "@/components/ui/number-ticker";
+
+// ... imports remain the same, remove CipherReveal if unused
+
 export default function XPage() {
   const [isHeld, setIsHeld] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
-  const [count, setCount] = useState("1,247"); 
+  const [rawCount, setRawCount] = useState(1247); // Number type for ticker
   const [welcomeName, setWelcomeName] = useState<string | null>(null);
   const touchStartTime = useRef<number>(0);
   
@@ -90,8 +94,7 @@ export default function XPage() {
         const supabase = getSupabaseClient();
         const { data, error } = await supabase.rpc('get_waitlist_count');
         if (!error && data !== null) {
-            // Apply +700 offset for social proof
-            setCount((data + 700).toLocaleString());
+            setRawCount(data + 700);
         }
     };
     fetchCount();
@@ -108,6 +111,13 @@ export default function XPage() {
     setIsHeld(true);
     touchStartTime.current = Date.now();
     vibrate(10); 
+
+    // Auto-reveal after 800ms hold (simpler than full cipher decode)
+    setTimeout(() => {
+        if (Date.now() - touchStartTime.current >= 800) {
+            handleRevealComplete();
+        }
+    }, 800);
   };
 
   const endInteraction = () => {
@@ -154,7 +164,7 @@ export default function XPage() {
              </motion.div>
         )}
 
-        {/* Main Display: Cipher OR Welcome Message */}
+        {/* Main Display: Count OR Welcome Message */}
         <div className="text-center transition-all duration-700">
             {welcomeName ? (
                  <motion.div
@@ -167,15 +177,12 @@ export default function XPage() {
                     </h1>
                  </motion.div>
             ) : (
-                <h1 className="text-6xl font-bold tracking-tighter md:text-8xl cursor-pointer">
-                    <CipherReveal 
-                        text="0x8F..." 
-                        revealText={count}
-                        isRevealing={isHeld || isRevealed} 
-                        onRevealComplete={handleRevealComplete}
-                        className={isRevealed ? "text-primary transition-colors duration-500" : "text-foreground/80"}
-                    />
-                </h1>
+                <div className="cursor-pointer">
+                     {/* The Ticker is always visible now, no decryption needed */}
+                    <h1 className="text-6xl font-bold tracking-tighter md:text-8xl">
+                        <NumberTicker value={rawCount} className="text-foreground" />
+                    </h1>
+                </div>
             )}
             
             <motion.p 
@@ -186,11 +193,11 @@ export default function XPage() {
                 {welcomeName ? (
                     <span className="text-[#4ade80] tracking-widest">TRANSMISSION SECURE</span>
                 ) : isRevealed ? (
-                    <span className="text-primary">Early Access Granted</span>
+                    <span className="text-primary">Access Granted</span>
                 ) : (
                     <>
-                        <span>Press & Hold to Decrypt</span>
-                        <span className="text-[10px] opacity-50 lowercase tracking-normal">(people in queue)</span>
+                        <span>Press & Hold to Join</span>
+                        <span className="text-[10px] opacity-50 lowercase tracking-normal">(people in line)</span>
                     </>
                 )}
             </motion.p>
@@ -217,9 +224,9 @@ export default function XPage() {
                         <div className="h-px w-12 bg-border mx-auto mb-6" />
                         <h3 className="font-bold text-lg tracking-tight">What is DiscreetKit?</h3>
                         <p className="text-sm text-muted-foreground leading-relaxed max-w-sm mx-auto">
-                            The world's first fully <Highlighter active={isRevealed} delay={0.6}>anonymous pharmacy</Highlighter>. 
+                            The world's first fully <Highlighter active={isRevealed} delay={0.6}>anonymous platform</Highlighter>. 
                             <br className="hidden sm:block" />
-                            We make accessible to you the things you would feel <Highlighter active={isRevealed} delay={0.8} color="#ef4444">embarrassed, shy, stigmatized</Highlighter> or judged to walk into a pharmacy and get.
+                            We make accessible to you the things you would feel <Highlighter active={isRevealed} delay={0.8} color="#ef4444">embarrassed, shy, stigmatized</Highlighter> or judged to walk into a store and get.
                         </p>
                         <p className="text-xs text-muted-foreground/60 max-w-xs mx-auto">
                             We only need your phone number to signal when we launch. It is encrypted and never shared.
