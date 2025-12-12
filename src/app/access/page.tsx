@@ -253,10 +253,7 @@ export default function AccessPage() {
                     transition={{ delay: 1 }}
                     className="pt-8"
                  >
-                    <a 
-                        href="https://chat.whatsapp.com/BdMvt9UnLPaAPUe4AexDOJ" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
+
                     <a 
                         href="https://chat.whatsapp.com/BdMvt9UnLPaAPUe4AexDOJ" 
                         target="_blank" 
