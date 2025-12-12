@@ -8,13 +8,15 @@ interface HighlighterProps {
   active?: boolean;
   className?: string;
   delay?: number;
+  color?: string;
 }
 
 export function Highlighter({ 
   children, 
   active = true, 
   className = "",
-  delay = 0 
+  delay = 0,
+  color = "hsl(var(--primary) / 0.2)"
 }: HighlighterProps) {
   return (
     <span className={`relative inline-block ${className}`}>
@@ -26,8 +28,8 @@ export function Highlighter({
             ease: "circOut", 
             delay: delay 
         }}
-        style={{ originX: 0 }}
-        className="absolute bottom-0 left-0 right-0 -z-10 h-[0.4em] translate-y-[0px] rotate-[-1deg] bg-primary/20"
+        style={{ originX: 0, backgroundColor: color }}
+        className="absolute bottom-0 left-0 right-0 -z-10 h-[0.4em] translate-y-[0px] rotate-[-1deg] rounded-sm"
       />
       <span className="relative z-10">{children}</span>
     </span>
