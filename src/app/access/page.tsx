@@ -54,22 +54,20 @@ function SuggestionForm() {
   }
 
   return (
-    <form action={formAction} className="mt-8 relative max-w-sm mx-auto">
-        <div className="relative">
-            <Input 
+    <form action={formAction} className="mt-8 relative w-full max-w-sm mx-auto">
+        <div className="relative w-full">
+            <input 
                 name="suggestion"
-                placeholder="I'm looking forward to seeing..." 
-                className="h-12 pr-12 bg-transparent border-x-0 border-t-0 border-b border-border rounded-none focus-visible:ring-0 px-4 placeholder:text-muted-foreground/50"
+                placeholder="I'm looking forward to..." 
+                className="h-12 w-full border-b border-border bg-transparent px-4 py-2 pr-12 text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none focus:ring-0"
                 required
             />
-            <Button 
+            <button 
                 type="submit" 
-                size="icon" 
-                variant="ghost" 
-                className="absolute right-0 top-1/2 -translate-y-1/2 h-10 w-10 hover:bg-transparent hover:text-primary"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 h-10 w-10 flex items-center justify-center text-muted-foreground hover:text-primary transition-colors hover:bg-transparent"
             >
                 <ArrowRight className="h-4 w-4" />
-            </Button>
+            </button>
         </div>
         {state.message && !state.success && (
             <p className="text-xs text-red-500 mt-2">{state.message}</p>
