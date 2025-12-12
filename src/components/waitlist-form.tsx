@@ -80,6 +80,9 @@ export function WaitlistForm({ className, onSuccess, ...props }: WaitlistFormPro
             )}
             </button>
         </div>
+        <p className="text-[10px] text-muted-foreground/60 text-center px-2">
+            Used only to signal when we launch. Encrypted & never shared.
+        </p>
       </div>
     </motion.form>
   );

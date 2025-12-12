@@ -228,9 +228,6 @@ export default function XPage() {
                             <br className="hidden sm:block" />
                             We make accessible to you the things you would feel <Highlighter active={isRevealed} delay={0.8} color="#ef4444">embarrassed, shy, stigmatized</Highlighter> or judged to walk into a store and get.
                         </p>
-                        <p className="text-xs text-muted-foreground/60 max-w-xs mx-auto">
-                            We only need your phone number to signal when we launch. It is encrypted and never shared.
-                        </p>
 
                         <SuggestionForm />
                     </motion.div>
@@ -252,11 +249,6 @@ export default function XPage() {
             </motion.div>
          )}
 
-      </div>
-      
-      {/* Footer Branding */}
-      <div className="absolute bottom-8 font-mono text-[10px] text-muted-foreground/50">
-        DISCREETKIT // X
       </div>
     </div>
   );
