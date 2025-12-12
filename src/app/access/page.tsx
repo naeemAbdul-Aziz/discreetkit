@@ -58,7 +58,7 @@ function SuggestionForm() {
         <div className="relative w-full">
             <input 
                 name="suggestion"
-                placeholder="I'm looking forward to..." 
+                placeholder="I'm looking forward to buying [Product]..." 
                 className="h-12 w-full border-b border-border bg-transparent px-4 py-2 pr-12 text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none focus:ring-0"
                 required
             />
