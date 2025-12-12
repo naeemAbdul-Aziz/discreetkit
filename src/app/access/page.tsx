@@ -82,7 +82,7 @@ import { NumberTicker } from "@/components/ui/number-ticker";
 
 // ... imports remain the same, remove CipherReveal if unused
 
-export default function XPage() {
+export default function AccessPage() {
   const [isHeld, setIsHeld] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
   const [rawCount, setRawCount] = useState(1247); // Number type for ticker
@@ -197,7 +197,7 @@ export default function XPage() {
                 ) : (
                     <>
                         <span>Press & Hold to Join</span>
-                        <span className="text-[10px] opacity-50 lowercase tracking-normal">(people in line)</span>
+                        <span className="text-[10px] opacity-50 lowercase tracking-normal">(people have joined)</span>
                     </>
                 )}
             </motion.p>
@@ -222,7 +222,9 @@ export default function XPage() {
                         className="mt-16 text-center space-y-6"
                     >
                         <div className="h-px w-12 bg-border mx-auto mb-6" />
-                        <h3 className="font-bold text-lg tracking-tight">What is DiscreetKit?</h3>
+                        <h3 className="font-bold text-lg tracking-tight">
+                            What is <span className="text-primary italic">DiscreetKit</span>?
+                        </h3>
                         <p className="text-sm text-muted-foreground leading-relaxed max-w-sm mx-auto">
                             The world's first fully <Highlighter active={isRevealed} delay={0.6}>anonymous platform</Highlighter>. 
                             <br className="hidden sm:block" />

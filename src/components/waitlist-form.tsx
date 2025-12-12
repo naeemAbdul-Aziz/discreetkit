@@ -1,7 +1,5 @@
-"use client";
-
 import * as React from "react";
-import { MoveRight } from "lucide-react";
+import { MoveRight, Lock } from "lucide-react";
 import { motion, HTMLMotionProps } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -12,11 +10,13 @@ interface WaitlistFormProps extends HTMLMotionProps<"form"> {
 import { getSupabaseClient } from "@/lib/supabase";
 
 export function WaitlistForm({ className, onSuccess, ...props }: WaitlistFormProps) {
+// ... existing state ...
   const [nickname, setNickname] = React.useState("");
   const [phone, setPhone] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
+// ... existing submit logic ...
     e.preventDefault();
     setIsLoading(true);
     
@@ -38,8 +38,6 @@ export function WaitlistForm({ className, onSuccess, ...props }: WaitlistFormPro
         setIsLoading(false);
     }
   };
-
-
 
   return (
     <motion.form
@@ -80,8 +78,9 @@ export function WaitlistForm({ className, onSuccess, ...props }: WaitlistFormPro
             )}
             </button>
         </div>
-        <p className="text-[10px] text-muted-foreground/60 text-center px-2">
-            Used only to signal when we launch. Encrypted & never shared.
+        <p className="flex items-center justify-center gap-1.5 text-[10px] text-muted-foreground/60 text-center px-2">
+            <Lock className="w-3 h-3" />
+            <span>Used only to signal when we launch. Encrypted & never shared.</span>
         </p>
       </div>
     </motion.form>

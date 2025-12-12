@@ -3,7 +3,7 @@ import { MetadataRoute } from 'next';
 import { getSupabaseAdminClient } from '@/lib/supabase';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = 'https://discreetkit.com';
+  const siteUrl = 'https://discreetkit.com'; // Main site URL
   const now = new Date();
 
   // 1. Get all dynamic product pages

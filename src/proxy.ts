@@ -13,7 +13,7 @@ export async function proxy(request: NextRequest) {
     // 2. Define protected domains/paths
     const isAdminSubdomain = hostname.startsWith('admin.');
     const isPharmacySubdomain = hostname.startsWith('pharmacy.');
-    const isXSubdomain = hostname === 'x.discreetkit.com' || hostname.startsWith('x.localhost');
+    const isAccessSubdomain = hostname === 'access.discreetkit.com' || hostname.startsWith('access.localhost');
     const isAdminPath = url.pathname.startsWith('/admin');
     const isPharmacyPath = url.pathname.startsWith('/pharmacy');
 
@@ -94,10 +94,10 @@ export async function proxy(request: NextRequest) {
         }
     }
 
-    // Rewrite x subdomain to /x path
-    if (isXSubdomain) {
+    // 6. Rewrite access subdomain to /access path
+    if (isAccessSubdomain) {
         if (url.pathname === '/') {
-            url.pathname = '/x';
+            url.pathname = '/access';
             return NextResponse.rewrite(url);
         }
     }
