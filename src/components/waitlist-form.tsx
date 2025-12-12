@@ -5,15 +5,16 @@ import { MoveRight } from "lucide-react";
 import { motion, HTMLMotionProps } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-interface WaitlistFormProps extends HTMLMotionProps<"form"> {}
+interface WaitlistFormProps extends HTMLMotionProps<"form"> {
+  onSuccess?: (name: string) => void;
+}
 
 import { getSupabaseClient } from "@/lib/supabase";
 
-export function WaitlistForm({ className, ...props }: WaitlistFormProps) {
+export function WaitlistForm({ className, onSuccess, ...props }: WaitlistFormProps) {
   const [nickname, setNickname] = React.useState("");
   const [phone, setPhone] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
-  const [isSubmitted, setIsSubmitted] = React.useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,28 +28,18 @@ export function WaitlistForm({ className, ...props }: WaitlistFormProps) {
 
         if (error) throw error;
 
-        setIsSubmitted(true);
+        if (onSuccess) {
+            onSuccess(nickname);
+        }
     } catch (error) {
         console.error('Error joining waitlist:', error);
-        // Fail silently or show error? For "hacker" vibe, maybe just a shake?
-        // helping the user is better.
         alert("Transmission failed. Please try again.");
     } finally {
         setIsLoading(false);
     }
   };
 
-  if (isSubmitted) {
-     return (
-        <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center font-mono text-sm text-green-500"
-        >
-            [ WELCOME {nickname.toUpperCase()} ]
-        </motion.div>
-     )
-  }
+
 
   return (
     <motion.form

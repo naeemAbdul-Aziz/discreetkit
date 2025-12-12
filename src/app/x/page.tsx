@@ -58,7 +58,7 @@ function SuggestionForm() {
         <div className="relative">
             <Input 
                 name="suggestion"
-                placeholder="What specific item are you looking for?" 
+                placeholder="I'm looking forward to seeing..." 
                 className="pr-12 bg-transparent border-x-0 border-t-0 border-b border-border rounded-none focus-visible:ring-0 px-0 text-center placeholder:text-muted-foreground/50 h-10"
                 required
             />
@@ -81,7 +81,8 @@ function SuggestionForm() {
 export default function XPage() {
   const [isHeld, setIsHeld] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
-  const [count, setCount] = useState("1,247"); // Fallback / Loading state
+  const [count, setCount] = useState("1,247"); 
+  const [welcomeName, setWelcomeName] = useState<string | null>(null);
   const touchStartTime = useRef<number>(0);
   
   useEffect(() => {
@@ -89,14 +90,13 @@ export default function XPage() {
         const supabase = getSupabaseClient();
         const { data, error } = await supabase.rpc('get_waitlist_count');
         if (!error && data !== null) {
-            // Format with commas
-            setCount(data.toLocaleString());
+            // Apply +700 offset for social proof
+            setCount((data + 700).toLocaleString());
         }
     };
     fetchCount();
   }, []);
   
-  // Haptic feedback function
   const vibrate = (pattern: number | number[]) => {
     if (typeof navigator !== "undefined" && navigator.vibrate) {
       navigator.vibrate(pattern);
@@ -104,23 +104,27 @@ export default function XPage() {
   };
 
   const startInteraction = () => {
-    if (isRevealed) return;
+    if (isRevealed || welcomeName) return;
     setIsHeld(true);
     touchStartTime.current = Date.now();
-    vibrate(10); // Light tap on start
+    vibrate(10); 
   };
 
   const endInteraction = () => {
-    if (isRevealed) return;
+    if (isRevealed || welcomeName) return;
     setIsHeld(false);
   };
 
-  // Callback when CipherReveal finishes the animation
   const handleRevealComplete = () => {
     if (!isRevealed) {
         setIsRevealed(true);
-        vibrate([50, 50, 50]); // Success vibration
+        vibrate([50, 50, 50]); 
     }
+  };
+
+  const handleJoinSuccess = (name: string) => {
+    setWelcomeName(name);
+    vibrate([50, 100, 50]);
   };
 
   return (
@@ -132,42 +136,56 @@ export default function XPage() {
       onTouchStart={startInteraction}
       onTouchEnd={endInteraction}
     >
-      {/* Background Matrix Effect (Optional/Subtle) */}
+      {/* Background Matrix Effect */}
       <div className="pointer-events-none absolute inset-0 opacity-[0.03]" 
            style={{ backgroundImage: 'radial-gradient(circle at center, currentColor 1px, transparent 1px)', backgroundSize: '24px 24px' }}
       ></div>
 
-      <div className="z-10 flex flex-col items-center gap-8 p-6 w-full max-w-lg transition-all duration-500">
+      <div className="z-10 flex flex-col items-center gap-10 p-6 w-full max-w-lg transition-all duration-500">
         
-        {/* Helper Icon (Only visible when not revealed) */}
-        {!isRevealed && (
+        {/* Helper Icon */}
+        {!isRevealed && !welcomeName && (
              <motion.div
                 animate={{ opacity: [0.3, 0.6, 0.3], scale: [0.95, 1.05, 0.95] }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                className="mb-[-20px] text-primary/40"
+                className="mb-[-28px] text-primary/40"
              >
                 <Fingerprint className="w-16 h-16" strokeWidth={1} />
              </motion.div>
         )}
 
-        {/* The Cipher Display */}
-        <div className="text-center">
-            <h1 className="text-6xl font-bold tracking-tighter md:text-8xl cursor-pointer">
-                <CipherReveal 
-                    text="0x8F..." 
-                    revealText={count}
-                    isRevealing={isHeld || isRevealed} 
-                    onRevealComplete={handleRevealComplete}
-                    className={isRevealed ? "text-primary transition-colors duration-500" : "text-foreground/80"}
-                />
-            </h1>
+        {/* Main Display: Cipher OR Welcome Message */}
+        <div className="text-center transition-all duration-700">
+            {welcomeName ? (
+                 <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="flex flex-col items-center gap-4"
+                 >
+                    <h1 className="text-4xl md:text-6xl font-bold tracking-tighter text-[#4ade80]">
+                        [ WELCOME {welcomeName.toUpperCase()} ]
+                    </h1>
+                 </motion.div>
+            ) : (
+                <h1 className="text-6xl font-bold tracking-tighter md:text-8xl cursor-pointer">
+                    <CipherReveal 
+                        text="0x8F..." 
+                        revealText={count}
+                        isRevealing={isHeld || isRevealed} 
+                        onRevealComplete={handleRevealComplete}
+                        className={isRevealed ? "text-primary transition-colors duration-500" : "text-foreground/80"}
+                    />
+                </h1>
+            )}
             
             <motion.p 
                 initial={{ opacity: 0.5 }}
-                animate={{ opacity: isHeld ? 1 : 0.6 }}
+                animate={{ opacity: (isHeld || welcomeName) ? 1 : 0.6 }}
                 className="mt-6 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground flex flex-col items-center gap-2"
             >
-                {isRevealed ? (
+                {welcomeName ? (
+                    <span className="text-[#4ade80] tracking-widest">TRANSMISSION SECURE</span>
+                ) : isRevealed ? (
                     <span className="text-primary">Early Access Granted</span>
                 ) : (
                     <>
@@ -178,32 +196,32 @@ export default function XPage() {
             </motion.p>
         </div>
 
-        {/* Form Container */}
+        {/* Content Container */}
         <AnimatePresence>
-            {isRevealed && (
+            {isRevealed && !welcomeName && (
                 <motion.div 
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
                     className="w-full"
                 >
-                    <WaitlistForm />
+                    <WaitlistForm onSuccess={handleJoinSuccess} />
                     
                     {/* Informative Content */}
                     <motion.div 
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.5 }}
-                        className="mt-12 text-center space-y-4"
+                        className="mt-16 text-center space-y-6"
                     >
                         <div className="h-px w-12 bg-border mx-auto mb-6" />
-                        <h3 className="font-bold text-lg">What is DiscreetKit?</h3>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
+                        <h3 className="font-bold text-lg tracking-tight">What is DiscreetKit?</h3>
+                        <p className="text-sm text-muted-foreground leading-relaxed max-w-sm mx-auto">
                             The world's first fully <Highlighter active={isRevealed} delay={0.6}>anonymous pharmacy</Highlighter>. 
                             <br className="hidden sm:block" />
                             We make accessible to you the things you would feel <Highlighter active={isRevealed} delay={0.8} color="#ef4444">embarrassed, shy, stigmatized</Highlighter> or judged to walk into a pharmacy and get.
                         </p>
-                        <p className="text-sm text-muted-foreground/80">
+                        <p className="text-xs text-muted-foreground/60 max-w-xs mx-auto">
                             We only need your phone number to signal when we launch. It is encrypted and never shared.
                         </p>
 
@@ -212,11 +230,25 @@ export default function XPage() {
                 </motion.div>
             )}
         </AnimatePresence>
+         
+         {/* Success Message After Join */}
+         {welcomeName && (
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center space-y-8 max-w-md mx-auto"
+            >
+                 <p className="text-sm text-muted-foreground">
+                    You have secured your spot. <br/> We will signal you when the protocol launches.
+                 </p>
+                 <SuggestionForm />
+            </motion.div>
+         )}
 
       </div>
       
       {/* Footer Branding */}
-      <div className="absolute bottom-8 font-mono text-[10px] text-muted-foreground">
+      <div className="absolute bottom-8 font-mono text-[10px] text-muted-foreground/50">
         DISCREETKIT // X
       </div>
     </div>
