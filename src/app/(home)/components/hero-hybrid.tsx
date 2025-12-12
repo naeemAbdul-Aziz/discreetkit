@@ -12,6 +12,13 @@ import { Highlighter } from '@/components/ui/highlighter';
 export function HeroHybrid() {
   const containerRef = useRef<HTMLDivElement>(null);
   
+  // Force scroll to top on mount to fix landing page issue
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, []);
+  
   const cards = data.map((card, index) => (
     <Card key={card.src} card={card} index={index} />
   ));
