@@ -608,3 +608,29 @@ export async function saveSuggestion(prevState: any, formData: FormData) {
     };
   }
 }
+
+/**
+ * Adds a user to the waitlist securely using admin privileges (bypasses RLS).
+ */
+export async function joinWaitlist(nickname: string, phone: string) {
+  try {
+    const supabase = getSupabaseAdminClient();
+    const { error } = await supabase.from('waitlist').insert({
+      nickname,
+      phone,
+    });
+
+    if (error) {
+      // Handle unique constraint violation for phone number if it exists
+      if (error.code === '23505') { // Postgres unique_violation code
+        return { success: false, message: "This number is already on the list." };
+      }
+      throw error;
+    }
+
+    return { success: true };
+  } catch (error: any) {
+    console.error('Waitlist Join Error:', error);
+    return { success: false, message: "Something went wrong. Please try again." };
+  }
+}

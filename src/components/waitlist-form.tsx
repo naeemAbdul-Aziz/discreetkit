@@ -7,7 +7,7 @@ interface WaitlistFormProps extends HTMLMotionProps<"form"> {
   onSuccess?: (name: string) => void;
 }
 
-import { getSupabaseClient } from "@/lib/supabase";
+import { joinWaitlist } from "@/lib/actions";
 
 export function WaitlistForm({ className, onSuccess, ...props }: WaitlistFormProps) {
 // ... existing state ...
@@ -16,24 +16,24 @@ export function WaitlistForm({ className, onSuccess, ...props }: WaitlistFormPro
   const [isLoading, setIsLoading] = React.useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-// ... existing submit logic ...
     e.preventDefault();
     setIsLoading(true);
     
     try {
-        const supabase = getSupabaseClient();
-        const { error } = await supabase
-            .from('waitlist')
-            .insert([{ nickname, phone }]);
+        const result = await joinWaitlist(nickname, phone);
 
-        if (error) throw error;
+        if (!result.success) {
+            alert(result.message);
+            setIsLoading(false);
+            return;
+        }
 
         if (onSuccess) {
             onSuccess(nickname);
         }
     } catch (error) {
         console.error('Error joining waitlist:', error);
-        alert("Transmission failed. Please try again.");
+        alert("Something went wrong. Please try again.");
     } finally {
         setIsLoading(false);
     }
