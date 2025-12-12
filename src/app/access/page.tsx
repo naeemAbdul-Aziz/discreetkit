@@ -45,7 +45,7 @@ function SuggestionForm() {
         <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center justify-center gap-2 text-primary text-sm font-medium mt-6"
+            className="flex items-center justify-center gap-2 text-primary/80 text-sm font-medium mt-6"
         >
             <CheckIcon className="h-4 w-4" />
             <span>Noted. We'll look into it.</span>
@@ -54,19 +54,19 @@ function SuggestionForm() {
   }
 
   return (
-    <form action={formAction} className="mt-8 relative max-w-sm mx-auto">
-        <div className="relative">
+    <form action={formAction} className="mt-8 relative max-w-xs mx-auto w-full">
+        <div className="relative group">
             <Input 
                 name="suggestion"
-                placeholder="I'm looking forward to seeing..." 
-                className="pr-12 bg-transparent border-x-0 border-t-0 border-b border-border rounded-none focus-visible:ring-0 px-0 text-center placeholder:text-muted-foreground/50 h-10"
+                placeholder="I want to see..." 
+                className="pr-10 bg-transparent border-x-0 border-t-0 border-b border-border/50 rounded-none focus-visible:ring-0 px-0 text-center placeholder:text-muted-foreground/40 h-12 text-base transition-colors group-focus-within:border-primary/50"
                 required
             />
             <Button 
                 type="submit" 
                 size="icon" 
                 variant="ghost" 
-                className="absolute right-0 top-0 h-10 w-10 hover:bg-transparent hover:text-primary"
+                className="absolute right-0 top-1 h-10 w-10 hover:bg-transparent hover:text-primary opacity-50 hover:opacity-100 transition-opacity"
             >
                 <ArrowRight className="h-4 w-4" />
             </Button>
@@ -151,7 +151,7 @@ export default function AccessPage() {
            style={{ backgroundImage: 'radial-gradient(circle at center, currentColor 1px, transparent 1px)', backgroundSize: '24px 24px' }}
       ></div>
 
-      <div className="z-10 flex flex-col items-center gap-10 p-6 w-full max-w-lg transition-all duration-500">
+      <div className="z-10 flex flex-col items-center gap-12 sm:gap-16 p-6 w-full max-w-lg transition-all duration-500">
         
         {/* Helper Icon */}
         {!isRevealed && !welcomeName && (
@@ -168,18 +168,18 @@ export default function AccessPage() {
         <div className="text-center transition-all duration-700">
             {welcomeName ? (
                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
+                    initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="flex flex-col items-center gap-4"
+                    className="flex flex-col items-center gap-6"
                  >
-                    <h1 className="text-4xl md:text-6xl font-bold tracking-tighter text-[#4ade80]">
+                    <h1 className="text-3xl md:text-5xl font-bold tracking-tighter text-[#4ade80]">
                         [ WELCOME {welcomeName.toUpperCase()} ]
                     </h1>
                  </motion.div>
             ) : (
                 <div className="cursor-pointer">
                      {/* The Ticker is always visible now, no decryption needed */}
-                    <h1 className="text-6xl font-bold tracking-tighter md:text-8xl">
+                    <h1 className="text-7xl font-bold tracking-tighter md:text-9xl">
                         <NumberTicker value={rawCount} className="text-foreground" />
                     </h1>
                 </div>
@@ -188,16 +188,16 @@ export default function AccessPage() {
             <motion.p 
                 initial={{ opacity: 0.5 }}
                 animate={{ opacity: (isHeld || welcomeName) ? 1 : 0.6 }}
-                className="mt-6 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground flex flex-col items-center gap-2"
+                className="mt-8 font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground flex flex-col items-center gap-2"
             >
                 {welcomeName ? (
                     <span className="text-[#4ade80] tracking-widest">SPOT SECURED</span>
                 ) : isRevealed ? (
-                    <span className="text-primary">You're In</span>
+                    <span className="text-primary font-medium">YOU'RE IN</span>
                 ) : (
                     <>
                         <span>Press & Hold to Join</span>
-                        <span className="text-[10px] opacity-50 lowercase tracking-normal">(people have joined)</span>
+                        <span className="opacity-50 tracking-normal normal-case font-sans text-[10px]">(people have joined)</span>
                     </>
                 )}
             </motion.p>
@@ -219,15 +219,17 @@ export default function AccessPage() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.5 }}
-                        className="mt-16 text-center space-y-6"
+                        className="mt-20 text-center space-y-4"
                     >
-                        <div className="h-px w-12 bg-border mx-auto mb-6" />
-                        <h3 className="font-bold text-lg tracking-tight">
-                            What is <span className="text-primary italic pr-1">DiscreetKit</span>?
+                        <div className="h-px w-8 bg-border/50 mx-auto mb-8" />
+                        
+                        <h3 className="text-[10px] font-semibold tracking-[0.2em] text-muted-foreground uppercase">
+                            What is DiscreetKit?
                         </h3>
-                        <p className="text-sm text-muted-foreground leading-relaxed max-w-sm mx-auto">
+                        
+                        <p className="text-base md:text-lg text-foreground/90 leading-relaxed max-w-sm mx-auto font-light">
                             A fully <Highlighter active={isRevealed} delay={0.6}>anonymous way to shop</Highlighter>. 
-                            <br className="hidden sm:block" />
+                            <br className="block" />
                             Get the things you feel <Highlighter active={isRevealed} delay={0.8} color="#ef4444">awkward, shy, or judged</Highlighter> buying in a store.
                         </p>
 
