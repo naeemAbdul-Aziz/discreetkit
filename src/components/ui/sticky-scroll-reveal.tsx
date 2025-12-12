@@ -97,13 +97,14 @@ export const StickyScroll = ({
           ))}
         </div>
       </div>
+
       <div
         className={cn(
-          "hidden lg:flex sticky top-0 h-screen w-full flex-col items-center justify-center",
+          "hidden md:flex sticky top-0 h-screen w-full flex-col items-center justify-center",
           contentClassName
         )}
       >
-        <div className={cn("h-96 w-[36rem] overflow-hidden rounded-xl border border-border bg-background")}> {/* Larger image */}
+        <div className={cn("h-80 w-full md:w-96 lg:w-[36rem] overflow-hidden rounded-xl border border-border bg-background")}> {/* Responsive width */}
            {content[activeCard].content ?? null}
         </div>
       </div>
