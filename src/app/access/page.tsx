@@ -191,9 +191,9 @@ export default function AccessPage() {
                 className="mt-6 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground flex flex-col items-center gap-2"
             >
                 {welcomeName ? (
-                    <span className="text-[#4ade80] tracking-widest">TRANSMISSION SECURE</span>
+                    <span className="text-[#4ade80] tracking-widest">SPOT SECURED</span>
                 ) : isRevealed ? (
-                    <span className="text-primary">Access Granted</span>
+                    <span className="text-primary">You're In</span>
                 ) : (
                     <>
                         <span>Press & Hold to Join</span>
@@ -223,12 +223,12 @@ export default function AccessPage() {
                     >
                         <div className="h-px w-12 bg-border mx-auto mb-6" />
                         <h3 className="font-bold text-lg tracking-tight">
-                            What is <span className="text-primary italic">DiscreetKit</span>?
+                            What is <span className="text-primary italic pr-1">DiscreetKit</span>?
                         </h3>
                         <p className="text-sm text-muted-foreground leading-relaxed max-w-sm mx-auto">
-                            The world's first fully <Highlighter active={isRevealed} delay={0.6}>anonymous platform</Highlighter>. 
+                            A fully <Highlighter active={isRevealed} delay={0.6}>anonymous way to shop</Highlighter>. 
                             <br className="hidden sm:block" />
-                            We make accessible to you the things you would feel <Highlighter active={isRevealed} delay={0.8} color="#ef4444">embarrassed, shy, stigmatized</Highlighter> or judged to walk into a store and get.
+                            Get the things you feel <Highlighter active={isRevealed} delay={0.8} color="#ef4444">awkward, shy, or judged</Highlighter> buying in a store.
                         </p>
 
                         <SuggestionForm />
@@ -245,7 +245,7 @@ export default function AccessPage() {
                 className="text-center space-y-8 max-w-md mx-auto"
             >
                  <p className="text-sm text-muted-foreground">
-                    You have secured your spot. <br/> We will signal you when the protocol launches.
+                    You're on the list. <br/> We'll text you when we launch.
                  </p>
                  <SuggestionForm />
             </motion.div>

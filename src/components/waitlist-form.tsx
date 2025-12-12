@@ -80,7 +80,7 @@ export function WaitlistForm({ className, onSuccess, ...props }: WaitlistFormPro
         </div>
         <p className="flex items-center justify-center gap-1.5 text-[10px] text-muted-foreground/60 text-center px-2">
             <Lock className="w-3 h-3" />
-            <span>Used only to signal when we launch. Encrypted & never shared.</span>
+            <span>We'll only text you when we launch. Your number is private.</span>
         </p>
       </div>
     </motion.form>

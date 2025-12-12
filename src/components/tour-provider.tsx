@@ -21,9 +21,9 @@ export function TourProvider({ children }: TourProviderProps) {
   useEffect(() => {
     // Only show on home page for first-time users, and NOT on subdomains
     const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
-    const isSubdomain = hostname.startsWith('admin.') || hostname.startsWith('pharmacy.');
+    const isSubdomain = hostname.startsWith('admin.') || hostname.startsWith('pharmacy.') || hostname.startsWith('access.');
 
-    if ((pathname === '/x' || isSubdomain) && typeof window !== 'undefined') {
+    if ((pathname === '/x' || pathname === '/access' || isSubdomain) && typeof window !== 'undefined') {
       return; 
     }
 
