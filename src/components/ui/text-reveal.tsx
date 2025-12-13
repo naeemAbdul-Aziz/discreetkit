@@ -15,16 +15,16 @@ export const TextReveal = ({ text, className, children }: TextRevealProps) => {
 
   const { scrollYProgress } = useScroll({
     target: targetRef,
-    offset: ["start end", "end start"],
+    offset: ["start 0.9", "start 0.25"],
   });
 
   const words = text ? text.split(" ") : [];
 
   return (
-    <div ref={targetRef} className={cn("relative z-0 h-[100vh]", className)}>
+    <div ref={targetRef} className={cn("relative z-0 h-[50vh]", className)}>
       <div
         className={
-          "sticky top-0 mx-auto flex h-[50%] max-w-4xl items-center bg-transparent px-[1rem] py-[5rem]"
+          "sticky top-0 mx-auto flex max-w-4xl items-center bg-transparent px-[1rem] py-[5rem]"
         }
       >
         <p

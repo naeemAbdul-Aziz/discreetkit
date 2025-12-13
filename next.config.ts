@@ -16,6 +16,11 @@ const nextConfig: NextConfig = {
     'dotprompt',
     'react-joyride'
   ],
+  experimental: {
+    serverActions: {
+      allowedOrigins: ["localhost:3000", "172.21.160.1:3000", "172.21.160.1:3001"]
+    }
+  },
   // Turbopack configuration (Next.js 15+)
   turbopack: {
     resolveAlias: {

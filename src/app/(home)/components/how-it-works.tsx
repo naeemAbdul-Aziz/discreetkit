@@ -1,20 +1,14 @@
-/**
- * @file how-it-works.tsx
- * @description a visual step-by-step guide explaining the service process.
- *              Mobile: vertical timeline.
- *              Desktop: horizontal stepper with 4 columns and connecting line.
- */
-
 'use client';
 
+import React from 'react';
 import { steps } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
-import { StickyScroll } from "@/components/ui/sticky-scroll-reveal";
+import { motion, AnimatePresence } from 'framer-motion';
+
 
 const toBase64 = (str: string) =>
   typeof window === 'undefined'
@@ -36,48 +30,19 @@ const shimmer = (w: number, h: number) => `
 </svg>`;
 
 export function HowItWorks() {
-  const stickyScrollContent = steps.map((step) => ({
-    title: step.title,
-    description: step.description,
-    step: step.number,
-    details: step.details,
-    content: (
-      <div className="h-full w-full flex items-center justify-center relative bg-muted/20">
-        <Image
-          src={step.imageUrl}
-          alt={step.title}
-          fill
-          className="h-full w-full object-cover"
-          placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
-        />
-      </div>
-    ),
-    cta: step.number === 4 ? (
-      <Button asChild size="lg" className="w-full sm:w-auto">
-        <Link href="/partner-care">
-          Meet Our Support Partner
-          <ArrowRight className="ml-2 h-4 w-4" />
-        </Link>
-      </Button>
-    ) : undefined,
-  }));
-
   return (
-    <section id="how-it-works" className="py-12 md:pt-24 md:pb-8 bg-background relative">
+    <section id="how-it-works" className="py-8 md:pt-10 md:pb-20 bg-background relative overflow-hidden">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="text-center mb-16 md:mb-24">
+        <div className="text-center mb-10 md:mb-16 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.5 }}
           >
-            <h2 className="mt-2 font-headline text-2xl font-bold text-foreground md:text-4xl">
+            <h2 className="mt-2 font-headline text-3xl font-bold text-foreground md:text-5xl tracking-tight">
               A Responsible Path to Your Health Answers
             </h2>
-            <p className="mt-4 max-w-2xl mx-auto text-muted-foreground md:text-lg">
-              Get your results in 4 simple, private, and secure steps.
-            </p>
           </motion.div>
         </div>
 
@@ -96,11 +61,9 @@ export function HowItWorks() {
                   viewport={{ once: true, margin: "-50px" }}
                   transition={{ duration: 0.5, delay: i * 0.1 }}
                 >
-                  {/* The step number circle */}
                   <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-primary bg-background font-bold text-primary z-10 flex-shrink-0 shadow-sm">
                     0{step.number}
                   </div>
-                  {/* The content */}
                   <div className="flex-1 pt-1 space-y-4">
                     <h3 className="text-xl font-bold text-foreground">{step.title}</h3>
                     <div className="relative aspect-[4/3] w-full max-w-sm rounded-2xl overflow-hidden shadow-md border border-border/50">
@@ -143,9 +106,71 @@ export function HowItWorks() {
           </div>
         </div>
 
-        {/* Desktop Layout: Sticky Scroll */}
-        <div className="hidden md:block w-full">
-           <StickyScroll content={stickyScrollContent} />
+        {/* Desktop Layout: Cinematic Checkerboard Grid */}
+        <div className="hidden md:grid grid-cols-12 gap-6 relative z-10 w-full max-w-7xl mx-auto">
+           {steps.map((step, i) => {
+              // Checkerboard Logic: 
+              // Row 1: Item 0 (7 cols), Item 1 (5 cols)
+              // Row 2: Item 2 (5 cols), Item 3 (7 cols)
+              const isWide = i === 0 || i === 3;
+              const colSpan = isWide ? "md:col-span-7" : "md:col-span-5";
+              
+              return (
+                <motion.div
+                    key={step.number}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-100px" }}
+                    transition={{ duration: 0.5, delay: i * 0.1 }}
+                    className={cn(
+                        "group relative h-[450px] w-full overflow-hidden rounded-3xl border border-white/5",
+                        colSpan
+                    )}
+                >
+                    {/* Background Image - Dimmed by default */}
+                    <div className="absolute inset-0 bg-black/20 z-10 transition-colors duration-500 group-hover:bg-transparent" />
+                    <Image
+                        src={step.imageUrl}
+                        alt={step.title}
+                        fill
+                        className="object-cover transition-all duration-700 scale-100 group-hover:scale-110 opacity-70 group-hover:opacity-100 grayscale-[20%] group-hover:grayscale-0"
+                        placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(600, 400))}`}
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                    />
+                    
+                    {/* Gradient Overlay for Text Readability */}
+                    <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/90 via-black/50 to-transparent z-20" />
+
+                    {/* Content */}
+                    <div className="absolute inset-0 z-30 flex flex-col justify-end p-8 md:p-10">
+                        <div className="transform transition-transform duration-500">
+                             <div className="flex items-center gap-4 mb-3">
+                                <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-white/10 text-white font-bold backdrop-blur-md">
+                                    0{step.number}
+                                </span>
+                                <h3 className="text-2xl md:text-3xl font-bold text-white tracking-tight drop-shadow-md">
+                                    {step.title}
+                                </h3>
+                             </div>
+                             
+                             <p className="text-white/80 max-w-md text-lg leading-relaxed mb-4">
+                                {step.description}
+                             </p>
+
+                             {step.number === 4 && (
+                                <div className="mt-2">
+                                    <Button asChild className="rounded-full bg-white text-black hover:bg-white/90">
+                                        <Link href="/partner-care">
+                                            Meet Our Partner <ArrowRight className="ml-2 h-4 w-4" />
+                                        </Link>
+                                    </Button>
+                                </div>
+                             )}
+                        </div>
+                    </div>
+                </motion.div>
+              );
+           })}
         </div>
 
       </div>
