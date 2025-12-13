@@ -43,7 +43,7 @@ export const StickyScroll = ({
 
   return (
     <motion.div
-      className="flex justify-center relative space-x-10 rounded-md"
+      className="flex justify-center items-start relative space-x-10 rounded-md"
       ref={ref}
     >
       <div className="div relative flex items-start px-4">
