@@ -178,7 +178,7 @@ export const steps: Step[] = [
     number: 2,
     title: 'Pharmacy Fulfillment',
     icon: Truck,
-    description: 'Your order is digitally routed to a verified partner pharmacy. They pack it immediately, ensuring professional handling without you ever stepping inside.',
+    description: 'Your order is digitally routed to your nearest verified partner pharmacy for speed. They pack it immediately, ensuring professional handling without you ever stepping inside.',
     details: ['Routed to licensed pharmacy', 'Professionally packed', 'Zero judgment'],
     imageUrl: 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759404957/discreetkit_pregnancy_cujiod.png',
     imageHint: 'pregnancy test kit product',
