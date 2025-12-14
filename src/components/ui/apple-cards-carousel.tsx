@@ -44,18 +44,22 @@ export const CarouselContext = createContext<{
 });
 
 export const Carousel = ({ items, initialScroll = 0, marquee = false, speed, autoplay = false, autoplayInterval = 3000 }: CarouselProps & { autoplay?: boolean; autoplayInterval?: number }) => {
+  // Determine if we should use the CSS marquee
+  const isMarquee = marquee || autoplay;
+
   const [emblaRef, emblaApi] = useEmblaCarousel(
     { 
       loop: true, 
       dragFree: true,
       align: "start",
       skipSnaps: false,
+      active: !isMarquee, // Disable Embla if marquee mode
     },
     [
-      (marquee || autoplay)
+      (!isMarquee && (marquee || autoplay)) // This logic is redundant if active=false, but good for safety
           ? AutoScroll({
               playOnInit: true,
-              speed: speed ? speed / 100 : 1, // Increased default speed for visibility
+              speed: speed ? speed / 100 : 1, 
               stopOnInteraction: false,
               stopOnMouseEnter: true,
               stopOnFocusIn: false, 
@@ -113,29 +117,83 @@ export const Carousel = ({ items, initialScroll = 0, marquee = false, speed, aut
   // `stopOnInteraction: false` means it resumes. 
   // We might want to PAUSE it explicitly when modal is open.
   
+  // For CSS Marquee:
+  // We need to ensure the animation pauses when a modal is open or (optional) on hover.
+  // The context provides `setPaused` which `Card` calls on open/close.
   const [isPaused, setIsPaused] = useState(false);
-  
-  useEffect(() => {
-      if(!emblaApi) return;
-      const autoScrollPlugin = emblaApi.plugins().autoScroll;
-      if (!autoScrollPlugin) return;
+  const [isHovered, setIsHovered] = useState(false);
 
-      if (isPaused) {
-          autoScrollPlugin.stop();
-      } else {
-         if (autoplay || marquee) autoScrollPlugin.play();
-      }
-  }, [isPaused, emblaApi, autoplay, marquee]);
-
+  // Calculate duration based on number of items and speed.
+  // Default speed ~ 1 corresponds to some px/s. ADJUST as needed. 
+  // speed=1 in Embla was fast. Here let's default to say 40s for full scroll?
+  // Or calculate based on item count? 
+  // Let's use a static duration or prop.
+  // Assuming about 5-10s per view? 
+  // Let's use fairly slow default: 40s.
+  // Ideally we'd measure width but fixed duration is often smoother.
+  const duration = items.length * 3; // e.g. 15 items * 3s = 45s loop. 
 
   return (
     <CarouselContext.Provider
       value={{ onCardClose: handleCardClose, currentIndex, setPaused: setIsPaused }}
     >
       <div className="relative w-full overflow-hidden" ref={emblaRef}>
+        {isMarquee ? (
+            <div 
+                className="flex select-none overflow-hidden"
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+            >
+             <div 
+                className={cn(
+                    "flex flex-nowrap gap-4 py-10 md:py-20",
+                    "animate-marquee" 
+                )}
+                style={{
+                    animationDuration: `${duration}s`,
+                    animationPlayState: (isPaused || isHovered) ? "paused" : "running"
+                }}
+             >
+                {/* First Set */}
+                {items.map((item, index) => (
+                    <div key={`slide-${index}`} className="flex-none pl-4">
+                         {item}
+                    </div>
+                ))}
+                 {/* Duplicate Set for Loop */}
+                {items.map((item, index) => (
+                    <div key={`slide-duplicate-${index}`} className="flex-none pl-4">
+                         {item}
+                    </div>
+                ))}
+             </div>
+             {/* We need the animation to translate -50% of THIS container? 
+                 Actually standard technique: 
+                 Wrapper (overflow hidden)
+                   Inner (flex) -> moves
+                 Inside Inner: [Set 1][Set 2]
+                 Move Inner from 0 to -50%.
+                 
+                 Wait, if Inner contains [Set 1][Set 2], width is 200%.
+                 Translate -50% means moving one full Set width.
+                 Yes.
+              */}
+              <style jsx>{`
+                @keyframes marquee {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(-50%); }
+                }
+                .animate-marquee {
+                    animation: marquee linear infinite;
+                    min-width: 100%; /* Ensure it takes width */
+                    width: max-content; /* Allow it to grow */
+                }
+              `}</style>
+            </div>
+        ) : (
         <div className={cn(
             "flex touch-pan-y",
-            marquee ? "" : "gap-4 pl-4 md:pl-6 max-w-7xl mx-auto py-10 md:py-20" // Re-add styling for standard mode
+            "gap-4 pl-4 md:pl-6 max-w-7xl mx-auto py-10 md:py-20"
         )}>
           {items.map((item, index) => (
             <motion.div
@@ -154,18 +212,16 @@ export const Carousel = ({ items, initialScroll = 0, marquee = false, speed, aut
                 },
               }}
               key={"card" + index}
-              className={cn(
-                  "flex-[0_0_auto]",
-                  marquee ? "pl-4" : "rounded-3xl"
-              )}
+              className="rounded-3xl flex-[0_0_auto]"
             >
               {item}
             </motion.div>
           ))}
         </div>
+        )}
       </div>
           
-      {!marquee && (
+      {!isMarquee && (
         <div className="flex justify-end gap-2 mr-10 -mt-8 mb-4 relative z-40">
             <button
             title="Scroll left"

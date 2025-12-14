@@ -24,7 +24,8 @@ export function HeroHybrid() {
   ));
   
   // Use original cards for standard carousel behavior
-  const carouselItems = cards;
+  // Duplicate items to ensure smooth infinite scroll without gaps/resets
+  const carouselItems = [...cards, ...cards, ...cards];
 
   return (
     <section ref={containerRef} className="relative w-full flex flex-col overflow-hidden bg-background pt-20 md:pt-32 pb-12 md:pb-20">
