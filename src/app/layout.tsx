@@ -98,6 +98,7 @@ export default function RootLayout({
       {/* DNS prefetch for faster lookups */}
       <link rel="dns-prefetch" href="https://res.cloudinary.com" />
       <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+      <link rel="preload" as="image" href="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png" />
       
       {/* Structured Data for Premium Google Search Results */}
       <StructuredData data={organizationSchema} />

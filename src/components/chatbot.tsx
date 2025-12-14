@@ -79,8 +79,8 @@ setInput('');
           <SheetHeader className="sticky top-0 z-50 bg-background border-b p-4">
             <SheetTitle className="flex items-center gap-2">
                 <Avatar className="h-8 w-8 border border-border">
-                    <AvatarImage src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png" alt="Pacely" />
-                     <AvatarFallback><Bot size={20} /></AvatarFallback>
+                     <AvatarImage src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png" alt="Pacely" />
+                     <AvatarFallback className="bg-transparent"></AvatarFallback>
                 </Avatar>
                 Pacely
             </SheetTitle>
@@ -100,7 +100,7 @@ setInput('');
                     {msg.role === 'model' && (
                         <Avatar className="h-8 w-8 border border-border">
                             <AvatarImage src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png" alt="Pacely" />
-                            <AvatarFallback><Bot size={20} /></AvatarFallback>
+                            <AvatarFallback className="bg-transparent"></AvatarFallback>
                         </Avatar>
                     )}
                     <div className={cn("max-w-[80%] rounded-lg p-3 text-sm", msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted')}>
@@ -118,7 +118,7 @@ setInput('');
                     <div className="flex items-start gap-3 justify-start">
                         <Avatar className="h-8 w-8 border border-border">
                             <AvatarImage src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png" alt="Pacely" />
-                            <AvatarFallback><Bot size={20} /></AvatarFallback>
+                            <AvatarFallback className="bg-transparent"></AvatarFallback>
                         </Avatar>
                         <div className="max-w-[80%] rounded-lg p-3 text-sm bg-muted flex items-center">
                             <BrandSpinner size="sm" /> Thinking...
