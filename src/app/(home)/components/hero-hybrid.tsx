@@ -67,7 +67,7 @@ export function HeroHybrid() {
         transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
         className="w-full"
       >
-        <Carousel items={carouselItems} autoplay={true} autoplayInterval={4000} />
+        <Carousel items={carouselItems} autoplay={true} />
       </motion.div>
     </section>
   );
@@ -79,7 +79,7 @@ const data = [
     title: "Intimacy Essentials.",
     src: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1764078634/the_weekend_szdgv5.jpg",
     content: (
-      <div className="bg-[#F5F5F7] dark:bg-neutral-800 p-8 md:p-14 rounded-3xl mb-4">
+      <>
         <p className="text-neutral-600 dark:text-neutral-400 text-base md:text-2xl font-sans max-w-3xl mx-auto">
           <span className="font-bold text-neutral-700 dark:text-neutral-200">
             Enhance your connection.
@@ -95,7 +95,7 @@ const data = [
             className="object-cover rounded-xl"
           />
         </div>
-      </div>
+      </>
     ),
   },
   {
@@ -103,7 +103,7 @@ const data = [
     title: "Personal Care.",
     src: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1764757548/personal_care_jfoz28.jpg",
     content: (
-      <div className="bg-[#F5F5F7] dark:bg-neutral-800 p-8 md:p-14 rounded-3xl mb-4">
+      <>
         <p className="text-neutral-600 dark:text-neutral-400 text-base md:text-2xl font-sans max-w-3xl mx-auto">
           <span className="font-bold text-neutral-700 dark:text-neutral-200">
             Everyday confidence.
@@ -120,7 +120,7 @@ const data = [
             className="object-cover rounded-xl"
           />
         </div>
-      </div>
+      </>
     ),
   },
   {
@@ -128,7 +128,7 @@ const data = [
     title: "Preparedness Kits.",
     src: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1764078617/prepared_for_anything_l6arrq.jpg",
     content: (
-      <div className="bg-[#F5F5F7] dark:bg-neutral-800 p-8 md:p-14 rounded-3xl mb-4">
+      <>
         <p className="text-neutral-600 dark:text-neutral-400 text-base md:text-2xl font-sans max-w-3xl mx-auto">
           <span className="font-bold text-neutral-700 dark:text-neutral-200">
             Ready for anything.
@@ -145,7 +145,7 @@ const data = [
             className="object-cover rounded-xl"
           />
         </div>
-      </div>
+      </>
     ),
   },
   {
@@ -153,7 +153,7 @@ const data = [
     title: "Real Doctors. Zero Judgement.",
     src: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757955894/pyschologist_old_lady_cdm0ej.jpg",
     content: (
-      <div className="bg-[#F5F5F7] dark:bg-neutral-800 p-8 md:p-14 rounded-3xl mb-4">
+      <>
         <p className="text-neutral-600 dark:text-neutral-400 text-base md:text-2xl font-sans max-w-3xl mx-auto">
           <span className="font-bold text-neutral-700 dark:text-neutral-200">
             Professional advice, privately.
@@ -169,7 +169,7 @@ const data = [
             className="object-cover rounded-xl"
           />
         </div>
-      </div>
+      </>
     ),
   },
   {
@@ -177,7 +177,7 @@ const data = [
     title: "Period Care.",
     src: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1764756036/self_care_green_purple_fy6cyv.png",
     content: (
-      <div className="bg-[#F5F5F7] dark:bg-neutral-800 p-8 md:p-14 rounded-3xl mb-4">
+      <>
         <p className="text-neutral-600 dark:text-neutral-400 text-base md:text-2xl font-sans max-w-3xl mx-auto">
           <span className="font-bold text-neutral-700 dark:text-neutral-200">
             Comfort when you need it.
@@ -193,7 +193,7 @@ const data = [
             className="object-cover rounded-xl"
           />
         </div>
-      </div>
+      </>
     ),
   },
 ];

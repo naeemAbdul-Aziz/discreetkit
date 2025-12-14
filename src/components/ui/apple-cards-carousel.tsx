@@ -18,7 +18,6 @@ import Image, { ImageProps } from "next/image";
 import { useOutsideClick } from "@/hooks/use-outside-click";
 import useEmblaCarousel from "embla-carousel-react";
 import AutoScroll from "embla-carousel-auto-scroll";
-import Autoplay from "embla-carousel-autoplay";
 
 interface CarouselProps {
   items: JSX.Element[];
@@ -48,25 +47,21 @@ export const Carousel = ({ items, initialScroll = 0, marquee = false, speed, aut
   const [emblaRef, emblaApi] = useEmblaCarousel(
     { 
       loop: true, 
-      dragFree: !marquee, // Use dragFree for standard carousel, strict loop for marquee
+      dragFree: true,
       align: "start",
-      containScroll: "trimSnaps",
+      skipSnaps: false,
     },
     [
-      marquee 
-        ? AutoScroll({
-            playOnInit: true,
-            speed: speed ? speed / 100 : 1,
-            stopOnInteraction: false,
-            stopOnMouseEnter: true,
-          })
-        : Autoplay({
-            delay: autoplayInterval,
-            stopOnInteraction: false, // Continue autoplay after interaction
-            stopOnMouseEnter: true, // Pause on hover
-            playOnInit: autoplay,
-          })
-    ]
+      (marquee || autoplay)
+          ? AutoScroll({
+              playOnInit: true,
+              speed: speed ? speed / 100 : 1, // Increased default speed for visibility
+              stopOnInteraction: false,
+              stopOnMouseEnter: true,
+              stopOnFocusIn: false, 
+            })
+          : null
+    ].filter(Boolean) as any
   );
 
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -122,15 +117,15 @@ export const Carousel = ({ items, initialScroll = 0, marquee = false, speed, aut
   
   useEffect(() => {
       if(!emblaApi) return;
-      const autoplayPlugin = emblaApi.plugins().autoplay;
-      if (!autoplayPlugin) return;
+      const autoScrollPlugin = emblaApi.plugins().autoScroll;
+      if (!autoScrollPlugin) return;
 
       if (isPaused) {
-          autoplayPlugin.stop();
+          autoScrollPlugin.stop();
       } else {
-         if (autoplay) autoplayPlugin.play();
+         if (autoplay || marquee) autoScrollPlugin.play();
       }
-  }, [isPaused, emblaApi, autoplay]);
+  }, [isPaused, emblaApi, autoplay, marquee]);
 
 
   return (
@@ -247,7 +242,7 @@ export const Card = ({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={handleClose}
-              className="bg-black/80 backdrop-blur-lg h-full w-full fixed inset-0"
+              className="bg-black/50 h-full w-full fixed inset-0"
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
