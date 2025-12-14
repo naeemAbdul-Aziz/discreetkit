@@ -9,7 +9,7 @@
 import { useState, useEffect, useCallback, useActionState, useRef } from 'react';
 import type { EmblaCarouselType } from 'embla-carousel';
 import Link from 'next/link';
-import Image from 'next/image';
+// import Image from 'next/image'; // Removing Image import
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Check, Lightbulb, Send } from 'lucide-react';
@@ -17,6 +17,7 @@ import { BrandSpinner } from '@/components/brand-spinner';
 import { motion } from 'framer-motion';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import { cn } from '@/lib/utils';
+import { CategoryShape } from './category-shapes';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { saveSuggestion } from '@/lib/actions';
@@ -142,16 +143,8 @@ export function ProductSelector() {
                                     <div className="p-1 h-full">
                                         <Link href={category.href} className="h-full block group">
                                             <Card className="h-full flex flex-col rounded-3xl bg-card overflow-hidden">
-                                                <div className="relative aspect-square w-full bg-muted/50 rounded-3xl overflow-hidden">
-                                                    <Image
-                                                        src={category.image_url}
-                                                        alt={category.name}
-                                                        fill
-                                                        className="object-contain p-4 rounded-3xl"
-                                                        sizes="(max-width: 768px) 80vw, 50vw"
-                                                        data-ai-hint={category.image_hint}
-                                                        placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
-                                                    />
+                                                <div className="relative aspect-square w-full bg-muted/50 rounded-3xl overflow-hidden p-0">
+                                                    <CategoryShape category={category.name} />
                                                 </div>
                                                 <div className="p-6 flex flex-col flex-grow">
                                                     <h3 className="text-xl font-bold text-foreground">{category.name}</h3>
@@ -203,16 +196,8 @@ export function ProductSelector() {
                         >
                             <Link href={category.href} className="h-full block group">
                                 <Card className="h-full flex flex-col rounded-3xl bg-card overflow-hidden">
-                                     <div className="relative aspect-square w-full bg-muted/50 rounded-3xl overflow-hidden">
-                                        <Image
-                                            src={category.image_url}
-                                            alt={category.name}
-                                            fill
-                                            className="object-contain p-4 rounded-3xl"
-                                            sizes="25vw"
-                                            data-ai-hint={category.image_hint}
-                                            placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(400, 300))}`}
-                                        />
+                                     <div className="relative aspect-square w-full bg-muted/50 rounded-3xl overflow-hidden p-0">
+                                         <CategoryShape category={category.name} />
                                     </div>
                                     <div className="p-6 flex flex-col flex-grow">
                                         <h3 className="text-xl font-bold text-foreground">{category.name}</h3>
