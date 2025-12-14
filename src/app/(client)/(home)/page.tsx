@@ -82,7 +82,7 @@ const componentMap = {
 
 // a generic loading skeleton component.
 const LoadingSkeleton = ({ height }: { height: string }) => (
-  <div className="container mx-auto px-4 md:px-6 py-12 md:py-24">
+  <div className="container mx-auto px-4 md:px-6 py-8 md:py-16">
     <Skeleton className="w-full" style={{ height }} />
   </div>
 );

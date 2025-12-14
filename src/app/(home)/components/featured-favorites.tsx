@@ -14,7 +14,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 
 export function FeaturedFavoritesSection({ products }: { products: (Product & { badge: string })[] }) {
   return (
-    <section className="py-12 md:py-24 bg-background">
+    <section className="py-12 md:py-16 bg-background">
       <div className="container mx-auto px-4 md:px-6">
         
         {/* Section Header */}

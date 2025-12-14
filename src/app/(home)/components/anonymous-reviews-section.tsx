@@ -15,7 +15,7 @@ import { MessageSquarePlus } from 'lucide-react';
 
 export function AnonymousReviewsSection() {
   return (
-    <div className="container mx-auto px-4 md:px-6 py-12 md:py-24">
+    <div className="container mx-auto px-4 md:px-6 py-10 md:py-16">
       <div className="flex flex-col items-center justify-center text-center space-y-4 mb-12">
         <h2 className="font-headline text-3xl font-bold md:text-4xl">Community Voices</h2>
         <p className="max-w-[700px] text-muted-foreground md:text-lg">

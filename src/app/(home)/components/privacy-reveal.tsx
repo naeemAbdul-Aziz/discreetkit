@@ -5,7 +5,7 @@ import { TextReveal } from "@/components/ui/text-reveal";
 export function PrivacyReveal() {
   return (
     <section className="bg-background relative">
-      <TextReveal text="Your Privacy Matters. Completely Anonymous & Secure." className="h-[40vh] md:h-[60vh]" />
+      <TextReveal text="Your Privacy Matters. Completely Anonymous & Secure." className="h-[40vh] md:h-[50vh]" />
     </section>
   );
 }

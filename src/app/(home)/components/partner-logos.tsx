@@ -28,7 +28,7 @@ const partners = [
 
 export function PartnerLogos() {
   return (
-    <div className="py-14 bg-background border-y border-border/40">
+    <div className="py-10 bg-background border-y border-border/40">
       <div className="max-w-screen-xl mx-auto px-4 md:px-8">
         <div className="text-center mb-10">
           <p className="text-sm font-semibold tracking-widest text-muted-foreground uppercase">

@@ -116,7 +116,7 @@ export function ProductSelector() {
     }, [api, onSelect]);
 
     return (
-        <section id="products" className="py-12 md:pt-8 md:pb-24">
+        <section id="products" className="py-8 md:pt-8 md:pb-16">
             <div className="container mx-auto px-4 md:px-6">
                 <div className="text-center mb-12">
                     <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-primary">

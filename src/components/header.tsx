@@ -75,7 +75,7 @@ export function Header() {
   const headerWidth = useTransform(scrollY, [0, 100], ["100%", "85%"]);
   const headerTop = useTransform(scrollY, [0, 100], ["0px", "16px"]);
   const headerRadius = useTransform(scrollY, [0, 100], ["0px", "9999px"]);
-  const headerBorder = useTransform(scrollY, [0, 100], ["rgba(0,0,0,0)", "rgba(0,0,0,0.05)"]);
+  // const headerBorder = useTransform(scrollY, [0, 100], ["rgba(0,0,0,0)", "rgba(0,0,0,0.05)"]); // Removed border
   const headerBackdrop = useTransform(scrollY, [0, 100], ["blur(0px)", "blur(12px)"]);
   const headerBg = useTransform(scrollY, [0, 100], ["rgba(255,255,255,0)", "rgba(255,255,255,0.8)"]);
 
@@ -123,11 +123,11 @@ export function Header() {
           width: isMounted ? headerWidth : "100%",
           marginTop: isMounted ? headerTop : "0px",
           borderRadius: isMounted ? headerRadius : "0px",
-          borderColor: isMounted ? headerBorder : "rgba(0,0,0,0)",
+          // borderColor: isMounted ? headerBorder : "rgba(0,0,0,0)",
           backdropFilter: isMounted ? headerBackdrop : "blur(0px)",
           backgroundColor: isMounted ? headerBg : "rgba(255,255,255,0.8)",
         }}
-        className="pointer-events-auto flex h-16 max-w-7xl items-center justify-between border px-6 transition-all duration-300 bg-white/80 backdrop-blur-sm"
+        className="pointer-events-auto flex h-16 max-w-7xl items-center justify-between px-6 transition-all duration-300 bg-white/80 backdrop-blur-sm shadow-sm"
       >
           {/* desktop navigation */}
           <nav className="hidden md:flex items-center gap-1">

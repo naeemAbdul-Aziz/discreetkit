@@ -31,7 +31,7 @@ const shimmer = (w: number, h: number) => `
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-8 md:pt-10 md:pb-20 bg-background relative overflow-hidden">
+    <section id="how-it-works" className="py-8 md:pt-10 md:pb-16 bg-background relative overflow-hidden">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-10 md:mb-16 relative z-10">
           <motion.div

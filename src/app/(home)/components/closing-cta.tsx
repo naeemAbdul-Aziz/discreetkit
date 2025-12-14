@@ -13,7 +13,7 @@ import { SparklesCore } from '@/components/ui/sparkles';
 
 export function ClosingCta() {
   return (
-    <section className="relative py-24 md:py-32 overflow-hidden bg-primary">
+    <section className="relative py-16 md:py-24 overflow-hidden bg-primary">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-primary/90 mix-blend-multiply z-10" />
