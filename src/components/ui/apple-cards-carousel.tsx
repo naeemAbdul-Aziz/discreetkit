@@ -18,6 +18,7 @@ import Image, { ImageProps } from "next/image";
 import { useOutsideClick } from "@/hooks/use-outside-click";
 import useEmblaCarousel from "embla-carousel-react";
 import AutoScroll from "embla-carousel-auto-scroll";
+import Autoplay from "embla-carousel-autoplay";
 
 interface CarouselProps {
   items: JSX.Element[];
@@ -36,167 +37,159 @@ type Card = {
 export const CarouselContext = createContext<{
   onCardClose: (index: number) => void;
   currentIndex: number;
+  setPaused?: (paused: boolean) => void;
 }>({
   onCardClose: () => {},
   currentIndex: 0,
+  setPaused: () => {},
 });
 
-export const Carousel = ({ items, initialScroll = 0, marquee = false, speed }: CarouselProps) => {
-  const carouselRef = React.useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = React.useState(false);
-  const [canScrollRight, setCanScrollRight] = React.useState(true);
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  useEffect(() => {
-    if (carouselRef.current) {
-      carouselRef.current.scrollLeft = initialScroll;
-      checkScrollability();
-    }
-  }, [initialScroll]);
-
-  const checkScrollability = () => {
-    if (carouselRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
-      setCanScrollLeft(scrollLeft > 0);
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth);
-    }
-  };
-
-  const scrollLeft = () => {
-    if (carouselRef.current) {
-      carouselRef.current.scrollBy({ left: -300, behavior: "smooth" });
-    }
-  };
-
-  const scrollRight = () => {
-    if (carouselRef.current) {
-      carouselRef.current.scrollBy({ left: 300, behavior: "smooth" });
-    }
-  };
-
-  const handleCardClose = (index: number) => {
-    if (carouselRef.current) {
-      const cardWidth = isMobile() ? 230 : 384; // (md:w-96)
-      const gap = isMobile() ? 4 : 8;
-      const scrollPosition = (cardWidth + gap) * (index + 1);
-      carouselRef.current.scrollTo({
-        left: scrollPosition,
-        behavior: "smooth",
-      });
-      setCurrentIndex(index);
-    }
-  };
-
-  const isMobile = () => {
-    return window && window.innerWidth < 768;
-  };
-
-  const [emblaRef] = useEmblaCarousel(
-    { loop: true, dragFree: true },
+export const Carousel = ({ items, initialScroll = 0, marquee = false, speed, autoplay = false, autoplayInterval = 3000 }: CarouselProps & { autoplay?: boolean; autoplayInterval?: number }) => {
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    { 
+      loop: true, 
+      dragFree: !marquee, // Use dragFree for standard carousel, strict loop for marquee
+      align: "start",
+      containScroll: "trimSnaps",
+    },
     [
-      AutoScroll({
-        playOnInit: true,
-        speed: speed ? speed / 100 : 1, // Adjust speed scaling as needed
-        stopOnInteraction: false,
-        stopOnMouseEnter: true,
-      }),
+      marquee 
+        ? AutoScroll({
+            playOnInit: true,
+            speed: speed ? speed / 100 : 1,
+            stopOnInteraction: false,
+            stopOnMouseEnter: true,
+          })
+        : Autoplay({
+            delay: autoplayInterval,
+            stopOnInteraction: false, // Continue autoplay after interaction
+            stopOnMouseEnter: true, // Pause on hover
+            playOnInit: autoplay,
+          })
     ]
   );
 
-  if (marquee) {
-    return (
-      <CarouselContext.Provider
-        value={{ onCardClose: handleCardClose, currentIndex }}
-      >
-        <div className="relative w-full overflow-hidden" ref={emblaRef}>
-          <div className="flex touch-pan-y">
-            {items.map((item, index) => (
-              <motion.div
-                initial={{
-                  opacity: 0,
-                  y: 20,
-                }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                  transition: {
-                    duration: 0.5,
-                    delay: 0.2 * index,
-                    ease: "easeOut",
-                    once: true,
-                  },
-                }}
-                key={"card" + index}
-                className="flex-[0_0_auto] pl-4"
-              >
-                {item}
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </CarouselContext.Provider>
-    );
-  }
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+
+    const onSelect = () => {
+      setCanScrollLeft(emblaApi.canScrollPrev());
+      setCanScrollRight(emblaApi.canScrollNext());
+      setCurrentIndex(emblaApi.selectedScrollSnap());
+    };
+
+    emblaApi.on("select", onSelect);
+    emblaApi.on("reInit", onSelect);
+    
+    // Initial check
+    onSelect();
+
+    return () => {
+      emblaApi.off("select", onSelect);
+      emblaApi.off("reInit", onSelect);
+    };
+  }, [emblaApi]);
+
+  const scrollLeft = () => {
+    emblaApi?.scrollPrev();
+  };
+
+  const scrollRight = () => {
+    emblaApi?.scrollNext();
+  };
+
+  const handleCardClose = (index: number) => {
+    if (emblaApi) {
+      emblaApi.scrollTo(index);
+    }
+  };
+  
+  // Pause autoplay when a card is open (handled via Context in Card component technically, 
+  // but here we provide the mechanism if needed. 
+  // Actually, Embla Autoplay has 'stopOnInteraction', and opening a card is an interaction usually.
+  // We can also expose a way to stop it explicitly if needed.
+  
+  // For now, the existing context is enough for `Card` to request close.
+  // Ideally, valid modal opening should pause autoplay. 
+  // `stopOnInteraction: false` means it resumes. 
+  // We might want to PAUSE it explicitly when modal is open.
+  
+  const [isPaused, setIsPaused] = useState(false);
+  
+  useEffect(() => {
+      if(!emblaApi) return;
+      const autoplayPlugin = emblaApi.plugins().autoplay;
+      if (!autoplayPlugin) return;
+
+      if (isPaused) {
+          autoplayPlugin.stop();
+      } else {
+         if (autoplay) autoplayPlugin.play();
+      }
+  }, [isPaused, emblaApi, autoplay]);
+
 
   return (
     <CarouselContext.Provider
-      value={{ onCardClose: handleCardClose, currentIndex }}
+      value={{ onCardClose: handleCardClose, currentIndex, setPaused: setIsPaused }}
     >
-      <div className="relative w-full">
-        <div
-          className="flex w-full overflow-x-scroll overscroll-x-auto py-10 md:py-20 scroll-smooth [scrollbar-width:none]"
-          ref={carouselRef}
-          onScroll={checkScrollability}
-        >
-          <div
-            className={cn(
-              "flex flex-row justify-start gap-4 pl-4 md:pl-6",
-              "max-w-7xl mx-auto"
-            )}
-          >
-            {items.map((item, index) => (
-              <motion.div
-                initial={{
-                  opacity: 0,
-                  y: 20,
-                }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                  transition: {
-                    duration: 0.5,
-                    delay: 0.2 * index,
-                    ease: "easeOut",
-                    once: true,
-                  },
-                }}
-                key={"card" + index}
-                className="last:pr-[5%] md:last:pr-[33%] rounded-3xl"
-              >
-                {item}
-              </motion.div>
-            ))}
-          </div>
-        </div>
-        <div className="flex justify-end gap-2 mr-10">
-          <button
-            title="Scroll left"
-            className="relative z-40 h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center disabled:opacity-50"
-            onClick={scrollLeft}
-            disabled={!canScrollLeft}
-          >
-            <IconArrowLeft className="h-6 w-6 text-gray-500" />
-          </button>
-          <button
-            title="Scroll right"
-            className="relative z-40 h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center disabled:opacity-50"
-            onClick={scrollRight}
-            disabled={!canScrollRight}
-          >
-            <IconArrowRight className="h-6 w-6 text-gray-500" />
-          </button>
+      <div className="relative w-full overflow-hidden" ref={emblaRef}>
+        <div className={cn(
+            "flex touch-pan-y",
+            marquee ? "" : "gap-4 pl-4 md:pl-6 max-w-7xl mx-auto py-10 md:py-20" // Re-add styling for standard mode
+        )}>
+          {items.map((item, index) => (
+            <motion.div
+              initial={{
+                opacity: 0,
+                y: 20,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+                transition: {
+                  duration: 0.5,
+                  delay: 0.2 * index,
+                  ease: "easeOut",
+                  once: true,
+                },
+              }}
+              key={"card" + index}
+              className={cn(
+                  "flex-[0_0_auto]",
+                  marquee ? "pl-4" : "rounded-3xl"
+              )}
+            >
+              {item}
+            </motion.div>
+          ))}
         </div>
       </div>
+          
+      {!marquee && (
+        <div className="flex justify-end gap-2 mr-10 -mt-8 mb-4 relative z-40">
+            <button
+            title="Scroll left"
+            className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center disabled:opacity-50"
+            onClick={scrollLeft}
+            disabled={!canScrollLeft}
+            >
+            <IconArrowLeft className="h-6 w-6 text-gray-500" />
+            </button>
+            <button
+            title="Scroll right"
+            className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center disabled:opacity-50"
+            onClick={scrollRight}
+            disabled={!canScrollRight}
+            >
+            <IconArrowRight className="h-6 w-6 text-gray-500" />
+            </button>
+        </div>
+      )}
     </CarouselContext.Provider>
   );
 };
@@ -212,7 +205,7 @@ export const Card = ({
 }) => {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const { onCardClose, currentIndex } = useContext(CarouselContext);
+  const { onCardClose, currentIndex, setPaused } = useContext(CarouselContext);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -223,13 +216,15 @@ export const Card = ({
 
     if (open) {
       document.body.style.overflow = "hidden";
+      if(setPaused) setPaused(true);
     } else {
       document.body.style.overflow = "auto";
+      if(setPaused) setPaused(false);
     }
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open]);
+  }, [open, setPaused]);
 
   useOutsideClick(containerRef, () => handleClose());
 
