@@ -131,7 +131,7 @@ export const Carousel = ({ items, initialScroll = 0, marquee = false, speed, aut
   // Assuming about 5-10s per view? 
   // Let's use fairly slow default: 40s.
   // Ideally we'd measure width but fixed duration is often smoother.
-  const duration = items.length * 3; // e.g. 15 items * 3s = 45s loop. 
+  const duration = items.length * 1; // Faster speed: 1s per item roughly. 
 
   return (
     <CarouselContext.Provider
