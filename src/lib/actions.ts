@@ -8,7 +8,7 @@
 'use server';
 
 import { z } from 'zod';
-import { generateTrackingCode, type Order } from './data';
+import { generateTrackingCode, generatePartnerCode, type Order } from './data';
 import { assignPharmacyForDeliveryArea, sendPharmacyOrderNotification } from './notifications';
 // Use OpenAI when API key is configured, otherwise fallback
 let _answerQuestions: ((input: { query: string; history: { role: 'user' | 'model'; parts: string }[] }) => Promise<{ answer: string }>) | null = null;
@@ -367,6 +367,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
 
 
     const code = generateTrackingCode();
+    const partnerCode = generatePartnerCode(); // Generate unique partner access code
     const finalDeliveryArea: string =
       deliveryArea === 'Other' ? (otherDeliveryArea || deliveryArea) : deliveryArea;
 
@@ -387,6 +388,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
       .from('orders')
       .insert({
         code,
+        partner_code: partnerCode, // Store unique partner code
         items: cartItems,
         status: 'pending_payment',
         delivery_area: finalDeliveryArea,
@@ -524,6 +526,7 @@ export async function getOrderAction(code: string): Promise<Order | null> {
     return {
       id: order.id.toString(),
       code: order.code,
+      partnerCode: order.partner_code, // Include partner code
       status: order.status,
       items: items,
       deliveryArea: order.delivery_area,

@@ -221,7 +221,9 @@ CREATE TABLE public.orders (
     delivery_photo_url text,
     delivery_notes text,
     cancelled_at timestamptz,
-    cancellation_reason text
+    cancellation_reason text,
+    -- Partner referral code
+    partner_code text
 );
 COMMENT ON TABLE public.orders IS 'Customer orders with fulfillment tracking.';
 COMMENT ON COLUMN public.orders.courier_name IS 'Name of the dispatch rider or service (e.g. Bolt, Uber, Private).';

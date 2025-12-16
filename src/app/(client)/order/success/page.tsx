@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useCart } from '@/hooks/use-cart';
 import { getOrderAction } from '@/lib/actions';
+import { type Order } from '@/lib/data';
 
 function SuccessContent() {
   const searchParams = useSearchParams();
@@ -24,6 +25,7 @@ function SuccessContent() {
   const [isVerifying, setIsVerifying] = useState(true);
   const [paymentStatus, setPaymentStatus] = useState<'success' | 'pending' | 'failed' | null>(null);
   const [isConfirmed, setIsConfirmed] = useState(false);
+  const [orderData, setOrderData] = useState<Order | null>(null);
 
   // Polling logic for "instant" confirmation
   useEffect(() => {
@@ -42,6 +44,7 @@ function SuccessContent() {
         if (order && order.status !== 'pending_payment') {
           setPaymentStatus('success');
           setIsConfirmed(true);
+          setOrderData(order); // Store order data for partner code
           return; // Stop polling
         }
       } catch (err) {
@@ -69,6 +72,11 @@ function SuccessContent() {
                 setPaymentStatus('success');
                 setIsConfirmed(true);
                 setIsVerifying(false); // Done
+                // Fetch order data to get partner code
+                if (safeCode) {
+                    const order = await getOrderAction(safeCode);
+                    if (order) setOrderData(order);
+                }
                 return;
             }
         } catch (e) {
@@ -209,6 +217,23 @@ function SuccessContent() {
             Keep this code safe. You'll need it to track your order.
           </p>
         </div>
+        
+        {/* Partner Access Code Section */}
+        {orderData?.partnerCode && (
+          <div className="pt-4 border-t border-dashed">
+            <p className="text-sm font-semibold text-foreground mb-1">🎁 Your Partner Access Code</p>
+            <p className="text-xs text-muted-foreground mb-3">
+              Show this code at Marie Stopes for priority, confidential care.
+            </p>
+            <div className="flex items-center justify-center rounded-lg border-2 border-primary/20 bg-primary/5 p-3">
+              <p className="text-xl font-bold tracking-widest text-primary">{orderData.partnerCode}</p>
+            </div>
+            <Link href="/partner-care" className="text-xs text-primary hover:underline mt-2 inline-block">
+              Learn more about our partner benefits →
+            </Link>
+          </div>
+        )}
+
         <div className="space-y-4">
           <Button asChild className="w-full">
             <Link href={`/track?code=${code}`}>

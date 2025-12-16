@@ -34,6 +34,7 @@ export type Category = {
 export type Order = {
   id: string;
   code: string;
+  partnerCode?: string | null; // Unique partner access code for referrals
   status: 'pending_payment' | 'received' | 'processing' | 'out_for_delivery' | 'completed';
   items: CartItem[];
   deliveryArea: string;
@@ -72,6 +73,19 @@ export const generateTrackingCode = (): string => {
   return result;
 };
 
+/**
+ * Generates a unique Partner Access Code for Marie Stopes referrals.
+ * Format: DK-MS-XXXX (where X is alphanumeric)
+ */
+export const generatePartnerCode = (): string => {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = 'DK-MS-';
+  for (let i = 0; i < 4; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+};
+
 export type Step = {
   number: number;
   title: string;
@@ -99,6 +113,7 @@ export type MarieStopesService = {
   description: string;
   imageUrl: string;
   imageHint: string;
+  category: 'Sexual Health' | 'Reproductive Health' | 'General Wellness';
 }
 
 export type MarieStopesData = {
@@ -251,45 +266,102 @@ export const marieStopesData: MarieStopesData = {
     whatsapp: "0556561081"
   },
   services: [
+    // Sexual Health
     {
-      title: "Confirmatory Testing",
-      description: "Get a professional test in a clinical setting to confirm your status and understand your health.",
+      title: "STI Testing & Management",
+      description: "Confidential testing and treatment for sexually transmitted infections.",
       imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757955894/counselling_old_lady_modern_xbthvs.jpg",
-      imageHint: "doctor patient tablet"
+      imageHint: "consultation",
+      category: "Sexual Health"
     },
     {
-      title: "Professional Counselling",
-      description: "Speak with a trained professional in a private, non-judgmental space to discuss your results and options.",
+      title: "HIV Testing & Counselling",
+      description: "Rapid, accurate HIV testing with professional pre- and post-test counselling.",
       imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757955894/counselling_old_lady_modern_xbthvs.jpg",
-      imageHint: "counselor listening patient"
+      imageHint: "medical advice",
+      category: "Sexual Health"
     },
+
+    // Reproductive Health (Contraception & Fertility)
     {
-      title: "Contraceptive Services",
-      description: "Explore a wide range of modern contraceptive options with expert guidance to fit your lifestyle.",
+      title: "Contraception & Family Planning",
+      description: "Full range of methods: Short-term (Pills, Injections) and Long-term (IUDs, Implants).",
       imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757953240/close-up-delivery-person-giving-parcel-client_al5mjd.jpg",
-      imageHint: "hands holding package"
+      imageHint: "contraception options",
+      category: "Reproductive Health"
     },
+    {
+      title: "Emergency Contraception",
+      description: "Access to emergency solutions when you need them most.",
+      imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757953240/close-up-delivery-person-giving-parcel-client_al5mjd.jpg",
+      imageHint: "emergency care",
+      category: "Reproductive Health"
+    },
+    {
+      title: "Pregnancy Testing & Options",
+      description: "Professional pregnancy testing and non-judgmental options counselling.",
+      imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757952387/man-being-happy-after-getting-negative-covid-test-result_udxny5.jpg",
+      imageHint: "pregnancy test",
+      category: "Reproductive Health"
+    },
+    {
+      title: "Fertility Counselling",
+      description: "Expert advice and testing for individuals or couples planning for a family.",
+      imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757955894/counselling_old_lady_modern_xbthvs.jpg",
+      imageHint: "couple counselling",
+      category: "Reproductive Health"
+    },
+    {
+      title: "Post-Abortion Care",
+      description: "Compassionate medical care and support following a miscarriage or abortion.",
+      imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757955894/counselling_old_lady_modern_xbthvs.jpg",
+      imageHint: "medical support",
+      category: "Reproductive Health"
+    },
+
+    // General Wellness
+    {
+      title: "Cervical Cancer Screening",
+      description: "Life-saving screening and preventive treatment for cervical cancer.",
+      imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757955894/counselling_old_lady_modern_xbthvs.jpg",
+      imageHint: "screening",
+      category: "General Wellness"
+    },
+    {
+      title: "General Consultation",
+      description: "Speak to a doctor about any general health concerns or lab service needs.",
+      imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757955894/counselling_old_lady_modern_xbthvs.jpg",
+      imageHint: "doctor consultation",
+      category: "General Wellness"
+    },
+    {
+      title: "Menstruation & Menopause",
+      description: "Specialized care for menstrual health and menopause management.",
+      imageUrl: "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1757955894/counselling_old_lady_modern_xbthvs.jpg",
+      imageHint: "womens health",
+      category: "General Wellness"
+    }
   ],
   faqs: [
     {
       question: "Do I need an appointment?",
-      answer: "Walk-ins are welcome, but we recommend calling ahead to confirm the best time and reduce your waiting period. You can call their toll-free number at 0800 20 8080."
+      answer: "With your Discreet Access Code, you can walk in, but calling ahead is recommended to minimize wait times."
     },
     {
       question: "Will my visit be confidential?",
-      answer: "Absolutely. Marie Stopes Ghana operates under strict confidentiality policies. Your information is protected and will not be shared. They are known for providing a safe and private environment."
+      answer: "Absolutely. Marie Stopes Ghana operates under strict confidentiality policies. Your information is protected."
     },
     {
-      question: "What should I expect during my visit?",
-      answer: "You will be greeted by friendly, non-judgmental staff. A trained counselor or healthcare provider will speak with you privately about your needs, explain the process, and answer any questions you have before any tests are done."
+      question: "What is the 'Discreet Access Code'?",
+      answer: "It is a unique code provided by DiscreetKit that signals to Marie Stopes staff that you are a partner client, ensuring you receive sensitive, priority care."
     },
     {
-      question: "Is there a special benefit for coming from DiscreetKit?",
-      answer: "While there isn't a direct discount, mentioning you came from DiscreetKit can help their staff understand your need for a discreet and sensitive experience. Our partnership ensures you will be treated with the utmost respect and privacy."
+      question: "Do I have to pay?",
+      answer: "Yes, you pay Marie Stopes directly for the service. The code facilitates your access and ensures verified, safe care."
     },
     {
       question: "How long will it take to get results?",
-      answer: "Results for many tests, including confirmatory HIV tests, are often available quickly, sometimes on the same day. The staff will inform you of the expected timeline for your specific test."
+      answer: "Results for many tests, including confirmatory HIV tests, are often available quickly, sometimes on the same day."
     }
   ]
 };
