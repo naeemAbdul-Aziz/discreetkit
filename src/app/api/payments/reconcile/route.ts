@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdminClient } from '@/lib/supabase';
 import { paymentDebug } from '@/lib/utils';
-import { sendOrderConfirmationSMS } from '@/lib/actions';
+import { sendOrderConfirmationSMS } from '@/lib/server-utils';
 
 // Node runtime (default) is required; do not export runtime = 'edge'
 
@@ -78,7 +78,7 @@ export async function GET(req: Request) {
           status: body?.data?.status ?? 'unknown',
           payload: body,
         });
-      } catch {}
+      } catch { }
       if (!res.ok || !body?.status) {
         results.push({ code: o.code, updated: false, reason: 'verify-failed' });
         continue;
@@ -110,7 +110,7 @@ export async function GET(req: Request) {
           });
           confirmed++;
           paymentDebug('Reconciled order to received', { code: o.code, orderId: current.id });
-          
+
           // Send SMS confirmation after successful payment reconciliation
           try {
             await sendOrderConfirmationSMS(current.id);
@@ -118,7 +118,7 @@ export async function GET(req: Request) {
           } catch (smsError) {
             console.error('Failed to send SMS confirmation on reconcile:', smsError);
           }
-          
+
           results.push({ code: o.code, updated: true });
         } else {
           results.push({ code: o.code, updated: false, reason: 'already-updated' });

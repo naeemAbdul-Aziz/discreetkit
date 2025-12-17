@@ -6,7 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServerClient, getUserRoles } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
-import { sendShippingNotificationSMS, sendDeliveryNotificationSMS } from '@/lib/actions';
+import { sendShippingNotificationSMS, sendDeliveryNotificationSMS } from '@/lib/server-utils';
 
 export async function PATCH(
   request: NextRequest,

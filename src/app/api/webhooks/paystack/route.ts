@@ -8,7 +8,7 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { getSupabaseAdminClient } from '@/lib/supabase';
 import { paymentDebug } from '@/lib/utils';
-import { sendOrderConfirmationSMS } from '@/lib/actions';
+import { sendOrderConfirmationSMS } from '@/lib/server-utils';
 
 export async function POST(req: Request) {
   // Sanitize secret key (some platforms add quotes)

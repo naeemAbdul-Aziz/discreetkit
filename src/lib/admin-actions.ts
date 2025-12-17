@@ -682,7 +682,7 @@ export async function assignPharmacy(orderId: number, pharmacyId: number) {
     return await assignPharmacyInternal(supabaseAdmin, orderId, pharmacyId)
 }
 
-import { sendShippingNotificationSMS, sendDeliveryNotificationSMS } from "@/lib/actions"
+import { sendShippingNotificationSMS, sendDeliveryNotificationSMS } from "@/lib/server-utils"
 
 // Bulk update order statuses
 export async function bulkUpdateOrderStatus(ids: number[], status: string) {

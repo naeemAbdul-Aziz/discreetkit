@@ -1,5 +1,5 @@
 import { getSupabaseAdminClient } from './supabase'
-import { sendSMS } from './actions'
+import { sendSMS } from './server-utils'
 
 /**
  * Sends a notification SMS to the assigned pharmacy for a given order.

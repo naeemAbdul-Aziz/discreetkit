@@ -5,7 +5,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdminClient } from '@/lib/supabase';
-import { sendSMS } from '@/lib/actions';
+import { sendSMS } from '@/lib/server-utils';
 
 export async function POST(req: NextRequest) {
   try {

@@ -3,7 +3,7 @@
  * Handles SMS and email notifications for pharmacy order assignments
  */
 
-import { sendSMS } from './actions';
+import { sendSMS } from './server-utils';
 import { sendOrderAssignedEmail, sendOrderStatusEmail, logEmailNotification } from './email-service';
 
 // Get subdomain-aware pharmacy dashboard URL

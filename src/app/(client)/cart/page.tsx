@@ -19,7 +19,7 @@ function CartPageContents() {
                     Looks like you haven't added any products yet.
                 </p>
                 <Button asChild className="mt-6">
-                    <Link href="/#products">
+                    <Link href="/products">
                         Browse Products
                     </Link>
                 </Button>

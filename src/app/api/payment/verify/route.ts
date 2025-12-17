@@ -11,7 +11,7 @@ import { NextResponse } from 'next/server';
 import { getSupabaseAdminClient } from '@/lib/supabase';
 import { paymentDebug, rlAllow } from '@/lib/utils';
 import { rlAllowDistributed } from '@/lib/rate-limit';
-import { sendOrderConfirmationSMS } from '@/lib/actions';
+import { sendOrderConfirmationSMS } from '@/lib/server-utils';
 
 export async function GET(req: Request) {
   try {
@@ -66,7 +66,7 @@ export async function GET(req: Request) {
         status: verifyData?.data?.status ?? 'unknown',
         payload: verifyData,
       });
-    } catch {}
+    } catch { }
 
     if (!verifyRes.ok || !verifyData?.status) {
       paymentDebug('Paystack verify failed', { reference, statusCode: verifyRes.status, bodyStatus: verifyData?.status });
@@ -111,7 +111,7 @@ export async function GET(req: Request) {
       }
 
       let wasUpdated = false;
-      
+
       if (order.status === 'pending_payment') {
         const { error: updateError } = await supabase
           .from('orders')
@@ -128,7 +128,7 @@ export async function GET(req: Request) {
           status: 'Payment Confirmed',
           note: `Successfully received GHS ${((amount ?? 0) / 100).toFixed(2)}.`,
         });
-        
+
         wasUpdated = true;
         paymentDebug('Order updated to received via verify', { reference, orderId: order.id });
 
