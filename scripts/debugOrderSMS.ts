@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
-import { sendOrderConfirmationSMS } from '../src/lib/actions';
+import { sendOrderConfirmationSMS } from '../src/lib/server-utils';
 
 // Setup simpler Supabase client for script
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;

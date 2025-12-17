@@ -45,6 +45,27 @@ export async function POST(req: Request) {
   // Log all webhook events for debugging
   paymentDebug('Webhook received', { eventType, reference, status: eventStatus });
 
+  // 2.5 Idempotency Check (Redis)
+  try {
+    const { getRedis } = await import('@/lib/redis'); // Dynamic import to avoid circular dep issues in some Next setups
+    const redis = await getRedis();
+    const eventId = event?.data?.id || reference || crypto.randomUUID();
+    const idempotencyKey = `paystack:event:${eventId}`;
+
+    // Check if processed
+    const processed = await redis.get(idempotencyKey);
+    if (processed) {
+      paymentDebug('Wait! Duplicate webhook detected. Skipping.', { reference });
+      return new NextResponse('Webhook already processed', { status: 200 });
+    }
+
+    // Mark as processed (valid for 24h)
+    await redis.set(idempotencyKey, 'true', { ex: 86400 });
+
+  } catch (redisError) {
+    console.warn('Idempotency check failed (Redis down?), continuing but risk of duplicates:', redisError);
+  }
+
   // 3. Handle payment success events
   // Paystack sends 'charge.success' for successful payments
   // We also handle the status field as a fallback

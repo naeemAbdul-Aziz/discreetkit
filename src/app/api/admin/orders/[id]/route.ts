@@ -4,7 +4,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServerClient, getSupabaseAdminClient } from '@/lib/supabase';
-import { sendShippingNotificationSMS, sendDeliveryNotificationSMS } from '@/lib/actions';
+import { sendShippingNotificationSMS, sendDeliveryNotificationSMS } from '@/lib/server-utils';
 import { z } from 'zod';
 
 const updateOrderStatusSchema = z.object({
