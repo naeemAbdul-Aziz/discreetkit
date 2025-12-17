@@ -123,7 +123,7 @@ async function sendCategories(to: string) {
     }]);
 }
 
-async function handleBrowsingState(to: string, body: string, session: SessionData) {
+async function handleBrowsingState(to: string, body: string, _session: SessionData) {
     // Check if it's a category selection
     const categoryPrefix = 'cat_';
 

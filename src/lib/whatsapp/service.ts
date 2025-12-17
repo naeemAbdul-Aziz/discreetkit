@@ -91,7 +91,7 @@ export async function sendInteractiveList(to: string, header: string, body: stri
 
     sections.forEach(section => {
         listText += `\n*${section.title}*\n`;
-        section.rows.forEach((row, i) => {
+        section.rows.forEach((row) => {
             listText += `- ${row.title}\n`;
         });
     });
