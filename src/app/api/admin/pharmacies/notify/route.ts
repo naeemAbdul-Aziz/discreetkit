@@ -11,6 +11,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: 'Invalid orderId' }, { status: 400 })
     }
     const supabase = getSupabaseAdminClient()
+
+    // Security Check: Verify Admin
+    const { createSupabaseServerClient, getUserRoles } = await import('@/lib/supabase');
+    const authClient = await createSupabaseServerClient();
+    const { data: { user } } = await authClient.auth.getUser();
+    if (!user) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+
+    const roles = await getUserRoles(supabase, user.id);
+    if (!roles.includes('admin')) {
+      return NextResponse.json({ ok: false, error: 'Forbidden' }, { status: 403 });
+    }
+
     const { data: order, error } = await supabase
       .from('orders')
       .select('id, pharmacy_id')

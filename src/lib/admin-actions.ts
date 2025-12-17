@@ -4,6 +4,28 @@ import { createSupabaseServerClient, getSupabaseAdminClient } from "@/lib/supaba
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 
+// Helper for Admin Authorization
+async function requireAdmin() {
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Unauthorized');
+
+    const { getUserRoles, getSupabaseAdminClient } = await import('@/lib/supabase');
+    // Use admin client to check roles if needed, or rely on getUserRoles which uses a passed client.
+    // getUserRoles takes (supabase, userId). We can use the standard client for reading public user_roles if generic,
+    // but usually roles table has RLS. Let's use the admin client to be sure we can read roles.
+    const adminClient = getSupabaseAdminClient();
+    const roles = await getUserRoles(adminClient, user.id);
+
+    const userEmail = user.email?.toLowerCase() || '';
+    const adminWhitelist = (process.env.ADMIN_EMAIL_WHITELIST || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
+
+    if (!roles.includes('admin') && !adminWhitelist.includes(userEmail)) {
+        throw new Error('Unauthorized: Admin access required');
+    }
+    return { user, supabase };
+}
+
 export async function getProducts() {
     const supabase = await createSupabaseServerClient();
     const { data: products, error } = await supabase
@@ -62,6 +84,7 @@ const productSchema = z.object({
 export type ProductFormValues = z.infer<typeof productSchema>;
 
 export async function upsertProduct(data: ProductFormValues) {
+    await requireAdmin();
     const supabase = await createSupabaseServerClient();
     const validated = productSchema.parse(data);
 
@@ -97,6 +120,7 @@ export async function upsertProduct(data: ProductFormValues) {
 }
 
 export async function deleteProduct(id: number) {
+    await requireAdmin();
     const supabase = await createSupabaseServerClient()
     const { error } = await supabase
         .from('products')
@@ -111,6 +135,7 @@ export async function deleteProduct(id: number) {
 
 // Partial field update for inline editing
 export async function updateProductField(id: number, patch: Partial<ProductFormValues>) {
+    await requireAdmin();
     const supabase = await createSupabaseServerClient();
     // Validate only provided keys by merging with existing schema defaults
     // Fetch existing product to build a full object if necessary
@@ -268,6 +293,7 @@ export async function searchPharmacies(query: string, deliveryArea?: string) {
 }
 
 export async function upsertPharmacy(data: PharmacyFormValues) {
+    await requireAdmin();
     const supabase = await createSupabaseServerClient()
     const validated = pharmacySchema.parse(data)
 
@@ -292,6 +318,7 @@ export async function upsertPharmacy(data: PharmacyFormValues) {
 }
 
 export async function createPharmacyWithUser(data: PharmacyFormValues) {
+    await requireAdmin();
     try {
         if (!process.env.SUPABASE_SERVICE_KEY) {
             console.error("Missing SUPABASE_SERVICE_KEY")
@@ -402,6 +429,7 @@ export async function createPharmacyWithUser(data: PharmacyFormValues) {
 }
 
 export async function linkPharmacyUser(pharmacyId: number, userEmail: string, password: string) {
+    await requireAdmin();
     // Use admin client for user creation
     const adminSupabase = getSupabaseAdminClient();
     const supabase = getSupabaseAdminClient();
@@ -472,6 +500,7 @@ export async function linkPharmacyUser(pharmacyId: number, userEmail: string, pa
 }
 
 export async function unlinkPharmacyUser(pharmacyId: number) {
+    await requireAdmin();
     const supabase = await createSupabaseServerClient()
 
     const { error } = await supabase
@@ -486,6 +515,7 @@ export async function unlinkPharmacyUser(pharmacyId: number) {
 }
 
 export async function deletePharmacy(id: number) {
+    await requireAdmin();
     const supabase = await createSupabaseServerClient()
     const { error } = await supabase
         .from('pharmacies')
@@ -571,6 +601,7 @@ export async function getDashboardStats() {
 }
 
 export async function updateOrderStatus(id: number, status: string, courierDetails?: { name: string; phone: string; trackingUrl?: string }) {
+    await requireAdmin();
     const supabase = await createSupabaseServerClient()
 
     const updatePayload: any = { status }
@@ -678,6 +709,15 @@ export async function assignPharmacy(orderId: number, pharmacyId: number) {
     if (!roles.includes('admin') && !adminWhitelist.includes(userEmail)) {
         return { error: 'Unauthorized: Admin access required' }
     }
+    // Using requireAdmin() helper defined above would be cleaner but this existing logic is fine.
+    // We already have the logic here, let's keep it to avoid regression or just rely on RequireAdmin?
+    // The existing logic imports getUserRoles locally. requireAdmin helper is consistent.
+    // Let's replace the whole block with requireAdmin check to be consistent.
+    // Wait, assignPharmacy returns { error } object, requireAdmin throws Error.
+    // I should catch the error or refactor requireAdmin to return boolean/error.
+    // Throwing error is better for security (stops execution hard), but client might expect { error: ... }
+    // These actions generally return { error } or { success }.
+    // I will leave assignPharmacy AS IS for now as it's already secure, just to be safe.
 
     return await assignPharmacyInternal(supabaseAdmin, orderId, pharmacyId)
 }
@@ -686,6 +726,7 @@ import { sendShippingNotificationSMS, sendDeliveryNotificationSMS } from "@/lib/
 
 // Bulk update order statuses
 export async function bulkUpdateOrderStatus(ids: number[], status: string) {
+    await requireAdmin();
     const allowed = ['pending_payment', 'received', 'processing', 'out_for_delivery', 'completed']
     if (!allowed.includes(status)) {
         return { error: 'Invalid status' }
@@ -729,6 +770,7 @@ export async function getStoreSettings() {
 }
 
 export async function updateStoreSettings(data: SettingsFormValues) {
+    await requireAdmin();
     const supabase = await createSupabaseServerClient()
     const validated = settingsSchema.parse(data)
 
@@ -791,6 +833,7 @@ export async function getPharmacyProducts(pharmacyId: number) {
 }
 
 export async function upsertPharmacyProduct(data: PharmacyProductFormValues) {
+    await requireAdmin();
     const supabase = await createSupabaseServerClient()
     const validated = pharmacyProductSchema.parse(data)
 
