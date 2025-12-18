@@ -16,12 +16,17 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
         }
 
-        const { From, Body, ProfileName } = result.data;
+        const { From, Body, ProfileName, Latitude, Longitude } = result.data;
+
+        let location = undefined;
+        if (Latitude && Longitude) {
+            location = { lat: parseFloat(Latitude), long: parseFloat(Longitude) };
+        }
 
         // 3. Process Message (Async)
         // We await here to ensure we don't return 200 before logic runs, 
         // mainly to catch errors. In high-scale, we might queue this.
-        await handleIncomingMessage(From, Body, ProfileName);
+        await handleIncomingMessage(From, Body, ProfileName, location);
 
         // 4. Return TwiML (Empty Response to stop Twilio from doing anything else)
         // Returning simple XML

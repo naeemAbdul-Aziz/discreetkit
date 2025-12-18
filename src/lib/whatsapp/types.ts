@@ -20,6 +20,9 @@ export const TwilioWebhookSchema = z.object({
     // For interactive messages (buttons/lists)
     ButtonPayload: z.string().optional(),
     ListId: z.string().optional(),
+    // Location Data
+    Latitude: z.string().optional(),
+    Longitude: z.string().optional(),
 });
 
 export type TwilioWebhookPayload = z.infer<typeof TwilioWebhookSchema>;
@@ -30,6 +33,7 @@ export type ConversationState =
     | 'AWAITING_TRIAGE_RESPONSE'
     | 'BROWSING_CATALOG'
     | 'VIEWING_PRODUCT'
+    | 'COLLECTING_ADDRESS' // [NEW] Zero-Friction Checkout Step
     | 'AWAITING_PAYMENT'
     | 'PARTNER_CARE_MENU'
     | 'PARTNER_CARE_VERIFICATION';
@@ -39,6 +43,11 @@ export interface SessionData {
     state: ConversationState;
     userId?: string;
     name?: string;
+    address?: string; // [NEW] Text Address
+    location?: {      // [NEW] GPS Pin
+        lat: number;
+        long: number;
+    };
     cart: {
         items: string[]; // Product IDs
         total: number;

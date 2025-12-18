@@ -9,9 +9,14 @@ import { getSupabaseAdminClient } from '../supabase'; // Admin client for secure
 export async function handleIncomingMessage(
     from: string, // WhatsApp ID (e.g., wallet ID or phone)
     body: string,
-    profileName?: string
+    profileName?: string,
+    location?: { lat: number, long: number } // [NEW] Location Data
 ) {
     const session = await getSession(from);
+    // [NEW] If location is present, use it for logic (override body if empty or generic)
+    if (location) {
+        console.log(`[Location Received] ${location.lat}, ${location.long}`);
+    }
     const normalizedBody = body.trim().toLowerCase();
 
     // 0. INTERCEPT NUMERIC INPUT (Virtual Buttons)
@@ -54,6 +59,10 @@ export async function handleIncomingMessage(
 
         case 'PARTNER_CARE_VERIFICATION':
             await handlePartnerVerification(from, body);
+            break;
+
+        case 'COLLECTING_ADDRESS': // [NEW]
+            await handleCollectingAddressState(from, body, session, location);
             break;
 
         default:
@@ -261,7 +270,9 @@ async function TransitionToSearch(to: string, query: string) {
 
 export async function handleViewingProductState(to: string, body: string, session: SessionData) {
     if (body === 'btn_buy' || body.toLowerCase() === 'buy' || body.toLowerCase().includes('buy')) {
-        await sendCheckoutLink(to, session);
+        // [MODIFIED] Ask for Address instead of immediate checkout
+        await transitionState(to, 'COLLECTING_ADDRESS');
+        await sendMessage(to, "📍 *Where should we deliver?*\n\nPlease reply with your **Delivery Address** (House/Street Name) OR send a **Location Pin** for faster delivery.");
     } else if (body === 'btn_back' || body.toLowerCase() === 'back') {
         await sendCategories(to);
     } else {
@@ -295,6 +306,15 @@ async function sendCheckoutLink(to: string, session: SessionData) {
     }
 
     try {
+        // [FIXED] Prepare Delivery Note BEFORE the insert object
+        let deliveryNote = `Source: WhatsApp Bot | Guest: ${session.name || 'Unknown'}`;
+        if (session.address) {
+            deliveryNote += ` | Address: ${session.address}`;
+        }
+        if (session.location) {
+            deliveryNote += ` | Location: https://maps.google.com/?q=${session.location.lat},${session.location.long}`;
+        }
+
         // 1. Create Pending Order in Database
         const supabase = getSupabaseAdminClient();
         const { error: dbError } = await supabase.from('orders').insert({
@@ -302,9 +322,9 @@ async function sendCheckoutLink(to: string, session: SessionData) {
             status: 'pending_payment',
             total_price: amount,
             subtotal: amount,
-            phone_masked: to, // Corret Column
-            email: email,     // Correct Column
-            delivery_address_note: `Detailed Source: WhatsApp Bot | Guest: ${session.name || 'Unknown'}`,
+            phone_masked: to,
+            email: email,
+            delivery_address_note: deliveryNote,
             delivery_area: 'WhatsApp',
             items: session.cart.items.map(id => ({ product_id: id, quantity: 1, price: amount }))
         });
@@ -418,5 +438,35 @@ async function handlePartnerVerification(to: string, body: string) {
         // Success!
         await sendMessage(to, `✅ *Access Granted*\n\nCode verified successfully.\nGenerated: ${new Date(order.created_at).toLocaleDateString()}\n\nYou are eligible for *Free STI Consulting* at any Marie Stopes center.\n\nShow this message at the front desk.`);
         await updateSession(to, { state: 'IDLE' }); // Reset to IDLE or a "LOGGED_IN" state
+    }
+}
+
+// --- ADDRESS COLLECTION HANDLER ---
+async function handleCollectingAddressState(
+    to: string,
+    body: string,
+    session: SessionData,
+    location?: { lat: number; long: number }
+) {
+    if (location) {
+        // User sent a PIN
+        await updateSession(to, {
+            location: location,
+            address: 'GPS Pin Received'
+        });
+        await sendMessage(to, "📍 Location received! Generating your secure checkout link...");
+        await sendCheckoutLink(to, { ...session, location }); // Pass updated session
+    } else {
+        // User sent TEXT
+        if (body.length < 3) {
+            // Basic validation
+            await sendMessage(to, "Please enter a valid delivery address (e.g., 'House 4, Oxford Street').");
+            return;
+        }
+        await updateSession(to, {
+            address: body
+        });
+        await sendMessage(to, "🏠 Address received! Generating your secure checkout link...");
+        await sendCheckoutLink(to, { ...session, address: body }); // Pass updated session
     }
 }
