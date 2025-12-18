@@ -157,4 +157,48 @@ We prevent unwanted zoom when focusing inputs on iOS Safari:
 - `layout.tsx` viewport meta adds `maximum-scale=1, user-scalable=no, interactive-widget=resizes-content` and `format-detection` to reduce auto-zoom and auto-linking.
 - `globals.css` enforces `font-size: 16px` on `input/textarea/select` (Safari zooms when <16px) and introduces `.min-h-dvh` and `.vk-safe` helpers for better behavior with the virtual keyboard and safe-area insets.
 
-If you prefer zero linter warnings for `text-size-adjust`, you may remove the standard property; functionality remains via `-webkit-text-size-adjust`.
+
+## 💬 WhatsApp Conversational Commerce (New)
+
+The system now features a "FAANG-level" WhatsApp Assistant (`src/lib/whatsapp/`) that serves as a full mobile storefront.
+
+### 🌟 Key Capabilities
+- **Conversational Commerce**: Users can browse categories, view products, and add to cart directly within WhatsApp.
+- **Instant Checkout**: Generates secure **Paystack** payment links.
+- **Real-Time Order Tracking**: Users can reply with their Order Code (e.g., `DK-WA-123456`) to get live status updates from the database.
+- **Partner Care Portal**: A verified gated experience for partners to unlock exclusive services using a specialized access code.
+
+### 🔧 Architecture & Innovations
+- **Virtual Buttons (Trial Compatible)**: To bypass Twilio Trial limitations, we implemented a smart "Numbered List" system where the bot maps user input (e.g., "1") to dynamic session IDs.
+- **Ghost-Order Prevention**: The bot creates a `pending_payment` order in Supabase *before* generating the payment link, ensuring 100% data integrity when the Paystack webhook fires.
+- **Unified Session Brain**: Uses **Upstash Redis** to maintain user state (Cart, Last Interaction) with a 24h TTL.
+
+### 🔗 Integration Flow
+1. **User** replies "Buy" -> **Bot** creates DB Order -> **Bot** sends Paystack Link.
+2. **User** pays -> **Paystack** calls Webhook -> **Webhook** matches Order Code -> **Webhook** updates Order to "Received" -> **Admin Dashboard** updates instantly via Realtime.
+
+For deep technical details, see [src/lib/whatsapp/README.md](src/lib/whatsapp/README.md).
+
+## 🛠 Tech Stack
+
+*   **Framework:** [Next.js](https://nextjs.org/) (App Router)
+*   **UI:** [React](https://reactjs.org/), [Tailwind CSS](https://tailwindcss.com/), [ShadCN UI](https://ui.shadcn.com/)
+*   **Generative AI:** [Firebase Genkit](https://firebase.google.com/docs/genkit) with [Google's Gemini models](https://ai.google.dev/)
+*   **Backend & Database:** [Supabase](https://supabase.io/)
+*   **State Management:** [Upstash Redis](https://upstash.com/) (for WhatsApp Sessions)
+*   **Messaging:** [Twilio](https://www.twilio.com/) (WhatsApp API)
+*   **Payments:** [Paystack](https://paystack.com/)
+*   **Notifications:** [Arkesel SMS](https://arkesel.com/)
+*   **Deployment:** [Vercel](https://vercel.com/)
+
+## 📦 Deployment & Setup
+
+This project is optimized for deployment on Vercel.
+
+### Required Environment Variables
+Ensure the following are set in Vercel for the WhatsApp Bot to function:
+- `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER`
+- `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`
+- `PAYSTACK_SECRET_KEY`
+- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_KEY`
+

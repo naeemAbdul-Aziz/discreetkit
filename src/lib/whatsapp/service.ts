@@ -89,12 +89,16 @@ export async function sendInteractiveButtons(to: string, body: string, buttons: 
 export async function sendInteractiveList(to: string, header: string, body: string, sections: InteractiveListSection[]) {
     let listText = `*${header}*\n${body}\n`;
 
+    let counter = 1;
     sections.forEach(section => {
-        listText += `\n*${section.title}*\n`;
+        listText += `\n*${section.title.toUpperCase()}*\n`;
         section.rows.forEach((row) => {
-            listText += `- ${row.title}\n`;
+            listText += `${counter}. *${row.title}*\n   _${row.description || ''}_\n`;
+            counter++;
         });
     });
+
+    listText += `\n(Reply with the number)`;
 
     return sendMessage(to, listText);
 }

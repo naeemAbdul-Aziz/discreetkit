@@ -14,6 +14,17 @@ export async function handleIncomingMessage(
     const session = await getSession(from);
     const normalizedBody = body.trim().toLowerCase();
 
+    // 0. INTERCEPT NUMERIC INPUT (Virtual Buttons)
+    // If user typed '1', '2', etc., and we have a list context, map it to the ID.
+    if (/^\d+$/.test(normalizedBody) && session.listOptions && session.listOptions.length > 0) {
+        const index = parseInt(normalizedBody) - 1;
+        if (index >= 0 && index < session.listOptions.length) {
+            // REWRITE the body as if the user clicked the button
+            body = session.listOptions[index];
+            console.log(`[Virtual Button] Mapped '${normalizedBody}' -> '${body}'`);
+        }
+    }
+
     // HIGH PRIORITY: CHECKOUT FLOW INTERCEPT
     // If we are viewing a product, we prioritize checking for "Buy" or "Back"
     if (session.state === 'VIEWING_PRODUCT') {
@@ -66,7 +77,10 @@ Your privacy is our priority. How can we help you today?`;
         { id: 'menu_help', title: '❓ FAQ & Help', description: 'Common questions' },
     ];
 
-    await updateSession(to, { state: 'IDLE' });
+    await updateSession(to, {
+        state: 'IDLE',
+        listOptions: rows.map(r => r.id) // Save IDs for number mapping
+    });
     await sendInteractiveList(to, 'Main Menu', message, [{ title: 'Options', rows }]);
 }
 
@@ -84,9 +98,32 @@ async function handleIdleState(to: string, body: string) {
         await sendMessage(to, "*FAQ*\n\nQ: Is it discreet?\nA: Yes, 100% unbranded packaging.\n\nQ: Who is the sender?\nA: 'DK Retail' on statements.\n\n(Reply 'menu' to go back)");
     } else {
         // If user sends a potential order code
-        if (body.startsWith('#DK-') || body.startsWith('DK-')) {
-            // Mock tracking response for MVP
-            await sendMessage(to, `🔍 Checking status for ${body}...\n\n✅ Status: *Processing*\n🚚 ETA: Tomorrow by 2 PM.`);
+        // If user sends a potential order code
+        const code = body.toUpperCase().replace('#', '').trim();
+        if (code.startsWith('DK-')) {
+            await sendMessage(to, `🔍 Checking status for ${code}...`);
+
+            const supabase = getSupabaseAdminClient();
+            const { data: order, error } = await supabase
+                .from('orders')
+                .select('status, created_at')
+                .eq('code', code)
+                .single();
+
+            if (error || !order) {
+                await sendMessage(to, `❌ We couldn't find an order with code *${code}*.\nPlease check the code and try again.`);
+            } else {
+                const statusMap: Record<string, string> = {
+                    'pending_payment': 'Payment Pending ⏳',
+                    'received': 'Order Received ✅',
+                    'processing': 'Processing 📦',
+                    'shipped': 'Out for Delivery 🚚',
+                    'delivered': 'Delivered 🎉',
+                    'cancelled': 'Cancelled ❌'
+                };
+                const statusText = statusMap[order.status] || order.status;
+                await sendMessage(to, `*Order Status*\nCode: ${code}\nStatus: *${statusText}*\nDate: ${new Date(order.created_at).toLocaleDateString()}\n\nReply 'Menu' for other options.`);
+            }
         } else {
             await sendMainMenu(to);
         }
@@ -117,6 +154,10 @@ async function sendCategories(to: string) {
     }));
 
     await transitionState(to, 'BROWSING_CATALOG');
+    await updateSession(to, {
+        state: 'BROWSING_CATALOG', // Ensure state is set
+        listOptions: rows.map(r => r.id)
+    });
     await sendInteractiveList(to, 'Shop Categories', 'Select a category:', [{
         title: 'Collections',
         rows
@@ -168,7 +209,10 @@ async function sendProductsInCategory(to: string, category: string) {
         description: `GHS ${p.price_ghs} - ${p.description?.substring(0, 30)}...`
     }));
 
-    await updateSession(to, { state: 'BROWSING_CATALOG' }); // Stay in browsing
+    await updateSession(to, {
+        state: 'BROWSING_CATALOG',
+        listOptions: rows.map(r => r.id)
+    });
     await sendInteractiveList(to, category, `Found ${products.length} items:`, [{
         title: 'Products',
         rows
@@ -191,16 +235,20 @@ async function sendProductDetails(to: string, productId: string) {
     const message = `*${product.name}*\n\n${product.description}\n\n💰 Price: *GHS ${product.price_ghs}*\n\nReply with "Buy" to purchase instantly or "Back" to keep shopping.`;
 
     // We transition to VIEWING_PRODUCT to handle the "Buy" response
+    const buttons = [
+        { type: 'reply', reply: { id: 'btn_back', title: 'Back' } },
+        { type: 'reply', reply: { id: 'btn_buy', title: 'Buy Now' } }
+    ];
+
+    // For buttons, we also want number support (1. Back, 2. Buy)
     await updateSession(to, {
         state: 'VIEWING_PRODUCT',
         cart: { items: [product.id.toString()], total: product.price_ghs },
-        lastInteraction: Date.now()
+        lastInteraction: Date.now(),
+        listOptions: buttons.map(b => b.reply.id) // Map button IDs
     });
 
-    await sendInteractiveButtons(to, message, [
-        { type: 'reply', reply: { id: 'btn_back', title: 'Back' } },
-        { type: 'reply', reply: { id: 'btn_buy', title: 'Buy Now' } }
-    ]);
+    await sendInteractiveButtons(to, message, buttons as any);
 }
 
 async function TransitionToSearch(to: string, query: string) {
@@ -236,6 +284,7 @@ async function sendCheckoutLink(to: string, session: SessionData) {
 
     const amount = session.cart.total; // In GHS
     const email = `whatsapp_${to.replace(/\D/g, '')}@discretekit.com`; // Dummy email for guest checkout
+    const orderCode = `DK-WA-${Date.now().toString().slice(-6)}`; // Unique Code
 
     // Generate Paystack Link
     const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
@@ -246,6 +295,25 @@ async function sendCheckoutLink(to: string, session: SessionData) {
     }
 
     try {
+        // 1. Create Pending Order in Database
+        const supabase = getSupabaseAdminClient();
+        const { error: dbError } = await supabase.from('orders').insert({
+            code: orderCode,
+            status: 'pending_payment',
+            total_price: amount,
+            customer_name: session.name || 'WhatsApp Guest',
+            customer_phone: to,
+            customer_email: email,
+            source: 'whatsapp', // Metadata for Dashboard
+            items: session.cart.items.map(id => ({ product_id: id, quantity: 1, price: amount })) // Simplified cart item structure
+        });
+
+        if (dbError) {
+            console.error("Order Creation Failed:", dbError);
+            throw new Error("Database insert failed");
+        }
+
+        // 2. Initialize Paystack Transaction
         const response = await fetch('https://api.paystack.co/transaction/initialize', {
             method: 'POST',
             headers: {
@@ -256,10 +324,13 @@ async function sendCheckoutLink(to: string, session: SessionData) {
                 email,
                 amount: amount * 100, // In kobo
                 currency: 'GHS',
+                reference: orderCode, // Link via Code
                 metadata: {
                     source: 'whatsapp',
                     whatsapp_id: to,
-                    product_ids: session.cart.items
+                    custom_fields: [
+                        { display_name: "Order Code", variable_name: "order_code", value: orderCode }
+                    ]
                 }
             })
         });
@@ -280,15 +351,21 @@ async function sendCheckoutLink(to: string, session: SessionData) {
 }
 
 async function sendPartnerCareMenu(to: string) {
-    await updateSession(to, { state: 'PARTNER_CARE_MENU' });
+    const rows = [
+        { id: 'care_verify', title: 'Verify Partner Code', description: 'Unlock free/discounted services' },
+        { id: 'care_clinic', title: 'Find Nearest Clinic', description: 'Get directions' },
+        { id: 'care_speak', title: 'Counselor Hotline', description: 'Talk to a professional' }
+    ];
+
+    await updateSession(to, {
+        state: 'PARTNER_CARE_MENU',
+        listOptions: rows.map(r => r.id)
+    });
+
     await sendInteractiveList(to, 'Partner Care 🏥', 'Exclusive services for our partners.\n\n*Marie Stopes Ghana*', [
         {
             title: 'Actions',
-            rows: [
-                { id: 'care_verify', title: 'Verify Partner Code', description: 'Unlock free/discounted services' },
-                { id: 'care_clinic', title: 'Find Nearest Clinic', description: 'Get directions' },
-                { id: 'care_speak', title: 'Counselor Hotline', description: 'Talk to a professional' }
-            ]
+            rows
         }
     ]);
 }

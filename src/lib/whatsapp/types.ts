@@ -49,6 +49,7 @@ export interface SessionData {
         step?: number;
     };
     tempOrderCode?: string; // For payment tracking
+    listOptions?: string[]; // For number-based navigation (1, 2, 3...) stores the IDs mapping
 }
 
 // --- Message Types for Service Layer ---

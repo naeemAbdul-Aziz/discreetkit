@@ -54,11 +54,7 @@ export function Footer() {
       <div className="container mx-auto px-6">
         
         {/* Massive Headline */}
-        <div className="mb-12 md:mb-24 border-b border-border pb-8 md:pb-12">
-          <h2 className="font-headline text-3xl md:text-6xl font-black tracking-tight uppercase">
-            {firstName}<span className="text-primary">{lastName}</span>.
-          </h2>
-        </div>
+        {/* Massive Headline Removed */ }
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 mb-12 md:mb-24">
           
