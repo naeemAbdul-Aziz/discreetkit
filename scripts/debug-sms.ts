@@ -1,5 +1,5 @@
 
-const fetch = global.fetch || require('node-fetch');
+// Native fetch is available in Node 18+
 
 async function run() {
     try {
@@ -24,3 +24,5 @@ async function run() {
 }
 
 run();
+
+export { }; // Treat as module
