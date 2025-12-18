@@ -301,6 +301,7 @@ async function sendCheckoutLink(to: string, session: SessionData) {
             code: orderCode,
             status: 'pending_payment',
             total_price: amount,
+            subtotal: amount, // Ensure subtotal logic is consistent
             customer_name: session.name || 'WhatsApp Guest',
             customer_phone: to,
             customer_email: email,
