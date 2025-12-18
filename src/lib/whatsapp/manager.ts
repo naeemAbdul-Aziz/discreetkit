@@ -301,17 +301,17 @@ async function sendCheckoutLink(to: string, session: SessionData) {
             code: orderCode,
             status: 'pending_payment',
             total_price: amount,
-            subtotal: amount, // Ensure subtotal logic is consistent
-            customer_name: session.name || 'WhatsApp Guest',
-            customer_phone: to,
-            customer_email: email,
-            source: 'whatsapp', // Metadata for Dashboard
-            items: session.cart.items.map(id => ({ product_id: id, quantity: 1, price: amount })) // Simplified cart item structure
+            subtotal: amount,
+            phone_masked: to, // Corret Column
+            email: email,     // Correct Column
+            delivery_address_note: `Detailed Source: WhatsApp Bot | Guest: ${session.name || 'Unknown'}`,
+            delivery_area: 'WhatsApp',
+            items: session.cart.items.map(id => ({ product_id: id, quantity: 1, price: amount }))
         });
 
         if (dbError) {
             console.error("Order Creation Failed:", dbError);
-            throw new Error("Database insert failed");
+            throw new Error(`Database insert failed: ${dbError.message}`);
         }
 
         // 2. Initialize Paystack Transaction
