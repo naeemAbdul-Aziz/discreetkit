@@ -34,6 +34,7 @@ export type ConversationState =
     | 'BROWSING_CATALOG'
     | 'VIEWING_PRODUCT'
     | 'COLLECTING_ADDRESS' // [NEW] Zero-Friction Checkout Step
+    | 'SELECTING_CAMPUS'   // [NEW] Student Discount Step
     | 'AWAITING_PAYMENT'
     | 'PARTNER_CARE_MENU'
     | 'PARTNER_CARE_VERIFICATION';

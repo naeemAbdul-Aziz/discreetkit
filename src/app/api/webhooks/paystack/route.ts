@@ -134,6 +134,20 @@ export async function POST(req: Request) {
             .then(() => paymentDebug('SMS confirmation sent', { orderId: order.id }))
             .catch(smsError => console.error('Failed to send SMS confirmation:', smsError));
 
+          // [NEW] Send WhatsApp Rich Receipt
+          // Check if it's a WhatsApp order via metadata
+          const whatsappId = event.data?.metadata?.whatsapp_id;
+          if (whatsappId) {
+            try {
+              const { sendOrderConfirmation } = await import('@/lib/whatsapp/manager');
+              const orderAmount = (amount / 100);
+              await sendOrderConfirmation(whatsappId, reference, orderAmount, 'Privacy Mode');
+              paymentDebug('WhatsApp confirmation sent', { whatsappId });
+            } catch (waError) {
+              console.error('Failed to send WhatsApp confirmation:', waError);
+            }
+          }
+
           // Auto-assign pharmacy after payment confirmation
           // This is isolated so failures don't affect payment confirmation or SMS
           if (order.delivery_area) {
