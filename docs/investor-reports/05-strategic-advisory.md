@@ -15,16 +15,46 @@ Here is the raw truth about your business model in the Ghanaian context.
 *   **The WhatsApp Moat:** Most apps fail in Africa because nobody wants to download another 50MB app. Building a robust commerce engine inside WhatsApp (where 98% of your market lives) is genius. It lowers Customer Acquisition Cost (CAC) significantly.
 *   **Market Size:** The Ghanaian pharmaceutical market is over **$600M/year**. Digital health in Africa is growing at 23% CAGR. The "Gen Z" demographic (your core) is the largest and most digitally native segment.
 
+### The "Winner" Narrative: Category Creation
+**Stop saying "We have no competitors."**
+Investors hate this. Instead, say: **"We are a Category Creator."**
+
+*   **The Competitor is "Social Friction":** You are not competing with other apps. You are competing with the *awkwardness* of walking into a chemist to buy condoms. You are unbundling the transaction from the location.
+*   **Indirect Competitors:**
+    *   *Glovo/Bolt:* Have logistics, but lack discretion (Privacy Gap).
+    *   *mPharma:* Focus on chronic illness, not SRH (Niche Gap).
+    *   *Herbalists:* Dangerous alternatives (Safety Gap).
+
 ### The Bad (Risks & Mitigations)
 *   **Logistics Risk:** "Last-mile delivery" is traditionally expensive.
-    *   *Your Solution (Validated):* Your **"Distributed Node" model** (partnering with pharmacies nationwide) is the correct answer. By ensuring the "fastest and closest node" handles fulfillment, you slash delivery costs to < GHS 15. The risk is now **Execution**—you must sign up enough density of pharmacies to make this work.
-*   **Trust & Counterfeits:** West Africa is flooded with fake meds. If one user gets a "fake" Plan B from your platform and tweets about it, you are dead.
-    *   *Fix:* You must have a "Coded Supply Chain." Only partner with top-tier verified pharmacies and market that verification aggressively.
-*   **Import Dependency:** 70% of meds are imported. If the Cedi crashes again, your prices spike, and demand drops.
+    *   *Your Solution:* **"Distributed Node" model**. By ensuring the "fastest and closest node" handles fulfillment, you slash delivery costs.
+*   **Platform Risk (The "WhatsApp Tax"):** What if Meta blocks your bot?
+    *   *Mitigation:* **Failover Strategy.** Your Web Storefront (`(client)`) is fully synced. If WhatsApp goes down, you instantly migrate users to the PWA (Progressive Web App) via SMS link.
+*   **Trust & Counterfeits:** West Africa is flooded with fake meds.
+    *   *Fix:* **"Coded Supply Chain."** Partner only with verified pharmacies.
 
 ---
 
-## 2. Funding Strategy: How much to raise?
+## 2. Unit Economics & Margins
+**Target Average Order Value (AOV):** **GHS 100**
+
+You have a clear strategy to reach profitability: **Curated Bundles** + **Delivery Arbitrage**.
+
+### A. The "Curated Bundle" Strategy
+Selling single items (e.g., one pack of condoms) destroys margins. You solve this with bundles like **"The Student Kit"**.
+*   **Example Breakdown (GHS 100 Basket):**
+    *   *Revenue:* GHS 100
+    *   *Product Cost (COGS):* GHS 70 (estimated)
+    *   *Gross Margin:* **GHS 30 (30%)**
+
+### B. The Delivery Strategy (Growth vs. Scale)
+You are partnering with a 3PL aggregator to get volume discounts.
+*   **Phase 1 (Growth / Pilot):** You pass the discount to the student.
+    *   *Logic:* Cheaper delivery = Lower Customer Acquisition Cost (CAC). You subsidize logistics to build density.
+*   **Phase 2 (Scale):** You keep the discount.
+    *   *Logic:* Once you have 1,000 orders/day, the GHS 5 difference between the "Public Rate" and your "Corporate Rate" becomes pure profit line.
+
+## 3. Funding Strategy: How much to raise?
 
 You are a student founder. Investors see "Risk." You need to sell "Inevitability."
 
