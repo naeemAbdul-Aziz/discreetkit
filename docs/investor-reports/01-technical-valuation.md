@@ -66,13 +66,20 @@ The "Brain" of the company involves algorithms that automate complex operational
 *   **CI/CD:** Automated GitHub workflows for production deployment.
 *   **Maintainability:** A `Service-Repository` pattern in the code architecture allows for rapid feature scaling without breaking existing logic.
 
-### F. Operational & Human Capital (Sweat Equity)
-**Valuation:** **$30,000**
+### F. Operational & Human Capital (The 16-Person Engine)
+**Valuation:** **$65,000+**
 
-Software requires context. This line item accounts for the specialized labor required to design the business model and negotiate the supply chain.
-*   **Product Strategy (6 months):** Replicating the strategic roadmap and product design ($15,000).
-*   **Business Development:** 200+ hours of negotiation to secure pharmacy partners and draft the `DiscreetKit Playbook` ($10,000).
-*   **Brand Identity:** High-fidelity visual identity and voice ($5,000).
+Unlike typical early-stage startups with just "two guys in a garage," DiscreetKit operates a sophisticated **Holacratic Organization** with 16 active members and a Senior Advisory Board.
+*   **The "Circle" Structure:** 13 functional specialists + 3 Co-Founders (CEO, CTO, COO).
+    *   *Medical & Research Circle:* Ensures clinical safety protocols.
+    *   *Legal & Compliance Circle:* Manages regulatory frameworks (NDAs, Act 843).
+    *   *Growth & Ops Hub:* 1M+ social reach capabilities and field execution.
+*   **Senior Advisory Board:**
+    *   *The Guardian:* Senior Lecturer (UG) & Pharmacy Owner (Supply Chain Assurance).
+    *   *Academic Advisor:* Senior Lecturer (Institutional Trust).
+    *   *Beta Network:* 50-member active testing circle (Validation Asset).
+
+This organizational maturity reduces "Key Man Risk" significantly.
 
 ### G. Network Assets (The "Moat")
 **Valuation:** **~$15,000** (Estimated)
@@ -95,8 +102,8 @@ The software is useless without the fulfillment network.
 | Asset Class | Description | Estimated Value (USD) |
 | :--- | :--- | :--- |
 | **Technology Stack** | Source Code, WhatsApp Engine, RLS Security | **$225,000** |
-| **Human Capital** | Founder Sweat Equity (Product, Brand, Legal) | **$30,000** |
+| **Human Capital** | 16-Person Team Org + Senior Advisors | **$65,000** |
 | **Network Assets** | Pharmacy Partner Contracts & Integration | **$15,000** |
 | **Brand & IP** | Trademark, Domain, Compliance Framework | **$10,000** |
-| **TOTAL PRE-MONEY VALUATION** | **"Floor" Valuation for Negotiation** | **~$280,000** |
+| **TOTAL PRE-MONEY VALUATION** | **"Floor" Valuation for Negotiation** | **~$315,000** |
 

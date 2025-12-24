@@ -54,7 +54,15 @@ You are partnering with a 3PL aggregator to get volume discounts.
 *   **Phase 2 (Scale):** You keep the discount.
     *   *Logic:* Once you have 1,000 orders/day, the GHS 5 difference between the "Public Rate" and your "Corporate Rate" becomes pure profit line.
 
-## 3. Funding Strategy: How much to raise?
+### 3. Validation Asset: The "Beta Circle"
+You are not guessing; you are optimizing.
+*   **Asset:** **50-Member Beta Cohort**.
+*   **Function:** This group tests every feature before public release.
+*   **Incentive Model:** They receive discounted codes and exclusive access. This creates a "feedback loop" that ensures when you launch to the wider campus, the product is already polished.
+
+---
+
+## 4. Funding Strategy: How much to raise?
 
 You are a student founder. Investors see "Risk." You need to sell "Inevitability."
 
