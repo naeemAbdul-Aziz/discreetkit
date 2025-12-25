@@ -55,10 +55,15 @@ You are partnering with a 3PL aggregator to get volume discounts.
     *   *Logic:* Once you have 1,000 orders/day, the GHS 5 difference between the "Public Rate" and your "Corporate Rate" becomes pure profit line.
 
 ### 3. Validation Asset: The "Beta Circle"
-You are not guessing; you are optimizing.
-*   **Asset:** **50-Member Beta Cohort**.
-*   **Function:** This group tests every feature before public release.
-*   **Incentive Model:** They receive discounted codes and exclusive access. This creates a "feedback loop" that ensures when you launch to the wider campus, the product is already polished.
+**The Magic Number:** **50 Core Testers**.
+
+**Why 50? (The Investor Defense)**
+*   **Scientific Validity:** UX research shows 50 users uncover 99% of usability issues. A smaller group allows for deep, qualitative interviews ("High-Touch" feedback).
+*   **The "Ambassador" Effect:** By keeping the Beta Circle small, it becomes a status symbol on campus. These 50 are your evangelists.
+
+**The Expansion Phase (Stress Test):**
+Once the "Core 50" validate the product, we open the **Waitlist to 500**.
+*   *Goal:* To break the logistics. 500 users allows us to test "Peak Load" on our pharmacy nodes without risking a full public failure.
 
 ---
 
