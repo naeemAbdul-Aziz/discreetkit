@@ -97,19 +97,38 @@ Currently, the Ministry of Health (MoH) and NGOs (USAID, Marie Stopes) run blind
 
 ---
 
-## 4. Beyond E-commerce: New Revenue Models
+## 4. The Ecosystem Play: Partnerships & Labs
+You asked: *"How do we approach UGMC, Marie Stopes, and Labs?"*
+This is how you evolve from a "Delivery App" to a "Health System."
 
-1.  **Telehealth Subscriptions (ARR):**
-    *   Don't just sell pills. Sell a **"Men's Health Club"** or **"Sisterhood Pass"**.
-    *   *Offer:* GHS 50/month = 1 free consultation/month + Free Delivery on all orders + 10% off products.
-    *   *Why:* Investors love Recurring Revenue (ARR). It stabilizes your cash flow.
+### A. UGMC (The "Centre of Excellence")
+*   **Role:** Flagship HIV care and research partner.
+*   **Why them:**
+    *   **Referral Destination:** UGMC now runs full Anti-retroviral Therapy (ART) services. They are the natural destination for users who test positive on a self-kit and need confirmatory testing and treatment.
+    *   **Trust Badge:** As a major teaching/research hospital with HIV research grants, they give you the "Centre of Excellence" branding.
+    *   **Clinical Protocols:** Their care guidelines will define your post-test flows (e.g., "Positive Interest" -> "Clinic Appointment within 48h"), keeping you aligned with national standards.
 
-2.  **The "Ads" Platform:**
-    *   Durex, Fiesta, or organic wellness brands struggle to reach youth.
-    *   Sell "Featured Product" slots in your WhatsApp menu.
+### B. Marie Stopes Ghana (The Service Layer)
+*   **Role:** Youth-friendly SRH, contraception, and tele-advice.
+*   **Why them:**
+    *   **Coverage & Youth Focus:** They serve 115,000+ women/year with a strong youth focus.
+    *   **Telemedicine:** Their pilots in remote support for sensitive services (like early medical abortion) make them the perfect partner for your in-app "Talk to a Counselor" feature.
+    *   **Brand Legitimacy:** Integrating them validates your platform for donors and impact investors who care about broad SRH coverage.
 
-3.  **Campus Ambassador Network:**
-    *   Use your "Student Founder" status. Recruit "Discreet Agents" on every campus (Legon, KNUST, Ashesi). They use referral codes. Peer-to-peer selling is powerful for taboo topics.
+### C. The Lab Network (e.g., MDS-Lancet)
+*   **Role:** Operational speed and redundancy.
+*   **Why you still need them (even with UGMC):**
+    *   **Complementary:** UGMC is for complex care/ART; Labs are for fast diagnostics and STI panels.
+    *   **Geography:** A private network gives you multiple collection points across the city/country, acting as a backup if hospital queues are long.
+    *   **Commercial Agility:** Easier to negotiate bundled pricing for "Student Checkup" codes.
+
+### D. The Simple Partner Stack
+Your "Rule of 3" strategy remains valid but is now more distinct:
+1.  **Clinical Depth:** UGMC (Complex care, ART, Credibility).
+2.  **Service Reach:** Marie Stopes (SRH, Tele-counseling, Youth).
+3.  **Operational Capacity:** One Lab Network (Fast testing, Redundancy).
+
+This mix allows you to show a complete, scalable referral ecosystem on your instruction sheets and pitch decks.
 
 ---
 
