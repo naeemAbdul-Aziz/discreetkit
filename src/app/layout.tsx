@@ -65,7 +65,7 @@ export default function RootLayout({
       {/* Prevent iOS Safari focus zoom and improve VKB behavior */}
       <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
       <meta name="format-detection" content="telephone=no,email=no,address=no" />
-      <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
       
       {/* Geo-targeting meta tags */}
       <meta name="geo.region" content="GH" />
@@ -73,14 +73,7 @@ export default function RootLayout({
       <meta name="geo.position" content="5.6037;-0.1870" />
       <meta name="ICBM" content="5.6037, -0.1870" />
       
-      {/* Mobile app meta tags */}
-      <meta name="mobile-web-app-capable" content="yes" />
-      <meta name="apple-mobile-web-app-capable" content="yes" />
-      <meta name="apple-mobile-web-app-title" content="DiscreetKit" />
-      
-      {/* Theme color */}
-      <meta name="theme-color" content="#ffffff" />
-      <meta name="msapplication-TileColor" content="#ffffff" />
+
       
       {/* Verification meta tags (add your verification codes) */}
       {/* <meta name="google-site-verification" content="YOUR_VERIFICATION_CODE" /> */}

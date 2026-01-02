@@ -89,25 +89,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.5
     },
 
-    // Location-specific landing pages (for local SEO)
-    {
-      url: `${siteUrl}/locations/accra`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.7
-    },
-    {
-      url: `${siteUrl}/locations/kumasi`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.7
-    },
-    {
-      url: `${siteUrl}/locations/university-of-ghana`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.7
-    },
+
   ];
 
   // 3. Combine and return
