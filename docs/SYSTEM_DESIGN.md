@@ -35,7 +35,7 @@ DiscreetKit is a modern web application built on the Jamstack architecture, heav
 
 ### 3.1. Frontend
 
-*   **Framework:** Next.js 14+ with the App Router. This allows for a hybrid approach of Server Components (for performance and SEO) and Client Components (for interactivity).
+*   **Framework:** Next.js 16.0.7 with the App Router. This allows for a hybrid approach of Server Components (for performance and SEO) and Client Components (for interactivity) using the latest React 18+ features.
 *   **UI Library:** React.
 *   **Component Toolkit:** `ShadCN UI` is used for pre-built, accessible, and themeable components (Buttons, Cards, Forms, etc.).
 *   **Styling:** `Tailwind CSS` provides utility-first styling, customized through `globals.css` and `tailwind.config.ts` to maintain a consistent brand identity.
@@ -60,7 +60,28 @@ DiscreetKit is a modern web application built on the Jamstack architecture, heav
 *   **Implementation:** All backend logic is encapsulated within **Next.js Server Actions** located in `src/lib/actions.ts`.
 *   **Security:** This is a critical security feature. Instead of the client making direct requests to the database (which would require exposing sensitive keys), the client invokes a Server Action. This action runs exclusively on the server, where it can safely use admin-level database credentials.
 
-### 3.5. Payment Gateway (Paystack)
+### 3.4. WhatsApp Commerce (Assistant Module)
+
+*   **Overview:** A "FAANG-level" conversational commerce system that allows users to browse, order, and track deliveries entirely within WhatsApp.
+*   **Architecture:**
+    *   **Manager (`manager.ts`):** The central "Brain" handling message routing, state transitions, and business logic.
+    *   **Service (`service.ts`):** Wraps the Twilio WhatsApp API for message delivery.
+    *   **Session (`session.ts`):** Manages user state (Cart, Last Interaction, Current Menu) using **Upstash Redis** with a 24h TTL.
+*   **Key Innovations:**
+    *   **Virtual Buttons:** To bypass Twilio Trial limitations (which block interactive buttons), the system renders numbered lists (e.g., "1. View Products") and maps user input (e.g., "1") back to specific action IDs.
+    *   **Ghost-Order Prevention:** When a user checks out, a `pending_payment` order is created in Supabase *before* generating the Paystack link. This ensures the webhook can always find the order to update, preventing "orphan" payments.
+    *   **Partner Care Portal:** A gated menu for partners to access exclusive services using a specialized access code.
+
+### 3.5. Pharmacy & Inventory System
+
+*   **Overview:** A real-time system for assigning orders to pharmacies, tracking stock, and facilitating communication.
+*   **Components:**
+    *   **Inventory Reservations:** When a pharmacy accepts an order, stock is automatically reserved. If not dispatched within 2 hours, a Cron job (`/api/cron/release-reservations`) releases the stock back to the pharmacy.
+    *   **Auto-Deduction:** Stock is permanently deducted when an order is completed.
+    *   **Communication:** A real-time chat system (`order_messages`) allows Admins and Pharmacies to communicate within the context of a specific order.
+    *   **Notifications:** Pharmacies receive SMS notifications for new assigned orders via `pharmacy_notifications`.
+
+### 3.6. Payment Gateway (Paystack)
 
 *   **Role:** Securely handles all payment processing (Mobile Money, Card).
 *   **Flow:**
@@ -121,7 +142,7 @@ To ensure orders transition out of `pending_payment` even if Paystack webhooks a
 - On the payment success page (`/order/success`), once payment is verified (or already confirmed via webhook), the cart is cleared programmatically to avoid accidental reorders and ensure a clean slate.
 - The clear operation is guarded so it only runs once per success visit.
 
-### 3.6. AI Chatbot (Genkit)
+### 3.7. AI Chatbot (Genkit)
 
 *   **Framework:** `Firebase Genkit` with the `googleAI` plugin.
 *   **Implementation:**
@@ -135,7 +156,7 @@ To ensure orders transition out of `pending_payment` even if Paystack webhooks a
 - Ensure `GOOGLE_GENAI_API_KEY` is configured for the `@genkit-ai/googleai` plugin (see `src/ai/genkit.ts`).
 - During development or when the API key is unavailable, the app currently uses a temporary fallback (`src/ai/flows/answer-questions-fallback.ts`) wired in `src/lib/actions.ts`. You can switch to the full Genkit flow by importing from `src/ai/flows/answer-questions` once the environment is ready.
 
-### 3.7. SMS Notifications (Arkesel)
+### 3.8. SMS Notifications (Arkesel)
 
 *   **Provider:** Arkesel SMS API (Official Documentation Format).
 *   **API Endpoint:** `https://sms.arkesel.com/sms/api` with GET method and query parameters.

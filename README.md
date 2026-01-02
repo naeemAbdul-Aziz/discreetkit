@@ -11,8 +11,9 @@ This repository contains the source code for the DiscreetKit Ghana web applicati
 *   **Secure Payments:** Integrated with Paystack for reliable and secure mobile money and card payments.
 *   **AI-Powered Assistant:** An integrated chatbot ("Pacely") powered by Google's Gemini to answer user questions about products, privacy, and the process.
 *   **Real-Time Order Tracking:** Users can track their order status with a unique, anonymous code.
+*   **Smart Pharmacy Management:** Real-time inventory tracking, auto-dispatch, and reservation system.
 *   **Supabase Backend:** Utilizes Supabase for database management and real-time updates.
-*   **Built with Next.js & ShadCN UI:** A modern, performant, and responsive user interface.
+*   **Built with Next.js 16 & ShadCN UI:** A modern, performant, and responsive user interface.
 
 ## 🚀 Getting Started
 
@@ -87,7 +88,7 @@ The application will now be accessible via your ngrok URL, and Paystack will be 
 
 ## 🛠 Tech Stack
 
-*   **Framework:** [Next.js](https://nextjs.org/) (App Router)
+*   **Framework:** [Next.js 16.0.7](https://nextjs.org/) (App Router)
 *   **UI:** [React](https://reactjs.org/), [Tailwind CSS](https://tailwindcss.com/), [ShadCN UI](https://ui.shadcn.com/)
 *   **Generative AI:** [Firebase Genkit](https://firebase.google.com/docs/genkit) with [Google's Gemini models](https://ai.google.dev/)
 *   **Backend & Database:** [Supabase](https://supabase.io/)

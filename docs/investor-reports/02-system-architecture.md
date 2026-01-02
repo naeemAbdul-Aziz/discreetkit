@@ -9,7 +9,7 @@ The application is structured as a **Monorepo** (Single Repository) housing thre
 
 | Component | Audience | Tech Profile |
 | :--- | :--- | :--- |
-| **Consumer Storefront** | Public Users | Next.js App Router, SSR for SEO, Framer Motion for high-fidelity UI. Optimized for conversion. |
+| **Consumer Storefront** | Public Users | Next.js 16 (App Router), SSR for SEO, Framer Motion for high-fidelity UI. Optimized for conversion. |
 | **Admin Command Center** | Internal Ops | Real-time data visualization, Role-Based Access Control (RBAC), Global Inventory Management. |
 | **Pharmacy Portal** | B2B Partners | Focused on operational efficiency. Real-time order polling, simplified inventory interface. |
 
@@ -17,7 +17,7 @@ The application is structured as a **Monorepo** (Single Repository) housing thre
 We utilize **Supabase** as a Backend-as-a-Service (BaaS) wrapper around **PostgreSQL**.
 *   **Database:** Relational data model (PostgreSQL) enforcing strict referential integrity between Orders, Products, and Pharmacy nodes.
 *   **Auth:** Integrated Authentication handling JWT tokens for secure session management across web and mobile.
-*   **Edge Functions:** Server-side logic runs on the Edge (Vercel Network) for low-latency responses globally.
+*   **Edge Functions & Server Actions:** Server-side logic runs on the Edge (Vercel Network) for low-latency responses globally.
 
 ### 3. Integration Grid
 The system acts as a central hub connecting specialized external services:
@@ -36,6 +36,7 @@ graph TD
     subgraph External Services
     Logic -->|Payments| Paystack[Paystack Fintech]
     Logic -->|SMS Alerts| Arkesel[Arkesel Gateway]
+    Logic -->|AI/RAG| Genkit[Google Gemini / Genkit]
     Logic -->|verification| MS[Marie Stopes API]
     end
     
