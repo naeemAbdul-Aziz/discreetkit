@@ -64,14 +64,14 @@ export function generateMetadata({
   currency = 'GHS',
   availability = 'InStock'
 }: SEOProps): Metadata {
-  const fullTitle = title 
+  const fullTitle = title
     ? `${title} | ${seoConfig.site.name}`
     : seoConfig.site.title;
-  
+
   const fullDescription = description || seoConfig.site.description;
   const fullUrl = `${seoConfig.site.url}${url}`;
   const socialImage = image || seoConfig.site.logo;
-  
+
   const allKeywords = [
     ...keywords,
     ...seoConfig.keywords.primary,
@@ -79,10 +79,25 @@ export function generateMetadata({
   ];
 
   const metadata: Metadata = {
+    metadataBase: new URL(seoConfig.site.url),
     title: fullTitle,
     description: fullDescription,
     keywords: allKeywords,
-    
+    icons: {
+      icon: seoConfig.site.favicon,
+      shortcut: seoConfig.site.favicon,
+      apple: [
+        { url: seoConfig.site.favicon },
+      ],
+    },
+    appleWebApp: {
+      capable: true,
+      title: seoConfig.site.name,
+      statusBarStyle: 'default',
+    },
+    themeColor: seoConfig.site.themeColor,
+    manifest: '/manifest.json',
+
     openGraph: {
       type: type as any,
       url: fullUrl,
@@ -99,15 +114,16 @@ export function generateMetadata({
       siteName: seoConfig.site.name,
       locale: 'en_GH',
     },
-    
+
     twitter: {
       card: 'summary_large_image',
       title: fullTitle,
       description: fullDescription,
       images: [socialImage],
       creator: seoConfig.social.twitter,
+      site: seoConfig.social.twitter,
     },
-    
+
     robots: {
       index: true,
       follow: true,
@@ -119,11 +135,11 @@ export function generateMetadata({
         'max-snippet': -1,
       },
     },
-    
+
     alternates: {
       canonical: fullUrl,
     },
-    
+
     other: {
       ...(price && { 'price:amount': price }),
       'price:currency': currency,

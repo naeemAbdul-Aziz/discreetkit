@@ -123,54 +123,80 @@ export function generateEnhancedOrganizationSchema() {
             name: 'Health Products',
             itemListElement: [
                 {
-                    '@type': 'OfferCatalog',
-                    name: 'Self-Test Kits',
-                    itemListElement: [
-                        {
-                            '@type': 'Offer',
-                            itemOffered: {
-                                '@type': 'Product',
-                                name: 'HIV Self-Test Kit',
-                                description: 'WHO-approved HIV self-test kit with 99% accuracy'
-                            }
+                    '@type': 'Offer',
+                    itemOffered: {
+                        '@type': 'Product',
+                        name: 'HIV Self-Test Kit',
+                        description: 'WHO-approved HIV self-test kit with 99% accuracy',
+                        image: seoConfig.site.logo,
+                        brand: {
+                            '@type': 'Brand',
+                            name: 'DiscreetKit'
                         },
-                        {
+                        offers: {
                             '@type': 'Offer',
-                            itemOffered: {
-                                '@type': 'Product',
-                                name: 'Pregnancy Test Kit',
-                                description: 'Reliable pregnancy test for fast and private results'
-                            }
+                            price: '50.00',
+                            priceCurrency: 'GHS',
+                            availability: 'https://schema.org/InStock'
                         }
-                    ]
+                    }
                 },
                 {
-                    '@type': 'OfferCatalog',
-                    name: 'Emergency Contraception',
-                    itemListElement: [
-                        {
+                    '@type': 'Offer',
+                    itemOffered: {
+                        '@type': 'Product',
+                        name: 'Pregnancy Test Kit',
+                        description: 'Reliable pregnancy test for fast and private results',
+                        image: seoConfig.site.logo,
+                        brand: {
+                            '@type': 'Brand',
+                            name: 'DiscreetKit'
+                        },
+                        offers: {
                             '@type': 'Offer',
-                            itemOffered: {
-                                '@type': 'Product',
-                                name: 'Postpill (Emergency Contraception)',
-                                description: 'Emergency contraception delivered discreetly'
-                            }
+                            price: '30.00',
+                            priceCurrency: 'GHS',
+                            availability: 'https://schema.org/InStock'
                         }
-                    ]
+                    }
                 },
                 {
-                    '@type': 'OfferCatalog',
-                    name: 'Wellness Products',
-                    itemListElement: [
-                        {
+                    '@type': 'Offer',
+                    itemOffered: {
+                        '@type': 'Product',
+                        name: 'Postpill (Emergency Contraception)',
+                        description: 'Emergency contraception delivered discreetly',
+                        image: seoConfig.site.logo,
+                        brand: {
+                            '@type': 'Brand',
+                            name: 'DiscreetKit'
+                        },
+                        offers: {
                             '@type': 'Offer',
-                            itemOffered: {
-                                '@type': 'Product',
-                                name: 'Premium Condoms',
-                                description: 'Ultra-thin, lubricated latex condoms'
-                            }
+                            price: '80.00',
+                            priceCurrency: 'GHS',
+                            availability: 'https://schema.org/InStock'
                         }
-                    ]
+                    }
+                },
+                {
+                    '@type': 'Offer',
+                    itemOffered: {
+                        '@type': 'Product',
+                        name: 'Premium Condoms',
+                        description: 'Ultra-thin, lubricated latex condoms',
+                        image: seoConfig.site.logo,
+                        brand: {
+                            '@type': 'Brand',
+                            name: 'DiscreetKit'
+                        },
+                        offers: {
+                            '@type': 'Offer',
+                            price: '45.00',
+                            priceCurrency: 'GHS',
+                            availability: 'https://schema.org/InStock'
+                        }
+                    }
                 }
             ]
         },
@@ -295,12 +321,26 @@ export function generateMedicalBusinessSchema() {
             {
                 '@type': 'MedicalTest',
                 name: 'HIV Self-Testing',
-                description: 'WHO-approved HIV self-test kits for private testing'
+                description: 'WHO-approved HIV self-test kits for private testing',
+                image: seoConfig.site.logo,
+                offers: {
+                    '@type': 'Offer',
+                    price: '50.00',
+                    priceCurrency: 'GHS',
+                    availability: 'https://schema.org/InStock'
+                }
             },
             {
                 '@type': 'MedicalTest',
                 name: 'Pregnancy Testing',
-                description: 'Reliable pregnancy test kits for home use'
+                description: 'Reliable pregnancy test kits for home use',
+                image: seoConfig.site.logo,
+                offers: {
+                    '@type': 'Offer',
+                    price: '30.00',
+                    priceCurrency: 'GHS',
+                    availability: 'https://schema.org/InStock'
+                }
             }
         ]
     };
@@ -333,21 +373,42 @@ export function generateServiceSchema() {
                     '@type': 'Offer',
                     itemOffered: {
                         '@type': 'Product',
-                        name: 'HIV Self-Test Kits'
+                        name: 'HIV Self-Test Kit',
+                        image: seoConfig.site.logo,
+                        offers: {
+                            '@type': 'Offer',
+                            price: '50.00',
+                            priceCurrency: 'GHS',
+                            availability: 'https://schema.org/InStock'
+                        }
                     }
                 },
                 {
                     '@type': 'Offer',
                     itemOffered: {
                         '@type': 'Product',
-                        name: 'Pregnancy Test Kits'
+                        name: 'Pregnancy Test Kit',
+                        image: seoConfig.site.logo,
+                        offers: {
+                            '@type': 'Offer',
+                            price: '30.00',
+                            priceCurrency: 'GHS',
+                            availability: 'https://schema.org/InStock'
+                        }
                     }
                 },
                 {
                     '@type': 'Offer',
                     itemOffered: {
                         '@type': 'Product',
-                        name: 'Emergency Contraception'
+                        name: 'Emergency Contraception',
+                        image: seoConfig.site.logo,
+                        offers: {
+                            '@type': 'Offer',
+                            price: '80.00',
+                            priceCurrency: 'GHS',
+                            availability: 'https://schema.org/InStock'
+                        }
                     }
                 }
             ]
