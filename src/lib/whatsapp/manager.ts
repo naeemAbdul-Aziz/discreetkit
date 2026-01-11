@@ -138,7 +138,26 @@ async function handleIdleState(to: string, body: string) {
                 await sendMessage(to, `*Order Status*\nCode: ${code}\nStatus: *${statusText}*\nDate: ${new Date(order.created_at).toLocaleDateString()}\n\nReply 'Menu' for other options.`);
             }
         } else {
-            await sendMainMenu(to);
+            // [HYBRID ROUTER]
+            // If the user says something that isn't a command or code, send to Pacely (AI)
+            // But only if it's long enough to be a question (> 2 chars)
+            if (body.length > 2) {
+                try {
+                    // Lazy load AI to avoid startup circular deps if any
+                    const { answerQuestions } = await import('../../ai/flows/answer-questions');
+                    const response = await answerQuestions({
+                        query: body,
+                        history: [] // We could fetch history from session/redis later
+                    });
+
+                    await sendMessage(to, response.answer);
+                } catch (aiError) {
+                    console.error('AI Error:', aiError);
+                    await sendMainMenu(to); // Fallback to menu
+                }
+            } else {
+                await sendMainMenu(to);
+            }
         }
     }
 }
@@ -444,8 +463,24 @@ async function handlePartnerCareState(to: string, body: string) {
         return;
     }
 
-    // Default Fallback
-    await sendPartnerCareMenu(to);
+    // Default Fallback: [HYBRID ROUTER]
+    // If not a menu click, try AI
+    if (body.length > 2) {
+        try {
+            const { answerQuestions } = await import('../../ai/flows/answer-questions');
+            const response = await answerQuestions({
+                query: body,
+                history: []
+            });
+            await sendMessage(to, response.answer);
+            // Re-offer menu after answer so they aren't lost
+            // await sendPartnerCareMenu(to); // Optional: might be too spammy. Let them read.
+        } catch (e) {
+            await sendPartnerCareMenu(to);
+        }
+    } else {
+        await sendPartnerCareMenu(to);
+    }
 }
 
 // --- VERIFICATION HANDLER ---

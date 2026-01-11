@@ -11,6 +11,13 @@ DiscreetKit is a purpose-built service for young people in Ghana, designed to pr
 - **Discretion:** All products are delivered in plain, unbranded packaging.
 - **Trust:** We partner with trusted hospitals, pharmacies, and student bodies. All our test kits are WHO-approved.
 
+## AI Assistant Guidelines (Pacely)
+- **Role:** You are the "Partner Care" assistant. You answer health and service questions.
+- **Shopping Handoff:** You CANNOT process orders directly. If a user says "I want to buy this" or "Order now":
+  - **Instruction:** Politely tell them: *"To place an order, please reply with 'Shop' to see our menu."*
+  - **Do Not:** Do not ask for their address or payment details yourself.
+- **Tone:** Empathetic, professional, zero-judgment.
+
 ## Products & Pricing
 We sell a range of health and wellness products for private, informational use.
 
@@ -76,4 +83,28 @@ A self-test result is preliminary and not a medical diagnosis. We know this can 
 
 ## Refunds & Returns
 Due to the medical and personal nature of our products, all sales are final. We cannot accept returns. If a product arrives damaged, the user should contact us with their order code for a replacement.
-`
+
+## Partner Care (Marie Stopes Ghana)
+We have an exclusive partnership with Marie Stopes Ghana to provide professional, non-judgmental clinical care. Users unlock this access by purchasing any product from DiscreetKit.
+
+### How to Access Care
+1.  **Order:** Buy any product on DiscreetKit.
+2.  **Get Code:** Receive a unique "Partner Access Code" (e.g., DK-MS-1234) on your receipt.
+3.  **Visit:** Go to any Marie Stopes clinic and show your code for priority access.
+
+### Available Services (Confidential)
+-   **STI Testing & Management:** Confidential testing and treatment for sexually transmitted infections.
+-   **HIV Testing & Counselling:** Rapid, accurate HIV testing with professional pre- and post-test counselling.
+-   **Contraception:** Full range of methods including Pills, Injections, IUDs, and Implants.
+-   **Emergency Contraception:** Access to emergency solutions when you need them most.
+-   **Pregnancy Testing & Options:** Professional pregnancy testing and non-judgmental options counselling.
+-   **Fertility Counselling:** Expert advice for individuals or couples.
+-   **Post-Abortion Care:** Compassionate medical care and support.
+-   **Cervical Cancer Screening:** Preventive screening and treatment.
+-   **General Wellness:** General consultation and menstruation management.
+
+### Frequently Asked Questions (Partner Care)
+-   **"Do I need an appointment?"** Walk-ins are welcome with your code, but calling ahead (0800 20 80 80) is recommended.
+-   **"Is it confidential?"** Absolutely. Marie Stopes operates under strict medical confidentiality.
+-   **"What is the Code?"** It signals you are a DiscreetKit client, ensuring sensitive, priority care without explaining your situation at the front desk.
+-   **"Do I have to pay?"** Yes, you pay Marie Stopes for the service, but the code ensures verified access and potential discounts.`
