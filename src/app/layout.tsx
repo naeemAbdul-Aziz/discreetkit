@@ -44,7 +44,7 @@ export const metadata: Metadata = generateMetadata({
   keywords: seoConfig.pages.home.keywords,
 });
 
-import { MagneticCursor } from '@/components/magnetic-cursor';
+import { MagneticCursor } from '@/components/ui/cursor';
 
 export default function RootLayout({
   children,

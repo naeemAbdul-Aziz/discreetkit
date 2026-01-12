@@ -661,7 +661,7 @@ export async function getDashboardStats() {
         revenueChart,
         categoryChart,
         regionChart,
-        totalRevenue: revenueChart.reduce((acc, curr) => acc + curr.revenue, 0),
+        totalRevenue: orders.reduce((acc: number, curr: any) => acc + (curr.total_price || 0), 0),
         totalOrders: orders.length,
         activePatients: new Set(orders.map((o: any) => o.user_id)).size
     };
