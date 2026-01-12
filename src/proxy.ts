@@ -92,6 +92,7 @@ export async function proxy(request: NextRequest) {
                 url.pathname = `/pharmacy${url.pathname}`;
             }
         }
+        return NextResponse.rewrite(url);
     }
 
     // 6. Rewrite access subdomain to /access path
