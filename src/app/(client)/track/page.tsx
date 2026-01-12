@@ -27,6 +27,7 @@ import {
   CreditCard,
   MapPin,
   ClipboardList,
+  MessageSquare,
 } from 'lucide-react';
 import { BrandSpinner } from '@/components/brand-spinner';
 import { cn } from '@/lib/utils';
