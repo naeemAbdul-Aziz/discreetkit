@@ -1,27 +1,19 @@
-/**
- * @file src/app/(dashboard)/admin/analytics/page.tsx
- * @description Placeholder page for the Admin Analytics section.
- */
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { getDashboardStats } from "@/lib/admin-actions";
+import AnalyticsDashboard from "./analytics-dashboard";
 
-export default function AdminAnalyticsPage() {
+export default async function AdminAnalyticsPage() {
+  const stats = await getDashboardStats();
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Analytics</CardTitle>
-        <CardDescription>
-          Detailed analytics and reporting for your store.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <p>Analytics content will be implemented here.</p>
-      </CardContent>
-    </Card>
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-3xl font-bold tracking-tight">Analytics</h2>
+        <p className="text-muted-foreground">
+          Detailed reporting and data hub for stakeholders.
+        </p>
+      </div>
+
+      <AnalyticsDashboard data={stats} />
+    </div>
   );
 }

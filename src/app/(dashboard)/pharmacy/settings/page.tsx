@@ -1,5 +1,5 @@
 
-import { getPharmacyServiceAreas, addServiceArea, removeServiceArea } from "@/lib/pharmacy-actions";
+import { getPharmacyServiceAreas, addServiceArea, removeServiceArea, getPharmacyProfile } from "@/lib/pharmacy-actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -9,9 +9,13 @@ import { Plus, Trash2, MapPin } from "lucide-react";
 import { revalidatePath } from "next/cache";
 
 import AddAreaForm from "./add-area-form";
+import OperationalSettings from "./operational-settings";
 
 export default async function PharmacySettingsPage() {
-  const serviceAreas = await getPharmacyServiceAreas();
+  const [serviceAreas, profile] = await Promise.all([
+    getPharmacyServiceAreas(),
+    getPharmacyProfile()
+  ]);
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -22,7 +26,14 @@ export default async function PharmacySettingsPage() {
 
       <Separator />
 
-      <div className="grid gap-6 md:grid-cols-2">
+
+      <div className="grid gap-6">
+        {/* Operational Settings */}
+        <div className="w-full">
+            <OperationalSettings initialIs24_7={profile?.is_24_7 || false} />
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2">
         {/* Add New Area */}
         <Card className="p-6 md:col-span-1 border-none shadow-sm">
           <h2 className="text-lg font-semibold mb-4">Add Delivery Area</h2>
@@ -60,6 +71,7 @@ export default async function PharmacySettingsPage() {
              </div>
            )}
         </Card>
+        </div>
       </div>
     </div>
   );
