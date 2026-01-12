@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { useSSE } from "@/hooks/use-sse";
 import { Download, TrendingUp, Users, ShoppingBag, Activity } from "lucide-react";
 import {
   AreaChart,
@@ -43,6 +45,20 @@ interface AnalyticsDashboardProps {
 
 export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
   const formatCurrency = (value: number) => `GHS ${value.toLocaleString()}`;
+  const router = useRouter();
+
+  useSSE('/api/admin/realtime/orders', {
+    onMessage: (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === 'orders') {
+          router.refresh();
+        }
+      } catch (e) {
+        console.error('SSE Error:', e);
+      }
+    }
+  });
 
   return (
     <div className="space-y-6">
@@ -239,35 +255,35 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
 
         {/* DATA HUB TAB */}
         <TabsContent value="data-hub" className="space-y-4">
-            <Card className="bg-slate-900 text-white border-none">
+            <Card className="border shadow-sm">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                        <Activity className="h-5 w-5 text-emerald-400" />
+                        <Activity className="h-5 w-5 text-primary" />
                         DiscreetKit Data Hub
                     </CardTitle>
-                    <CardDescription className="text-slate-400">
+                    <CardDescription>
                         Secure, anonymized data exports for authorized stakeholders (MoH, NGOs, Research Partners).
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="space-y-4">
-                        <div className="p-4 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-between">
+                        <div className="p-4 rounded-lg border bg-card flex items-center justify-between shadow-sm">
                             <div>
-                                <h4 className="font-semibold text-emerald-400">Public Health Report</h4>
-                                <p className="text-sm text-slate-400">Aggregated category trends and infection vector proxies.</p>
+                                <h4 className="font-semibold text-foreground">Public Health Report</h4>
+                                <p className="text-sm text-muted-foreground">Aggregated category trends and infection vector proxies.</p>
                             </div>
-                            <Button variant="outline" className="text-black bg-white hover:bg-slate-200 border-none">
-                                <Download className="mr-2 h-4 w-4" /> Export CSV
+                            <Button variant="outline" className="gap-2">
+                                <Download className="h-4 w-4" /> Export CSV
                             </Button>
                         </div>
 
-                        <div className="p-4 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-between">
+                        <div className="p-4 rounded-lg border bg-card flex items-center justify-between shadow-sm">
                             <div>
-                                <h4 className="font-semibold text-emerald-400">Supply Chain Feed</h4>
-                                <p className="text-sm text-slate-400">Demand heatmaps and stock utilization rates.</p>
+                                <h4 className="font-semibold text-foreground">Supply Chain Feed</h4>
+                                <p className="text-sm text-muted-foreground">Demand heatmaps and stock utilization rates.</p>
                             </div>
-                            <Button variant="outline" className="text-black bg-white hover:bg-slate-200 border-none">
-                                <Download className="mr-2 h-4 w-4" /> Export JSON
+                            <Button variant="outline" className="gap-2">
+                                <Download className="h-4 w-4" /> Export JSON
                             </Button>
                         </div>
                     </div>

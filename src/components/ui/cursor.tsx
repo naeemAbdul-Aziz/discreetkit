@@ -57,11 +57,19 @@ export function MagneticCursor() {
         }}
       >
         <motion.div
-          className="bg-white rounded-full transition-[width,height,opacity] duration-200 ease-out"
+          className="rounded-full pointer-events-none"
           animate={{
-            width: isHovering ? 24 : 8,
-            height: isHovering ? 24 : 8,
-            opacity: isHovering ? 0.5 : 1,
+            width: isHovering ? 48 : 12,
+            height: isHovering ? 48 : 12,
+            backgroundColor: isHovering ? 'transparent' : 'hsl(var(--primary))',
+            border: isHovering ? '1.5px solid hsl(var(--primary))' : '0px solid transparent',
+            opacity: 0.8,
+          }}
+          transition={{
+            type: "spring",
+            stiffness: 400,
+            damping: 25,
+            mass: 0.8
           }}
         />
       </motion.div>
