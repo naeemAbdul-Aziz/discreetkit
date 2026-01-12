@@ -1,7 +1,7 @@
 "use client"
 
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar"
-import { Home, ShoppingBag, Package, Users, Settings, LogOut } from "lucide-react"
+import { Home, ShoppingBag, Package, Users, Settings, LogOut, BarChart } from "lucide-react"
 import Link from "next/link"
 import { useIsMobile } from "@/hooks/use-mobile"
 import * as React from "react"
@@ -51,6 +51,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
     return [
         { href: "/admin", label: "Overview", icon: Home },
+        { href: "/admin/analytics", label: "Analytics", icon: BarChart },
         { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
         { href: "/admin/products", label: "Products", icon: Package },
         { href: "/admin/categories", label: "Categories", icon: Package },
