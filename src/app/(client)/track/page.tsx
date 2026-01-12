@@ -59,9 +59,24 @@ const statusMap: Record<OrderStatus, { icon: React.ElementType; label: string; d
   },
   completed: {
     icon: PackageCheck,
-    label: 'Completed',
+    label: 'Delivered',
     description: 'Your order has been successfully delivered.',
   },
+};
+
+const getFriendlyEventTitle = (raw: string) => {
+  const map: Record<string, string> = {
+    'order_created': 'Order Placed',
+    'payment_pending': 'Payment Pending',
+    'payment_confirmed': 'Payment Confirmed',
+    'processing': 'Processing Started',
+    'packed': 'Order Packed',
+    'dispatch_assigned': 'Rider Assigned',
+    'out_for_delivery': 'Out for Delivery',
+    'completed': 'Package Delivered',
+    'cancelled': 'Order Cancelled'
+  };
+  return map[raw] || raw.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 };
 
 const allStatuses: OrderStatus[] = [
@@ -190,59 +205,48 @@ function Tracker() {
             {/* LEFT COLUMN: Status & Items (Span 2) */}
             <div className="md:col-span-2 space-y-6">
                 
-                {/* 1. Main Status Stepper */}
-                <Card className="rounded-3xl border-muted shadow-sm">
-                    <CardHeader>
-                        <CardTitle className="text-lg">Order Status</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        {order.status === 'pending_payment' ? (
-                            <div className="flex items-center gap-4 p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/20 text-yellow-700">
-                                <CreditCard className="h-6 w-6" />
-                                <div>
-                                    <p className="font-bold">Payment Pending</p>
-                                    <p className="text-sm opacity-90">We are waiting for your payment to confirm this order.</p>
-                                </div>
-                            </div>
-                        ) : (
-                             <div className="relative flex flex-col gap-6 pl-2">
-                                {allStatuses.map((status, index) => {
-                                    const isCompleted = index <= currentStatusIndex;
-                                    const isCurrent = index === currentStatusIndex;
-                                    const Icon = statusMap[status].icon;
-                                    
-                                    return (
-                                    <div key={status} className="relative flex gap-4">
-                                        {/* Connector Line */}
-                                        {index < allStatuses.length - 1 && (
-                                            <div className={cn(
-                                                "absolute left-[19px] top-10 w-0.5 h-[calc(100%+8px)] -z-10",
-                                                isCompleted && index < currentStatusIndex ? "bg-primary/20" : "bg-muted"
-                                            )} />
-                                        )}
-                                        
-                                        {/* Icon Bubble */}
-                                        <div className={cn(
-                                            "relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 transition-colors duration-300",
-                                            isCompleted ? "border-primary bg-primary text-primary-foreground shadow-md" : "border-muted bg-muted/40 text-muted-foreground"
-                                        )}>
-                                            <Icon className="h-5 w-5" />
-                                        </div>
 
-                                        {/* Text Info */}
-                                        <div className={cn("pt-1", isCurrent && "animate-in fade-in slide-in-from-left-2 duration-500")}>
-                                            <p className={cn("font-bold text-base", isCurrent ? "text-primary" : "text-foreground")}>
-                                                {statusMap[status].label}
+                
+                {/* 2. Vertical Timeline (The Hero) */}
+                 <Card className="rounded-3xl border-muted shadow-sm overflow-hidden">
+                    <CardHeader className="bg-muted/30 pb-6">
+                        <CardTitle className="flex items-center gap-2 text-xl">
+                            <ClipboardList className="h-5 w-5 text-primary" /> Tracking History
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-8 pl-6">
+                        <div className="relative border-l-2 border-primary/20 ml-3 space-y-10 pb-2">
+                             {[...order.events]
+                                .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) // Newest first for vertical timeline
+                                .map((event, index) => {
+                                 const isLatest = index === 0;
+                                 return (
+                                    <div key={index} className="relative pl-8">
+                                        {/* Dot */}
+                                        <div className={cn(
+                                            "absolute -left-[9px] top-1 h-4 w-4 rounded-full border-4 border-background transition-all duration-300",
+                                            isLatest ? "bg-primary ring-4 ring-primary/10 shadow-lg scale-110" : "bg-muted-foreground/40"
+                                        )} />
+                                        
+                                        <div className={cn("flex flex-col gap-1 transition-opacity duration-500", !isLatest && "opacity-80")}>
+                                            <h4 className={cn("font-bold text-lg", isLatest ? "text-primary" : "text-foreground")}>
+                                                {getFriendlyEventTitle(event.status)}
+                                            </h4>
+                                            
+                                            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-1">
+                                                {new Date(event.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })} at {new Date(event.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                                             </p>
-                                            <p className="text-sm text-muted-foreground leading-snug">
-                                                {statusMap[status].description}
-                                            </p>
+
+                                            {event.note && (
+                                                 <div className="mt-2 text-sm text-foreground/80 bg-muted/30 p-3 rounded-r-xl rounded-bl-xl border border-muted/50 max-w-md">
+                                                    {event.note}
+                                                 </div>
+                                            )}
                                         </div>
                                     </div>
-                                    );
-                                })}
-                            </div>
-                        )}
+                                 )
+                             })}
+                        </div>
                     </CardContent>
                 </Card>
 
@@ -336,49 +340,17 @@ function Tracker() {
                     </CardContent>
                 </Card>
 
-                {/* 5. Event History Timeline */}
-                <Card className="rounded-3xl border-muted shadow-sm">
-                    <CardHeader className="pb-4">
-                        <CardTitle className="text-base flex items-center gap-2">
-                            <ClipboardList className="h-4 w-4 text-primary" /> Event History
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="relative pl-2 border-l-2 border-muted space-y-6 ml-2">
-                             {[...order.events]
-                                .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-                                .map((event, index, array) => {
-                                 const isLatest = index === array.length - 1;
-                                 return (
-                                    <div key={index} className="relative pl-6">
-                                        {/* Dot */}
-                                        <div className={cn(
-                                            "absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-background",
-                                            isLatest ? "bg-primary ring-4 ring-primary/20" : "bg-muted-foreground/30"
-                                        )} />
-                                        
-                                        <div className="flex flex-col gap-1">
-                                            <div className="flex items-center gap-2">
-                                                <Badge 
-                                                    variant={isLatest ? "default" : "secondary"}
-                                                    className={cn("pointer-events-none", !isLatest && "opacity-70")}
-                                                >
-                                                    {event.status}
-                                                </Badge>
-                                            </div>
-                                            
-                                            {event.note && (
-                                                 <p className="text-xs text-muted-foreground leading-relaxed">
-                                                    {event.note}
-                                                 </p>
-                                            )}
-                                            <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-mono mt-1">
-                                                {new Date(event.date).toLocaleDateString()} • {new Date(event.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                                            </p>
-                                        </div>
-                                    </div>
-                                 )
-                             })}
+                {/* 5. Helpful Links (Replaced old timeline) */}
+                <Card className="rounded-3xl border-muted shadow-sm overflow-hidden bg-primary text-primary-foreground">
+                    <CardContent className="p-6">
+                        <div className="flex items-center gap-4">
+                            <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
+                                <MessageSquare className="h-5 w-5 text-white" />
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-lg">Need Help?</h4>
+                                <p className="text-sm text-white/80">Support is available 24/7 on WhatsApp.</p>
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
