@@ -597,7 +597,74 @@ export async function getDashboardStats() {
         .sort((a, b) => b.quantity - a.quantity)
         .slice(0, 5); // Top 5
 
-    return { topPharmacies, topProducts };
+    // --- TIME SERIES DATA (Daily Revenue & Orders) ---
+    // Explicitly create supabase client for internal queries
+    const supabase = await createSupabaseServerClient();
+
+    const dailyStats: Record<string, { date: string, revenue: number, orders: number }> = {};
+    const now = new Date();
+    // Initialize last 30 days
+    for (let i = 29; i >= 0; i--) {
+        const d = new Date(now);
+        d.setDate(d.getDate() - i);
+        const dateStr = d.toISOString().split('T')[0];
+        dailyStats[dateStr] = { date: dateStr, revenue: 0, orders: 0 };
+    }
+
+    orders.forEach((o: any) => {
+        const dateStr = new Date(o.created_at).toISOString().split('T')[0];
+        if (dailyStats[dateStr]) {
+            dailyStats[dateStr].revenue += (o.total_price || 0);
+            dailyStats[dateStr].orders += 1;
+        }
+    });
+
+    const revenueChart = Object.values(dailyStats);
+
+    // --- CATEGORY DISTRIBUTION ---
+    const categoryStats: Record<string, number> = {};
+
+    const { data: allProducts } = await supabase.from('products').select('id, name, category');
+    const productMap = new Map(allProducts?.map((p: any) => [p.name, p.category]) || []);
+
+    orders.forEach((o: any) => {
+        if (o.items) {
+            let items: any[] = [];
+            try { items = typeof o.items === 'string' ? JSON.parse(o.items) : o.items; } catch (e) { }
+
+            if (Array.isArray(items)) {
+                items.forEach((item: any) => {
+                    const cat = productMap.get(item.name) || 'Other';
+                    categoryStats[cat] = (categoryStats[cat] || 0) + 1;
+                });
+            }
+        }
+    });
+
+    const categoryChart = Object.entries(categoryStats).map(([name, value]) => ({ name, value }));
+
+    // --- REGIONAL DATA ---
+    const regionalStats: Record<string, number> = {};
+    orders.forEach((o: any) => {
+        if (o.delivery_area) {
+            regionalStats[o.delivery_area] = (regionalStats[o.delivery_area] || 0) + 1;
+        }
+    });
+    const regionChart = Object.entries(regionalStats)
+        .map(([name, value]) => ({ name, value }))
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 10);
+
+    return {
+        topPharmacies,
+        topProducts,
+        revenueChart,
+        categoryChart,
+        regionChart,
+        totalRevenue: revenueChart.reduce((acc, curr) => acc + curr.revenue, 0),
+        totalOrders: orders.length,
+        activePatients: new Set(orders.map((o: any) => o.user_id)).size
+    };
 }
 
 export async function updateOrderStatus(id: number, status: string, courierDetails?: { name: string; phone: string; trackingUrl?: string }) {

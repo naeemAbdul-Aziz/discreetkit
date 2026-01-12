@@ -30,7 +30,7 @@ export function DeliveryDialog({ orderId, isOpen, onOpenChange, onSuccess }: Del
     setLoading(true);
     try {
       const res = await updateOrderStatus(orderId, 'out_for_delivery', {
-        name: riderName || 'Private Rider',
+        name: riderName,
         phone: riderPhone,
         trackingUrl: trackingUrl
       });

@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { OrderDetailsSheet } from "./order-details-sheet"
+import { DeliveryDialog } from "./delivery-dialog"
 
 interface Order {
   id: number
@@ -43,6 +44,10 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
   const [declineReason, setDeclineReason] = useState("")
   const [detailsSheetOpen, setDetailsSheetOpen] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  
+  // Delivery Dialog State
+  const [deliveryDialogOpen, setDeliveryDialogOpen] = useState(false)
+  const [pendingDeliveryId, setPendingDeliveryId] = useState<number | null>(null)
 
   const handleViewDetails = (order: Order) => {
     setSelectedOrder(order)
@@ -129,7 +134,8 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
   }
 
   const handleMarkOutForDelivery = async (id: number) => {
-    await handleOrderAction(id, 'update_status', { status: 'out_for_delivery' })
+    setPendingDeliveryId(id)
+    setDeliveryDialogOpen(true)
   }
 
   const handleMarkCompleted = async (id: number) => {
@@ -317,6 +323,16 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
         onMarkCompleted={() => selectedOrder && handleMarkCompleted(selectedOrder.id)}
         loading={loading?.id === selectedOrder?.id}
         loadingAction={loading?.action}
+      />
+
+      <DeliveryDialog
+        orderId={pendingDeliveryId}
+        isOpen={deliveryDialogOpen}
+        onOpenChange={setDeliveryDialogOpen}
+        onSuccess={() => {
+            onOrderUpdate?.()
+            setDetailsSheetOpen(false) // Close details if open, to show list update or just refresh
+        }}
       />
     </>
   )

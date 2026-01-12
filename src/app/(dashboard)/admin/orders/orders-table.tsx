@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { MoreHorizontal, Search, Clock, Package, Truck, CheckCircle, CreditCard, AlertCircle } from "lucide-react"
+import { MoreHorizontal, Search, Clock, Package, Truck, CheckCircle, CreditCard, AlertCircle, MessageSquare } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import {
   DropdownMenu,
@@ -26,6 +26,16 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { OrderMessages } from "@/components/order-messages"
 import { useToast } from "@/hooks/use-toast"
 import { assignPharmacy, bulkUpdateOrderStatus, searchPharmacies } from "@/lib/admin-actions"
 import { getSupabaseClient } from "@/lib/supabase"
@@ -48,6 +58,10 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
   const [pendingStatusUpdate, setPendingStatusUpdate] = useState<{id: number, status: string} | null>(null)
   const [riderName, setRiderName] = useState("")
   const [riderPhone, setRiderPhone] = useState("")
+  
+  // Messaging State
+  const [messageDialogOpen, setMessageDialogOpen] = useState(false)
+  const [activeMessageOrderId, setActiveMessageOrderId] = useState<number | null>(null)
 
   // Pagination
   const [page, setPage] = useState(1)
@@ -241,9 +255,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
     }
   }
 
-  // Import Dialog components just for this
-  const { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } = require("@/components/ui/dialog")
-  const { Label } = require("@/components/ui/label")
+  // Dialog components are now imported at the top
 
   return (
     <div className="space-y-4">
@@ -259,17 +271,33 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
             <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="name" className="text-right">Name</Label>
-                    <Input id="name" value={riderName} onChange={(e) => setRiderName(e.target.value)} className="col-span-3" />
+                    <Input id="name" value={riderName} onChange={(e) => setRiderName(e.target.value)} className="col-span-3" required />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="phone" className="text-right">Phone</Label>
-                    <Input id="phone" value={riderPhone} onChange={(e) => setRiderPhone(e.target.value)} className="col-span-3" />
+                    <Input id="phone" value={riderPhone} onChange={(e) => setRiderPhone(e.target.value)} className="col-span-3" required />
                 </div>
             </div>
             <DialogFooter>
                 <Button variant="outline" onClick={() => setRiderDialogOpen(false)}>Cancel</Button>
-                <Button onClick={confirmRiderAssignment}>Assign & Update Status</Button>
+                <Button onClick={confirmRiderAssignment} disabled={!riderName || !riderPhone}>Assign & Update Status</Button>
             </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+
+      {/* Message Dialog */}
+      <Dialog open={messageDialogOpen} onOpenChange={setMessageDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+           <DialogHeader>
+             <DialogTitle>Pharmacy Chat</DialogTitle>
+             <DialogDescription>
+               Communicate with the pharmacy regarding this order.
+             </DialogDescription>
+           </DialogHeader>
+           {activeMessageOrderId && (
+             <OrderMessages orderId={activeMessageOrderId} userRole="admin" />
+           )}
         </DialogContent>
       </Dialog>
 
@@ -386,6 +414,12 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start">
+                      <DropdownMenuItem onClick={() => { setActiveMessageOrderId(order.id); setMessageDialogOpen(true); }}>
+                         <div className="flex items-center gap-2">
+                            <MessageSquare className="h-4 w-4" />
+                            <span>Chat with Pharmacy</span>
+                         </div>
+                      </DropdownMenuItem>
                       {['pending_payment','received','processing','out_for_delivery','completed'].map(s => (
                         <DropdownMenuItem key={s} onClick={()=> handleStatusChangeClick(order.id, s)}>
                           {titleCase(s)}
