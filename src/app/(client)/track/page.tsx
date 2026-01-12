@@ -345,8 +345,10 @@ function Tracker() {
                     </CardHeader>
                     <CardContent>
                         <div className="relative pl-2 border-l-2 border-muted space-y-6 ml-2">
-                             {order.events.map((event, index) => {
-                                 const isLatest = index === 0;
+                             {[...order.events]
+                                .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                                .map((event, index, array) => {
+                                 const isLatest = index === array.length - 1;
                                  return (
                                     <div key={index} className="relative pl-6">
                                         {/* Dot */}

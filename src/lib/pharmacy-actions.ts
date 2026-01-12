@@ -5,6 +5,51 @@ import { createSupabaseServerClient, getUserRoles } from './supabase';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
+// --- PROFILE SETTINGS ---
+
+export async function getPharmacyProfile() {
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return null;
+
+    const { data: pharmacy } = await supabase
+        .from('pharmacies')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+    return pharmacy;
+}
+
+export async function updatePharmacyOperationalSettings(prevState: any, formData: FormData) {
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { success: false, message: 'Unauthorized' };
+
+    const { data: pharmacy } = await supabase
+        .from('pharmacies')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+    if (!pharmacy) return { success: false, message: 'Pharmacy profile not found' };
+
+    const is24_7 = formData.get('is_24_7') === 'on';
+
+    const { error } = await supabase
+        .from('pharmacies')
+        .update({ is_24_7: is24_7 })
+        .eq('id', pharmacy.id);
+
+    if (error) {
+        console.error('Update settings error:', error);
+        return { success: false, message: 'Failed to update settings' };
+    }
+
+    revalidatePath('/pharmacy/settings');
+    return { success: true, message: 'Settings updated successfully' };
+}
+
 // --- SERVICE AREAS ---
 
 export async function getPharmacyServiceAreas() {
