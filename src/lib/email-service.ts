@@ -43,7 +43,7 @@ export async function sendOrderAssignedEmail(data: OrderAssignedEmailData) {
         const dashboardUrl = getPharmacyDashboardUrl();
 
         const { data: emailData, error } = await resend.emails.send({
-            from: 'DiscreetKit <orders@discreetkit.com>',
+            from: 'DiscreetKit <hello@discreetkit.com>',
             to: data.pharmacyEmail,
             subject: `New Order Assigned: ${data.orderCode}`,
             html: `
@@ -128,7 +128,7 @@ export async function sendOrderStatusEmail(data: OrderStatusEmailData) {
         const message = statusMessages[data.newStatus] || `Order status updated to ${data.newStatus}.`;
 
         const { data: emailData, error } = await resend.emails.send({
-            from: 'DiscreetKit <orders@discreetkit.com>',
+            from: 'DiscreetKit <hello@discreetkit.com>',
             to: data.pharmacyEmail,
             subject: `Order Status Update: ${data.orderCode}`,
             html: `
@@ -210,5 +210,197 @@ export async function logEmailNotification(
         });
     } catch (err) {
         console.error('[logEmailNotification] Failed to log:', err);
+    }
+}
+
+/**
+ * Send branded order confirmation email to customer
+ */
+export async function sendCustomerOrderConfirmation(order: {
+    email: string;
+    code: string;
+    totalPrice: number;
+    items: { name: string; quantity: number; price_ghs: number }[];
+    deliveryArea: string;
+}) {
+    // DiscreetKit Brand Colors: Teal (#187f76) and Gold Accent
+    const brandColor = '#187f76';
+    const accentColor = '#fbbf24';
+    const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762356008/discreetkit_profile_photo_voqfia.png';
+    const trackUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${order.code}`;
+
+    try {
+        const { data: emailData, error } = await resend.emails.send({
+            from: 'DiscreetKit <hello@discreetkit.com>',
+            to: order.email,
+            subject: `Order Confirmation: ${order.code}`,
+            html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f9fafb; }
+                .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+                .header { padding: 30px 20px; text-align: center; border-bottom: 3px solid ${brandColor}; }
+                .logo { width: 60px; height: 60px; margin-bottom: 10px; border-radius: 50%; }
+                .content { padding: 40px 30px; }
+                .h1 { color: #111; font-size: 24px; margin-bottom: 20px; font-weight: 700; }
+                .text { color: #555; margin-bottom: 20px; font-size: 16px; }
+                .order-box { background-color: #f3f4f6; border-radius: 12px; padding: 20px; margin: 30px 0; }
+                .order-row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; }
+                .order-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+                .order-total { font-weight: 700; font-size: 18px; color: ${brandColor}; margin-top: 10px; padding-top: 10px; border-top: 2px solid #e5e7eb; display: flex; justify-content: space-between; }
+                .button { display: inline-block; background-color: ${brandColor}; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 50px; font-weight: 600; text-align: center; margin-top: 20px; }
+                .footer { background-color: #f9fafb; padding: 30px; text-align: center; font-size: 13px; color: #9ca3af; }
+                .discreet-notice { background-color: #ecfdf5; border: 1px solid #d1fae5; color: #065f46; padding: 15px; border-radius: 8px; font-size: 14px; margin-top: 30px; text-align: center; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <img src="${logoUrl}" alt="DiscreetKit Logo" class="logo">
+                    <div style="font-weight: 700; font-size: 20px; color: #111;">Discreet<span style="color: ${accentColor};">Kit</span></div>
+                </div>
+                <div class="content">
+                    <div class="h1">Order Confirmed</div>
+                    <div class="text">Thank you for your order. We have received it and are preparing it for discreet delivery.</div>
+                    
+                    <div class="discreet-notice">
+                        <strong>Privacy Check:</strong> This charge will appear on your statement as "Paystack" or "DiscreetKit". The package will arrive in plain, unbranded packaging.
+                    </div>
+
+                    <div class="order-box">
+                        <div style="margin-bottom: 15px; font-size: 14px; color: #888;">ORDER #${order.code}</div>
+                        
+                        ${order.items.map(item => `
+                        <div class="order-row">
+                            <span style="color: #333;">${item.name} x${item.quantity}</span>
+                            <span style="color: #555;">GHS ${(item.price_ghs * item.quantity).toFixed(2)}</span>
+                        </div>
+                        `).join('')}
+                        
+                        <div class="order-total">
+                            <span>TOTAL</span>
+                            <span>GHS ${order.totalPrice.toFixed(2)}</span>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center;">
+                        <a href="${trackUrl}" class="button">Track Your Order</a>
+                    </div>
+                </div>
+                <div class="footer">
+                    <p>&copy; ${new Date().getFullYear()} Access DiscreetKit Ltd.</p>
+                    <p>Accra, Ghana • <a href="mailto:hello@discreetkit.com" style="color: #9ca3af;">hello@discreetkit.com</a></p>
+                    <p>You received this email because you placed an order on DiscreetKit.com.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+            `
+        });
+
+        if (error) {
+            console.error('[sendCustomerOrderConfirmation] Error:', error);
+            return { success: false, error: error.message };
+        }
+        return { success: true, emailId: emailData?.id };
+    } catch (err: any) {
+        console.error('[sendCustomerOrderConfirmation] Exception:', err);
+        return { success: false, error: err.message };
+    }
+}
+
+/**
+ * Send receipt email to customer (can be same as confirmation or separate)
+ * For now, we will alias it to confirmation or simple variant
+ */
+export async function sendCustomerReceipt(order: {
+    email: string;
+    code: string;
+    totalPrice: number;
+    items: { name: string; quantity: number; price_ghs: number }[];
+    paymentDate: string;
+}) {
+    // Currently re-using the confirmation style but focusing on "Receipt" wording
+    const brandColor = '#187f76';
+    const accentColor = '#fbbf24';
+    const logoUrl = 'https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762356008/discreetkit_profile_photo_voqfia.png';
+
+    try {
+        const { data: emailData, error } = await resend.emails.send({
+            from: 'DiscreetKit <hello@discreetkit.com>',
+            to: order.email,
+            subject: `Receipt for Order ${order.code}`,
+            html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f9fafb; }
+                .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+                .header { padding: 30px 20px; text-align: center; border-bottom: 3px solid ${brandColor}; }
+                .logo { width: 60px; height: 60px; margin-bottom: 10px; border-radius: 50%; }
+                .content { padding: 40px 30px; }
+                .h1 { color: #111; font-size: 24px; margin-bottom: 20px; font-weight: 700; }
+                .text { color: #555; margin-bottom: 20px; font-size: 16px; }
+                .receipt-box { border: 1px dashed #ccc; background-color: #fff; padding: 20px; margin: 30px 0; }
+                .receipt-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+                .total { font-size: 20px; font-weight: 700; color: ${brandColor}; border-top: 1px solid #eee; padding-top: 15px; margin-top: 15px; display: flex; justify-content: space-between; }
+                .footer { background-color: #f9fafb; padding: 30px; text-align: center; font-size: 13px; color: #9ca3af; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                 <div class="header">
+                    <img src="${logoUrl}" alt="DiscreetKit Logo" class="logo">
+                    <div style="font-weight: 700; font-size: 20px; color: #111;">Discreet<span style="color: ${accentColor};">Kit</span></div>
+                </div>
+                <div class="content">
+                    <div class="h1">Payment Receipt</div>
+                    <div class="text">This email confirms that your payment was successful.</div>
+                    
+                    <div class="receipt-box">
+                        <div style="text-align: center; margin-bottom: 20px; color: #888; font-size: 13px;">${order.paymentDate}</div>
+                        
+                         ${order.items.map(item => `
+                        <div class="receipt-row">
+                            <span>${item.name} (x${item.quantity})</span>
+                            <span>GHS ${(item.price_ghs * item.quantity).toFixed(2)}</span>
+                        </div>
+                        `).join('')}
+
+                        <div class="total">
+                            <span>Paid</span>
+                            <span>GHS ${order.totalPrice.toFixed(2)}</span>
+                        </div>
+                    </div>
+
+                    <div class="text" style="font-size: 14px; color: #888; text-align: center;">
+                        Transaction Reference: ${order.code}
+                    </div>
+                </div>
+                <div class="footer">
+                    <p>&copy; ${new Date().getFullYear()} Access DiscreetKit Ltd.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+            `
+        });
+        
+        if (error) {
+             console.error('[sendCustomerReceipt] Error:', error);
+             return { success: false, error: error.message };
+        }
+        return { success: true, emailId: emailData?.id };
+
+    } catch (err: any) {
+        console.error('[sendCustomerReceipt] Exception:', err);
+        return { success: false, error: err.message };
     }
 }

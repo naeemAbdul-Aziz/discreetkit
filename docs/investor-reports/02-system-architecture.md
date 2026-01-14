@@ -73,24 +73,24 @@ The WhatsApp integration is architected as a **Headless Client**. It consumes th
 A core value proposition is "Structural Privacy". We don't just promise privacy; we architect for it.
 
 ```mermaid
-flowchart LR
+graph LR
     User(("User"))
   
-    subgraph "Public Zone (Ephemeral)"
+    subgraph PublicZone
         Browser["Browser Session"]
         Cart["Local Storage Cart"]
     end
   
-    subgraph "Secure Zone (Encrypted)"
+    subgraph SecureZone
         Order["Order Record"]
         PII["PII: Phone/Location"]
     end
   
-    subgraph "Pharmacy Zone (Need-to-Know)"
+    subgraph PharmacyZone
         Pack["Packing List"]
     end
   
-    subgraph "Rider Zone (Blind)"
+    subgraph RiderZone
         Delivery["Delivery Info"]
     end
 
@@ -101,8 +101,6 @@ flowchart LR
     Order -->|Masked Data| Pack
     Order -->|Location Only| Delivery
   
-    Note right of Pack: Pharmacy sees products,<br/>but NOT user identity.
-    Note right of Delivery: Rider sees location,<br/>but NOT product contents.
 ```
 
 ### Privacy Enforcements
