@@ -96,7 +96,7 @@ export async function POST(req: Request) {
         // Find the order using the reference code
         const { data: order, error: findError } = await supabaseAdmin
           .from('orders')
-          .select('id, status, delivery_area')
+          .select('id, status, delivery_area, email, total_price, code, items')
           .eq('code', reference)
           .single();
 
@@ -133,6 +133,21 @@ export async function POST(req: Request) {
           sendOrderConfirmationSMS(order.id)
             .then(() => paymentDebug('SMS confirmation sent', { orderId: order.id }))
             .catch(smsError => console.error('Failed to send SMS confirmation:', smsError));
+
+          // [NEW] Send Customer Order Confirmation Email (Branded)
+          if (order.email) {
+             const { sendCustomerOrderConfirmation } = await import('@/lib/email-service');
+             sendCustomerOrderConfirmation({
+                email: order.email,
+                code: order.code,
+                totalPrice: order.total_price,
+                items: order.items as any[],
+                deliveryArea: order.delivery_area
+             }).then((res) => {
+                if (res.success) paymentDebug('Customer email confirmation sent', { emailId: res.emailId });
+                else console.error('Failed to send customer email:', res.error);
+             }).catch(err => console.error('Customer email exception:', err));
+          }
 
           // [NEW] Send WhatsApp Rich Receipt
           // Check if it's a WhatsApp order via metadata

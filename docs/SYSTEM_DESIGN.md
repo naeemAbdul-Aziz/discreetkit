@@ -191,20 +191,20 @@ graph TD
         Pharm["Pharmacy Portal"]
     end
 
-    subgraph "Backend Kernel (Supabase)"
+    subgraph BackendKernel
         DB[("PostgreSQL")]
         Auth["GoTrue Auth"]
         Realitme["Realtime Engine"]
         Storage["File Storage"]
     end
 
-    subgraph "Edge Logic (Vercel)"
+    subgraph EdgeLogic
         API["Next.js Server Actions"]
         Cron["Cron Jobs"]
         BaaS["Edge Functions"]
     end
 
-    subgraph "External Services"
+    subgraph ExternalServices
         Paystack["Paystack (Payments)"]
         Arkesel["Arkesel (SMS)"]
         Genkit["Google Gemini (AI)"]
