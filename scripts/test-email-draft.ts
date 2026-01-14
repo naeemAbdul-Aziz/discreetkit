@@ -1,0 +1,3 @@
+const { sendCustomerOrderConfirmation } = require('../src/lib/email-service'); // Use require for simple script if ts-node/modules are tricky, but this is TS...
+// Wait, this project is Next.js/TS. Running a standalone TS script might be annoying with imports.
+// Better to simple make a temporary API route for testing.
