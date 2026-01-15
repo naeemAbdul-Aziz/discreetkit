@@ -261,7 +261,7 @@ export async function sendCustomerOrderConfirmation(order: {
             <div class="container">
                 <div class="header">
                     <img src="${logoUrl}" alt="DiscreetKit Logo" class="logo">
-                    <div style="font-weight: 700; font-size: 20px; color: #111;">Discreet<span style="color: ${accentColor};">Kit</span></div>
+                    <div style="font-weight: 700; font-size: 20px; color: #111;">DiscreetKit</div>
                 </div>
                 <div class="content">
                     <div class="h1">Order Confirmed</div>
@@ -358,7 +358,7 @@ export async function sendCustomerReceipt(order: {
             <div class="container">
                  <div class="header">
                     <img src="${logoUrl}" alt="DiscreetKit Logo" class="logo">
-                    <div style="font-weight: 700; font-size: 20px; color: #111;">Discreet<span style="color: ${accentColor};">Kit</span></div>
+                    <div style="font-weight: 700; font-size: 20px; color: #111;">DiscreetKit</div>
                 </div>
                 <div class="content">
                     <div class="h1">Payment Receipt</div>
