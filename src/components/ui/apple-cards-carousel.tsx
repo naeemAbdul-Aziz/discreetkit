@@ -156,14 +156,14 @@ export const Carousel = ({
       >
         {isMarquee ? (
           <div
-            className="flex select-none overflow-hidden"
+            className="select-none overflow-hidden w-full"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
             <div
               className={cn(
                 "flex flex-nowrap py-10 md:py-20",
-                "animate-marquee"
+                "animate-marquee w-max min-w-full"
               )}
               style={{
                 animationDuration: `${duration}s`,
