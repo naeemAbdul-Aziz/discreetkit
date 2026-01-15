@@ -139,8 +139,8 @@ export const Carousel = ({
   // Let's use fairly slow default: 40s.
   // Ideally we'd measure width but fixed duration is often smoother.
   // Speed prop (e.g. 200 = 2x speed, 50 = 0.5x speed). Default factor is 1s per item.
-  // We use 100 as base. So speed 100 = 1s per item. Speed 200 = 0.5s per item.
-  const duration = items.length * (speed ? 100 / speed : 1);
+  // We use 50 as base for smoother fast scroll.
+  const duration = items.length * (speed ? 50 / speed : 1);
 
   return (
     <CarouselContext.Provider
@@ -150,7 +150,10 @@ export const Carousel = ({
         setPaused: setIsPaused,
       }}
     >
-      <div className="relative w-full overflow-hidden" ref={emblaRef}>
+      <div
+        className="relative w-full overflow-hidden"
+        ref={isMarquee ? null : emblaRef}
+      >
         {isMarquee ? (
           <div
             className="flex select-none overflow-hidden"
