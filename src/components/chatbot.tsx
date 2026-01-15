@@ -157,7 +157,7 @@ export function Chatbot() {
                           : "bg-muted"
                       )}
                     >
-                      {msg.parts}
+                      <FormattedMessage text={msg.parts} />
                     </div>
                     {msg.role === "user" && (
                       <Avatar className="h-8 w-8">
