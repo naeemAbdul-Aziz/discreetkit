@@ -43,28 +43,35 @@ export const CarouselContext = createContext<{
   setPaused: () => {},
 });
 
-export const Carousel = ({ items, initialScroll = 0, marquee = false, speed, autoplay = false, autoplayInterval = 3000 }: CarouselProps & { autoplay?: boolean; autoplayInterval?: number }) => {
+export const Carousel = ({
+  items,
+  initialScroll = 0,
+  marquee = false,
+  speed,
+  autoplay = false,
+  autoplayInterval = 3000,
+}: CarouselProps & { autoplay?: boolean; autoplayInterval?: number }) => {
   // Determine if we should use the CSS marquee
   const isMarquee = marquee || autoplay;
 
   const [emblaRef, emblaApi] = useEmblaCarousel(
-    { 
-      loop: true, 
+    {
+      loop: true,
       dragFree: true,
       align: "start",
       skipSnaps: false,
       active: !isMarquee, // Disable Embla if marquee mode
     },
     [
-      (!isMarquee && (marquee || autoplay)) // This logic is redundant if active=false, but good for safety
-          ? AutoScroll({
-              playOnInit: true,
-              speed: speed ? speed / 100 : 1, 
-              stopOnInteraction: false,
-              stopOnMouseEnter: true,
-              stopOnFocusIn: false, 
-            })
-          : null
+      !isMarquee && (marquee || autoplay) // This logic is redundant if active=false, but good for safety
+        ? AutoScroll({
+            playOnInit: true,
+            speed: speed ? speed / 100 : 1,
+            stopOnInteraction: false,
+            stopOnMouseEnter: true,
+            stopOnFocusIn: false,
+          })
+        : null,
     ].filter(Boolean) as any
   );
 
@@ -83,7 +90,7 @@ export const Carousel = ({ items, initialScroll = 0, marquee = false, speed, aut
 
     emblaApi.on("select", onSelect);
     emblaApi.on("reInit", onSelect);
-    
+
     // Initial check
     onSelect();
 
@@ -106,17 +113,17 @@ export const Carousel = ({ items, initialScroll = 0, marquee = false, speed, aut
       emblaApi.scrollTo(index);
     }
   };
-  
-  // Pause autoplay when a card is open (handled via Context in Card component technically, 
-  // but here we provide the mechanism if needed. 
+
+  // Pause autoplay when a card is open (handled via Context in Card component technically,
+  // but here we provide the mechanism if needed.
   // Actually, Embla Autoplay has 'stopOnInteraction', and opening a card is an interaction usually.
   // We can also expose a way to stop it explicitly if needed.
-  
+
   // For now, the existing context is enough for `Card` to request close.
-  // Ideally, valid modal opening should pause autoplay. 
-  // `stopOnInteraction: false` means it resumes. 
+  // Ideally, valid modal opening should pause autoplay.
+  // `stopOnInteraction: false` means it resumes.
   // We might want to PAUSE it explicitly when modal is open.
-  
+
   // For CSS Marquee:
   // We need to ensure the animation pauses when a modal is open or (optional) on hover.
   // The context provides `setPaused` which `Card` calls on open/close.
@@ -124,50 +131,58 @@ export const Carousel = ({ items, initialScroll = 0, marquee = false, speed, aut
   const [isHovered, setIsHovered] = useState(false);
 
   // Calculate duration based on number of items and speed.
-  // Default speed ~ 1 corresponds to some px/s. ADJUST as needed. 
+  // Default speed ~ 1 corresponds to some px/s. ADJUST as needed.
   // speed=1 in Embla was fast. Here let's default to say 40s for full scroll?
-  // Or calculate based on item count? 
+  // Or calculate based on item count?
   // Let's use a static duration or prop.
-  // Assuming about 5-10s per view? 
+  // Assuming about 5-10s per view?
   // Let's use fairly slow default: 40s.
   // Ideally we'd measure width but fixed duration is often smoother.
-  const duration = items.length * 1; // Faster speed: 1s per item roughly. 
+  const duration = items.length * 1; // Faster speed: 1s per item roughly.
 
   return (
     <CarouselContext.Provider
-      value={{ onCardClose: handleCardClose, currentIndex, setPaused: setIsPaused }}
+      value={{
+        onCardClose: handleCardClose,
+        currentIndex,
+        setPaused: setIsPaused,
+      }}
     >
       <div className="relative w-full overflow-hidden" ref={emblaRef}>
         {isMarquee ? (
-            <div 
-                className="flex select-none overflow-hidden"
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
+          <div
+            className="flex select-none overflow-hidden"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            <div
+              className={cn(
+                "flex flex-nowrap gap-4 py-10 md:py-20",
+                "animate-marquee"
+              )}
+              style={{
+                animationDuration: `${duration}s`,
+                animationPlayState:
+                  isPaused || isHovered ? "paused" : "running",
+              }}
             >
-             <div 
-                className={cn(
-                    "flex flex-nowrap gap-4 py-10 md:py-20",
-                    "animate-marquee" 
-                )}
-                style={{
-                    animationDuration: `${duration}s`,
-                    animationPlayState: (isPaused || isHovered) ? "paused" : "running"
-                }}
-             >
-                {/* First Set */}
-                {items.map((item, index) => (
-                    <div key={`slide-${index}`} className="flex-none pl-4">
-                         {item}
-                    </div>
-                ))}
-                 {/* Duplicate Set for Loop */}
-                {items.map((item, index) => (
-                    <div key={`slide-duplicate-${index}`} className="flex-none pl-4">
-                         {item}
-                    </div>
-                ))}
-             </div>
-             {/* We need the animation to translate -50% of THIS container? 
+              {/* First Set */}
+              {items.map((item, index) => (
+                <div key={`slide-${index}`} className="flex-none pl-4">
+                  {item}
+                </div>
+              ))}
+              {/* Duplicate Set for Loop */}
+              {items.map((item, index) => (
+                <div
+                  key={`slide-duplicate-${index}`}
+                  className="flex-none pl-4"
+                >
+                  {item}
+                </div>
+              ))}
+            </div>
+            {/* We need the animation to translate -50% of THIS container? 
                  Actually standard technique: 
                  Wrapper (overflow hidden)
                    Inner (flex) -> moves
@@ -178,67 +193,73 @@ export const Carousel = ({ items, initialScroll = 0, marquee = false, speed, aut
                  Translate -50% means moving one full Set width.
                  Yes.
               */}
-              <style jsx>{`
-                @keyframes marquee {
-                    0% { transform: translateX(0); }
-                    100% { transform: translateX(-50%); }
+            <style jsx>{`
+              @keyframes marquee {
+                0% {
+                  transform: translateX(0);
                 }
-                .animate-marquee {
-                    animation: marquee linear infinite;
-                    min-width: 100%; /* Ensure it takes width */
-                    width: max-content; /* Allow it to grow */
+                100% {
+                  transform: translateX(-50%);
                 }
-              `}</style>
-            </div>
+              }
+              .animate-marquee {
+                animation: marquee linear infinite;
+                min-width: 100%; /* Ensure it takes width */
+                width: max-content; /* Allow it to grow */
+              }
+            `}</style>
+          </div>
         ) : (
-        <div className={cn(
-            "flex touch-pan-y",
-            "gap-4 pl-4 md:pl-6 max-w-7xl mx-auto py-10 md:py-20"
-        )}>
-          {items.map((item, index) => (
-            <motion.div
-              initial={{
-                opacity: 0,
-                y: 20,
-              }}
-              animate={{
-                opacity: 1,
-                y: 0,
-                transition: {
-                  duration: 0.5,
-                  delay: 0.2 * index,
-                  ease: "easeOut",
-                  once: true,
-                },
-              }}
-              key={"card" + index}
-              className="rounded-3xl flex-[0_0_auto]"
-            >
-              {item}
-            </motion.div>
-          ))}
-        </div>
+          <div
+            className={cn(
+              "flex touch-pan-y",
+              "gap-4 pl-4 md:pl-6 max-w-7xl mx-auto py-10 md:py-20"
+            )}
+          >
+            {items.map((item, index) => (
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  y: 20,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                  transition: {
+                    duration: 0.5,
+                    delay: 0.2 * index,
+                    ease: "easeOut",
+                    once: true,
+                  },
+                }}
+                key={"card" + index}
+                className="rounded-3xl flex-[0_0_auto]"
+              >
+                {item}
+              </motion.div>
+            ))}
+          </div>
         )}
       </div>
-          
+
       {!isMarquee && (
         <div className="flex justify-end gap-2 mr-10 -mt-8 mb-4 relative z-40">
-            <button
+          <button
             title="Scroll left"
             className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center disabled:opacity-50"
             onClick={scrollLeft}
             disabled={!canScrollLeft}
-            >
+          >
             <IconArrowLeft className="h-6 w-6 text-gray-500" />
-            </button>
-            <button
+          </button>
+          <button
             title="Scroll right"
             className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center disabled:opacity-50"
             onClick={scrollRight}
             disabled={!canScrollRight}
-            >
+          >
             <IconArrowRight className="h-6 w-6 text-gray-500" />
-            </button>
+          </button>
         </div>
       )}
     </CarouselContext.Provider>
@@ -254,89 +275,13 @@ export const Card = ({
   index: number;
   layout?: boolean;
 }) => {
-  const [open, setOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { onCardClose, currentIndex, setPaused } = useContext(CarouselContext);
+  // Modal logic removed as per user request
 
-  useEffect(() => {
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        handleClose();
-      }
-    }
-
-    if (open) {
-      document.body.style.overflow = "hidden";
-      if(setPaused) setPaused(true);
-    } else {
-      document.body.style.overflow = "auto";
-      if(setPaused) setPaused(false);
-    }
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open, setPaused]);
-
-  useOutsideClick(containerRef, () => handleClose());
-
-  const handleOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    onCardClose(index);
-  };
-
+  // Modal logic removed as per user request
   return (
     <>
-      <AnimatePresence>
-        {open && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center md:p-10">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={handleClose}
-              className="bg-black/50 h-full w-full fixed inset-0"
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              ref={containerRef}
-              layoutId={layout ? `card-${card.title}` : undefined}
-              className="max-w-4xl w-full bg-white dark:bg-neutral-900 h-full md:h-auto md:max-h-[85vh] overflow-y-auto z-[60] p-6 md:p-12 md:rounded-[2rem] font-sans relative shadow-[0_20px_50px_rgba(0,0,0,0.15)] flex flex-col border border-neutral-100 dark:border-neutral-800"
-            >
-              <button
-                title="Close card"
-                className="absolute top-6 right-6 bg-neutral-100/50 dark:bg-neutral-800/50 hover:bg-neutral-200 dark:hover:bg-neutral-700 backdrop-blur-md h-10 w-10 rounded-full flex items-center justify-center transition-all duration-200 z-50 group"
-                onClick={handleClose}
-              >
-                <IconX className="h-5 w-5 text-neutral-500 group-hover:text-neutral-900 dark:text-neutral-400 dark:group-hover:text-white transition-colors" />
-              </button>
-              <motion.p
-                layoutId={layout ? `category-${card.title}` : undefined}
-                className="text-sm font-bold text-primary uppercase tracking-wider mb-2"
-              >
-                {card.category}
-              </motion.p>
-              <motion.h2
-                layoutId={layout ? `title-${card.title}` : undefined}
-                className="text-3xl md:text-5xl font-bold text-neutral-900 dark:text-white mb-6 leading-tight"
-              >
-                {card.title}
-              </motion.h2>
-              <div className="prose prose-lg dark:prose-invert max-w-none text-neutral-600 dark:text-neutral-300">
-                {card.content}
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-      <motion.button
+      <motion.div
         layoutId={layout ? `card-${card.title}` : undefined}
-        onClick={handleOpen}
         className="rounded-3xl bg-gray-100 dark:bg-neutral-900 h-80 w-56 md:h-[40rem] md:w-96 overflow-hidden flex flex-col items-start justify-start relative z-10 group"
       >
         <div className="absolute h-full top-0 inset-x-0 bg-gradient-to-b from-black/50 via-transparent to-transparent z-30 pointer-events-none" />
@@ -348,14 +293,14 @@ export const Card = ({
             >
               {card.category}
             </motion.p>
-            
+
             {/* Subtle Plus Icon */}
             {/* Subtle Plus Icon Removed */}
             {/* <div className="bg-white/20 backdrop-blur-md p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <IconPlus className="w-4 h-4 text-white" />
             </div> */}
           </div>
-          
+
           <motion.p
             layoutId={layout ? `title-${card.title}` : undefined}
             className="text-white text-xl md:text-3xl font-semibold max-w-xs text-left [text-wrap:balance] font-sans mt-2"
@@ -368,9 +313,9 @@ export const Card = ({
           alt={card.title}
           fill
           className="object-cover absolute z-10 inset-0"
-          style={{ objectPosition: 'center 55%' }}
+          style={{ objectPosition: "center 55%" }}
         />
-      </motion.button>
+      </motion.div>
     </>
   );
 };
