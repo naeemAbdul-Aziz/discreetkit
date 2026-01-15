@@ -81,7 +81,7 @@ export function HeroHybrid() {
         transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
         className="w-full"
       >
-        <Carousel items={carouselItems} autoplay={true} speed={1000} />
+        <Carousel items={carouselItems} autoplay={true} speed={150} />
       </motion.div>
     </section>
   );
