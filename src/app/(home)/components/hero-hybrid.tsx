@@ -25,8 +25,8 @@ export function HeroHybrid() {
 
   // Use original cards for standard carousel behavior
   // Duplicate items to ensure smooth infinite scroll without gaps/resets
-  // Duplicate items 4x to ensure smooth infinite scroll without gaps/resets on wide screens
-  const carouselItems = [...cards, ...cards, ...cards, ...cards];
+  // Duplicate items 2x (10 items) - Marquee duplicates this again for loop
+  const carouselItems = [...cards, ...cards];
 
   return (
     <section
