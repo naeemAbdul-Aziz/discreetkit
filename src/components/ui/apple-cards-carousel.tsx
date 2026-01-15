@@ -145,7 +145,6 @@ export const Carousel = ({
       value={{
         onCardClose: handleCardClose,
         currentIndex,
-        setPaused: setIsPaused,
       }}
     >
       <div
