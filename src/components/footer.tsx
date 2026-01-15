@@ -113,7 +113,7 @@ export function Footer() {
             &copy; {new Date().getFullYear()}{" "}
             {settings?.store_name || "Access DiscreetKit Ltd."}
           </p>
-          <p className="mt-2 md:mt-0">Designed with precision in Accra.</p>
+          <p className="mt-2 md:mt-0"></p>
         </div>
       </div>
     </footer>

@@ -2,54 +2,66 @@
 import React, { useRef } from "react";
 import { Carousel, Card } from "@/components/ui/apple-cards-carousel";
 import Image from "next/image";
-import Link from 'next/link';
-import { ArrowRight, Play } from 'lucide-react';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { variants } from '@/lib/motion';
-import { Highlighter } from '@/components/ui/highlighter';
+import Link from "next/link";
+import { ArrowRight, Play } from "lucide-react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { variants } from "@/lib/motion";
+import { Highlighter } from "@/components/ui/highlighter";
 
 export function HeroHybrid() {
   const containerRef = useRef<HTMLDivElement>(null);
-  
+
   // Force scroll to top on mount to fix landing page issue
   React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-        window.scrollTo({ top: 0, behavior: 'instant' });
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "instant" });
     }
   }, []);
-  
+
   const cards = data.map((card, index) => (
     <Card key={card.src} card={card} index={index} />
   ));
-  
+
   // Use original cards for standard carousel behavior
   // Duplicate items to ensure smooth infinite scroll without gaps/resets
   const carouselItems = [...cards, ...cards, ...cards];
 
   return (
-    <section ref={containerRef} className="relative w-full flex flex-col overflow-hidden bg-background pt-20 md:pt-32 pb-12 md:pb-20">
+    <section
+      ref={containerRef}
+      className="relative w-full flex flex-col overflow-hidden bg-background pt-20 md:pt-32 pb-12 md:pb-20"
+    >
       <div className="container relative z-10 px-4 md:px-6 flex flex-col items-center">
-        
         {/* 1. TEXT SECTION (From Original Hero) */}
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto mb-8 md:mb-12">
-          <motion.div 
+          <motion.div
             initial="hidden"
             animate="visible"
             variants={variants.staggerContainer}
             className="w-full"
           >
-            <motion.h1 
+            <motion.h1
               variants={variants.fadeUp}
               className="font-headline text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter text-foreground leading-[0.95] mb-8"
             >
-              Get Sorted <Highlighter className="text-primary italic font-light">Discreetly.</Highlighter>
+              Get Sorted{" "}
+              <Highlighter className="text-primary italic font-light">
+                Discreetly.
+              </Highlighter>
             </motion.h1>
- 
+
             {/* Subtext removed for cleaner, image-first approach */}
 
-            <motion.div variants={variants.fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
-              <Button asChild size="lg" className="h-11 md:h-14 px-6 md:px-10 text-base md:text-lg rounded-full w-full sm:w-auto shadow-xl hover:scale-105 transition-all duration-300">
+            <motion.div
+              variants={variants.fadeUp}
+              className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto"
+            >
+              <Button
+                asChild
+                size="lg"
+                className="h-11 md:h-14 px-6 md:px-10 text-base md:text-lg rounded-full w-full sm:w-auto shadow-xl hover:scale-105 transition-all duration-300"
+              >
                 <Link href="/#products">
                   Order Anonymously
                   <ArrowRight className="ml-2 w-4 h-4 md:w-5 md:h-5" />
@@ -62,13 +74,13 @@ export function HeroHybrid() {
 
       {/* 2. CAROUSEL SECTION (From Demo) */}
       {/* Moved outside container for full width */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
         className="w-full"
       >
-        <Carousel items={carouselItems} autoplay={true} />
+        <Carousel items={carouselItems} autoplay={true} speed={300} />
       </motion.div>
     </section>
   );
@@ -85,8 +97,9 @@ const data = [
           <span className="font-bold text-neutral-700 dark:text-neutral-200">
             Enhance your connection.
           </span>{" "}
-          From protection to pleasure, our intimacy kits are curated to ensure safety and satisfaction. 
-          Discreetly delivered, so you can focus on the moment without any awkward pharmacy runs.
+          From protection to pleasure, our intimacy kits are curated to ensure
+          safety and satisfaction. Discreetly delivered, so you can focus on the
+          moment without any awkward pharmacy runs.
         </p>
         <div className="relative h-64 w-full mt-10">
           <Image
@@ -109,9 +122,9 @@ const data = [
           <span className="font-bold text-neutral-700 dark:text-neutral-200">
             Everyday confidence.
           </span>{" "}
-          Stay fresh and confident with our premium personal care selection. 
-          We stock high-quality essentials that you use daily, delivered right to your door 
-          in unbranded packaging.
+          Stay fresh and confident with our premium personal care selection. We
+          stock high-quality essentials that you use daily, delivered right to
+          your door in unbranded packaging.
         </p>
         <div className="relative h-64 w-full mt-10">
           <Image
@@ -134,8 +147,9 @@ const data = [
           <span className="font-bold text-neutral-700 dark:text-neutral-200">
             Ready for anything.
           </span>{" "}
-          Accidents happen, but panic doesn't have to. Our preparedness kits include 
-          emergency contraception and other urgent care items, so you have them 
+          Accidents happen, but panic doesn't have to. Our preparedness kits
+          include emergency contraception and other urgent care items, so you
+          have them
           <i>before</i> you need them.
         </p>
         <div className="relative h-64 w-full mt-10">
@@ -159,8 +173,9 @@ const data = [
           <span className="font-bold text-neutral-700 dark:text-neutral-200">
             Professional advice, privately.
           </span>{" "}
-          Skip the waiting room. Consult with licensed medical professionals online 
-          for prescriptions and health advice. It's safe, secure, and completely confidential.
+          Skip the waiting room. Consult with licensed medical professionals
+          online for prescriptions and health advice. It's safe, secure, and
+          completely confidential.
         </p>
         <div className="relative h-64 w-full mt-10">
           <Image
@@ -183,8 +198,9 @@ const data = [
           <span className="font-bold text-neutral-700 dark:text-neutral-200">
             Comfort when you need it.
           </span>{" "}
-          We offer a range of feminine hygiene products designed for comfort and reliability. 
-          Get your monthly essentials delivered discreetly, so you never have to worry about running out.
+          We offer a range of feminine hygiene products designed for comfort and
+          reliability. Get your monthly essentials delivered discreetly, so you
+          never have to worry about running out.
         </p>
         <div className="relative h-64 w-full mt-10">
           <Image
