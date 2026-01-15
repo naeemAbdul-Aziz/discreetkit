@@ -25,15 +25,8 @@ export function HeroHybrid() {
 
   // Use original cards for standard carousel behavior
   // Duplicate items to ensure smooth infinite scroll without gaps/resets
-  // Duplicate items 6x to ensure smooth infinite scroll without gaps/resets on wide screens
-  const carouselItems = [
-    ...cards,
-    ...cards,
-    ...cards,
-    ...cards,
-    ...cards,
-    ...cards,
-  ];
+  // Duplicate items 4x to ensure smooth infinite scroll without gaps/resets on wide screens
+  const carouselItems = [...cards, ...cards, ...cards, ...cards];
 
   return (
     <section
@@ -88,7 +81,7 @@ export function HeroHybrid() {
         transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
         className="w-full"
       >
-        <Carousel items={carouselItems} autoplay={true} speed={300} />
+        <Carousel items={carouselItems} autoplay={true} speed={1000} />
       </motion.div>
     </section>
   );
