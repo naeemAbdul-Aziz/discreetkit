@@ -1,40 +1,62 @@
+"use client";
 
-'use client';
-
-import { useActionState } from 'react';
-import { useFormStatus } from 'react-dom';
-import { useEffect, useRef, useState } from 'react';
-import { createOrderAction } from '@/lib/actions';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
-import { ShieldCheck, ArrowRight, GraduationCap, AlertTriangle, Lock, Mail, MapPin, Loader2 } from 'lucide-react';
-import { BrandSpinner } from '@/components/brand-spinner';
-import { ChatTrigger } from '@/components/chat-trigger';
-import { useCart } from '@/hooks/use-cart';
-import { discounts, DiscountLocation } from '@/lib/data';
-import Image from 'next/image';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
-import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Checkbox } from '@/components/ui/checkbox';
-import Link from 'next/link';
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
+import { useEffect, useRef, useState } from "react";
+import { createOrderAction } from "@/lib/actions";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import {
+  ShieldCheck,
+  ArrowRight,
+  GraduationCap,
+  AlertTriangle,
+  Lock,
+  Mail,
+  MapPin,
+  Loader2,
+} from "lucide-react";
+import { BrandSpinner } from "@/components/brand-spinner";
+import { ChatTrigger } from "@/components/chat-trigger";
+import { useCart } from "@/hooks/use-cart";
+import { discounts, DiscountLocation } from "@/lib/data";
+import Image from "next/image";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Checkbox } from "@/components/ui/checkbox";
+import Link from "next/link";
 
 function SubmitButton({ disabled }: { disabled: boolean }) {
   const { pending } = useFormStatus();
   return (
-    <Button 
-        type="submit" 
-        className="w-full" 
-        size="lg"
-        disabled={disabled}
-        loading={pending}
+    <Button
+      type="submit"
+      className="w-full"
+      size="lg"
+      disabled={disabled}
+      loading={pending}
     >
-      {pending ? 'Processing...' : (
+      {pending ? (
+        "Processing..."
+      ) : (
         <>
           Proceed to Payment
           <ArrowRight />
@@ -48,9 +70,9 @@ function FormPendingOverlay() {
   const { pending } = useFormStatus();
   if (!pending) return null;
   return (
-  <div className="absolute inset-0 z-20 bg-background/60 backdrop-blur-[1px] flex items-center justify-center rounded-3xl">
+    <div className="absolute inset-0 z-20 bg-background/60 backdrop-blur-[1px] flex items-center justify-center rounded-3xl">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-  <BrandSpinner size="sm" />
+        <BrandSpinner size="sm" />
         Confirming order…
       </div>
     </div>
@@ -72,76 +94,104 @@ const shimmer = (w: number, h: number) => `
 </svg>`;
 
 const toBase64 = (str: string) =>
-  typeof window === 'undefined'
-    ? Buffer.from(str).toString('base64')
+  typeof window === "undefined"
+    ? Buffer.from(str).toString("base64")
     : window.btoa(str);
 
 function OrderSummaryCard() {
-    const { items, subtotal, studentDiscount, deliveryFee, totalPrice, isStudent } = useCart();
-    
-    if (items.length === 0) {
-        return null;
-    }
+  const {
+    items,
+    subtotal,
+    studentDiscount,
+    deliveryFee,
+    totalPrice,
+    isStudent,
+  } = useCart();
 
-    return (
-  <Card className="rounded-3xl">
-            <CardHeader>
-                <CardTitle>Order Summary</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                {isStudent && (
-                    <div className="flex items-center gap-2 rounded-lg bg-success/10 p-3 text-success">
-                        <GraduationCap className="h-5 w-5" />
-                        <p className="text-sm font-medium">Student discount (Free Delivery) applied!</p>
-                    </div>
-                )}
-                <div className="space-y-4 text-sm">
-                {items.map(item => (
-                    <div key={item.id} className="flex justify-between items-center gap-4">
-                        <div className="flex items-center gap-4">
-                            <div className="relative h-12 w-12 flex-shrink-0 rounded-md bg-muted overflow-hidden">
-                                {item.image_url && <Image src={item.image_url} alt={item.name} fill className="object-contain p-1" placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(48, 48))}`} />}
-                            </div>
-                            <div>
-                                <p className="font-semibold text-foreground">{item.name}</p>
-                                <p className="text-muted-foreground">Qty: {item.quantity}</p>
-                            </div>
-                        </div>
-                        <div className="text-right">
-                            <p className="font-medium text-foreground">GHS {(item.price_ghs * item.quantity).toFixed(2)}</p>
-                        </div>
-                    </div>
-                ))}
+  if (items.length === 0) {
+    return null;
+  }
+
+  return (
+    <Card className="rounded-3xl">
+      <CardHeader>
+        <CardTitle>Order Summary</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {isStudent && (
+          <div className="flex items-center gap-2 rounded-lg bg-success/10 p-3 text-success">
+            <GraduationCap className="h-5 w-5" />
+            <p className="text-sm font-medium">
+              Student discount (Free Delivery) applied!
+            </p>
+          </div>
+        )}
+        <div className="space-y-4 text-sm">
+          {items.map((item) => (
+            <div
+              key={item.id}
+              className="flex justify-between items-center gap-4"
+            >
+              <div className="flex items-center gap-4">
+                <div className="relative h-12 w-12 flex-shrink-0 rounded-md bg-muted overflow-hidden">
+                  {item.image_url && (
+                    <Image
+                      src={item.image_url}
+                      alt={item.name}
+                      fill
+                      className="object-contain p-1"
+                      placeholder={`data:image/svg+xml;base64,${toBase64(
+                        shimmer(48, 48)
+                      )}`}
+                    />
+                  )}
                 </div>
-
-                <Separator />
-
-                <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                        <p className="text-muted-foreground">Subtotal</p>
-                        <p className="font-medium text-foreground">GHS {subtotal.toFixed(2)}</p>
-                    </div>
-                {studentDiscount > 0 && (
-                    <div className="flex justify-between text-success font-medium">
-                        <p>Student Discount (Free Delivery)</p>
-                        <p>- GHS {studentDiscount.toFixed(2)}</p>
-                    </div>
-                    )}
-                    <div className="flex justify-between">
-                        <p className="text-muted-foreground">Delivery Fee</p>
-                        <p className="font-medium text-foreground">GHS {deliveryFee.toFixed(2)}</p>
-                    </div>
+                <div>
+                  <p className="font-semibold text-foreground">{item.name}</p>
+                  <p className="text-muted-foreground">Qty: {item.quantity}</p>
                 </div>
-                
-                <Separator />
+              </div>
+              <div className="text-right">
+                <p className="font-medium text-foreground">
+                  GHS {(item.price_ghs * item.quantity).toFixed(2)}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
 
-                <div className="flex items-baseline justify-between font-bold text-lg">
-                    <p>Total</p>
-                    <p className="text-primary">GHS {totalPrice.toFixed(2)}</p>
-                </div>
-            </CardContent>
-        </Card>
-    );
+        <Separator />
+
+        <div className="space-y-2 text-sm">
+          <div className="flex justify-between">
+            <p className="text-muted-foreground">Subtotal</p>
+            <p className="font-medium text-foreground">
+              GHS {subtotal.toFixed(2)}
+            </p>
+          </div>
+          {studentDiscount > 0 && (
+            <div className="flex justify-between text-success font-medium">
+              <p>Student Discount (Free Delivery)</p>
+              <p>- GHS {studentDiscount.toFixed(2)}</p>
+            </div>
+          )}
+          <div className="flex justify-between">
+            <p className="text-muted-foreground">Delivery Fee</p>
+            <p className="font-medium text-foreground">
+              GHS {deliveryFee.toFixed(2)}
+            </p>
+          </div>
+        </div>
+
+        <Separator />
+
+        <div className="flex items-baseline justify-between font-bold text-lg">
+          <p>Total</p>
+          <p className="text-primary">GHS {totalPrice.toFixed(2)}</p>
+        </div>
+      </CardContent>
+    </Card>
+  );
 }
 
 const FieldError = ({ message }: { message?: string }) => {
@@ -154,29 +204,36 @@ const FieldError = ({ message }: { message?: string }) => {
   );
 };
 
-
 export function OrderForm() {
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 
-  const { items, subtotal, studentDiscount, deliveryFee, totalPrice, clearCart, deliveryLocation, setDeliveryLocation, isStudent } = useCart(
-    (state) => ({
-      items: state.items,
-      subtotal: state.subtotal,
-      studentDiscount: state.studentDiscount,
-      deliveryFee: state.deliveryFee,
-      totalPrice: state.totalPrice,
-      clearCart: state.clearCart,
-      deliveryLocation: state.deliveryLocation,
-      setDeliveryLocation: state.setDeliveryLocation,
-      isStudent: state.isStudent,
-    })
-  );
+  const {
+    items,
+    subtotal,
+    studentDiscount,
+    deliveryFee,
+    totalPrice,
+    clearCart,
+    deliveryLocation,
+    setDeliveryLocation,
+    isStudent,
+  } = useCart((state) => ({
+    items: state.items,
+    subtotal: state.subtotal,
+    studentDiscount: state.studentDiscount,
+    deliveryFee: state.deliveryFee,
+    totalPrice: state.totalPrice,
+    clearCart: state.clearCart,
+    deliveryLocation: state.deliveryLocation,
+    setDeliveryLocation: state.setDeliveryLocation,
+    isStudent: state.isStudent,
+  }));
 
   const [showOther, setShowOther] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
-  
+
   // Geolocation State
   const [locationLoading, setLocationLoading] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
@@ -186,70 +243,90 @@ export function OrderForm() {
     setLocationError(null);
 
     if (!navigator.geolocation) {
-       setLocationError('Geolocation is not supported by this browser.');
-       setLocationLoading(false);
-       return;
+      setLocationError("Geolocation is not supported by this browser.");
+      setLocationLoading(false);
+      return;
     }
 
     navigator.geolocation.getCurrentPosition(
-        (position) => {
-            const { latitude, longitude } = position.coords;
-            
-            // Find nearest campus
-            const MAX_DISTANCE_KM = 5;
-            const nearest = discounts.reduce((acc, loc) => {
-                if (!loc.coords) return acc;
-                const dist = calculateDistance(latitude, longitude, loc.coords.lat, loc.coords.lng);
-                return dist < acc.dist ? { loc, dist } : acc;
-            }, { loc: null as DiscountLocation | null, dist: Infinity });
+      (position) => {
+        const { latitude, longitude } = position.coords;
 
-            if (nearest.loc && nearest.dist <= MAX_DISTANCE_KM) {
-                setDeliveryLocation(nearest.loc.campus);
-                toast({
-                    title: 'Location Found',
-                    description: `You are near ${nearest.loc.campus}. Discount applied!`,
-                });
-            } else {
-                 toast({
-                    title: 'Location Found',
-                    description: 'No specific campus detected nearby. Please select manually.',
-                    variant: 'default'
-                });
-            }
-            setLocationLoading(false);
-        },
-        (error) => {
-            console.error("Geolocation error:", error);
-            let msg = 'Unable to retrieve location.';
-            if (error.code === error.PERMISSION_DENIED) msg = 'Location permission denied.';
-            setLocationError(msg);
-            setLocationLoading(false);
-            toast({
-                title: 'Location Error',
-                description: msg,
-                variant: 'destructive',
-            });
+        // Find nearest campus
+        const MAX_DISTANCE_KM = 5;
+        const nearest = discounts.reduce(
+          (acc, loc) => {
+            if (!loc.coords) return acc;
+            const dist = calculateDistance(
+              latitude,
+              longitude,
+              loc.coords.lat,
+              loc.coords.lng
+            );
+            return dist < acc.dist ? { loc, dist } : acc;
+          },
+          { loc: null as DiscountLocation | null, dist: Infinity }
+        );
+
+        if (nearest.loc && nearest.dist <= MAX_DISTANCE_KM) {
+          setDeliveryLocation(nearest.loc.campus);
+          toast({
+            title: "Location Found",
+            description: `You are near ${nearest.loc.campus}. Discount applied!`,
+          });
+        } else {
+          toast({
+            title: "Location Found",
+            description:
+              "No specific campus detected nearby. Please select manually.",
+            variant: "default",
+          });
         }
+        setLocationLoading(false);
+      },
+      (error) => {
+        console.error("Geolocation error:", error);
+        let msg = "Unable to retrieve location.";
+        if (error.code === error.PERMISSION_DENIED)
+          msg = "Location permission denied.";
+        setLocationError(msg);
+        setLocationLoading(false);
+        toast({
+          title: "Location Error",
+          description: msg,
+          variant: "destructive",
+        });
+      }
     );
   };
 
   // Haversine formula for distance in km
-  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-      const R = 6371; // radius of earth in km
-      const dLat = deg2rad(lat2 - lat1);
-      const dLon = deg2rad(lon2 - lon1);
-      const a = 
-        Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-        Math.sin(dLon/2) * Math.sin(dLon/2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      return R * c;
-  }
-  const deg2rad = (deg: number) => deg * (Math.PI/180);
-  
+  const calculateDistance = (
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number
+  ) => {
+    const R = 6371; // radius of earth in km
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(lat1)) *
+        Math.cos(deg2rad(lat2)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
+  const deg2rad = (deg: number) => deg * (Math.PI / 180);
+
   useEffect(() => {
     setIsMounted(true);
-    if (deliveryLocation && discounts.some(d => d.campus === deliveryLocation)) {
+    if (
+      deliveryLocation &&
+      discounts.some((d) => d.campus === deliveryLocation)
+    ) {
       setShowOther(false);
     } else {
       setShowOther(true);
@@ -264,47 +341,50 @@ export function OrderForm() {
   };
 
   const initialState: CreateOrderState = {
-    message: '',
+    message: "",
     errors: {},
     success: false,
     authorization_url: null,
   };
 
   const [state, dispatch] = useActionState<CreateOrderState, FormData>(
-    createOrderAction as unknown as (state: CreateOrderState, payload: FormData) => Promise<CreateOrderState>,
+    createOrderAction as unknown as (
+      state: CreateOrderState,
+      payload: FormData
+    ) => Promise<CreateOrderState>,
     initialState
   );
 
   useEffect(() => {
     if (state.success && state.authorization_url) {
       toast({
-        title: 'Order Details Confirmed!',
-        description: 'Redirecting to secure payment...',
-        variant: 'default',
+        title: "Order Details Confirmed!",
+        description: "Redirecting to secure payment...",
+        variant: "default",
       });
       // Redirect to Paystack for payment
       window.location.href = state.authorization_url;
     } else if (!state.success && state.message) {
-        // Display specific field errors if they exist, otherwise show general message
-        if (!state.errors || Object.keys(state.errors).length === 0) {
-            toast({
-                title: 'An error occurred',
-                description: state.message,
-                variant: 'destructive',
-            });
-        }
+      // Display specific field errors if they exist, otherwise show general message
+      if (!state.errors || Object.keys(state.errors).length === 0) {
+        toast({
+          title: "An error occurred",
+          description: state.message,
+          variant: "destructive",
+        });
+      }
     }
   }, [state, toast]);
 
   const handleLocationChange = (value: string) => {
-    if (value === 'Other') {
+    if (value === "Other") {
       setShowOther(true);
       setDeliveryLocation(null);
     } else {
       setShowOther(false);
       setDeliveryLocation(value);
     }
-  }
+  };
 
   if (!isMounted) {
     return <OrderFormSkeleton />;
@@ -323,170 +403,229 @@ export function OrderForm() {
         <div className="lg:col-span-7">
           <form ref={formRef} action={dispatch} className="space-y-8 relative">
             <FormPendingOverlay />
-            <input type="hidden" name="cartItems" value={JSON.stringify(items)} />
+            <input
+              type="hidden"
+              name="cartItems"
+              value={JSON.stringify(items)}
+            />
             <input type="hidden" name="subtotal" value={subtotal} />
-            <input type="hidden" name="studentDiscount" value={studentDiscount} />
+            <input
+              type="hidden"
+              name="studentDiscount"
+              value={studentDiscount}
+            />
             <input type="hidden" name="deliveryFee" value={deliveryFee} />
             <input type="hidden" name="totalPrice" value={totalPrice} />
-            
+
             <Card className="bg-card rounded-3xl border-border/50 shadow-sm">
-                <CardHeader>
-                    <CardTitle>Delivery & Payment Details</CardTitle>
-                    <CardDescription>
-                        We only need a location and contact for the delivery rider. Your details are deleted after delivery.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                    <div className="space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="email">Email Address *</Label>
-                            <div className="relative">
-                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                <Input 
-                                    id="email" 
-                                    name="email" 
-                                    type="email" 
-                                    placeholder="e.g., yourname@email.com" 
-                                    className={cn("pl-10", state.errors?.email && "border-destructive focus-visible:ring-destructive")}
-                                />
-                            </div>
-                            <FieldError message={state.errors?.email?.[0]} />
-                            <p className="text-[0.8rem] text-muted-foreground">
-                            For payment confirmation from Paystack. We don't store it.
-                            </p>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="deliveryArea">Delivery Area / Campus *</Label>
-                            <div className="flex gap-2">
-                                <Select name="deliveryArea" onValueChange={handleLocationChange} value={deliveryLocation || "Other"} disabled={!isMounted}>
-                                <SelectTrigger className={cn("flex-1", state.errors?.deliveryArea && "border-destructive focus-visible:ring-destructive")}>
-                                    <SelectValue placeholder="Select a location..." />
-                                </SelectTrigger>
-                                <SelectContent>
-                                        <SelectItem value="Other">Other (Standard Delivery)</SelectItem>
-                                        {discounts.map(loc => (
-                                        <SelectItem key={loc.id} value={loc.campus}>{loc.campus}</SelectItem>
-                                        ))}
-                                </SelectContent>
-                                </Select>
-                                <Button 
-                                    type="button" 
-                                    variant="outline" 
-                                    size="icon" 
-                                    onClick={handleUseLocation} 
-                                    disabled={locationLoading}
-                                    title="Use my current location"
-                                >
-                                    {locationLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <MapPin className="h-4 w-4" />}
-                                </Button>
-                             </div>
-                            <FieldError message={state.errors?.deliveryArea?.[0]} />
-                            <p className="text-[0.8rem] text-muted-foreground">Select a campus for FREE delivery.</p>
-                        </div>
-
-                        {showOther ? (
-                            <div className="space-y-2">
-                                    <Label htmlFor="otherDeliveryArea">Please Specify Your Location *</Label>
-                                <Input 
-                                    id="otherDeliveryArea" 
-                                    name="otherDeliveryArea" 
-                                    placeholder="e.g., Osu, Airport Area" 
-                                    className={cn(state.errors?.otherDeliveryArea && "border-destructive focus-visible:ring-destructive")}
-                                    />
-                                  <FieldError message={state.errors?.otherDeliveryArea?.[0]} />
-                            </div>
-                        ) : (
-                            <div className="space-y-2">
-                                <Label htmlFor="meetingPoint">Select Pickup / Meeting Point *</Label>
-                                <Select name="otherDeliveryArea">
-                                    <SelectTrigger className={cn(state.errors?.otherDeliveryArea && "border-destructive focus-visible:ring-destructive")}>
-                                        <SelectValue placeholder="Select pickup point..." />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {discounts.find(d => d.campus === deliveryLocation)?.meetingPoints?.map(point => (
-                                            <SelectItem key={point} value={point}>{point}</SelectItem>
-                                        ))}
-                                        <SelectItem value="Other">Other (Specify in notes)</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <FieldError message={state.errors?.otherDeliveryArea?.[0]} />
-                                <p className="text-[0.8rem] text-muted-foreground">Choose a common spot for easier delivery.</p>
-                            </div>
+              <CardHeader className="pb-4">
+                <CardTitle>Delivery & Payment</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-5">
+                <div className="space-y-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="email">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        placeholder="name@example.com"
+                        className={cn(
+                          "pl-10",
+                          state.errors?.email &&
+                            "border-destructive focus-visible:ring-destructive"
                         )}
-                        
-                        <div className="space-y-2">
-                            <Label htmlFor="deliveryAddressNote">Additional Notes for Delivery Agent</Label>
-                            <Textarea
-                            id="deliveryAddressNote"
-                            name="deliveryAddressNote"
-                            placeholder="e.g., 'Call upon arrival at the main gate', 'Leave with the security.'"
-                            />
-                            <p className="text-[0.8rem] text-muted-foreground">
-                            Optional notes to help the rider find you.
-                            </p>
-                        </div>
-                        <div className="space-y-2">
-                            <div className="flex items-center gap-2">
-                            <Label htmlFor="phone_masked">Contact Number (for delivery rider only) *</Label>
-                            </div>
-                            <Input 
-                            id="phone_masked" 
-                            name="phone_masked" 
-                            type="tel" 
-                            placeholder="e.g., 024xxxxxxx" 
-                            className={cn(state.errors?.phone_masked && "border-destructive focus-visible:ring-destructive")}
-                            />
-                            <FieldError message={state.errors?.phone_masked?.[0]} />
-                            <p className="text-[0.8rem] text-muted-foreground flex items-center gap-1.5">
-                            <ShieldCheck className="h-3.5 w-3.5 text-primary" />
-                            This will be masked and is only for the rider to contact you.
-                            </p>
-                        </div>
+                      />
                     </div>
+                    <FieldError message={state.errors?.email?.[0]} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="deliveryArea">Delivery Location</Label>
+                    <div className="flex gap-2">
+                      <Select
+                        name="deliveryArea"
+                        onValueChange={handleLocationChange}
+                        value={deliveryLocation || "Other"}
+                        disabled={!isMounted}
+                      >
+                        <SelectTrigger
+                          className={cn(
+                            "flex-1",
+                            state.errors?.deliveryArea &&
+                              "border-destructive focus-visible:ring-destructive"
+                          )}
+                        >
+                          <SelectValue placeholder="Select a location..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Other">
+                            Other (Standard Delivery)
+                          </SelectItem>
+                          {discounts.map((loc) => (
+                            <SelectItem key={loc.id} value={loc.campus}>
+                              {loc.campus}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={handleUseLocation}
+                        disabled={locationLoading}
+                        title="Use my current location"
+                      >
+                        {locationLoading ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <MapPin className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                    <FieldError message={state.errors?.deliveryArea?.[0]} />
+                  </div>
 
-                    <Separator />
-                    
-                    <div className="items-top flex space-x-2 pt-2">
-                        <Checkbox id="terms" checked={termsAccepted} onCheckedChange={(checked) => setTermsAccepted(checked as boolean)} />
-                        <div className="grid gap-1.5 leading-none">
-                            <label
-                            htmlFor="terms"
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                            >
-                            By checking this box, you agree to our{' '}
-                            <Link href="/terms" className="underline text-primary hover:text-primary/80" target="_blank">
-                                Terms and Conditions
-                            </Link>{' '}
-                            and{' '}
-                            <Link href="/privacy" className="underline text-primary hover:text-primary/80" target="_blank">
-                                Privacy Notice
-                            </Link>
-                            .
-                            </label>
-                        </div>
+                  {showOther ? (
+                    <div className="space-y-1.5">
+                      <Label htmlFor="otherDeliveryArea">Exact Location</Label>
+                      <Input
+                        id="otherDeliveryArea"
+                        name="otherDeliveryArea"
+                        placeholder="e.g., Osu, Airport Area"
+                        className={cn(
+                          state.errors?.otherDeliveryArea &&
+                            "border-destructive focus-visible:ring-destructive"
+                        )}
+                      />
+                      <FieldError
+                        message={state.errors?.otherDeliveryArea?.[0]}
+                      />
                     </div>
-                </CardContent>
+                  ) : (
+                    <div className="space-y-1.5">
+                      <Label htmlFor="meetingPoint">Pickup Point</Label>
+                      <Select name="otherDeliveryArea">
+                        <SelectTrigger
+                          className={cn(
+                            state.errors?.otherDeliveryArea &&
+                              "border-destructive focus-visible:ring-destructive"
+                          )}
+                        >
+                          <SelectValue placeholder="Select pickup point..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {discounts
+                            .find((d) => d.campus === deliveryLocation)
+                            ?.meetingPoints?.map((point) => (
+                              <SelectItem key={point} value={point}>
+                                {point}
+                              </SelectItem>
+                            ))}
+                          <SelectItem value="Other">
+                            Other (Specify in notes)
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FieldError
+                        message={state.errors?.otherDeliveryArea?.[0]}
+                      />
+                    </div>
+                  )}
+
+                  <div className="space-y-1.5">
+                    <Label htmlFor="deliveryAddressNote">
+                      Notes (Optional)
+                    </Label>
+                    <Textarea
+                      id="deliveryAddressNote"
+                      name="deliveryAddressNote"
+                      placeholder="e.g., 'Call upon arrival', 'Main gate'"
+                      className="min-h-[80px]"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="phone_masked">Phone</Label>
+                    </div>
+                    <Input
+                      id="phone_masked"
+                      name="phone_masked"
+                      type="tel"
+                      placeholder="024xxxxxxx"
+                      className={cn(
+                        state.errors?.phone_masked &&
+                          "border-destructive focus-visible:ring-destructive"
+                      )}
+                    />
+                    <FieldError message={state.errors?.phone_masked?.[0]} />
+                    <p className="text-[0.7rem] text-muted-foreground/80 flex items-center gap-1">
+                      <ShieldCheck className="h-3 w-3" />
+                      Private & masked for rider.
+                    </p>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="items-top flex space-x-2 pt-2">
+                  <Checkbox
+                    id="terms"
+                    checked={termsAccepted}
+                    onCheckedChange={(checked) =>
+                      setTermsAccepted(checked as boolean)
+                    }
+                  />
+                  <div className="grid gap-1.5 leading-none">
+                    <label
+                      htmlFor="terms"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      By checking this box, you agree to our{" "}
+                      <Link
+                        href="/terms"
+                        className="underline text-primary hover:text-primary/80"
+                        target="_blank"
+                      >
+                        Terms and Conditions
+                      </Link>{" "}
+                      and{" "}
+                      <Link
+                        href="/privacy"
+                        className="underline text-primary hover:text-primary/80"
+                        target="_blank"
+                      >
+                        Privacy Notice
+                      </Link>
+                      .
+                    </label>
+                  </div>
+                </div>
+              </CardContent>
             </Card>
-            
+
             <SubmitButton disabled={isSubmitDisabled} />
           </form>
         </div>
 
         {/* Right Column: Order Summary */}
         <div className="lg:col-span-5 order-first lg:order-last">
-            <div className="sticky top-24 space-y-6 h-fit">
-                <OrderSummaryCard />
-                 <div className="flex items-center gap-2 rounded-lg bg-muted/50 p-4 text-muted-foreground border border-border/50">
-                    <Lock className="h-5 w-5 text-success flex-shrink-0" />
-                    <p className="text-xs font-medium">Secured via Paystack. Your privacy is guaranteed.</p>
-                </div>
+          <div className="sticky top-24 space-y-6 h-fit">
+            <OrderSummaryCard />
+            <div className="flex items-center gap-2 rounded-lg bg-muted/50 p-4 text-muted-foreground border border-border/50">
+              <Lock className="h-5 w-5 text-success flex-shrink-0" />
+              <p className="text-xs font-medium">
+                Secured via Paystack. Your privacy is guaranteed.
+              </p>
             </div>
+          </div>
         </div>
       </div>
     </>
   );
 }
-
 
 function OrderFormSkeleton() {
   return (
@@ -494,42 +633,42 @@ function OrderFormSkeleton() {
       <div className="mt-8">
         <div className="flex items-center justify-center rounded-lg border-2 border-dashed bg-muted p-6 text-center h-[125px]" />
       </div>
-     
+
       <form className="mt-8 space-y-8 animate-pulse">
         <Card className="bg-card rounded-2xl">
-             <CardHeader>
-                <div className="h-7 w-1/2 bg-muted rounded" />
-                <div className="h-4 w-3/4 bg-muted rounded" />
-            </CardHeader>
-            <CardContent className="space-y-6">
-                <div className="space-y-4">
-                    <div className="space-y-2">
-                        <div className="h-4 w-1/3 bg-muted rounded" />
-                        <div className="h-10 w-full bg-muted rounded-md" />
-                    </div>
-                    <div className="space-y-2">
-                        <div className="h-4 w-1/4 bg-muted rounded" />
-                        <div className="h-10 w-full bg-muted rounded-md" />
-                    </div>
-                    <div className="space-y-2">
-                        <div className="h-4 w-1/3 bg-muted rounded" />
-                        <div className="h-20 w-full bg-muted rounded-md" />
-                    </div>
-                    <div className="space-y-2">
-                        <div className="h-4 w-1/2 bg-muted rounded" />
-                        <div className="h-10 w-full bg-muted rounded-md" />
-                    </div>
-                </div>
+          <CardHeader>
+            <div className="h-7 w-1/2 bg-muted rounded" />
+            <div className="h-4 w-3/4 bg-muted rounded" />
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <div className="h-4 w-1/3 bg-muted rounded" />
+                <div className="h-10 w-full bg-muted rounded-md" />
+              </div>
+              <div className="space-y-2">
+                <div className="h-4 w-1/4 bg-muted rounded" />
+                <div className="h-10 w-full bg-muted rounded-md" />
+              </div>
+              <div className="space-y-2">
+                <div className="h-4 w-1/3 bg-muted rounded" />
+                <div className="h-20 w-full bg-muted rounded-md" />
+              </div>
+              <div className="space-y-2">
+                <div className="h-4 w-1/2 bg-muted rounded" />
+                <div className="h-10 w-full bg-muted rounded-md" />
+              </div>
+            </div>
 
-                <Separator />
-                
-                 <div className="space-y-4">
-                    <div className="h-6 w-1/3 bg-muted rounded" />
-                    <div className="h-10 w-full bg-muted rounded-md" />
-                </div>
-            </CardContent>
+            <Separator />
+
+            <div className="space-y-4">
+              <div className="h-6 w-1/3 bg-muted rounded" />
+              <div className="h-10 w-full bg-muted rounded-md" />
+            </div>
+          </CardContent>
         </Card>
-        
+
         <div className="h-11 w-full bg-muted rounded-md" />
       </form>
     </>
