@@ -92,6 +92,22 @@ export function Chatbot() {
     e.preventDefault();
     if (!input.trim() || isPending) return;
 
+    // Smart Action: Intercept "Shop" command to open the product menu
+    const normalizedInput = input.trim().toLowerCase().replace(/['"]/g, "");
+    if (["shop", "menu", "store", "order", "buy"].includes(normalizedInput)) {
+      setIsOpen(false);
+      setInput("");
+
+      // Wait for sheet to close then scroll
+      setTimeout(() => {
+        const productsSection = document.getElementById("products");
+        if (productsSection) {
+          productsSection.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 300);
+      return;
+    }
+
     const userMessage: Message = { role: "user", parts: input };
     const newHistory = [...history, userMessage];
     setHistory(newHistory);
