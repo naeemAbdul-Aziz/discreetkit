@@ -43,6 +43,12 @@ export async function handleIncomingMessage(
         return;
     }
 
+    // Global Shop Command
+    if (normalizedBody === 'shop' || normalizedBody === 'store') {
+        await sendCategories(from);
+        return;
+    }
+
     // 2. STATE BASED ROUTING
     switch (session.state) {
         case 'IDLE':
@@ -150,7 +156,12 @@ async function handleIdleState(to: string, body: string) {
                         history: [] // We could fetch history from session/redis later
                     });
 
-                    await sendMessage(to, response.answer);
+                    // Format: Convert **bold** to *bold* and ensure list spacing
+                    const formattedAnswer = response.answer
+                        .replace(/\*\*/g, '*')
+                        .replace(/([^\n])\s(\d+\.)/g, '$1\n\n$2');
+
+                    await sendMessage(to, formattedAnswer);
                 } catch (aiError) {
                     console.error('AI Error:', aiError);
                     await sendMainMenu(to); // Fallback to menu
@@ -472,7 +483,10 @@ async function handlePartnerCareState(to: string, body: string) {
                 query: body,
                 history: []
             });
-            await sendMessage(to, response.answer);
+            const formattedAnswer = response.answer
+                .replace(/\*\*/g, '*')
+                .replace(/([^\n])\s(\d+\.)/g, '$1\n\n$2');
+            await sendMessage(to, formattedAnswer);
             // Re-offer menu after answer so they aren't lost
             // await sendPartnerCareMenu(to); // Optional: might be too spammy. Let them read.
         } catch (e) {
