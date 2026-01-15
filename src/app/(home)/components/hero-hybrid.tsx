@@ -25,7 +25,15 @@ export function HeroHybrid() {
 
   // Use original cards for standard carousel behavior
   // Duplicate items to ensure smooth infinite scroll without gaps/resets
-  const carouselItems = [...cards, ...cards, ...cards];
+  // Duplicate items 6x to ensure smooth infinite scroll without gaps/resets on wide screens
+  const carouselItems = [
+    ...cards,
+    ...cards,
+    ...cards,
+    ...cards,
+    ...cards,
+    ...cards,
+  ];
 
   return (
     <section
