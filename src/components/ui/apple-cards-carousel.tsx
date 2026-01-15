@@ -159,7 +159,7 @@ export const Carousel = ({
           >
             <div
               className={cn(
-                "flex flex-nowrap gap-4 py-10 md:py-20",
+                "flex flex-nowrap py-10 md:py-20",
                 "animate-marquee"
               )}
               style={{
