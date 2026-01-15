@@ -1,21 +1,9 @@
 "use client";
-import React, {
-  useEffect,
-  useRef,
-  useState,
-  createContext,
-  useContext,
-} from "react";
-import {
-  IconArrowLeft,
-  IconArrowRight,
-  IconX,
-  IconPlus,
-} from "@tabler/icons-react";
+import React, { useEffect, useState, createContext } from "react";
+import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import Image, { ImageProps } from "next/image";
-import { useOutsideClick } from "@/hooks/use-outside-click";
 import useEmblaCarousel from "embla-carousel-react";
 import AutoScroll from "embla-carousel-auto-scroll";
 
@@ -127,8 +115,6 @@ export const Carousel = ({
   // For CSS Marquee:
   // We need to ensure the animation pauses when a modal is open or (optional) on hover.
   // The context provides `setPaused` which `Card` calls on open/close.
-  const [isPaused, setIsPaused] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
 
   // Calculate duration based on number of items and speed.
   // Default speed ~ 1 corresponds to some px/s. ADJUST as needed.
@@ -147,7 +133,6 @@ export const Carousel = ({
       value={{
         onCardClose: handleCardClose,
         currentIndex,
-        setPaused: setIsPaused,
       }}
     >
       <div
@@ -155,11 +140,7 @@ export const Carousel = ({
         ref={isMarquee ? null : emblaRef}
       >
         {isMarquee ? (
-          <div
-            className="select-none overflow-hidden w-full"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-          >
+          <div className="select-none overflow-hidden w-full">
             <div
               className={cn(
                 "flex flex-nowrap py-10 md:py-20",
@@ -167,8 +148,12 @@ export const Carousel = ({
               )}
               style={{
                 animationDuration: `${duration}s`,
-                animationPlayState:
-                  isPaused || isHovered ? "paused" : "running",
+                animationPlayState: "running",
+                backfaceVisibility: "hidden",
+                perspective: 1000,
+                WebkitBackfaceVisibility: "hidden",
+                WebkitPerspective: 1000,
+                willChange: "transform",
               }}
             >
               {/* First Set */}
