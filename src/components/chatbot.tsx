@@ -7,6 +7,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -57,6 +58,7 @@ const FormattedMessage = ({ text }: { text: string }) => {
 };
 
 export function Chatbot() {
+  const router = useRouter();
   const { isOpen, setIsOpen } = useChatbot();
   const [history, setHistory] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -97,14 +99,7 @@ export function Chatbot() {
     if (["shop", "menu", "store", "order", "buy"].includes(normalizedInput)) {
       setIsOpen(false);
       setInput("");
-
-      // Wait for sheet to close then scroll
-      setTimeout(() => {
-        const productsSection = document.getElementById("products");
-        if (productsSection) {
-          productsSection.scrollIntoView({ behavior: "smooth" });
-        }
-      }, 300);
+      router.push("/products");
       return;
     }
 

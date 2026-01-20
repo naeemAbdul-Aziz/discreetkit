@@ -113,12 +113,14 @@ export async function autoAssignOrder(orderId: number, deliveryArea: string, ite
     const { pharmacyId, reason } = await findBestPharmacyForOrder(simpleItems, deliveryArea)
 
     if (!pharmacyId) {
-        // Log failure
+        // Log failure (User Friendly)
         await supabase.from('order_events').insert({
             order_id: orderId,
-            status: 'Assignment Failed',
-            note: `Auto-assignment failed: ${reason}. Pending manual assignment.`
+            status: 'Processing',
+            note: `Optimization in progress. Finding the best route for your delivery.`
         })
+        // Log technical reason internally
+        console.warn(`[Auto-Assign] Failed for order ${orderId}: ${reason}`);
         return { success: false, reason }
     }
 
@@ -133,11 +135,11 @@ export async function autoAssignOrder(orderId: number, deliveryArea: string, ite
 
     if (error) return { success: false, error: error.message }
 
-    // Log success
+    // Log success (User Friendly)
     await supabase.from('order_events').insert({
         order_id: orderId,
-        status: 'Auto-Assigned',
-        note: `Order assigned to pharmacy #${pharmacyId}. Logic: ${reason}`
+        status: 'Order Packed',
+        note: `Your order has been assigned to a nearby partner pharmacy for quick fulfillment.`
     })
 
     // Trigger notification (async)
