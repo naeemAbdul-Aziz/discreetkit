@@ -81,7 +81,7 @@ export function WaitlistForm({
             <span className="animate-pulse">Joining...</span>
           ) : (
             <span className="flex items-center gap-2">
-              Join Waitlist <MoveRight className="h-4 w-4" />
+              Submit <MoveRight className="h-4 w-4" />
             </span>
           )}
         </Button>

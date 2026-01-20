@@ -324,6 +324,11 @@ export async function sendCustomerReceipt(order: {
     items: { name: string; quantity: number; price_ghs: number }[];
     paymentDate: string;
 }) {
+    // Import brand templates to ensure contact details match the "new structure"
+    const brandTemplates = await import('@/lib/brand-templates.json');
+    const contactSection = brandTemplates.company_profile.sections.find((s: any) => s.heading === "Contact Details");
+    const contactEmail = contactSection?.content.match(/Email: (.*)/)?.[1] || 'hello@discreetkit.com';
+
     // Currently re-using the confirmation style but focusing on "Receipt" wording
     const brandColor = '#187f76';
     const accentColor = '#fbbf24';
@@ -331,7 +336,7 @@ export async function sendCustomerReceipt(order: {
 
     try {
         const { data: emailData, error } = await resend.emails.send({
-            from: 'DiscreetKit <hello@discreetkit.com>',
+            from: `DiscreetKit <${contactEmail}>`,
             to: order.email,
             subject: `Receipt for Order ${order.code}`,
             html: `
@@ -386,6 +391,7 @@ export async function sendCustomerReceipt(order: {
                 </div>
                 <div class="footer">
                     <p>&copy; ${new Date().getFullYear()} Access DiscreetKit Ltd.</p>
+                    <p>Accra, Ghana • <a href="mailto:${contactEmail}" style="color: #9ca3af;">${contactEmail}</a></p>
                 </div>
             </div>
         </body>
