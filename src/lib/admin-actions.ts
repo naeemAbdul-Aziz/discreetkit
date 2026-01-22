@@ -173,6 +173,20 @@ const pharmacySchema = z.object({
     email: z.string().email().optional().or(z.literal("")),
     user_email: z.string().email().optional().or(z.literal("")),
     user_password: z.string().min(6).optional().or(z.literal("")),
+    // New Partnership Fields
+    partner_code: z.string().optional(),
+    trade_discount_percentage: z.coerce.number().min(0).max(100).default(20),
+    bank_details: z.object({
+        bank_name: z.string().optional(),
+        account_number: z.string().optional(),
+        account_name: z.string().optional(),
+        branch: z.string().optional(),
+    }).optional(),
+    momo_details: z.object({
+        network: z.string().optional(), // MTN, Telecel, AT
+        number: z.string().optional(),
+        account_name: z.string().optional(),
+    }).optional(),
 })
 
 export type PharmacyFormValues = z.infer<typeof pharmacySchema>
@@ -212,6 +226,10 @@ export async function getPharmacies() {
     return pharmacies.map(p => ({
         ...p,
         user: p.user_id ? userMap[p.user_id] ?? null : null,
+        // Ensure defaults for new fields if null
+        trade_discount_percentage: p.trade_discount_percentage ?? 20,
+        bank_details: p.bank_details ?? {},
+        momo_details: p.momo_details ?? {},
     }));
 }
 
@@ -305,6 +323,11 @@ export async function upsertPharmacy(data: PharmacyFormValues) {
         contact_person: validated.contact_person,
         phone_number: validated.phone_number,
         email: validated.email,
+        // Partnership Fields
+        partner_code: validated.partner_code,
+        trade_discount_percentage: validated.trade_discount_percentage,
+        bank_details: validated.bank_details,
+        momo_details: validated.momo_details,
     }
 
     if (validated.id) payload.id = validated.id
@@ -337,6 +360,11 @@ export async function createPharmacyWithUser(data: PharmacyFormValues) {
             contact_person: validated.contact_person,
             phone_number: validated.phone_number,
             email: validated.email,
+            // Partnership Fields
+            partner_code: validated.partner_code,
+            trade_discount_percentage: validated.trade_discount_percentage || 20,
+            bank_details: validated.bank_details || {},
+            momo_details: validated.momo_details || {},
         }
 
         const { data: pharmacy, error: pharmacyError } = await supabase
@@ -1293,4 +1321,153 @@ export async function rejectProductRequest(requestId: number) {
 
     revalidatePath('/admin/products');
     return { success: true, message: 'Request rejected' };
+}
+
+// --- Pharmacy Inventory / Pricing Management ---
+
+export async function getPharmacyInventory(pharmacyId: number) {
+    await requireAdmin();
+    const supabase = await createSupabaseServerClient();
+
+    // 1. Get all global products
+    const { data: products } = await supabase
+        .from('products')
+        .select('*')
+        .order('name');
+
+    // 2. Get pharmacy specific settings
+    const { data: pharmacyProducts } = await supabase
+        .from('pharmacy_products')
+        .select('*')
+        .eq('pharmacy_id', pharmacyId);
+
+    // 3. Merge
+    const merged = products?.map(p => {
+        const pp = pharmacyProducts?.find(x => x.product_id === p.id);
+        return {
+            ...p,
+            is_available: pp?.is_available ?? false,
+            stock_level: pp?.stock_level ?? 0,
+            cost_price_ghs: pp?.cost_price_ghs ?? null, // The override
+            pharmacy_price_ghs: pp?.pharmacy_price_ghs ?? p.price_ghs // Selling price
+        };
+    });
+
+    return merged || [];
+}
+
+export async function updatePharmacyInventory(pharmacyId: number, productId: number, updates: {
+    stock_level?: number,
+    cost_price_ghs?: number, // Partner supply price override
+    is_available?: boolean
+}) {
+    await requireAdmin();
+    const supabase = await createSupabaseServerClient();
+
+    const payload: any = {
+        pharmacy_id: pharmacyId,
+        product_id: productId,
+        last_updated: new Date().toISOString()
+    };
+    
+    if (updates.stock_level !== undefined) payload.stock_level = updates.stock_level;
+    if (updates.cost_price_ghs !== undefined) payload.cost_price_ghs = updates.cost_price_ghs;
+    if (updates.is_available !== undefined) payload.is_available = updates.is_available;
+
+    const { error } = await supabase
+        .from('pharmacy_products')
+        .upsert(payload, { onConflict: 'pharmacy_id, product_id' });
+
+    if (error) return { success: false, message: error.message };
+
+    revalidatePath(`/admin/partners/${pharmacyId}`);
+    return { success: true, message: 'Updated successfully' };
+}
+
+
+// --- Financials & Reports ---
+
+export async function generatePayoutReport(startDate?: string, endDate?: string) {
+    await requireAdmin();
+    const supabase = await createSupabaseServerClient();
+
+    // Default to last 7 days if not provided
+    const start = startDate ? new Date(startDate) : new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const end = endDate ? new Date(endDate) : new Date();
+
+    // 1. Fetch Completed Orders in Range
+    const { data: orders, error: ordersError } = await supabase
+        .from('orders')
+        .select(`
+            id, code, total_price, pharmacy_id, created_at, status
+        `)
+        .eq('status', 'completed')
+        .gte('created_at', start.toISOString())
+        .lte('created_at', end.toISOString());
+
+    if (ordersError) throw new Error(ordersError.message);
+
+    // 2. Fetch Pharmacies to get Discount Rates & Bank Details
+    const { data: pharmacies, error: pharmError } = await supabase
+        .from('pharmacies')
+        .select('*');
+
+    if (pharmError) throw new Error(pharmError.message);
+
+    const pharmacyMap = new Map(pharmacies.map((p: any) => [p.id, p]));
+
+    // 3. Aggregate Data
+    const payouts: Record<number, {
+        pharmacy_id: number,
+        pharmacy_name: string,
+        partner_code: string,
+        trade_discount: number,
+        total_orders: number,
+        gross_revenue: number, // Retail Price
+        platform_fee: number,  // Retained by Platform
+        net_payout: number,    // Remitted to Pharmacy
+        bank_details: any,
+        momo_details: any
+    }> = {};
+
+    orders.forEach((order: any) => {
+        if (!order.pharmacy_id) return;
+        const p = pharmacyMap.get(order.pharmacy_id);
+        if (!p) return;
+
+        if (!payouts[order.pharmacy_id]) {
+            payouts[order.pharmacy_id] = {
+                pharmacy_id: p.id,
+                pharmacy_name: p.name,
+                partner_code: p.partner_code || 'N/A',
+                trade_discount: p.trade_discount_percentage || 20, // Default 20%
+                total_orders: 0,
+                gross_revenue: 0,
+                platform_fee: 0,
+                net_payout: 0,
+                bank_details: p.bank_details,
+                momo_details: p.momo_details
+            };
+        }
+
+        const amount = order.total_price || 0;
+        const discountRate = (p.trade_discount_percentage || 20) / 100;
+        const platformShare = amount * discountRate;
+        const pharmacyShare = amount - platformShare;
+
+        payouts[order.pharmacy_id].total_orders += 1;
+        payouts[order.pharmacy_id].gross_revenue += amount;
+        payouts[order.pharmacy_id].platform_fee += platformShare;
+        payouts[order.pharmacy_id].net_payout += pharmacyShare;
+    });
+
+    // 4. Format for Display/CSV
+    const reportData = Object.values(payouts).map(p => ({
+        ...p,
+        gross_revenue: Number(p.gross_revenue.toFixed(2)),
+        platform_fee: Number(p.platform_fee.toFixed(2)),
+        net_payout: Number(p.net_payout.toFixed(2)),
+    }));
+
+    return reportData;
 }

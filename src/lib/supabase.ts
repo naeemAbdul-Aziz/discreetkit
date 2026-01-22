@@ -12,8 +12,14 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 
 // These are the public-facing variables, safe to be exposed in the browser.
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+// These are the public-facing variables, safe to be exposed in the browser.
+let supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+// Fix for "WebSocket not available" / mixed content errors in Production
+if (process.env.NODE_ENV === 'production' && supabaseUrl && supabaseUrl.startsWith('http://')) {
+  supabaseUrl = supabaseUrl.replace('http://', 'https://');
+}
 
 // --- This is for CLIENT Components ---
 // Singleton instance for the public client
