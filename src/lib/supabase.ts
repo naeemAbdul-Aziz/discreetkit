@@ -34,16 +34,27 @@ export function getSupabaseClient() {
     throw new Error('getSupabaseClient() must only be called in client components (browser environment)');
   }
   if (!supabaseInstance) {
-    supabaseInstance = createBrowserClient(supabaseUrl, supabaseAnonKey);
+    const cookieDomain = process.env.NEXT_PUBLIC_COOKIE_DOMAIN;
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    
+    supabaseInstance = createBrowserClient(supabaseUrl, supabaseAnonKey, {
+      cookieOptions: {
+        ...(cookieDomain && !isLocalhost ? { domain: cookieDomain } : {}),
+      }
+    });
   }
   return supabaseInstance!;
 }
 
 // --- This is for SERVER Components and SERVER ACTIONS ---
 export async function createSupabaseServerClient() {
-  const { cookies } = await import('next/headers');
+  const { cookies, headers } = await import('next/headers');
   const cookieStore = await cookies();
+  const headerStore = await headers();
+  const host = headerStore.get('host') || '';
+  const isLocalhost = host.includes('localhost') || host.includes('127.0.0.1');
   const cookieDomain = process.env.NEXT_PUBLIC_COOKIE_DOMAIN;
+  
   return createServerClient(
     supabaseUrl,
     supabaseAnonKey,
@@ -58,7 +69,7 @@ export async function createSupabaseServerClient() {
               name,
               value,
               ...options,
-              ...(cookieDomain ? { domain: cookieDomain } : {}),
+              ...(cookieDomain && !isLocalhost ? { domain: cookieDomain } : {}),
               sameSite: 'lax',
               secure: process.env.NODE_ENV === 'production'
             })
@@ -69,13 +80,16 @@ export async function createSupabaseServerClient() {
         },
         remove(name: string, options: CookieOptions) {
           try {
-            cookieStore.set({ name, value: '', ...options, ...(cookieDomain ? { domain: cookieDomain } : {}) })
+            cookieStore.set({ name, value: '', ...options, ...(cookieDomain && !isLocalhost ? { domain: cookieDomain } : {}) })
           } catch (error) {
             // The `delete` cookie method throws when trying to delete a cookie in a Server Action.
             // This is expected, and can be safely ignored.
           }
         },
       },
+      cookieOptions: {
+         ...(cookieDomain && !isLocalhost ? { domain: cookieDomain } : {}),
+      }
     }
   );
 }
@@ -89,7 +103,10 @@ export function createSupabaseMiddlewareClient(request: NextRequest) {
     },
   });
 
+  const host = request.headers.get('host') || '';
+  const isLocalhost = host.includes('localhost') || host.includes('127.0.0.1');
   const cookieDomain = process.env.NEXT_PUBLIC_COOKIE_DOMAIN;
+  
   const supabase = createServerClient(
     supabaseUrl,
     supabaseAnonKey,
@@ -113,7 +130,7 @@ export function createSupabaseMiddlewareClient(request: NextRequest) {
             name,
             value,
             ...options,
-            ...(cookieDomain ? { domain: cookieDomain } : {}),
+            ...(cookieDomain && !isLocalhost ? { domain: cookieDomain } : {}),
             sameSite: 'lax',
             secure: process.env.NODE_ENV === 'production'
           });
@@ -133,12 +150,15 @@ export function createSupabaseMiddlewareClient(request: NextRequest) {
             name,
             value: '',
             ...options,
-            ...(cookieDomain ? { domain: cookieDomain } : {}),
+            ...(cookieDomain && !isLocalhost ? { domain: cookieDomain } : {}),
             sameSite: 'lax',
             secure: process.env.NODE_ENV === 'production'
           });
         },
       },
+      cookieOptions: {
+         ...(cookieDomain && !isLocalhost ? { domain: cookieDomain } : {}),
+      }
     }
   );
 
