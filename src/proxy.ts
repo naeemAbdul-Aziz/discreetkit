@@ -98,28 +98,23 @@ export async function proxy(request: NextRequest) {
 
     // 5. Subdomain Rewrites
     if (isAdminSubdomain) {
+        // Rewrite root to /admin
         if (url.pathname === '/') {
             url.pathname = '/admin';
-        } else {
-            // Do not force-prefix certain global routes
-            const exemptPaths = ['/login', '/unauthorized', '/robots.txt', '/sitemap.xml'];
-            const isExempt = exemptPaths.some((p) => url.pathname.startsWith(p));
-            if (!url.pathname.startsWith('/admin') && !isExempt) {
-                url.pathname = `/admin${url.pathname}`;
-            }
+        } else if (!url.pathname.startsWith('/admin') && !url.pathname.startsWith('/api') && !url.pathname.startsWith('/_next')) {
+             // Only prepend /admin if it's not already there and not a system path
+            url.pathname = `/admin${url.pathname}`;
         }
         return NextResponse.rewrite(url);
     }
+    
     if (isPharmacySubdomain) {
+        // Rewrite root to /pharmacy/dashboard
         if (url.pathname === '/') {
             url.pathname = '/pharmacy/dashboard';
-        } else {
-            // Do not force-prefix certain global routes
-            const exemptPaths = ['/login', '/unauthorized', '/robots.txt', '/sitemap.xml'];
-            const isExempt = exemptPaths.some((p) => url.pathname.startsWith(p));
-            if (!url.pathname.startsWith('/pharmacy') && !isExempt) {
-                url.pathname = `/pharmacy${url.pathname}`;
-            }
+        } else if (!url.pathname.startsWith('/pharmacy') && !url.pathname.startsWith('/api') && !url.pathname.startsWith('/_next')) {
+            // Only prepend /pharmacy if it's not already there
+            url.pathname = `/pharmacy${url.pathname}`;
         }
         return NextResponse.rewrite(url);
     }

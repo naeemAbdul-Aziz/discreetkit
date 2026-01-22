@@ -63,6 +63,8 @@ CREATE TABLE public.user_roles (
     primary key (user_id, role_id)
 );
 COMMENT ON TABLE public.user_roles IS 'Mapping of users to roles.';
+CREATE INDEX user_roles_role_id_idx ON public.user_roles(role_id);
+CREATE INDEX user_roles_user_id_idx ON public.user_roles(user_id);
 
 -- 3.3 STORE SETTINGS
 CREATE TABLE public.store_settings (
@@ -135,13 +137,37 @@ CREATE TABLE public.pharmacies (
     user_id uuid references auth.users(id) on delete set null,
     is_24_7 boolean default false,
     is_open boolean default true,
-    operating_hours jsonb
+    is_open boolean default true,
+    operating_hours jsonb,
+    -- Partnership Fields (Added 2026-01-22)
+    partner_code text UNIQUE,
+    trade_discount_percentage numeric(5, 2) DEFAULT 20.00,
+    bank_details jsonb DEFAULT '{}'::jsonb,
+    momo_details jsonb DEFAULT '{}'::jsonb
 );
 COMMENT ON TABLE public.pharmacies IS 'Partner pharmacies for order fulfillment.';
 COMMENT ON COLUMN public.pharmacies.is_24_7 IS 'Flag if the pharmacy operates 24 hours a day.';
 COMMENT ON COLUMN public.pharmacies.is_open IS 'Manual override to close a pharmacy temporarily.';
 COMMENT ON COLUMN public.pharmacies.operating_hours IS 'JSON object defining opening/closing times if not 24/7.';
+COMMENT ON COLUMN public.pharmacies.partner_code IS 'Unique DK-PARTNER-XXX code for identification.';
+COMMENT ON COLUMN public.pharmacies.trade_discount_percentage IS 'Agreed margin discount (e.g. 20%) deducted from retail price for payout.';
 CREATE INDEX pharmacies_user_id_idx ON public.pharmacies(user_id);
+
+-- Trigger to auto-generate Partner Code
+CREATE OR REPLACE FUNCTION generate_partner_code()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.partner_code IS NULL THEN
+        NEW.partner_code := 'DK-PARTNER-' || LPAD(floor(random()*1000)::text, 3, '0') || SUBSTRING(md5(random()::text), 1, 3);
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_set_partner_code
+    BEFORE INSERT ON public.pharmacies
+    FOR EACH ROW
+    EXECUTE FUNCTION generate_partner_code();
 
 -- 4.3 PRODUCT REQUESTS
 CREATE TABLE public.product_requests (
@@ -165,6 +191,7 @@ CREATE TABLE public.pharmacy_products (
     is_available boolean default true,
     last_updated timestamp with time zone default now(),
     created_at timestamp with time zone default now(),
+    cost_price_ghs numeric(10, 2), -- Override for negotiated cost
     UNIQUE(pharmacy_id, product_id)
 );
 COMMENT ON TABLE public.pharmacy_products IS 'Pharmacy-specific product inventory and pricing.';
@@ -243,6 +270,8 @@ CREATE INDEX orders_status_idx ON public.orders(status);
 CREATE INDEX orders_pharmacy_id_status_idx ON public.orders(pharmacy_id, status);
 CREATE INDEX orders_estimated_delivery_idx ON public.orders(estimated_delivery_time) WHERE status IN ('processing', 'out_for_delivery');
 CREATE INDEX orders_cancelled_idx ON public.orders(cancelled_at) WHERE cancelled_at IS NOT NULL;
+CREATE INDEX orders_partner_code_idx ON public.orders(partner_code);
+CREATE INDEX orders_items_gin_idx ON public.orders USING GIN (items);
 
 -- 6.2 ORDER EVENTS
 CREATE TABLE public.order_events (
@@ -253,6 +282,7 @@ CREATE TABLE public.order_events (
     note text
 );
 COMMENT ON TABLE public.order_events IS 'Audit log of order status changes.';
+CREATE INDEX order_events_order_id_idx ON public.order_events(order_id);
 
 -- 6.3 ORDER MESSAGES
 CREATE TABLE public.order_messages (
@@ -269,6 +299,7 @@ COMMENT ON TABLE public.order_messages IS 'Communication thread for orders betwe
 COMMENT ON COLUMN public.order_messages.is_internal IS 'If true, only visible to admins (internal notes).';
 CREATE INDEX order_messages_order_idx ON public.order_messages(order_id);
 CREATE INDEX order_messages_created_idx ON public.order_messages(created_at DESC);
+CREATE INDEX order_messages_sender_id_idx ON public.order_messages(sender_id);
 
 -- 6.4 ORDER CANCELLATIONS
 CREATE TABLE public.order_cancellations (
@@ -286,6 +317,7 @@ CREATE TABLE public.order_cancellations (
 COMMENT ON TABLE public.order_cancellations IS 'Tracks order cancellation requests and refund processing.';
 CREATE INDEX order_cancellations_order_idx ON public.order_cancellations(order_id);
 CREATE INDEX order_cancellations_refund_status_idx ON public.order_cancellations(refund_status);
+CREATE INDEX order_cancellations_approved_by_idx ON public.order_cancellations(approved_by);
 
 -- 6.5 INVENTORY RESERVATIONS
 CREATE TABLE public.inventory_reservations (
@@ -304,6 +336,8 @@ COMMENT ON COLUMN public.inventory_reservations.status IS 'active: reserved, rel
 CREATE INDEX inventory_reservations_order_idx ON public.inventory_reservations(order_id);
 CREATE INDEX inventory_reservations_pharmacy_idx ON public.inventory_reservations(pharmacy_id);
 CREATE INDEX inventory_reservations_status_idx ON public.inventory_reservations(status) WHERE status = 'active';
+CREATE INDEX inventory_reservations_product_id_idx ON public.inventory_reservations(product_id);
+CREATE INDEX inventory_reservations_pharmacy_product_idx ON public.inventory_reservations(pharmacy_id, product_id);
 
 -- 6.6 PHARMACY NOTIFICATIONS
 CREATE TABLE public.pharmacy_notifications (
@@ -375,95 +409,104 @@ ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.order_messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.inventory_reservations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.order_cancellations ENABLE ROW LEVEL SECURITY;
+-- New tables from optimization
+ALTER TABLE public.order_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.pharmacy_notifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.payment_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.suggestions ENABLE ROW LEVEL SECURITY;
 
--- 8.1 BASIC ACCESS
-CREATE POLICY "Admin full access" ON public.categories FOR ALL USING (auth.role() = 'service_role');
+-- 8.1 BASIC ACCESS & ROLES
 CREATE POLICY "Public read access" ON public.products FOR SELECT USING (true);
 CREATE POLICY "Admin full access" ON public.products FOR ALL USING (auth.role() = 'service_role');
+
+-- Categories (Public read only, Admin full)
+CREATE POLICY "Public read access" ON public.categories FOR SELECT USING (true);
+CREATE POLICY "Admin full access" ON public.categories FOR ALL USING (auth.role() = 'service_role');
+
+-- Roles (Public read, Service role manage)
+CREATE POLICY "Public read access" ON public.roles FOR SELECT USING (true);
+CREATE POLICY "Service role full access" ON public.roles FOR ALL USING ((SELECT auth.role()) = 'service_role');
+
+-- User Roles (Users can read own)
+CREATE POLICY "Users can read own roles" ON public.user_roles FOR SELECT USING (user_id = (SELECT auth.uid()));
 
 -- 8.2 PHARMACIES
 CREATE POLICY "Admin full access" ON public.pharmacies FOR ALL USING (auth.role() = 'service_role');
 CREATE POLICY "Pharmacy users can view their own pharmacy" ON public.pharmacies FOR SELECT USING (
-    auth.uid() = user_id OR auth.role() = 'service_role'
+    user_id = (SELECT auth.uid()) OR (SELECT auth.role()) = 'service_role'
 );
 CREATE POLICY "Allow admin insert pharmacies" ON public.pharmacies FOR INSERT WITH CHECK (auth.role() = 'service_role' OR auth.role() = 'authenticated');
-CREATE POLICY "Allow admin update pharmacies" ON public.pharmacies FOR UPDATE USING (auth.role() = 'service_role' OR user_id = auth.uid());
-CREATE POLICY "Allow admin delete pharmacies" ON public.pharmacies FOR DELETE USING (auth.role() = 'service_role' OR user_id = auth.uid());
+CREATE POLICY "Allow admin update pharmacies" ON public.pharmacies FOR UPDATE USING (auth.role() = 'service_role' OR user_id = (SELECT auth.uid()));
+CREATE POLICY "Allow admin delete pharmacies" ON public.pharmacies FOR DELETE USING (auth.role() = 'service_role' OR user_id = (SELECT auth.uid()));
 
--- 8.3 PHARMACY INVENTORY (Consolidated & Fixed)
+-- 8.3 PHARMACY INVENTORY
 CREATE POLICY "Pharmacies can view their own inventory" ON public.pharmacy_products FOR SELECT
-    USING (pharmacy_id IN (SELECT id FROM public.pharmacies WHERE user_id = auth.uid()));
-
+    USING (pharmacy_id IN (SELECT id FROM public.pharmacies WHERE user_id = (SELECT auth.uid())));
 CREATE POLICY "Pharmacies can manage their own inventory" ON public.pharmacy_products FOR ALL
-    USING (pharmacy_id IN (SELECT id FROM public.pharmacies WHERE user_id = auth.uid()));
-
+    USING (pharmacy_id IN (SELECT id FROM public.pharmacies WHERE user_id = (SELECT auth.uid())));
 CREATE POLICY "Admins can view all inventory" ON public.pharmacy_products FOR SELECT
-    USING (EXISTS (SELECT 1 FROM public.user_roles ur JOIN public.roles r ON ur.role_id = r.id WHERE ur.user_id = auth.uid() AND r.name = 'admin'));
+    USING (EXISTS (SELECT 1 FROM public.user_roles ur JOIN public.roles r ON ur.role_id = r.id WHERE ur.user_id = (SELECT auth.uid()) AND r.name = 'admin'));
 
--- 8.4 PHARMACY SERVICE AREAS (Consolidated & Fixed)
+-- 8.4 PHARMACY SERVICE AREAS
 CREATE POLICY "Pharmacies can view their own areas" ON public.pharmacy_service_areas FOR SELECT
-    USING (pharmacy_id IN (SELECT id FROM public.pharmacies WHERE user_id = auth.uid()));
-
+    USING (pharmacy_id IN (SELECT id FROM public.pharmacies WHERE user_id = (SELECT auth.uid())));
 CREATE POLICY "Pharmacies can manage their own areas" ON public.pharmacy_service_areas FOR ALL
-    USING (pharmacy_id IN (SELECT id FROM public.pharmacies WHERE user_id = auth.uid()));
-
+    USING (pharmacy_id IN (SELECT id FROM public.pharmacies WHERE user_id = (SELECT auth.uid())));
 CREATE POLICY "Admins can view all areas" ON public.pharmacy_service_areas FOR SELECT
-    USING (EXISTS (SELECT 1 FROM public.user_roles ur JOIN public.roles r ON ur.role_id = r.id WHERE ur.user_id = auth.uid() AND r.name = 'admin'));
+    USING (EXISTS (SELECT 1 FROM public.user_roles ur JOIN public.roles r ON ur.role_id = r.id WHERE ur.user_id = (SELECT auth.uid()) AND r.name = 'admin'));
 
 -- 8.5 ORDERS
 CREATE POLICY "Public read via code" ON public.orders FOR SELECT USING (true);
 CREATE POLICY "Admin full access" ON public.orders FOR ALL USING (auth.role() = 'service_role');
 
--- Fixed: Pharmacies can update their assigned orders
 CREATE POLICY "Pharmacies can update assigned orders" ON public.orders FOR UPDATE
-    USING (pharmacy_id IN (SELECT id FROM public.pharmacies WHERE user_id = auth.uid()))
-    WITH CHECK (pharmacy_id IN (SELECT id FROM public.pharmacies WHERE user_id = auth.uid()));
+    USING (pharmacy_id IN (SELECT id FROM public.pharmacies WHERE user_id = (SELECT auth.uid())))
+    WITH CHECK (pharmacy_id IN (SELECT id FROM public.pharmacies WHERE user_id = (SELECT auth.uid())));
 
 CREATE POLICY "Pharmacies can view assigned orders" ON public.orders FOR SELECT
-    USING (pharmacy_id IN (SELECT id FROM public.pharmacies WHERE user_id = auth.uid()));
+    USING (pharmacy_id IN (SELECT id FROM public.pharmacies WHERE user_id = (SELECT auth.uid())));
 
--- 8.6 ORDER EVENTS, MESSAGES, ETC
+-- 8.6 ORDER EVENTS, MESSAGES, CANCELLATIONS
 CREATE POLICY "Read linked order events" ON public.order_events FOR SELECT USING (EXISTS (SELECT 1 FROM public.orders WHERE id = order_id));
 CREATE POLICY "Admin full access" ON public.order_events FOR ALL USING (auth.role() = 'service_role');
 
+-- Messages
 CREATE POLICY "Admins can view all messages" ON public.order_messages FOR SELECT
-    USING (EXISTS (SELECT 1 FROM public.user_roles ur JOIN public.roles r ON ur.role_id = r.id WHERE ur.user_id = auth.uid() AND r.name = 'admin'));
-
+    USING (EXISTS (SELECT 1 FROM public.user_roles ur JOIN public.roles r ON ur.role_id = r.id WHERE ur.user_id = (SELECT auth.uid()) AND r.name = 'admin'));
 CREATE POLICY "Pharmacies can view their order messages" ON public.order_messages FOR SELECT
-    USING (NOT is_internal AND order_id IN (SELECT o.id FROM public.orders o JOIN public.pharmacies p ON o.pharmacy_id = p.id WHERE p.user_id = auth.uid()));
-
+    USING (NOT is_internal AND order_id IN (SELECT o.id FROM public.orders o JOIN public.pharmacies p ON o.pharmacy_id = p.id WHERE p.user_id = (SELECT auth.uid())));
 CREATE POLICY "Admins can insert messages" ON public.order_messages FOR INSERT
-    WITH CHECK (EXISTS (SELECT 1 FROM public.user_roles ur JOIN public.roles r ON ur.role_id = r.id WHERE ur.user_id = auth.uid() AND r.name = 'admin'));
-
+    WITH CHECK (EXISTS (SELECT 1 FROM public.user_roles ur JOIN public.roles r ON ur.role_id = r.id WHERE ur.user_id = (SELECT auth.uid()) AND r.name = 'admin'));
 CREATE POLICY "Pharmacies can insert messages" ON public.order_messages FOR INSERT
-    WITH CHECK (sender_type = 'pharmacy' AND NOT is_internal AND order_id IN (SELECT o.id FROM public.orders o JOIN public.pharmacies p ON o.pharmacy_id = p.id WHERE p.user_id = auth.uid()));
+    WITH CHECK (sender_type = 'pharmacy' AND NOT is_internal AND order_id IN (SELECT o.id FROM public.orders o JOIN public.pharmacies p ON o.pharmacy_id = p.id WHERE p.user_id = (SELECT auth.uid())));
 
+-- Cancellations
 CREATE POLICY "Admins can view all cancellations" ON public.order_cancellations FOR SELECT
-    USING (EXISTS (SELECT 1 FROM public.user_roles ur JOIN public.roles r ON ur.role_id = r.id WHERE ur.user_id = auth.uid() AND r.name = 'admin'));
+    USING (EXISTS (SELECT 1 FROM public.user_roles ur JOIN public.roles r ON ur.role_id = r.id WHERE ur.user_id = (SELECT auth.uid()) AND r.name = 'admin'));
 CREATE POLICY "Admins can manage cancellations" ON public.order_cancellations FOR ALL
-    USING (EXISTS (SELECT 1 FROM public.user_roles ur JOIN public.roles r ON ur.role_id = r.id WHERE ur.user_id = auth.uid() AND r.name = 'admin'));
+    USING (EXISTS (SELECT 1 FROM public.user_roles ur JOIN public.roles r ON ur.role_id = r.id WHERE ur.user_id = (SELECT auth.uid()) AND r.name = 'admin'));
 
+-- Reservations
 CREATE POLICY "Admins can view all reservations" ON public.inventory_reservations FOR SELECT
-    USING (EXISTS (SELECT 1 FROM public.user_roles ur JOIN public.roles r ON ur.role_id = r.id WHERE ur.user_id = auth.uid() AND r.name = 'admin'));
+    USING (EXISTS (SELECT 1 FROM public.user_roles ur JOIN public.roles r ON ur.role_id = r.id WHERE ur.user_id = (SELECT auth.uid()) AND r.name = 'admin'));
 CREATE POLICY "Pharmacies can view their reservations" ON public.inventory_reservations FOR SELECT
-    USING (pharmacy_id IN (SELECT id FROM public.pharmacies WHERE user_id = auth.uid()));
+    USING (pharmacy_id IN (SELECT id FROM public.pharmacies WHERE user_id = (SELECT auth.uid())));
 
 -- 8.7 REVIEWS & PRODUCT REQUESTS
-CREATE POLICY "Enable insert for everyone" on public.reviews for insert with check (true);
+CREATE POLICY "Enable insert for everyone" on public.reviews for insert with check (auth.role() IN ('anon', 'authenticated', 'service_role'));
 CREATE POLICY "Enable read for everyone" on public.reviews for select using (true);
 
 CREATE POLICY "Pharmacies can view their own requests" on public.product_requests for select
-    using (pharmacy_id in (select id from public.pharmacies where user_id = auth.uid()));
+    using (pharmacy_id in (select id from public.pharmacies where user_id = (SELECT auth.uid())));
 CREATE POLICY "Pharmacies can insert their own requests" on public.product_requests for insert
-    with check (pharmacy_id in (select id from public.pharmacies where user_id = auth.uid()));
+    with check (pharmacy_id in (select id from public.pharmacies where user_id = (SELECT auth.uid())));
 CREATE POLICY "Admins can view all requests" on public.product_requests for select
-    using (exists (select 1 from public.user_roles ur join public.roles r on ur.role_id = r.id where ur.user_id = auth.uid() and r.name = 'admin'));
+    using (exists (select 1 from public.user_roles ur join public.roles r on ur.role_id = r.id where ur.user_id = (SELECT auth.uid()) and r.name = 'admin'));
 
--- 8.8 OTHERS
+-- 8.8 OTHERS (Admin Only)
 CREATE POLICY "Admin full access" ON public.pharmacy_notifications FOR ALL USING (auth.role() = 'service_role');
 CREATE POLICY "Admin full access" ON public.suggestions FOR ALL USING (auth.role() = 'service_role');
 CREATE POLICY "Admin full access" ON public.payment_events FOR ALL USING (auth.role() = 'service_role');
-
 
 -- ==========================================
 -- 9. FUNCTIONS & TRIGGERS
@@ -580,8 +623,16 @@ CREATE TRIGGER trigger_set_estimated_delivery_time
     EXECUTE FUNCTION set_estimated_delivery_time();
 
 
+
+ALTER FUNCTION update_pharmacy_product_timestamp() SET search_path = public;
+ALTER FUNCTION create_inventory_reservations() SET search_path = public;
+ALTER FUNCTION release_expired_reservations() SET search_path = public;
+ALTER FUNCTION fulfill_inventory_reservations() SET search_path = public;
+ALTER FUNCTION set_estimated_delivery_time() SET search_path = public;
+
 -- ==========================================
 -- 10. SYSTEM INITIALIZATION
+
 -- ==========================================
 
 -- Essential system roles
@@ -628,5 +679,26 @@ security definer
 as $$
   select count(*)::integer from public.waitlist;
 $$;
+ALTER FUNCTION get_waitlist_count() SET search_path = public;
 
 grant execute on function get_waitlist_count to anon, authenticated;
+
+-- ==========================================
+-- 12. VIEWS
+-- ==========================================
+
+CREATE OR REPLACE VIEW public.pharmacy_payouts_due AS
+SELECT 
+    p.id as pharmacy_id,
+    p.name as pharmacy_name,
+    p.partner_code,
+    p.trade_discount_percentage,
+    COUNT(o.id) as total_orders,
+    SUM(o.total_price) as total_revenue,
+    SUM(o.total_price * (1 - (COALESCE(p.trade_discount_percentage, 20) / 100))) as payout_due,
+    MIN(o.created_at) as period_start,
+    MAX(o.created_at) as period_end
+FROM public.orders o
+JOIN public.pharmacies p ON o.pharmacy_id = p.id
+WHERE o.status = 'completed'
+GROUP BY p.id, p.name, p.partner_code, p.trade_discount_percentage;
