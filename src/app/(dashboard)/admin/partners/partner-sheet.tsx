@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
@@ -8,18 +8,18 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { upsertPharmacy, createPharmacyWithUser } from "@/lib/admin-actions"
-import { useToast } from "@/hooks/use-toast"
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { Separator } from "@/components/ui/separator"
-import { User } from "lucide-react"
+} from "@/components/ui/sheet";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { upsertPharmacy, createPharmacyWithUser } from "@/lib/admin-actions";
+import { useToast } from "@/hooks/use-toast";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Separator } from "@/components/ui/separator";
+import { User } from "lucide-react";
 
 const formSchema = z.object({
   id: z.number().optional(),
@@ -29,22 +29,48 @@ const formSchema = z.object({
   phone_number: z.string().optional(),
   email: z.string().email().optional().or(z.literal("")),
   user_email: z.string().email().optional().or(z.literal("")),
-  user_password: z.string().min(6, "Password must be at least 6 characters").optional().or(z.literal("")),
-})
+  user_password: z
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .optional()
+    .or(z.literal("")),
+  // New Partnership Fields
+  partner_code: z.string().optional(),
+  trade_discount_percentage: z.coerce.number().min(0).max(100).default(20),
+  bank_details: z
+    .object({
+      bank_name: z.string().optional(),
+      account_number: z.string().optional(),
+      account_name: z.string().optional(),
+      branch: z.string().optional(),
+    })
+    .optional(),
+  momo_details: z
+    .object({
+      network: z.string().optional(),
+      number: z.string().optional(),
+      account_name: z.string().optional(),
+    })
+    .optional(),
+});
 
-type FormValues = z.infer<typeof formSchema>
+type FormValues = z.infer<typeof formSchema>;
 
 interface PartnerSheetProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  partner?: any
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  partner?: any;
 }
 
-export function PartnerSheet({ open, onOpenChange, partner }: PartnerSheetProps) {
-  const { toast } = useToast()
-  const router = useRouter()
-  const [showUserFields, setShowUserFields] = useState(false)
-  
+export function PartnerSheet({
+  open,
+  onOpenChange,
+  partner,
+}: PartnerSheetProps) {
+  const { toast } = useToast();
+  const router = useRouter();
+  const [showUserFields, setShowUserFields] = useState(false);
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -55,8 +81,16 @@ export function PartnerSheet({ open, onOpenChange, partner }: PartnerSheetProps)
       email: "",
       user_email: "",
       user_password: "",
+      trade_discount_percentage: 20,
+      bank_details: {
+        bank_name: "",
+        account_number: "",
+        account_name: "",
+        branch: "",
+      },
+      momo_details: { network: "", number: "", account_name: "" },
     },
-  })
+  });
 
   useEffect(() => {
     if (partner) {
@@ -67,8 +101,20 @@ export function PartnerSheet({ open, onOpenChange, partner }: PartnerSheetProps)
         email: partner.email || "",
         user_email: "",
         user_password: "",
-      })
-      setShowUserFields(false)
+        trade_discount_percentage: partner.trade_discount_percentage || 20,
+        bank_details: partner.bank_details || {
+          bank_name: "",
+          account_number: "",
+          account_name: "",
+          branch: "",
+        },
+        momo_details: partner.momo_details || {
+          network: "",
+          number: "",
+          account_name: "",
+        },
+      });
+      setShowUserFields(false);
     } else {
       form.reset({
         name: "",
@@ -78,37 +124,55 @@ export function PartnerSheet({ open, onOpenChange, partner }: PartnerSheetProps)
         email: "",
         user_email: "",
         user_password: "",
-      })
-      setShowUserFields(false)
+        trade_discount_percentage: 20,
+        bank_details: {
+          bank_name: "",
+          account_number: "",
+          account_name: "",
+          branch: "",
+        },
+        momo_details: { network: "", number: "", account_name: "" },
+      });
+      setShowUserFields(false);
     }
-  }, [partner, form])
+  }, [partner, form]);
 
   async function onSubmit(data: FormValues) {
     try {
-      let res
-      
+      let res;
+
       // If creating new pharmacy with user credentials
       if (!data.id && data.user_email && data.user_password) {
-        res = await createPharmacyWithUser(data)
+        res = await createPharmacyWithUser(data);
       } else if (data.id && data.user_email && data.user_password) {
         // Update pharmacy details first
-        await upsertPharmacy(data)
+        await upsertPharmacy(data);
         // Then link user
-        res = await import("@/lib/admin-actions").then(mod => mod.linkPharmacyUser(data.id!, data.user_email!, data.user_password!))
+        res = await import("@/lib/admin-actions").then((mod) =>
+          mod.linkPharmacyUser(data.id!, data.user_email!, data.user_password!),
+        );
       } else {
         // Regular update or create without user
-        res = await upsertPharmacy(data)
+        res = await upsertPharmacy(data);
       }
-      
+
       if (res.error) {
-        toast({ variant: "destructive", title: "Error", description: res.error })
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: res.error,
+        });
       } else {
-        toast({ title: "Success", description: "Partner saved successfully." })
-        router.refresh()
-        onOpenChange(false)
+        toast({ title: "Success", description: "Partner saved successfully." });
+        router.refresh();
+        onOpenChange(false);
       }
     } catch (error) {
-      toast({ variant: "destructive", title: "Error", description: "Something went wrong." })
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Something went wrong.",
+      });
     }
   }
 
@@ -118,20 +182,31 @@ export function PartnerSheet({ open, onOpenChange, partner }: PartnerSheetProps)
         <SheetHeader>
           <SheetTitle>{partner ? "Edit Partner" : "Add Partner"}</SheetTitle>
           <SheetDescription>
-            Manage pharmacy details and contact info.
+            Manage pharmacy details, financials, and contact info.
           </SheetDescription>
         </SheetHeader>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 py-4">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="grid gap-4 py-4"
+        >
           <div className="grid gap-2">
             <Label htmlFor="name">Pharmacy Name</Label>
             <Input id="name" {...form.register("name")} />
-            {form.formState.errors.name && <p className="text-sm text-destructive">{form.formState.errors.name.message}</p>}
+            {form.formState.errors.name && (
+              <p className="text-sm text-destructive">
+                {form.formState.errors.name.message}
+              </p>
+            )}
           </div>
 
           <div className="grid gap-2">
             <Label htmlFor="location">Location / Address</Label>
             <Input id="location" {...form.register("location")} />
-            {form.formState.errors.location && <p className="text-sm text-destructive">{form.formState.errors.location.message}</p>}
+            {form.formState.errors.location && (
+              <p className="text-sm text-destructive">
+                {form.formState.errors.location.message}
+              </p>
+            )}
           </div>
 
           <div className="grid gap-2">
@@ -150,29 +225,95 @@ export function PartnerSheet({ open, onOpenChange, partner }: PartnerSheetProps)
             </div>
           </div>
 
+          <div className="grid gap-2">
+            <Label htmlFor="trade_discount">Trade Discount (%)</Label>
+            <Input
+              id="trade_discount"
+              type="number"
+              {...form.register("trade_discount_percentage")}
+            />
+            <p className="text-xs text-muted-foreground">
+              Default is 20%. This is the margin withheld by platform.
+            </p>
+          </div>
+
           <Separator className="my-2" />
-          
+          <h4 className="font-medium">Banking Details (For Settlement)</h4>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-2">
+              <Label>Bank Name</Label>
+              <Input
+                {...form.register("bank_details.bank_name")}
+                placeholder="e.g. Ecobank"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label>Account No.</Label>
+              <Input {...form.register("bank_details.account_number")} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-2">
+              <Label>Account Name</Label>
+              <Input {...form.register("bank_details.account_name")} />
+            </div>
+            <div className="grid gap-2">
+              <Label>Branch</Label>
+              <Input {...form.register("bank_details.branch")} />
+            </div>
+          </div>
+
+          <h4 className="font-medium pt-2">Mobile Money (Optional)</h4>
+          <div className="grid grid-cols-3 gap-2">
+            <div className="grid gap-2">
+              <Label>Network</Label>
+              <Input
+                {...form.register("momo_details.network")}
+                placeholder="MTN"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label>Number</Label>
+              <Input {...form.register("momo_details.number")} />
+            </div>
+            <div className="grid gap-2">
+              <Label>Name</Label>
+              <Input
+                {...form.register("momo_details.account_name")}
+                placeholder="Reg Name"
+              />
+            </div>
+          </div>
+
+          <Separator className="my-2" />
+
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <User className="h-4 w-4 text-muted-foreground" />
               <Label className="text-base font-semibold">User Account</Label>
             </div>
-            
+
             {partner?.user ? (
               <div className="bg-muted/50 p-3 rounded-md border">
                 <p className="text-sm font-medium">Linked Account</p>
-                <p className="text-sm text-muted-foreground">{partner.user.email}</p>
+                <p className="text-sm text-muted-foreground">
+                  {partner.user.email}
+                </p>
               </div>
             ) : (
               <>
                 <p className="text-sm text-muted-foreground">
-                  {partner ? "This partner has no user account. Create one below." : "Create a login account for this pharmacy to access their portal."}
+                  {partner
+                    ? "This partner has no user account. Create one below."
+                    : "Create a login account for this pharmacy to access their portal."}
                 </p>
-                
+
                 {!showUserFields ? (
-                  <Button 
-                    type="button" 
-                    variant="outline" 
+                  <Button
+                    type="button"
+                    variant="outline"
                     size="sm"
                     onClick={() => setShowUserFields(true)}
                   >
@@ -182,21 +323,35 @@ export function PartnerSheet({ open, onOpenChange, partner }: PartnerSheetProps)
                   <div className="space-y-3 pt-2">
                     <div className="grid gap-2">
                       <Label htmlFor="user_email">User Email</Label>
-                      <Input id="user_email" type="email" {...form.register("user_email")} placeholder="pharmacy@example.com" />
+                      <Input
+                        id="user_email"
+                        type="email"
+                        {...form.register("user_email")}
+                        placeholder="pharmacy@example.com"
+                      />
                     </div>
                     <div className="grid gap-2">
                       <Label htmlFor="user_password">Password</Label>
-                      <Input id="user_password" type="password" {...form.register("user_password")} placeholder="Min. 6 characters" />
-                      {form.formState.errors.user_password && <p className="text-sm text-destructive">{form.formState.errors.user_password.message}</p>}
+                      <Input
+                        id="user_password"
+                        type="password"
+                        {...form.register("user_password")}
+                        placeholder="Min. 6 characters"
+                      />
+                      {form.formState.errors.user_password && (
+                        <p className="text-sm text-destructive">
+                          {form.formState.errors.user_password.message}
+                        </p>
+                      )}
                     </div>
-                    <Button 
-                      type="button" 
-                      variant="ghost" 
+                    <Button
+                      type="button"
+                      variant="ghost"
                       size="sm"
                       onClick={() => {
-                        setShowUserFields(false)
-                        form.setValue("user_email", "")
-                        form.setValue("user_password", "")
+                        setShowUserFields(false);
+                        form.setValue("user_email", "");
+                        form.setValue("user_password", "");
                       }}
                     >
                       Cancel
@@ -215,5 +370,5 @@ export function PartnerSheet({ open, onOpenChange, partner }: PartnerSheetProps)
         </form>
       </SheetContent>
     </Sheet>
-  )
+  );
 }
