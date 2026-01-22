@@ -7,8 +7,9 @@
  */
 'use server';
 
+// import { z } from 'zod';
+// Duplicate import removed. Consolidated below at line 151.
 import { z } from 'zod';
-import { generateTrackingCode, generatePartnerCode, type Order } from './data';
 import { assignPharmacyForDeliveryArea, sendPharmacyOrderNotification } from './notifications';
 import { sendSMS } from './server-utils'; // Internal use only
 // Use OpenAI when API key is configured, otherwise fallback
@@ -128,7 +129,7 @@ export async function login(formData: FormData) {
 const orderSchema = z.object({
   cartItems: z.string().min(1, 'Cart cannot be empty.'),
   deliveryArea: z.string().min(3, 'Delivery area is required.'),
-  deliveryAddressNote: z.string().optional(),
+  deliveryAddressNote: z.string().max(1000, "Note is too long.").optional(),
   phone_masked: z.string().regex(/^0\d{9}$/, 'Phone number must be exactly 10 digits and start with 0 (e.g., 0201234567).'),
   otherDeliveryArea: z.string().optional(),
   subtotal: z.string(),
@@ -137,6 +138,19 @@ const orderSchema = z.object({
   totalPrice: z.string(),
   email: z.string().email({ message: "A valid email is required for payment." }),
 });
+
+/**
+ * Creates a new order in the database and initializes a Paystack transaction.
+ * This action is called from the order form.
+ *
+ * @param prevState - The previous state of the form, used by `useActionState`.
+ * @param formData - The data submitted from the order form.
+ * @returns An object containing success status, a message, any validation errors, and the Paystack authorization URL.
+ */
+// ... (imports)
+// Note: We need to import DELIVERY_FEES and discounts from './data'
+import { generateTrackingCode, generatePartnerCode, type Order, DELIVERY_FEES, discounts } from './data';
+// ...
 
 /**
  * Creates a new order in the database and initializes a Paystack transaction.
@@ -160,8 +174,8 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     };
   }
 
-  const cartItems: CartItem[] = JSON.parse(validatedFields.data.cartItems);
-  if (cartItems.length === 0) {
+  const clientCartItems: CartItem[] = JSON.parse(validatedFields.data.cartItems);
+  if (clientCartItems.length === 0) {
     return {
       errors: { cartItems: ['Your cart is empty. Please add at least one item.'] },
       message: 'Your cart is empty.',
@@ -183,18 +197,90 @@ export async function createOrderAction(prevState: any, formData: FormData) {
   try {
     const supabaseAdmin = getSupabaseAdminClient();
 
+    // --- SECURITY: Server-Side Price Calculation ---
+    // 1. Fetch real product prices from DB
+    const productIds = clientCartItems.map(item => item.id);
+    const { data: dbProducts, error: prodError } = await supabaseAdmin
+      .from('products')
+      .select('id, price_ghs, student_price_ghs, name')
+      .in('id', productIds);
 
-    const code = generateTrackingCode();
-    const partnerCode = generatePartnerCode(); // Generate unique partner access code
+    if (prodError || !dbProducts) {
+      throw new Error('Failed to validate product prices.');
+    }
+
+    const dbProductMap = new Map(dbProducts.map(p => [p.id, p]));
+
+    // 2. Determine Delivery Fee & Student Status
+    // Logic: If delivery area matches a campus, treat as student (or eligible for student pricing)
+    // Strict match against known campuses for discounts
     const finalDeliveryArea: string =
       deliveryArea === 'Other' ? (otherDeliveryArea || deliveryArea) : deliveryArea;
 
+    const isCampusDelivery = discounts.some(d => d.campus === deliveryArea);
+    
+    // Delivery Fee Logic
+    // Standard: 20 GHS, Campus: 10 GHS (or Free if that's the promo, code said "studentDiscount" was waived fee?)
+    // User's previous code: `student_discount: parseFloat(validatedFields.data.studentDiscount)`
+    // And comment: "This is now the waived delivery fee for students"
+    // So if student, delivery fee is effectively 0 or discounted.
+    // Let's stick to `DELIVERY_FEES` from data.ts or logic.
+    // data.ts says: standard: 20.00, campus: 10.00.
+    
+    // Let's interpret "Student Discount" as paying the Campus delivery fee instead of Standard.
+    // Or if products have `student_price_ghs`, use that?
+    // For anonymous orders, we might not want to give student *product* prices unless verified? 
+    // But let's assume "Campus Delivery" implies student context for now to match naive client logic securely.
+    
+    const realDeliveryFee = isCampusDelivery ? DELIVERY_FEES.campus : DELIVERY_FEES.standard;
+    const appliedStudentDiscount = 0; // If we just use the lower fee, we don't need a separate "discount" value unless tracking it.
+    
+    // 3. Recalculate Subtotal
+    let calculatedSubtotal = 0;
+    const finalCartItems = []; // Rebuild items with trusted names/prices if needed
+
+    for (const item of clientCartItems) {
+      const dbProduct = dbProductMap.get(item.id);
+      if (!dbProduct) {
+        throw new Error(`Product not found: ${item.name} (${item.id})`); // Stop order if product doesn't exist
+      }
+
+      // Use student price if campus delivery? Or always standard price?
+      // To be safe and consistent with "DiscreetKit", let's use standard price unless we have strict student auth.
+      // However, if the business model relies on campus trust, maybe we use student price?
+      // Let's use `price_ghs` (Standard) to be safe against abuse, unless `is_student_product` logic exists.
+      // Current client logic sends `studentDiscount` as a value.
+      // Let's use standard prices for now to prevent tampering.
+      const price = dbProduct.price_ghs; 
+
+      calculatedSubtotal += price * item.quantity;
+      
+      finalCartItems.push({
+        ...item,
+        price: price, // Ensure price is correct in stored json
+        name: dbProduct.name // Ensure name is correct
+      });
+    }
+
+    const calculatedTotalPrice = calculatedSubtotal + realDeliveryFee;
+
+    // Compare with client provided values (Optional: just overwrite, but logging discrepancies is good for security)
+    const clientTotal = parseFloat(validatedFields.data.totalPrice);
+    if (Math.abs(calculatedTotalPrice - clientTotal) > 0.5) { // 0.5 tolerance for float math
+         console.warn(`[Price Security] Client Total: ${clientTotal}, Server Total: ${calculatedTotalPrice}. Overwriting with Server Total.`);
+    }
+    
     const priceDetails = {
-      subtotal: parseFloat(validatedFields.data.subtotal),
-      student_discount: parseFloat(validatedFields.data.studentDiscount), // This is now the waived delivery fee for students
-      delivery_fee: parseFloat(validatedFields.data.deliveryFee),
-      total_price: parseFloat(validatedFields.data.totalPrice),
+      subtotal: calculatedSubtotal,
+      student_discount: appliedStudentDiscount, // We effectively applied it via lower delivery fee
+      delivery_fee: realDeliveryFee,
+      total_price: calculatedTotalPrice,
     };
+    
+    // --- END SECURITY CHECK ---
+
+    const code = generateTrackingCode();
+    const partnerCode = generatePartnerCode(); // Generate unique partner access code
 
     // Attempt pharmacy assignment based on delivery area
     // We'll assign after order creation to use the order ID
@@ -207,14 +293,14 @@ export async function createOrderAction(prevState: any, formData: FormData) {
       .insert({
         code,
         partner_code: partnerCode, // Store unique partner code
-        items: cartItems,
+        items: finalCartItems, // Use verified items
         status: 'pending_payment',
         delivery_area: finalDeliveryArea,
         delivery_address_note: validatedFields.data.deliveryAddressNote,
         phone_masked: validatedFields.data.phone_masked,
         email: validatedFields.data.email,
         pharmacy_id: null, // Will be assigned after payment
-        ...priceDetails,
+        ...priceDetails, // Use server-calculated prices
       })
       .select('id, pharmacy_id')
       .single();
@@ -239,18 +325,6 @@ export async function createOrderAction(prevState: any, formData: FormData) {
       .catch(err => console.error('Background SMS failed:', err));
 
     // 4. Auto-Assignment skipped here. Will be handled by webhook after payment.
-    // try {
-    //   const { autoAssignOrder } = await import('@/lib/order-assignment');
-    //   await autoAssignOrder(orderData.id, finalDeliveryArea, cartItems);
-    // } catch (assignError) {
-    //   console.error("Auto-assignment error:", assignError);
-    // }
-
-    // Note: Pharmacy assignment happens AFTER payment confirmation in the webhook usually, 
-    // but user requested logic implementation. If we assign now, the pharmacy sees it before payment.
-    // If we want to wait for payment, we should move this to the webhook.
-    // However, for "Cash on Delivery" or immediate processing, this is fine.
-    // Given the context, we'll assign now but status is 'pending_payment'.
 
 
     // 4. Initialize Paystack Transaction
@@ -394,7 +468,7 @@ export async function handleChat(
 }
 
 const suggestionSchema = z.object({
-  suggestion: z.string().min(5, 'Suggestion must be at least 5 characters long.'),
+  suggestion: z.string().min(5, 'Suggestion must be at least 5 characters long.').max(1000, "Suggestion is too long."),
 });
 
 /**

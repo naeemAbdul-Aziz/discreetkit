@@ -152,7 +152,7 @@ async function handleIdleState(to: string, body: string) {
                     // Lazy load AI to avoid startup circular deps if any
                     const { answerQuestions } = await import('../../ai/flows/answer-questions');
                     const response = await answerQuestions({
-                        query: body,
+                        query: body, 
                         history: [] // We could fetch history from session/redis later
                     });
 
