@@ -1,6 +1,6 @@
 'use server';
 
-import { getSupabaseAdminClient } from './supabase';
+import { createSupabaseServerClient } from './supabase';
 import type { Product } from './data';
 
 const ITEMS_PER_PAGE = 12;
@@ -27,7 +27,7 @@ export async function getFilteredProducts({
     brand = 'All',
     page = 1
 }: FilterOptions): Promise<ProductsResponse> {
-    const supabase = getSupabaseAdminClient();
+    const supabase = await createSupabaseServerClient();
     const from = (page - 1) * ITEMS_PER_PAGE;
     const to = from + ITEMS_PER_PAGE - 1;
 
@@ -96,7 +96,7 @@ export async function getFilteredProducts({
  * This avoids fetching all products just to build filters.
  */
 export async function getProductFilterOptions() {
-    const supabase = getSupabaseAdminClient();
+    const supabase = await createSupabaseServerClient();
     
     // We can't easily do "DISTINCT" in one query for multiple fields without RPC or raw SQL.
     // But we can fetch just the columns needed.

@@ -1,6 +1,13 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { createSupabaseMiddlewareClient, getUserRoles } from './lib/supabase';
+import { rlAllowDistributed } from "./lib/rate-limit";
+
+// Define rate limit configuration
+const RATE_LIMITS = {
+  api: { points: 10, duration: 60 }, // 10 request per 60 seconds for general API
+  auth: { points: 5, duration: 300 } // 5 requests per 5 minutes for Auth/Admin
+};
 
 export async function proxy(request: NextRequest) {
     // 1. Initialize Supabase and check auth
@@ -9,6 +16,28 @@ export async function proxy(request: NextRequest) {
 
     const url = request.nextUrl;
     const hostname = request.headers.get('host') || '';
+    const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1";
+
+    // 0. Rate Limiting Protection (API Only)
+    if (url.pathname.startsWith("/api")) {
+        // Determine limit type
+        const limit = url.pathname.includes("/api/auth") ? RATE_LIMITS.auth : RATE_LIMITS.api;
+        
+        // Use simple IP based key for global API throttle
+        const globalKey = `mw_api_${ip}`;
+
+        try {
+            // Use distributed rate limiter (Upstash) if available
+            const { allowed, retryAfterSec } = await rlAllowDistributed(globalKey, limit.points, limit.duration);
+            
+            if (!allowed) {
+                return new NextResponse("Too Many Requests", { status: 429, headers: { "Retry-After": String(retryAfterSec) } });
+            }
+        } catch (e) {
+            console.error("Middleware Rate Limit Error:", e);
+            // Fail open to avoid blocking legitimate users on error
+        }
+    }
 
     // 2. Define protected domains/paths
     const isAdminSubdomain = hostname.startsWith('admin.');

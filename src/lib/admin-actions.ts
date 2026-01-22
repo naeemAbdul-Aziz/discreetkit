@@ -27,6 +27,7 @@ async function requireAdmin() {
 }
 
 export async function getProducts() {
+    await requireAdmin();
     const supabase = await createSupabaseServerClient();
     const { data: products, error } = await supabase
         .from('products')
@@ -215,6 +216,7 @@ export async function getPharmacies() {
 }
 
 export async function searchPharmacies(query: string, deliveryArea?: string) {
+    await requireAdmin();
     const supabase = await createSupabaseServerClient()
 
     // If deliveryArea is provided, we want to find pharmacies that cover this area first.
@@ -531,6 +533,7 @@ export async function deletePharmacy(id: number) {
 // --- Orders ---
 
 export async function getOrders() {
+    await requireAdmin();
     const supabase = await createSupabaseServerClient()
     const { data, error } = await supabase
         .from('orders')

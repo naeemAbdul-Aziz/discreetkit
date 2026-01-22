@@ -31,7 +31,16 @@ export async function POST(req: Request) {
     .update(body)
     .digest('hex');
 
-  if (hash !== signature) {
+  // Use timingSafeEqual to prevent timing attacks
+  const signatureBuffer = Buffer.from(signature || '', 'utf8');
+  const hashBuffer = Buffer.from(hash, 'utf8');
+
+  // Ensure buffers are same length before comparing (or it throws). 
+  // If lengths differ, it's invalid anyway.
+  const isValid = signatureBuffer.length === hashBuffer.length && 
+                  crypto.timingSafeEqual(signatureBuffer, hashBuffer);
+
+  if (!isValid) {
     paymentDebug('Invalid Paystack webhook signature');
     return new NextResponse('Webhook Error: Invalid signature', { status: 400 });
   }

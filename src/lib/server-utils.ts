@@ -7,7 +7,7 @@ export async function sendSMS(phone: string, message: string): Promise<{ ok: boo
     // Trim accidental quotes from env var (some deploy UIs add quotes)
     if (typeof arkeselApiKey === 'string') arkeselApiKey = arkeselApiKey.replace(/^"|"$/g, '').trim();
 
-    console.log('sendSMS called — phone:', phone, 'messagePreview:', message?.slice(0, 120));
+    console.log('sendSMS called — phone:', phone.replace(/.(?=.{4})/g, '*'), 'messagePreview:', message?.slice(0, 120));
     // console.log('Arkesel key present:', !!arkeselApiKey, 'key length:', (arkeselApiKey || '').length);
 
     if (!arkeselApiKey || arkeselApiKey.length === 0) {
@@ -19,8 +19,10 @@ export async function sendSMS(phone: string, message: string): Promise<{ ok: boo
     // Format phone number for Ghana (add 233 prefix if starts with 0)
     const recipient = phone.startsWith('0') ? `233${phone.substring(1)}` : phone;
     const senderId = process.env.ARKESEL_SENDER_ID || 'DiscreetKit';
-
-    // console.log('Arkesel SMS - recipient:', recipient, 'sender:', senderId, 'messagePreview:', message.slice(0, 50) + '...');
+    
+    // PII MASKING: Only log last 4 digits
+    const maskedPhone = recipient.replace(/.(?=.{4})/g, '*');
+    console.log('Arkesel SMS - recipient:', maskedPhone, 'sender:', senderId, 'messagePreview:', message.slice(0, 50) + '...');
 
     try {
         // Build URL with query parameters as per Arkesel documentation
@@ -125,7 +127,7 @@ export async function sendOrderConfirmationSMS(orderId: string): Promise<void> {
         if (!result.ok) {
             console.error('SMS sending failed for order confirmation:', { orderId, code: order.code, error: result.error });
         } else {
-            console.log('Order confirmation SMS sent successfully:', { orderId, code: order.code, recipient: result.recipient });
+            console.log('Order confirmation SMS sent successfully:', { orderId, code: order.code, recipient: result.recipient.replace(/.(?=.{4})/g, '*') });
         }
     } catch (error) {
         console.error('Error sending order confirmation SMS:', error);
