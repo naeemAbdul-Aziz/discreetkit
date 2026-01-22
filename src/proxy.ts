@@ -97,13 +97,18 @@ export async function proxy(request: NextRequest) {
     }
 
     // 5. Subdomain Rewrites
+    // Global routes that should NEVER be prefixed with /admin or /pharmacy
+    const exemptPaths = ['/login', '/unauthorized', '/robots.txt', '/sitemap.xml'];
+
     if (isAdminSubdomain) {
         // Rewrite root to /admin
         if (url.pathname === '/') {
             url.pathname = '/admin';
-        } else if (!url.pathname.startsWith('/admin') && !url.pathname.startsWith('/api') && !url.pathname.startsWith('/_next')) {
-             // Only prepend /admin if it's not already there and not a system path
-            url.pathname = `/admin${url.pathname}`;
+        } else {
+             const isExempt = exemptPaths.some((p) => url.pathname.startsWith(p));
+             if (!url.pathname.startsWith('/admin') && !url.pathname.startsWith('/api') && !url.pathname.startsWith('/_next') && !isExempt) {
+                 url.pathname = `/admin${url.pathname}`;
+             }
         }
         return NextResponse.rewrite(url);
     }
@@ -112,9 +117,11 @@ export async function proxy(request: NextRequest) {
         // Rewrite root to /pharmacy/dashboard
         if (url.pathname === '/') {
             url.pathname = '/pharmacy/dashboard';
-        } else if (!url.pathname.startsWith('/pharmacy') && !url.pathname.startsWith('/api') && !url.pathname.startsWith('/_next')) {
-            // Only prepend /pharmacy if it's not already there
-            url.pathname = `/pharmacy${url.pathname}`;
+        } else {
+            const isExempt = exemptPaths.some((p) => url.pathname.startsWith(p));
+            if (!url.pathname.startsWith('/pharmacy') && !url.pathname.startsWith('/api') && !url.pathname.startsWith('/_next') && !isExempt) {
+                url.pathname = `/pharmacy${url.pathname}`;
+            }
         }
         return NextResponse.rewrite(url);
     }
