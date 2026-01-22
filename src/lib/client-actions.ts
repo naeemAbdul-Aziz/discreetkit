@@ -1,8 +1,8 @@
-import { getSupabaseClient } from '@/lib/supabase';
+import { createSupabaseServerClient } from '@/lib/supabase';
 import type { Product } from '@/lib/data';
 
 export async function getProductsWithStock(category?: string | string[]): Promise<Product[]> {
-    const supabase = getSupabaseClient();
+    const supabase = await createSupabaseServerClient();
     let query = supabase
         .from('products')
         .select(`

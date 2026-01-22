@@ -26,9 +26,13 @@ if (process.env.NODE_ENV === 'production' && supabaseUrl && supabaseUrl.startsWi
 let supabaseInstance: any = null;
 /**
  * Returns a singleton instance of the public Supabase client.
- * Safe for client-side use.
+ * Safe for client-side use. MUST only be called from client components.
  */
 export function getSupabaseClient() {
+  // Guard against SSR - only create the client in the browser
+  if (typeof window === 'undefined') {
+    throw new Error('getSupabaseClient() must only be called in client components (browser environment)');
+  }
   if (!supabaseInstance) {
     supabaseInstance = createBrowserClient(supabaseUrl, supabaseAnonKey);
   }
@@ -177,7 +181,3 @@ export function getSupabaseAdminClient() {
     },
   });
 }
-
-
-// For convenience, export a pre-instantiated version for the client-side.
-export const supabase = getSupabaseClient();
