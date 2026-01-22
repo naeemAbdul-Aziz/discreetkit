@@ -1,5 +1,5 @@
 // lib/seo.ts
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 
 // Import the SEO config - we'll use dynamic import to avoid type issues
 const getSEOConfig = () => {
@@ -36,6 +36,16 @@ const getSEOConfig = () => {
 };
 
 const seoConfig = getSEOConfig();
+
+export const siteViewport: Viewport = {
+  themeColor: seoConfig.site.themeColor,
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+  interactiveWidget: 'resizes-content', // @ts-ignore - Next.js types might not have this yet but it's valid
+};
 
 export interface SEOProps {
   title?: string;
@@ -95,7 +105,6 @@ export function generateMetadata({
       title: seoConfig.site.name,
       statusBarStyle: 'default',
     },
-    themeColor: seoConfig.site.themeColor,
     manifest: '/manifest.json',
 
     openGraph: {
