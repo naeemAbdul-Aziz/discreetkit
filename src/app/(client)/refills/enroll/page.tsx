@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Card,
   CardContent,
@@ -14,28 +13,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { createRefillSubscription } from "@/lib/actions";
 import { Loader2, CheckCircle2 } from "lucide-react";
-import Image from "next/image";
-
-// We need to fetch product details. Ideally this is a server component,
-// but for interactivity with the form, we'll use a mixed approach or fetch client side for now/server action.
-// Let's make this page a client component that calls a server action to get product details?
-// Or better, make the parent page.tsx server-side and pass product to a child form.
-// For simplicity in this step, I'll fetch via a direct server action wrapper or just mock the product display
-// if I passed it, but searchParams are available.
-
-// Actually, let's keep it simple: Client component that submits to server action.
-// We'll trust the ID passed.
 
 export default function EnrollmentPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { toast } = useToast();
   const productId = searchParams.get("productId");
-  const productName = searchParams.get("productName") || "Medication Refill"; // Fallback
-  // Ideally we fetch the real product to show price/image.
+  const productName = searchParams.get("productName") || "Medication Refill";
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState(1);
@@ -44,7 +31,7 @@ export default function EnrollmentPage() {
     address: "",
     phone: "",
     doctor: "",
-    city: "Accra", // defaulting
+    city: "Accra",
   });
 
   const [successCode, setSuccessCode] = useState<string | null>(null);
@@ -161,19 +148,21 @@ export default function EnrollmentPage() {
           </CardHeader>
           <CardContent className="space-y-6">
             {step === 1 && (
-              <RadioGroup
-                defaultValue="monthly"
-                value={formData.frequency}
-                onValueChange={(v) =>
-                  setFormData({ ...formData, frequency: v })
-                }
-                className="grid grid-cols-1 gap-4"
-              >
+              <div className="grid grid-cols-1 gap-4">
                 <div
-                  className={`flex items-center space-x-4 rounded-xl border p-4 transition-all ${formData.frequency === "monthly" ? "border-primary bg-primary/5" : "hover:bg-muted/50"}`}
+                  onClick={() =>
+                    setFormData({ ...formData, frequency: "monthly" })
+                  }
+                  className={`flex items-center space-x-4 rounded-xl border p-4 transition-all cursor-pointer ${formData.frequency === "monthly" ? "border-primary bg-primary/5" : "hover:bg-muted/50"}`}
                 >
-                  <RadioGroupItem value="monthly" id="monthly" />
-                  <Label htmlFor="monthly" className="flex-1 cursor-pointer">
+                  <div
+                    className={`h-4 w-4 rounded-full border flex items-center justify-center ${formData.frequency === "monthly" ? "border-primary" : "border-muted-foreground"}`}
+                  >
+                    {formData.frequency === "monthly" && (
+                      <div className="h-2 w-2 rounded-full bg-primary" />
+                    )}
+                  </div>
+                  <div className="flex-1">
                     <span className="block font-semibold text-lg">
                       Monthly Refill
                     </span>
@@ -181,22 +170,31 @@ export default function EnrollmentPage() {
                       Best for daily medications (PrEP, ARVs). Delivered every
                       30 days.
                     </span>
-                  </Label>
+                  </div>
                 </div>
                 <div
-                  className={`flex items-center space-x-4 rounded-xl border p-4 transition-all ${formData.frequency === "quarterly" ? "border-primary bg-primary/5" : "hover:bg-muted/50"}`}
+                  onClick={() =>
+                    setFormData({ ...formData, frequency: "quarterly" })
+                  }
+                  className={`flex items-center space-x-4 rounded-xl border p-4 transition-all cursor-pointer ${formData.frequency === "quarterly" ? "border-primary bg-primary/5" : "hover:bg-muted/50"}`}
                 >
-                  <RadioGroupItem value="quarterly" id="quarterly" />
-                  <Label htmlFor="quarterly" className="flex-1 cursor-pointer">
+                  <div
+                    className={`h-4 w-4 rounded-full border flex items-center justify-center ${formData.frequency === "quarterly" ? "border-primary" : "border-muted-foreground"}`}
+                  >
+                    {formData.frequency === "quarterly" && (
+                      <div className="h-2 w-2 rounded-full bg-primary" />
+                    )}
+                  </div>
+                  <div className="flex-1">
                     <span className="block font-semibold text-lg">
                       Quarterly Refill
                     </span>
                     <span className="block text-sm text-muted-foreground">
                       Received 3 months supply at once. Delivered every 90 days.
                     </span>
-                  </Label>
+                  </div>
                 </div>
-              </RadioGroup>
+              </div>
             )}
 
             {step === 2 && (

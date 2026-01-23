@@ -220,7 +220,6 @@ async function SubscriptionCard({ subscription }: { subscription: any }) {
                     Contact Support
                   </Button>
                   <Button
-                    variant="destructive"
                     variant="ghost"
                     className="w-full text-red-500 hover:text-red-600 hover:bg-red-50"
                   >
