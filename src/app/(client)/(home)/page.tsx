@@ -13,6 +13,7 @@ import { createSupabaseServerClient } from "@/lib/supabase";
 import type { Product } from "@/lib/data";
 import { ProductSelector } from "@/app/(home)/components/product-selector";
 import { FeaturedFavoritesSection } from "@/app/(home)/components/featured-favorites";
+import { getHomeCategories } from "@/lib/store-actions";
 
 // fetches all products from the supabase database.
 async function getProducts(): Promise<Product[]> {
@@ -100,55 +101,57 @@ const LoadingSkeleton = ({ height }: { height: string }) => (
 const PartnerLogos = dynamic(
   () =>
     import("@/app/(home)/components/partner-logos").then(
-      (mod) => mod.PartnerLogos
+      (mod) => mod.PartnerLogos,
     ),
   {
     loading: () => (
       <LoadingSkeleton height={componentMap.PartnerLogos.height} />
     ),
-  }
+  },
 );
 const ProductBenefits = dynamic(
   () =>
     import("@/app/(home)/components/product-benefits").then(
-      (mod) => mod.ProductBenefits
+      (mod) => mod.ProductBenefits,
     ),
   {
     loading: () => (
       <LoadingSkeleton height={componentMap.ProductBenefits.height} />
     ),
-  }
+  },
 );
 const HowItWorks = dynamic(
   () =>
     import("@/app/(home)/components/how-it-works").then(
-      (mod) => mod.HowItWorks
+      (mod) => mod.HowItWorks,
     ),
-  { loading: () => <LoadingSkeleton height={componentMap.HowItWorks.height} /> }
+  {
+    loading: () => <LoadingSkeleton height={componentMap.HowItWorks.height} />,
+  },
 );
 
 const Faq = dynamic(
   () => import("@/app/(home)/components/faq").then((mod) => mod.Faq),
-  { loading: () => <LoadingSkeleton height={componentMap.Faq.height} /> }
+  { loading: () => <LoadingSkeleton height={componentMap.Faq.height} /> },
 );
 const ContactUs = dynamic(
   () =>
     import("@/app/(home)/components/contact-us").then((mod) => mod.ContactUs),
-  { loading: () => <LoadingSkeleton height={componentMap.ContactUs.height} /> }
+  { loading: () => <LoadingSkeleton height={componentMap.ContactUs.height} /> },
 );
 
 const PrivacyReveal = dynamic(() =>
   import("@/app/(home)/components/privacy-reveal").then(
-    (mod) => mod.PrivacyReveal
-  )
+    (mod) => mod.PrivacyReveal,
+  ),
 );
 
 const AnonymousReviewsSection = dynamic(
   () =>
     import("@/app/(home)/components/anonymous-reviews-section").then(
-      (mod) => mod.AnonymousReviewsSection
+      (mod) => mod.AnonymousReviewsSection,
     ),
-  { loading: () => <LoadingSkeleton height="400px" /> }
+  { loading: () => <LoadingSkeleton height="400px" /> },
 );
 
 // a wrapper component to provide consistent styling for page sections.
@@ -160,8 +163,11 @@ const SectionWrapper: React.FC<{
 );
 
 export default async function Home() {
-  // fetch product data on the server.
-  const products = await getProducts();
+  // fetch product data and categories on the server.
+  const [products, categories] = await Promise.all([
+    getProducts(),
+    getHomeCategories(),
+  ]);
 
   const hivTest = products.find((p) => p.id === 1);
   const coupleBundle = products.find((p) => p.id === 3);
@@ -192,7 +198,7 @@ export default async function Home() {
 
       {/* [MOVED UP] Categories - Immediate "Shop" intent */}
       <SectionWrapper>
-        <ProductSelector />
+        <ProductSelector categories={categories} />
       </SectionWrapper>
 
       {/* [MOVED UP] Featured Products - Immediate "Buy" intent */}

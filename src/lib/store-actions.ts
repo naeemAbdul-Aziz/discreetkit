@@ -116,3 +116,22 @@ export async function getProductFilterOptions() {
         wellnessCategories: ['All', ...wellnessCategories.sort()]
     };
 }
+
+/**
+ * Fetches categories for homepage display
+ */
+export async function getHomeCategories() {
+    const supabase = await createSupabaseServerClient();
+    
+    const { data: categories, error } = await supabase
+        .from('categories')
+        .select('name, slug, description, image_url')
+        .order('id', { ascending: true });
+        
+    if (error || !categories) {
+        console.error('Error fetching categories:', error);
+        return [];
+    }
+
+    return categories;
+}

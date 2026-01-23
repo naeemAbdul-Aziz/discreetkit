@@ -78,12 +78,13 @@ async function main() {
   console.log('\n⚙️  Store Settings...')
   await supabase.from('store_settings').upsert({ id: 1, store_name: 'DiscreetKit Ghana', currency: 'GHS' })
 
-  // 3. Categories (Matches valid types in data.ts)
+  // 3. Categories
   console.log('\n📂 Categories...')
   const categories = [
-    { name: 'Sexual Health', slug: 'sexual-health', description: 'Condoms, Lube, STI Kits', image_url: 'https://images.unsplash.com/photo-1576073719676-aa95576db207?auto=format&fit=crop&q=80&w=1000' },
-    { name: 'Reproductive Health', slug: 'reproductive-health', description: 'Contraceptives, Pregnancy Tests', image_url: 'https://images.unsplash.com/photo-1585435557343-3b092031a831?auto=format&fit=crop&q=80&w=1000' },
-    { name: 'General Wellness', slug: 'general-wellness', description: 'Vitamins, Supplements', image_url: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&q=80&w=1000' }
+    { name: 'Test Kits', slug: 'test-kits', description: 'Private, WHO-approved self-test kits.', image_url: 'https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&q=80&w=1000' },
+    { name: 'Value Bundles', slug: 'value-bundles', description: 'Save money with our curated bundles and kits.', image_url: 'https://images.unsplash.com/photo-1590736932470-7b567b57cd10?auto=format&fit=crop&q=80&w=1000' },
+    { name: 'Intimacy Essentials', slug: 'intimacy-essentials', description: 'Condoms, lube, and emergency contraception.', image_url: 'https://images.unsplash.com/photo-1585435557343-3b092031a831?auto=format&fit=crop&q=80&w=1000' },
+    { name: 'Medication Refills', slug: 'medication-refills', description: 'Confidential refill service for your essential prescriptions.', image_url: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&q=80&w=1000' }
   ]
   
   for (const cat of categories) {
@@ -103,20 +104,33 @@ async function main() {
       console.log("   🧹 Cleaned up invalid categories")
   }
 
-  // 4. Products (Authentic items)
+  // 4. Products (Stigma-free items for youth)
   console.log('\n💊 Products...')
   const products = [
-      // Sexual Health
-      { name: 'Durex Extra Safe (3 Pack)', slug: 'durex-extra-safe-3', category: 'Sexual Health', price_ghs: 45.00, stock_level: 100, description: 'Sslightly thicker for extra confidence.', image_url: 'https://images.unsplash.com/photo-1596489354024-k5164d1f5eabe8?auto=format&fit=crop&q=80&w=1000' },
-      { name: 'Durex Play Lube (50ml)', slug: 'durex-play-lube', category: 'Sexual Health', price_ghs: 60.00, stock_level: 80, description: 'Water-based lubricant.', image_url: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=1000' },
-      { name: 'HIV Self-Test Kit', slug: 'hiv-self-test', category: 'Sexual Health', price_ghs: 30.00, stock_level: 200, description: 'Private, accurate HIV test.', image_url: 'https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&q=80&w=1000' },
+      // Test Kits
+      { name: 'HIV Self-Test Kit', slug: 'hiv-self-test', category: 'Test Kits', price_ghs: 30.00, stock_level: 200, description: 'Private, accurate HIV test.', image_url: 'https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&q=80&w=1000' },
+      { name: 'Pregnancy Test Strip', slug: 'pregnancy-test', category: 'Test Kits', price_ghs: 15.00, stock_level: 300, description: 'Fast and accurate.', image_url: 'https://images.unsplash.com/photo-1608047648316-d446dc052912?auto=format&fit=crop&q=80&w=1000' },
+      { name: 'Ovulation Test Kit', slug: 'ovulation-test', category: 'Test Kits', price_ghs: 20.00, stock_level: 150, description: 'Track your fertility privately.', image_url: 'https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&q=80&w=1000' },
 
-      // Reproductive Health
-      { name: 'Postinor-2', slug: 'postinor-2', category: 'Reproductive Health', price_ghs: 35.00, stock_level: 50, description: 'Emergency contraceptive pill.', image_url: 'https://images.unsplash.com/photo-1627308595186-e8d1a123e758?auto=format&fit=crop&q=80&w=1000', requires_prescription: true },
-      { name: 'Pregnancy Test Strip', slug: 'pregnancy-test', category: 'Reproductive Health', price_ghs: 15.00, stock_level: 300, description: 'Fast and accurate.', image_url: 'https://images.unsplash.com/photo-1608047648316-d446dc052912?auto=format&fit=crop&q=80&w=1000' },
+      // Intimacy Essentials (Condoms, Lube, Emergency Contraception)
+      { name: 'Durex Extra Safe (3 Pack)', slug: 'durex-extra-safe-3', category: 'Intimacy Essentials', price_ghs: 45.00, stock_level: 100, description: 'Slightly thicker for extra confidence.', image_url: 'https://images.unsplash.com/photo-1596489354024-k5164d1f5eabe8?auto=format&fit=crop&q=80&w=1000' },
+      { name: 'Durex Invisible (3 Pack)', slug: 'durex-invisible-3', category: 'Intimacy Essentials', price_ghs: 50.00, stock_level: 80, description: 'Ultra-thin for maximum sensitivity.', image_url: 'https://images.unsplash.com/photo-1596489354024-k5164d1f5eabe8?auto=format&fit=crop&q=80&w=1000' },
+      { name: 'Durex Play Lube (50ml)', slug: 'durex-play-lube', category: 'Intimacy Essentials', price_ghs: 60.00, stock_level: 80, description: 'Water-based lubricant.', image_url: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=1000' },
+      { name: 'Female Condoms (3 Pack)', slug: 'female-condoms-3', category: 'Intimacy Essentials', price_ghs: 55.00, stock_level: 60, description: 'Discreet protection you control.', image_url: 'https://images.unsplash.com/photo-1596489354024-k5164d1f5eabe8?auto=format&fit=crop&q=80&w=1000' },
+      { name: 'Postinor-2', slug: 'postinor-2', category: 'Intimacy Essentials', price_ghs: 35.00, stock_level: 50, description: 'Emergency contraceptive pill.', image_url: 'https://images.unsplash.com/photo-1627308595186-e8d1a123e758?auto=format&fit=crop&q=80&w=1000', requires_prescription: true },
+      { name: 'Plan B', slug: 'plan-b', category: 'Intimacy Essentials', price_ghs: 40.00, stock_level: 40, description: 'Emergency contraception.', image_url: 'https://images.unsplash.com/photo-1627308595186-e8d1a123e758?auto=format&fit=crop&q=80&w=1000', requires_prescription: true },
 
-      // General Wellness
-      { name: 'Multivitamin Complex', slug: 'multivitamin', category: 'General Wellness', price_ghs: 85.00, stock_level: 40, description: 'Daily essential vitamins.', image_url: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&q=80&w=1000' },
+      // Value Bundles (includes all bundles and preparedness kits)
+      { name: 'The All-In-One Bundle', slug: 'all-in-one-bundle', category: 'Value Bundles', price_ghs: 120.00, stock_level: 50, description: 'HIV Test, Condoms, and Lube.', image_url: 'https://images.unsplash.com/photo-1590736932470-7b567b57cd10?auto=format&fit=crop&q=80&w=1000' },
+      { name: 'Support Bundle', slug: 'support-bundle', category: 'Value Bundles', price_ghs: 90.00, stock_level: 50, description: 'Essential care items.', image_url: 'https://images.unsplash.com/photo-1590736932470-7b567b57cd10?auto=format&fit=crop&q=80&w=1000' },
+      { name: 'Safe Sex Bundle', slug: 'safe-sex-bundle', category: 'Value Bundles', price_ghs: 110.00, stock_level: 45, description: 'Condoms, Lube, and Emergency Contraception.', image_url: 'https://images.unsplash.com/photo-1590736932470-7b567b57cd10?auto=format&fit=crop&q=80&w=1000' },
+      { name: 'Emergency Contraception Kit', slug: 'emergency-contraception-kit', category: 'Value Bundles', price_ghs: 75.00, stock_level: 40, description: 'Be prepared for emergencies.', image_url: 'https://images.unsplash.com/photo-1576073719676-aa95576db207?auto=format&fit=crop&q=80&w=1000' },
+      { name: 'Safe Sex Starter Kit', slug: 'safe-sex-starter-kit', category: 'Value Bundles', price_ghs: 95.00, stock_level: 35, description: 'Everything you need to get started.', image_url: 'https://images.unsplash.com/photo-1576073719676-aa95576db207?auto=format&fit=crop&q=80&w=1000' },
+
+      // Medication Refills
+      { name: 'HIV Treatment Refill', slug: 'hiv-treatment-refill', category: 'Medication Refills', price_ghs: 0.00, stock_level: 999, description: 'Confidential ARV refill service.', image_url: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&q=80&w=1000', requires_prescription: true },
+      { name: 'PrEP Refill', slug: 'prep-refill', category: 'Medication Refills', price_ghs: 0.00, stock_level: 999, description: 'Pre-exposure prophylaxis refill.', image_url: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&q=80&w=1000', requires_prescription: true },
+      { name: 'Long-term Support Refill', slug: 'long-term-support-refill', category: 'Medication Refills', price_ghs: 0.00, stock_level: 999, description: 'Ongoing support medication.', image_url: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&q=80&w=1000', requires_prescription: true },
   ]
   
   const productMap = new Map<string, number>() // slug -> id
@@ -150,7 +164,7 @@ async function main() {
       operating_hours: { open: '08:00', close: '22:00' },
       is_open: true,
       email: 'beybeepharmacy@gmail.com',
-      phone_number: '+233550000000'
+      phone_number: '+233203001107'
   }
   
   // Check existence

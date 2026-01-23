@@ -32,7 +32,24 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { saveSuggestion } from "@/lib/actions";
 
-const categories = [
+type Category = {
+  name: string;
+  slug: string;
+  description: string;
+  image_url: string;
+};
+
+type DisplayCategory = {
+  name: string;
+  description: string;
+  examples: string[];
+  image_url: string;
+  image_hint: string;
+  href: string;
+};
+
+// Fallback hardcoded categories (used if database fetch fails)
+const fallbackCategories: DisplayCategory[] = [
   {
     name: "Test Kits",
     description: "Private, WHO-approved self-test kits.",
@@ -43,13 +60,13 @@ const categories = [
     href: "/products/test-kits",
   },
   {
-    name: "Wellness Essentials",
-    description: "Contraception and personal care items.",
+    name: "Intimacy Essentials",
+    description: "Condoms and personal care items.",
     examples: ["Emergency Contraception", "Condoms & Lube"],
     image_url:
       "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png",
     image_hint: "emergency contraception pill",
-    href: "/products/wellness",
+    href: "/products/intimacy-essentials",
   },
   {
     name: "Value Bundles",
@@ -72,6 +89,25 @@ const categories = [
   },
 ];
 
+// Map database categories to display format
+function mapCategoriesToDisplay(dbCategories: Category[]): DisplayCategory[] {
+  const categoryExamples: Record<string, string[]> = {
+    "Test Kits": ["HIV Self-test", "Pregnancy Test"],
+    "Intimacy Essentials": ["Condoms", "Lube", "Emergency Contraception"],
+    "Value Bundles": ["Emergency Kit", "Couple Bundle", "The All-In-One"],
+    "Medication Refills": ["HIV Treatment", "PrEP", "Long-term Support"],
+  };
+
+  return dbCategories.map((cat) => ({
+    name: cat.name,
+    description: cat.description,
+    examples: categoryExamples[cat.name] || ["View Products"],
+    image_url: cat.image_url,
+    image_hint: cat.name.toLowerCase(),
+    href: `/products/${cat.slug}`,
+  }));
+}
+
 const shimmer = (w: number, h: number) => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <defs>
@@ -91,13 +127,23 @@ const toBase64 = (str: string) =>
     ? Buffer.from(str).toString("base64")
     : window.btoa(str);
 
-export function ProductSelector() {
+export function ProductSelector({
+  categories: dbCategories,
+}: {
+  categories: Category[];
+}) {
   const [api, setApi] = useState<EmblaCarouselType | undefined>();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 
   const [state, formAction, isPending] = useActionState(saveSuggestion, null);
+
+  // Use database categories if available, otherwise fallback
+  const categories =
+    dbCategories.length > 0
+      ? mapCategoriesToDisplay(dbCategories)
+      : fallbackCategories;
 
   useEffect(() => {
     if (state?.success) {
@@ -202,7 +248,7 @@ export function ProductSelector() {
                   "h-2 w-2 rounded-full bg-border transition-all",
                   index === selectedIndex
                     ? "w-4 bg-primary"
-                    : "hover:bg-primary/50"
+                    : "hover:bg-primary/50",
                 )}
                 aria-label={`go to slide ${index + 1}`}
               />
