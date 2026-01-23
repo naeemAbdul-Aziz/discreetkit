@@ -34,6 +34,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_set_partner_code ON public.pharmacies;
 CREATE TRIGGER trigger_set_partner_code
     BEFORE INSERT ON public.pharmacies
     FOR EACH ROW

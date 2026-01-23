@@ -529,3 +529,99 @@ export async function joinWaitlist(nickname: string, phone: string) {
     return { success: false, message: "Something went wrong. Please try again." };
   }
 }
+
+// --- Medication Refill Actions ---
+
+const refillSchema = z.object({
+  productId: z.string().min(1, 'Product is required'),
+  frequency: z.enum(['monthly', 'quarterly']),
+  deliveryAddress: z.string().min(10, 'Valid delivery address is required'), // JSON string
+  doctor: z.string().optional(),
+});
+
+export async function createRefillSubscription(prevState: any, formData: FormData) {
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, message: 'You must be logged in to enroll.' };
+    }
+
+    const rawData = {
+      productId: formData.get('productId'),
+      frequency: formData.get('frequency'),
+      deliveryAddress: formData.get('deliveryAddress'),
+      doctor: formData.get('doctor'),
+    };
+
+    const validated = refillSchema.safeParse(rawData);
+
+    if (!validated.success) {
+      return {
+        success: false,
+        message: 'Invalid input.',
+        errors: validated.error.flatten().fieldErrors
+      };
+    }
+
+    const address = JSON.parse(validated.data.deliveryAddress); // Verify JSON
+
+    const { data, error } = await supabase
+      .from('medication_refill_subscriptions')
+      .insert({
+        user_id: user.id,
+        product_id: parseInt(validated.data.productId), // Convert bigInt (as number)
+        frequency: validated.data.frequency,
+        delivery_address: address,
+        prescribing_doctor: validated.data.doctor || null,
+        status: 'active'
+      })
+      .select('subscription_code, id')
+      .single();
+
+    if (error) {
+        console.error('Subscription error:', error);
+        return { success: false, message: 'Failed to create subscription. ' + error.message };
+    }
+
+    revalidatePath('/refills/dashboard');
+    return { success: true, message: 'Enrolled successfully!', code: data.subscription_code };
+
+  } catch (error: any) {
+    console.error('Create Subscription Error:', error);
+    return { success: false, message: 'An unexpected error occurred.' };
+  }
+}
+
+export async function getUserRefillSubscriptions() {
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) return [];
+
+  // Use the view for richer data
+  const { data, error } = await supabase
+    .from('active_refill_subscriptions')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('enrolled_at', { ascending: false });
+
+  if (error) {
+    console.error('Fetch subscriptions error:', error);
+    return [];
+  }
+  return data;
+}
+
+export async function getUserRefillLogs(subscriptionId: string) {
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase
+        .from('refill_logs')
+        .select('*')
+        .eq('subscription_id', subscriptionId)
+        .order('filled_at', { ascending: false });
+        
+    if (error) return [];
+    return data;
+}
