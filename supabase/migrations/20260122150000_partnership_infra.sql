@@ -49,7 +49,7 @@ SELECT
     p.trade_discount_percentage,
     COUNT(o.id) as total_orders,
     SUM(o.total_price) as total_revenue,
-    SUM(o.total_price * (1 - (COALESCE(p.trade_discount_percentage, 20) / 100))) as payout_due,
+    SUM(o.subtotal * (1 - (COALESCE(p.trade_discount_percentage, 20) / 100))) as payout_due,
     MIN(o.created_at) as period_start,
     MAX(o.created_at) as period_end
 FROM public.orders o

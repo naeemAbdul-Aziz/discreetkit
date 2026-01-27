@@ -15,7 +15,8 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { createRefillSubscription } from "@/lib/actions";
-import { Loader2, CheckCircle2 } from "lucide-react";
+import { getSupabaseClient } from "@/lib/supabase";
+import { Loader2, CheckCircle2, Upload, FileCheck } from "lucide-react";
 
 export default function EnrollmentPage() {
   const searchParams = useSearchParams();
@@ -25,6 +26,7 @@ export default function EnrollmentPage() {
   const productName = searchParams.get("productName") || "Medication Refill";
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     frequency: "monthly",
@@ -32,6 +34,7 @@ export default function EnrollmentPage() {
     phone: "",
     doctor: "",
     city: "Accra",
+    prescriptionUrl: "",
   });
 
   const [successCode, setSuccessCode] = useState<string | null>(null);
@@ -51,6 +54,48 @@ export default function EnrollmentPage() {
     );
   }
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+
+    setIsUploading(true);
+    const file = e.target.files[0];
+
+    try {
+      const supabase = getSupabaseClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        toast({ title: "Please login first", variant: "destructive" });
+        return;
+      }
+
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
+      const { error: uploadError, data } = await supabase.storage
+        .from("prescriptions")
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      setFormData((prev) => ({ ...prev, prescriptionUrl: data.path }));
+      toast({
+        title: "Prescription Uploaded",
+        description: "File attached successfully.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Upload Failed",
+        description: error.message || "Could not upload file.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handleSubmit = async () => {
     setIsSubmitting(true);
 
@@ -66,6 +111,8 @@ export default function EnrollmentPage() {
     payload.append("frequency", formData.frequency);
     payload.append("deliveryAddress", fullAddress);
     if (formData.doctor) payload.append("doctor", formData.doctor);
+    if (formData.prescriptionUrl)
+      payload.append("prescriptionUrl", formData.prescriptionUrl);
 
     const result = await createRefillSubscription(null, payload);
 
@@ -235,6 +282,36 @@ export default function EnrollmentPage() {
                     />
                   </div>
                 </div>
+
+                <div className="grid gap-2 border-t pt-4 mt-4">
+                  <Label>Verification Document (Required)</Label>
+                  <div className="border-2 border-dashed rounded-lg p-6 text-center hover:bg-muted/50 transition-colors relative">
+                    <Input
+                      type="file"
+                      accept="image/*,.pdf"
+                      onChange={handleFileUpload}
+                      className="absolute inset-0 opacity-0 cursor-pointer"
+                      id="prescription-upload"
+                    />
+                    <div className="flex flex-col items-center gap-2 pointer-events-none">
+                      {isUploading ? (
+                        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                      ) : formData.prescriptionUrl ? (
+                        <FileCheck className="h-8 w-8 text-green-500" />
+                      ) : (
+                        <Upload className="h-8 w-8 text-muted-foreground" />
+                      )}
+                      <span className="text-sm text-muted-foreground">
+                        {isUploading
+                          ? "Uploading..."
+                          : formData.prescriptionUrl
+                            ? "File attached"
+                            : "Click to upload prescription or report"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="grid gap-2 pt-4">
                   <Label htmlFor="doctor">Prescribing Doctor (Optional)</Label>
                   <Input
@@ -272,7 +349,12 @@ export default function EnrollmentPage() {
             ) : (
               <Button
                 onClick={handleSubmit}
-                disabled={isSubmitting || !formData.address || !formData.phone}
+                disabled={
+                  isSubmitting ||
+                  !formData.address ||
+                  !formData.phone ||
+                  isUploading
+                }
               >
                 {isSubmitting && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
