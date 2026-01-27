@@ -537,6 +537,7 @@ const refillSchema = z.object({
   frequency: z.enum(['monthly', 'quarterly']),
   deliveryAddress: z.string().min(10, 'Valid delivery address is required'), // JSON string
   doctor: z.string().optional(),
+  prescriptionUrl: z.string().optional(), // Should be required technically, but optional for migration/flexibility? Let's make it optional for now, enforced by UI.
 });
 
 export async function createRefillSubscription(prevState: any, formData: FormData) {
@@ -553,6 +554,7 @@ export async function createRefillSubscription(prevState: any, formData: FormDat
       frequency: formData.get('frequency'),
       deliveryAddress: formData.get('deliveryAddress'),
       doctor: formData.get('doctor'),
+      prescriptionUrl: formData.get('prescriptionUrl'),
     };
 
     const validated = refillSchema.safeParse(rawData);
@@ -575,6 +577,7 @@ export async function createRefillSubscription(prevState: any, formData: FormDat
         frequency: validated.data.frequency,
         delivery_address: address,
         prescribing_doctor: validated.data.doctor || null,
+        prescription_document_url: validated.data.prescriptionUrl || null,
         status: 'active'
       })
       .select('subscription_code, id')
