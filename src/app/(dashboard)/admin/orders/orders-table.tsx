@@ -22,6 +22,8 @@ import {
   CreditCard,
   AlertCircle,
   MessageSquare,
+  Check,
+  ChevronsUpDown,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
@@ -44,6 +46,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { Label } from "@/components/ui/label";
 import { OrderMessages } from "@/components/order-messages";
 import { useToast } from "@/hooks/use-toast";
@@ -53,6 +68,7 @@ import {
   searchPharmacies,
 } from "@/lib/admin-actions";
 import { getSupabaseClient } from "@/lib/supabase";
+import { cn } from "@/lib/utils";
 
 // Helper
 const titleCase = (s: string) =>
@@ -590,14 +606,14 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-40 justify-start"
-                      onClick={() => setAssigningId(order.id)}
-                    >
-                      {order.pharmacies?.name || "Unassigned"}
-                    </Button>
+                    <PharmacyCombobox
+                      orderId={order.id}
+                      currentPharmacyId={order.pharmacy_id}
+                      currentPharmacyName={order.pharmacies?.name}
+                      deliveryArea={order.delivery_area}
+                      onAssign={handleAssignPharmacy}
+                      loading={assigningId === order.id}
+                    />
                     {order.pharmacy_ack_status === "declined" && (
                       <div className="relative group cursor-help">
                         <AlertCircle className="h-4 w-4 text-destructive" />
@@ -727,16 +743,6 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
         </Table>
       </div>
 
-      {/* Pharmacy Assignment Dialog */}
-      <PharmacyAssignmentDialog
-        open={!!assigningId}
-        onOpenChange={(open) => !open && setAssigningId(null)}
-        onAssign={(pid, pname) => {
-          if (assigningId) handleAssignPharmacy(assigningId, pid, pname);
-        }}
-        deliveryArea={orders.find((o) => o.id === assigningId)?.delivery_area}
-      />
-
       {/* Pagination Controls */}
       {filteredOrders.length > pageSize && (
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-2 gap-2">
@@ -786,95 +792,119 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
   );
 }
 
-function PharmacyAssignmentDialog({
-  open,
-  onOpenChange,
-  onAssign,
+function PharmacyCombobox({
+  orderId,
+  currentPharmacyId,
+  currentPharmacyName,
   deliveryArea,
+  onAssign,
+  loading,
 }: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onAssign: (id: number, name: string) => void;
+  orderId: number;
+  currentPharmacyId: number | null;
+  currentPharmacyName?: string;
   deliveryArea?: string;
+  onAssign: (orderId: number, pharmacyId: number, pharmacyName: string) => void;
+  loading: boolean;
 }) {
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState<
+  const [open, setOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [pharmacies, setPharmacies] = useState<
     { id: number; name: string; recommended?: boolean; is_24_7?: boolean }[]
   >([]);
   const [searching, setSearching] = useState(false);
 
-  // Load recommendations on open
+  // Load pharmacies when popover opens
   useEffect(() => {
     if (open) {
       setSearching(true);
       searchPharmacies("", deliveryArea).then((data) => {
-        setResults(data);
+        setPharmacies(data);
         setSearching(false);
       });
     }
   }, [open, deliveryArea]);
 
-  // Debounce search
+  // Debounced search
   useEffect(() => {
+    if (!open) return;
+
     const timer = setTimeout(async () => {
-      if (open && query) {
+      if (searchQuery) {
         setSearching(true);
         try {
-          const data = await searchPharmacies(query, deliveryArea);
-          setResults(data);
+          const data = await searchPharmacies(searchQuery, deliveryArea);
+          setPharmacies(data);
         } catch (e) {
           console.error(e);
         } finally {
           setSearching(false);
         }
+      } else {
+        // Reset to initial recommendations
+        setSearching(true);
+        searchPharmacies("", deliveryArea).then((data) => {
+          setPharmacies(data);
+          setSearching(false);
+        });
       }
     }, 300);
+
     return () => clearTimeout(timer);
-  }, [query, open, deliveryArea]);
+  }, [searchQuery, open, deliveryArea]);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Assign Pharmacy</DialogTitle>
-          <DialogDescription>
-            Search and select a pharmacy to fulfill this order.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="py-4 space-y-4">
-          <Input
-            placeholder="Search pharmacy by name..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            autoFocus
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-40 justify-between"
+          size="sm"
+          disabled={loading}
+        >
+          <span className="truncate">
+            {loading ? "Assigning..." : currentPharmacyName || "Unassigned"}
+          </span>
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[300px] p-0" align="start">
+        <Command shouldFilter={false}>
+          <CommandInput
+            placeholder="Search pharmacy..."
+            value={searchQuery}
+            onValueChange={setSearchQuery}
           />
-
-          <div className="max-h-[300px] overflow-y-auto border rounded-md divide-y">
-            {searching && (
-              <div className="p-4 text-center text-muted-foreground text-sm">
-                Searching...
-              </div>
-            )}
-            {!searching && results.length === 0 && (
-              <div className="p-4 text-center text-muted-foreground text-sm">
-                No pharmacies found.
-              </div>
-            )}
-
-            {!searching &&
-              results.map((p) => (
-                <button
-                  key={p.id}
-                  className="w-full text-left px-4 py-3 hover:bg-muted/50 transition-colors flex items-center justify-between group"
-                  onClick={() => {
-                    onAssign(p.id, p.name);
-                    onOpenChange(false);
+          <CommandList>
+            <CommandEmpty>
+              {searching ? "Searching..." : "No pharmacy found."}
+            </CommandEmpty>
+            <CommandGroup>
+              {pharmacies.map((pharmacy) => (
+                <CommandItem
+                  key={pharmacy.id}
+                  value={pharmacy.name}
+                  onSelect={() => {
+                    onAssign(orderId, pharmacy.id, pharmacy.name);
+                    setOpen(false);
                   }}
+                  className="flex items-center justify-between"
                 >
-                  <div className="font-medium">{p.name}</div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    {p.is_24_7 && (
+                  <div className="flex items-center gap-2">
+                    <Check
+                      className={cn(
+                        "h-4 w-4",
+                        currentPharmacyId === pharmacy.id
+                          ? "opacity-100"
+                          : "opacity-0",
+                      )}
+                    />
+                    <span className="truncate">{pharmacy.name}</span>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    {pharmacy.is_24_7 && (
                       <Badge
                         variant="secondary"
                         className="h-5 text-[10px] px-1 bg-blue-100 text-blue-700"
@@ -882,20 +912,21 @@ function PharmacyAssignmentDialog({
                         24/7
                       </Badge>
                     )}
-                    {p.recommended && (
+                    {pharmacy.recommended && (
                       <Badge
-                        variant="success"
+                        variant="secondary"
                         className="h-5 text-[10px] px-1 bg-green-100 text-green-700"
                       >
                         Best
                       </Badge>
                     )}
                   </div>
-                </button>
+                </CommandItem>
               ))}
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 }
