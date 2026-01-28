@@ -986,7 +986,7 @@ VALUES (
     'prescriptions', 
     'prescriptions', 
     false, 
-    5242880, -- 5MB
+    20971520, -- 20MB (20 * 1024 * 1024)
     ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/bmp', 'image/jpg', 'application/pdf']
 ) ON CONFLICT (id) DO UPDATE SET 
     allowed_mime_types = EXCLUDED.allowed_mime_types,

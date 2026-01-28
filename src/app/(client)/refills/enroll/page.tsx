@@ -344,7 +344,7 @@ export default function EnrollmentPage() {
                         <span className="text-xs sm:text-sm text-muted-foreground">
                           {formData.prescriptionUrl
                             ? "Tap again to change"
-                            : "Supports: JPG, PNG, PDF (Max 5MB)"}
+                            : "Supports: JPG, PNG, PDF (Max 20MB)"}
                         </span>
                       </div>
                     </div>
