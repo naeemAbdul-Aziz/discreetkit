@@ -14,7 +14,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { createRefillSubscription } from "@/lib/actions";
+import {
+  createRefillSubscription,
+  uploadPrescriptionAction,
+} from "@/lib/actions";
 import { getSupabaseClient } from "@/lib/supabase";
 import { Loader2, CheckCircle2, Upload, FileCheck } from "lucide-react";
 
