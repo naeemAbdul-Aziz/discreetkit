@@ -1491,6 +1491,7 @@ export async function getRefillSubscriptions() {
             user_id,
             prescription_verified,
             prescription_document_url,
+            delivery_address,
             product:products(name, image_url),
             pharmacy:pharmacies(id, name)
         `)
@@ -1570,4 +1571,18 @@ export async function verifyPrescription(subscriptionId: string, isValid: boolea
 
     revalidatePath('/admin/refills');
     return { success: true };
+}
+
+// Helper to get signed URL securely on server side (admin only)
+export async function getPrescriptionUrlAction(path: string) {
+    await requireAdmin();
+    const supabase = getSupabaseAdminClient();
+    if (!path) return { error: 'No path provided' };
+
+    const { data, error } = await supabase.storage
+        .from('prescriptions')
+        .createSignedUrl(path, 3600); // 1 hour
+
+    if (error) return { error: error.message };
+    return { signedUrl: data.signedUrl };
 }

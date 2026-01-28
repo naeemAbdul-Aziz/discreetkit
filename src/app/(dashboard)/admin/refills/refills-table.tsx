@@ -130,17 +130,19 @@ export function RefillsTable({
 
   const loadPrescription = async (path: string) => {
     if (!path) return;
-    const supabase = getSupabaseClient();
-    const { data } = await supabase.storage
-      .from("prescriptions")
-      .createSignedUrl(path, 3600);
-    if (data?.signedUrl) {
-      setPrescriptionUrl(data.signedUrl);
+
+    // Use server action to avoid RLS issues
+    const { getPrescriptionUrlAction } = await import("@/lib/admin-actions");
+    const result = await getPrescriptionUrlAction(path);
+
+    if (result.signedUrl) {
+      setPrescriptionUrl(result.signedUrl);
       setViewingPrescription(path);
     } else {
+      console.error("Error loading document:", path, result.error);
       toast({
         title: "Error",
-        description: "Could not load document.",
+        description: "Could not load document: " + (result.error || "Unknown"),
         variant: "destructive",
       });
     }
@@ -153,7 +155,7 @@ export function RefillsTable({
           <TableHeader>
             <TableRow>
               <TableHead>Code</TableHead>
-              <TableHead>User</TableHead>
+              <TableHead>Patient / Contact</TableHead>
               <TableHead>Product</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Pharmacy</TableHead>
@@ -168,88 +170,95 @@ export function RefillsTable({
                 </TableCell>
               </TableRow>
             ) : (
-              subscriptions.map((sub) => (
-                <TableRow key={sub.id}>
-                  <TableCell className="font-mono text-xs">
-                    {sub.subscription_code}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-col">
-                      <span className="font-medium">
-                        {sub.user_name || "Anonymous"}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {sub.user_email}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="max-w-[200px] truncate">
-                    {sub.product_name || "Product"}
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={
-                        sub.status === "active"
-                          ? "default"
-                          : sub.status === "pending_verification"
-                            ? "secondary"
-                            : "outline"
-                      }
-                    >
-                      {sub.status.replace("_", " ")}
-                    </Badge>
-                    {sub.prescription_verified && (
-                      <CheckCircle className="inline h-3 w-3 ml-1 text-green-500" />
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {sub.pharmacy?.name ? (
-                      <Badge variant="outline" className="gap-1">
-                        <Store className="h-3 w-3" /> {sub.pharmacy.name}
-                      </Badge>
-                    ) : (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setAssigningId(sub.id)}
-                        className="text-xs h-7"
+              subscriptions.map((sub) => {
+                // Parse helpful contact info
+                const address = sub.delivery_address || {};
+                const contactName =
+                  sub.user_name || address.fullName || "Anonymous";
+                const contactDetail =
+                  sub.user_email || address.phone || sub.subscription_code;
+
+                return (
+                  <TableRow key={sub.id}>
+                    <TableCell className="font-mono text-xs">
+                      {sub.subscription_code}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col">
+                        <span className="font-medium">{contactName}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {contactDetail}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="max-w-[200px] truncate">
+                      {sub.product_name || "Product"}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          sub.status === "active"
+                            ? "default"
+                            : sub.status === "pending_verification"
+                              ? "secondary"
+                              : "outline"
+                        }
                       >
-                        Assign Pharmacy
-                      </Button>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      {sub.prescription_document_url && (
+                        {sub.status.replace("_", " ")}
+                      </Badge>
+                      {sub.prescription_verified && (
+                        <CheckCircle className="inline h-3 w-3 ml-1 text-green-500" />
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {sub.pharmacy?.name ? (
+                        <Badge variant="outline" className="gap-1">
+                          <Store className="h-3 w-3" /> {sub.pharmacy.name}
+                        </Badge>
+                      ) : (
                         <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() =>
-                            loadPrescription(sub.prescription_document_url!)
-                          }
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setAssigningId(sub.id)}
+                          className="text-xs h-7"
                         >
-                          <FileText className="h-4 w-4" />
+                          Assign Pharmacy
                         </Button>
                       )}
-
-                      {!sub.prescription_verified && (
-                        <>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        {sub.prescription_document_url && (
                           <Button
-                            variant="default"
+                            variant="outline"
                             size="icon"
-                            className="h-8 w-8 bg-green-600 hover:bg-green-700"
-                            onClick={() => handleVerify(sub.id, true)}
+                            className="h-8 w-8"
+                            onClick={() =>
+                              loadPrescription(sub.prescription_document_url!)
+                            }
                           >
-                            <CheckCircle className="h-4 w-4" />
+                            <FileText className="h-4 w-4" />
                           </Button>
-                          {/* Reject button logic can be added later, simplified for now */}
-                        </>
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
+                        )}
+
+                        {!sub.prescription_verified && (
+                          <>
+                            <Button
+                              variant="default"
+                              size="icon"
+                              className="h-8 w-8 bg-green-600 hover:bg-green-700"
+                              onClick={() => handleVerify(sub.id, true)}
+                            >
+                              <CheckCircle className="h-4 w-4" />
+                            </Button>
+                            {/* Reject button logic can be added later, simplified for now */}
+                          </>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             )}
           </TableBody>
         </Table>
