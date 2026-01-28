@@ -14,7 +14,7 @@ async function requirePharmacy() {
     // We'll trust route protection but verify we can get the pharmacy ID
     const { data: pharmacy } = await supabase
         .from('pharmacies')
-        .select('id, name')
+        .select('*') // Select all fields as profile might need them
         .eq('user_id', user.id)
         .single();
 
@@ -22,6 +22,8 @@ async function requirePharmacy() {
     
     return { user, supabase, pharmacy };
 }
+
+// --- Refill Portal Actions ---
 
 export async function getAssignedSubscriptions() {
     const { pharmacy, supabase } = await requirePharmacy();
@@ -49,8 +51,6 @@ export async function getAssignedSubscriptions() {
     if (!subscriptions) return [];
 
     // Fetch User Details for contacts
-    // Since we need to show contact info even for anonymous users (stored in table or delivery_address), 
-    // we also try to fetch registered user emails if available.
     const userIds = [...new Set(subscriptions.map((s: any) => s.user_id).filter(Boolean))];
     let userMap: Record<string, { email: string | null, name: string | null }> = {};
 
@@ -87,7 +87,7 @@ export async function logRefill(subscriptionId: string, notes: string) {
         .insert({
             subscription_id: subscriptionId,
             pharmacy_id: pharmacy.id,
-            status: 'completed', // Direct to completed for now, or 'ready_for_pickup'
+            status: 'completed', 
             pharmacist_notes: notes,
             filled_at: new Date().toISOString()
         });
@@ -95,8 +95,6 @@ export async function logRefill(subscriptionId: string, notes: string) {
     if (logError) return { error: logError.message };
 
     // 2. Update Subscription Next Delivery Date
-    // We need to calculate based on frequency. 
-    // Fetch current frequency first.
     const { data: sub } = await supabase
         .from('medication_refill_subscriptions')
         .select('frequency, next_delivery_date')
@@ -104,12 +102,8 @@ export async function logRefill(subscriptionId: string, notes: string) {
         .single();
     
     if (sub) {
-        const currentNext = new Date(sub.next_delivery_date || Date.now());
-        const confirmDate = new Date(); // Or use the scheduled date? Let's bump from *today* or *schedule*?
-        // Usually bump from schedule if consistent, or today if late.
-        // Let's simplified: Bump +1 Month or +3 Months from TODAY.
-        
         let nextDate = new Date();
+        // Simple logic: +1 or +3 months from NOW
         if (sub.frequency === 'quarterly') {
             nextDate.setMonth(nextDate.getMonth() + 3);
         } else {
@@ -123,5 +117,85 @@ export async function logRefill(subscriptionId: string, notes: string) {
     }
 
     revalidatePath('/pharmacy/refills');
+    return { success: true };
+}
+
+// --- Settings & Operational Actions (Restored) ---
+
+export async function getPharmacyProfile() {
+    const { pharmacy } = await requirePharmacy();
+    return pharmacy;
+}
+
+export async function getPharmacyServiceAreas() {
+    const { pharmacy, supabase } = await requirePharmacy();
+    
+    const { data, error } = await supabase
+        .from('pharmacy_service_areas')
+        .select('*')
+        .eq('pharmacy_id', pharmacy.id)
+        .order('created_at', { ascending: false });
+
+    if (error) throw new Error(error.message);
+    return data || [];
+}
+
+export async function updatePharmacyOperationalSettings(_prevState: any, formData: FormData) {
+    const { pharmacy, supabase } = await requirePharmacy();
+    
+    const is24_7 = formData.get('is_24_7') === 'on';
+    
+    const { error } = await supabase
+        .from('pharmacies')
+        .update({ is_24_7 })
+        .eq('id', pharmacy.id);
+
+    if (error) return { success: false, message: error.message };
+    
+    revalidatePath('/pharmacy/settings');
+    return { success: true };
+}
+
+export async function addServiceArea(_prevState: any, formData: FormData) {
+    const { pharmacy, supabase } = await requirePharmacy();
+
+    const areaName = formData.get('areaName') as string;
+    const deliveryFee = Number(formData.get('deliveryFee'));
+    const maxDeliveryTime = Number(formData.get('maxDeliveryTime'));
+    const minTime = Number(formData.get('minTime'));
+    const maxTime = Number(formData.get('maxTime'));
+
+    if (!areaName) return { error: 'Area name is required' };
+
+    const { error } = await supabase
+        .from('pharmacy_service_areas')
+        .insert({
+            pharmacy_id: pharmacy.id,
+            area_name: areaName,
+            delivery_fee: deliveryFee || 0,
+            max_delivery_time_hours: maxDeliveryTime || 24,
+            estimated_min_minutes: minTime || 30,
+            estimated_max_minutes: maxTime || 120,
+            is_active: true
+        });
+
+    if (error) return { error: error.message };
+
+    revalidatePath('/pharmacy/settings');
+    return { success: true };
+}
+
+export async function removeServiceArea(areaId: number) {
+    const { pharmacy, supabase } = await requirePharmacy();
+
+    const { error } = await supabase
+        .from('pharmacy_service_areas')
+        .delete()
+        .eq('id', areaId)
+        .eq('pharmacy_id', pharmacy.id); // Security check
+
+    if (error) throw new Error(error.message);
+    
+    revalidatePath('/pharmacy/settings');
     return { success: true };
 }
