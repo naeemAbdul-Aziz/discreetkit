@@ -22,26 +22,42 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import * as React from "react";
 import { getSupabaseClient } from "@/lib/supabase";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 export function DashboardSidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const [isPharmacy, setIsPharmacy] = React.useState(false);
+  const [subdomain, setSubdomain] = React.useState<"admin" | "pharmacy" | null>(
+    null,
+  );
+  const [isMounted, setIsMounted] = React.useState(false);
 
   React.useEffect(() => {
+    setIsMounted(true);
     if (typeof window !== "undefined") {
       const hostname = window.location.hostname;
       if (
         hostname.startsWith("pharmacy.") ||
         pathname.startsWith("/pharmacy")
       ) {
-        setIsPharmacy(true);
+        setSubdomain("pharmacy");
+      } else if (hostname.startsWith("admin.")) {
+        setSubdomain("admin");
+      } else {
+        setSubdomain(null); // default
       }
     }
   }, [pathname]);
 
   const navItems = React.useMemo(() => {
-    if (isPharmacy) {
+    // Prevent flash of wrong content by returning empty or skeleton if needed,
+    // but better to default to standard items if not mounted to support SEO/SSR if possible?
+    // SSR usually implies standard domain. checking subdomain on server needs headers(),
+    // but for client component "use client", we rely on client state.
+    // We'll trust the default (null) usually means standard, or initial render.
+
+    if (subdomain === "pharmacy") {
       const basePharmacyItems = [
         {
           href: "/pharmacy/dashboard",
@@ -52,18 +68,11 @@ export function DashboardSidebar() {
         { href: "/pharmacy/settings", label: "Settings", icon: Settings },
       ];
 
-      // If on pharmacy subdomain, strip /pharmacy prefix
-      // Note: We check for pharmacy subdomain in the effect above, but we need to know if we should strip.
-      // Reuse the isPharmacy boolean which implies we are in the pharmacy context (subdomain or path).
-      // But strictly for *subdomain* users we want clean URLs.
-      // Let's check window.location.hostname again or trust that if isPharmacy is true and we are client side...
-      // Actually, to be safe and consistent with admin logic:
-      let isPharmacySubdomain = false;
-      if (typeof window !== "undefined") {
-        isPharmacySubdomain = window.location.hostname.startsWith("pharmacy.");
-      }
-
-      if (isPharmacySubdomain) {
+      // Strip prefixes if on subdomain
+      if (
+        typeof window !== "undefined" &&
+        window.location.hostname.startsWith("pharmacy.")
+      ) {
         return basePharmacyItems.map((item) => ({
           ...item,
           href:
@@ -75,11 +84,38 @@ export function DashboardSidebar() {
       return basePharmacyItems;
     }
 
-    // Check if we are on admin subdomain
-    let isAdminSubdomain = false;
-    if (typeof window !== "undefined") {
-      isAdminSubdomain = window.location.hostname.startsWith("admin.");
+    if (subdomain === "admin") {
+      const baseItems = [
+        { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+        { href: "/admin/analytics", label: "Analytics", icon: BarChart },
+        { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
+        { href: "/admin/products", label: "Products", icon: Package },
+        { href: "/admin/categories", label: "Categories", icon: Layers },
+        { href: "/admin/partners", label: "Partners", icon: Users },
+        { href: "/admin/settings", label: "Settings", icon: Settings },
+      ];
+
+      // Strip prefixes if on subdomain
+      if (
+        typeof window !== "undefined" &&
+        window.location.hostname.startsWith("admin.")
+      ) {
+        return baseItems.map((item) => ({
+          ...item,
+          href: item.href === "/admin" ? "/" : item.href.replace("/admin", ""),
+        }));
+      }
+
+      return baseItems;
     }
+
+    // Default (probably client or initial server render of main site admin logic?)
+    // Actually, if subdomain is null, we assume we might be on main site admin dashboard accessing via path?
+    // The original logic defaulted to admin items if NOT pharmacy?
+    // Original:
+    // if (isPharmacy) { ... }
+    // else { const baseItems = adminItems ... }
+    // So default is Admin items.
 
     const baseItems = [
       { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -91,22 +127,17 @@ export function DashboardSidebar() {
       { href: "/admin/settings", label: "Settings", icon: Settings },
     ];
 
-    // If on admin subdomain, strip /admin prefix to avoid double nesting in middleware
-    if (isAdminSubdomain) {
-      return baseItems.map((item) => ({
-        ...item,
-        href: item.href === "/admin" ? "/" : item.href.replace("/admin", ""),
-      }));
-    }
-
     return baseItems;
-  }, [isPharmacy, pathname]);
+  }, [subdomain]);
 
   const handleSignOut = async () => {
     const supabase = getSupabaseClient();
     await supabase.auth.signOut();
     router.push("/login");
   };
+
+  if (!isMounted)
+    return <Sidebar variant="inset" className="border-r bg-white shadow-sm" />; // Prevent hydration mismatch flicker
 
   return (
     <Sidebar
@@ -115,9 +146,9 @@ export function DashboardSidebar() {
       className="border-r bg-white shadow-sm"
     >
       <SidebarHeader className="px-4 py-6 flex justify-center items-center border-b border-border/50">
-        <Link href="/" className="flex items-center">
-          {/* DiscreetKit Wordmark - Hidden on mobile, shown on desktop */}
-          <h2 className="hidden md:block font-headline text-2xl font-black tracking-tight uppercase">
+        <Link href="/" className="flex items-center group">
+          {/* DiscreetKit Wordmark */}
+          <h2 className="hidden md:block font-headline text-2xl font-black tracking-tight uppercase transition-transform group-hover:scale-105">
             Discreet<span className="text-primary">Kit</span>.
           </h2>
         </Link>
@@ -125,7 +156,6 @@ export function DashboardSidebar() {
       <SidebarContent className="flex flex-col py-4 gap-2 px-2 lg:px-4">
         <SidebarMenu>
           {navItems.map((item) => {
-            // Updated active logic to handle both / and /admin when using subdomains
             const isActive =
               item.href === "/admin" || item.href === "/"
                 ? pathname === "/admin" || pathname === "/"
@@ -138,20 +168,46 @@ export function DashboardSidebar() {
                   tooltip={item.label}
                   isActive={isActive}
                   size="lg"
-                  className={`group flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200
-                    ${isActive ? "bg-primary/10 text-primary shadow-sm" : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"}
-                    `}
+                  className={cn(
+                    "group relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors duration-200 overflow-hidden",
+                    isActive
+                      ? "text-primary"
+                      : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100/50",
+                  )}
                 >
                   <Link
                     href={item.href}
                     aria-current={isActive ? "page" : undefined}
-                    className="flex items-center gap-3 w-full"
+                    className="flex items-center gap-3 w-full relative z-10"
                   >
+                    {isActive && (
+                      <motion.div
+                        layoutId="sidebar-active-item"
+                        className="absolute inset-0 bg-primary/10 rounded-lg -z-10"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 30,
+                        }}
+                      />
+                    )}
+
                     <item.icon
-                      className={`h-5 w-5 shrink-0 ${isActive ? "stroke-[2]" : "stroke-[1.5] group-hover:stroke-[2]"}`}
+                      className={cn(
+                        "h-5 w-5 shrink-0 transition-all duration-200",
+                        isActive
+                          ? "stroke-[2.5]"
+                          : "stroke-[1.5] group-hover:stroke-[2]",
+                      )}
                     />
                     <span
-                      className={`hidden lg:inline-block text-sm font-medium ${isActive ? "font-semibold" : ""}`}
+                      className={cn(
+                        "hidden lg:inline-block text-sm font-medium transition-all duration-200",
+                        isActive ? "font-bold tracking-wide" : "font-medium",
+                      )}
                     >
                       {item.label}
                     </span>
@@ -167,7 +223,7 @@ export function DashboardSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton
               onClick={handleSignOut}
-              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+              className="text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors"
               size="lg"
             >
               <LogOut className="h-5 w-5" />
