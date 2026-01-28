@@ -18,7 +18,8 @@ const nextConfig: NextConfig = {
   ],
   experimental: {
     serverActions: {
-      allowedOrigins: ["localhost:3000", "172.21.160.1:3000", "172.21.160.1:3001"]
+      allowedOrigins: ["localhost:3000", "172.21.160.1:3000", "172.21.160.1:3001"],
+      bodySizeLimit: '20mb',
     }
   },
   // Turbopack configuration (Next.js 15+)

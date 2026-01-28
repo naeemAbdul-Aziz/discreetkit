@@ -551,7 +551,7 @@ export async function uploadPrescriptionAction(formData: FormData) {
     if (!file) throw new Error('No file provided.');
 
     // Basic validation
-    if (file.size > 5 * 1024 * 1024) throw new Error('File too large (Max 5MB).');
+    if (file.size > 20 * 1024 * 1024) throw new Error('File too large (Max 20MB).');
     const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
     if (!validTypes.includes(file.type)) throw new Error('Invalid file type. Use JPG, PNG, or PDF.');
 
