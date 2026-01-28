@@ -243,7 +243,7 @@ export async function getPharmacyServiceAreas() {
 export async function updatePharmacyOperationalSettings(_prevState: any, formData: FormData) {
     const { pharmacy, supabase } = await requirePharmacy();
     
-    const is24_7 = formData.get('is_24_7') === 'on';
+    const is_24_7 = formData.get('is_24_7') === 'on';
     
     const { error } = await supabase
         .from('pharmacies')
@@ -253,7 +253,7 @@ export async function updatePharmacyOperationalSettings(_prevState: any, formDat
     if (error) return { success: false, message: error.message };
     
     revalidatePath('/pharmacy/settings');
-    return { success: true };
+    return { success: true, message: 'Settings updated successfully' };
 }
 
 export async function addServiceArea(_prevState: any, formData: FormData) {
@@ -265,7 +265,7 @@ export async function addServiceArea(_prevState: any, formData: FormData) {
     const minTime = Number(formData.get('minTime'));
     const maxTime = Number(formData.get('maxTime'));
 
-    if (!areaName) return { error: 'Area name is required' };
+    if (!areaName) return { success: false, message: 'Area name is required' };
 
     const { error } = await supabase
         .from('pharmacy_service_areas')
@@ -279,10 +279,10 @@ export async function addServiceArea(_prevState: any, formData: FormData) {
             is_active: true
         });
 
-    if (error) return { error: error.message };
+    if (error) return { success: false, message: error.message };
 
     revalidatePath('/pharmacy/settings');
-    return { success: true };
+    return { success: true, message: 'Service area added successfully' };
 }
 
 export async function removeServiceArea(areaId: number) {
