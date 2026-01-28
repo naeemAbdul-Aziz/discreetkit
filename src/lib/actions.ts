@@ -536,7 +536,7 @@ const refillSchema = z.object({
   productId: z.string().min(1, 'Product is required'),
   frequency: z.enum(['monthly', 'quarterly']),
   deliveryAddress: z.string().min(10, 'Valid delivery address is required'), // JSON string
-  doctor: z.string().optional(),
+  doctor: z.string().optional().or(z.literal('')),
   prescriptionUrl: z.string().optional(), // Should be required technically, but optional for migration/flexibility? Let's make it optional for now, enforced by UI.
 });
 
