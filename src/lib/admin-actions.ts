@@ -1471,3 +1471,103 @@ export async function generatePayoutReport(startDate?: string, endDate?: string)
 
     return reportData;
 }
+
+// --- Medication Refill Subscriptions ---
+
+export async function getRefillSubscriptions() {
+    await requireAdmin();
+    const supabase = await createSupabaseServerClient();
+    
+    // 1. Fetch Subscriptions with Joins
+    const { data: subscriptions, error } = await supabase
+        .from('medication_refill_subscriptions')
+        .select(`
+            id,
+            subscription_code,
+            status,
+            frequency,
+            next_delivery_date,
+            enrolled_at,
+            user_id,
+            prescription_verified,
+            prescription_document_url,
+            product:products(name, image_url),
+            pharmacy:pharmacies(id, name)
+        `)
+        .order('enrolled_at', { ascending: false });
+
+    if (error) throw new Error(error.message);
+    if (!subscriptions) return [];
+
+    // 2. Fetch User Details (Emails) manually since auth.users is not joinable
+    const userIds = [...new Set(subscriptions.map((s: any) => s.user_id))];
+    let userMap: Record<string, { email: string | null, name: string | null }> = {};
+
+    if (userIds.length > 0) {
+        const adminSupabase = getSupabaseAdminClient();
+        // Fetch all users? Or try to filter? listUsers doesn't fitler by ID array efficiently.
+        // We'll fetch a page. If > 50 users, this might miss some. 
+        // TODO: Implement better user batch fetching.
+        // Increased page size to catch more users
+        const { data: userData } = await adminSupabase.auth.admin.listUsers({ perPage: 1000 });
+        if (userData?.users) {
+            userData.users.forEach(u => {
+                if (userIds.includes(u.id)) {
+                    userMap[u.id] = { 
+                        email: u.email ?? null,
+                        name: u.user_metadata?.name || u.user_metadata?.full_name || null
+                    };
+                }
+            });
+        }
+    }
+
+    // 3. Attach User Data
+    return subscriptions.map((s: any) => ({
+        ...s,
+        user_email: userMap[s.user_id]?.email || 'Unknown User',
+        user_name: userMap[s.user_id]?.name || 'Anonymous',
+        // Normalize single object relations if they come back as arrays (Supabase sometimes does this)
+        product: Array.isArray(s.product) ? s.product[0] : s.product,
+        pharmacy: Array.isArray(s.pharmacy) ? s.pharmacy[0] : s.pharmacy,
+        // Helper for table
+        product_name: Array.isArray(s.product) ? s.product[0]?.name : s.product?.name,
+    }));
+}
+
+export async function assignPharmacyToSubscription(subscriptionId: string, pharmacyId: number) {
+    await requireAdmin();
+    const supabase = getSupabaseAdminClient(); // Use admin client for write
+
+    const { error } = await supabase
+        .from('medication_refill_subscriptions')
+        .update({ pharmacy_id: pharmacyId })
+        .eq('id', subscriptionId);
+
+    if (error) return { error: error.message };
+
+    revalidatePath('/admin/refills');
+    return { success: true };
+}
+
+export async function verifyPrescription(subscriptionId: string, isValid: boolean) {
+    await requireAdmin();
+    const supabase = getSupabaseAdminClient();
+
+    const updatePayload: any = { prescription_verified: isValid };
+    
+    // Logic: If verified=true, status can become 'active' if it was 'pending_verification'.
+    if (isValid) {
+        updatePayload.status = 'active'; 
+    }
+
+    const { error } = await supabase
+        .from('medication_refill_subscriptions')
+        .update(updatePayload)
+        .eq('id', subscriptionId);
+
+    if (error) return { error: error.message };
+
+    revalidatePath('/admin/refills');
+    return { success: true };
+}

@@ -649,6 +649,7 @@ INSERT INTO public.store_settings (id) VALUES (1) ON CONFLICT DO NOTHING;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.reviews;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.orders;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.order_events;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.order_messages;
 
 -- ==========================================
 -- 11. WAITLIST
@@ -720,7 +721,7 @@ CREATE TABLE IF NOT EXISTS public.medication_refill_subscriptions (
   
   -- Enrollment details
   enrolled_at timestamptz DEFAULT now(),
-  status text DEFAULT 'active' CHECK (status IN ('active', 'paused', 'cancelled')),
+  status text DEFAULT 'pending_verification' CHECK (status IN ('active', 'paused', 'cancelled', 'pending_verification')),
   
   -- Delivery schedule
   frequency text DEFAULT 'monthly' CHECK (frequency IN ('monthly', 'quarterly')),
@@ -916,3 +917,48 @@ CREATE POLICY "Pharmacies can view/manage logs for their subscriptions"
   );
 
 COMMENT ON TABLE public.refill_logs IS 'Immutable log of every medication fulfillment/refill event for legal compliance and history';
+-- ==========================================
+-- 13. STORAGE & BUCKETS
+-- ==========================================
+
+-- 13.1 PRESCRIPTIONS BUCKET
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+    'prescriptions', 
+    'prescriptions', 
+    false, 
+    5242880, -- 5MB
+    ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/bmp', 'image/jpg', 'application/pdf']
+) ON CONFLICT (id) DO UPDATE SET 
+    allowed_mime_types = EXCLUDED.allowed_mime_types,
+    public = false;
+
+-- 13.2 STORAGE RLS
+CREATE POLICY "Users can upload their own prescriptions" ON storage.objects
+FOR INSERT WITH CHECK (
+    bucket_id = 'prescriptions' AND 
+    auth.uid()::text = (storage.foldername(name))[1]
+);
+
+CREATE POLICY "Users can view their own prescriptions" ON storage.objects
+FOR SELECT USING (
+    bucket_id = 'prescriptions' AND 
+    auth.uid()::text = (storage.foldername(name))[1]
+);
+
+CREATE POLICY "Admins can view all prescriptions" ON storage.objects
+FOR SELECT USING (
+    bucket_id = 'prescriptions' AND 
+    EXISTS (SELECT 1 FROM public.user_roles ur JOIN public.roles r ON ur.role_id = r.id WHERE ur.user_id = auth.uid() AND r.name = 'admin')
+);
+
+CREATE POLICY "Pharmacies can view assigned prescriptions" ON storage.objects
+FOR SELECT USING (
+    bucket_id = 'prescriptions' AND 
+    EXISTS (
+        SELECT 1 FROM public.medication_refill_subscriptions sub
+        JOIN public.pharmacies p ON sub.pharmacy_id = p.id
+        WHERE p.user_id = auth.uid()
+        AND sub.prescription_document_url LIKE '%' || storage.objects.name
+    )
+);

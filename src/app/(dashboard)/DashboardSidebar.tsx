@@ -17,6 +17,7 @@ import {
   Package,
   Layers,
   BarChart,
+  Repeat,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -64,6 +65,7 @@ export function DashboardSidebar() {
           label: "Dashboard",
           icon: LayoutDashboard,
         },
+        { href: "/pharmacy/refills", label: "Refills", icon: Repeat },
         { href: "/pharmacy/inventory", label: "Inventory", icon: Package },
         { href: "/pharmacy/settings", label: "Settings", icon: Settings },
       ];
@@ -92,6 +94,7 @@ export function DashboardSidebar() {
         { href: "/admin/products", label: "Products", icon: Package },
         { href: "/admin/categories", label: "Categories", icon: Layers },
         { href: "/admin/partners", label: "Partners", icon: Users },
+        { href: "/admin/refills", label: "Refills", icon: Repeat },
         { href: "/admin/settings", label: "Settings", icon: Settings },
       ];
 
@@ -125,6 +128,7 @@ export function DashboardSidebar() {
       { href: "/admin/categories", label: "Categories", icon: Layers },
       { href: "/admin/partners", label: "Partners", icon: Users },
       { href: "/admin/settings", label: "Settings", icon: Settings },
+      { href: "/admin/refills", label: "Refills", icon: Repeat },
     ];
 
     return baseItems;

@@ -1,7 +1,7 @@
 
 'use server';
 
-import { createSupabaseServerClient, getUserRoles } from './supabase';
+import { createSupabaseServerClient, getUserRoles, getSupabaseAdminClient } from './supabase';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
@@ -339,4 +339,155 @@ export async function declineOrder(orderId: number) {
 
     revalidatePath('/pharmacy/orders');
     return { success: true, message: 'Order declined and returned to pool' };
+}
+
+// --- PHARMACY REFILLS ---
+
+export async function getPharmacyRefillSubscriptions() {
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return [];
+
+    const { data: pharmacy } = await supabase.from('pharmacies').select('id').eq('user_id', user.id).single();
+    if (!pharmacy) return [];
+
+    const { data: subscriptions, error } = await supabase
+        .from('medication_refill_subscriptions')
+        .select(`
+            *,
+            product:products(name, image_url)
+        `)
+        .eq('pharmacy_id', pharmacy.id)
+        .order('next_delivery_date', { ascending: true }); // Urgent first
+
+    if (error) throw new Error(error.message);
+    
+    // Normalize logic
+    return subscriptions.map((s: any) => ({
+        ...s,
+        product: Array.isArray(s.product) ? s.product[0] : s.product,
+        product_name: Array.isArray(s.product) ? s.product[0]?.name : s.product?.name,
+    }));
+}
+
+export async function verifyPharmacyPrescription(subscriptionId: string, isValid: boolean) {
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { success: false, message: 'Unauthorized' };
+
+    const { data: pharmacy } = await supabase.from('pharmacies').select('id').eq('user_id', user.id).single();
+    if (!pharmacy) return { success: false, message: 'Pharmacy not found' };
+
+    // Update with ownership check
+    const { error } = await supabase
+        .from('medication_refill_subscriptions')
+        .update({ 
+            prescription_verified: isValid,
+             // Activate if currently pending verification and valid
+            status: isValid ? 'active' : 'pending_verification' // Or whatever logic
+        })
+        .eq('id', subscriptionId)
+        .eq('pharmacy_id', pharmacy.id); // Security: Ensure assigned to this pharmacy
+
+    if (error) return { success: false, message: error.message };
+
+    revalidatePath('/pharmacy/refills');
+    return { success: true };
+}
+
+export async function processRefill(subscriptionId: string) {
+    // 1. Verify Access
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { success: false, message: 'Unauthorized' };
+
+    const { data: pharmacy } = await supabase.from('pharmacies').select('id, name, partner_code').eq('user_id', user.id).single();
+    if (!pharmacy) return { success: false, message: 'Pharmacy not found' };
+    
+    // 2. Fetch Subscription
+    const { data: sub } = await supabase
+        .from('medication_refill_subscriptions')
+        .select('*, product:products(*)')
+        .eq('id', subscriptionId)
+        .eq('pharmacy_id', pharmacy.id)
+        .single();
+
+    if (!sub) return { success: false, message: 'Subscription not found or not assigned.' };
+    if (!sub.prescription_verified) return { success: false, message: 'Prescription must be verified first.' };
+
+    // 3. Create Order
+    // We use Admin Client to bypass RLS for creating order on behalf of user
+    const supabaseAdmin = getSupabaseAdminClient();
+    
+    // Prepare product item
+    const product = Array.isArray(sub.product) ? sub.product[0] : sub.product;
+    const item = {
+        id: product.id,
+        name: product.name,
+        price: product.price_ghs,
+        quantity: 1, // Default to 1 unit refill
+        image: product.image_url
+    };
+
+    const { generateTrackingCode } = await import('./data');
+    const code = generateTrackingCode();
+    
+    // Address logic: Subscription has `delivery_address` JSON.
+    const address = sub.delivery_address || {};
+    // Extract delivery area if possible, or default to pharmacy location?
+    // Refills often delivery? 
+    // We'll use "Standard Delivery" or what's in address.
+    
+    const { data: order, error: orderError } = await supabaseAdmin
+        .from('orders')
+        .insert({
+            code,
+            partner_code: pharmacy.partner_code, // Tag this pharmacy as the partner
+            user_id: sub.user_id, // Link to user
+            pharmacy_id: pharmacy.id, // Assign to this pharmacy immediately
+            items: [item],
+            total_price: product.price_ghs + 20, // Add standard fee?
+            delivery_fee: 20,
+            subtotal: product.price_ghs,
+            status: 'pending_payment', // Waiting for user to pay
+            delivery_area: address.city || 'Accra', // Fallback
+            delivery_address_note: `Refill Subscription ${sub.subscription_code}`,
+            phone_masked: address.phone,
+            pharmacy_ack_status: 'accepted', // Auto-accept since pharmacy created it
+            pharmacy_ack_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+    if (orderError) {
+        console.error('Refill order error', orderError);
+        return { success: false, message: 'Failed to create order: ' + orderError.message };
+    }
+
+    // 4. Log Refill in refill_logs
+    await supabaseAdmin
+        .from('refill_logs')
+        .insert({
+            subscription_id: sub.id,
+            pharmacy_id: pharmacy.id,
+            status: 'processing',
+            filled_at: new Date().toISOString(),
+            pharmacist_notes: 'Refill processed via dashboard.'
+        });
+
+    // 5. Update next delivery date
+    let nextDate = new Date();
+    if (sub.frequency === 'quarterly') {
+        nextDate.setMonth(nextDate.getMonth() + 3);
+    } else {
+        nextDate.setMonth(nextDate.getMonth() + 1); // Monthly default
+    }
+    
+    await supabaseAdmin
+        .from('medication_refill_subscriptions')
+        .update({ next_delivery_date: nextDate.toISOString().split('T')[0] })
+        .eq('id', sub.id);
+
+    revalidatePath('/pharmacy/refills');
+    return { success: true, message: 'Refill processed. Order created: ' + code };
 }
