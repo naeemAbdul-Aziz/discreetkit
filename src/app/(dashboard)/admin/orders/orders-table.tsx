@@ -590,14 +590,14 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <PharmacyCombobox
-                      initialName={order.pharmacies?.name}
-                      value={order.pharmacy_id}
-                      onAssign={(pid, pname) =>
-                        handleAssignPharmacy(order.id, pid, pname)
-                      }
-                      loading={assigningId === order.id}
-                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-40 justify-start"
+                      onClick={() => setAssigningId(order.id)}
+                    >
+                      {order.pharmacies?.name || "Unassigned"}
+                    </Button>
                     {order.pharmacy_ack_status === "declined" && (
                       <div className="relative group cursor-help">
                         <AlertCircle className="h-4 w-4 text-destructive" />
@@ -699,15 +699,11 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                         </DropdownMenuSubTrigger>
                         <DropdownMenuSubContent className="p-0">
                           <div className="p-2">
-                            <PharmacyCombobox
-                              initialName={order.pharmacies?.name}
-                              value={order.pharmacy_id}
-                              onAssign={(pid, pname) =>
-                                handleAssignPharmacy(order.id, pid, pname)
-                              }
-                              loading={assigningId === order.id}
-                              inDropdown={true}
-                            />
+                            <DropdownMenuItem
+                              onClick={() => setAssigningId(order.id)}
+                            >
+                              Find Pharmacy...
+                            </DropdownMenuItem>
                           </div>
                         </DropdownMenuSubContent>
                       </DropdownMenuSub>
@@ -731,9 +727,20 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
         </Table>
       </div>
 
+      {/* Pharmacy Assignment Dialog */}
+      <PharmacyAssignmentDialog
+        open={!!assigningId}
+        onOpenChange={(open) => !open && setAssigningId(null)}
+        onAssign={(pid, pname) => {
+          if (assigningId) handleAssignPharmacy(assigningId, pid, pname);
+        }}
+        deliveryArea={orders.find((o) => o.id === assigningId)?.delivery_area}
+      />
+
       {/* Pagination Controls */}
       {filteredOrders.length > pageSize && (
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-2 gap-2">
+          {/* ... existing pagination ... */}
           <div className="flex items-center gap-2">
             <span className="text-sm">Rows per page:</span>
             <select
@@ -779,38 +786,33 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
   );
 }
 
-function PharmacyCombobox({
-  initialName,
-  value,
+function PharmacyAssignmentDialog({
+  open,
+  onOpenChange,
   onAssign,
-  loading,
-  inDropdown,
   deliveryArea,
 }: {
-  initialName?: string;
-  value: number | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onAssign: (id: number, name: string) => void;
-  loading: boolean;
-  inDropdown?: boolean;
   deliveryArea?: string;
 }) {
-  const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<
     { id: number; name: string; recommended?: boolean; is_24_7?: boolean }[]
   >([]);
   const [searching, setSearching] = useState(false);
 
-  // Load initial recommendations on open if query is empty
+  // Load recommendations on open
   useEffect(() => {
-    if ((open || inDropdown) && !query) {
+    if (open) {
       setSearching(true);
       searchPharmacies("", deliveryArea).then((data) => {
         setResults(data);
         setSearching(false);
       });
     }
-  }, [open, query, deliveryArea, inDropdown]);
+  }, [open, deliveryArea]);
 
   // Debounce search
   useEffect(() => {
@@ -830,63 +832,52 @@ function PharmacyCombobox({
     return () => clearTimeout(timer);
   }, [query, open, deliveryArea]);
 
-  const display = value ? initialName || "Assigned" : "Unassigned";
-
   return (
-    <div
-      className="relative w-40"
-      onClick={(e) => inDropdown && e.stopPropagation()}
-    >
-      {!inDropdown && (
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full justify-start"
-          onClick={() => setOpen((o) => !o)}
-        >
-          {loading ? "Assigning..." : display}
-        </Button>
-      )}
-      {(open || inDropdown) && (
-        <div
-          className={
-            inDropdown
-              ? ""
-              : "absolute z-10 mt-1 w-full rounded border bg-popover p-2 shadow"
-          }
-        >
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Assign Pharmacy</DialogTitle>
+          <DialogDescription>
+            Search and select a pharmacy to fulfill this order.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="py-4 space-y-4">
           <Input
-            placeholder="Search pharmacy..."
+            placeholder="Search pharmacy by name..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="mb-2 h-8 py-1 text-sm"
             autoFocus
           />
-          <div className="max-h-48 overflow-y-auto space-y-1">
+
+          <div className="max-h-[300px] overflow-y-auto border rounded-md divide-y">
             {searching && (
-              <div className="text-xs text-muted-foreground px-1">
+              <div className="p-4 text-center text-muted-foreground text-sm">
                 Searching...
+              </div>
+            )}
+            {!searching && results.length === 0 && (
+              <div className="p-4 text-center text-muted-foreground text-sm">
+                No pharmacies found.
               </div>
             )}
 
             {!searching &&
               results.map((p) => (
-                <Button
+                <button
                   key={p.id}
-                  variant="ghost"
-                  size="sm"
-                  className="w-full justify-between group"
+                  className="w-full text-left px-4 py-3 hover:bg-muted/50 transition-colors flex items-center justify-between group"
                   onClick={() => {
                     onAssign(p.id, p.name);
-                    setOpen(false);
+                    onOpenChange(false);
                   }}
                 >
-                  <span className="truncate mr-2">{p.name}</span>
-                  <div className="flex items-center gap-1 shrink-0">
+                  <div className="font-medium">{p.name}</div>
+                  <div className="flex items-center gap-2 shrink-0">
                     {p.is_24_7 && (
                       <Badge
                         variant="secondary"
-                        className="h-5 text-[10px] px-1 bg-blue-100 text-blue-700 hover:bg-blue-100"
+                        className="h-5 text-[10px] px-1 bg-blue-100 text-blue-700"
                       >
                         24/7
                       </Badge>
@@ -894,22 +885,17 @@ function PharmacyCombobox({
                     {p.recommended && (
                       <Badge
                         variant="success"
-                        className="h-5 text-[10px] px-1 bg-green-100 text-green-700 hover:bg-green-100"
+                        className="h-5 text-[10px] px-1 bg-green-100 text-green-700"
                       >
                         Best
                       </Badge>
                     )}
                   </div>
-                </Button>
+                </button>
               ))}
-            {!searching && results.length === 0 && (
-              <div className="text-xs text-muted-foreground px-1">
-                No matches found
-              </div>
-            )}
           </div>
         </div>
-      )}
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
