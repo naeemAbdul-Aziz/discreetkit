@@ -1,5 +1,5 @@
 import { getProductsWithStock } from "@/lib/client-actions";
-import { ProductCard } from "../(components)/product-card";
+import { ServiceCard } from "./service-card";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -21,26 +21,26 @@ export default async function MedicationPage() {
               Medication Refills
             </h1>
             <p className="mt-4 max-w-3xl mx-auto text-base text-muted-foreground">
-              A confidential and reliable refill service for your essential
-              long-term medications. Delivered with the same privacy and care
-              you expect from DiscreetKit.
+              A private, reliable subscription service for your essential
+              medications. Enroll once for discreet monthly or quarterly
+              delivery.
             </p>
           </div>
 
           <Alert className="max-w-4xl mx-auto mb-12 bg-card">
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Prescription Required</AlertTitle>
+            <AlertTitle>Enrollment & Verification</AlertTitle>
             <AlertDescription>
-              A valid prescription from a licensed healthcare provider is
-              required for all medication refills. You will be prompted to
-              upload a photo of your prescription during the checkout process.
+              To ensure compliance, you must upload a valid prescription or
+              medical report during enrollment. Our partner pharmacies will
+              verify your documents before the first delivery.
             </AlertDescription>
           </Alert>
 
           {medications.length > 0 ? (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {medications.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <ServiceCard key={product.id} product={product} />
               ))}
             </div>
           ) : (

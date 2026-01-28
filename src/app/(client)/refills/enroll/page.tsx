@@ -61,26 +61,28 @@ export default function EnrollmentPage() {
     const file = e.target.files[0];
 
     try {
-      const supabase = getSupabaseClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const payload = new FormData();
+      payload.append("file", file);
 
-      if (!user) {
-        toast({ title: "Please login first", variant: "destructive" });
-        return;
-      }
+      // Dynamic import to avoid server-action-in-client issues depending on Next.js version,
+      // but importing standard server actions at top is standard.
+      // We need to import it at the top of the file, let's assume it's imported.
+      // I'll add the import in a separate replace_file_content or assume I can add it here if I replace the whole block?
+      // I'll use the imported function name. I need to make sure I import it first.
+      // Wait, I can't add the import in this block if it's not at the top.
+      // I should probably do a multi-replace or use the existing imports.
+      // I'll blindly call `uploadPrescriptionAction` here and then add the import in a second step to be safe.
 
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+      // Actually, I can replace the import line in another call.
+      // Let's write the logic assuming `uploadPrescriptionAction` is available.
 
-      const { error: uploadError, data } = await supabase.storage
-        .from("prescriptions")
-        .upload(fileName, file);
+      const { uploadPrescriptionAction } = await import("@/lib/actions");
+      const result = await uploadPrescriptionAction(payload); // Call server action
 
-      if (uploadError) throw uploadError;
+      if (!result.success || !result.path)
+        throw new Error(result.message || "Upload failed");
 
-      setFormData((prev) => ({ ...prev, prescriptionUrl: data.path }));
+      setFormData((prev) => ({ ...prev, prescriptionUrl: result.path! })); // using ! because we checked !result.path above
       toast({
         title: "Prescription Uploaded",
         description: "File attached successfully.",
