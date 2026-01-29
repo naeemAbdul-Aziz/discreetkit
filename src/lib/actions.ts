@@ -168,7 +168,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
-      message: 'Error: Please check the form fields.',
+      message: 'Please check your delivery information and try again.',
       success: false,
       authorization_url: null,
     };
@@ -177,8 +177,8 @@ export async function createOrderAction(prevState: any, formData: FormData) {
   const clientCartItems: CartItem[] = JSON.parse(validatedFields.data.cartItems);
   if (clientCartItems.length === 0) {
     return {
-      errors: { cartItems: ['Your cart is empty. Please add at least one item.'] },
-      message: 'Your cart is empty.',
+      errors: { cartItems: ['Your cart is empty. Please add items before checking out.'] },
+      message: 'Your cart is empty. Please add items to continue.',
       success: false,
       authorization_url: null,
     };
@@ -187,8 +187,8 @@ export async function createOrderAction(prevState: any, formData: FormData) {
   const { deliveryArea, otherDeliveryArea } = validatedFields.data;
   if (deliveryArea === 'Other' && (!otherDeliveryArea || otherDeliveryArea.length < 3)) {
     return {
-      errors: { otherDeliveryArea: ['Please specify your delivery area.'] },
-      message: 'Error: Please specify your delivery area.',
+      errors: { otherDeliveryArea: ['Please enter your delivery location.'] },
+      message: 'Please specify where you would like your order delivered.',
       success: false,
       authorization_url: null,
     };
@@ -206,7 +206,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
       .in('id', productIds);
 
     if (prodError || !dbProducts) {
-      throw new Error('Failed to validate product prices.');
+      throw new Error('Unable to verify product information. Please try again.');
     }
 
     const dbProductMap = new Map(dbProducts.map(p => [p.id, p]));
@@ -363,7 +363,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
       console.error('Paystack API Error:', paystackData);
       // Attempt to delete the pending order if Paystack fails to prevent orphaned orders
       await supabaseAdmin.from('orders').delete().eq('id', orderData.id);
-      throw new Error(paystackData.message || 'Could not initialize payment. Please try again.');
+      throw new Error(paystackData.message || 'Unable to initialize payment. Please check your connection and try again.');
     }
 
     revalidatePath('/order');
@@ -548,12 +548,12 @@ const refillSchema = z.object({
 export async function uploadPrescriptionAction(formData: FormData) {
   try {
     const file = formData.get('file') as File;
-    if (!file) throw new Error('No file provided.');
+    if (!file) throw new Error('Please select a file to upload.');
 
     // Basic validation
-    if (file.size > 20 * 1024 * 1024) throw new Error('File too large (Max 20MB).');
+    if (file.size > 20 * 1024 * 1024) throw new Error('File is too large. Please upload a file smaller than 20MB.');
     const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
-    if (!validTypes.includes(file.type)) throw new Error('Invalid file type. Use JPG, PNG, or PDF.');
+    if (!validTypes.includes(file.type)) throw new Error('Invalid file format. Please upload a JPG, PNG, or PDF file.');
 
     const supabaseAdmin = getSupabaseAdminClient();
     const fileExt = file.name.split('.').pop();
@@ -573,7 +573,7 @@ export async function uploadPrescriptionAction(formData: FormData) {
     return { success: true, path: data.path };
   } catch (error: any) {
     console.error('Upload Error:', error);
-    return { success: false, message: error.message };
+    return { success: false, message: error.message || 'Unable to upload file. Please try again.' };
   }
 }
 
@@ -593,7 +593,7 @@ export async function createRefillSubscription(prevState: any, formData: FormDat
     if (!validated.success) {
       return {
         success: false,
-        message: 'Invalid input.',
+        message: 'Please check your information and try again.',
         errors: validated.error.flatten().fieldErrors
       };
     }
@@ -624,17 +624,17 @@ export async function createRefillSubscription(prevState: any, formData: FormDat
         if (error.code === '23505') {
           return { 
             success: false, 
-            message: 'This phone number already has an active subscription for this medication. Please use your existing subscription code to track your refills.' 
+            message: 'You already have an active subscription for this medication with this phone number. Check your SMS for your tracking code or visit the Track page to view your subscription status.' 
           };
         }
-        return { success: false, message: 'Failed to create subscription. ' + error.message };
+        return { success: false, message: 'Unable to complete enrollment. Please try again or contact support if the issue persists.' };
     }
 
     return { success: true, message: 'Enrolled successfully!', code: data.subscription_code };
 
   } catch (error: any) {
     console.error('Create Subscription Error:', error);
-    return { success: false, message: 'An unexpected error occurred.' };
+    return { success: false, message: 'Something went wrong. Please try again or contact support if the problem continues.' };
   }
 }
 
