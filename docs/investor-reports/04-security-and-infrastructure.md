@@ -21,6 +21,7 @@ We do not rely on application-level logic for security. We enforce it at the **D
 *   **Guest Checkout:** The system supports guest checkout where user data is retained only for the lifecycle of the active order and operational audit logs, supporting GDPR "Right to be Forgotten" workflows.
 *   **Anonymous Subscriptions:** Refill subscriptions are cryptographically decoupled from user identities. Tracking is code-based (`DK-SUB-XXX`), ensuring no long-term user accounts are needed for recurring care.
 *   **Masked Notifications & API:** SMS notifications and public tracking endpoints automatically mask PII (e.g., `020****567`, "Package #123") to prevent data scraping or accidental exposure.
+*   **The "Rider Firewall":** Our Rider Registry architecture ensures delivery personnel never see the specific contents of a package. They receive only pickup/drop-off coordinates and a masked contact number, ensuring "Zero-Knowledge Delivery."
 
 ---
 

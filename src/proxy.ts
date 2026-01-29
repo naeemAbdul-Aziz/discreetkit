@@ -9,7 +9,8 @@ const RATE_LIMITS = {
   auth: { points: 5, duration: 300 } // 5 requests per 5 minutes for Auth/Admin
 };
 
-export async function middleware(request: NextRequest) {
+// Renamed from middleware to proxy for Next.js 16
+export async function proxy(request: NextRequest) {
     // 1. Initialize Supabase and check auth
     const { supabase, response } = createSupabaseMiddlewareClient(request);
     const { data: { user } } = await supabase.auth.getUser();

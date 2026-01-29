@@ -26,8 +26,8 @@ Investors hate this. Instead, say: **"We are a Category Creator."**
     *   *Herbalists:* Dangerous alternatives (Safety Gap).
 
 ### The Bad (Risks & Mitigations)
-*   **Logistics Risk:** "Last-mile delivery" is traditionally expensive.
-    *   *Your Solution:* **"Distributed Node" model**. By ensuring the "fastest and closest node" handles fulfillment, you slash delivery costs.
+*   **Logistics Risk:** "Last-mile delivery" is traditionally expensive and capital intensive (bikes, fuel, insurance).
+    *   *Your Solution:* **"Asset-Light Rider Registry."** Instead of buying bikes, we aggregate the existing fleets of our pharmacy partners. We are an orchestration layer, not a logistics company. This keeps our burn rate near zero.
 *   **Platform Risk (The "WhatsApp Tax"):** What if Meta blocks your bot?
     *   *Mitigation:* **Failover Strategy.** Your Web Storefront (`(client)`) is fully synced. If WhatsApp goes down, you instantly migrate users to the PWA (Progressive Web App) via SMS link.
 *   **Trust & Counterfeits:** West Africa is flooded with fake meds.

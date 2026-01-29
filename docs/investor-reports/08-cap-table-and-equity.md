@@ -52,6 +52,7 @@ You are launching in the **Legon Enclave**: UG (Legon), UPSA, Wisconsin, and GIM
     *   3PL Delivery Subsidies
     *   Stipends for 16 staff (Even small allowances add up)
     *   Marketing/Activations
+*   **Asset-Light Leverage:** Because you use the **Pharmacy Rider Registry** instead of owning a fleet, your OpEx is significantly lower than a traditional logistics startup. This efficiency is your key negotiation lever for a higher Valuation Cap (you do more with less).
 *   **Verdict:** $150k is **LEAN**. Do not ask for less, or you will run out of cash in 6 months.
 
 ### The Target Deal

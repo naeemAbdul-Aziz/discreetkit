@@ -61,3 +61,27 @@ To support our partnership with Marie Stopes, the system implements a verificati
 1.  **Input:** User enters a code (e.g., `DK-MS-2024`).
 2.  **Validation:** System checks against the `orders` table to see if this code (generated during a previous purchase) exists and is valid.
 3.  **Unlock:** If valid, the user is transitioned to a "Verified" state, unlocking hidden menu options (e.g., "Speak to Counselor", "Claim Free Service").
+
+---
+
+## 4. Asset-Light Logistics Engine ("The Rider Registry")
+
+**File Reference:** `src/lib/admin-actions.ts` (Rider Management Module)
+
+To operate without a capital-intensive fleet, the system uses a **Decentralized Dispatch Protocol** that leverages pharmacy partners' existing logistics infrastructure.
+
+### The Problem:
+Owning a bike fleet is expensive (Maintenance, Fuel, Insurance, HR). However, relying on third-party aggregators (Uber/Bolt) can be unreliable for discreet medical deliveries.
+
+### The Solution: "Pharmacy-Sourced Fleet"
+1.  **Registry:** Each pharmacy partner registers their trusted internal riders or preferred courier services into the `pharmacy_riders` table. This creates a virtual fleet that spans the entire city without DiscreteKit owning a single tire.
+2.  **Smart Assignment:** When dispatching an order, the pharmacy selects from their pre-validated rider list.
+3.  **Automated Bridging:**
+    *   **Trigger:** Rider assignment instantly triggers an automated bridge between the Rider and the Customer.
+    *   **Notification:** Customer receives: *"Your order is on the way. Rider: [Name] ([Phone]). Track here: [Link]"*.
+    *   **Privacy:** PII (Personally Identifiable Information) masking ensures the rider calls the customer without seeing their full profile data on a public app.
+
+### Value:
+*   **CAC Reduction:** No fleet startup cost.
+*   **Scale:** Instant city-wide coverage by onboarding pharmacies.
+*   **Trust:** Customers deal with trusted, verified medical couriers, not random gig-workers.

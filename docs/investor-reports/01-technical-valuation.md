@@ -34,7 +34,7 @@ The system leverages a **Serverless Event-Driven Architecture** utilizing Supaba
 The codebase contains three distinct, fully integrated applications sharing a single monorepo:
 1.  **Consumer Storefront:** A "High-Fidelity" e-commerce experience featuring extensive micro-interactions (`framer-motion`), premium UI/UX design (Apple-aesthetic), and full SEO optimization.
 2.  **Admin Command Center:** A powerful dashboard for global oversight, enabling real-time visualization of revenue, partner onboarding, and network-wide inventory control.
-3.  **Pharmacy Operations Portal:** A specialized interface for partners to accept orders, manage local stock, and coordinate logistics.
+3.  **Pharmacy Operations Portal:** A specialized interface for partners to accept orders, manage local stock, and **coordinate their internal rider fleet**.
 
 *Value Driver:* The use of **Next.js 16 (App Router)** places the tech stack at the cutting edge, minimizing technical debt for the next 4-5 years.
 
@@ -58,6 +58,7 @@ The "Brain" of the company involves algorithms that automate complex operational
 *   **Partner Verification System:** Automated verification logic for Marie Stopes partner codes (`DK-MS-XXXX`), distinct from standard discount codes, integrated into the care pathways.
 *   **Anonymous Subscription Engine:** A privacy-first algorithms that manages recurring billing and "Subscription Tracking" without storing user accounts, utilizing unique entropy-based tokens for identity.
 *   **Inventory Synchronization:** Logic ensuring that a sale on WhatsApp, the Web, or a manual Admin entry instantly reconciles stock levels across the entire distributed database.
+*   **Asset-Light Logistics Engine:** A decentralized dispatch system that aggregates pharmacy-owned riders into a "Virtual Fleet," decoupling logistics from capital expenditure.
 
 ### E. Quality Assurance & DevOps
 **Valuation:** $15,000 – $25,000  
@@ -87,6 +88,7 @@ This organizational maturity reduces "Key Man Risk" significantly.
 
 The software is useless without the fulfillment network.
 *   **Asset:** Signed Memorandums of Understanding (MoUs) with pharmacy nodes.
+*   **Asset:** **Virtual Fleet Registry:** A growing database of verified pharmacy riders (Names + Phone Numbers) ready for dispatch.
 *   **Value:** Solves the "Cold Start Problem." A competitor can copy the code but cannot replicate the trust relationships overnight.
 *   **Metric:** Caculated at ~$2,000 Cost-of-Acquisition per active node partner.
 

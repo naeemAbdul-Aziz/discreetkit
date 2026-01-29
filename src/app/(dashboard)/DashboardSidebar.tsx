@@ -18,6 +18,7 @@ import {
   Layers,
   BarChart,
   Repeat,
+  Truck,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -67,6 +68,7 @@ export function DashboardSidebar() {
         },
         { href: "/pharmacy/refills", label: "Refills", icon: Repeat },
         { href: "/pharmacy/inventory", label: "Inventory", icon: Package },
+        { href: "/pharmacy/riders", label: "Riders", icon: Truck },
         { href: "/pharmacy/settings", label: "Settings", icon: Settings },
       ];
 
