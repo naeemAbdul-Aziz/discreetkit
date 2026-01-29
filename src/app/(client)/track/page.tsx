@@ -46,41 +46,41 @@ const statusMap: Record<
 > = {
   pending_payment: {
     icon: CreditCard,
-    label: "Pending Payment",
-    description: "Awaiting payment confirmation.",
+    label: "Confirming Payment",
+    description: "We're verifying your payment securely.",
   },
   received: {
     icon: Package,
-    label: "Order Received",
-    description: "We have your order and are preparing it.",
+    label: "Order Confirmed",
+    description: "Your order is confirmed and in safe hands.",
   },
   processing: {
     icon: Server,
-    label: "Processing",
-    description: "Your order is being processed at our facility.",
+    label: "Being Prepared",
+    description: "We're carefully packing your order with care.",
   },
   out_for_delivery: {
     icon: Truck,
-    label: "Out for Delivery",
-    description: "Your package is on its way to you.",
+    label: "On the Way",
+    description: "A trusted rider is bringing your package to you.",
   },
   completed: {
     icon: PackageCheck,
     label: "Delivered",
-    description: "Your order has been successfully delivered.",
+    description: "Delivered safely and discreetly. Thank you!",
   },
 };
 
 const getFriendlyEventTitle = (raw: string) => {
   const map: Record<string, string> = {
-    order_created: "Order Placed",
-    payment_pending: "Payment Pending",
+    order_created: "Order Received",
+    payment_pending: "Confirming Payment",
     payment_confirmed: "Payment Confirmed",
-    processing: "Processing Started",
-    packed: "Order Packed",
-    dispatch_assigned: "Rider Assigned",
+    processing: "Preparing Your Order",
+    packed: "Packed & Ready",
+    dispatch_assigned: "On the Way",
     out_for_delivery: "Out for Delivery",
-    completed: "Package Delivered",
+    completed: "Delivered",
     cancelled: "Order Cancelled",
   };
   return (
@@ -90,6 +90,20 @@ const getFriendlyEventTitle = (raw: string) => {
       .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
       .join(" ")
   );
+};
+
+const getReassuranceMessage = (status: string): string => {
+  const messages: Record<string, string> = {
+    order_created: "We've got your order! Our team is on it.",
+    payment_pending: "Verifying your payment securely.",
+    payment_confirmed: "Payment received. Your order is confirmed!",
+    processing: "We're carefully preparing your package with discretion.",
+    packed: "All set! Your order is packed and ready to go.",
+    dispatch_assigned: "A trusted rider is heading your way.",
+    out_for_delivery: "Almost there! Your package is on the way.",
+    completed: "Delivered safely. Thank you for trusting us!",
+  };
+  return messages[status] || "Your order is in safe hands.";
 };
 
 const getFriendlyNote = (note: string | null): string | null => {
@@ -218,7 +232,7 @@ function Tracker() {
                 Track Your Order
               </CardTitle>
               <CardDescription className="mt-1">
-                Real-time updates on your DiscreetKit delivery.
+                Your privacy matters. We're delivering with care and discretion.
               </CardDescription>
             </div>
             <form
@@ -294,12 +308,26 @@ function OrderTrackingView({ order }: { order: Order }) {
                   (a, b) =>
                     new Date(b.date).getTime() - new Date(a.date).getTime(),
                 ) // Newest first
+                .filter((event, index, self) => {
+                  // Deduplicate: Keep only the first occurrence of each status+date combination
+                  const key = `${event.status}-${new Date(event.date).toISOString()}`;
+                  return (
+                    index ===
+                    self.findIndex(
+                      (e) =>
+                        `${e.status}-${new Date(e.date).toISOString()}` === key,
+                    )
+                  );
+                })
                 .map((event, index) => {
                   const isLatest = index === 0;
                   const friendlyNote = getFriendlyNote(event.note);
 
                   return (
-                    <div key={index} className="relative pl-8 group">
+                    <div
+                      key={`${event.status}-${event.date}-${index}`}
+                      className="relative pl-8 group"
+                    >
                       {/* Dot */}
                       <div
                         className={cn(
@@ -338,8 +366,13 @@ function OrderTrackingView({ order }: { order: Order }) {
                           })}
                         </p>
 
+                        {/* Reassurance Message */}
+                        <div className="mt-2 text-sm text-foreground/90 bg-primary/5 p-3 rounded-r-xl rounded-bl-xl border border-primary/10 max-w-md">
+                          {getReassuranceMessage(event.status)}
+                        </div>
+
                         {friendlyNote && (
-                          <div className="mt-2 text-sm text-foreground/80 bg-muted/30 p-3 rounded-r-xl rounded-bl-xl border border-muted/50 max-w-md animate-in fade-in slide-in-from-top-1 duration-500">
+                          <div className="mt-2 text-sm text-muted-foreground bg-muted/30 p-3 rounded-r-xl rounded-bl-xl border border-muted/50 max-w-md">
                             {friendlyNote}
                           </div>
                         )}

@@ -26,9 +26,9 @@ The Partner acts as an authorized fulfillment point. The goal is to capture the 
 
 **2. RESPONSIBILITIES**
 
-**A. The Platform:** Handles marketing, demand generation, digital order processing, last-mile delivery via unbranded riders, payment collection, and customer support.
+**A. The Platform:** Handles marketing, demand generation, digital order processing, payment collection, customer support, and **logistics orchestration** (via the Rider Registry protocol).
 
-**B. The Partner:** Ensures stock of Core SKUs (specifically HIV Self-Tests, Emergency Contraceptives, and Pregnancy Test Kits), picks and packs orders using the **Blind Handoff** protocol, checks expiry dates, and ensures regulatory compliance (Pharmacy Act, 1994).
+**B. The Partner:** Ensures stock of Core SKUs, picks and packs orders using the **Blind Handoff** protocol, and **manages dispatch** via assigned riders (either internal staff or platform-provided couriers) in accordance with the Rider Registry standards.
 
 ---
 

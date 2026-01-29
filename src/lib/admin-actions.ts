@@ -3,6 +3,7 @@
 import { createSupabaseServerClient, getSupabaseAdminClient } from "@/lib/supabase"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
+import { riderSchema, type RiderFormValues } from "@/lib/validation-schemas"
 
 // Helper for Admin Authorization
 async function requireAdmin() {
@@ -1593,4 +1594,75 @@ export async function getPrescriptionUrlAction(path: string) {
 
     if (error) return { error: error.message };
     return { signedUrl: data.signedUrl };
+}
+
+// --- Rider Management ---
+
+
+
+export async function getPharmacyRiders(pharmacyId: number) {
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Unauthorized');
+
+    const { data, error } = await supabase
+        .from('pharmacy_riders')
+        .select('*')
+        .eq('pharmacy_id', pharmacyId)
+        .order('is_active', { ascending: false })
+        .order('name');
+        
+    if (error) throw new Error(error.message);
+    return data;
+}
+
+export async function addPharmacyRider(data: RiderFormValues) {
+    const supabase = await createSupabaseServerClient();
+    // Normalize phone
+    let phone = data.phone.trim();
+    if (phone.startsWith('0')) phone = `233${phone.substring(1)}`;
+    
+    const { error } = await supabase
+        .from('pharmacy_riders')
+        .insert({
+            pharmacy_id: data.pharmacy_id,
+            name: data.name,
+            phone: phone,
+            is_active: data.is_active
+        });
+        
+    if (error) {
+        if (error.code === '23505') return { error: 'This rider is already registered.' };
+        return { error: error.message };
+    }
+    
+    // Use string path for revalidatePath to avoid type error
+    revalidatePath('/dashboard/pharmacy/riders');
+    return { success: true };
+}
+
+export async function deletePharmacyRider(id: number) {
+    const supabase = await createSupabaseServerClient();
+    const { error } = await supabase
+        .from('pharmacy_riders')
+        .delete()
+        .eq('id', id);
+        
+    if (error) return { error: error.message };
+    
+    revalidatePath('/dashboard/pharmacy/riders');
+    return { success: true };
+}
+
+export async function toggleRiderStatus(id: number, isActive: boolean) {
+    const supabase = await createSupabaseServerClient();
+    const { error } = await supabase
+        .from('pharmacy_riders')
+        .update({ is_active: isActive })
+        .eq('id', id);
+        
+    if (error) return { error: error.message };
+    
+    revalidatePath('/dashboard/pharmacy/riders');
+    return { success: true };
 }

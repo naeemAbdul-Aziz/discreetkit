@@ -55,7 +55,8 @@ The system implements a **Hybrid Inventory Model**:
 
 1. **Global Catalogue:** Defined centrally by Admins.
 2. **Local Availability:** Each Pharmacy node has its own stock table (`pharmacy_products`).
-3. **Aggregation:** The user sees a "Virtual Global Stock" which is the sum of all available partner stocks. This allows for essentially infinite horizontal scaling of inventory without centralized warehousing.
+3. **Rider Registry:** Each Pharmacy node manages its own fleet of riders (`pharmacy_riders`), creating a decentralized logistics mesh.
+4. **Aggregation:** The user sees a "Virtual Global Stock" which is the sum of all available partner stocks. This allows for essentially infinite horizontal scaling of inventory without centralized warehousing.
 
 ### B. Headless Commerce (WhatsApp)
 
@@ -91,7 +92,8 @@ graph LR
     end
   
     subgraph RiderZone
-        Delivery["Delivery Info"]
+        Delivery["Delivery Info (Name/Map)"]
+        NoContent["No Product Content"]
     end
 
     User --> Browser
@@ -99,7 +101,7 @@ graph LR
     Cart -->|Order Submission| Order
   
     Order -->|Masked Data| Pack
-    Order -->|Location Only| Delivery
+    Order -->|Masked Call Route| RiderZone
   
 ```
 

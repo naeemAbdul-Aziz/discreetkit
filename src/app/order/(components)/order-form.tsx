@@ -394,10 +394,6 @@ export function OrderForm() {
 
   return (
     <>
-      <div className="mt-8 mb-8 md:mb-0">
-        <ChatTrigger />
-      </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-10 items-start mt-4 lg:mt-8">
         {/* Left Column: Form */}
         <div className="lg:col-span-7">
@@ -605,6 +601,11 @@ export function OrderForm() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Help Section - Pacely AI Assistant */}
+            <div className="mt-4">
+              <ChatTrigger />
+            </div>
 
             <SubmitButton disabled={isSubmitDisabled} />
           </form>
