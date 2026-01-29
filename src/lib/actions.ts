@@ -696,6 +696,32 @@ export async function getSubscriptionAction(code: string) {
       .eq('subscription_id', subscription.id)
       .order('dispensed_at', { ascending: false });
 
+    // --- SECURITY: MASK PII ---
+    let maskedAddress = subscription.delivery_address;
+    if (maskedAddress) {
+        // Clone to avoid mutating original if it was somehow referenced elsewhere (though it's fresh from DB)
+        maskedAddress = { ...maskedAddress };
+        
+        // Mask Phone: 0201234567 -> 020****567
+        if (maskedAddress.phone && maskedAddress.phone.length > 6) {
+            const p = maskedAddress.phone;
+            maskedAddress.phone = `${p.substring(0, 3)}****${p.substring(p.length - 3)}`;
+        }
+
+        // Mask Street/Address: Truncate giving only hint or city
+        // "123 Main St, Apt 4, Accra" -> "123 Main St..." or just City
+        // Let's keep City visible, mask specific street info heavily.
+        if (maskedAddress.street) {
+             const parts = maskedAddress.street.split(' ');
+             if (parts.length > 2) {
+                 maskedAddress.street = `${parts[0]} ${parts[1]}***`;
+             } else {
+                 maskedAddress.street = `${maskedAddress.street.substring(0, 3)}***`; 
+             }
+        }
+    }
+    // --- END SECURITY ---
+
     return {
       id: subscription.id,
       code: subscription.subscription_code,
@@ -704,8 +730,9 @@ export async function getSubscriptionAction(code: string) {
       nextDeliveryDate: subscription.next_delivery_date,
       enrolledAt: subscription.enrolled_at,
       prescriptionVerified: subscription.prescription_verified,
-      prescriptionUrl: subscription.prescription_document_url,
-      deliveryAddress: subscription.delivery_address,
+      // prescriptionUrl: subscription.prescription_document_url, // REMOVED FOR SECURITY
+      hasPrescription: !!subscription.prescription_document_url, // Boolean flag instead
+      deliveryAddress: maskedAddress,
       product: Array.isArray(subscription.product) ? subscription.product[0] : subscription.product,
       pharmacy: Array.isArray(subscription.pharmacy) ? subscription.pharmacy[0] : subscription.pharmacy,
       refillHistory: refillLogs || [],

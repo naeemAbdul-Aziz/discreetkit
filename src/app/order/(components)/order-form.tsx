@@ -141,7 +141,7 @@ function OrderSummaryCard() {
                       fill
                       className="object-contain p-1"
                       placeholder={`data:image/svg+xml;base64,${toBase64(
-                        shimmer(48, 48)
+                        shimmer(48, 48),
                       )}`}
                     />
                   )}
@@ -261,11 +261,11 @@ export function OrderForm() {
               latitude,
               longitude,
               loc.coords.lat,
-              loc.coords.lng
+              loc.coords.lng,
             );
             return dist < acc.dist ? { loc, dist } : acc;
           },
-          { loc: null as DiscountLocation | null, dist: Infinity }
+          { loc: null as DiscountLocation | null, dist: Infinity },
         );
 
         if (nearest.loc && nearest.dist <= MAX_DISTANCE_KM) {
@@ -296,7 +296,7 @@ export function OrderForm() {
           description: msg,
           variant: "destructive",
         });
-      }
+      },
     );
   };
 
@@ -305,7 +305,7 @@ export function OrderForm() {
     lat1: number,
     lon1: number,
     lat2: number,
-    lon2: number
+    lon2: number,
   ) => {
     const R = 6371; // radius of earth in km
     const dLat = deg2rad(lat2 - lat1);
@@ -350,9 +350,9 @@ export function OrderForm() {
   const [state, dispatch] = useActionState<CreateOrderState, FormData>(
     createOrderAction as unknown as (
       state: CreateOrderState,
-      payload: FormData
+      payload: FormData,
     ) => Promise<CreateOrderState>,
-    initialState
+    initialState,
   );
 
   useEffect(() => {
@@ -398,10 +398,10 @@ export function OrderForm() {
         <ChatTrigger />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-start mt-4 lg:mt-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-10 items-start mt-4 lg:mt-8">
         {/* Left Column: Form */}
         <div className="lg:col-span-7">
-          <form ref={formRef} action={dispatch} className="space-y-8 relative">
+          <form ref={formRef} action={dispatch} className="space-y-6 relative">
             <FormPendingOverlay />
             <input
               type="hidden"
@@ -421,7 +421,7 @@ export function OrderForm() {
               <CardHeader className="pb-4">
                 <CardTitle>Delivery & Payment</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-5">
+              <CardContent className="space-y-4">
                 <div className="space-y-4">
                   <div className="space-y-1.5">
                     <Label htmlFor="email">Email</Label>
@@ -435,7 +435,7 @@ export function OrderForm() {
                         className={cn(
                           "pl-10",
                           state.errors?.email &&
-                            "border-destructive focus-visible:ring-destructive"
+                            "border-destructive focus-visible:ring-destructive",
                         )}
                       />
                     </div>
@@ -454,7 +454,7 @@ export function OrderForm() {
                           className={cn(
                             "flex-1",
                             state.errors?.deliveryArea &&
-                              "border-destructive focus-visible:ring-destructive"
+                              "border-destructive focus-visible:ring-destructive",
                           )}
                         >
                           <SelectValue placeholder="Select a location..." />
@@ -497,7 +497,7 @@ export function OrderForm() {
                         placeholder="e.g., Osu, Airport Area"
                         className={cn(
                           state.errors?.otherDeliveryArea &&
-                            "border-destructive focus-visible:ring-destructive"
+                            "border-destructive focus-visible:ring-destructive",
                         )}
                       />
                       <FieldError
@@ -511,7 +511,7 @@ export function OrderForm() {
                         <SelectTrigger
                           className={cn(
                             state.errors?.otherDeliveryArea &&
-                              "border-destructive focus-visible:ring-destructive"
+                              "border-destructive focus-visible:ring-destructive",
                           )}
                         >
                           <SelectValue placeholder="Select pickup point..." />
@@ -557,7 +557,7 @@ export function OrderForm() {
                       placeholder="024xxxxxxx"
                       className={cn(
                         state.errors?.phone_masked &&
-                          "border-destructive focus-visible:ring-destructive"
+                          "border-destructive focus-visible:ring-destructive",
                       )}
                     />
                     <FieldError message={state.errors?.phone_masked?.[0]} />
@@ -611,8 +611,8 @@ export function OrderForm() {
         </div>
 
         {/* Right Column: Order Summary */}
-        <div className="lg:col-span-5 order-first lg:order-last">
-          <div className="sticky top-24 space-y-6 h-fit">
+        <div className="lg:col-span-5 lg:order-last">
+          <div className="sticky top-24 space-y-4 h-fit">
             <OrderSummaryCard />
             <div className="flex items-center gap-2 rounded-lg bg-muted/50 p-4 text-muted-foreground border border-border/50">
               <Lock className="h-5 w-5 text-success flex-shrink-0" />

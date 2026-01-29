@@ -1,4 +1,4 @@
-﻿-- DISCREETKIT SYSTEM SCHEMA
+-- DISCREETKIT SYSTEM SCHEMA
 -- Comprehensive database structure with RLS and documentation.
 -- Consolidated Version: 2025-12-08
 
@@ -136,7 +136,6 @@ CREATE TABLE public.pharmacies (
     email text,
     user_id uuid references auth.users(id) on delete set null,
     is_24_7 boolean default false,
-    is_open boolean default true,
     is_open boolean default true,
     operating_hours jsonb,
     -- Partnership Fields (Added 2026-01-22)

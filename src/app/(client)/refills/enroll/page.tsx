@@ -169,9 +169,9 @@ export default function EnrollmentPage() {
           <CardFooter className="flex flex-col gap-3">
             <Button
               className="w-full"
-              onClick={() => router.push("/products/medication-refills")}
+              onClick={() => router.push(`/track?code=${successCode}`)}
             >
-              Browse More Products
+              Track Subscription
             </Button>
             <Button
               variant="outline"
@@ -179,6 +179,13 @@ export default function EnrollmentPage() {
               onClick={() => window.print()}
             >
               Save This Code
+            </Button>
+            <Button
+              variant="link"
+              className="w-full text-muted-foreground"
+              onClick={() => router.push("/products/medication-refills")}
+            >
+              Back to Catalog
             </Button>
           </CardFooter>
         </Card>

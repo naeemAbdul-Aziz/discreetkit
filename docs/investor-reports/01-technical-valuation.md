@@ -56,6 +56,7 @@ This is the platform's key differentiator. Unlike standard apps that use plugins
 The "Brain" of the company involves algorithms that automate complex operational workflows:
 *   **Smart Order Routing:** The `autoAssignOrder` logic acts as an automated dispatcher, routing orders to specific partners based on business rules (Coverage -> Stock -> Cost -> Speed) and notifying them instantly via cross-channel alerts (Email/SMS).
 *   **Partner Verification System:** Automated verification logic for Marie Stopes partner codes (`DK-MS-XXXX`), distinct from standard discount codes, integrated into the care pathways.
+*   **Anonymous Subscription Engine:** A privacy-first algorithms that manages recurring billing and "Subscription Tracking" without storing user accounts, utilizing unique entropy-based tokens for identity.
 *   **Inventory Synchronization:** Logic ensuring that a sale on WhatsApp, the Web, or a manual Admin entry instantly reconciles stock levels across the entire distributed database.
 
 ### E. Quality Assurance & DevOps
