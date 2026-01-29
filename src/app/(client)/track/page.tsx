@@ -222,7 +222,7 @@ function Tracker() {
   const currentStatusIndex = order ? allStatuses.indexOf(order.status) : -1;
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6">
+    <div className="w-full max-w-7xl mx-auto space-y-8 px-4 sm:px-6 lg:px-8">
       {/* Search Card */}
       <Card className="rounded-3xl border-muted shadow-sm overflow-hidden">
         <CardHeader className="bg-muted/40 pb-8">
@@ -290,9 +290,9 @@ function OrderTrackingView({ order }: { order: Order }) {
   const currentStatusIndex = allStatuses.indexOf(order.status);
 
   return (
-    <div className="grid gap-6 md:grid-cols-3">
-      {/* LEFT COLUMN: Status & Items (Span 2) */}
-      <div className="md:col-span-2 space-y-6">
+    <div className="grid gap-8 lg:grid-cols-12">
+      {/* LEFT COLUMN: Status & Items (Span 8) */}
+      <div className="lg:col-span-8 space-y-8">
         {/* 2. Vertical Timeline (The Hero) */}
         <Card className="rounded-3xl border-muted shadow-sm overflow-hidden">
           <CardHeader className="bg-muted/30 pb-6">
@@ -431,8 +431,8 @@ function OrderTrackingView({ order }: { order: Order }) {
         </Card>
       </div>
 
-      {/* RIGHT COLUMN: Summary & History (Span 1) */}
-      <div className="space-y-6">
+      {/* RIGHT COLUMN: Summary & History (Span 4) */}
+      <div className="lg:col-span-4 space-y-8">
         {/* 3. Summary & Payment */}
         <Card className="rounded-3xl border-muted shadow-sm bg-muted/20">
           <CardHeader>
@@ -582,9 +582,9 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
     : null;
 
   return (
-    <div className="grid gap-6 md:grid-cols-3">
+    <div className="grid gap-8 lg:grid-cols-12">
       {/* LEFT COLUMN: Status & Details */}
-      <div className="md:col-span-2 space-y-6">
+      <div className="lg:col-span-8 space-y-8">
         {/* Subscription Status Card */}
         <Card className="rounded-3xl border-muted shadow-sm overflow-hidden">
           <CardHeader className="bg-muted/30 pb-6">
@@ -715,7 +715,7 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
 
       {/* RIGHT COLUMN: Details */}
 
-      <div className="space-y-6">
+      <div className="lg:col-span-4 space-y-8">
         {/* Prescription Status */}
         <Card className="rounded-3xl border-muted shadow-sm">
           <CardHeader className="pb-3">

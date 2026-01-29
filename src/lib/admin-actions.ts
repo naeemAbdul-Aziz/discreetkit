@@ -719,8 +719,36 @@ export async function updateOrderStatus(id: number, status: string, courierDetai
 
     // Trigger SMS notifications asynchronously
     if (status === 'out_for_delivery') {
-        // Pass courier details to SMS if needed (requires updating SMS function too, but for now we just store it)
+        // 1. Notify Customer (Existing)
         sendShippingNotificationSMS(String(id)).catch(console.error)
+
+        // 2. Notify Rider (New)
+        if (courierDetails?.phone) {
+            // Fetch order & pharmacy details for the rider message
+            const { data: orderData } = await supabase
+                .from('orders')
+                .select(`
+                    code, 
+                    delivery_area, 
+                    total_price, 
+                    pharmacies (name, location, phone_number)
+                `)
+                .eq('id', id)
+                .single();
+
+            if (orderData && orderData.pharmacies) {
+                // Handle array vs object for pharmacy relation just in case
+                const pharmacy = Array.isArray(orderData.pharmacies) ? orderData.pharmacies[0] : orderData.pharmacies;
+                
+                const pickupMsg = `New Delivery Assigned! Order ${orderData.code}. Pickup: ${pharmacy.name} (${pharmacy.location}). Deliver to: ${orderData.delivery_area}. Amount: GHS ${orderData.total_price}.`;
+                
+                // Use the internal sendSMS helper
+                const { sendSMS } = await import('@/lib/server-utils');
+                sendSMS(courierDetails.phone, pickupMsg).catch(err => 
+                    console.error('Failed to send Rider SMS:', err)
+                );
+            }
+        }
     } else if (status === 'completed') {
         sendDeliveryNotificationSMS(String(id)).catch(console.error)
     }
@@ -728,6 +756,8 @@ export async function updateOrderStatus(id: number, status: string, courierDetai
     revalidatePath('/admin/orders')
     return { success: true }
 }
+
+
 
 export async function assignPharmacyInternal(supabaseAdmin: any, orderId: number, pharmacyId: number) {
     // Get order and pharmacy details for notifications
@@ -1665,4 +1695,108 @@ export async function toggleRiderStatus(id: number, isActive: boolean) {
     
     revalidatePath('/dashboard/pharmacy/riders');
     return { success: true };
+}
+
+// --- Operations Dashboard Actions ---
+
+export async function getOperationsStats() {
+    await requireAdmin();
+    const supabase = await createSupabaseServerClient();
+    
+    // Parallelize queries for performance
+    const [ridersRes, ordersRes] = await Promise.all([
+        supabase
+            .from('pharmacy_riders')
+            .select('id', { count: 'exact', head: true })
+            .eq('is_active', true),
+        supabase
+            .from('orders')
+            .select('id, status, created_at, pharmacy_ack_status')
+            .in('status', ['received', 'processing', 'out_for_delivery'])
+    ]);
+
+    if (ridersRes.error) throw new Error(ridersRes.error.message);
+    if (ordersRes.error) throw new Error(ordersRes.error.message);
+
+    const activeRiders = ridersRes.count || 0;
+    const orders = ordersRes.data || [];
+
+    const now = new Date();
+    const STUCK_THRESHOLD_MINS = 30;
+
+    let processingCount = 0;
+    let outForDeliveryCount = 0;
+    let stuckCount = 0;
+    let unassignedCount = 0;
+
+    orders.forEach(o => {
+        if (o.status === 'out_for_delivery') {
+            outForDeliveryCount++;
+        } else if (o.status === 'processing') {
+            processingCount++;
+            
+            // Check for stuck orders
+            const created = new Date(o.created_at);
+            const diffMins = (now.getTime() - created.getTime()) / (1000 * 60);
+            if (diffMins > STUCK_THRESHOLD_MINS) {
+                stuckCount++;
+            }
+        } else if (o.status === 'received') {
+            // Received but not yet processing usually means unassigned or waiting for pharmacy ack
+            unassignedCount++;
+        }
+    });
+
+    return {
+        activeRiders,
+        processingCount,
+        outForDeliveryCount,
+        stuckCount,
+        unassignedCount
+    };
+}
+
+export async function getLiveDeliveries() {
+    await requireAdmin();
+    const supabase = await createSupabaseServerClient();
+
+    const { data, error } = await supabase
+        .from('orders')
+        .select(`
+            id, 
+            code, 
+            status, 
+            created_at, 
+            delivery_area, 
+            total_price,
+            courier_name,
+            courier_phone,
+            pharmacies(name),
+            order_events(status, created_at)
+        `)
+        .in('status', ['processing', 'out_for_delivery'])
+        .order('created_at', { ascending: true }); // Oldest first (priority)
+
+    if (error) throw new Error(error.message);
+
+    // Process to add "time elapsed" and simplify structure
+    return (data || []).map((order: any) => {
+         const pharmacyName = Array.isArray(order.pharmacies) 
+            ? order.pharmacies[0]?.name 
+            : order.pharmacies?.name || 'Unassigned';
+
+         // Find default "stuck" status
+         const now = new Date();
+         const created = new Date(order.created_at);
+         const minutesElapsed = Math.floor((now.getTime() - created.getTime()) / (1000 * 60));
+         
+         const isStuck = order.status === 'processing' && minutesElapsed > 30;
+
+         return {
+            ...order,
+            pharmacyName,
+            minutesElapsed,
+            isStuck
+         };
+    });
 }
