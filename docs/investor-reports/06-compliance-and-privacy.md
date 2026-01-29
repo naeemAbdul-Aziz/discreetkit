@@ -14,6 +14,7 @@ We do not just have a written policy; we force these rules to happen using our c
 | :--- | :--- | :--- |
 | **Right to See Data** | Admin tools verify who sees what automatically. | `src/lib/admin-actions.ts` |
 | **Keeping Little Data** | Users can buy without creating an account (Guest Checkout). | `src/lib/whatsapp/manager.ts` |
+| **Anonymous Care** | Recurring refills are tracked via code, not user account. | `src/lib/actions.ts` |
 | **Strict Access** | The database itself blocks unauthorized access. | `supabase/migrations/schema.sql` |
 | **Right to Delete** | We can completely remove user data if asked. | `src/lib/auth/utils.ts` |
 
@@ -35,6 +36,7 @@ We treat personal health information with extreme care.
     *   *What the System says:* "Package #DK-9923"
     *   *What the User gets:* The correct medication.
     *   *Why this matters:* The rider is just a delivery person. They do not know, and cannot tell anyone, what the customer bought.
+*   **Safe Public Tracking:** The "Track Order" page is publicly accessible but cryptographically safe. PII (Phone/Address) is masked on the server before being sent to the browser, so even if a tracking code is leaked, personal data is not exposed.
 
 ### C. Secure Payments
 We limit our risk by never seeing or storing credit card numbers.

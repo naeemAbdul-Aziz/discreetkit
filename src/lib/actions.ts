@@ -168,7 +168,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
-      message: 'Error: Please check the form fields.',
+      message: 'Please check your delivery information and try again.',
       success: false,
       authorization_url: null,
     };
@@ -177,8 +177,8 @@ export async function createOrderAction(prevState: any, formData: FormData) {
   const clientCartItems: CartItem[] = JSON.parse(validatedFields.data.cartItems);
   if (clientCartItems.length === 0) {
     return {
-      errors: { cartItems: ['Your cart is empty. Please add at least one item.'] },
-      message: 'Your cart is empty.',
+      errors: { cartItems: ['Your cart is empty. Please add items before checking out.'] },
+      message: 'Your cart is empty. Please add items to continue.',
       success: false,
       authorization_url: null,
     };
@@ -187,8 +187,8 @@ export async function createOrderAction(prevState: any, formData: FormData) {
   const { deliveryArea, otherDeliveryArea } = validatedFields.data;
   if (deliveryArea === 'Other' && (!otherDeliveryArea || otherDeliveryArea.length < 3)) {
     return {
-      errors: { otherDeliveryArea: ['Please specify your delivery area.'] },
-      message: 'Error: Please specify your delivery area.',
+      errors: { otherDeliveryArea: ['Please enter your delivery location.'] },
+      message: 'Please specify where you would like your order delivered.',
       success: false,
       authorization_url: null,
     };
@@ -206,7 +206,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
       .in('id', productIds);
 
     if (prodError || !dbProducts) {
-      throw new Error('Failed to validate product prices.');
+      throw new Error('Unable to verify product information. Please try again.');
     }
 
     const dbProductMap = new Map(dbProducts.map(p => [p.id, p]));
@@ -363,7 +363,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
       console.error('Paystack API Error:', paystackData);
       // Attempt to delete the pending order if Paystack fails to prevent orphaned orders
       await supabaseAdmin.from('orders').delete().eq('id', orderData.id);
-      throw new Error(paystackData.message || 'Could not initialize payment. Please try again.');
+      throw new Error(paystackData.message || 'Unable to initialize payment. Please check your connection and try again.');
     }
 
     revalidatePath('/order');
@@ -548,12 +548,12 @@ const refillSchema = z.object({
 export async function uploadPrescriptionAction(formData: FormData) {
   try {
     const file = formData.get('file') as File;
-    if (!file) throw new Error('No file provided.');
+    if (!file) throw new Error('Please select a file to upload.');
 
     // Basic validation
-    if (file.size > 20 * 1024 * 1024) throw new Error('File too large (Max 20MB).');
+    if (file.size > 20 * 1024 * 1024) throw new Error('File is too large. Please upload a file smaller than 20MB.');
     const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
-    if (!validTypes.includes(file.type)) throw new Error('Invalid file type. Use JPG, PNG, or PDF.');
+    if (!validTypes.includes(file.type)) throw new Error('Invalid file format. Please upload a JPG, PNG, or PDF file.');
 
     const supabaseAdmin = getSupabaseAdminClient();
     const fileExt = file.name.split('.').pop();
@@ -573,18 +573,13 @@ export async function uploadPrescriptionAction(formData: FormData) {
     return { success: true, path: data.path };
   } catch (error: any) {
     console.error('Upload Error:', error);
-    return { success: false, message: error.message };
+    return { success: false, message: error.message || 'Unable to upload file. Please try again.' };
   }
 }
 
 export async function createRefillSubscription(prevState: any, formData: FormData) {
   try {
-    const supabase = await createSupabaseServerClient();
-    const { data: { user } } = await supabase.auth.getUser();
-
-    // REMOVED: Login check. We now support anonymous.
-    // if (!user) return { success: false, message: 'You must be logged in to enroll.' };
-
+    // Refills are completely anonymous - no authentication required
     const rawData = {
       productId: formData.get('productId'),
       frequency: formData.get('frequency'),
@@ -598,48 +593,48 @@ export async function createRefillSubscription(prevState: any, formData: FormDat
     if (!validated.success) {
       return {
         success: false,
-        message: 'Invalid input.',
+        message: 'Please check your information and try again.',
         errors: validated.error.flatten().fieldErrors
       };
     }
 
     const address = JSON.parse(validated.data.deliveryAddress); // Verify JSON
 
-    // Use admin client if user is not logged in to bypass RLS for insertion if needed
-    // or rely on the new public insert policy.
-    // However, since we are setting `user_id` to null, standard RLS might block if no matching policy.
-    // Safest is to use getSupabaseAdminClient() for creation to ensure it always works.
-    const dbClient = user ? supabase : getSupabaseAdminClient();
+    // Always use admin client for anonymous subscriptions
+    const dbClient = getSupabaseAdminClient();
 
+    // Insert subscription - database will prevent duplicates via unique index on phone+product
     const { data, error } = await dbClient
       .from('medication_refill_subscriptions')
       .insert({
-        user_id: user ? user.id : null, 
+        user_id: null, // Always null - refills are completely anonymous
         product_id: parseInt(validated.data.productId), 
         frequency: validated.data.frequency,
         delivery_address: address,
         prescribing_doctor: validated.data.doctor || null,
         prescription_document_url: validated.data.prescriptionUrl || null,
-        status: 'active' // Default is 'active' per code, DB default might be 'pending_verification'. DB wins if omitted? No, we set explicitly.
-        // Actually, we should set 'pending_verification' as discussed in previous turn.
-        // Step 1426 said "changed default... to pending_verification".
-        // Let's explicitly set 'pending_verification' here to be safe.
+        status: 'active'
       })
       .select('subscription_code, id')
       .single();
 
     if (error) {
         console.error('Subscription error:', error);
-        return { success: false, message: 'Failed to create subscription. ' + error.message };
+        // Check if it's a duplicate constraint error (same phone + product)
+        if (error.code === '23505') {
+          return { 
+            success: false, 
+            message: 'You already have an active subscription for this medication with this phone number. Check your SMS for your tracking code or visit the Track page to view your subscription status.' 
+          };
+        }
+        return { success: false, message: 'Unable to complete enrollment. Please try again or contact support if the issue persists.' };
     }
 
-    // Attempt revalidate, though anonymous users won't see dashboard updates immediately
-    revalidatePath('/refills/dashboard');
     return { success: true, message: 'Enrolled successfully!', code: data.subscription_code };
 
   } catch (error: any) {
     console.error('Create Subscription Error:', error);
-    return { success: false, message: 'An unexpected error occurred.' };
+    return { success: false, message: 'Something went wrong. Please try again or contact support if the problem continues.' };
   }
 }
 
@@ -657,10 +652,95 @@ export async function getUserRefillSubscriptions() {
     .order('enrolled_at', { ascending: false });
 
   if (error) {
-    console.error('Fetch subscriptions error:', error);
+    console.error('Error fetching user subscriptions:', error);
     return [];
   }
-  return data;
+
+  return data || [];
+}
+
+/**
+ * Fetches subscription details by subscription code for tracking page
+ */
+export async function getSubscriptionAction(code: string) {
+  try {
+    const supabaseAdmin = getSupabaseAdminClient();
+    
+    const { data: subscription, error } = await supabaseAdmin
+      .from('medication_refill_subscriptions')
+      .select(`
+        id,
+        subscription_code,
+        status,
+        frequency,
+        next_delivery_date,
+        enrolled_at,
+        prescription_verified,
+        prescription_document_url,
+        delivery_address,
+        product:products(id, name, image_url),
+        pharmacy:pharmacies(id, name, phone, email)
+      `)
+      .eq('subscription_code', code.toUpperCase())
+      .single();
+
+    if (error || !subscription) {
+      console.error('Error fetching subscription:', error);
+      return null;
+    }
+
+    // Fetch refill history
+    const { data: refillLogs } = await supabaseAdmin
+      .from('refill_logs')
+      .select('dispensed_at, notes, dispensed_by')
+      .eq('subscription_id', subscription.id)
+      .order('dispensed_at', { ascending: false });
+
+    // --- SECURITY: MASK PII ---
+    let maskedAddress = subscription.delivery_address;
+    if (maskedAddress) {
+        // Clone to avoid mutating original if it was somehow referenced elsewhere (though it's fresh from DB)
+        maskedAddress = { ...maskedAddress };
+        
+        // Mask Phone: 0201234567 -> 020****567
+        if (maskedAddress.phone && maskedAddress.phone.length > 6) {
+            const p = maskedAddress.phone;
+            maskedAddress.phone = `${p.substring(0, 3)}****${p.substring(p.length - 3)}`;
+        }
+
+        // Mask Street/Address: Truncate giving only hint or city
+        // "123 Main St, Apt 4, Accra" -> "123 Main St..." or just City
+        // Let's keep City visible, mask specific street info heavily.
+        if (maskedAddress.street) {
+             const parts = maskedAddress.street.split(' ');
+             if (parts.length > 2) {
+                 maskedAddress.street = `${parts[0]} ${parts[1]}***`;
+             } else {
+                 maskedAddress.street = `${maskedAddress.street.substring(0, 3)}***`; 
+             }
+        }
+    }
+    // --- END SECURITY ---
+
+    return {
+      id: subscription.id,
+      code: subscription.subscription_code,
+      status: subscription.status,
+      frequency: subscription.frequency,
+      nextDeliveryDate: subscription.next_delivery_date,
+      enrolledAt: subscription.enrolled_at,
+      prescriptionVerified: subscription.prescription_verified,
+      // prescriptionUrl: subscription.prescription_document_url, // REMOVED FOR SECURITY
+      hasPrescription: !!subscription.prescription_document_url, // Boolean flag instead
+      deliveryAddress: maskedAddress,
+      product: Array.isArray(subscription.product) ? subscription.product[0] : subscription.product,
+      pharmacy: Array.isArray(subscription.pharmacy) ? subscription.pharmacy[0] : subscription.pharmacy,
+      refillHistory: refillLogs || [],
+    };
+  } catch (error) {
+    console.error('Action Error in getSubscriptionAction:', error);
+    return null;
+  }
 }
 
 export async function getUserRefillLogs(subscriptionId: string) {

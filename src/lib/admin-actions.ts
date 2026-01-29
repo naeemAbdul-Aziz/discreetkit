@@ -1524,16 +1524,24 @@ export async function getRefillSubscriptions() {
     }
 
     // 3. Attach User Data
-    return subscriptions.map((s: any) => ({
-        ...s,
-        user_email: userMap[s.user_id]?.email || 'Unknown User',
-        user_name: userMap[s.user_id]?.name || 'Anonymous',
-        // Normalize single object relations if they come back as arrays (Supabase sometimes does this)
-        product: Array.isArray(s.product) ? s.product[0] : s.product,
-        pharmacy: Array.isArray(s.pharmacy) ? s.pharmacy[0] : s.pharmacy,
-        // Helper for table
-        product_name: Array.isArray(s.product) ? s.product[0]?.name : s.product?.name,
-    }));
+    return subscriptions.map((s: any) => {
+        // Extract contact info from delivery_address for anonymous users
+        const deliveryAddress = s.delivery_address || {};
+        const contactPhone = deliveryAddress.phone || null;
+        const contactEmail = deliveryAddress.email || null;
+        
+        return {
+            ...s,
+            user_email: s.user_id ? (userMap[s.user_id]?.email || 'Unknown User') : (contactEmail || 'No Email'),
+            user_name: s.user_id ? (userMap[s.user_id]?.name || 'Anonymous') : (deliveryAddress.name || 'Anonymous'),
+            contact_phone: s.user_id ? null : contactPhone, // Only show for anonymous
+            // Normalize single object relations if they come back as arrays (Supabase sometimes does this)
+            product: Array.isArray(s.product) ? s.product[0] : s.product,
+            pharmacy: Array.isArray(s.pharmacy) ? s.pharmacy[0] : s.pharmacy,
+            // Helper for table
+            product_name: Array.isArray(s.product) ? s.product[0]?.name : s.product?.name,
+        };
+    });
 }
 
 export async function assignPharmacyToSubscription(subscriptionId: string, pharmacyId: number) {
