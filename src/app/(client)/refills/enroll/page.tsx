@@ -166,9 +166,19 @@ export default function EnrollmentPage() {
               anonymously if you choose pickup.
             </p>
           </CardContent>
-          <CardFooter className="flex justify-center">
-            <Button onClick={() => router.push("/refills/dashboard")}>
-              Go to Dashboard
+          <CardFooter className="flex flex-col gap-3">
+            <Button
+              className="w-full"
+              onClick={() => router.push("/products/medication-refills")}
+            >
+              Browse More Products
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => window.print()}
+            >
+              Save This Code
             </Button>
           </CardFooter>
         </Card>

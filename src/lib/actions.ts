@@ -579,12 +579,7 @@ export async function uploadPrescriptionAction(formData: FormData) {
 
 export async function createRefillSubscription(prevState: any, formData: FormData) {
   try {
-    const supabase = await createSupabaseServerClient();
-    const { data: { user } } = await supabase.auth.getUser();
-
-    // REMOVED: Login check. We now support anonymous.
-    // if (!user) return { success: false, message: 'You must be logged in to enroll.' };
-
+    // Refills are completely anonymous - no authentication required
     const rawData = {
       productId: formData.get('productId'),
       frequency: formData.get('frequency'),
@@ -605,36 +600,36 @@ export async function createRefillSubscription(prevState: any, formData: FormDat
 
     const address = JSON.parse(validated.data.deliveryAddress); // Verify JSON
 
-    // Use admin client if user is not logged in to bypass RLS for insertion if needed
-    // or rely on the new public insert policy.
-    // However, since we are setting `user_id` to null, standard RLS might block if no matching policy.
-    // Safest is to use getSupabaseAdminClient() for creation to ensure it always works.
-    const dbClient = user ? supabase : getSupabaseAdminClient();
+    // Always use admin client for anonymous subscriptions
+    const dbClient = getSupabaseAdminClient();
 
+    // Insert subscription - database will prevent duplicates via unique index on phone+product
     const { data, error } = await dbClient
       .from('medication_refill_subscriptions')
       .insert({
-        user_id: user ? user.id : null, 
+        user_id: null, // Always null - refills are completely anonymous
         product_id: parseInt(validated.data.productId), 
         frequency: validated.data.frequency,
         delivery_address: address,
         prescribing_doctor: validated.data.doctor || null,
         prescription_document_url: validated.data.prescriptionUrl || null,
-        status: 'active' // Default is 'active' per code, DB default might be 'pending_verification'. DB wins if omitted? No, we set explicitly.
-        // Actually, we should set 'pending_verification' as discussed in previous turn.
-        // Step 1426 said "changed default... to pending_verification".
-        // Let's explicitly set 'pending_verification' here to be safe.
+        status: 'active'
       })
       .select('subscription_code, id')
       .single();
 
     if (error) {
         console.error('Subscription error:', error);
+        // Check if it's a duplicate constraint error (same phone + product)
+        if (error.code === '23505') {
+          return { 
+            success: false, 
+            message: 'This phone number already has an active subscription for this medication. Please use your existing subscription code to track your refills.' 
+          };
+        }
         return { success: false, message: 'Failed to create subscription. ' + error.message };
     }
 
-    // Attempt revalidate, though anonymous users won't see dashboard updates immediately
-    revalidatePath('/refills/dashboard');
     return { success: true, message: 'Enrolled successfully!', code: data.subscription_code };
 
   } catch (error: any) {
@@ -657,10 +652,68 @@ export async function getUserRefillSubscriptions() {
     .order('enrolled_at', { ascending: false });
 
   if (error) {
-    console.error('Fetch subscriptions error:', error);
+    console.error('Error fetching user subscriptions:', error);
     return [];
   }
-  return data;
+
+  return data || [];
+}
+
+/**
+ * Fetches subscription details by subscription code for tracking page
+ */
+export async function getSubscriptionAction(code: string) {
+  try {
+    const supabaseAdmin = getSupabaseAdminClient();
+    
+    const { data: subscription, error } = await supabaseAdmin
+      .from('medication_refill_subscriptions')
+      .select(`
+        id,
+        subscription_code,
+        status,
+        frequency,
+        next_delivery_date,
+        enrolled_at,
+        prescription_verified,
+        prescription_document_url,
+        delivery_address,
+        product:products(id, name, image_url),
+        pharmacy:pharmacies(id, name, phone, email)
+      `)
+      .eq('subscription_code', code.toUpperCase())
+      .single();
+
+    if (error || !subscription) {
+      console.error('Error fetching subscription:', error);
+      return null;
+    }
+
+    // Fetch refill history
+    const { data: refillLogs } = await supabaseAdmin
+      .from('refill_logs')
+      .select('dispensed_at, notes, dispensed_by')
+      .eq('subscription_id', subscription.id)
+      .order('dispensed_at', { ascending: false });
+
+    return {
+      id: subscription.id,
+      code: subscription.subscription_code,
+      status: subscription.status,
+      frequency: subscription.frequency,
+      nextDeliveryDate: subscription.next_delivery_date,
+      enrolledAt: subscription.enrolled_at,
+      prescriptionVerified: subscription.prescription_verified,
+      prescriptionUrl: subscription.prescription_document_url,
+      deliveryAddress: subscription.delivery_address,
+      product: Array.isArray(subscription.product) ? subscription.product[0] : subscription.product,
+      pharmacy: Array.isArray(subscription.pharmacy) ? subscription.pharmacy[0] : subscription.pharmacy,
+      refillHistory: refillLogs || [],
+    };
+  } catch (error) {
+    console.error('Action Error in getSubscriptionAction:', error);
+    return null;
+  }
 }
 
 export async function getUserRefillLogs(subscriptionId: string) {
