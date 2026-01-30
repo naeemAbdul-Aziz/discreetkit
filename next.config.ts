@@ -14,7 +14,8 @@ const nextConfig: NextConfig = {
     '@opentelemetry/sdk-node',
     'handlebars',
     'dotprompt',
-    'react-joyride'
+    'react-joyride',
+    '@sentry/node'
   ],
   experimental: {
     serverActions: {

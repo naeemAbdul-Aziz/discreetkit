@@ -12,7 +12,7 @@
 	- Eliminate `'unsafe-inline'`/`'unsafe-eval'` gradually by moving inline scripts/styles to files and using nonces.
 - **Optional integrations**:
 	- Use a third-party collector (Report URI) by pointing `report-uri` to their endpoint.
-	- Forward logs to an APM (e.g., Sentry) via the `/api/csp-report` handler.
+	- Forward to Sentry by setting `SENTRY_DSN`; the `/api/csp-report` endpoint will capture a structured event with context and tags. Set alerts for spikes or payment domain blocks.
 
 ## Code Quality Gates (Jan 2026)
 

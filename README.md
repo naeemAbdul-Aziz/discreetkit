@@ -1,3 +1,11 @@
+### CSP Monitoring & Alerts
+
+- Set `CSP_REPORT_ONLY=1` to enable `Content-Security-Policy-Report-Only` with reports sent to `/api/csp-report`.
+- Optional alerts: add `SENTRY_DSN` (server-side) to forward CSP violations to Sentry.
+- Verify headers:
+    - Windows: `curl.exe -I https://<domain> | findstr /C:"Content-Security-Policy-Report-Only"`
+- Generate a test report via DevTools to confirm logging.
+
 
 # DiscreetKit Ghana - Confidential Health Products
 
