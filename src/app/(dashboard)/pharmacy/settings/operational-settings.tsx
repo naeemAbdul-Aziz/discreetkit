@@ -52,7 +52,7 @@ export default function OperationalSettings({ initialIs24_7 }: OperationalSettin
             Operational Settings
         </CardTitle>
         <CardDescription>
-          Manage your store's operating hours and availability.
+          Manage your store&apos;s operating hours and availability.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -63,7 +63,7 @@ export default function OperationalSettings({ initialIs24_7 }: OperationalSettin
                     Enable this if you operate and deliver round the clock.
                     <br/>
                     <span className="text-xs text-blue-600 bg-blue-50 px-1 rounded mt-1 inline-block">
-                        Shows "24/7" badge to customers
+                      Shows &quot;24/7&quot; badge to customers
                     </span>
                 </div>
             </div>

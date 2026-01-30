@@ -188,7 +188,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [toast]);
 
   const handleStatusChangeClick = (orderId: number, newStatus: string) => {
     if (newStatus === "out_for_delivery") {

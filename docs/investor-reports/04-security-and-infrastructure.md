@@ -1,3 +1,9 @@
+## Operational Risk Reduction via Quality Gates (Jan 2026)
+
+- **Automated gates:** CI enforces zero warnings and strict typecheck. Builds must pass before deploy.
+- **Risk controls:** React hook dependency and purity checks prevent race conditions and stale state in dashboards and realtime features.
+- **Outcome:** Lower likelihood of customer-facing inconsistencies, improved post-deploy stability, and faster rollback/triage due to standardized code quality.
+
 # Security & Infrastructure Report
 
 **Compliance Level:** Healthcare / E-Commerce Standard  

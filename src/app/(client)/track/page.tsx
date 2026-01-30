@@ -92,8 +92,11 @@ const getFriendlyEventTitle = (raw: string) => {
   );
 };
 
-const getReassuranceMessage = (status: string): string => {
+const getReassuranceMessage = (status: string): string | null => {
+  const normalized = status.toLowerCase().replace(/\s+/g, "_");
+
   const messages: Record<string, string> = {
+    order_received: "We've got your order! Our team is on it.",
     order_created: "We've got your order! Our team is on it.",
     payment_pending: "Verifying your payment securely.",
     payment_confirmed: "Payment received. Your order is confirmed!",
@@ -103,7 +106,8 @@ const getReassuranceMessage = (status: string): string => {
     out_for_delivery: "Almost there! Your package is on the way.",
     completed: "Delivered safely. Thank you for trusting us!",
   };
-  return messages[status] || "Your order is in safe hands.";
+
+  return messages[normalized] || messages[status] || null;
 };
 
 const getFriendlyNote = (note: string | null): string | null => {
@@ -309,14 +313,12 @@ function OrderTrackingView({ order }: { order: Order }) {
                     new Date(b.date).getTime() - new Date(a.date).getTime(),
                 ) // Newest first
                 .filter((event, index, self) => {
-                  // Deduplicate: Keep only the first occurrence of each status+date combination
-                  const key = `${event.status}-${new Date(event.date).toISOString()}`;
+                  // Deduplicate: Keep only the ONE latest occurrence of each status
+                  // We ignore usage of 'date' in the key to merge 'Payment Confirmed' duplicates
+                  const key = event.status.toLowerCase().trim();
                   return (
                     index ===
-                    self.findIndex(
-                      (e) =>
-                        `${e.status}-${new Date(e.date).toISOString()}` === key,
-                    )
+                    self.findIndex((e) => e.status.toLowerCase().trim() === key)
                   );
                 })
                 .map((event, index) => {
@@ -367,9 +369,11 @@ function OrderTrackingView({ order }: { order: Order }) {
                         </p>
 
                         {/* Reassurance Message */}
-                        <div className="mt-2 text-sm text-foreground/90 bg-primary/5 p-3 rounded-r-xl rounded-bl-xl border border-primary/10 max-w-md">
-                          {getReassuranceMessage(event.status)}
-                        </div>
+                        {getReassuranceMessage(event.status) && (
+                          <div className="mt-2 text-sm text-foreground/90 bg-primary/5 p-3 rounded-r-xl rounded-bl-xl border border-primary/10 max-w-md">
+                            {getReassuranceMessage(event.status)}
+                          </div>
+                        )}
 
                         {friendlyNote && (
                           <div className="mt-2 text-sm text-muted-foreground bg-muted/30 p-3 rounded-r-xl rounded-bl-xl border border-muted/50 max-w-md">

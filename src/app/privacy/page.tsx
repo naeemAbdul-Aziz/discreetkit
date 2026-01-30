@@ -1,5 +1,6 @@
 import { generateMetadata as generateSEOMetadata } from "@/lib/seo";
 import { generateBreadcrumbSchema } from "@/lib/seo";
+import Link from "next/link";
 
 export const metadata = generateSEOMetadata({
   title: "Privacy Policy",
@@ -24,9 +25,9 @@ export default function PrivacyPage() {
       />
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <nav className="mb-6 text-sm text-muted-foreground">
-          <a href="/" className="hover:text-foreground">
+          <Link href="/" className="hover:text-foreground">
             Home
-          </a>
+          </Link>
           <span className="mx-2">/</span>
           <span>Privacy Policy</span>
         </nav>

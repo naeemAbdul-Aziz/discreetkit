@@ -7,6 +7,11 @@ import { motion, AnimatePresence } from "framer-motion";
 export function DevBanner() {
   const [isVisible, setIsVisible] = useState(false);
 
+  const handleDismiss = () => {
+    setIsVisible(false);
+    sessionStorage.setItem("dev-banner-dismissed", "true");
+  };
+
   useEffect(() => {
     // Check if previously dismissed in this session
     const dismissed = sessionStorage.getItem("dev-banner-dismissed");
@@ -20,11 +25,6 @@ export function DevBanner() {
       return () => clearTimeout(timer);
     }
   }, []);
-
-  const handleDismiss = () => {
-    setIsVisible(false);
-    sessionStorage.setItem("dev-banner-dismissed", "true");
-  };
 
   return (
     <AnimatePresence>

@@ -1,3 +1,12 @@
+## 2026-01-30 — ESLint v9 Flat Config & React Rule Enforcement
+
+- Migrated to ESLint v9 flat config and updated `package.json` to call it explicitly.
+- Enforced strict React rules in `src/app/(dashboard)/**`:
+	- `react-hooks/exhaustive-deps`: error
+	- `react-hooks/purity`: error
+	- `react-hooks/set-state-in-effect`: error
+- Addressed code issues where needed (orders table, riders page, product table) to achieve zero warnings in CI.
+
 # Database change management
 
 This repository uses Supabase migrations as the single source of truth for schema changes.

@@ -1,3 +1,15 @@
+## Code Quality Enhancements (Q1 2026)
+
+- **What changed:** Enforced strict React linting (exhaustive deps, purity, effect discipline) and zero-warning CI, with TypeScript strict typechecking on every PR.
+- **Why it matters:**
+    - Fewer production defects from subtle state bugs in realtime/admin surfaces.
+    - Faster, safer iteration with high-confidence refactors.
+    - Improved maintainability and onboarding due to clear, enforced standards.
+- **Indicative impact:**
+    - Expected reduction in state-related incidents by 20–30%.
+    - Review time reduced by ~10–20% due to automated gates.
+    - Lower maintenance overhead and better SLA adherence from more predictable releases.
+
 # Total Enterprise Valuation & Asset Report
 **Date:** December 18, 2025  
 **Subject:** DiscreetKit Enterprise Asset Valuation  

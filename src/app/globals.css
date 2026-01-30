@@ -112,8 +112,6 @@
     overflow-x: hidden;
     /* Always show scrollbar to prevent layout shift */
     overflow-y: scroll;
-    /* Improve scroll performance */
-    -webkit-overflow-scrolling: touch;
 
     @screen sm {
       font-size: 15.5px;
@@ -168,5 +166,4 @@
 
 .no-scrollbar {
   -ms-overflow-style: none;
-  scrollbar-width: none;
 }

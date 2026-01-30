@@ -1,3 +1,30 @@
+## Linting & CI Hardening (Jan 30, 2026)
+
+- **Summary:** Migrated to ESLint v9 flat config and enforced stricter React rules across the Dashboard, with CI failing on any warnings. TypeScript strict mode verified and `typecheck` added as a standard gate.
+- **Key changes:**
+   - `eslint.config.mjs`: Enforced `react-hooks/exhaustive-deps` and `react-hooks/purity` as errors; escalated `react-hooks/set-state-in-effect` to error for `src/app/(dashboard)/**`.
+   - `package.json`: Lint script uses explicit flat config and `--max-warnings=0`; typecheck script available.
+   - Fixed hook dependency and effect usage in:
+      - `src/app/(dashboard)/admin/orders/orders-table.tsx` (added `toast` to effect deps)
+      - `src/app/(dashboard)/pharmacy/riders/page.tsx` (moved `fetchRiders` before effect; added to deps)
+      - `src/app/(dashboard)/admin/products/product-table.tsx` (moved `setPage(1)` into debounced timeout)
+- **Outcomes:**
+   - CI lint runs pass with zero warnings/errors.
+   - TypeScript typecheck passes under strict mode.
+   - Reduced risk of subtle state bugs in realtime and admin flows.
+
+### Developer Commands
+
+- Lint: `npm run lint`
+- Typecheck: `npm run typecheck`
+- Build: `npm run build`
+
+### Rationale and Value
+
+- Enforcing exhaustive deps and purity eliminates a class of race conditions and stale state bugs in React.
+- Zero-warning CI improves review quality and accelerates merges without regressions.
+- Strict TypeScript reduces runtime type errors and improves refactor safety.
+
 # 🎉 DEPLOYMENT COMPLETE - Communication & Inventory System
 
 ## ✅ What Was Implemented

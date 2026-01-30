@@ -203,3 +203,20 @@ Ensure the following are set in Vercel for the WhatsApp Bot to function:
 - `PAYSTACK_SECRET_KEY`
 - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_KEY`
 
+## ✅ Quality Gates
+
+- Lint: `npm run lint` (ESLint v9 flat config; CI fails on any warnings)
+- Typecheck: `npm run typecheck` (TypeScript strict mode)
+- Build: `npm run build` (CI build gate to catch compile errors)
+
+### React Rules Enforced (Dashboard)
+- `react-hooks/exhaustive-deps`: error
+- `react-hooks/purity`: error
+- `react-hooks/set-state-in-effect`: error
+- `react-hooks/error-boundaries`: error (segment error boundaries via `src/app/(dashboard)/error.tsx`)
+
+### Example Patterns
+- Move pagination resets inside debounced callbacks (not synchronous effects).
+- Include stable references (e.g., `toast`) in effect deps for realtime subscriptions.
+- Avoid try/catch around JSX; rely on Next.js `error.tsx` for rendering errors.
+

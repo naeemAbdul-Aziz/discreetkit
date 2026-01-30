@@ -1,3 +1,28 @@
+## Code Quality Gates (Jan 2026)
+
+- **Lint:** Use ESLint v9 flat config. CI fails on any warnings (`--max-warnings=0`).
+- **React rules (Dashboard):**
+	- `react-hooks/exhaustive-deps`: error — include all referenced functions/values in deps.
+	- `react-hooks/purity`: error — avoid impure operations in render.
+	- `react-hooks/set-state-in-effect`: error — avoid synchronous setState in effect body; prefer event handlers or debounced callbacks.
+- **Next.js conventions:** Use `next/link` and `next/image`; no raw `<a>` or `<img>` in app router.
+- **TypeScript:** Strict mode enabled; `npm run typecheck` must pass.
+- **PR checklist:** Ensure lint + typecheck + build succeed before merging.
+
+### Patterns & Examples
+
+- Debounced search should reset pagination inside the debounce callback, not via synchronous effect setState.
+- Realtime subscriptions should include all referenced stable callbacks (e.g., `toast`) in effect deps.
+- Escape unescaped entities in JSX to avoid rendering errors and SEO issues.
+
+## Security & Performance
+
+- **Security Headers:** See `next.config.ts` — CSP, HSTS, X-Frame-Options, Referrer-Policy, Permissions-Policy are set globally.
+- **API Rate Limiting:** `src/middleware.ts` enforces 60 req/min/IP on `/api/*` using Upstash Redis (if env present). Webhooks are exempt.
+- **Images Optimization:** `next.config.ts` allows remote patterns for Cloudinary/Unsplash et al; use `next/image` for responsive, optimized images.
+- **Client Performance:** Debounce expensive actions; avoid synchronous `setState` in effects; prefer memoization for large lists; consider virtualization if lists exceed ~500 rows.
+- **Admin/Pharmacy Dashboards:** Keep filters/search debounced; paginate aggressively; move heavy aggregation to server-side API or DB views with indexes.
+
 # THE DISCREETKIT BRAND & OPERATING MODEL BIBLE
 
 **For Internal Use & Partners**  

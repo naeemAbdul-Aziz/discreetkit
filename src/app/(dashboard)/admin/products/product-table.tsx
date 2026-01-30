@@ -50,12 +50,13 @@ export function ProductTable({ initialProducts, categories = [] }: { initialProd
   const { toast } = useToast()
 
   useEffect(() => {
-    const t = setTimeout(() => setDebouncedSearch(searchTerm), 300)
+    const t = setTimeout(() => {
+      setDebouncedSearch(searchTerm)
+      // Reset to first page when the debounced search value updates
+      setPage(1)
+    }, 300)
     return () => clearTimeout(t)
   }, [searchTerm])
-
-  // Reset to first page on search
-  useEffect(() => { setPage(1) }, [debouncedSearch])
 
   const filteredProducts = products.filter(p => 
     p.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||

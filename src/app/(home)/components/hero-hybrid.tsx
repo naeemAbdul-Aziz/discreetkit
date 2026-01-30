@@ -148,7 +148,7 @@ const data = [
           <span className="font-bold text-neutral-700 dark:text-neutral-200">
             Ready for anything.
           </span>{" "}
-          Accidents happen, but panic doesn't have to. Our preparedness kits
+          Accidents happen, but panic doesn&apos;t have to. Our preparedness kits
           include emergency contraception and other urgent care items, so you
           have them
           <i>before</i> you need them.
@@ -175,7 +175,7 @@ const data = [
             Professional advice, privately.
           </span>{" "}
           Skip the waiting room. Consult with licensed medical professionals
-          online for prescriptions and health advice. It's safe, secure, and
+          online for prescriptions and health advice. It&apos;s safe, secure, and
           completely confidential.
         </p>
         <div className="relative h-64 w-full mt-10">

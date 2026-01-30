@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Package, Truck, CheckCircle, Clock, AlertCircle, Info } from 'lucide-react'
 import { OrdersList } from './orders-list'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -26,7 +26,7 @@ export default function PharmacyDashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [dataLoaded, setDataLoaded] = useState(false);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -72,11 +72,11 @@ export default function PharmacyDashboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
 
   // Real-time updates via SSE - only connect if initial load succeeded
   useSSE(dataLoaded ? '/api/pharmacy/realtime' : '', {
@@ -124,11 +124,11 @@ export default function PharmacyDashboardPage() {
           <Info className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           <AlertTitle className="text-blue-900 dark:text-blue-100">Pharmacy Account Not Linked</AlertTitle>
           <AlertDescription className="text-blue-800 dark:text-blue-200 mt-2">
-            <p className="mb-3">Your account hasn't been linked to a pharmacy yet. This is normal for new accounts.</p>
+            <p className="mb-3">Your account hasn&apos;t been linked to a pharmacy yet. This is normal for new accounts.</p>
             <p className="mb-3"><strong>Next steps:</strong></p>
             <ol className="list-decimal list-inside space-y-1 ml-2">
               <li>Contact your administrator to link your account to a pharmacy</li>
-              <li>Or, if you're an admin, go to the Partners page to create and link a pharmacy</li>
+              <li>Or, if you&apos;re an admin, go to the Partners page to create and link a pharmacy</li>
             </ol>
             <Button 
               onClick={() => router.push('/admin/partners')} 
@@ -172,7 +172,7 @@ export default function PharmacyDashboardPage() {
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Error Loading Dashboard</AlertTitle>
           <AlertDescription className="mt-2">
-            <p className="mb-3">We couldn't load your pharmacy dashboard. Please try again.</p>
+            <p className="mb-3">We couldn&apos;t load your pharmacy dashboard. Please try again.</p>
             <Button onClick={() => loadData()} variant="outline" size="sm">
               Retry
             </Button>
@@ -202,7 +202,7 @@ export default function PharmacyDashboardPage() {
           <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
           <AlertTitle className="text-blue-900 dark:text-blue-100">Welcome to Your Dashboard!</AlertTitle>
           <AlertDescription className="text-blue-800 dark:text-blue-200">
-            You don't have any orders yet. Orders will appear here once customers place orders and they're assigned to your pharmacy.
+            You don&apos;t have any orders yet. Orders will appear here once customers place orders and they&apos;re assigned to your pharmacy.
           </AlertDescription>
         </Alert>
       )}

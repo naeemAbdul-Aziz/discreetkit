@@ -315,10 +315,10 @@ export function ProductSelector({
               <Lightbulb className="h-12 w-12 sm:h-16 sm:w-16 text-primary flex-shrink-0" />
               <div className="flex-grow">
                 <h3 className="text-xl font-bold text-foreground">
-                  Can't Find What You're Looking For?
+                  Can&apos;t Find What You&apos;re Looking For?
                 </h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Let us know what products you'd like to see in our catalog.
+                  Let us know what products you&apos;d like to see in our catalog.
                 </p>
                 <form
                   ref={formRef}

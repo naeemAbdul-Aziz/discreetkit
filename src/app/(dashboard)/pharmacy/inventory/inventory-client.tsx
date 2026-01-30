@@ -105,7 +105,7 @@ export default function InventoryClient({ products, pharmacyId }: InventoryClien
             <DialogHeader>
               <DialogTitle>Request New Product</DialogTitle>
               <DialogDescription>
-                Can't find what you're looking for? Suggest a product to be added to the global catalog.
+                Can&apos;t find what you&apos;re looking for? Suggest a product to be added to the global catalog.
               </DialogDescription>
             </DialogHeader>
             <form action={async (formData) => {
@@ -200,7 +200,7 @@ export default function InventoryClient({ products, pharmacyId }: InventoryClien
       {filteredProducts.length === 0 && (
           <div className="text-center py-12 text-muted-foreground">
               <Package className="h-12 w-12 mx-auto mb-4 opacity-20" />
-              <p>No products found matching "{search}"</p>
+              <p>No products found matching {search}</p>
           </div>
       )}
     </div>
