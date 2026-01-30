@@ -25,6 +25,17 @@
    - Require status checks: `lint`, `typecheck`, `build` (strict/up-to-date).
    - Prevent force pushes and branch deletion; enforce for admins.
 
+   ### CSP Monitoring & Alerts (Staged)
+
+   - Enable `CSP_REPORT_ONLY=1` in Production to send violation reports to `/api/csp-report` without breaking the site.
+   - Optional alerts: set `SENTRY_DSN` (server-side) to forward violations to Sentry with tags for quick triage.
+   - Verify headers on your production URL:
+      - Windows PowerShell:
+         - `curl.exe -I https://<domain> | findstr /C:"Content-Security-Policy-Report-Only"`
+         - `curl.exe -I https://<domain> | findstr /C:"/api/csp-report"`
+   - Generate a test violation in DevTools (e.g., load a script/image from an unlisted host) and check Vercel logs for "CSP Violation" (and Sentry if configured).
+   - Rollout: monitor for 48–72 hours, whitelist only essential hosts (payments, images/CDN, Supabase, vitals), then promote the tightened policy from report-only to enforced via PR.
+
 ### Developer Commands
 
 - Lint: `npm run lint`
