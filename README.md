@@ -6,6 +6,12 @@
     - Windows: `curl.exe -I https://<domain> | findstr /C:"Content-Security-Policy-Report-Only"`
 - Generate a test report via DevTools to confirm logging.
 
+### Security & Governance Overview
+
+- **Next.js 16 Proxy**: Middleware logic consolidated in `src/proxy.ts` to align with framework requirements; handles auth gating, subdomain routing, and rate limiting.
+- **Build-Safe Sitemap**: `src/app/sitemap.ts` includes dynamic products when Supabase envs exist; falls back to static categories in CI to keep builds reliable.
+- **Branch Protection**: `main` requires PRs with 1 approval, conversation resolution, and passing `lint`, `typecheck`, `build`; force pushes/deletions blocked; admins enforced. `.github/CODEOWNERS` routes critical paths to designated reviewers.
+
 
 # DiscreetKit Ghana - Confidential Health Products
 
