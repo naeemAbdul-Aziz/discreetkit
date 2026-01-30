@@ -4,6 +4,11 @@
 - **Risk controls:** React hook dependency and purity checks prevent race conditions and stale state in dashboards and realtime features.
 - **Outcome:** Lower likelihood of customer-facing inconsistencies, improved post-deploy stability, and faster rollback/triage due to standardized code quality.
 
+## Governance Controls (Main Branch Protection)
+
+- **Policy:** Require PRs with 1 approval and conversation resolution; enforce status checks (`lint`, `typecheck`, `build`) and up-to-date branches; block force pushes/deletions; include administrators.
+- **Impact:** Reduces production incident probability; improves auditability and aligns with standard compliance expectations.
+
 # Security & Infrastructure Report
 
 **Compliance Level:** Healthcare / E-Commerce Standard  
@@ -21,6 +26,10 @@ We do not rely on application-level logic for security. We enforce it at the **D
     *   `Customers` can only SELECT orders `WHERE user_id = auth.uid()`.
     *   `Pharmacies` can only SELECT orders `WHERE pharmacy_id = auth.pharmacy_id()`.
 *   **Impact:** Even if a hacker compromised the API credentials of a frontend client, they could not dump the database. They would still be restricted by the RLS policies of the logged-in user.
+
+### Content Security Policy (CSP)
+- **Current:** Strict global headers configured; `script-src` includes allowances for Paystack and operational tooling.
+- **Roadmap:** Stage removal of `'unsafe-eval'` and use `Content-Security-Policy-Report-Only` to validate stricter rules at scale; consider nonces/hashes for scripts post validation.
 
 ### Data Minimization
 *   **Guest Checkout:** The system supports guest checkout where user data is retained only for the lifecycle of the active order and operational audit logs, supporting GDPR "Right to be Forgotten" workflows.
@@ -55,3 +64,12 @@ The entire codebase is written in **TypeScript**.
     1.  **Pull Request:** Triggers automated linting and build checks.
     2.  **Merge:** Triggers deployment to Vercel.
     3.  **Atomic Deploys:** Every deployment is immutable. If a bug is found, we can rollback to the previous version in < 30 seconds.
+
+### Edge Middleware & Proxy Architecture (Next.js 16)
+- **Change:** Migrated from `middleware.ts` to `proxy.ts` to align with Next.js 16; unified auth gating, subdomain rewrites (admin/pharmacy/access), and IP-based rate limiting (Upstash Redis when available; fail-open on error).
+- **Outcome:** Eliminates framework conflict, standardizes enforcement at the edge, and reduces operational surprises.
+
+### Caching Strategy
+- **Reads:** Short-lived Redis caches for admin analytics and listings.
+- **Writes:** Targeted invalidation of related keys immediately after mutations to prevent stale dashboards.
+- **Business effect:** Faster perceived performance with correctness preserved; lower load on Supabase during admin spikes.
