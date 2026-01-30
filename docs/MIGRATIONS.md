@@ -1,3 +1,24 @@
+## 2026-01-30 — ESLint v9 Flat Config & React Rule Enforcement
+
+- Migrated to ESLint v9 flat config and updated `package.json` to call it explicitly.
+- Enforced strict React rules in `src/app/(dashboard)/**`:
+	- `react-hooks/exhaustive-deps`: error
+	- `react-hooks/purity`: error
+	- `react-hooks/set-state-in-effect`: error
+- Addressed code issues where needed (orders table, riders page, product table) to achieve zero warnings in CI.
+
+## 2026-01-30 — Next.js 16 Proxy & Build-Safe Sitemap
+
+- Migrated middleware behavior to `src/proxy.ts`; removed `src/middleware.ts` to resolve build conflict in Next.js 16.
+- Updated `src/app/sitemap.ts` to conditionally import Supabase only when `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_KEY` exist; falls back to static category URLs when envs are missing (CI-safe).
+- Added short-lived Redis caching with explicit invalidation hooks in admin actions to maintain correctness after writes.
+
+### CSP Report-Only & Endpoint
+
+- Introduced `Content-Security-Policy-Report-Only` (env-gated by `CSP_REPORT_ONLY=1`) to safely detect violations before enforcing stricter CSP.
+- Added `/api/csp-report` route to accept browser reports and log structured details.
+- Optional: forward violations to Sentry when `SENTRY_DSN` is set for alerting and dashboards.
+
 # Database change management
 
 This repository uses Supabase migrations as the single source of truth for schema changes.

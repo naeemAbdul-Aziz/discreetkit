@@ -1,3 +1,68 @@
+## CSP Monitoring
+
+- **What it is**: Content Security Policy (CSP) controls where scripts, styles, images, and frames can load from. In `report-only` mode, violations are not blocked; browsers send JSON reports describing what would have been blocked.
+- **Where reports go**: When `CSP_REPORT_ONLY=1` is set, the app sends `Content-Security-Policy-Report-Only` with `report-uri /api/csp-report`. The endpoint at `/api/csp-report` logs structured violation details.
+- **How to view**:
+	- Local: run the app, reproduce a violation, and check server logs (look for `CSP Violation`).
+	- Vercel: Project → Deployments → Logs; filter for `api/csp-report` and `CSP Violation`.
+- **What a report means**: It includes fields like `effectiveDirective` (the rule that triggered), `blockedURI` (the resource), `documentURI` (page URL), and source location (file/line). Use these to whitelist needed sources or chase down unsafe inline code.
+- **Triage steps**:
+	- Group by `effectiveDirective` and `blockedURI` to identify top offenders.
+	- Confirm the resource is required; if yes, add the host to the corresponding directive (e.g., `img-src`, `script-src`). If not, remove or fix the code.
+	- Eliminate `'unsafe-inline'`/`'unsafe-eval'` gradually by moving inline scripts/styles to files and using nonces.
+- **Optional integrations**:
+	- Use a third-party collector (Report URI) by pointing `report-uri` to their endpoint.
+	- Forward to Sentry by setting `SENTRY_DSN`; the `/api/csp-report` endpoint will capture a structured event with context and tags. Set alerts for spikes or payment domain blocks.
+
+## Code Quality Gates (Jan 2026)
+
+- **Lint:** Use ESLint v9 flat config. CI fails on any warnings (`--max-warnings=0`).
+- **React rules (Dashboard):**
+	- `react-hooks/exhaustive-deps`: error — include all referenced functions/values in deps.
+	- `react-hooks/purity`: error — avoid impure operations in render.
+	- `react-hooks/set-state-in-effect`: error — avoid synchronous setState in effect body; prefer event handlers or debounced callbacks.
+- **Next.js conventions:** Use `next/link` and `next/image`; no raw `<a>` or `<img>` in app router.
+- **TypeScript:** Strict mode enabled; `npm run typecheck` must pass.
+- **PR checklist:** Ensure lint + typecheck + build succeed before merging.
+
+### Patterns & Examples
+
+- Debounced search should reset pagination inside the debounce callback, not via synchronous effect setState.
+- Realtime subscriptions should include all referenced stable callbacks (e.g., `toast`) in effect deps.
+- Escape unescaped entities in JSX to avoid rendering errors and SEO issues.
+
+## Security & Performance
+
+- **Security Headers:** See `next.config.ts` — CSP, HSTS, X-Frame-Options, Referrer-Policy, Permissions-Policy are set globally.
+- **API Rate Limiting:** `src/proxy.ts` enforces 60 req/min/IP on `/api/*` using Upstash Redis (if env present). Webhooks are exempt.
+- **Images Optimization:** `next.config.ts` allows remote patterns for Cloudinary/Unsplash et al; use `next/image` for responsive, optimized images.
+- **Client Performance:** Debounce expensive actions; avoid synchronous `setState` in effects; prefer memoization for large lists; consider virtualization if lists exceed ~500 rows.
+- **Admin/Pharmacy Dashboards:** Keep filters/search debounced; paginate aggressively; move heavy aggregation to server-side API or DB views with indexes.
+
+### CSP Staging Toggle
+- Set environment variable `CSP_REPORT_ONLY=1` to add a `Content-Security-Policy-Report-Only` header that removes `'unsafe-eval'` for staging validation.
+- Keep production enforce policy unchanged; switch off by removing the env var.
+
+### CI Build Cache
+- CI uses `actions/cache` to restore/save `.next/cache` for faster builds; no app logic changes.
+
+## Branch Protection & Merging
+
+- **Protect `main`:** Prevent force pushes and deletion.
+- **Require PRs:** Disable direct pushes to `main` for contributors; use PRs only.
+- **Reviews:** Require at least 1 approval; require conversation resolution before merge; optionally require code owner review when `CODEOWNERS` exists.
+- **Status checks:** Require passing `lint`, `typecheck`, and `build` GitHub Actions jobs before merging; require branches to be up to date with base.
+- **Merge strategy:** Prefer squash merges for a clean history; optionally enforce linear history.
+- **Admins:** Enforce for admins as well to avoid bypassing gates.
+
+Implementation (GitHub UI): Settings → Branches → Branch protection rules → Add rule for `main`.
+- Check: Require a pull request before merging (1 approval, dismiss stale reviews, require conversation resolution).
+- Check: Require status checks to pass (select `lint`, `typecheck`, `build`; require branches up to date).
+- Check: Include administrators; restrict who can push to matching branches (optional, e.g., only CI).
+- Enable: Restrict deletions; prevent force pushes.
+
+Optional: add `.github/CODEOWNERS` to route critical paths to reviewers (e.g., `src/app/(dashboard) @admins`).
+
 # THE DISCREETKIT BRAND & OPERATING MODEL BIBLE
 
 **For Internal Use & Partners**  

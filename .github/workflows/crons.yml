@@ -1,0 +1,33 @@
+
+name: Cron Jobs
+
+on:
+  schedule:
+    # Runs every 15 minutes
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+jobs:
+  run-crons:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Escalations (Every 15m)
+        run: |
+          curl -X GET ${{ secrets.SITE_URL }}/api/cron/check-escalations \
+          -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+          --fail
+
+      - name: Release Reservations (Every 15m)
+        run: |
+          curl -X GET ${{ secrets.SITE_URL }}/api/cron/release-reservations \
+          -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+          --fail
+
+      - name: Reconcile Payments (Daily at 5 AM UTC - Check logic inside script or run separately if strictly daily)
+        # We can run this every 15m too, the endpoint logic handles idempotency or we can just trigger it.
+        # But to be clean, let's check the time or allow it to run more often (it's safe).
+        # Actually reconcile is typically low cost, running it often ensures faster recovery.
+        run: |
+          curl -X GET ${{ secrets.SITE_URL }}/api/payments/reconcile \
+          -H "x-cron-key: ${{ secrets.CRON_SECRET }}" \
+          --fail

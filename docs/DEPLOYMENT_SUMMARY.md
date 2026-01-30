@@ -1,3 +1,54 @@
+## Linting & CI Hardening (Jan 30, 2026)
+
+- **Summary:** Migrated to ESLint v9 flat config and enforced stricter React rules across the Dashboard, with CI failing on any warnings. TypeScript strict mode verified and `typecheck` added as a standard gate.
+- **Key changes:**
+   - `eslint.config.mjs`: Enforced `react-hooks/exhaustive-deps` and `react-hooks/purity` as errors; escalated `react-hooks/set-state-in-effect` to error for `src/app/(dashboard)/**`.
+   - `package.json`: Lint script uses explicit flat config and `--max-warnings=0`; typecheck script available.
+   - Fixed hook dependency and effect usage in:
+      - `src/app/(dashboard)/admin/orders/orders-table.tsx` (added `toast` to effect deps)
+      - `src/app/(dashboard)/pharmacy/riders/page.tsx` (moved `fetchRiders` before effect; added to deps)
+      - `src/app/(dashboard)/admin/products/product-table.tsx` (moved `setPage(1)` into debounced timeout)
+- **Outcomes:**
+   - CI lint runs pass with zero warnings/errors.
+   - TypeScript typecheck passes under strict mode.
+   - Reduced risk of subtle state bugs in realtime and admin flows.
+
+### Next.js 16 Proxy & Build Stability
+
+- Replaced legacy `src/middleware.ts` with `src/proxy.ts` to align with Next.js 16 expectations and prevent build conflicts.
+- Made `src/app/sitemap.ts` resilient: uses dynamic product entries when Supabase envs are present; falls back to static categories when missing (CI-safe).
+
+### Branch Protection Rules
+
+- Protected `main` with the following:
+   - Require PRs with 1 approval and conversation resolution.
+   - Require status checks: `lint`, `typecheck`, `build` (strict/up-to-date).
+   - Prevent force pushes and branch deletion; enforce for admins.
+
+   ### CSP Monitoring & Alerts (Staged)
+
+   - Enable `CSP_REPORT_ONLY=1` in Production to send violation reports to `/api/csp-report` without breaking the site.
+   - Optional alerts: set `SENTRY_DSN` (server-side) to forward violations to Sentry with tags for quick triage.
+   - Verify headers on your production URL:
+      - Windows PowerShell:
+         - `curl.exe -I https://<domain> | findstr /C:"Content-Security-Policy-Report-Only"`
+         - `curl.exe -I https://<domain> | findstr /C:"/api/csp-report"`
+   - Generate a test violation in DevTools (e.g., load a script/image from an unlisted host) and check Vercel logs for "CSP Violation" (and Sentry if configured).
+   - Rollout: monitor for 48–72 hours, whitelist only essential hosts (payments, images/CDN, Supabase, vitals), then promote the tightened policy from report-only to enforced via PR.
+
+### Developer Commands
+
+- Lint: `npm run lint`
+- Typecheck: `npm run typecheck`
+- Build: `npm run build`
+
+### Rationale and Value
+
+- Enforcing exhaustive deps and purity eliminates a class of race conditions and stale state bugs in React.
+- Zero-warning CI improves review quality and accelerates merges without regressions.
+- Strict TypeScript reduces runtime type errors and improves refactor safety.
+ - Branch protection and CI gates improve production stability and governance.
+
 # 🎉 DEPLOYMENT COMPLETE - Communication & Inventory System
 
 ## ✅ What Was Implemented

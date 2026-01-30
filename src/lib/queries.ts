@@ -6,7 +6,7 @@ export async function fetchStoreSettings() {
         const { data, error } = await supabase
             .from('store_settings')
             .select('*')
-            .single()
+            .maybeSingle()
 
         if (error) {
             console.error('Error fetching settings:', error)

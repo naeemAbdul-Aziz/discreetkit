@@ -16,12 +16,14 @@ Ensure you have access to [Google Search Console](https://search.google.com/sear
 ---
 
 ## Step 1: Submit the New Sitemap
-We cleaned up the sitemap to remove broken links. You must submit the fresh one.
+We cleaned up the sitemap and made it build-safe. It includes dynamic product URLs when Supabase envs are present; otherwise falls back to static categories to keep CI builds reliable.
 
 1. In GSC, go to **Sitemaps** in the left sidebar.
 2. Under "Add a new sitemap", enter `sitemap.xml`.
 3. Click **Submit**.
 4. **Verify**: It should say "Success" and show the correct "Discovered URLs" count.
+   - Note: If your CI build lacked Supabase envs, the count will reflect static category pages only.
+   - To include product URLs, add `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_KEY` to the build environment and redeploy.
 
 ## Step 2: Force Re-indexing (The "Fast Track")
 To fix the "gibberish" or old favicon *immediately* for the homepage:

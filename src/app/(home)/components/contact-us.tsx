@@ -71,14 +71,14 @@ export function ContactUs() {
           <div className="space-y-8">
             <div>
               <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-primary">
-                We're Here to Help
+                We&apos;re Here to Help
               </p>
               <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground md:text-4xl">
                 Get in Touch
               </h2>
               <p className="mt-4 text-base text-muted-foreground md:text-lg">
                 Have questions about our products, delivery, or how it works?
-                Interested in partnership? Or have a product suggestion? We're
+                Interested in partnership? Or have a product suggestion? We&apos;re
                 here to provide answers and support.
               </p>
             </div>

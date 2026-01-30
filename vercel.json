@@ -4,15 +4,6 @@
     "env": {
       "NEXT_TELEMETRY_DISABLED": "1"
     }
-  },
-  "crons": [
-    {
-      "path": "/api/payments/reconcile",
-      "schedule": "0 5 * * *"
-    },
-    {
-      "path": "/api/cron/release-reservations",
-      "schedule": "0 6 * * *"
-    }
-  ]
+  }
+
 }

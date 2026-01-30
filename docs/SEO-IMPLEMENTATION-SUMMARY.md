@@ -23,9 +23,10 @@
   - Explicit allow/disallow for privacy/terms pages
   - Added crawl delays for bot-friendly behavior
 - **Improved sitemap.xml**:
-  - Added legal pages with appropriate priorities
-  - Included location-specific pages for local SEO
-  - Better priority distribution
+  - Adds legal pages with appropriate priorities
+  - Includes category pages for local SEO
+  - Dynamically adds product URLs when Supabase envs are present; otherwise falls back to static categories to keep CI builds reliable.
+  - Ensure `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_KEY` are set in CI to include product entries.
 
 ## SEO Schema Generators Available
 
@@ -128,7 +129,7 @@ generateHowToSchema({
 - `/src/app/privacy/page.tsx` - New privacy policy page
 - `/src/app/terms/page.tsx` - New terms of service page
 - `/src/app/robots.ts` - Enhanced crawl rules
-- `/src/app/sitemap.ts` - Better URL structure and priorities
+- `/src/app/sitemap.ts` - Build-safe dynamic sitemap with static fallback
 - `/src/components/footer.tsx` - Improved navigation links
 - `/public/manifest.json` - Enhanced PWA capabilities
 

@@ -42,7 +42,7 @@ src/components/seo/                 # SEO components
 app/layout.tsx                      # Root metadata + structured data
 app/(client)/products/layout.tsx    # Products section metadata
 app/products/[id]/layout.tsx        # Individual product metadata
-app/sitemap.ts                      # Enhanced XML sitemap
+app/sitemap.ts                      # Build-safe XML sitemap (dynamic with static fallback)
 app/robots.ts                       # SEO-optimized robots.txt
 ```
 
@@ -133,6 +133,10 @@ app/robots.ts                       # SEO-optimized robots.txt
 - Custom event tracking
 
 ## 🚀 Usage Instructions
+### Sitemap behavior (CI-safe)
+- `app/sitemap.ts` will include dynamic product URLs only when `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_KEY` are present.
+- Without these envs (e.g., CI build), sitemap prerenders using static category pages to avoid build failures.
+- To include product URLs in CI builds, add the Supabase envs to your CI environment.
 
 ### Basic Implementation
 ```tsx
@@ -287,7 +291,7 @@ Or update `.seo-config.json`:
 
 ### Search Console Setup
 - Verify domain ownership
-- Submit XML sitemap
+- Submit XML sitemap (static fallback appears when CI lacks Supabase envs; dynamic products included when envs are present)
 - Monitor crawl errors
 - Track search performance
 

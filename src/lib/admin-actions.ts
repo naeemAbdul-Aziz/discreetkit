@@ -4,6 +4,41 @@ import { createSupabaseServerClient, getSupabaseAdminClient } from "@/lib/supaba
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 import { riderSchema, type RiderFormValues } from "@/lib/validation-schemas"
+import { getRedis } from "@/lib/redis"
+
+// Lightweight cache helpers (fail-open if Redis is not configured)
+const CACHE_TTL_SHORT = 60; // seconds
+async function cacheGet<T>(key: string): Promise<T | null> {
+    try {
+        const redis = await getRedis();
+        const val = await redis.get(key);
+        if (val == null) return null;
+        if (typeof val === 'string') {
+            return JSON.parse(val) as T;
+        }
+        return val as T;
+    } catch {
+        return null;
+    }
+}
+
+async function cacheSet<T>(key: string, value: T, ttlSeconds = CACHE_TTL_SHORT): Promise<void> {
+    try {
+        const redis = await getRedis();
+        await redis.set(key, JSON.stringify(value), { ex: ttlSeconds });
+    } catch {
+        // ignore cache errors
+    }
+}
+
+async function cacheDel(key: string): Promise<void> {
+    try {
+        const redis = await getRedis();
+        await redis.del(key);
+    } catch {
+        // ignore cache errors
+    }
+}
 
 // Helper for Admin Authorization
 async function requireAdmin() {
@@ -193,6 +228,10 @@ const pharmacySchema = z.object({
 export type PharmacyFormValues = z.infer<typeof pharmacySchema>
 
 export async function getPharmacies() {
+    // Try cache first
+    const cached = await cacheGet<any[]>(`cache:pharmacies:list`);
+    if (cached) return cached;
+
     const supabase = await createSupabaseServerClient();
     const { data: pharmacies, error } = await supabase
         .from('pharmacies')
@@ -224,7 +263,7 @@ export async function getPharmacies() {
     }
 
     // Return enriched pharmacies with a `user` object similar to previous join shape
-    return pharmacies.map(p => ({
+    const enriched = pharmacies.map(p => ({
         ...p,
         user: p.user_id ? userMap[p.user_id] ?? null : null,
         // Ensure defaults for new fields if null
@@ -232,6 +271,10 @@ export async function getPharmacies() {
         bank_details: p.bank_details ?? {},
         momo_details: p.momo_details ?? {},
     }));
+
+    // Cache the enriched list briefly
+    cacheSet(`cache:pharmacies:list`, enriched, CACHE_TTL_SHORT);
+    return enriched;
 }
 
 export async function searchPharmacies(query: string, deliveryArea?: string) {
@@ -339,6 +382,8 @@ export async function upsertPharmacy(data: PharmacyFormValues) {
 
     if (error) return { error: error.message }
 
+    // Invalidate pharmacy list cache
+    cacheDel('cache:pharmacies:list');
     revalidatePath('/admin/partners')
     return { success: true }
 }
@@ -451,6 +496,8 @@ export async function createPharmacyWithUser(data: PharmacyFormValues) {
             }
         }
 
+        // Invalidate caches affected by new pharmacy creation/linking
+        cacheDel('cache:pharmacies:list');
         revalidatePath('/admin/partners')
         return { success: true }
     } catch (error: any) {
@@ -526,6 +573,8 @@ export async function linkPharmacyUser(pharmacyId: number, userEmail: string, pa
         if (error) return { error: error.message }
     }
 
+    // Invalidate pharmacy list to refresh user linkage
+    cacheDel('cache:pharmacies:list');
     revalidatePath('/admin/partners')
     return { success: true }
 }
@@ -541,6 +590,8 @@ export async function unlinkPharmacyUser(pharmacyId: number) {
 
     if (error) return { error: error.message }
 
+    // Invalidate pharmacy list to refresh user linkage
+    cacheDel('cache:pharmacies:list');
     revalidatePath('/admin/partners')
     return { success: true }
 }
@@ -555,6 +606,8 @@ export async function deletePharmacy(id: number) {
 
     if (error) return { error: error.message }
 
+    // Invalidate caches related to pharmacies
+    cacheDel('cache:pharmacies:list');
     revalidatePath('/admin/partners')
     return { success: true }
 }
@@ -719,8 +772,36 @@ export async function updateOrderStatus(id: number, status: string, courierDetai
 
     // Trigger SMS notifications asynchronously
     if (status === 'out_for_delivery') {
-        // Pass courier details to SMS if needed (requires updating SMS function too, but for now we just store it)
+        // 1. Notify Customer (Existing)
         sendShippingNotificationSMS(String(id)).catch(console.error)
+
+        // 2. Notify Rider (New)
+        if (courierDetails?.phone) {
+            // Fetch order & pharmacy details for the rider message
+            const { data: orderData } = await supabase
+                .from('orders')
+                .select(`
+                    code, 
+                    delivery_area, 
+                    total_price, 
+                    pharmacies (name, location, phone_number)
+                `)
+                .eq('id', id)
+                .single();
+
+            if (orderData && orderData.pharmacies) {
+                // Handle array vs object for pharmacy relation just in case
+                const pharmacy = Array.isArray(orderData.pharmacies) ? orderData.pharmacies[0] : orderData.pharmacies;
+                
+                const pickupMsg = `New Delivery Assigned! Order ${orderData.code}. Pickup: ${pharmacy.name} (${pharmacy.location}). Deliver to: ${orderData.delivery_area}. Amount: GHS ${orderData.total_price}.`;
+                
+                // Use the internal sendSMS helper
+                const { sendSMS } = await import('@/lib/server-utils');
+                sendSMS(courierDetails.phone, pickupMsg).catch(err => 
+                    console.error('Failed to send Rider SMS:', err)
+                );
+            }
+        }
     } else if (status === 'completed') {
         sendDeliveryNotificationSMS(String(id)).catch(console.error)
     }
@@ -728,6 +809,8 @@ export async function updateOrderStatus(id: number, status: string, courierDetai
     revalidatePath('/admin/orders')
     return { success: true }
 }
+
+
 
 export async function assignPharmacyInternal(supabaseAdmin: any, orderId: number, pharmacyId: number) {
     // Get order and pharmacy details for notifications
@@ -907,6 +990,10 @@ const pharmacyProductSchema = z.object({
 export type PharmacyProductFormValues = z.infer<typeof pharmacyProductSchema>
 
 export async function getPharmacyProducts(pharmacyId: number) {
+    const cacheKey = `cache:pharmacy:${pharmacyId}:products`;
+    const cached = await cacheGet<any[]>(cacheKey);
+    if (cached) return cached;
+
     const supabase = await createSupabaseServerClient()
     const { data, error } = await supabase
         .from('pharmacy_products')
@@ -928,7 +1015,9 @@ export async function getPharmacyProducts(pharmacyId: number) {
 
     // Filter out any pharmacy_products where the parent product might have been deleted
     // (orphaned records) to prevent UI crashes
-    return (data || []).filter((item: any) => item.products !== null)
+    const result = (data || []).filter((item: any) => item.products !== null)
+    cacheSet(cacheKey, result, CACHE_TTL_SHORT);
+    return result
 }
 
 export async function upsertPharmacyProduct(data: PharmacyProductFormValues) {
@@ -945,6 +1034,9 @@ export async function upsertPharmacyProduct(data: PharmacyProductFormValues) {
 
     if (error) return { error: error.message }
 
+    // Invalidate per-pharmacy product and analytics caches
+    cacheDel(`cache:pharmacy:${validated.pharmacy_id}:products`);
+    cacheDel(`cache:pharmacy:${validated.pharmacy_id}:analytics`);
     revalidatePath(`/admin/partners/${validated.pharmacy_id}`)
     return { success: true }
 }
@@ -967,6 +1059,9 @@ export async function updatePharmacyProductStock(
 
     if (error) return { error: error.message }
 
+    // Invalidate per-pharmacy product and analytics caches
+    cacheDel(`cache:pharmacy:${pharmacyId}:products`);
+    cacheDel(`cache:pharmacy:${pharmacyId}:analytics`);
     revalidatePath(`/admin/partners/${pharmacyId}`)
     return { success: true }
 }
@@ -992,6 +1087,9 @@ export async function bulkAssignProductsToPharmacy(
 
     if (error) return { error: error.message }
 
+    // Invalidate per-pharmacy product and analytics caches
+    cacheDel(`cache:pharmacy:${pharmacyId}:products`);
+    cacheDel(`cache:pharmacy:${pharmacyId}:analytics`);
     revalidatePath(`/admin/partners/${pharmacyId}`)
     return { success: true }
 }
@@ -1007,6 +1105,9 @@ export async function deletePharmacyProduct(pharmacyId: number, productId: numbe
 
     if (error) return { error: error.message }
 
+    // Invalidate per-pharmacy product and analytics caches
+    cacheDel(`cache:pharmacy:${pharmacyId}:products`);
+    cacheDel(`cache:pharmacy:${pharmacyId}:analytics`);
     revalidatePath(`/admin/partners/${pharmacyId}`)
     return { success: true }
 }
@@ -1041,6 +1142,10 @@ export async function reassignOrder(orderId: number, newPharmacyId: number) {
 }
 
 export async function getPharmacyAnalytics(pharmacyId: number) {
+    const cacheKey = `cache:pharmacy:${pharmacyId}:analytics`;
+    const cached = await cacheGet<{ totalOrders: number; totalRevenue: number; productCount: number; ordersByStatus: Record<string, number> }>(cacheKey);
+    if (cached) return cached;
+
     const supabase = await createSupabaseServerClient()
 
     // Get order stats
@@ -1055,7 +1160,7 @@ export async function getPharmacyAnalytics(pharmacyId: number) {
         .select('id')
         .eq('pharmacy_id', pharmacyId)
 
-    return {
+    const analytics = {
         totalOrders: orderStats?.length || 0,
         totalRevenue: orderStats?.reduce((sum, order) => sum + (order.total_price || 0), 0) || 0,
         productCount: productCount?.length || 0,
@@ -1063,7 +1168,9 @@ export async function getPharmacyAnalytics(pharmacyId: number) {
             acc[order.status] = (acc[order.status] || 0) + 1
             return acc
         }, {} as Record<string, number>) || {}
-    }
+    };
+    cacheSet(cacheKey, analytics, CACHE_TTL_SHORT);
+    return analytics
 }
 
 export async function getServiceAreas(pharmacyId: number) {
@@ -1092,6 +1199,8 @@ export async function addServiceArea(data: { pharmacy_id: number; area_name: str
         return { error: error.message }
     }
     console.log('[addServiceArea] Successfully added area:', newArea);
+    // Invalidate analytics cache (service areas may influence operations)
+    cacheDel(`cache:pharmacy:${data.pharmacy_id}:analytics`);
     revalidatePath(`/admin/partners/${data.pharmacy_id}`)
     return { data: newArea }
 }
@@ -1109,6 +1218,7 @@ export async function toggleServiceAreaStatus(id: number, isActive: boolean) {
     // but revalidating the partners route group might be enough or we skip specific path revalidation 
     // and rely on client state updates or general revalidation.
     // Ideally we fetch the pharmacy_id first.
+    // Note: Consider invalidating analytics for the related pharmacy if needed
     return { success: true }
 }
 
@@ -1665,4 +1775,108 @@ export async function toggleRiderStatus(id: number, isActive: boolean) {
     
     revalidatePath('/dashboard/pharmacy/riders');
     return { success: true };
+}
+
+// --- Operations Dashboard Actions ---
+
+export async function getOperationsStats() {
+    await requireAdmin();
+    const supabase = await createSupabaseServerClient();
+    
+    // Parallelize queries for performance
+    const [ridersRes, ordersRes] = await Promise.all([
+        supabase
+            .from('pharmacy_riders')
+            .select('id', { count: 'exact', head: true })
+            .eq('is_active', true),
+        supabase
+            .from('orders')
+            .select('id, status, created_at, pharmacy_ack_status')
+            .in('status', ['received', 'processing', 'out_for_delivery'])
+    ]);
+
+    if (ridersRes.error) throw new Error(ridersRes.error.message);
+    if (ordersRes.error) throw new Error(ordersRes.error.message);
+
+    const activeRiders = ridersRes.count || 0;
+    const orders = ordersRes.data || [];
+
+    const now = new Date();
+    const STUCK_THRESHOLD_MINS = 30;
+
+    let processingCount = 0;
+    let outForDeliveryCount = 0;
+    let stuckCount = 0;
+    let unassignedCount = 0;
+
+    orders.forEach(o => {
+        if (o.status === 'out_for_delivery') {
+            outForDeliveryCount++;
+        } else if (o.status === 'processing') {
+            processingCount++;
+            
+            // Check for stuck orders
+            const created = new Date(o.created_at);
+            const diffMins = (now.getTime() - created.getTime()) / (1000 * 60);
+            if (diffMins > STUCK_THRESHOLD_MINS) {
+                stuckCount++;
+            }
+        } else if (o.status === 'received') {
+            // Received but not yet processing usually means unassigned or waiting for pharmacy ack
+            unassignedCount++;
+        }
+    });
+
+    return {
+        activeRiders,
+        processingCount,
+        outForDeliveryCount,
+        stuckCount,
+        unassignedCount
+    };
+}
+
+export async function getLiveDeliveries() {
+    await requireAdmin();
+    const supabase = await createSupabaseServerClient();
+
+    const { data, error } = await supabase
+        .from('orders')
+        .select(`
+            id, 
+            code, 
+            status, 
+            created_at, 
+            delivery_area, 
+            total_price,
+            courier_name,
+            courier_phone,
+            pharmacies(name),
+            order_events(status, created_at)
+        `)
+        .in('status', ['processing', 'out_for_delivery'])
+        .order('created_at', { ascending: true }); // Oldest first (priority)
+
+    if (error) throw new Error(error.message);
+
+    // Process to add "time elapsed" and simplify structure
+    return (data || []).map((order: any) => {
+         const pharmacyName = Array.isArray(order.pharmacies) 
+            ? order.pharmacies[0]?.name 
+            : order.pharmacies?.name || 'Unassigned';
+
+         // Find default "stuck" status
+         const now = new Date();
+         const created = new Date(order.created_at);
+         const minutesElapsed = Math.floor((now.getTime() - created.getTime()) / (1000 * 60));
+         
+         const isStuck = order.status === 'processing' && minutesElapsed > 30;
+
+         return {
+            ...order,
+            pharmacyName,
+            minutesElapsed,
+            isStuck
+         };
+    });
 }

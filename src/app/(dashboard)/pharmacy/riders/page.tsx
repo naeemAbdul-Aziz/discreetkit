@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -54,6 +55,22 @@ export default function RidersPage() {
   const [processing, setProcessing] = useState(false);
   const { toast } = useToast();
 
+  const fetchRiders = useCallback(async (id: number) => {
+    try {
+      const data = await getPharmacyRiders(id);
+      setRiders(data || []);
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Error",
+        description: "Failed to load riders",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
+
   useEffect(() => {
     async function init() {
       const supabase = getSupabaseClient();
@@ -71,27 +88,11 @@ export default function RidersPage() {
 
       if (pharmacy) {
         setPharmacyId(pharmacy.id);
-        fetchRiders(pharmacy.id);
+        fetchRiders(pharmacy.id); // Call fetchRiders with pharmacy ID
       }
     }
     init();
-  }, []);
-
-  async function fetchRiders(id: number) {
-    try {
-      const data = await getPharmacyRiders(id);
-      setRiders(data || []);
-    } catch (error) {
-      console.error(error);
-      toast({
-        title: "Error",
-        description: "Failed to load riders",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  }
+  }, [fetchRiders]);
 
   async function handleAddRider(e: React.FormEvent) {
     e.preventDefault();
@@ -159,7 +160,7 @@ export default function RidersPage() {
           title: "Updated",
           description: `Rider ${!currentStatus ? "activated" : "deactivated"}`,
         });
-        fetchRiders(pharmacyId);
+        fetchRiders(pharmacyId); // Call fetchRiders with pharmacy ID
       }
     } catch (error) {
       console.error(error);
@@ -252,7 +253,7 @@ export default function RidersPage() {
                     colSpan={4}
                     className="text-center h-24 text-muted-foreground"
                   >
-                    No riders added yet. Click "Add Rider" to start.
+                    No riders added yet. Click &quot;Add Rider&quot; to start.
                   </TableCell>
                 </TableRow>
               ) : (

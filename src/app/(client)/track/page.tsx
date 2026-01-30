@@ -92,8 +92,11 @@ const getFriendlyEventTitle = (raw: string) => {
   );
 };
 
-const getReassuranceMessage = (status: string): string => {
+const getReassuranceMessage = (status: string): string | null => {
+  const normalized = status.toLowerCase().replace(/\s+/g, "_");
+
   const messages: Record<string, string> = {
+    order_received: "We've got your order! Our team is on it.",
     order_created: "We've got your order! Our team is on it.",
     payment_pending: "Verifying your payment securely.",
     payment_confirmed: "Payment received. Your order is confirmed!",
@@ -103,7 +106,8 @@ const getReassuranceMessage = (status: string): string => {
     out_for_delivery: "Almost there! Your package is on the way.",
     completed: "Delivered safely. Thank you for trusting us!",
   };
-  return messages[status] || "Your order is in safe hands.";
+
+  return messages[normalized] || messages[status] || null;
 };
 
 const getFriendlyNote = (note: string | null): string | null => {
@@ -222,7 +226,7 @@ function Tracker() {
   const currentStatusIndex = order ? allStatuses.indexOf(order.status) : -1;
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6">
+    <div className="w-full max-w-7xl mx-auto space-y-8 px-4 sm:px-6 lg:px-8">
       {/* Search Card */}
       <Card className="rounded-3xl border-muted shadow-sm overflow-hidden">
         <CardHeader className="bg-muted/40 pb-8">
@@ -290,9 +294,9 @@ function OrderTrackingView({ order }: { order: Order }) {
   const currentStatusIndex = allStatuses.indexOf(order.status);
 
   return (
-    <div className="grid gap-6 md:grid-cols-3">
-      {/* LEFT COLUMN: Status & Items (Span 2) */}
-      <div className="md:col-span-2 space-y-6">
+    <div className="grid gap-8 lg:grid-cols-12">
+      {/* LEFT COLUMN: Status & Items (Span 8) */}
+      <div className="lg:col-span-8 space-y-8">
         {/* 2. Vertical Timeline (The Hero) */}
         <Card className="rounded-3xl border-muted shadow-sm overflow-hidden">
           <CardHeader className="bg-muted/30 pb-6">
@@ -309,14 +313,12 @@ function OrderTrackingView({ order }: { order: Order }) {
                     new Date(b.date).getTime() - new Date(a.date).getTime(),
                 ) // Newest first
                 .filter((event, index, self) => {
-                  // Deduplicate: Keep only the first occurrence of each status+date combination
-                  const key = `${event.status}-${new Date(event.date).toISOString()}`;
+                  // Deduplicate: Keep only the ONE latest occurrence of each status
+                  // We ignore usage of 'date' in the key to merge 'Payment Confirmed' duplicates
+                  const key = event.status.toLowerCase().trim();
                   return (
                     index ===
-                    self.findIndex(
-                      (e) =>
-                        `${e.status}-${new Date(e.date).toISOString()}` === key,
-                    )
+                    self.findIndex((e) => e.status.toLowerCase().trim() === key)
                   );
                 })
                 .map((event, index) => {
@@ -367,9 +369,11 @@ function OrderTrackingView({ order }: { order: Order }) {
                         </p>
 
                         {/* Reassurance Message */}
-                        <div className="mt-2 text-sm text-foreground/90 bg-primary/5 p-3 rounded-r-xl rounded-bl-xl border border-primary/10 max-w-md">
-                          {getReassuranceMessage(event.status)}
-                        </div>
+                        {getReassuranceMessage(event.status) && (
+                          <div className="mt-2 text-sm text-foreground/90 bg-primary/5 p-3 rounded-r-xl rounded-bl-xl border border-primary/10 max-w-md">
+                            {getReassuranceMessage(event.status)}
+                          </div>
+                        )}
 
                         {friendlyNote && (
                           <div className="mt-2 text-sm text-muted-foreground bg-muted/30 p-3 rounded-r-xl rounded-bl-xl border border-muted/50 max-w-md">
@@ -431,8 +435,8 @@ function OrderTrackingView({ order }: { order: Order }) {
         </Card>
       </div>
 
-      {/* RIGHT COLUMN: Summary & History (Span 1) */}
-      <div className="space-y-6">
+      {/* RIGHT COLUMN: Summary & History (Span 4) */}
+      <div className="lg:col-span-4 space-y-8">
         {/* 3. Summary & Payment */}
         <Card className="rounded-3xl border-muted shadow-sm bg-muted/20">
           <CardHeader>
@@ -582,9 +586,9 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
     : null;
 
   return (
-    <div className="grid gap-6 md:grid-cols-3">
+    <div className="grid gap-8 lg:grid-cols-12">
       {/* LEFT COLUMN: Status & Details */}
-      <div className="md:col-span-2 space-y-6">
+      <div className="lg:col-span-8 space-y-8">
         {/* Subscription Status Card */}
         <Card className="rounded-3xl border-muted shadow-sm overflow-hidden">
           <CardHeader className="bg-muted/30 pb-6">
@@ -715,7 +719,7 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
 
       {/* RIGHT COLUMN: Details */}
 
-      <div className="space-y-6">
+      <div className="lg:col-span-4 space-y-8">
         {/* Prescription Status */}
         <Card className="rounded-3xl border-muted shadow-sm">
           <CardHeader className="pb-3">
