@@ -1,3 +1,19 @@
+## CSP Monitoring
+
+- **What it is**: Content Security Policy (CSP) controls where scripts, styles, images, and frames can load from. In `report-only` mode, violations are not blocked; browsers send JSON reports describing what would have been blocked.
+- **Where reports go**: When `CSP_REPORT_ONLY=1` is set, the app sends `Content-Security-Policy-Report-Only` with `report-uri /api/csp-report`. The endpoint at `/api/csp-report` logs structured violation details.
+- **How to view**:
+	- Local: run the app, reproduce a violation, and check server logs (look for `CSP Violation`).
+	- Vercel: Project → Deployments → Logs; filter for `api/csp-report` and `CSP Violation`.
+- **What a report means**: It includes fields like `effectiveDirective` (the rule that triggered), `blockedURI` (the resource), `documentURI` (page URL), and source location (file/line). Use these to whitelist needed sources or chase down unsafe inline code.
+- **Triage steps**:
+	- Group by `effectiveDirective` and `blockedURI` to identify top offenders.
+	- Confirm the resource is required; if yes, add the host to the corresponding directive (e.g., `img-src`, `script-src`). If not, remove or fix the code.
+	- Eliminate `'unsafe-inline'`/`'unsafe-eval'` gradually by moving inline scripts/styles to files and using nonces.
+- **Optional integrations**:
+	- Use a third-party collector (Report URI) by pointing `report-uri` to their endpoint.
+	- Forward logs to an APM (e.g., Sentry) via the `/api/csp-report` handler.
+
 ## Code Quality Gates (Jan 2026)
 
 - **Lint:** Use ESLint v9 flat config. CI fails on any warnings (`--max-warnings=0`).
