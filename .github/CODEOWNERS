@@ -1,0 +1,12 @@
+# CODEOWNERS: Minimal, high-impact ownership
+# Default owner
+* @naeemAbdul-Aziz
+
+# Critical application paths
+src/app/(dashboard) @naeemAbdul-Aziz
+src/app/(pharmacy) @naeemAbdul-Aziz
+src/app/api/** @naeemAbdul-Aziz
+src/lib/** @naeemAbdul-Aziz
+
+# Investor documentation
+docs/investor-reports/** @naeemAbdul-Aziz

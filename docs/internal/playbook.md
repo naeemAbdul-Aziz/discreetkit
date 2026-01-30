@@ -23,6 +23,13 @@
 - **Client Performance:** Debounce expensive actions; avoid synchronous `setState` in effects; prefer memoization for large lists; consider virtualization if lists exceed ~500 rows.
 - **Admin/Pharmacy Dashboards:** Keep filters/search debounced; paginate aggressively; move heavy aggregation to server-side API or DB views with indexes.
 
+### CSP Staging Toggle
+- Set environment variable `CSP_REPORT_ONLY=1` to add a `Content-Security-Policy-Report-Only` header that removes `'unsafe-eval'` for staging validation.
+- Keep production enforce policy unchanged; switch off by removing the env var.
+
+### CI Build Cache
+- CI uses `actions/cache` to restore/save `.next/cache` for faster builds; no app logic changes.
+
 ## Branch Protection & Merging
 
 - **Protect `main`:** Prevent force pushes and deletion.
