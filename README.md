@@ -220,3 +220,26 @@ Ensure the following are set in Vercel for the WhatsApp Bot to function:
 - Include stable references (e.g., `toast`) in effect deps for realtime subscriptions.
 - Avoid try/catch around JSX; rely on Next.js `error.tsx` for rendering errors.
 
+## 🔒 Branch Protection & Merging
+
+- Protect `main` with branch rules: require PRs, 1 approval, and conversation resolution.
+- Require status checks: `lint`, `typecheck`, `build` and branch up-to-date.
+- Prevent force pushes and deletions; enforce for admins; prefer squash merges.
+
+## 🛡 Middleware → Proxy (Next.js 16)
+
+- Use `src/proxy.ts` for middleware behavior (auth, subdomain rewrites, rate limits).
+- Remove `src/middleware.ts` to avoid conflicts; build expects proxy only.
+- Rate limiting: IP-based, Upstash Redis-backed if env present; fails open on error.
+
+## 🗺 Sitemap & Robots
+
+- `src/app/sitemap.ts` generates dynamic product URLs when `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_KEY` exist; otherwise falls back to static categories.
+- `src/app/robots.ts` defines crawl rules and points to `/sitemap.xml`.
+- For CI builds without Supabase envs, sitemap still prerenders successfully (static fallback). To include products in CI, add Supabase envs to CI.
+
+## 🔏 CSP Hardening (Staged)
+
+- Recommended next: remove `'unsafe-eval'` from `script-src` and use `Content-Security-Policy-Report-Only` to validate stricter rules before enforcing.
+- Keep `'unsafe-inline'` in `style-src` for now; evaluate nonce/hashes for scripts after report-only verification.
+

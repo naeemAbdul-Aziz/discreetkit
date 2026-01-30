@@ -13,6 +13,18 @@
    - TypeScript typecheck passes under strict mode.
    - Reduced risk of subtle state bugs in realtime and admin flows.
 
+### Next.js 16 Proxy & Build Stability
+
+- Replaced legacy `src/middleware.ts` with `src/proxy.ts` to align with Next.js 16 expectations and prevent build conflicts.
+- Made `src/app/sitemap.ts` resilient: uses dynamic product entries when Supabase envs are present; falls back to static categories when missing (CI-safe).
+
+### Branch Protection Rules
+
+- Protected `main` with the following:
+   - Require PRs with 1 approval and conversation resolution.
+   - Require status checks: `lint`, `typecheck`, `build` (strict/up-to-date).
+   - Prevent force pushes and branch deletion; enforce for admins.
+
 ### Developer Commands
 
 - Lint: `npm run lint`
@@ -24,6 +36,7 @@
 - Enforcing exhaustive deps and purity eliminates a class of race conditions and stale state bugs in React.
 - Zero-warning CI improves review quality and accelerates merges without regressions.
 - Strict TypeScript reduces runtime type errors and improves refactor safety.
+ - Branch protection and CI gates improve production stability and governance.
 
 # 🎉 DEPLOYMENT COMPLETE - Communication & Inventory System
 

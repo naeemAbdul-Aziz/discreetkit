@@ -7,6 +7,12 @@
 	- `react-hooks/set-state-in-effect`: error
 - Addressed code issues where needed (orders table, riders page, product table) to achieve zero warnings in CI.
 
+## 2026-01-30 — Next.js 16 Proxy & Build-Safe Sitemap
+
+- Migrated middleware behavior to `src/proxy.ts`; removed `src/middleware.ts` to resolve build conflict in Next.js 16.
+- Updated `src/app/sitemap.ts` to conditionally import Supabase only when `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_KEY` exist; falls back to static category URLs when envs are missing (CI-safe).
+- Added short-lived Redis caching with explicit invalidation hooks in admin actions to maintain correctness after writes.
+
 # Database change management
 
 This repository uses Supabase migrations as the single source of truth for schema changes.
