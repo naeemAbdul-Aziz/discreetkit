@@ -1116,3 +1116,42 @@ CREATE POLICY "Pharmacies can delete their own riders"
       AND p.user_id = auth.uid()
     )
   );
+- -   M i g r a t i o n :   C l e a n   u p   d u p l i c a t e s   a n d   p r e v e n t   f u t u r e   d u p l i c a t e   a n o n y m o u s   s u b s c r i p t i o n s  
+ - -   S t e p   1 :   I d e n t i f y   a n d   h a n d l e   e x i s t i n g   d u p l i c a t e s   b e f o r e   a d d i n g   u n i q u e   c o n s t r a i n t  
+  
+ - -   1 .   C r e a t e   t h e   p h o n e   e x t r a c t i o n   f u n c t i o n   f i r s t  
+ C R E A T E   O R   R E P L A C E   F U N C T I O N   g e t _ s u b s c r i p t i o n _ p h o n e ( d e l i v e r y _ a d d r e s s   j s o n b )  
+ R E T U R N S   t e x t   A S   $ $  
+ B E G I N  
+     R E T U R N   d e l i v e r y _ a d d r e s s - > > ' p h o n e ' ;  
+ E N D ;  
+ $ $   L A N G U A G E   p l p g s q l   I M M U T A B L E ;  
+  
+ - -   2 .   C a n c e l   d u p l i c a t e   a c t i v e   s u b s c r i p t i o n s   ( k e e p   o n l y   t h e   o l d e s t   o n e   p e r   p h o n e + p r o d u c t )  
+ - -   T h i s   m a r k s   n e w e r   d u p l i c a t e s   a s   ' c a n c e l l e d '   s o   t h e y   d o n ' t   b l o c k   t h e   u n i q u e   i n d e x  
+ W I T H   d u p l i c a t e s   A S   (  
+     S E L E C T    
+         i d ,  
+         R O W _ N U M B E R ( )   O V E R   (  
+             P A R T I T I O N   B Y   g e t _ s u b s c r i p t i o n _ p h o n e ( d e l i v e r y _ a d d r e s s ) ,   p r o d u c t _ i d    
+             O R D E R   B Y   e n r o l l e d _ a t   A S C     - -   K e e p   t h e   o l d e s t   s u b s c r i p t i o n  
+         )   a s   r n  
+     F R O M   p u b l i c . m e d i c a t i o n _ r e f i l l _ s u b s c r i p t i o n s  
+     W H E R E   s t a t u s   =   ' a c t i v e '  
+ )  
+ U P D A T E   p u b l i c . m e d i c a t i o n _ r e f i l l _ s u b s c r i p t i o n s  
+ S E T   s t a t u s   =   ' c a n c e l l e d ' ,  
+         u p d a t e d _ a t   =   n o w ( )  
+ W H E R E   i d   I N   (  
+     S E L E C T   i d   F R O M   d u p l i c a t e s   W H E R E   r n   >   1  
+ ) ;  
+  
+ - -   3 .   N o w   a d d   t h e   u n i q u e   i n d e x   ( w i l l   s u c c e e d   s i n c e   d u p l i c a t e s   a r e   c a n c e l l e d )  
+ C R E A T E   U N I Q U E   I N D E X   I F   N O T   E X I S T S   u n i q u e _ a c t i v e _ p h o n e _ p r o d u c t _ s u b s c r i p t i o n  
+ O N   p u b l i c . m e d i c a t i o n _ r e f i l l _ s u b s c r i p t i o n s   ( g e t _ s u b s c r i p t i o n _ p h o n e ( d e l i v e r y _ a d d r e s s ) ,   p r o d u c t _ i d )  
+ W H E R E   s t a t u s   =   ' a c t i v e ' ;  
+  
+ - -   4 .   A d d   c o m m e n t   e x p l a i n i n g   t h e   c o n s t r a i n t  
+ C O M M E N T   O N   I N D E X   p u b l i c . u n i q u e _ a c t i v e _ p h o n e _ p r o d u c t _ s u b s c r i p t i o n   I S    
+ ' P r e v e n t s   t h e   s a m e   p h o n e   n u m b e r   f r o m   c r e a t i n g   d u p l i c a t e   a c t i v e   s u b s c r i p t i o n s   f o r   t h e   s a m e   p r o d u c t .   T h i s   e n s u r e s   a n o n y m o u s   u s e r s   c a n n o t   a c c i d e n t a l l y   c r e a t e   m u l t i p l e   s u b s c r i p t i o n s . ' ;  
+ 
