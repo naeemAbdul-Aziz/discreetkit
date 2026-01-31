@@ -27,9 +27,13 @@ We do not rely on application-level logic for security. We enforce it at the **D
     *   `Pharmacies` can only SELECT orders `WHERE pharmacy_id = auth.pharmacy_id()`.
 *   **Impact:** Even if a hacker compromised the API credentials of a frontend client, they could not dump the database. They would still be restricted by the RLS policies of the logged-in user.
 
-### Content Security Policy (CSP)
-- **Current:** Strict global headers configured; `script-src` includes allowances for Paystack and operational tooling.
-- **Roadmap:** Stage removal of `'unsafe-eval'` and use `Content-Security-Policy-Report-Only` to validate stricter rules at scale; consider nonces/hashes for scripts post validation.
+### Content Security Policy (CSP) & Hardened Headers
+- **Status:** **Production Hardened (Jan 2026)**
+- **Implementation:** NIST-aligned security headers enforced globally via `next.config.ts`.
+    - **Exfiltration Prevention:** Strict `connect-src` allowlists restrict data transmission only to trusted endpoints (Supabase, Paystack, Arkesel), neutralizing common data leakage attacks.
+    - **Anti-Clickjacking:** `X-Frame-Options: SAMEORIGIN` blocks malicious iframe attacks while preserving essential admin workflows.
+    - **Transport Security:** `Strict-Transport-Security` (HSTS) with preloading enforced to prevent Man-in-the-Middle (MitM) downgrade attacks.
+    - **Component Isolation:** `Permissions-Policy` locks down sensor access (Camera/Mic/Geolocation) to minimize browser-level attack surface.
 
 ### Data Minimization
 *   **Guest Checkout:** The system supports guest checkout where user data is retained only for the lifecycle of the active order and operational audit logs, supporting GDPR "Right to be Forgotten" workflows.

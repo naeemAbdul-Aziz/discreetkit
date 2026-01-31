@@ -52,6 +52,7 @@ The system leverages a **Serverless Event-Driven Architecture** utilizing Supaba
 *   **Data Modeling:** Complex multi-tenant schema handling "Global vs. Local" inventory. The system aggregates stock levels from dispersed pharmacy nodes while maintaining a centralized product catalog.
 *   **Security Layer:** Implementation of Row Level Security (RLS) policies ensures rigorous data isolation between Admin, Pharmacy, and Customer roles.
 *   **Performance:** Utilization of `revalidatePath` and edge-caching strategies ensures instant data propagation across the network without server overhead.
+*   **Bank-Grade Compliance:** Full implementation of Content Security Policy (CSP), HSTS, and frame-busting protections, elevating the platform's security posture to meet fintech/healthcare enterprise standards.
 
 ### B. Frontend Ecosystem (The "Three-Pillar" Interface)
 **Valuation:** $55,000 – $75,000  
