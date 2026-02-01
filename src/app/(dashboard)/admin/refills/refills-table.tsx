@@ -174,9 +174,9 @@ export function RefillsTable({
                 // Parse helpful contact info
                 const address = sub.delivery_address || {};
                 const contactName =
-                  sub.user_name || address.fullName || "Anonymous";
+                  sub.user_name || address.name || address.fullName || "Anonymous";
                 const contactDetail =
-                  sub.user_email || address.phone || sub.subscription_code;
+                  (sub.user_email ?? sub.contact_phone ?? address.phone ?? sub.subscription_code);
 
                 return (
                   <TableRow key={sub.id}>
@@ -304,7 +304,7 @@ export function RefillsTable({
         open={!!viewingPrescription}
         onOpenChange={(o) => !o && setViewingPrescription(null)}
       >
-        <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
+        <DialogContent className="max-w-5xl max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>Verification Document</DialogTitle>
           </DialogHeader>
@@ -313,7 +313,7 @@ export function RefillsTable({
               viewingPrescription?.toLowerCase().endsWith(".pdf") ? (
                 <iframe
                   src={prescriptionUrl}
-                  className="w-full h-[600px]"
+                  className="w-full h-[80vh]"
                   title="Document Viewer"
                 />
               ) : (
@@ -321,7 +321,7 @@ export function RefillsTable({
                 <img
                   src={prescriptionUrl}
                   alt="Prescription"
-                  className="max-w-full max-h-[600px] object-contain"
+                  className="w-full max-h-[75vh] object-contain"
                 />
               )
             ) : (
