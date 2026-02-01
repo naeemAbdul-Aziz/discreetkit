@@ -1640,12 +1640,14 @@ export async function getRefillSubscriptions() {
         const deliveryAddress = s.delivery_address || {};
         const contactPhone = deliveryAddress.phone || null;
         const contactEmail = deliveryAddress.email || null;
-        
+
         return {
             ...s,
-            user_email: s.user_id ? (userMap[s.user_id]?.email || 'Unknown User') : (contactEmail || 'No Email'),
+            // Prefer real user email only when available; otherwise null to allow fallback to phone in UI
+            user_email: s.user_id ? (userMap[s.user_id]?.email || null) : null,
             user_name: s.user_id ? (userMap[s.user_id]?.name || 'Anonymous') : (deliveryAddress.name || 'Anonymous'),
-            contact_phone: s.user_id ? null : contactPhone, // Only show for anonymous
+            contact_phone: contactPhone,
+            contact_email: contactEmail,
             // Normalize single object relations if they come back as arrays (Supabase sometimes does this)
             product: Array.isArray(s.product) ? s.product[0] : s.product,
             pharmacy: Array.isArray(s.pharmacy) ? s.pharmacy[0] : s.pharmacy,
