@@ -526,6 +526,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
               <TableHead>Order ID</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Customer</TableHead>
+              <TableHead>Note</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Pharmacy</TableHead>
               <TableHead className="text-right">Total</TableHead>
@@ -559,6 +560,22 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                   {new Date(order.created_at).toISOString().slice(0, 10)}
                 </TableCell>
                 <TableCell>{order.email || "Anonymous"}</TableCell>
+                <TableCell className="max-w-[240px]">
+                  {order.delivery_address_note ? (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" size="sm" className="text-xs">
+                          View Note
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="max-w-[360px] text-sm">
+                        {order.delivery_address_note}
+                      </PopoverContent>
+                    </Popover>
+                  ) : (
+                    <span className="text-muted-foreground text-xs">—</span>
+                  )}
+                </TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
