@@ -579,17 +579,24 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="px-2">
-                        {getStatusBadge(order.status)}
-                        {order.status === "out_for_delivery" &&
-                          order.courier_name && (
-                            <div
-                              className="text-[10px] text-muted-foreground mt-1 text-center truncate max-w-[100px]"
-                              title={`Rider: ${order.courier_name} (${order.courier_phone || "No phone"})`}
-                            >
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="px-2 h-8 items-center"
+                        title={
+                          order.status === "out_for_delivery" && order.courier_name
+                            ? `Rider: ${order.courier_name} (${order.courier_phone || "No phone"})`
+                            : undefined
+                        }
+                      >
+                        <span className="inline-flex items-center gap-2">
+                          {getStatusBadge(order.status)}
+                          {order.status === "out_for_delivery" && order.courier_name && (
+                            <span className="text-[10px] text-muted-foreground truncate max-w-[100px]">
                               🚚 {order.courier_name}
-                            </div>
+                            </span>
                           )}
+                        </span>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start">
