@@ -305,6 +305,7 @@ export function RefillsTable({
       <Dialog
         open={!!viewingPrescription}
         onOpenChange={(o) => !o && setViewingPrescription(null)}
+        modal={false}
       >
         <DialogContent className="max-w-5xl max-h-[90vh] flex flex-col">
           <DialogHeader>

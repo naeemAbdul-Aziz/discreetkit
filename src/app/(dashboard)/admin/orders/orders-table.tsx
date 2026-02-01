@@ -342,7 +342,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
   return (
     <div className="space-y-4">
       {/* Rider Dialog */}
-      <Dialog open={riderDialogOpen} onOpenChange={setRiderDialogOpen}>
+      <Dialog open={riderDialogOpen} onOpenChange={setRiderDialogOpen} modal={false}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Assign Dispatch Rider</DialogTitle>
@@ -392,7 +392,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
       </Dialog>
 
       {/* Message Dialog */}
-      <Dialog open={messageDialogOpen} onOpenChange={setMessageDialogOpen}>
+      <Dialog open={messageDialogOpen} onOpenChange={setMessageDialogOpen} modal={false}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>Pharmacy Chat</DialogTitle>

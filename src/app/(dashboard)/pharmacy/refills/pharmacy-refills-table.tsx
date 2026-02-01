@@ -151,7 +151,7 @@ export function PharmacyRefillsTable({
         </TableBody>
       </Table>
 
-      <Dialog open={!!loggingId} onOpenChange={(o) => !o && setLoggingId(null)}>
+      <Dialog open={!!loggingId} onOpenChange={(o) => !o && setLoggingId(null)} modal={false}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Log Medication Refill</DialogTitle>
