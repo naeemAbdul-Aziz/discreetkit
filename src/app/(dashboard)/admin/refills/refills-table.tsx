@@ -12,35 +12,12 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  FileText,
-  CheckCircle,
-  XCircle,
-  Store,
-  ExternalLink,
-} from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { FileText, CheckCircle, Store, ExternalLink } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import {
-  assignPharmacyToSubscription,
-  verifyPrescription,
-} from "@/lib/admin-actions";
-import { getSupabaseClient } from "@/lib/supabase";
-import Image from "next/image";
+import { assignPharmacyToSubscription, verifyPrescription } from "@/lib/admin-actions";
+import { dashboardTable, adminRefillsCols, actions as actionStyles } from "@/components/ui/table-layout";
 
 export function RefillsTable({
   initialSubscriptions,
@@ -63,18 +40,18 @@ export function RefillsTable({
   const handleAssign = async () => {
     if (!assigningId || !selectedPharmacyId) return;
     const result = await assignPharmacyToSubscription(
-      assigningId,
-      parseInt(selectedPharmacyId),
-    );
-    if (result.error) {
+      return (
+        <div>
+          <div className={dashboardTable.container}>
+            <Table className={dashboardTable.table}>
       toast({
         title: "Error",
-        description: result.error,
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Success",
+                  <TableHead className={adminRefillsCols.codeHead}>Code</TableHead>
+                  <TableHead className={adminRefillsCols.patientHead}>Patient / Contact</TableHead>
+                  <TableHead className={adminRefillsCols.productHead}>Product</TableHead>
+                  <TableHead className={adminRefillsCols.statusHead}>Status</TableHead>
+                  <TableHead className={adminRefillsCols.pharmacyHead}>Pharmacy</TableHead>
+                  <TableHead className={adminRefillsCols.actionsHead}>Actions</TableHead>
         description: "Pharmacy assigned successfully.",
       });
       setSubscriptions((prev) =>
@@ -95,10 +72,10 @@ export function RefillsTable({
     }
   };
 
-  const handleVerify = async (id: string, isValid: boolean) => {
+                        <TableCell className={adminRefillsCols.codeCell}>
     const result = await verifyPrescription(id, isValid);
     if (result.error) {
-      toast({
+                        <TableCell className={adminRefillsCols.patientCell}>
         title: "Error",
         description: result.error,
         variant: "destructive",
@@ -106,18 +83,12 @@ export function RefillsTable({
     } else {
       toast({
         title: isValid ? "Verified" : "Rejected",
-        description: isValid
+                        <TableCell className={adminRefillsCols.productCell}>
           ? "Prescription verified & activated."
           : "Prescription rejected.",
-      });
+                        <TableCell className={adminRefillsCols.statusCell}>
       // Update local state optimistically
-      setSubscriptions((prev) =>
-        prev.map((s) =>
-          s.id === id
-            ? {
-                ...s,
-                prescription_verified: isValid,
-                status:
+                            variant={sub.status === "active" ? "default" : sub.status === "pending_verification" ? "secondary" : "outline"}
                   isValid && s.status === "pending_verification"
                     ? "active"
                     : s.status,
@@ -125,7 +96,7 @@ export function RefillsTable({
             : s,
         ),
       );
-    }
+                        <TableCell className={adminRefillsCols.pharmacyCell}>
   };
 
   const loadPrescription = async (path: string) => {
@@ -141,13 +112,13 @@ export function RefillsTable({
     } else {
       console.error("Error loading document:", path, result.error);
       toast({
-        title: "Error",
-        description: "Could not load document: " + (result.error || "Unknown"),
+                        <TableCell className={adminRefillsCols.actionsCell}>
+                          <div className="flex items-center gap-2 justify-end">
         variant: "destructive",
       });
     }
   };
-
+                                className={actionStyles.iconButton}
   return (
     <div>
       <div className="rounded-md border bg-white overflow-x-auto">
@@ -162,15 +133,15 @@ export function RefillsTable({
               <TableHead className="w-[140px] text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
+                                  className={`${actionStyles.iconButton} bg-green-600 hover:bg-green-700`}
             {subscriptions.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center">
-                  No subscriptions found.
-                </TableCell>
-              </TableRow>
-            ) : (
-              subscriptions.map((sub) => {
+              <TableHead className={adminRefillsCols.codeHead}>Code</TableHead>
+              <TableHead className={adminRefillsCols.patientHead}>Patient / Contact</TableHead>
+              <TableHead className={adminRefillsCols.productHead}>Product</TableHead>
+              <TableHead className={adminRefillsCols.statusHead}>Status</TableHead>
+              <TableHead className={adminRefillsCols.pharmacyHead}>Pharmacy</TableHead>
+              <TableHead className={adminRefillsCols.actionsHead}>Actions</TableHead>
                 // Parse helpful contact info
                 const address = sub.delivery_address || {};
                 const contactName =
@@ -191,10 +162,10 @@ export function RefillsTable({
                         </span>
                       </div>
                     </TableCell>
-                      <TableCell className="w-[220px] truncate">
+                    <TableCell className={adminRefillsCols.codeCell}>
                       {sub.product_name || "Product"}
                     </TableCell>
-                      <TableCell className="w-[140px] whitespace-nowrap">
+                    <TableCell className={adminRefillsCols.patientCell}>
                       <Badge
                         variant={
                           sub.status === "active"
@@ -202,10 +173,10 @@ export function RefillsTable({
                             : sub.status === "pending_verification"
                               ? "secondary"
                               : "outline"
-                        }
+                    <TableCell className={adminRefillsCols.productCell}>
                       >
                         {sub.status.replace("_", " ")}
-                      </Badge>
+                    <TableCell className={adminRefillsCols.statusCell}>
                       {sub.prescription_verified && (
                         <CheckCircle className="inline h-3 w-3 ml-1 text-green-500" />
                       )}
@@ -221,7 +192,7 @@ export function RefillsTable({
                           size="sm"
                           onClick={() => setAssigningId(sub.id)}
                           className="text-xs h-7"
-                        >
+                    <TableCell className={adminRefillsCols.pharmacyCell}>
                           Assign Pharmacy
                         </Button>
                       )}
@@ -237,13 +208,13 @@ export function RefillsTable({
                               loadPrescription(sub.prescription_document_url!)
                             }
                             title="View Document"
-                          >
-                            <FileText className="h-4 w-4" />
+                    <TableCell className={adminRefillsCols.actionsCell}>
+                      <div className="flex items-center gap-2 justify-end">
                           </Button>
                         )}
 
                         {!sub.prescription_verified && (
-                          <>
+                            className={actionStyles.iconButton}
                             <Button
                               variant="default"
                               size="icon"
@@ -255,10 +226,10 @@ export function RefillsTable({
                             </Button>
                             {/* Reject button logic can be added later, simplified for now */}
                           </>
-                        )}
+                            <Button
                       </div>
                     </TableCell>
-                  </TableRow>
+                              className={`${actionStyles.iconButton} bg-green-600 hover:bg-green-700`}
                 );
               })
             )}
@@ -267,10 +238,7 @@ export function RefillsTable({
       </div>
 
       {/* Assign Pharmacy Dialog */}
-      <Dialog
-        open={!!assigningId}
-        onOpenChange={(o) => !o && setAssigningId(null)}
-      >
+      <Dialog open={!!assigningId} onOpenChange={(o) => !o && setAssigningId(null)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Assign Pharmacy</DialogTitle>
@@ -302,11 +270,7 @@ export function RefillsTable({
       </Dialog>
 
       {/* View Prescription Dialog */}
-      <Dialog
-        open={!!viewingPrescription}
-        onOpenChange={(o) => !o && setViewingPrescription(null)}
-        modal={false}
-      >
+      <Dialog open={!!viewingPrescription} onOpenChange={(o) => !o && setViewingPrescription(null)} modal={false}>
         <DialogContent className="max-w-5xl max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>Verification Document</DialogTitle>

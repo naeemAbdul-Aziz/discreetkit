@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Pill, CheckCircle, CalendarClock, Phone, User } from "lucide-react";
+import { Pill, CalendarClock, Phone, User } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -23,8 +23,8 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { logRefill } from "@/lib/pharmacy-actions";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { dashboardTable, pharmacyRefillsCols, actions as actionStyles } from "@/components/ui/table-layout";
 
 export function PharmacyRefillsTable({
   initialSubscriptions,
@@ -54,23 +54,20 @@ export function PharmacyRefillsTable({
       });
       setLoggingId(null);
       setNotes("");
-      // Refresh strictly via router refresh usually, but simple state update here works for 'done' feeling
-      // Ideally we re-fetch or use router.refresh()
-      // For MVP Vercel AI, let's just close dialog. Real-time update via router.refresh() is cleaner in Next.js
       window.location.reload();
     }
   };
 
   return (
-    <div className="rounded-md border bg-white overflow-x-auto">
-      <Table className="table-fixed">
+    <div className={dashboardTable.container}>
+      <Table className={dashboardTable.table}>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[260px]">Patient / Contact</TableHead>
-            <TableHead className="w-[220px]">Product</TableHead>
-            <TableHead className="w-[120px]">Next Due</TableHead>
-            <TableHead className="w-[120px]">Status</TableHead>
-            <TableHead className="w-[120px] text-right">Actions</TableHead>
+            <TableHead className={pharmacyRefillsCols.patientHead}>Patient / Contact</TableHead>
+            <TableHead className={pharmacyRefillsCols.productHead}>Product</TableHead>
+            <TableHead className={pharmacyRefillsCols.nextDueHead}>Next Due</TableHead>
+            <TableHead className={pharmacyRefillsCols.statusHead}>Status</TableHead>
+            <TableHead className={pharmacyRefillsCols.actionsHead}>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -82,22 +79,16 @@ export function PharmacyRefillsTable({
             </TableRow>
           ) : (
             subscriptions.map((sub) => {
-              // Parse helpful contact info
               const address = sub.delivery_address || {};
-              // Prefer Delivery Name -> User Name -> Anonymous
-              const contactName =
-                address.fullName || sub.user_name || "Anonymous";
-              // Prefer Delivery Phone -> User Email -> Code
-              const contactDetail =
-                address.phone || sub.user_email || sub.subscription_code;
+              const contactName = address.fullName || sub.user_name || "Anonymous";
+              const contactDetail = address.phone || sub.user_email || sub.subscription_code;
 
               return (
                 <TableRow key={sub.id}>
-                  <TableCell className="w-[260px]">
+                  <TableCell className={pharmacyRefillsCols.patientCell}>
                     <div className="flex flex-col">
                       <span className="font-medium flex items-center gap-2 truncate">
-                        <User className="h-3 w-3 text-muted-foreground" />{" "}
-                        {contactName}
+                        <User className="h-3 w-3 text-muted-foreground" /> {contactName}
                       </span>
                       <span className="text-xs text-muted-foreground flex items-center gap-2 truncate">
                         <Phone className="h-3 w-3" /> {contactDetail}
@@ -107,7 +98,7 @@ export function PharmacyRefillsTable({
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell className="w-[220px]">
+                  <TableCell className={pharmacyRefillsCols.productCell}>
                     <div className="flex flex-col">
                       <span className="font-medium truncate">{sub.product_name}</span>
                       <span className="text-xs text-muted-foreground capitalize">
@@ -115,7 +106,7 @@ export function PharmacyRefillsTable({
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell className="w-[120px] whitespace-nowrap">
+                  <TableCell className={pharmacyRefillsCols.nextDueCell}>
                     <div className="flex items-center gap-2 text-sm">
                       <CalendarClock className="h-4 w-4 text-orange-500" />
                       {sub.next_delivery_date
@@ -123,19 +114,13 @@ export function PharmacyRefillsTable({
                         : "Pending"}
                     </div>
                   </TableCell>
-                  <TableCell className="w-[120px]">
-                    <Badge
-                      variant={
-                        sub.status === "active" ? "default" : "secondary"
-                      }
-                    >
-                      {sub.status}
-                    </Badge>
+                  <TableCell className={pharmacyRefillsCols.statusCell}>
+                    <Badge variant={sub.status === "active" ? "default" : "secondary"}>{sub.status}</Badge>
                   </TableCell>
-                  <TableCell className="w-[120px] text-right">
+                  <TableCell className={pharmacyRefillsCols.actionsCell}>
                     <Button
                       size="sm"
-                      className="gap-2 h-8 min-w-[120px] items-center"
+                      className={`gap-2 ${actionStyles.actionButton}`}
                       onClick={() => setLoggingId(sub.id)}
                       disabled={sub.status !== "active"}
                       title="Log Refill"
