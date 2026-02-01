@@ -681,7 +681,7 @@ export async function getSubscriptionAction(code: string) {
         prescription_document_url,
         delivery_address,
         product:products(id, name, image_url),
-        pharmacy:pharmacies(id, name, phone, email)
+        pharmacy:pharmacies(id, name, phone_number:phone, email)
       `)
       .eq('subscription_code', code.trim().toUpperCase())
       .single();
