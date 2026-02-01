@@ -502,7 +502,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
       </div>
 
       <div className="rounded-md border bg-card overflow-x-auto">
-        <Table className="min-w-[600px]">
+        <Table className="min-w-[600px] table-fixed">
           <TableHeader>
             <TableRow>
               <TableHead className="w-8">
