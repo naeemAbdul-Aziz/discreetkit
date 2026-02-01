@@ -523,14 +523,14 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                   className="h-4 w-4 rounded border"
                 />
               </TableHead>
-              <TableHead>Order ID</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead>Note</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Pharmacy</TableHead>
-              <TableHead className="text-right">Total</TableHead>
-              <TableHead className="w-[50px]"></TableHead>
+              <TableHead className="w-[120px]">Order ID</TableHead>
+              <TableHead className="w-[110px]">Date</TableHead>
+              <TableHead className="w-[220px]">Customer</TableHead>
+              <TableHead className="w-[110px]">Note</TableHead>
+              <TableHead className="w-[170px]">Status</TableHead>
+              <TableHead className="w-[180px]">Pharmacy</TableHead>
+              <TableHead className="text-right w-[100px]">Total</TableHead>
+              <TableHead className="w-[44px]"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -555,12 +555,12 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                     className="h-4 w-4 rounded border"
                   />
                 </TableCell>
-                <TableCell className="font-medium">{order.code}</TableCell>
-                <TableCell className="text-muted-foreground text-sm">
+                <TableCell className="font-medium font-mono text-sm whitespace-nowrap w-[120px]">{order.code}</TableCell>
+                <TableCell className="text-muted-foreground text-sm whitespace-nowrap w-[110px]">
                   {new Date(order.created_at).toISOString().slice(0, 10)}
                 </TableCell>
-                <TableCell>{order.email || "Anonymous"}</TableCell>
-                <TableCell className="max-w-[240px]">
+                <TableCell className="truncate max-w-[220px]">{order.email || "Anonymous"}</TableCell>
+                <TableCell className="w-[110px]">
                   {order.delivery_address_note ? (
                     <Popover>
                       <PopoverTrigger asChild>
@@ -576,7 +576,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                     <span className="text-muted-foreground text-xs">—</span>
                   )}
                 </TableCell>
-                <TableCell>
+                <TableCell className="w-[170px]">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
@@ -628,7 +628,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
-                <TableCell>
+                <TableCell className="w-[180px]">
                   <div className="flex items-center gap-2">
                     <PharmacyCombobox
                       orderId={order.id}
@@ -687,10 +687,10 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                     )}
                   </div>
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-right w-[100px] whitespace-nowrap">
                   GHS {Number(order.total_price || 0).toFixed(2)}
                 </TableCell>
-                <TableCell>
+                <TableCell className="w-[44px]">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="h-8 w-8 p-0">
