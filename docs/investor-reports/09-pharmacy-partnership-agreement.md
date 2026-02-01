@@ -1,3 +1,10 @@
+## SLA & Reliability Addendum (2026-02)
+
+- Scheduled operations ensure timely inventory release and escalation handling (15-minute cadence).
+- Admin SMS alerts deliver actionable notifications to designated contacts (`ADMIN_PHONES`).
+- Target SLA: Acknowledge escalations within 30 minutes; resolve processing stalls within 2 hours.
+- Reporting: Monthly operational report includes escalation counts, response times, and resolution rates.
+- Integration: Partners receive guidance on setting notification contacts and verifying delivery.
 # STRATEGIC FULFILLMENT PARTNER AGREEMENT
 
 **Ref: DK-PARTNER-[Code]**

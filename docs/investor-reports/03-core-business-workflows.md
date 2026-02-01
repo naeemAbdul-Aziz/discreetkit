@@ -5,6 +5,13 @@
 - Testability: added a secure endpoint to validate SMS delivery paths without touching production orders.
 - Outcome: quicker human intervention on stuck orders → improved fulfillment reliability and customer satisfaction.
 
+### Investor Highlights
+
+- Proactive intervention: Automatic detection + SMS alerts reduce abandonment and delayed fulfillment.
+- Lower support burden: Fewer manual checks and escalations; clearer audit via `order_events`.
+- Revenue protection: Reduced cancellations/refunds from stuck orders; stabilizes conversion and repeat rates.
+- SLA uplift: Faster response windows measurable over time; supports stronger partner and customer SLAs.
+
 # Core Business Workflows & IP
 
 This document outlines the proprietary business logic and algorithms that drive the DiscreetKit platform. These workflows constitute the core Intellectual Property (IP) of the system.

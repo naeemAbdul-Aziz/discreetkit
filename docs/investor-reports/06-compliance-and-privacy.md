@@ -1,3 +1,9 @@
+## Operational Logging & Secret Hygiene (2026-02)
+
+- Secrets alignment: single `CRON_SECRET` value across CI and server; validated at job start.
+- Sanitized auth: headers/values normalized to avoid mismatches; prevents logging sensitive content.
+- Controlled alerts: Admin SMS endpoints require bearer auth; no customer PII exposed in alert content.
+- Audit trails: Escalation and reservation events recorded in `order_events` with timestamps.
 # Compliance & Privacy Infrastructure Report
 **Subject:** How We Protect User Data (GDPR/HIPAA Standards)  
 **Security Level:** High Assurance

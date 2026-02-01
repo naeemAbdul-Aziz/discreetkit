@@ -5,6 +5,13 @@
 - Split responsibilities (daily vs 15-minute) clarify operational cadence and simplify incident response.
 - Recommendation: maintain identical `CRON_SECRET` across environments; periodically validate admin SMS endpoints.
 
+### Business Impact Narrative
+
+- Reliability as a moat: Scheduled ops now actively prevent order stalling, improving trust and NPS.
+- Unit economics: Fewer failed fulfillments and refunds improve gross margin and CAC payback.
+- Scalability: Concurrency controls and split workloads (15m vs daily) scale without coordination overhead.
+- Execution discipline: Clear operational playbook and test endpoints reduce MTTR and incident costs.
+
 # Strategic Advisory & Venture Critique
 **For:** DiscreetKit Founding Team  
 **Date:** December 18, 2025  

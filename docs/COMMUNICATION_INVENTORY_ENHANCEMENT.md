@@ -5,6 +5,15 @@ This migration adds critical operational features to improve order management, p
 
 ---
 
+## 💼 Business Impact (2026-02)
+
+- Reliability: Scheduled cleanup and escalation checks reduce stuck orders and missed dispatches.
+- Revenue protection: Lower cancellations/refunds and better stock availability improve conversion.
+- Partner SLAs: Admin SMS alerts enable faster responses; measurable improvements in resolution times.
+- Customer trust: Visible delivery estimates and faster interventions lift NPS and repeat purchase rates.
+
+---
+
 ## 🚀 New Features
 
 ### 1. **Order Communication System**

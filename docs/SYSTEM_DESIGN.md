@@ -78,6 +78,7 @@ DiscreetKit is a modern web application built on the Jamstack architecture, heav
   * **Auto-Deduction:** Stock is permanently deducted when an order is completed.
   * **Communication:** A real-time chat system (`order_messages`) allows Admins and Pharmacies to communicate within the context of a specific order.
   * **Notifications:** Pharmacies receive SMS notifications for new assigned orders via `pharmacy_notifications`.
+  * **Escalations & Admin Alerts:** A scheduled job (`/api/cron/check-escalations`) runs every 15 minutes to detect stuck orders and sends SMS alerts to admin contacts (`ADMIN_PHONES`).
 
 ### 3.6. Payment Gateway (Paystack)
 
@@ -120,6 +121,13 @@ To ensure orders transition out of `pending_payment` even if Paystack webhooks a
 * Verify endpoint `/api/payment/verify` has a lightweight per-IP+reference rate limit (5 requests/min) to reduce abuse. This is an in-memory limit and acts per instance in serverless.
 * Enable debug logs by setting `PAYMENTS_DEBUG=true` to emit safe, structured messages from both webhook and verify paths. Keep it off in production unless troubleshooting.
 * Security headers are set via Next.js `headers()` (HSTS, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, X-Frame-Options). Adjust as needed based on embedding or third-party requirements.
+
+### Scheduled Operations (2026-02)
+
+* **15-minute cadence:** Escalation checks and reservation releases with concurrency guards and retry logic.
+* **Daily cadence (05:00 UTC):** Payment reconciliation batch verification to advance stuck `pending_payment` orders.
+* **Auth & secrets:** Bearer headers (`Authorization` or `x-cron-key`) validated against `CRON_SECRET` with sanitized comparisons.
+* **Testability:** Admin SMS test endpoint enables quick validation of alert delivery without mutating production orders.
 
 ### Scheduled Reconciliation
 
