@@ -432,6 +432,8 @@ export async function getOrderAction(code: string): Promise<Order | null> {
       courierPhone: order.courier_phone,
       courierTrackingUrl: order.courier_tracking_url,
       events: order.order_events
+        // Hide internal escalation signals from client-facing views
+        .filter((e: any) => e.status !== 'Escalation Alert')
         .map((e: any) => ({
           status: e.status,
           note: e.note ?? '',
