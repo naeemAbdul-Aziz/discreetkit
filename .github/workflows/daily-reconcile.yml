@@ -1,16 +1,16 @@
-name: Cron Jobs
+name: Daily Payments Reconcile
 
 on:
   schedule:
-    # Runs every 15 minutes
-    - cron: '*/15 * * * *'
+    # Runs daily at 05:00 UTC
+    - cron: '0 5 * * *'
   workflow_dispatch:
 
 jobs:
-  run-crons:
+  reconcile-payments:
     runs-on: ubuntu-latest
     concurrency:
-      group: cron-15m
+      group: daily-reconcile
       cancel-in-progress: false
     env:
       SITE_URL: ${{ secrets.SITE_URL }}
@@ -35,24 +35,13 @@ jobs:
           fi
           curl --version
 
-      - name: Check Escalations (Every 15m)
+      - name: Reconcile Payments
         shell: bash
         run: |
           for i in 1 2 3; do
             curl --silent --show-error --fail --max-time 60 \
-              -X GET "$SITE_URL/api/cron/check-escalations" \
-              -H "Authorization: Bearer $CRON_SECRET" && exit 0 || echo "Retry $i/3 in 10s";
+              -X GET "$SITE_URL/api/payments/reconcile" \
+              -H "x-cron-key: $CRON_SECRET" && exit 0 || echo "Retry $i/3 in 10s";
             sleep 10;
           done
-          echo "❌ Check Escalations failed after retries"; exit 1
-
-      - name: Release Reservations (Every 15m)
-        shell: bash
-        run: |
-          for i in 1 2 3; do
-            curl --silent --show-error --fail --max-time 60 \
-              -X GET "$SITE_URL/api/cron/release-reservations" \
-              -H "Authorization: Bearer $CRON_SECRET" && exit 0 || echo "Retry $i/3 in 10s";
-            sleep 10;
-          done
-          echo "❌ Release Reservations failed after retries"; exit 1
+          echo "❌ Reconcile Payments failed after retries"; exit 1

@@ -1,3 +1,10 @@
+## Scheduled Ops Security & Reliability (2026-02)
+
+- Secrets alignment: `CRON_SECRET` required by both GitHub Actions and server endpoints; early validation prevents misconfigured runs.
+- Auth normalization: headers and secrets sanitized to avoid whitespace/quote mismatches causing false unauthorized responses.
+- Least privilege: cron jobs invoke public API endpoints with bearer key; no server keys exposed to CI runner.
+- Operational safeguards: concurrency limits and retries reduce incident likelihood from transient network faults.
+
 ## Operational Risk Reduction via Quality Gates (Jan 2026)
 
 - **Automated gates:** CI enforces zero warnings and strict typecheck. Builds must pass before deploy.

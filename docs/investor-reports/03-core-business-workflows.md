@@ -1,3 +1,10 @@
+## Escalation Workflow & Admin Alerts (2026-02)
+
+- Stale order detection runs every 15 minutes, scanning `orders` in `received` or `processing` states beyond thresholds.
+- Admin alerts are sent via SMS to `ADMIN_PHONES` using Arkesel; events logged in `order_events` for auditability.
+- Testability: added a secure endpoint to validate SMS delivery paths without touching production orders.
+- Outcome: quicker human intervention on stuck orders → improved fulfillment reliability and customer satisfaction.
+
 # Core Business Workflows & IP
 
 This document outlines the proprietary business logic and algorithms that drive the DiscreetKit platform. These workflows constitute the core Intellectual Property (IP) of the system.

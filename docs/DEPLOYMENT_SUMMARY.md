@@ -1,3 +1,40 @@
+## Cron Jobs Update (2026-02-01)
+
+### Endpoints & Workflows
+
+- Escalations: `src/app/api/cron/check-escalations/route.ts` — every 15 minutes; alerts admins via SMS.
+- Release reservations: `src/app/api/cron/release-reservations/route.ts` — every 15 minutes; returns stock.
+- Daily reconcile: `.github/workflows/daily-reconcile.yml` — 05:00 UTC; verifies pending payments in batches.
+- 15-minute workflow: `.github/workflows/crons.yml` — hardened with concurrency group and 3-attempt `curl` retries.
+
+### Required Secrets/Env
+
+- GitHub Actions: `SITE_URL`, `CRON_SECRET`.
+- Vercel: `CRON_SECRET` (same value as GitHub), `ADMIN_PHONES="+233203001107,+233550069924"`, `ARKESEL_API_KEY`, `ARKESEL_SENDER_ID`.
+
+### Admin SMS Test Commands
+
+- Windows PowerShell:
+
+```powershell
+$env:CRON_SECRET = '<your-cron-secret>'
+$env:SITE_URL    = 'https://discreetkit.com'
+curl.exe --fail -H "Authorization: Bearer $($env:CRON_SECRET)" "$($env:SITE_URL)/api/cron/test-admin-sms?msg=Hello%20Admin"
+```
+
+- macOS/Linux:
+
+```bash
+export CRON_SECRET='<your-cron-secret>'
+export SITE_URL='https://discreetkit.com'
+curl --fail -H "Authorization: Bearer $CRON_SECRET" "$SITE_URL/api/cron/test-admin-sms?msg=Hello%20Admin"
+```
+
+### Post-Deployment Checks
+
+- Verify Actions runs for both workflows succeed.
+- Confirm SMS delivery for both admin numbers via Arkesel dashboard and logs.
+- Ensure reconcile logs show processed batch with expected results.
 ## Linting & CI Hardening (Jan 30, 2026)
 
 - **Summary:** Migrated to ESLint v9 flat config and enforced stricter React rules across the Dashboard, with CI failing on any warnings. TypeScript strict mode verified and `typecheck` added as a standard gate.

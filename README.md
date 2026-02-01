@@ -114,6 +114,30 @@ The application will now be accessible via your ngrok URL, and Paystack will be 
 
 This project is optimized for deployment on Vercel or Firebase App Hosting. Simply connect your Git repository and configure the environment variables in the hosting provider's dashboard. Remember to set `NEXT_PUBLIC_SITE_URL` to your actual production domain.
 
+## ⏱ Cron Jobs & Scheduled Tasks
+
+- GitHub Actions schedules:
+    - 15m cron: [.github/workflows/crons.yml](.github/workflows/crons.yml) — runs escalation checks and releases expired reservations with retries and concurrency guard.
+    - Daily reconcile (05:00 UTC): [.github/workflows/daily-reconcile.yml](.github/workflows/daily-reconcile.yml) — verifies pending payments in batches.
+- Required repository secrets:
+    - `SITE_URL` (e.g., https://discreetkit.com)
+    - `CRON_SECRET` (shared bearer key used by server endpoints)
+- Server endpoints:
+    - Escalations: [src/app/api/cron/check-escalations/route.ts](src/app/api/cron/check-escalations/route.ts)
+    - Release reservations: [src/app/api/cron/release-reservations/route.ts](src/app/api/cron/release-reservations/route.ts)
+    - Payments reconcile: [src/app/api/payments/reconcile/route.ts](src/app/api/payments/reconcile/route.ts)
+    - Admin SMS test: [src/app/api/cron/test-admin-sms/route.ts](src/app/api/cron/test-admin-sms/route.ts)
+
+### Admin SMS Alerts (Ghana)
+
+- Configure `ADMIN_PHONES` as a server environment variable in Vercel (Production/Preview) using comma-separated E.164 numbers:
+    - Example: `+233203001107,+233550069924`
+- Local dev example in [.env.local](.env.local):
+    - `ADMIN_PHONES="+233203001107,+233550069924"`
+- Test delivery (PowerShell / Windows):
+    - Set envs: `$env:CRON_SECRET='...' ; $env:SITE_URL='https://discreetkit.com'`
+    - Call endpoint: `curl.exe --fail -H "Authorization: Bearer $($env:CRON_SECRET)" "$($env:SITE_URL)/api/cron/test-admin-sms?msg=Hello%20Admin"`
+
 ## 🧩 Admin Dashboard Data Integrity & Realtime
 
 The admin dashboard pages (`/admin/dashboard`, `/admin/orders`, `/admin/products`, `/admin/partners`, `/admin/settings`) rely on:

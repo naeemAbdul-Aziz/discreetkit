@@ -1,3 +1,10 @@
+## Operational Resilience Update (2026-02)
+
+- Reliability upgrades to scheduled operations reduce fulfillment risk and improve SLA posture.
+- Proactive admin alerting shortens time-to-intervention on stalled orders.
+- Split responsibilities (daily vs 15-minute) clarify operational cadence and simplify incident response.
+- Recommendation: maintain identical `CRON_SECRET` across environments; periodically validate admin SMS endpoints.
+
 # Strategic Advisory & Venture Critique
 **For:** DiscreetKit Founding Team  
 **Date:** December 18, 2025  
