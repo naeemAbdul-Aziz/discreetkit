@@ -14,10 +14,13 @@ export async function GET(request: Request) {
     // Verify authorization
     const authHeader = request.headers.get('authorization')
     const cronSecret = process.env.CRON_SECRET
+    const sanitize = (v?: string | null) => (v ?? '').replace(/^"|"$/g, '').trim()
+    const expectedAuth = `Bearer ${sanitize(cronSecret)}`
+    const providedAuth = sanitize(authHeader)
     
     // Allow Vercel Cron (has x-vercel-cron header) or correct secret
     const isVercelCron = request.headers.get('x-vercel-cron')
-    const isAuthorized = isVercelCron || (authHeader && authHeader === `Bearer ${cronSecret}`)
+    const isAuthorized = isVercelCron || (!!cronSecret && providedAuth === expectedAuth)
     
     if (!isAuthorized) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

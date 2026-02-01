@@ -9,12 +9,15 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: Request) {
     try {
         // Auth Check
-        const authHeader = req.headers.get('authorization');
-        const cronSecret = process.env.CRON_SECRET;
+       const authHeader = req.headers.get('authorization');
+       const cronSecret = process.env.CRON_SECRET;
+       const sanitize = (v?: string | null) => (v ?? '').replace(/^"|"$/g, '').trim();
+       const expectedAuth = `Bearer ${sanitize(cronSecret)}`;
+       const providedAuth = sanitize(authHeader);
         
         // Return 401 but LOG it clearly so we know why it failed in Vercel logs
-        if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
-             console.error('[Cron Security] Unauthorized attempt or missing CRON_SECRET. Header:', authHeader);
+       if (!cronSecret || providedAuth !== expectedAuth) {
+           console.error('[Cron Security] Unauthorized attempt or missing CRON_SECRET. Header present:', !!authHeader);
              return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 

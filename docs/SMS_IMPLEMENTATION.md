@@ -18,6 +18,8 @@ The SMS system sends notifications at key points in the order lifecycle:
 ARKESEL_API_KEY=your-arkesel-api-key
 ARKESEL_SENDER_ID=DiscreetKit
 NEXT_PUBLIC_SITE_URL=https://discreetkit.com
+# Admin phones (comma-separated E.164 numbers)
+ADMIN_PHONES="+233203001107,+233550069924"
 ```
 
 The sender ID "DiscreetKit" has been whitelisted with Arkesel for your account.
@@ -75,12 +77,20 @@ async function sendSMS(phone: string, message: string): Promise<{ok: boolean; re
 
 ### Manual Testing
 
-Test endpoint available at `/api/test/sms` (POST):
-```json
-{
-  "orderId": "123",
-  "type": "confirmation" | "shipping" | "delivery"
-}
+Test admin delivery via cron test endpoint (GET):
+
+PowerShell / Windows
+```powershell
+$env:CRON_SECRET = '<your-cron-secret>'
+$env:SITE_URL    = 'https://discreetkit.com'
+curl.exe --fail -H "Authorization: Bearer $($env:CRON_SECRET)" "$($env:SITE_URL)/api/cron/test-admin-sms?msg=Hello%20Admin"
+```
+
+macOS/Linux
+```bash
+export CRON_SECRET='<your-cron-secret>'
+export SITE_URL='https://discreetkit.com'
+curl --fail -H "Authorization: Bearer $CRON_SECRET" "$SITE_URL/api/cron/test-admin-sms?msg=Hello%20Admin"
 ```
 
 ## Phone Number Formatting
@@ -110,6 +120,7 @@ PATCH /api/admin/orders/[orderId]
 ## Security Features
 
 - API key stored securely in environment variables
+- `CRON_SECRET` required for cron endpoints that trigger admin SMS tests
 - Admin authentication required for status updates
 - Rate limiting on payment verification endpoints
 - Webhook signature verification for Paystack events

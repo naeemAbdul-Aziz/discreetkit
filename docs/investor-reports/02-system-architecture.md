@@ -1,3 +1,18 @@
+## Scheduled Jobs Architecture (2026-02 update)
+
+- Workflows:
+    - 15-minute cron — operational tasks: escalation checks and releasing expired inventory reservations.
+    - Daily reconcile — payments verification batch at 05:00 UTC.
+- Runtime hardening:
+    - Concurrency guards to prevent overlapping runs.
+    - Three-attempt retry with backoff for network/transient errors.
+    - Secret validation and `curl` availability checks at job start.
+- API contracts:
+    - Escalations: `Authorization: Bearer <CRON_SECRET>`.
+    - Release reservations: `Authorization: Bearer <CRON_SECRET>` or `x-vercel-cron`.
+    - Reconcile: `x-cron-key: <CRON_SECRET>`.
+    - Admin SMS test: bearer auth; sends to `ADMIN_PHONES`.
+
 # System Architecture Overview
 
 ## High-Level Topology

@@ -1,3 +1,15 @@
+## 2026-02-01 Reliability Upgrade Summary
+
+- Cron architecture split: 15-minute operational jobs remain in `crons.yml`; daily payments reconcile moved to `daily-reconcile.yml` running at 05:00 UTC.
+- Resilience: added concurrency guards and retry loops to reduce transient failure impact and prevent overlapping executions.
+- Security: normalized header/secret parsing in API routes to eliminate false 401s; early secret validation in workflows.
+- Observability: explicit failure messaging and hardened curl usage; added admin SMS test endpoint to validate alerting channels.
+
+Impact on valuation (indicative):
+- Reduced scheduled task failure rate → lowers operational risk and support burden.
+- Faster MTTR for job incidents due to clearer failure semantics and testability → improves SLA confidence.
+- Introduction of proactive admin alerts for escalation scenarios → enhances quality of service, reducing churn risk.
+
 ## Code Quality Enhancements (Q1 2026)
 
 - **What changed:** Enforced strict React linting (exhaustive deps, purity, effect discipline) and zero-warning CI, with TypeScript strict typechecking on every PR.

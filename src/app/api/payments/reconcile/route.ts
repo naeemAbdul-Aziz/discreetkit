@@ -17,11 +17,12 @@ export async function GET(req: Request) {
   const authHeader = req.headers.get('x-cron-key');
   const vercelCron = req.headers.get('x-vercel-cron');
   const cronSecret = process.env.CRON_SECRET;
+  const sanitize = (v?: string | null) => (v ?? '').replace(/^"|"$/g, '').trim();
 
   let authorized = false;
   if (cronSecret) {
     // Prefer explicit shared secret via header or query param
-    authorized = authHeader === cronSecret || secretParam === cronSecret;
+    authorized = sanitize(authHeader) === sanitize(cronSecret) || sanitize(secretParam) === sanitize(cronSecret);
   } else {
     // Fallback: allow calls coming from Vercel Cron if secret not configured
     authorized = !!vercelCron;
