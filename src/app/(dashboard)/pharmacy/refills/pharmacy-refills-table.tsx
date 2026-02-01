@@ -62,15 +62,15 @@ export function PharmacyRefillsTable({
   };
 
   return (
-    <div className="rounded-md border bg-white">
-      <Table>
+    <div className="rounded-md border bg-white overflow-x-auto">
+      <Table className="table-fixed">
         <TableHeader>
           <TableRow>
-            <TableHead>Patient / Contact</TableHead>
-            <TableHead>Product</TableHead>
-            <TableHead>Next Due</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead className="w-[260px]">Patient / Contact</TableHead>
+            <TableHead className="w-[220px]">Product</TableHead>
+            <TableHead className="w-[120px]">Next Due</TableHead>
+            <TableHead className="w-[120px]">Status</TableHead>
+            <TableHead className="w-[120px] text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -93,13 +93,13 @@ export function PharmacyRefillsTable({
 
               return (
                 <TableRow key={sub.id}>
-                  <TableCell>
+                  <TableCell className="w-[260px]">
                     <div className="flex flex-col">
-                      <span className="font-medium flex items-center gap-2">
+                      <span className="font-medium flex items-center gap-2 truncate">
                         <User className="h-3 w-3 text-muted-foreground" />{" "}
                         {contactName}
                       </span>
-                      <span className="text-xs text-muted-foreground flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground flex items-center gap-2 truncate">
                         <Phone className="h-3 w-3" /> {contactDetail}
                       </span>
                       <span className="text-[10px] text-gray-400 font-mono mt-1">
@@ -107,15 +107,15 @@ export function PharmacyRefillsTable({
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="w-[220px]">
                     <div className="flex flex-col">
-                      <span className="font-medium">{sub.product_name}</span>
+                      <span className="font-medium truncate">{sub.product_name}</span>
                       <span className="text-xs text-muted-foreground capitalize">
                         {sub.frequency} Refill
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="w-[120px] whitespace-nowrap">
                     <div className="flex items-center gap-2 text-sm">
                       <CalendarClock className="h-4 w-4 text-orange-500" />
                       {sub.next_delivery_date
@@ -123,7 +123,7 @@ export function PharmacyRefillsTable({
                         : "Pending"}
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="w-[120px]">
                     <Badge
                       variant={
                         sub.status === "active" ? "default" : "secondary"
@@ -132,7 +132,7 @@ export function PharmacyRefillsTable({
                       {sub.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="w-[120px] text-right">
                     <Button
                       size="sm"
                       className="gap-2 h-8 min-w-[120px] items-center"

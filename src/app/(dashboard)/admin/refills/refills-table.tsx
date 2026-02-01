@@ -150,16 +150,16 @@ export function RefillsTable({
 
   return (
     <div>
-      <div className="rounded-md border bg-white">
-        <Table>
+      <div className="rounded-md border bg-white overflow-x-auto">
+        <Table className="table-fixed">
           <TableHeader>
             <TableRow>
-              <TableHead>Code</TableHead>
-              <TableHead>Patient / Contact</TableHead>
-              <TableHead>Product</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Pharmacy</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="w-[120px]">Code</TableHead>
+              <TableHead className="w-[240px]">Patient / Contact</TableHead>
+              <TableHead className="w-[220px]">Product</TableHead>
+              <TableHead className="w-[140px]">Status</TableHead>
+              <TableHead className="w-[180px]">Pharmacy</TableHead>
+              <TableHead className="w-[140px] text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -180,25 +180,25 @@ export function RefillsTable({
 
                 return (
                   <TableRow key={sub.id}>
-                    <TableCell className="font-mono text-xs">
+                    <TableCell className="font-mono text-xs w-[120px] whitespace-nowrap">
                       {sub.subscription_code}
                     </TableCell>
-                    <TableCell>
+                      <TableCell className="w-[240px]">
                       <div className="flex flex-col">
-                        <span className="font-medium">{contactName}</span>
-                        <span className="text-xs text-muted-foreground">
+                          <span className="font-medium truncate">{contactName}</span>
+                          <span className="text-xs text-muted-foreground truncate">
                           {contactDetail}
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className="max-w-[200px] truncate">
+                      <TableCell className="w-[220px] truncate">
                       {sub.product_name || "Product"}
                     </TableCell>
-                    <TableCell>
+                      <TableCell className="w-[140px] whitespace-nowrap">
                       <Badge
                         variant={
                           sub.status === "active"
-                            ? "default"
+                            <TableCell className="w-[180px]">
                             : sub.status === "pending_verification"
                               ? "secondary"
                               : "outline"
@@ -214,7 +214,7 @@ export function RefillsTable({
                       {sub.pharmacy?.name ? (
                         <Badge variant="outline" className="gap-1">
                           <Store className="h-3 w-3" /> {sub.pharmacy.name}
-                        </Badge>
+                            <TableCell className="w-[140px] text-right">
                       ) : (
                         <Button
                           variant="ghost"
