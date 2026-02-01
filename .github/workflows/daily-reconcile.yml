@@ -39,7 +39,7 @@ jobs:
         shell: bash
         run: |
           for i in 1 2 3; do
-            curl --silent --show-error --fail --max-time 60 \
+            curl --silent --show-error --fail --max-time 60 -L \
               -X GET "$SITE_URL/api/payments/reconcile" \
               -H "x-cron-key: $CRON_SECRET" && exit 0 || echo "Retry $i/3 in 10s";
             sleep 10;
