@@ -25,9 +25,14 @@ export default function IntimacyEssentialsPage() {
   useEffect(() => {
     const fetchProducts = async () => {
       setIsLoading(true);
-      // Fetch Intimacy Essentials category
-      const products = await getProductsWithStock("Intimacy Essentials");
-      setWellnessProducts(products);
+      // Map "Intimacy Essentials" to actual catalog categories
+      // Includes Wellness (Lubricants, Condoms) and Emergency (Postpill)
+      const products = await getProductsWithStock(["Wellness", "Emergency"]);
+      const intimacy = products.filter((p) =>
+        p.category === "Emergency" ||
+        (p.category === "Wellness" && (p.sub_category === "Lubricants" || p.sub_category === "Condoms"))
+      );
+      setWellnessProducts(intimacy);
       setIsLoading(false);
     };
     fetchProducts();

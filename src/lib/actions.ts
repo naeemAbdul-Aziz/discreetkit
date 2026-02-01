@@ -683,7 +683,7 @@ export async function getSubscriptionAction(code: string) {
         product:products(id, name, image_url),
         pharmacy:pharmacies(id, name, phone, email)
       `)
-      .eq('subscription_code', code.toUpperCase())
+      .eq('subscription_code', code.trim().toUpperCase())
       .single();
 
     if (error || !subscription) {
@@ -692,11 +692,11 @@ export async function getSubscriptionAction(code: string) {
     }
 
     // Fetch refill history
-    const { data: refillLogs } = await supabaseAdmin
+    const { data: refillLogs, error: logsError } = await supabaseAdmin
       .from('refill_logs')
-      .select('dispensed_at, notes, dispensed_by')
+      .select('filled_at, status, pharmacist_notes, next_refill_authorized_date')
       .eq('subscription_id', subscription.id)
-      .order('dispensed_at', { ascending: false });
+      .order('filled_at', { ascending: false });
 
     // --- SECURITY: MASK PII ---
     let maskedAddress = subscription.delivery_address;
