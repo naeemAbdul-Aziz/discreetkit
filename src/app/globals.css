@@ -112,6 +112,8 @@
     overflow-x: hidden;
     /* Always show scrollbar to prevent layout shift */
     overflow-y: scroll;
+    /* Reserve gutter space so opening dialogs/menus don't shift layout */
+    scrollbar-gutter: stable;
 
     @screen sm {
       font-size: 15.5px;
