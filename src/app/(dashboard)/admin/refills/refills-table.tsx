@@ -236,6 +236,7 @@ export function RefillsTable({
                             onClick={() =>
                               loadPrescription(sub.prescription_document_url!)
                             }
+                            title="View Document"
                           >
                             <FileText className="h-4 w-4" />
                           </Button>
@@ -248,6 +249,7 @@ export function RefillsTable({
                               size="icon"
                               className="h-8 w-8 bg-green-600 hover:bg-green-700"
                               onClick={() => handleVerify(sub.id, true)}
+                              title="Verify"
                             >
                               <CheckCircle className="h-4 w-4" />
                             </Button>

@@ -884,7 +884,7 @@ function PharmacyCombobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-40 justify-between"
+          className="w-40 h-8 justify-between items-center"
           size="sm"
           disabled={loading}
         >

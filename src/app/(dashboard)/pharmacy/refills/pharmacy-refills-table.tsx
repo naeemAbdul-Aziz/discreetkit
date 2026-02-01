@@ -135,12 +135,13 @@ export function PharmacyRefillsTable({
                   <TableCell>
                     <Button
                       size="sm"
-                      className="gap-2"
+                      className="gap-2 h-8 min-w-[120px] items-center"
                       onClick={() => setLoggingId(sub.id)}
                       disabled={sub.status !== "active"}
+                      title="Log Refill"
                     >
                       <Pill className="h-4 w-4" />
-                      Log Refill
+                      <span className="truncate">Log Refill</span>
                     </Button>
                   </TableCell>
                 </TableRow>
