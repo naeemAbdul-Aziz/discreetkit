@@ -32,7 +32,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Truck, Phone, Power } from "lucide-react";
 import {
-  getPharmacyRiders,
+  getMyPharmacyRiders,
   addPharmacyRider,
   deletePharmacyRider,
   toggleRiderStatus,
@@ -55,9 +55,9 @@ export default function RidersPage() {
   const [processing, setProcessing] = useState(false);
   const { toast } = useToast();
 
-  const fetchRiders = useCallback(async (id: number) => {
+  const fetchRiders = useCallback(async () => {
     try {
-      const data = await getPharmacyRiders(id);
+      const data = await getMyPharmacyRiders();
       setRiders(data || []);
     } catch (error) {
       console.error(error);
@@ -79,17 +79,8 @@ export default function RidersPage() {
       } = await supabase.auth.getUser();
       if (!user) return; // Redirect handled by middleware potentially
 
-      // Fetch pharmacy for this user
-      const { data: pharmacy } = await supabase
-        .from("pharmacies")
-        .select("id")
-        .eq("user_id", user.id)
-        .single();
-
-      if (pharmacy) {
-        setPharmacyId(pharmacy.id);
-        fetchRiders(pharmacy.id); // Call fetchRiders with pharmacy ID
-      }
+      // Riders are fetched on server using current user pharmacy
+      fetchRiders();
     }
     init();
   }, [fetchRiders]);
@@ -117,7 +108,7 @@ export default function RidersPage() {
         toast({ title: "Success", description: "Rider added successfully" });
         setIsAddOpen(false);
         setNewRider({ name: "", phone: "" });
-        fetchRiders(pharmacyId);
+        fetchRiders();
       }
     } catch (error) {
       toast({ title: "Error", variant: "destructive" });
@@ -138,7 +129,7 @@ export default function RidersPage() {
         });
       } else {
         toast({ title: "Deleted", description: "Rider removed" });
-        if (pharmacyId) fetchRiders(pharmacyId);
+        fetchRiders();
       }
     } catch (error) {
       toast({ title: "Error", variant: "destructive" });
@@ -160,7 +151,7 @@ export default function RidersPage() {
           title: "Updated",
           description: `Rider ${!currentStatus ? "activated" : "deactivated"}`,
         });
-        fetchRiders(pharmacyId); // Call fetchRiders with pharmacy ID
+        fetchRiders();
       }
     } catch (error) {
       console.error(error);
