@@ -186,6 +186,9 @@ export function DeliveryDialog({
               value={trackingUrl}
               onChange={(e) => setTrackingUrl(e.target.value)}
             />
+            <p className="text-xs text-muted-foreground">
+              If left blank, we&apos;ll auto-generate a tracking link for this order.
+            </p>
           </div>
 
           <DialogFooter>
