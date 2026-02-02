@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { updateOrderStatus } from "@/lib/admin-actions";
+// NOTE: Use pharmacy API route instead of admin server action
 import { useToast } from "@/hooks/use-toast";
 import { Truck, Users } from "lucide-react";
 import { getPharmacyRiders } from "@/lib/admin-actions";
@@ -91,16 +91,24 @@ export function DeliveryDialog({
 
     setLoading(true);
     try {
-      const res = await updateOrderStatus(orderId, "out_for_delivery", {
-        name: riderName,
-        phone: riderPhone,
-        trackingUrl: trackingUrl,
+      const res = await fetch(`/api/pharmacy/orders/${orderId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "update_status",
+          status: "out_for_delivery",
+          courier_name: riderName,
+          courier_phone: riderPhone,
+          courier_tracking_url: trackingUrl,
+        }),
       });
 
-      if (res.error) {
+      const result = await res.json();
+
+      if (!res.ok || result.error) {
         toast({
           title: "Error updating order",
-          description: res.error,
+          description: result.error || "Failed to update order",
           variant: "destructive",
         });
       } else {
@@ -178,6 +186,9 @@ export function DeliveryDialog({
               value={trackingUrl}
               onChange={(e) => setTrackingUrl(e.target.value)}
             />
+            <p className="text-xs text-muted-foreground">
+              If left blank, we&apos;ll auto-generate a tracking link for this order.
+            </p>
           </div>
 
           <DialogFooter>
