@@ -140,7 +140,6 @@ export function PartnerSheet({
   async function onSubmit(data: FormValues) {
     try {
       let res;
-
       // If creating new pharmacy with user credentials
       if (!data.id && data.user_email && data.user_password) {
         res = await createPharmacyWithUser(data);
@@ -156,7 +155,7 @@ export function PartnerSheet({
         res = await upsertPharmacy(data);
       }
 
-      if (res.error) {
+      if (res?.error) {
         toast({
           variant: "destructive",
           title: "Error",
@@ -164,14 +163,16 @@ export function PartnerSheet({
         });
       } else {
         toast({ title: "Success", description: "Partner saved successfully." });
-        router.refresh();
         onOpenChange(false);
+        // Refresh purely for data update, don't await/block UI
+        router.refresh();
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Submit error:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Something went wrong.",
+        description: error.message || "Something went wrong.",
       });
     }
   }
