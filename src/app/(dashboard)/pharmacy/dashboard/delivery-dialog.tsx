@@ -107,8 +107,8 @@ export function DeliveryDialog({
           title: "Order Out for Delivery",
           description: "Customer has been notified.",
         });
-        onSuccess();
         onOpenChange(false);
+        onSuccess(); // Trigger parent refresh or state update
       }
     } catch (error) {
       toast({
@@ -117,7 +117,7 @@ export function DeliveryDialog({
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      if (isOpen) setLoading(false);
     }
   };
 
@@ -178,7 +178,8 @@ export function DeliveryDialog({
               onChange={(e) => setTrackingUrl(e.target.value)}
             />
             <p className="text-xs text-muted-foreground">
-              If left blank, we&apos;ll auto-generate a tracking link for this order.
+              If left blank, we&apos;ll auto-generate a tracking link for this
+              order.
             </p>
           </div>
 

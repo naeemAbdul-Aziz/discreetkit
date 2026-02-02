@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
@@ -8,23 +8,25 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+} from "@/components/ui/sheet";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { upsertProduct, approveProductRequest } from "@/lib/admin-actions"
-import { useToast } from "@/hooks/use-toast"
-import { useEffect } from "react"
+} from "@/components/ui/select";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { upsertProduct, approveProductRequest } from "@/lib/admin-actions";
+import { useToast } from "@/hooks/use-toast";
+import { useEffect } from "react";
+
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   id: z.number().optional(),
@@ -37,20 +39,27 @@ const formSchema = z.object({
   featured: z.boolean().optional(),
   requires_prescription: z.boolean().optional(),
   is_student_product: z.boolean().optional(),
-})
+});
 
-type FormValues = z.infer<typeof formSchema>
+type FormValues = z.infer<typeof formSchema>;
 
 interface ProductSheetProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  product?: any
-  categories?: any[]
-  requestId?: number // Optional: if present, we are approving a request
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  product?: any;
+  categories?: any[];
+  requestId?: number; // Optional: if present, we are approving a request
 }
 
-export function ProductSheet({ open, onOpenChange, product, categories = [], requestId }: ProductSheetProps) {
-  const { toast } = useToast()
+export function ProductSheet({
+  open,
+  onOpenChange,
+  product,
+  categories = [],
+  requestId,
+}: ProductSheetProps) {
+  const { toast } = useToast();
+  const router = useRouter();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -61,7 +70,7 @@ export function ProductSheet({ open, onOpenChange, product, categories = [], req
       image_url: "",
       description: "",
     },
-  })
+  });
 
   // Reset form when product changes (Edit mode vs Add mode)
   useEffect(() => {
@@ -70,7 +79,7 @@ export function ProductSheet({ open, onOpenChange, product, categories = [], req
         ...product,
         image_url: product.image_url || "",
         description: product.description || "",
-      })
+      });
     } else {
       form.reset({
         name: "",
@@ -79,42 +88,48 @@ export function ProductSheet({ open, onOpenChange, product, categories = [], req
         stock_level: 0,
         image_url: "",
         description: "",
-      })
+      });
     }
-  }, [product, form])
+  }, [product, form]);
 
   async function onSubmit(data: FormValues) {
     try {
       let res: any;
+      // Optimistic close: If this is an edit or simple add, we can close first or concurrent
+      // But for robust error feedback, we wait for server action result, THEN close immediately.
+
       if (requestId) {
         // Approve Request Flow
-        res = await approveProductRequest(requestId, data)
+        res = await approveProductRequest(requestId, data);
       } else {
         // Standard Upsert Flow
-        res = await upsertProduct(data)
+        res = await upsertProduct(data);
       }
 
-      if (res.error || (res.success === false)) {
+      if (res.error || res.success === false) {
         toast({
           variant: "destructive",
           title: "Error",
           description: res.error || res.message,
-        })
+        });
       } else {
         toast({
           title: "Success",
-          description: requestId 
-            ? "Request approved and product created." 
-            : product ? "Product updated successfully." : "Product added successfully.",
-        })
-        onOpenChange(false)
+          description: requestId
+            ? "Request approved and product created."
+            : product
+              ? "Product updated successfully."
+              : "Product added successfully.",
+        });
+        onOpenChange(false);
+        router.refresh();
       }
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
         description: "Something went wrong.",
-      })
+      });
     }
   }
 
@@ -124,23 +139,32 @@ export function ProductSheet({ open, onOpenChange, product, categories = [], req
         <SheetHeader>
           <SheetTitle>{product ? "Edit Product" : "Add Product"}</SheetTitle>
           <SheetDescription>
-            {product ? "Make changes to your product here." : "Add a new product to your inventory."}
+            {product
+              ? "Make changes to your product here."
+              : "Add a new product to your inventory."}
           </SheetDescription>
         </SheetHeader>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 py-4">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="grid gap-4 py-4"
+        >
           <input type="hidden" {...form.register("id")} />
-          
+
           <div className="grid gap-2">
             <Label htmlFor="name">Name</Label>
             <Input id="name" {...form.register("name")} />
-            {form.formState.errors.name && <p className="text-sm text-destructive">{form.formState.errors.name.message}</p>}
+            {form.formState.errors.name && (
+              <p className="text-sm text-destructive">
+                {form.formState.errors.name.message}
+              </p>
+            )}
           </div>
-          
+
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
               <Label htmlFor="category">Category</Label>
-              <Select 
-                onValueChange={(val) => form.setValue("category", val)} 
+              <Select
+                onValueChange={(val) => form.setValue("category", val)}
                 defaultValue={product?.category}
                 value={form.watch("category")}
               >
@@ -154,26 +178,45 @@ export function ProductSheet({ open, onOpenChange, product, categories = [], req
                     </SelectItem>
                   ))}
                   {categories.length === 0 && (
-                     <SelectItem value="Uncategorized" disabled>No categories found</SelectItem>
+                    <SelectItem value="Uncategorized" disabled>
+                      No categories found
+                    </SelectItem>
                   )}
                 </SelectContent>
               </Select>
-              {form.formState.errors.category && <p className="text-sm text-destructive">{form.formState.errors.category.message}</p>}
+              {form.formState.errors.category && (
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.category.message}
+                </p>
+              )}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="stock">Stock Level</Label>
-              <Input id="stock" type="number" {...form.register("stock_level")} />
+              <Input
+                id="stock"
+                type="number"
+                {...form.register("stock_level")}
+              />
             </div>
           </div>
 
           <div className="grid gap-2">
             <Label htmlFor="price">Price (GHS)</Label>
-            <Input id="price" type="number" step="0.01" {...form.register("price_ghs")} />
+            <Input
+              id="price"
+              type="number"
+              step="0.01"
+              {...form.register("price_ghs")}
+            />
           </div>
 
           <div className="grid gap-2">
             <Label htmlFor="image">Image URL</Label>
-            <Input id="image" placeholder="https://..." {...form.register("image_url")} />
+            <Input
+              id="image"
+              placeholder="https://..."
+              {...form.register("image_url")}
+            />
           </div>
 
           <div className="grid gap-2">
@@ -182,34 +225,34 @@ export function ProductSheet({ open, onOpenChange, product, categories = [], req
           </div>
 
           <div className="flex items-center gap-4">
-             {/* Add checkboxes for boolean flags if I update the schema later, for now just ensuring ID is there */}
+            {/* Add checkboxes for boolean flags if I update the schema later, for now just ensuring ID is there */}
           </div>
 
           <div className="flex flex-col gap-4">
             <div className="flex items-center space-x-2">
-              <input 
-                type="checkbox" 
-                id="featured" 
+              <input
+                type="checkbox"
+                id="featured"
                 className="h-4 w-4 rounded border-gray-300"
-                {...form.register("featured")} 
+                {...form.register("featured")}
               />
               <Label htmlFor="featured">Featured Product</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <input 
-                type="checkbox" 
-                id="prescription" 
+              <input
+                type="checkbox"
+                id="prescription"
                 className="h-4 w-4 rounded border-gray-300"
-                {...form.register("requires_prescription")} 
+                {...form.register("requires_prescription")}
               />
               <Label htmlFor="prescription">Requires Prescription</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <input 
-                type="checkbox" 
-                id="student" 
+              <input
+                type="checkbox"
+                id="student"
                 className="h-4 w-4 rounded border-gray-300"
-                {...form.register("is_student_product")} 
+                {...form.register("is_student_product")}
               />
               <Label htmlFor="student">Student Discount Eligible</Label>
             </div>
@@ -223,5 +266,5 @@ export function ProductSheet({ open, onOpenChange, product, categories = [], req
         </form>
       </SheetContent>
     </Sheet>
-  )
+  );
 }
