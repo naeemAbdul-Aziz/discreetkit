@@ -116,13 +116,17 @@ export async function PATCH(
       eventNote += ` (Rider: ${riderBits})`;
     }
 
-    await supabase
-      .from('order_events')
-      .insert({
-        order_id: Number(id),
-        status: updateData.status || 'acknowledged',
-        note: eventNote
-      });
+    // Deduplicate events when no status change on update_status
+    const shouldInsertEvent = action === 'acknowledge' || previousStatus !== updateData.status;
+    if (shouldInsertEvent) {
+      await supabase
+        .from('order_events')
+        .insert({
+          order_id: Number(id),
+          status: updateData.status || 'acknowledged',
+          note: eventNote
+        });
+    }
 
     // Trigger SMS notifications if status changed
     if (previousStatus !== updateData.status) {

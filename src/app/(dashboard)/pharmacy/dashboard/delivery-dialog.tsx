@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 // NOTE: Use pharmacy API route instead of admin server action
 import { useToast } from "@/hooks/use-toast";
 import { Truck, Users } from "lucide-react";
-import { getPharmacyRiders } from "@/lib/admin-actions";
+import { getMyPharmacyRiders } from "@/lib/admin-actions";
 import {
   Select,
   SelectContent,
@@ -50,20 +50,11 @@ export function DeliveryDialog({
     if (isOpen) {
       // Fetch riders when dialog opens
       const fetchRiders = async () => {
-        const supabase = getSupabaseClient();
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        if (user) {
-          const { data: pharmacy } = await supabase
-            .from("pharmacies")
-            .select("id")
-            .eq("user_id", user.id)
-            .single();
-          if (pharmacy) {
-            const data = await getPharmacyRiders(pharmacy.id);
-            setRiders(data || []);
-          }
+        try {
+          const data = await getMyPharmacyRiders();
+          setRiders(data || []);
+        } catch (e) {
+          setRiders([]);
         }
       };
 

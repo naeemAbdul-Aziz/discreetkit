@@ -113,7 +113,7 @@
     /* Always show scrollbar to prevent layout shift */
     overflow-y: scroll;
     /* Reserve gutter space so opening dialogs/menus don't shift layout */
-    scrollbar-gutter: stable;
+    /* Guard with @supports to avoid Safari warning */
 
     @screen sm {
       font-size: 15.5px;
@@ -125,6 +125,12 @@
 
     @screen lg {
       font-size: 17px;
+    }
+  }
+
+  @supports (scrollbar-gutter: stable) {
+    html {
+      scrollbar-gutter: stable;
     }
   }
 

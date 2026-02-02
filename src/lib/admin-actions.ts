@@ -1710,26 +1710,50 @@ export async function getPrescriptionUrlAction(path: string) {
 
 // --- Rider Management ---
 
-
-
-export async function getPharmacyRiders(pharmacyId: number) {
+async function getCurrentPharmacyId() {
     const supabase = await createSupabaseServerClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Unauthorized');
+    const { data: pharmacy, error } = await supabase
+        .from('pharmacies')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+    if (error || !pharmacy) throw new Error('Pharmacy not found');
+    return pharmacy.id as number;
+}
 
+// Admin-only: list riders for any pharmacy
+export async function getPharmacyRiders(pharmacyId: number) {
+    await requireAdmin();
+    const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase
         .from('pharmacy_riders')
         .select('*')
         .eq('pharmacy_id', pharmacyId)
         .order('is_active', { ascending: false })
         .order('name');
-        
+    if (error) throw new Error(error.message);
+    return data;
+}
+
+// Pharmacist: list riders for the current user's pharmacy
+export async function getMyPharmacyRiders() {
+    const pharmacyId = await getCurrentPharmacyId();
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase
+        .from('pharmacy_riders')
+        .select('*')
+        .eq('pharmacy_id', pharmacyId)
+        .order('is_active', { ascending: false })
+        .order('name');
     if (error) throw new Error(error.message);
     return data;
 }
 
 export async function addPharmacyRider(data: RiderFormValues) {
     const supabase = await createSupabaseServerClient();
+    const pharmacyId = await getCurrentPharmacyId();
     // Normalize phone
     let phone = data.phone.trim();
     if (phone.startsWith('0')) phone = `233${phone.substring(1)}`;
@@ -1737,7 +1761,7 @@ export async function addPharmacyRider(data: RiderFormValues) {
     const { error } = await supabase
         .from('pharmacy_riders')
         .insert({
-            pharmacy_id: data.pharmacy_id,
+            pharmacy_id: pharmacyId,
             name: data.name,
             phone: phone,
             is_active: data.is_active
@@ -1755,11 +1779,19 @@ export async function addPharmacyRider(data: RiderFormValues) {
 
 export async function deletePharmacyRider(id: number) {
     const supabase = await createSupabaseServerClient();
+    const pharmacyId = await getCurrentPharmacyId();
+    const { data: rider } = await supabase
+        .from('pharmacy_riders')
+        .select('id, pharmacy_id')
+        .eq('id', id)
+        .single();
+    if (!rider || rider.pharmacy_id !== pharmacyId) {
+        return { error: 'Unauthorized' };
+    }
     const { error } = await supabase
         .from('pharmacy_riders')
         .delete()
         .eq('id', id);
-        
     if (error) return { error: error.message };
     
     revalidatePath('/dashboard/pharmacy/riders');
@@ -1768,11 +1800,19 @@ export async function deletePharmacyRider(id: number) {
 
 export async function toggleRiderStatus(id: number, isActive: boolean) {
     const supabase = await createSupabaseServerClient();
+    const pharmacyId = await getCurrentPharmacyId();
+    const { data: rider } = await supabase
+        .from('pharmacy_riders')
+        .select('id, pharmacy_id')
+        .eq('id', id)
+        .single();
+    if (!rider || rider.pharmacy_id !== pharmacyId) {
+        return { error: 'Unauthorized' };
+    }
     const { error } = await supabase
         .from('pharmacy_riders')
         .update({ is_active: isActive })
         .eq('id', id);
-        
     if (error) return { error: error.message };
     
     revalidatePath('/dashboard/pharmacy/riders');
