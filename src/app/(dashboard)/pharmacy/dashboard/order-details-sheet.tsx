@@ -37,6 +37,13 @@ export function OrderDetailsSheet({
   loadingAction
 }: OrderDetailsSheetProps) {
   if (!order) return null
+  // Compute progress width class to avoid inline styles
+  const progressWidthClass = (() => {
+    if (order.status === 'completed') return 'w-full';
+    if (order.status === 'out_for_delivery') return 'w-2/3';
+    if (order.status === 'processing' && order.pharmacy_ack_status === 'accepted') return 'w-1/3';
+    return 'w-0';
+  })();
 
   const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items
   const itemsArray = Array.isArray(items) ? items : []
@@ -112,13 +119,7 @@ export function OrderDetailsSheet({
           <div className="w-full py-4">
             <div className="relative flex items-center justify-between w-full">
               <div className="absolute left-0 top-1/2 w-full h-1 bg-muted -z-10" />
-              <div className={`absolute left-0 top-1/2 h-1 bg-primary -z-10 transition-all duration-500 ease-in-out`}
-                style={{ 
-                  width: order.status === 'completed' ? '100%' : 
-                         order.status === 'out_for_delivery' ? '66%' : 
-                         (order.status === 'processing' && order.pharmacy_ack_status === 'accepted') ? '33%' : '0%' 
-                }} 
-              />
+              <div className={`absolute left-0 top-1/2 h-1 bg-primary -z-10 transition-all duration-500 ease-in-out ${progressWidthClass}`} />
               
               {[
                 { id: 'start', label: 'Received', icon: CheckCircle, active: true },
