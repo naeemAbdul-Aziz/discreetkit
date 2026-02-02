@@ -12,6 +12,11 @@
 - **Build-Safe Sitemap**: `src/app/sitemap.ts` includes dynamic products when Supabase envs exist; falls back to static categories in CI to keep builds reliable.
 - **Branch Protection**: `main` requires PRs with 1 approval, conversation resolution, and passing `lint`, `typecheck`, `build`; force pushes/deletions blocked; admins enforced. `.github/CODEOWNERS` routes critical paths to designated reviewers.
 
+### Observability (Sentry) & Testing
+
+- Provide `SENTRY_DSN` (server-side) and optionally `SENTRY_TRACES_SAMPLE_RATE` to enable telemetry in API routes (orders status transitions, SMS attempts, exceptions).
+- Run tests with Vitest: `npm run test` (see `vitest.config.ts`).
+
 
 # DiscreetKit Ghana - Confidential Health Products
 
@@ -71,6 +76,8 @@ GEMINI_API_KEY="your-google-ai-api-key"
 
 # Site URL (Production: discreetkit.com | Local: use ngrok for Paystack webhooks)
 NEXT_PUBLIC_SITE_URL="https://discreetkit.com"
+SENTRY_DSN="https://<key>@sentry.io/<project>"
+SENTRY_TRACES_SAMPLE_RATE="0.2"
 ```
 
 ### 4. Set Up Ngrok for Local Development

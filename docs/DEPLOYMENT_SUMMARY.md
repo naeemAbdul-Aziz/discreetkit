@@ -398,6 +398,23 @@ Track these KPIs:
 ✅ Auto-return stock if not dispatched in 2 hours
 ✅ Track delivery time estimates
 ✅ Process cancellation requests (structure ready)
+
+---
+
+## February 2026 Updates
+
+- Security: Verified RLS on `orders` SELECT and added optional UPDATE policy for pharmacies (see supabase/migrations/20260202090000_orders_update_policy.sql) to enable client-side writes when desired. `pharmacy_riders` has full RLS (SELECT/INSERT/UPDATE/DELETE) per pharmacy.
+- Reliability: Pharmacy orders API maintains idempotent event logging and avoids duplicate SMS sends on unchanged status.
+- Observability: Sentry instrumentation added to pharmacy orders API for status transitions, SMS attempts, and exceptions. Configure `SENTRY_DSN` and optionally `SENTRY_TRACES_SAMPLE_RATE`.
+- UI Consistency: Shared table layout ensures consistent column widths and interaction patterns across admin and pharmacy dashboards.
+- Testing: Introduced Vitest with `vitest.config.ts` and initial placeholder flow test. Expand with mocks of Next request/response and Supabase client.
+
+### Environment Variables
+- `SENTRY_DSN`: Sentry DSN for API error and event tracking.
+- `SENTRY_TRACES_SAMPLE_RATE`: Optional traces sample rate (default 0.2 when set).
+
+### Build/CI Commands
+- `npm run typecheck && npm run lint && npm run build && npm run test`
 ✅ Upload delivery proof (columns ready)
 
 **What's Still Manual:**
