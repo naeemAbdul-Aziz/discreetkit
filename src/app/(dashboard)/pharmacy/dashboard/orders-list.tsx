@@ -233,7 +233,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
                       <Button
                         size="sm"
                         onClick={() => handleAccept(order.id)}
-                        disabled={acceptLoading || declineLoading}
+                        disabled={acceptLoading}
                         className="bg-green-600 hover:bg-green-700 text-white"
                       >
                          {acceptLoading ? <div className="h-4 w-4 mr-1 animate-spin rounded-full border-2 border-white border-t-transparent" /> : <CheckCircle className="h-4 w-4 mr-1" />}
@@ -243,9 +243,9 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
                         size="sm"
                         variant="destructive"
                         onClick={() => handleDeclineClick(order.id)}
-                        disabled={acceptLoading || declineLoading}
+                        disabled={declineLoading}
                       >
-                         <XCircle className="h-4 w-4 mr-1" />
+                         {declineLoading ? <div className="h-4 w-4 mr-1 animate-spin rounded-full border-2 border-white/70 border-t-transparent" /> : <XCircle className="h-4 w-4 mr-1" />}
                         Decline
                       </Button>
                     </>
