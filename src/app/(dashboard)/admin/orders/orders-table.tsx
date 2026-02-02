@@ -69,6 +69,7 @@ import {
 } from "@/lib/admin-actions";
 import { getSupabaseClient } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
+import { dashboardTable, ordersTableCols, actions as actionStyles } from "@/components/ui/table-layout";
 
 // Helper
 const titleCase = (s: string) =>
@@ -501,7 +502,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
         </div>
       </div>
 
-      <div className="rounded-md border bg-card overflow-x-auto">
+      <div className={dashboardTable.container}>
         <Table className="min-w-[600px] table-fixed">
           <TableHeader>
             <TableRow>
@@ -523,14 +524,14 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                   className="h-4 w-4 rounded border"
                 />
               </TableHead>
-              <TableHead>Order ID</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead>Note</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Pharmacy</TableHead>
-              <TableHead className="text-right">Total</TableHead>
-              <TableHead className="w-[50px]"></TableHead>
+              <TableHead className={ordersTableCols.codeHead}>Order ID</TableHead>
+              <TableHead className={ordersTableCols.dateHead}>Date</TableHead>
+              <TableHead className={ordersTableCols.customerHead}>Customer</TableHead>
+              <TableHead className={ordersTableCols.noteHead}>Note</TableHead>
+              <TableHead className={ordersTableCols.statusHead}>Status</TableHead>
+              <TableHead className={ordersTableCols.pharmacyHead}>Pharmacy</TableHead>
+              <TableHead className={ordersTableCols.totalHead}>Total</TableHead>
+              <TableHead className={ordersTableCols.actionsHead}></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -555,12 +556,12 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                     className="h-4 w-4 rounded border"
                   />
                 </TableCell>
-                <TableCell className="font-medium">{order.code}</TableCell>
-                <TableCell className="text-muted-foreground text-sm">
+                <TableCell className={ordersTableCols.codeCell}>{order.code}</TableCell>
+                <TableCell className={ordersTableCols.dateCell}>
                   {new Date(order.created_at).toISOString().slice(0, 10)}
                 </TableCell>
-                <TableCell>{order.email || "Anonymous"}</TableCell>
-                <TableCell className="max-w-[240px]">
+                <TableCell className={ordersTableCols.customerCell}>{order.email || "Anonymous"}</TableCell>
+                <TableCell className={ordersTableCols.noteCell}>
                   {order.delivery_address_note ? (
                     <Popover>
                       <PopoverTrigger asChild>
@@ -576,7 +577,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                     <span className="text-muted-foreground text-xs">—</span>
                   )}
                 </TableCell>
-                <TableCell>
+                <TableCell className={ordersTableCols.statusCell}>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
@@ -628,7 +629,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
-                <TableCell>
+                <TableCell className={ordersTableCols.pharmacyCell}>
                   <div className="flex items-center gap-2">
                     <PharmacyCombobox
                       orderId={order.id}
@@ -687,13 +688,13 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                     )}
                   </div>
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className={ordersTableCols.totalCell}>
                   GHS {Number(order.total_price || 0).toFixed(2)}
                 </TableCell>
-                <TableCell>
+                <TableCell className={ordersTableCols.actionsCell}>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
+                      <Button variant="ghost" className={`${actionStyles.iconButton} p-0`}>
                         <span className="sr-only">Open menu</span>
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
