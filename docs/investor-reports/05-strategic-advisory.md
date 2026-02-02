@@ -12,6 +12,11 @@
 - Scalability: Concurrency controls and split workloads (15m vs daily) scale without coordination overhead.
 - Execution discipline: Clear operational playbook and test endpoints reduce MTTR and incident costs.
 
+### Technical Strategy Alignment (February 2026)
+- **FAANG-level resilience:** Adopted idempotency, structured logging (Sentry), and strict RLS to reduce incidents and protect SLAs.
+- **Governance:** Zero-warning lint, strict typecheck, and build gates on PRs improve release quality and investor confidence.
+- **Roadmap:** Expand tests (Vitest integration) for order lifecycle and add Playwright e2e for pharmacy dashboard; instrument additional APIs with telemetry.
+
 # Strategic Advisory & Venture Critique
 **For:** DiscreetKit Founding Team  
 **Date:** December 18, 2025  

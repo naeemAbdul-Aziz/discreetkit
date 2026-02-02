@@ -1,4 +1,5 @@
 ## Scheduled Ops Security & Reliability (2026-02)
+**(Built over 6 Months of Hardening)**
 
 - Secrets alignment: `CRON_SECRET` required by both GitHub Actions and server endpoints; early validation prevents misconfigured runs.
 - Auth normalization: headers and secrets sanitized to avoid whitespace/quote mismatches causing false unauthorized responses.
@@ -33,6 +34,12 @@ We do not rely on application-level logic for security. We enforce it at the **D
     *   `Customers` can only SELECT orders `WHERE user_id = auth.uid()`.
     *   `Pharmacies` can only SELECT orders `WHERE pharmacy_id = auth.pharmacy_id()`.
 *   **Impact:** Even if a hacker compromised the API credentials of a frontend client, they could not dump the database. They would still be restricted by the RLS policies of the logged-in user.
+
+### February 2026 Additions
+- **Pharmacy Orders:** RLS SELECT policies validated; an optional UPDATE policy is added to allow pharmacies to update their own orders when enabling client writes. Otherwise, updates remain server-side using the service role with explicit ownership checks.
+- **Rider Registry:** Full RLS on `pharmacy_riders` (SELECT/INSERT/UPDATE/DELETE) per pharmacy; server actions enforce ownership to prevent cross-tenant mutations.
+- **Observability:** Sentry instrumentation captures order status transitions, SMS notification attempts, and exceptions for faster incident triage.
+- **Idempotency:** API prevents duplicate SMS on unchanged statuses and deduplicates `order_events` to keep logs and analytics clean.
 
 ### Content Security Policy (CSP) & Hardened Headers
 - **Status:** **Production Hardened (Jan 2026)**

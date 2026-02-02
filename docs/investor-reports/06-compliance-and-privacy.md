@@ -1,9 +1,15 @@
 ## Operational Logging & Secret Hygiene (2026-02)
+**(Built over 6 Months of Hardening)**
 
 - Secrets alignment: single `CRON_SECRET` value across CI and server; validated at job start.
 - Sanitized auth: headers/values normalized to avoid mismatches; prevents logging sensitive content.
 - Controlled alerts: Admin SMS endpoints require bearer auth; no customer PII exposed in alert content.
 - Audit trails: Escalation and reservation events recorded in `order_events` with timestamps.
+
+## February 2026 Compliance Reinforcements
+- **Tenant Isolation:** Confirmed RLS on `orders` and full RLS on `pharmacy_riders`; optional orders UPDATE policy documented for cases where client-side writes are enabled, otherwise server-side updates with ownership checks.
+- **Observability with Privacy:** Sentry captures exceptions and operational breadcrumbs (status transitions, SMS attempts) without storing PII; logs use masked identifiers.
+- **Idempotent Notifications:** Prevent duplicate SMS on unchanged statuses to minimize exposure and noise; deduplicated events keep audits concise.
 # Compliance & Privacy Infrastructure Report
 **Subject:** How We Protect User Data (GDPR/HIPAA Standards)  
 **Security Level:** High Assurance

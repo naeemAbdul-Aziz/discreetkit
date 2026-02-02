@@ -30,6 +30,26 @@ Impact on valuation (indicative):
 - **Caching Correctness:** Introduced short TTL Redis caches for admin reads with explicit invalidation on writes (`pharmacies:list`, `pharmacy:{id}:products`, `pharmacy:{id}:analytics`). Business effect: faster dashboards without stale data.
 
 ## Reliability & Performance Signals
+# February 2026 Technical Updates (FAANG-level practices)
+
+## Security & Isolation
+- Database Row Level Security (RLS) verified on `orders` and fully enforced on `pharmacy_riders`. Optional `orders` UPDATE policy added to enable client-side writes when desired; otherwise, updates remain server-side with service role and ownership checks.
+- Rider management hardened: server resolves pharmacist’s pharmacy and restricts mutations to the owning pharmacy, reducing cross-tenant risk.
+
+## Observability & Incident Response
+- Sentry instrumentation added to pharmacy order API for status transitions, SMS attempts, and exceptions. Breadcrumbs and error capture enable faster root cause analysis and SLA protection.
+
+## Reliability & Cost Control
+- Idempotent API behavior prevents duplicate SMS sends on unchanged statuses; event deduplication reduces noise in `order_events` and analytics.
+- Consistent UI/UX across admin and pharmacy dashboards via shared table layout, improving operator speed and lowering error rates.
+
+## Testing & CI
+- Vitest introduced and wired for future integration tests on order lifecycle. CI gates (`typecheck`, `lint`, `build`, `test`) strengthen pre-merge quality.
+
+Indicative valuation impact:
+- Reduced incident frequency and faster MTTR → improves SLA confidence and lowers operational risk.
+- Lower SMS duplication and cleaner audit trails → direct opex savings and better analytics integrity.
+- Stronger tenant isolation and governance → improves compliance posture and investor confidence.
 
 - **Zero-Warning CI:** Enforced; correlates with lower post-merge hotfix frequency.
 - **Type Safety:** Strict TS reduces runtime defects; faster onboarding for new engineers.
@@ -45,7 +65,7 @@ Impact on valuation (indicative):
 
 ## 1. Executive Summary
 
-The DiscreetKit platform is a sophisticated, enterprise-grade distributed commerce system. It is not merely a website but a multi-interface synchronized platform integrating real-time inventory management, decentralized logistics (pharmacy network), and an advanced "Headless Commerce" module via WhatsApp.
+The DiscreetKit platform is a sophisticated, enterprise-grade distributed commerce system. **Built over 6 months of intensive R&D**, it is not merely a website but a multi-interface synchronized platform integrating real-time inventory management, decentralized logistics (pharmacy network), and an advanced "Headless Commerce" module via WhatsApp.
 
 **Estimated Total Enterprise Value (TEV):** **~$280,000 USD (Floor Valuation)**  
 *(Technology + Human Capital + Network Assets)*
