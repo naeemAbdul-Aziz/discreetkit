@@ -125,3 +125,16 @@ graph LR
 1. **Identity/Content Decoupling:** The Pharmacy knows *what* to pack but not *who* it's for. The Rider knows *where* to go but not *what* they are carrying (plain packaging).
 2. **No Accounts:** Users are identified by ephemeral Browser IDs or Order Codes, eliminating the risk of "Account Breach" leaking history.
 3. **Data Minimization:** We only request phone numbers for delivery coordination. We do not store ages, medical history, or ID card numbers.
+
+## February 2026 Architecture Enhancements
+
+### Observability & Telemetry
+- Sentry integrated into the pharmacy orders API for status transitions and notification attempts; exceptions captured for rapid diagnostics.
+
+### Tenant Isolation & Server Authority
+- RLS policies confirmed for `orders` (SELECT) and fully defined for `pharmacy_riders` (SELECT/INSERT/UPDATE/DELETE). Optional `orders` UPDATE policy available when enabling client-side writes via anon key.
+- Server-side ownership checks ensure pharmacists can only mutate riders/orders belonging to their pharmacy, reducing blast radius if a client is compromised.
+
+### Idempotency & Event Hygiene
+- Order status updates are idempotent; unchanged transitions do not resend SMS.
+- `order_events` entries deduplicated on unchanged statuses to keep audit trails clean and analytics accurate.

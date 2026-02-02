@@ -1,6 +1,6 @@
 -- DISCREETKIT SYSTEM SCHEMA
 -- Comprehensive database structure with RLS and documentation.
--- Consolidated Version: 2025-12-08
+-- Consolidated Version: 2026-02-02 (Reflects Admin RLS & Medication Refills)
 
 -- ==========================================
 -- 0. EXTENSIONS
@@ -30,6 +30,9 @@ DROP TABLE IF EXISTS public.user_roles CASCADE;
 DROP TABLE IF EXISTS public.roles CASCADE;
 DROP TABLE IF EXISTS public.store_settings CASCADE;
 DROP TABLE IF EXISTS public.waitlist CASCADE;
+DROP TABLE IF EXISTS public.medication_refill_subscriptions CASCADE;
+DROP TABLE IF EXISTS public.refill_logs CASCADE;
+DROP TABLE IF EXISTS public.pharmacy_riders CASCADE;
 
 DROP TYPE IF EXISTS public.order_status CASCADE;
 
@@ -118,9 +121,6 @@ CREATE TABLE public.products (
 );
 COMMENT ON TABLE public.products IS 'Product catalog with pricing and metadata.';
 
--- 4.3 PRODUCT REQUESTS
--- 4.3 PRODUCT REQUESTS (Moved after Pharmacies)
-
 -- ==========================================
 -- 5. PARTNERS & INVENTORY
 -- ==========================================
@@ -138,7 +138,7 @@ CREATE TABLE public.pharmacies (
     is_24_7 boolean default false,
     is_open boolean default true,
     operating_hours jsonb,
-    -- Partnership Fields (Added 2026-01-22)
+    -- Partnership Fields
     partner_code text UNIQUE,
     trade_discount_percentage numeric(5, 2) DEFAULT 20.00,
     bank_details jsonb DEFAULT '{}'::jsonb,
@@ -196,7 +196,6 @@ CREATE TABLE public.pharmacy_products (
 COMMENT ON TABLE public.pharmacy_products IS 'Pharmacy-specific product inventory and pricing.';
 CREATE INDEX pharmacy_products_pharmacy_id_idx ON public.pharmacy_products(pharmacy_id);
 CREATE INDEX pharmacy_products_product_id_idx ON public.pharmacy_products(product_id);
--- New index for availability lookups
 CREATE INDEX pharmacy_products_lookup_idx ON public.pharmacy_products(pharmacy_id, product_id, is_available);
 
 -- 5.3 PHARMACY SERVICE AREAS
@@ -215,7 +214,6 @@ COMMENT ON TABLE public.pharmacy_service_areas IS 'Delivery areas served by each
 COMMENT ON COLUMN public.pharmacy_service_areas.estimated_min_minutes IS 'Minimum delivery time in minutes for this area.';
 COMMENT ON COLUMN public.pharmacy_service_areas.estimated_max_minutes IS 'Maximum delivery time in minutes for this area.';
 CREATE INDEX pharmacy_service_areas_pharmacy_id_idx ON public.pharmacy_service_areas(pharmacy_id);
--- GIN index for fuzzy search on area name
 CREATE INDEX pharmacy_service_areas_area_name_gin_idx ON public.pharmacy_service_areas USING gin (area_name gin_trgm_ops);
 
 -- ==========================================
@@ -408,7 +406,6 @@ ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.order_messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.inventory_reservations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.order_cancellations ENABLE ROW LEVEL SECURITY;
--- New tables from optimization
 ALTER TABLE public.order_events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.pharmacy_notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.payment_events ENABLE ROW LEVEL SECURITY;
@@ -429,14 +426,27 @@ CREATE POLICY "Service role full access" ON public.roles FOR ALL USING ((SELECT 
 -- User Roles (Users can read own)
 CREATE POLICY "Users can read own roles" ON public.user_roles FOR SELECT USING (user_id = (SELECT auth.uid()));
 
--- 8.2 PHARMACIES
+-- 8.2 PHARMACIES (Updated 2026-02-02)
 CREATE POLICY "Admin full access" ON public.pharmacies FOR ALL USING (auth.role() = 'service_role');
 CREATE POLICY "Pharmacy users can view their own pharmacy" ON public.pharmacies FOR SELECT USING (
     user_id = (SELECT auth.uid()) OR (SELECT auth.role()) = 'service_role'
 );
 CREATE POLICY "Allow admin insert pharmacies" ON public.pharmacies FOR INSERT WITH CHECK (auth.role() = 'service_role' OR auth.role() = 'authenticated');
-CREATE POLICY "Allow admin update pharmacies" ON public.pharmacies FOR UPDATE USING (auth.role() = 'service_role' OR user_id = (SELECT auth.uid()));
-CREATE POLICY "Allow admin delete pharmacies" ON public.pharmacies FOR DELETE USING (auth.role() = 'service_role' OR user_id = (SELECT auth.uid()));
+
+-- New UPDATE/DELETE Policies allowing Admin access
+CREATE POLICY "Allow admin and owner update pharmacies" ON public.pharmacies 
+FOR UPDATE USING (
+    auth.role() = 'service_role' 
+    OR user_id = (SELECT auth.uid()) 
+    OR EXISTS (SELECT 1 FROM public.user_roles ur JOIN public.roles r ON ur.role_id = r.id WHERE ur.user_id = (SELECT auth.uid()) AND r.name = 'admin')
+);
+
+CREATE POLICY "Allow admin and owner delete pharmacies" ON public.pharmacies 
+FOR DELETE USING (
+    auth.role() = 'service_role' 
+    OR user_id = (SELECT auth.uid()) 
+    OR EXISTS (SELECT 1 FROM public.user_roles ur JOIN public.roles r ON ur.role_id = r.id WHERE ur.user_id = (SELECT auth.uid()) AND r.name = 'admin')
+);
 
 -- 8.3 PHARMACY INVENTORY
 CREATE POLICY "Pharmacies can view their own inventory" ON public.pharmacy_products FOR SELECT
@@ -621,8 +631,6 @@ CREATE TRIGGER trigger_set_estimated_delivery_time
     FOR EACH ROW
     EXECUTE FUNCTION set_estimated_delivery_time();
 
-
-
 ALTER FUNCTION update_pharmacy_product_timestamp() SET search_path = public;
 ALTER FUNCTION create_inventory_reservations() SET search_path = public;
 ALTER FUNCTION release_expired_reservations() SET search_path = public;
@@ -631,7 +639,6 @@ ALTER FUNCTION set_estimated_delivery_time() SET search_path = public;
 
 -- ==========================================
 -- 10. SYSTEM INITIALIZATION
-
 -- ==========================================
 
 -- Essential system roles
@@ -701,8 +708,7 @@ SELECT
 FROM public.orders o
 JOIN public.pharmacies p ON o.pharmacy_id = p.id
 WHERE o.status = 'completed'
-GROUP BY p.id, p.name, p.partner_code, p.trade_discount_percentage;- -   M e d i c a t i o n   R e f i l l   S u b s c r i p t i o n s   S c h e m a 
-
+GROUP BY p.id, p.name, p.partner_code, p.trade_discount_percentage;
 
 -- ==========================================
 -- 13. MEDICATION REFILL SUBSCRIPTIONS (Added 2026-01-23)
@@ -745,7 +751,7 @@ CREATE INDEX IF NOT EXISTS idx_refill_subscriptions_user_id ON public.medication
 CREATE INDEX IF NOT EXISTS idx_refill_subscriptions_status ON public.medication_refill_subscriptions(status);
 CREATE INDEX IF NOT EXISTS idx_refill_subscriptions_next_delivery ON public.medication_refill_subscriptions(next_delivery_date) WHERE status = 'active';
 
--- 13.2 DUPLICATE PREVENTION (Phone + Product for active subscriptions)
+-- Support function for Unique Phone-Product Constraint
 CREATE OR REPLACE FUNCTION get_subscription_phone(delivery_address jsonb)
 RETURNS text AS $$
 BEGIN
@@ -759,6 +765,7 @@ WHERE status = 'active';
 
 COMMENT ON INDEX public.unique_active_phone_product_subscription IS 
 'Prevents the same phone number from creating duplicate active subscriptions for the same product. This ensures anonymous users cannot accidentally create multiple subscriptions.';
+
 
 -- 13.3 RLS POLICIES
 ALTER TABLE public.medication_refill_subscriptions ENABLE ROW LEVEL SECURITY;
@@ -869,144 +876,25 @@ WHERE mrs.status = 'active';
 
 ALTER VIEW public.active_refill_subscriptions SET (security_invoker = true);
 GRANT SELECT ON public.active_refill_subscriptions TO authenticated;
-GRANT SELECT ON public.active_refill_subscriptions TO anon; -- Allow anon to view if they have code
+GRANT SELECT ON public.active_refill_subscriptions TO anon; 
 
-CREATE OR REPLACE FUNCTION update_medication_refill_subscriptions_updated_at()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = now();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trigger_update_medication_refill_subscriptions_updated_at
-  BEFORE UPDATE ON public.medication_refill_subscriptions
-  FOR EACH ROW
-  EXECUTE FUNCTION update_medication_refill_subscriptions_updated_at();
-
--- Trigger to auto-generate DK-SUB code
-CREATE OR REPLACE FUNCTION generate_subscription_code()
-RETURNS TRIGGER AS $$
-BEGIN
-    IF NEW.subscription_code IS NULL THEN
-        -- Generate random 6-character suffix
-        NEW.subscription_code := 'DK-SUB-' || upper(substring(md5(random()::text) from 1 for 6));
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trigger_set_subscription_code
-    BEFORE INSERT ON public.medication_refill_subscriptions
-    FOR EACH ROW
-    EXECUTE FUNCTION generate_subscription_code();
-
--- 6. Create view for active subscriptions with product details
-CREATE OR REPLACE VIEW public.active_refill_subscriptions AS
-SELECT 
-  mrs.id,
-  mrs.subscription_code,
-  mrs.user_id,
-  mrs.product_id,
-  p.name as product_name,
-  p.price_ghs,
-  p.image_url,
-  mrs.status,
-  mrs.frequency,
-  mrs.next_delivery_date,
-  mrs.prescription_verified,
-  mrs.prescription_expiry_date,
-  mrs.enrolled_at,
-  ph.name as pharmacy_name,
-  ph.id as pharmacy_id
-FROM public.medication_refill_subscriptions mrs
-JOIN public.products p ON mrs.product_id = p.id
-LEFT JOIN public.pharmacies ph ON mrs.pharmacy_id = ph.id
-WHERE mrs.status = 'active';
-
--- Set security invoker for the view
-ALTER VIEW public.active_refill_subscriptions SET (security_invoker = true);
-
--- Grant permissions
-GRANT SELECT ON public.active_refill_subscriptions TO authenticated;
-
--- 7. Add comments
-COMMENT ON TABLE public.medication_refill_subscriptions IS 'Stores medication refill subscription enrollments for recurring delivery service';
-COMMENT ON COLUMN public.medication_refill_subscriptions.status IS 'Subscription status: active, paused, or cancelled';
-COMMENT ON COLUMN public.medication_refill_subscriptions.frequency IS 'Delivery frequency: monthly or quarterly';
-COMMENT ON COLUMN public.medication_refill_subscriptions.delivery_address IS 'JSON object with address details: {street, city, region, phone}';
-COMMENT ON COLUMN public.medication_refill_subscriptions.prescription_verified IS 'Whether prescription has been verified by pharmacy/admin';
-
--- 8. Create refill_logs table for medical history tracking
-CREATE TABLE IF NOT EXISTS public.refill_logs (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  subscription_id uuid NOT NULL REFERENCES public.medication_refill_subscriptions(id) ON DELETE CASCADE,
-  pharmacy_id bigint REFERENCES public.pharmacies(id),
-  
-  -- Fulfillment details
-  filled_at timestamptz DEFAULT now(),
-  status text DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'ready_for_pickup', 'completed', 'cancelled')),
-  pharmacist_notes text,
-  next_refill_authorized_date date,
-  
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
-
--- Index for history lookups
-CREATE INDEX IF NOT EXISTS idx_refill_logs_subscription_id ON public.refill_logs(subscription_id);
-
--- Enable RLS
-ALTER TABLE public.refill_logs ENABLE ROW LEVEL SECURITY;
-
--- RLS Policies for Logs
--- Users can view their own logs
-CREATE POLICY "Users can view own refill logs"
-  ON public.refill_logs
-  FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.medication_refill_subscriptions sub
-      WHERE sub.id = refill_logs.subscription_id
-      AND sub.user_id = auth.uid()
-    )
-  );
-
--- Admins can view all logs
-CREATE POLICY "Admins can view all logs"
-  ON public.refill_logs FOR SELECT
-  USING (EXISTS (SELECT 1 FROM public.user_roles ur JOIN public.roles r ON ur.role_id = r.id WHERE ur.user_id = auth.uid() AND r.name = 'admin'));
-
--- Pharmacies can view/manage logs for their subscriptions
-CREATE POLICY "Pharmacies can view/manage logs for their subscriptions"
-  ON public.refill_logs FOR ALL
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.medication_refill_subscriptions sub
-      JOIN public.pharmacies p ON sub.pharmacy_id = p.id
-      WHERE sub.id = refill_logs.subscription_id
-      AND p.user_id = auth.uid()
-    )
-  );
-
-COMMENT ON TABLE public.refill_logs IS 'Immutable log of every medication fulfillment/refill event for legal compliance and history';
 -- ==========================================
--- 13. STORAGE & BUCKETS
+-- 14. STORAGE & BUCKETS
 -- ==========================================
 
--- 13.1 PRESCRIPTIONS BUCKET
+-- 14.1 PRESCRIPTIONS BUCKET
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 VALUES (
     'prescriptions', 
     'prescriptions', 
     false, 
-    20971520, -- 20MB (20 * 1024 * 1024)
+    20971520, -- 20MB
     ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/bmp', 'image/jpg', 'application/pdf']
 ) ON CONFLICT (id) DO UPDATE SET 
     allowed_mime_types = EXCLUDED.allowed_mime_types,
     public = false;
 
--- 13.2 STORAGE RLS
+-- 14.2 STORAGE RLS
 CREATE POLICY "Users can upload their own prescriptions" ON storage.objects
 FOR INSERT WITH CHECK (
     bucket_id = 'prescriptions' AND 
@@ -1037,10 +925,10 @@ FOR SELECT USING (
 );
 
 -- ==========================================
--- 14. PHARMACY RIDERS (Added 2026-01-29)
+-- 15. PHARMACY RIDERS (Added 2026-01-29)
 -- ==========================================
 
--- 14.1 PHARMACY RIDERS TABLE
+-- 15.1 PHARMACY RIDERS TABLE
 CREATE TABLE IF NOT EXISTS public.pharmacy_riders (
   id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   pharmacy_id bigint REFERENCES public.pharmacies(id) ON DELETE CASCADE,
@@ -1048,7 +936,7 @@ CREATE TABLE IF NOT EXISTS public.pharmacy_riders (
   phone text NOT NULL,
   is_active boolean DEFAULT true,
   
-  -- Performance tracking (can be updated by triggers/functions later)
+  -- Performance tracking
   total_deliveries int DEFAULT 0,
   last_active_at timestamptz,
   
@@ -1060,11 +948,11 @@ CREATE TABLE IF NOT EXISTS public.pharmacy_riders (
 );
 COMMENT ON TABLE public.pharmacy_riders IS 'Registry of delivery riders employed by pharmacy partners (Asset-Light Logistics).';
 
--- 14.2 INDEXES
+-- 15.2 INDEXES
 CREATE INDEX IF NOT EXISTS idx_pharmacy_riders_pharmacy_id ON public.pharmacy_riders(pharmacy_id);
 CREATE INDEX IF NOT EXISTS idx_pharmacy_riders_active ON public.pharmacy_riders(is_active) WHERE is_active = true;
 
--- 14.3 RLS POLICIES
+-- 15.3 RLS POLICIES
 ALTER TABLE public.pharmacy_riders ENABLE ROW LEVEL SECURITY;
 
 -- Admins: Full access
@@ -1082,129 +970,18 @@ CREATE POLICY "Admins can manage all riders"
 
 -- Pharmacies: Manage their own riders
 CREATE POLICY "Pharmacies can view their own riders"
-  ON public.pharmacy_riders
-  FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.pharmacies p
-      WHERE p.id = pharmacy_riders.pharmacy_id
-      AND p.user_id = auth.uid()
-    )
-  );
+  ON public.pharmacy_riders FOR SELECT
+  USING (EXISTS (SELECT 1 FROM public.pharmacies p WHERE p.id = pharmacy_riders.pharmacy_id AND p.user_id = auth.uid()));
 
 CREATE POLICY "Pharmacies can create their own riders"
-  ON public.pharmacy_riders
-  FOR INSERT
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM public.pharmacies p
-      WHERE p.id = pharmacy_riders.pharmacy_id
-      AND p.user_id = auth.uid()
-    )
-  );
+  ON public.pharmacy_riders FOR INSERT
+  WITH CHECK (EXISTS (SELECT 1 FROM public.pharmacies p WHERE p.id = pharmacy_riders.pharmacy_id AND p.user_id = auth.uid()));
 
 CREATE POLICY "Pharmacies can update their own riders"
-  ON public.pharmacy_riders
-  FOR UPDATE
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.pharmacies p
-      WHERE p.id = pharmacy_riders.pharmacy_id
-      AND p.user_id = auth.uid()
-    )
-  )
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM public.pharmacies p
-      WHERE p.id = pharmacy_riders.pharmacy_id
-      AND p.user_id = auth.uid()
-    )
-  );
+  ON public.pharmacy_riders FOR UPDATE
+  USING (EXISTS (SELECT 1 FROM public.pharmacies p WHERE p.id = pharmacy_riders.pharmacy_id AND p.user_id = auth.uid()))
+  WITH CHECK (EXISTS (SELECT 1 FROM public.pharmacies p WHERE p.id = pharmacy_riders.pharmacy_id AND p.user_id = auth.uid()));
 
 CREATE POLICY "Pharmacies can delete their own riders"
-  ON public.pharmacy_riders
-  FOR DELETE
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.pharmacies p
-      WHERE p.id = pharmacy_riders.pharmacy_id
-      AND p.user_id = auth.uid()
-    )
-  );
-- -   M i g r a t i o n :   C l e a n   u p   d u p l i c a t e s   a n d   p r e v e n t   f u t u r e   d u p l i c a t e   a n o n y m o u s   s u b s c r i p t i o n s 
- 
- - -   S t e p   1 :   I d e n t i f y   a n d   h a n d l e   e x i s t i n g   d u p l i c a t e s   b e f o r e   a d d i n g   u n i q u e   c o n s t r a i n t 
- 
- 
- 
- - -   1 .   C r e a t e   t h e   p h o n e   e x t r a c t i o n   f u n c t i o n   f i r s t 
- 
- C R E A T E   O R   R E P L A C E   F U N C T I O N   g e t _ s u b s c r i p t i o n _ p h o n e ( d e l i v e r y _ a d d r e s s   j s o n b ) 
- 
- R E T U R N S   t e x t   A S   $ $ 
- 
- B E G I N 
- 
-     R E T U R N   d e l i v e r y _ a d d r e s s - > > ' p h o n e ' ; 
- 
- E N D ; 
- 
- $ $   L A N G U A G E   p l p g s q l   I M M U T A B L E ; 
- 
- 
- 
- - -   2 .   C a n c e l   d u p l i c a t e   a c t i v e   s u b s c r i p t i o n s   ( k e e p   o n l y   t h e   o l d e s t   o n e   p e r   p h o n e + p r o d u c t ) 
- 
- - -   T h i s   m a r k s   n e w e r   d u p l i c a t e s   a s   ' c a n c e l l e d '   s o   t h e y   d o n ' t   b l o c k   t h e   u n i q u e   i n d e x 
- 
- W I T H   d u p l i c a t e s   A S   ( 
- 
-     S E L E C T   
- 
-         i d , 
- 
-         R O W _ N U M B E R ( )   O V E R   ( 
- 
-             P A R T I T I O N   B Y   g e t _ s u b s c r i p t i o n _ p h o n e ( d e l i v e r y _ a d d r e s s ) ,   p r o d u c t _ i d   
- 
-             O R D E R   B Y   e n r o l l e d _ a t   A S C     - -   K e e p   t h e   o l d e s t   s u b s c r i p t i o n 
- 
-         )   a s   r n 
- 
-     F R O M   p u b l i c . m e d i c a t i o n _ r e f i l l _ s u b s c r i p t i o n s 
- 
-     W H E R E   s t a t u s   =   ' a c t i v e ' 
- 
- ) 
- 
- U P D A T E   p u b l i c . m e d i c a t i o n _ r e f i l l _ s u b s c r i p t i o n s 
- 
- S E T   s t a t u s   =   ' c a n c e l l e d ' , 
- 
-         u p d a t e d _ a t   =   n o w ( ) 
- 
- W H E R E   i d   I N   ( 
- 
-     S E L E C T   i d   F R O M   d u p l i c a t e s   W H E R E   r n   >   1 
- 
- ) ; 
- 
- 
- 
- - -   3 .   N o w   a d d   t h e   u n i q u e   i n d e x   ( w i l l   s u c c e e d   s i n c e   d u p l i c a t e s   a r e   c a n c e l l e d ) 
- 
- C R E A T E   U N I Q U E   I N D E X   I F   N O T   E X I S T S   u n i q u e _ a c t i v e _ p h o n e _ p r o d u c t _ s u b s c r i p t i o n 
- 
- O N   p u b l i c . m e d i c a t i o n _ r e f i l l _ s u b s c r i p t i o n s   ( g e t _ s u b s c r i p t i o n _ p h o n e ( d e l i v e r y _ a d d r e s s ) ,   p r o d u c t _ i d ) 
- 
- W H E R E   s t a t u s   =   ' a c t i v e ' ; 
- 
- 
- 
- - -   4 .   A d d   c o m m e n t   e x p l a i n i n g   t h e   c o n s t r a i n t 
- 
- C O M M E N T   O N   I N D E X   p u b l i c . u n i q u e _ a c t i v e _ p h o n e _ p r o d u c t _ s u b s c r i p t i o n   I S   
- 
- ' P r e v e n t s   t h e   s a m e   p h o n e   n u m b e r   f r o m   c r e a t i n g   d u p l i c a t e   a c t i v e   s u b s c r i p t i o n s   f o r   t h e   s a m e   p r o d u c t .   T h i s   e n s u r e s   a n o n y m o u s   u s e r s   c a n n o t   a c c i d e n t a l l y   c r e a t e   m u l t i p l e   s u b s c r i p t i o n s . ' ; 
- 
- 
+  ON public.pharmacy_riders FOR DELETE
+  USING (EXISTS (SELECT 1 FROM public.pharmacies p WHERE p.id = pharmacy_riders.pharmacy_id AND p.user_id = auth.uid()));

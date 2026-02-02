@@ -85,3 +85,8 @@ Over time you may squash older migrations to a baseline to reduce deploy time:
 - All DDL must go through migrations.
 - `schema.sql` is for reference only.
 - Never commit secrets; use environment variables.
+
+## 2026-02-02 — Optional Orders UPDATE Policy
+
+- Added `supabase/migrations/20260202090000_orders_update_policy.sql` to allow pharmacies to UPDATE their own `orders` rows.
+- This is optional and only needed if enabling direct client writes via the anon key; otherwise, prefer server-side updates using the service role with ownership checks.

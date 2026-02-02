@@ -129,6 +129,25 @@ To ensure orders transition out of `pending_payment` even if Paystack webhooks a
 * **Auth & secrets:** Bearer headers (`Authorization` or `x-cron-key`) validated against `CRON_SECRET` with sanitized comparisons.
 * **Testability:** Admin SMS test endpoint enables quick validation of alert delivery without mutating production orders.
 
+### 3.9. Observability (Sentry)
+
+* **Scope:** Server API routes instrumented for status transitions (orders), SMS attempts, and exceptions.
+* **Setup:** Provide `SENTRY_DSN` and optionally `SENTRY_TRACES_SAMPLE_RATE` (default 0.2 when present).
+* **Usage:** Errors captured via Sentry; breadcrumbs added for shipping/delivery notification triggers.
+* **Value:** Faster incident detection, root cause analysis, and SLA protection.
+
+### 3.10. Role-Based Data Access (RLS)
+
+* **Orders:** RLS SELECT policies restrict pharmacies to their own orders; optional UPDATE policy available to allow client-side writes when desired.
+* **Riders:** Full RLS (SELECT/INSERT/UPDATE/DELETE) per pharmacy for `pharmacy_riders`.
+* **Admin/Service Role:** Maintains full access via role checks or bypass in server-side code; never exposed to the browser.
+
+### 3.11. Testing (Vitest)
+
+* **Framework:** Vitest for Node-based unit/integration tests.
+* **Config:** See `vitest.config.ts`; run with `npm run test`.
+* **Focus Areas:** Order lifecycle flows, idempotency, and notification hooks using stubs/mocks.
+
 ### Scheduled Reconciliation
 
 * Endpoint: `GET /api/payments/reconcile` (Node runtime)

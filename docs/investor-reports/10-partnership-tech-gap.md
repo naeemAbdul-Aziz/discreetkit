@@ -4,6 +4,11 @@
 - SMS alerts to partner contacts reduce reliance on dashboards and email latency.
 - Inventory auto-release avoids dead stock and improves product availability without manual intervention.
 - Clear endpoints and test commands enable partners to validate integrations quickly.
+
+### February 2026 Dispatch & Rider Management Enhancements
+- **Secure Rider Registry:** Full RLS on `pharmacy_riders` and server-side ownership checks ensure partners manage only their riders; prevents cross-tenant edits.
+- **Pharmacy Dispatch API:** Pharmacy-side status updates now auto-generate tracking links when missing and accept rider details; idempotent behavior avoids duplicate notifications.
+- **Operational UX:** Independent Accept/Decline button loading states and shared table layout stabilize partner dashboards under load.
 # Technology Gap Analysis: Supports for Partnership Agreement
 
 **Objective:** Align functionality with `09-pharmacy-partnership-agreement.md`.

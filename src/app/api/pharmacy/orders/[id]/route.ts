@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import * as Sentry from '@sentry/node';
 import { createSupabaseServerClient, getUserRoles } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
 import { sendShippingNotificationSMS, sendDeliveryNotificationSMS } from '@/lib/server-utils';
@@ -12,6 +13,21 @@ export async function PATCH(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
+  // Initialize Sentry once per runtime if DSN is provided
+  try {
+    // Initialize only if a client doesn't exist yet and DSN is provided
+    // In Node SDK, `getClient()` returns the active client when initialized.
+    if (!Sentry.getClient?.() && process.env.SENTRY_DSN) {
+      Sentry.init({
+        dsn: process.env.SENTRY_DSN,
+        tracesSampleRate: Number(process.env.SENTRY_TRACES_SAMPLE_RATE ?? 0.2),
+      });
+    }
+  } catch (e) {
+    // Non-fatal: proceed without Sentry if init fails
+    console.warn('[Sentry] init failed:', e);
+  }
+
   const { id } = await context.params;
   try {
     const supabase = await createSupabaseServerClient();
@@ -130,10 +146,33 @@ export async function PATCH(
 
     // Trigger SMS notifications if status changed
     if (previousStatus !== updateData.status) {
-      if (updateData.status === 'out_for_delivery') {
-        sendShippingNotificationSMS(id).catch(err => console.error('Failed to send shipping SMS:', err));
-      } else if (updateData.status === 'completed') {
-        sendDeliveryNotificationSMS(id).catch(err => console.error('Failed to send delivery SMS:', err));
+      try {
+        if (updateData.status === 'out_for_delivery') {
+          Sentry.addBreadcrumb({
+            category: 'orders',
+            message: 'Sending shipping SMS',
+            level: 'info',
+            data: { orderId: id }
+          });
+          sendShippingNotificationSMS(id).catch(err => {
+            Sentry.captureException(err, { level: 'error', extra: { orderId: id } });
+            console.error('Failed to send shipping SMS:', err);
+          });
+        } else if (updateData.status === 'completed') {
+          Sentry.addBreadcrumb({
+            category: 'orders',
+            message: 'Sending delivery SMS',
+            level: 'info',
+            data: { orderId: id }
+          });
+          sendDeliveryNotificationSMS(id).catch(err => {
+            Sentry.captureException(err, { level: 'error', extra: { orderId: id } });
+            console.error('Failed to send delivery SMS:', err);
+          });
+        }
+      } catch (smsWrapErr) {
+        // Continue even if breadcrumb/capture fails
+        console.warn('[Sentry] SMS breadcrumb/capture failed:', smsWrapErr);
       }
     }
 
@@ -142,6 +181,11 @@ export async function PATCH(
     return NextResponse.json({ success: true });
 
   } catch (error) {
+    try {
+      Sentry.captureException(error, { level: 'error' });
+    } catch (e) {
+      // ignore Sentry capture errors
+    }
     console.error('[Pharmacy Order API] Error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
