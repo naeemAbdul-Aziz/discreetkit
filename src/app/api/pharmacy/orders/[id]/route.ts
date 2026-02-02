@@ -44,7 +44,7 @@ export async function PATCH(
     // Verify order belongs to this pharmacy
     const { data: order, error: orderError } = await supabase
       .from('orders')
-      .select('id, pharmacy_id, code, courier_tracking_url')
+      .select('id, pharmacy_id, status, code, courier_tracking_url')
       .eq('id', id)
       .single();
 
@@ -53,6 +53,8 @@ export async function PATCH(
     }
 
     let updateData: any = {};
+
+    const previousStatus = order.status;
 
     if (action === 'acknowledge') {
       updateData.pharmacy_ack_status = pharmacy_ack_status;
@@ -89,7 +91,20 @@ export async function PATCH(
       throw new Error(`Failed to update order: ${updateError.message}`);
     }
 
-    console.log(`[Pharmacy Order API] Order ${id} updated: action=${action}, status=${updateData.status}, ack=${updateData.pharmacy_ack_status}`);
+    console.log(JSON.stringify({
+      msg: 'Pharmacy Order API update',
+      orderId: id,
+      actorUserId: user.id,
+      action,
+      previousStatus,
+      newStatus: updateData.status,
+      ack: updateData.pharmacy_ack_status,
+      courier: {
+        name: updateData.courier_name,
+        phone: updateData.courier_phone,
+        trackingUrl: updateData.courier_tracking_url,
+      }
+    }));
 
     // Log the event
     let eventNote = `Pharmacy ${action}: ${pharmacy_ack_status || status}`;
@@ -110,10 +125,12 @@ export async function PATCH(
       });
 
     // Trigger SMS notifications if status changed
-    if (updateData.status === 'out_for_delivery') {
-      sendShippingNotificationSMS(id).catch(err => console.error('Failed to send shipping SMS:', err));
-    } else if (updateData.status === 'completed') {
-      sendDeliveryNotificationSMS(id).catch(err => console.error('Failed to send delivery SMS:', err));
+    if (previousStatus !== updateData.status) {
+      if (updateData.status === 'out_for_delivery') {
+        sendShippingNotificationSMS(id).catch(err => console.error('Failed to send shipping SMS:', err));
+      } else if (updateData.status === 'completed') {
+        sendDeliveryNotificationSMS(id).catch(err => console.error('Failed to send delivery SMS:', err));
+      }
     }
 
     revalidatePath('/pharmacy/dashboard');

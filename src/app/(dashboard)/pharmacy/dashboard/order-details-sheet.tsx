@@ -190,27 +190,26 @@ export function OrderDetailsSheet({
           <div className="space-y-2">
             {order.status === 'received' && order.pharmacy_ack_status === 'pending' && (
               <>
-                <Button
-                  className="w-full"
-                  onClick={onAccept}
-                  disabled={loading && loadingAction === 'accept'}
-                >
-                  {loading && loadingAction === 'accept' ? (
-                    <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                  ) : (
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                  )}
-                  Accept Order
-                </Button>
+                {(() => {
+                  const isAcceptLoading = !!(loading && loadingAction === 'accept');
+                  return (
+                    <Button
+                      className="w-full"
+                      onClick={onAccept}
+                      loading={isAcceptLoading}
+                    >
+                      {!isAcceptLoading && <CheckCircle className="h-4 w-4 mr-2" />}
+                      Accept Order
+                    </Button>
+                  );
+                })()}
                 <Button
                   className="w-full"
                   variant="destructive"
                   onClick={onDecline}
-                  disabled={loading && loadingAction === 'decline'}
+                  loading={!!(loading && loadingAction === 'decline')}
                 >
-                  {loading && loadingAction === 'decline' ? (
-                    <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                  ) : (
+                  {!(loading && loadingAction === 'decline') && (
                     <XCircle className="h-4 w-4 mr-2" />
                   )}
                   Decline Order
@@ -219,33 +218,35 @@ export function OrderDetailsSheet({
             )}
 
             {order.status === 'processing' && (
-              <Button
-                className="w-full"
-                onClick={onMarkOutForDelivery}
-                disabled={loading && loadingAction === 'out_for_delivery'}
-              >
-                {loading && loadingAction === 'out_for_delivery' ? (
-                  <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                ) : (
-                  <Truck className="h-4 w-4 mr-2" />
-                )}
-                Mark Out for Delivery
-              </Button>
+              (() => {
+                const isOutForDeliveryLoading = !!(loading && loadingAction === 'out_for_delivery');
+                return (
+                  <Button
+                    className="w-full"
+                    onClick={onMarkOutForDelivery}
+                    loading={isOutForDeliveryLoading}
+                  >
+                    {!isOutForDeliveryLoading && <Truck className="h-4 w-4 mr-2" />}
+                    Mark Out for Delivery
+                  </Button>
+                );
+              })()
             )}
 
             {order.status === 'out_for_delivery' && (
-              <Button
-                className="w-full"
-                onClick={onMarkCompleted}
-                disabled={loading && loadingAction === 'completed'}
-              >
-                {loading && loadingAction === 'completed' ? (
-                  <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                ) : (
-                  <CheckCircle className="h-4 w-4 mr-2" />
-                )}
-                Confirm Delivery
-              </Button>
+              (() => {
+                const isCompletedLoading = !!(loading && loadingAction === 'completed');
+                return (
+                  <Button
+                    className="w-full"
+                    onClick={onMarkCompleted}
+                    loading={isCompletedLoading}
+                  >
+                    {!isCompletedLoading && <CheckCircle className="h-4 w-4 mr-2" />}
+                    Confirm Delivery
+                  </Button>
+                );
+              })()
             )}
           </div>
 
