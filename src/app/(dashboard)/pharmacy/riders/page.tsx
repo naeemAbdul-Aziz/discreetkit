@@ -53,10 +53,10 @@ export default function RidersPage() {
   const [newRider, setNewRider] = useState({ name: "", phone: "" });
   const [processing, setProcessing] = useState(false);
   const { toast } = useToast();
-  const supabase = getSupabaseClient();
 
   const fetchRiders = useCallback(
     async (pharmId: number) => {
+      const supabase = getSupabaseClient();
       try {
         const { data, error } = await supabase
           .from("pharmacy_riders")
@@ -87,11 +87,12 @@ export default function RidersPage() {
         setLoading(false);
       }
     },
-    [supabase, toast],
+    [toast],
   );
 
   useEffect(() => {
     async function init() {
+      const supabase = getSupabaseClient();
       try {
         // Get current user
         const {
@@ -141,7 +142,7 @@ export default function RidersPage() {
       }
     }
     init();
-  }, [supabase, fetchRiders, toast]);
+  }, [fetchRiders, toast]);
 
   async function handleAddRider(e: React.FormEvent) {
     e.preventDefault();
@@ -155,6 +156,7 @@ export default function RidersPage() {
     }
 
     setProcessing(true);
+    const supabase = getSupabaseClient();
 
     try {
       const { data, error } = await supabase
@@ -197,6 +199,7 @@ export default function RidersPage() {
     if (!confirm("Are you sure you want to remove this rider?")) return;
     if (!pharmacyId) return;
 
+    const supabase = getSupabaseClient();
     try {
       const { error } = await supabase
         .from("pharmacy_riders")
@@ -227,6 +230,7 @@ export default function RidersPage() {
   async function handleToggleStatus(id: number, currentStatus: boolean) {
     if (!pharmacyId) return;
 
+    const supabase = getSupabaseClient();
     try {
       const { error } = await supabase
         .from("pharmacy_riders")

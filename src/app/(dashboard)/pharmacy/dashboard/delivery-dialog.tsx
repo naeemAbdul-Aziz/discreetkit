@@ -54,12 +54,12 @@ export function DeliveryDialog({
   const [riders, setRiders] = useState<any[]>([]);
   const [selectedRiderId, setSelectedRiderId] = useState<string>("manual");
   const isMobile = useMediaQuery("(max-width: 640px)");
-  const supabase = getSupabaseClient();
 
   useEffect(() => {
     if (isOpen) {
       // Fetch riders when dialog opens
       const fetchRiders = async () => {
+        const supabase = getSupabaseClient();
         try {
           // Get current user
           const {
@@ -104,7 +104,7 @@ export function DeliveryDialog({
 
       fetchRiders();
     }
-  }, [isOpen, supabase]);
+  }, [isOpen]);
 
   const handleRiderSelect = (value: string) => {
     setSelectedRiderId(value);
