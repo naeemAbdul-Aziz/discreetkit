@@ -31,87 +31,163 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Truck, Phone, Power } from "lucide-react";
-import {
-  getMyPharmacyRiders,
-  addPharmacyRider,
-  deletePharmacyRider,
-  toggleRiderStatus,
-} from "@/lib/admin-actions";
-// We need pharmacyId. Usually available via session or context.
-// For now, we'll assume we can get it from an API or pass it in.
-// Ideally, the server action `getPharmacyRiders` should fetch for the *current user's* pharmacy.
-// But `getPharmacyRiders` takes `pharmacyId`.
-// Let's create a wrapper or fetch the pharmacy ID first.
-// Actually, `getPharmacyRiders` checks auth but takes ID.
-// We should fetch the current user's pharmacy ID on mount.
 import { getSupabaseClient } from "@/lib/supabase";
 
+interface Rider {
+  id: number;
+  pharmacy_id: number;
+  name: string;
+  phone: string;
+  is_active: boolean;
+  total_deliveries: number;
+  last_active_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export default function RidersPage() {
-  const [riders, setRiders] = useState<any[]>([]);
+  const [riders, setRiders] = useState<Rider[]>([]);
   const [loading, setLoading] = useState(true);
   const [pharmacyId, setPharmacyId] = useState<number | null>(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [newRider, setNewRider] = useState({ name: "", phone: "" });
   const [processing, setProcessing] = useState(false);
   const { toast } = useToast();
+  const supabase = getSupabaseClient();
 
-  const fetchRiders = useCallback(async () => {
-    try {
-      const data = await getMyPharmacyRiders();
-      setRiders(data || []);
-    } catch (error) {
-      console.error(error);
-      toast({
-        title: "Error",
-        description: "Failed to load riders",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
+  const fetchRiders = useCallback(
+    async (pharmId: number) => {
+      try {
+        const { data, error } = await supabase
+          .from("pharmacy_riders")
+          .select("*")
+          .eq("pharmacy_id", pharmId)
+          .order("is_active", { ascending: false })
+          .order("name");
+
+        if (error) {
+          console.error("Fetch riders error:", error);
+          toast({
+            title: "Error",
+            description: `Failed to load riders: ${error.message}`,
+            variant: "destructive",
+          });
+          return;
+        }
+
+        setRiders(data || []);
+      } catch (error: any) {
+        console.error("Unexpected error:", error);
+        toast({
+          title: "Error",
+          description: error.message || "An unexpected error occurred",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    },
+    [supabase, toast],
+  );
 
   useEffect(() => {
     async function init() {
-      const supabase = getSupabaseClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return; // Redirect handled by middleware potentially
+      try {
+        // Get current user
+        const {
+          data: { user },
+          error: userError,
+        } = await supabase.auth.getUser();
 
-      // Riders are fetched on server using current user pharmacy
-      fetchRiders();
+        if (userError || !user) {
+          console.error("User error:", userError);
+          toast({
+            title: "Authentication Error",
+            description: "Please log in to continue",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+
+        // Get pharmacy for this user
+        const { data: pharmacy, error: pharmacyError } = await supabase
+          .from("pharmacies")
+          .select("id")
+          .eq("user_id", user.id)
+          .single();
+
+        if (pharmacyError || !pharmacy) {
+          console.error("Pharmacy error:", pharmacyError);
+          toast({
+            title: "Error",
+            description: "No pharmacy found for your account",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+
+        setPharmacyId(pharmacy.id);
+        await fetchRiders(pharmacy.id);
+      } catch (error: any) {
+        console.error("Init error:", error);
+        toast({
+          title: "Error",
+          description: error.message || "Failed to initialize",
+          variant: "destructive",
+        });
+        setLoading(false);
+      }
     }
     init();
-  }, [fetchRiders]);
+  }, [supabase, fetchRiders, toast]);
 
   async function handleAddRider(e: React.FormEvent) {
     e.preventDefault();
-    if (!pharmacyId) return;
+    if (!pharmacyId) {
+      toast({
+        title: "Error",
+        description: "Pharmacy ID not found",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setProcessing(true);
 
     try {
-      const res = await addPharmacyRider({
-        pharmacy_id: pharmacyId,
-        name: newRider.name,
-        phone: newRider.phone,
-        is_active: true,
-      });
+      const { data, error } = await supabase
+        .from("pharmacy_riders")
+        .insert({
+          pharmacy_id: pharmacyId,
+          name: newRider.name,
+          phone: newRider.phone,
+          is_active: true,
+        })
+        .select()
+        .single();
 
-      if (res?.error) {
+      if (error) {
+        console.error("Add rider error:", error);
         toast({
           title: "Error",
-          description: res.error,
+          description: error.message,
           variant: "destructive",
         });
       } else {
         toast({ title: "Success", description: "Rider added successfully" });
         setIsAddOpen(false);
         setNewRider({ name: "", phone: "" });
-        fetchRiders();
+        await fetchRiders(pharmacyId);
       }
-    } catch (error) {
-      toast({ title: "Error", variant: "destructive" });
+    } catch (error: any) {
+      console.error("Unexpected error:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add rider",
+        variant: "destructive",
+      });
     } finally {
       setProcessing(false);
     }
@@ -119,31 +195,49 @@ export default function RidersPage() {
 
   async function handleDelete(id: number) {
     if (!confirm("Are you sure you want to remove this rider?")) return;
+    if (!pharmacyId) return;
+
     try {
-      const res = await deletePharmacyRider(id);
-      if (res?.error) {
+      const { error } = await supabase
+        .from("pharmacy_riders")
+        .delete()
+        .eq("id", id);
+
+      if (error) {
+        console.error("Delete error:", error);
         toast({
           title: "Error",
-          description: res.error,
+          description: error.message,
           variant: "destructive",
         });
       } else {
-        toast({ title: "Deleted", description: "Rider removed" });
-        fetchRiders();
+        toast({ title: "Deleted", description: "Rider removed successfully" });
+        await fetchRiders(pharmacyId);
       }
-    } catch (error) {
-      toast({ title: "Error", variant: "destructive" });
+    } catch (error: any) {
+      console.error("Unexpected error:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete rider",
+        variant: "destructive",
+      });
     }
   }
 
   async function handleToggleStatus(id: number, currentStatus: boolean) {
     if (!pharmacyId) return;
+
     try {
-      const res = await toggleRiderStatus(id, !currentStatus);
-      if (res?.error) {
+      const { error } = await supabase
+        .from("pharmacy_riders")
+        .update({ is_active: !currentStatus })
+        .eq("id", id);
+
+      if (error) {
+        console.error("Toggle status error:", error);
         toast({
           title: "Error",
-          description: res.error,
+          description: error.message,
           variant: "destructive",
         });
       } else {
@@ -151,10 +245,15 @@ export default function RidersPage() {
           title: "Updated",
           description: `Rider ${!currentStatus ? "activated" : "deactivated"}`,
         });
-        fetchRiders();
+        await fetchRiders(pharmacyId);
       }
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      console.error("Unexpected error:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update rider status",
+        variant: "destructive",
+      });
     }
   }
 
