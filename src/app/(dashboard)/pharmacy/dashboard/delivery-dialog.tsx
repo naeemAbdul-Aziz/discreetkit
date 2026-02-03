@@ -9,6 +9,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,6 +32,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getSupabaseClient } from "@/lib/supabase";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 interface DeliveryDialogProps {
   orderId: number | null;
@@ -45,6 +54,7 @@ export function DeliveryDialog({
   const [trackingUrl, setTrackingUrl] = useState("");
   const [riders, setRiders] = useState<any[]>([]);
   const [selectedRiderId, setSelectedRiderId] = useState<string>("manual");
+  const isMobile = useMediaQuery("(max-width: 640px)");
 
   useEffect(() => {
     if (isOpen) {
@@ -121,6 +131,106 @@ export function DeliveryDialog({
     }
   };
 
+  const formContent = (
+    <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+      <div className="space-y-2">
+        <Label>Select Rider (Optional)</Label>
+        <Select value={selectedRiderId} onValueChange={handleRiderSelect}>
+          <SelectTrigger className="h-12">
+            <SelectValue placeholder="Select a registered rider" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="manual">Enter Manually</SelectItem>
+            {riders.map((r) => (
+              <SelectItem key={r.id} value={r.id.toString()}>
+                {r.name} ({r.phone})
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="riderName">Rider / Service Name</Label>
+        <Input
+          id="riderName"
+          placeholder="e.g. Kojo (Bolt) or ShaQ Express"
+          value={riderName}
+          onChange={(e) => setRiderName(e.target.value)}
+          required
+          className="h-12"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="riderPhone">Rider Contact Number</Label>
+        <Input
+          id="riderPhone"
+          placeholder="024..."
+          value={riderPhone}
+          onChange={(e) => setRiderPhone(e.target.value)}
+          required
+          className="h-12"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="trackingUrl">Tracking Link (Optional)</Label>
+        <Input
+          id="trackingUrl"
+          placeholder="https://..."
+          value={trackingUrl}
+          onChange={(e) => setTrackingUrl(e.target.value)}
+          className="h-12"
+        />
+        <p className="text-xs text-muted-foreground">
+          If left blank, we&apos;ll auto-generate a tracking link for this
+          order.
+        </p>
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-2 pt-4">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => onOpenChange(false)}
+          className="w-full sm:w-auto order-2 sm:order-1"
+        >
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          disabled={loading}
+          className="bg-blue-500 hover:bg-blue-600 text-white w-full sm:w-auto order-1 sm:order-2"
+        >
+          {loading ? (
+            "Processing..."
+          ) : (
+            <>
+              <Truck className="mr-2 h-4 w-4" />
+              Confirm Dispatch
+            </>
+          )}
+        </Button>
+      </div>
+    </form>
+  );
+
+  if (isMobile) {
+    return (
+      <Sheet open={isOpen} onOpenChange={onOpenChange}>
+        <SheetContent side="bottom" className="h-[90vh] overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Assign Dispatch Rider</SheetTitle>
+            <SheetDescription>
+              Enter the details of the rider picking up this package. This helps
+              track the delivery.
+            </SheetDescription>
+          </SheetHeader>
+          {formContent}
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
@@ -131,82 +241,7 @@ export function DeliveryDialog({
             track the delivery.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-          <div className="space-y-2">
-            <Label>Select Rider (Optional)</Label>
-            <Select value={selectedRiderId} onValueChange={handleRiderSelect}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a registered rider" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="manual">Enter Manually</SelectItem>
-                {riders.map((r) => (
-                  <SelectItem key={r.id} value={r.id.toString()}>
-                    {r.name} ({r.phone})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="riderName">Rider / Service Name</Label>
-            <Input
-              id="riderName"
-              placeholder="e.g. Kojo (Bolt) or ShaQ Express"
-              value={riderName}
-              onChange={(e) => setRiderName(e.target.value)}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="riderPhone">Rider Contact Number</Label>
-            <Input
-              id="riderPhone"
-              placeholder="024..."
-              value={riderPhone}
-              onChange={(e) => setRiderPhone(e.target.value)}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="trackingUrl">Tracking Link (Optional)</Label>
-            <Input
-              id="trackingUrl"
-              placeholder="https://..."
-              value={trackingUrl}
-              onChange={(e) => setTrackingUrl(e.target.value)}
-            />
-            <p className="text-xs text-muted-foreground">
-              If left blank, we&apos;ll auto-generate a tracking link for this
-              order.
-            </p>
-          </div>
-
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={loading}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              {loading ? (
-                "Processing..."
-              ) : (
-                <>
-                  <Truck className="mr-2 h-4 w-4" />
-                  Confirm Dispatch
-                </>
-              )}
-            </Button>
-          </DialogFooter>
-        </form>
+        {formContent}
       </DialogContent>
     </Dialog>
   );
