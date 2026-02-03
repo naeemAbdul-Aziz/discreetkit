@@ -129,10 +129,9 @@ export async function POST(req: Request) {
           }
 
           // Log the payment confirmation event
-          await supabaseAdmin.from('order_events').insert({
-            order_id: order.id,
-            status: 'Payment Confirmed',
-            note: `Successfully received GHS ${(amount / 100).toFixed(2)}.`,
+          const { createOrderEvent } = await import('@/lib/event-messages');
+          await createOrderEvent(supabaseAdmin, order.id, 'payment_confirmed', {
+            amount: amount / 100,
           });
 
           paymentDebug('Webhook updated order to received', { reference, orderId: order.id });

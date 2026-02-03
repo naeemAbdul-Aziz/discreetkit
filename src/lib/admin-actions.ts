@@ -860,11 +860,10 @@ export async function assignPharmacyInternal(supabaseAdmin: any, orderId: number
             })
 
             // Log assignment event
-            await supabaseAdmin.from('order_events').insert({
-                order_id: orderId,
-                status: 'Assigned to Pharmacy',
-                note: `Order assigned to ${pharmacy.name}. Notifications sent.`
-            })
+            const { createOrderEvent } = await import('@/lib/event-messages');
+            await createOrderEvent(supabaseAdmin, orderId, 'assigned_to_pharmacy', {
+                pharmacyName: pharmacy.name,
+            });
         } catch (notifError) {
             console.error('[assignPharmacy] Failed to send notifications:', notifError)
             // Don't fail the assignment if notifications fail

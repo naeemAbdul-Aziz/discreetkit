@@ -122,26 +122,22 @@ export async function PATCH(
       }
     }));
 
-    // Log the event
-    let eventNote = `Pharmacy ${action}: ${pharmacy_ack_status || status}`;
-    if (note) {
-      eventNote += ` - ${note}`;
-    }
-    if (updateData.courier_name || updateData.courier_phone) {
-      const riderBits = [updateData.courier_name, updateData.courier_phone].filter(Boolean).join(' / ');
-      eventNote += ` (Rider: ${riderBits})`;
-    }
-
-    // Deduplicate events when no status change on update_status
+    // Log the event with customer-friendly messaging
     const shouldInsertEvent = action === 'acknowledge' || previousStatus !== updateData.status;
     if (shouldInsertEvent) {
-      await supabase
-        .from('order_events')
-        .insert({
-          order_id: Number(id),
-          status: updateData.status || 'acknowledged',
-          note: eventNote
+      const { createOrderEvent } = await import('@/lib/event-messages');
+      
+      if (action === 'acknowledge') {
+        const eventStatus = pharmacy_ack_status === 'accepted' ? 'pharmacy_accepted' : 'pharmacy_declined';
+        await createOrderEvent(supabase, Number(id), eventStatus, {
+          customNote: note || undefined,
         });
+      } else if (updateData.status) {
+        await createOrderEvent(supabase, Number(id), updateData.status, {
+          riderName: updateData.courier_name,
+          riderPhone: updateData.courier_phone,
+        });
+      }
     }
 
     // Trigger SMS notifications if status changed

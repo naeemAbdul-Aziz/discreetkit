@@ -47,18 +47,18 @@ export async function recordPharmacyAcknowledgement(orderId: number, decision: '
     return { ok: false };
   }
   // Log event
-  const statusText = decision === 'accepted' ? 'Pharmacy Accepted' : 'Pharmacy Declined';
-
-  let note = decision === 'accepted' ? 'Pharmacy confirmed it can fulfill the order.' : 'Pharmacy declined; needs reassignment.';
-  if (reason) {
-    note = decision === 'accepted' ? note + ` - ${reason}` : `Pharmacy acknowledge: declined - ${reason}`;
+  const { createOrderEvent } = await import('@/lib/event-messages');
+  
+  if (decision === 'accepted') {
+    await createOrderEvent(supabaseAdmin, orderId, 'pharmacy_accepted', {
+      customNote: reason || undefined,
+    });
+  } else {
+    await createOrderEvent(supabaseAdmin, orderId, 'pharmacy_declined', {
+      customNote: reason || undefined,
+    });
   }
-
-  await supabaseAdmin.from('order_events').insert({
-    order_id: orderId,
-    status: statusText,
-    note: note
-  });
+  
   return { ok: true };
 }
 
@@ -310,11 +310,8 @@ export async function createOrderAction(prevState: any, formData: FormData) {
       throw new Error('Failed to retrieve order ID after creation.');
 
     // 2. Add an initial "Order Received" event
-    await supabaseAdmin.from('order_events').insert({
-      order_id: orderData.id,
-      status: 'Order Received',
-      note: 'Order placed, awaiting payment confirmation.',
-    });
+    const { createOrderEvent } = await import('@/lib/event-messages');
+    await createOrderEvent(supabaseAdmin, orderData.id, 'order_created');
 
     // 3. Send initial customer SMS Notification
     const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${code}`;
