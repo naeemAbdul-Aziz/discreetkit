@@ -23,7 +23,6 @@ import { Label } from "@/components/ui/label";
 // NOTE: Use pharmacy API route instead of admin server action
 import { useToast } from "@/hooks/use-toast";
 import { Truck, Users } from "lucide-react";
-import { getMyPharmacyRiders } from "@/lib/admin-actions";
 import {
   Select,
   SelectContent,
@@ -60,10 +59,45 @@ export function DeliveryDialog({
     if (isOpen) {
       // Fetch riders when dialog opens
       const fetchRiders = async () => {
+        const supabase = getSupabaseClient();
         try {
-          const data = await getMyPharmacyRiders();
-          setRiders(data || []);
+          // Get current user
+          const {
+            data: { user },
+          } = await supabase.auth.getUser();
+          if (!user) {
+            setRiders([]);
+            return;
+          }
+
+          // Get pharmacy for this user
+          const { data: pharmacy } = await supabase
+            .from("pharmacies")
+            .select("id")
+            .eq("user_id", user.id)
+            .single();
+
+          if (!pharmacy) {
+            setRiders([]);
+            return;
+          }
+
+          // Fetch riders for this pharmacy
+          const { data, error } = await supabase
+            .from("pharmacy_riders")
+            .select("*")
+            .eq("pharmacy_id", pharmacy.id)
+            .eq("is_active", true)
+            .order("name");
+
+          if (error) {
+            console.error("Error fetching riders:", error);
+            setRiders([]);
+          } else {
+            setRiders(data || []);
+          }
         } catch (e) {
+          console.error("Unexpected error fetching riders:", e);
           setRiders([]);
         }
       };
