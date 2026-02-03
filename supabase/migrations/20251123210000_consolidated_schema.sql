@@ -347,6 +347,176 @@ CREATE TABLE public.pharmacy_notifications (
     sent_at timestamptz,
     created_at timestamptz not null default now()
 );
+COMMENT ON DATABASE postgres IS 'Applied migration: 20260120120000_perf_security_optimization.sql';
+
+-- ==========================================
+-- 16. SEED DATA (SILVER PILL PHARMACY)
+-- ==========================================
+
+BEGIN;
+
+-- 16.1 ADD PHARMACY
+INSERT INTO public.pharmacies (name, location, contact_person, phone_number, email, is_active, is_24_7)
+VALUES (
+    'Silver Pill Pharmacy',
+    'Accra, Ghana',
+    'Pharmacy Manager',
+    '0201234567',
+    'silverpillpharmacy@gmail.com',
+    true,
+    true
+)
+ON CONFLICT (email) DO UPDATE 
+SET 
+    name = EXCLUDED.name,
+    location = EXCLUDED.location,
+    is_active = EXCLUDED.is_active,
+    is_24_7 = EXCLUDED.is_24_7;
+
+-- 16.2 ADD SERVICE AREAS
+WITH pharmacy AS (
+    SELECT id FROM public.pharmacies WHERE email = 'silverpillpharmacy@gmail.com'
+)
+INSERT INTO public.pharmacy_service_areas (pharmacy_id, area_name, delivery_fee, max_delivery_time_hours, estimated_min_minutes, estimated_max_minutes, is_active)
+SELECT 
+    pharmacy.id,
+    area_name,
+    delivery_fee,
+    max_delivery_time_hours,
+    estimated_min_minutes,
+    estimated_max_minutes,
+    true
+FROM pharmacy, (VALUES
+    -- Campus Areas
+    ('University of Ghana (Legon)', 10.00, 2, 30, 60),
+    ('Legon', 10.00, 2, 30, 60),
+    ('UG', 10.00, 2, 30, 60),
+    ('UPSA', 10.00, 2, 30, 60),
+    ('GIMPA', 10.00, 2, 30, 60),
+    ('Wisconsin International University College', 10.00, 2, 30, 60),
+    ('Academic City University College', 10.00, 2, 30, 60),
+    ('Lancaster University Ghana', 10.00, 2, 30, 60),
+    ('KNUST', 10.00, 2, 30, 60),
+    ('Kumasi', 10.00, 2, 30, 60),
+    ('UCC', 10.00, 2, 30, 60),
+    ('Cape Coast', 10.00, 2, 30, 60),
+    -- Accra Areas
+    ('Osu', 20.00, 3, 45, 90),
+    ('East Legon', 20.00, 3, 45, 90),
+    ('Spintex', 20.00, 3, 45, 90),
+    ('Dansoman', 20.00, 3, 45, 90),
+    ('Tema', 20.00, 3, 45, 90),
+    ('Madina', 20.00, 3, 45, 90),
+    ('Achimota', 20.00, 3, 45, 90),
+    ('Kaneshie', 20.00, 3, 45, 90),
+    ('Circle', 20.00, 3, 45, 90),
+    ('Adabraka', 20.00, 3, 45, 90),
+    ('Airport', 20.00, 3, 45, 90),
+    ('Dzorwulu', 20.00, 3, 45, 90),
+    ('Labone', 20.00, 3, 45, 90),
+    ('Cantonments', 20.00, 3, 45, 90),
+    ('Teshie', 20.00, 3, 45, 90),
+    ('Nungua', 20.00, 3, 45, 90),
+    ('Haatso', 20.00, 3, 45, 90),
+    ('Dome', 20.00, 3, 45, 90),
+    ('Kasoa', 25.00, 4, 60, 120),
+    -- Other Major Cities
+    ('Takoradi', 30.00, 5, 90, 180),
+    ('Tamale', 30.00, 5, 90, 180),
+    ('Ho', 30.00, 5, 90, 180),
+    ('Sunyani', 30.00, 5, 90, 180),
+    ('Koforidua', 25.00, 4, 60, 120)
+) AS areas(area_name, delivery_fee, max_delivery_time_hours, estimated_min_minutes, estimated_max_minutes)
+ON CONFLICT (pharmacy_id, area_name) DO UPDATE
+SET 
+    delivery_fee = EXCLUDED.delivery_fee,
+    max_delivery_time_hours = EXCLUDED.max_delivery_time_hours,
+    estimated_min_minutes = EXCLUDED.estimated_min_minutes,
+    estimated_max_minutes = EXCLUDED.estimated_max_minutes,
+    is_active = EXCLUDED.is_active;
+
+-- 16.3 STOCK INVENTORY
+WITH pharmacy AS (
+    SELECT id FROM public.pharmacies WHERE email = 'silverpillpharmacy@gmail.com'
+)
+INSERT INTO public.pharmacy_products (pharmacy_id, product_id, stock_level, is_available, reorder_level, reorder_quantity)
+SELECT 
+    pharmacy.id,
+    products.id,
+    CASE 
+        WHEN products.featured = true THEN 500
+        WHEN products.category = 'Testing' THEN 300
+        WHEN products.category = 'Protection' THEN 400
+        WHEN products.category = 'Bundles' THEN 200
+        ELSE 250
+    END as stock_level,
+    true as is_available,
+    50 as reorder_level,
+    100 as reorder_quantity
+FROM pharmacy, public.products
+ON CONFLICT (pharmacy_id, product_id) DO UPDATE
+SET 
+    stock_level = EXCLUDED.stock_level,
+    is_available = EXCLUDED.is_available,
+    updated_at = NOW();
+
+-- 16.4 CREATE USER
+INSERT INTO auth.users (
+    instance_id,
+    id,
+    aud,
+    role,
+    email,
+    encrypted_password,
+    email_confirmed_at,
+    recovery_sent_at,
+    last_sign_in_at,
+    raw_app_meta_data,
+    raw_user_meta_data,
+    created_at,
+    updated_at,
+    confirmation_token,
+    email_change,
+    email_change_token_new,
+    recovery_token
+)
+VALUES (
+    '00000000-0000-0000-0000-000000000000',
+    gen_random_uuid(),
+    'authenticated',
+    'authenticated',
+    'silverpillpharmacy@gmail.com',
+    crypt('DiscreetKitAdmin2k25', gen_salt('bf')),
+    NOW(),
+    NOW(),
+    NOW(),
+    '{"provider":"email","providers":["email"]}',
+    '{}',
+    NOW(),
+    NOW(),
+    '',
+    '',
+    '',
+    ''
+)
+ON CONFLICT DO NOTHING;
+
+-- 16.5 ASSIGN ROLE
+INSERT INTO public.user_roles (user_id, role_id)
+SELECT 
+    u.id, 
+    r.id 
+FROM auth.users u, public.roles r 
+WHERE u.email = 'silverpillpharmacy@gmail.com' 
+AND r.name = 'pharmacy'
+ON CONFLICT DO NOTHING;
+
+-- 16.6 LINK USER TO PHARMACY
+UPDATE public.pharmacies
+SET user_id = (SELECT id FROM auth.users WHERE email = 'silverpillpharmacy@gmail.com')
+WHERE email = 'silverpillpharmacy@gmail.com';
+
+COMMIT;
 COMMENT ON TABLE public.pharmacy_notifications IS 'Queue for SMS notifications to pharmacies.';
 CREATE INDEX pharmacy_notifications_order_idx ON public.pharmacy_notifications(order_id);
 CREATE UNIQUE INDEX pharmacy_notifications_order_pharmacy_idx ON public.pharmacy_notifications(order_id, pharmacy_id);
