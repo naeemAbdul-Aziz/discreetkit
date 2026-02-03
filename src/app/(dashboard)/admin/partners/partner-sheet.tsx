@@ -16,7 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { upsertPharmacy, createPharmacyWithUser } from "@/lib/admin-actions";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import { User } from "lucide-react";
@@ -69,6 +69,7 @@ export function PartnerSheet({
 }: PartnerSheetProps) {
   const { toast } = useToast();
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const [showUserFields, setShowUserFields] = useState(false);
 
   const form = useForm<FormValues>({
@@ -165,7 +166,9 @@ export function PartnerSheet({
         toast({ title: "Success", description: "Partner saved successfully." });
         onOpenChange(false);
         // Refresh purely for data update, don't await/block UI
-        router.refresh();
+        startTransition(() => {
+          router.refresh();
+        });
       }
     } catch (error: any) {
       console.error("Submit error:", error);
@@ -364,8 +367,13 @@ export function PartnerSheet({
           </div>
 
           <SheetFooter className="pt-4">
-            <Button type="submit" disabled={form.formState.isSubmitting}>
-              {form.formState.isSubmitting ? "Saving..." : "Save changes"}
+            <Button
+              type="submit"
+              disabled={form.formState.isSubmitting || isPending}
+            >
+              {form.formState.isSubmitting || isPending
+                ? "Saving..."
+                : "Save changes"}
             </Button>
           </SheetFooter>
         </form>

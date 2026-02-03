@@ -69,7 +69,11 @@ import {
 } from "@/lib/admin-actions";
 import { getSupabaseClient } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
-import { dashboardTable, ordersTableCols, actions as actionStyles } from "@/components/ui/table-layout";
+import {
+  dashboardTable,
+  ordersTableCols,
+  actions as actionStyles,
+} from "@/components/ui/table-layout";
 
 // Helper
 const titleCase = (s: string) =>
@@ -84,6 +88,11 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [bulkSaving, setBulkSaving] = useState(false);
   const [assigningId, setAssigningId] = useState<number | null>(null);
+  const [assignDialogOpen, setAssignDialogOpen] = useState(false);
+  const [activeAssignOrder, setActiveAssignOrder] = useState<{
+    id: number;
+    pharmacyId: number | null;
+  } | null>(null);
 
   // Rider Assignment State
   const [riderDialogOpen, setRiderDialogOpen] = useState(false);
@@ -343,7 +352,11 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
   return (
     <div className="space-y-4">
       {/* Rider Dialog */}
-      <Dialog open={riderDialogOpen} onOpenChange={setRiderDialogOpen} modal={false}>
+      <Dialog
+        open={riderDialogOpen}
+        onOpenChange={setRiderDialogOpen}
+        modal={false}
+      >
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Assign Dispatch Rider</DialogTitle>
@@ -393,7 +406,11 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
       </Dialog>
 
       {/* Message Dialog */}
-      <Dialog open={messageDialogOpen} onOpenChange={setMessageDialogOpen} modal={false}>
+      <Dialog
+        open={messageDialogOpen}
+        onOpenChange={setMessageDialogOpen}
+        modal={false}
+      >
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>Pharmacy Chat</DialogTitle>
@@ -404,6 +421,45 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
           {activeMessageOrderId && (
             <OrderMessages orderId={activeMessageOrderId} userRole="admin" />
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Assign Pharmacy Dialog */}
+      <Dialog
+        open={assignDialogOpen}
+        onOpenChange={setAssignDialogOpen}
+        modal={false}
+      >
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Assign Pharmacy</DialogTitle>
+            <DialogDescription>
+              Select a pharmacy to assign this order to.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            {activeAssignOrder && (
+              <PharmacyCombobox
+                orderId={activeAssignOrder.id}
+                currentPharmacyId={activeAssignOrder.pharmacyId}
+                // Pass dummy props or just ignore name for now since Combobox handles search
+                currentPharmacyName={""}
+                onAssign={(oid, pid, pname) => {
+                  handleAssignPharmacy(oid, pid, pname);
+                  setAssignDialogOpen(false);
+                }}
+                loading={assigningId === activeAssignOrder.id}
+              />
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setAssignDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
@@ -524,14 +580,21 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                   className="h-4 w-4 rounded border"
                 />
               </TableHead>
-              <TableHead className={ordersTableCols.codeHead}>Order ID</TableHead>
+              <TableHead className={ordersTableCols.codeHead}>
+                Order ID
+              </TableHead>
               <TableHead className={ordersTableCols.dateHead}>Date</TableHead>
-              <TableHead className={ordersTableCols.customerHead}>Customer</TableHead>
+              <TableHead className={ordersTableCols.customerHead}>
+                Customer
+              </TableHead>
               <TableHead className={ordersTableCols.noteHead}>Note</TableHead>
-              <TableHead className={ordersTableCols.statusHead}>Status</TableHead>
-              <TableHead className={ordersTableCols.pharmacyHead}>Pharmacy</TableHead>
+              <TableHead className={ordersTableCols.statusHead}>
+                Status
+              </TableHead>
+              <TableHead className={ordersTableCols.pharmacyHead}>
+                Pharmacy
+              </TableHead>
               <TableHead className={ordersTableCols.totalHead}>Total</TableHead>
-              <TableHead className={ordersTableCols.actionsHead}></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -556,11 +619,15 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                     className="h-4 w-4 rounded border"
                   />
                 </TableCell>
-                <TableCell className={ordersTableCols.codeCell}>{order.code}</TableCell>
+                <TableCell className={ordersTableCols.codeCell}>
+                  {order.code}
+                </TableCell>
                 <TableCell className={ordersTableCols.dateCell}>
                   {new Date(order.created_at).toISOString().slice(0, 10)}
                 </TableCell>
-                <TableCell className={ordersTableCols.customerCell}>{order.email || "Anonymous"}</TableCell>
+                <TableCell className={ordersTableCols.customerCell}>
+                  {order.email || "Anonymous"}
+                </TableCell>
                 <TableCell className={ordersTableCols.noteCell}>
                   {order.delivery_address_note ? (
                     <Popover>
@@ -585,18 +652,20 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                         size="sm"
                         className="px-2 h-8 items-center"
                         title={
-                          order.status === "out_for_delivery" && order.courier_name
+                          order.status === "out_for_delivery" &&
+                          order.courier_name
                             ? `Rider: ${order.courier_name} (${order.courier_phone || "No phone"})`
                             : undefined
                         }
                       >
                         <span className="inline-flex items-center gap-2">
                           {getStatusBadge(order.status)}
-                          {order.status === "out_for_delivery" && order.courier_name && (
-                            <span className="text-[10px] text-muted-foreground truncate max-w-[100px]">
-                              🚚 {order.courier_name}
-                            </span>
-                          )}
+                          {order.status === "out_for_delivery" &&
+                            order.courier_name && (
+                              <span className="text-[10px] text-muted-foreground truncate max-w-[100px]">
+                                🚚 {order.courier_name}
+                              </span>
+                            )}
                         </span>
                       </Button>
                     </DropdownMenuTrigger>
@@ -626,6 +695,17 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                           {titleCase(s)}
                         </DropdownMenuItem>
                       ))}
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setActiveAssignOrder({
+                            id: order.id,
+                            pharmacyId: order.pharmacy_id,
+                          });
+                          setAssignDialogOpen(true);
+                        }}
+                      >
+                        Assign Pharmacy
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
@@ -690,66 +770,6 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                 </TableCell>
                 <TableCell className={ordersTableCols.totalCell}>
                   GHS {Number(order.total_price || 0).toFixed(2)}
-                </TableCell>
-                <TableCell className={ordersTableCols.actionsCell}>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className={`${actionStyles.iconButton} p-0`}>
-                        <span className="sr-only">Open menu</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
-                      <DropdownMenuSub>
-                        <DropdownMenuSubTrigger>
-                          Update Status
-                        </DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent>
-                          <DropdownMenuRadioGroup
-                            value={order.status}
-                            onValueChange={(val) =>
-                              handleStatusChangeClick(order.id, val)
-                            }
-                          >
-                            <DropdownMenuRadioItem value="pending_payment">
-                              Pending Payment
-                            </DropdownMenuRadioItem>
-                            <DropdownMenuRadioItem value="received">
-                              Received
-                            </DropdownMenuRadioItem>
-                            <DropdownMenuRadioItem value="processing">
-                              Processing
-                            </DropdownMenuRadioItem>
-                            <DropdownMenuRadioItem value="out_for_delivery">
-                              Out for Delivery
-                            </DropdownMenuRadioItem>
-                            <DropdownMenuRadioItem value="completed">
-                              Completed
-                            </DropdownMenuRadioItem>
-                          </DropdownMenuRadioGroup>
-                        </DropdownMenuSubContent>
-                      </DropdownMenuSub>
-
-                      <DropdownMenuSub>
-                        <DropdownMenuSubTrigger>
-                          {order.pharmacy_id
-                            ? "Reassign Pharmacy"
-                            : "Assign Pharmacy"}
-                        </DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent className="p-0">
-                          <div className="p-2">
-                            <DropdownMenuItem
-                              onClick={() => setAssigningId(order.id)}
-                            >
-                              Find Pharmacy...
-                            </DropdownMenuItem>
-                          </div>
-                        </DropdownMenuSubContent>
-                      </DropdownMenuSub>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
                 </TableCell>
               </TableRow>
             ))}

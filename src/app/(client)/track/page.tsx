@@ -113,7 +113,7 @@ const getReassuranceMessage = (status: string): string | null => {
 const getFriendlyNote = (note: string | null): string | null => {
   if (!note) return null;
 
-  // Hide technical/debug messages
+  // Hide technical/debug messages - expanded blocklist
   const blocklist = [
     "Auto-assignment failed",
     "Pending manual assignment",
@@ -121,6 +121,17 @@ const getFriendlyNote = (note: string | null): string | null => {
     "pharmacy #",
     "covers area but",
     "No pharmacy covers",
+    "Pharmacy acknowledge:",
+    "Notifications sent",
+    "Rider:",
+    "(Rider:",
+    "acknowledge:",
+    "declined -",
+    "needs reassignment",
+    "Email notification",
+    "failed:",
+    "Error:",
+    "Exception:",
   ];
 
   if (blocklist.some((term) => note.includes(term))) {
