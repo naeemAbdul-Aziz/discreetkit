@@ -108,6 +108,12 @@ const nextConfig: NextConfig = {
         hostname: 'upload.wikimedia.org',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.supabase.co',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
@@ -123,12 +129,12 @@ const nextConfig: NextConfig = {
           { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
           { 
              key: 'Content-Security-Policy', 
-             value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://checkout.paystack.com https://js.paystack.co https://vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://res.cloudinary.com https://images.unsplash.com https://img.freepik.com https://picsum.photos https://i.pravatar.cc https://upload.wikimedia.org https://placehold.co; font-src 'self' data:; connect-src 'self' https://checkout.paystack.com https://api.paystack.co https://vitals.vercel-insights.com https://sms.arkesel.com https://*.supabase.co wss://*.supabase.co; frame-src 'self' https://checkout.paystack.com; object-src 'none'; base-uri 'self';"
+             value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://checkout.paystack.com https://js.paystack.co https://vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://res.cloudinary.com https://images.unsplash.com https://img.freepik.com https://picsum.photos https://i.pravatar.cc https://upload.wikimedia.org https://placehold.co https://*.supabase.co; font-src 'self' data:; connect-src 'self' https://checkout.paystack.com https://api.paystack.co https://vitals.vercel-insights.com https://sms.arkesel.com https://*.supabase.co wss://*.supabase.co; frame-src 'self' https://checkout.paystack.com; object-src 'none'; base-uri 'self';"
           }
           // Optional: stage stricter CSP in report-only mode
           , ...(process.env.CSP_REPORT_ONLY === '1' ? [{
             key: 'Content-Security-Policy-Report-Only',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' https://checkout.paystack.com https://js.paystack.co https://vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://res.cloudinary.com https://images.unsplash.com https://img.freepik.com https://picsum.photos https://i.pravatar.cc https://upload.wikimedia.org https://placehold.co; font-src 'self' data:; connect-src 'self' https://checkout.paystack.com https://api.paystack.co https://vitals.vercel-insights.com https://sms.arkesel.com https://*.supabase.co wss://*.supabase.co; frame-src 'self' https://checkout.paystack.com; object-src 'none'; base-uri 'self'; report-uri /api/csp-report"
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' https://checkout.paystack.com https://js.paystack.co https://vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://res.cloudinary.com https://images.unsplash.com https://img.freepik.com https://picsum.photos https://i.pravatar.cc https://upload.wikimedia.org https://placehold.co https://*.supabase.co; font-src 'self' data:; connect-src 'self' https://checkout.paystack.com https://api.paystack.co https://vitals.vercel-insights.com https://sms.arkesel.com https://*.supabase.co wss://*.supabase.co; frame-src 'self' https://checkout.paystack.com; object-src 'none'; base-uri 'self'; report-uri /api/csp-report"
           }] : [])
         ],
       },
