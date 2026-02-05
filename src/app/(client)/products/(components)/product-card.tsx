@@ -116,9 +116,9 @@ export function ProductCard({ product }: { product: Product }) {
                 <Link
                   href={`/refills/enroll?productId=${product.id}&productName=${encodeURIComponent(product.name)}`}
                   onClick={(e) => e.stopPropagation()}
-                  className="flex h-12 w-auto px-4 items-center justify-center rounded-full shadow-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-sm"
+                  className="flex h-14 w-auto px-6 items-center justify-center rounded-full shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-xl font-semibold text-sm"
                 >
-                  Enroll
+                  Enroll Now
                 </Link>
               ) : (
                 <button
@@ -128,7 +128,7 @@ export function ProductCard({ product }: { product: Product }) {
                     addItem(product);
                   }}
                   className={cn(
-                    "flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
+                    "flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 hover:shadow-xl",
                     isInCart
                       ? "bg-success text-success-foreground hover:bg-success/90"
                       : "bg-primary text-primary-foreground hover:bg-primary/90",
@@ -136,7 +136,7 @@ export function ProductCard({ product }: { product: Product }) {
                   aria-label={isInCart ? "In cart" : "Add to cart"}
                 >
                   {isInCart ? (
-                    <Check className="h-5 w-5" />
+                    <Check className="h-6 w-6" />
                   ) : (
                     <Plus className="h-6 w-6" />
                   )}
@@ -147,7 +147,7 @@ export function ProductCard({ product }: { product: Product }) {
         </div>
       </Link>
 
-      <div className="mt-4 px-2">
+      <div className="mt-5 px-2 space-y-2">
         <Link
           href={`/products/${product.id}`}
           className="block group-hover:text-primary transition-colors duration-300"
@@ -156,9 +156,16 @@ export function ProductCard({ product }: { product: Product }) {
             {product.name}
           </h3>
         </Link>
-        <p className="mt-1 font-medium text-muted-foreground">
-          GHS {product.price_ghs.toFixed(2)}
-        </p>
+        <div className="flex items-baseline gap-2">
+          <p className="text-xl font-bold text-primary">
+            GHS {product.price_ghs.toFixed(2)}
+          </p>
+          {product.student_price_ghs && (
+            <span className="text-xs text-green-600 font-medium">
+              Student: GHS {product.student_price_ghs.toFixed(2)}
+            </span>
+          )}
+        </div>
       </div>
     </motion.div>
   );
