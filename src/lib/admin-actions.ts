@@ -755,6 +755,7 @@ export async function getDashboardStats() {
 export async function updateOrderStatus(id: number, status: string, courierDetails?: { name: string; phone: string; trackingUrl?: string }) {
     await requireAdmin();
     const supabase = await createSupabaseServerClient()
+    const supabaseAdmin = getSupabaseAdminClient()
 
     const updatePayload: any = { status }
     if (courierDetails) {
@@ -772,6 +773,16 @@ export async function updateOrderStatus(id: number, status: string, courierDetai
 
     // Trigger SMS notifications asynchronously
     if (status === 'out_for_delivery') {
+        // Log a customer-friendly event with rider context
+        try {
+            const { createOrderEvent } = await import('@/lib/event-messages');
+            await createOrderEvent(supabaseAdmin, id, 'out_for_delivery', {
+                riderName: courierDetails?.name,
+                riderPhone: courierDetails?.phone,
+            });
+        } catch (evtErr) {
+            console.warn('[Admin] Failed to create out_for_delivery event:', evtErr)
+        }
         // 1. Notify Customer (Existing)
         sendShippingNotificationSMS(String(id)).catch(console.error)
 
@@ -803,6 +814,13 @@ export async function updateOrderStatus(id: number, status: string, courierDetai
             }
         }
     } else if (status === 'completed') {
+        // Log delivery event
+        try {
+            const { createOrderEvent } = await import('@/lib/event-messages');
+            await createOrderEvent(supabaseAdmin, id, 'completed');
+        } catch (evtErr) {
+            console.warn('[Admin] Failed to create completed event:', evtErr)
+        }
         sendDeliveryNotificationSMS(String(id)).catch(console.error)
     }
 

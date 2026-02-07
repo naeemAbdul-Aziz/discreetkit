@@ -123,8 +123,6 @@ const getFriendlyNote = (note: string | null): string | null => {
     "No pharmacy covers",
     "Pharmacy acknowledge:",
     "Notifications sent",
-    "Rider:",
-    "(Rider:",
     "acknowledge:",
     "declined -",
     "needs reassignment",
