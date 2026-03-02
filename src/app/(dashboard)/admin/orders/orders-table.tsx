@@ -99,6 +99,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
   const [pendingStatusUpdate, setPendingStatusUpdate] = useState<{
     id: number;
     status: string;
+    forceOverride?: boolean;
   } | null>(null);
   const [riderName, setRiderName] = useState("");
   const [riderPhone, setRiderPhone] = useState("");
@@ -108,6 +109,19 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
   const [activeMessageOrderId, setActiveMessageOrderId] = useState<
     number | null
   >(null);
+
+  // Override State
+  const [overridePrompt, setOverridePrompt] = useState<{
+    orderId: number;
+    newStatus: string;
+    pharmacyName: string;
+  } | null>(null);
+
+  const [bulkOverridePrompt, setBulkOverridePrompt] = useState<{
+    status: string;
+    restrictedCount: number;
+    totalCount: number;
+  } | null>(null);
 
   // Pagination
   const [page, setPage] = useState(1);
@@ -201,8 +215,23 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
   }, [toast]);
 
   const handleStatusChangeClick = (orderId: number, newStatus: string) => {
+    const currentOrder = orders.find((o) => o.id === orderId);
+
+    // Check if it's an assigned order and a restricted status update
+    const isRestrictedTransition =
+      !!currentOrder?.pharmacy_id &&
+      ["processing", "out_for_delivery", "completed"].includes(newStatus);
+
+    if (isRestrictedTransition) {
+      setOverridePrompt({
+        orderId,
+        newStatus,
+        pharmacyName: currentOrder?.pharmacies?.name || "Assigned Pharmacy",
+      });
+      return;
+    }
+
     if (newStatus === "out_for_delivery") {
-      const currentOrder = orders.find((o) => o.id === orderId);
       setRiderName(currentOrder?.courier_name || "");
       setRiderPhone(currentOrder?.courier_phone || "");
       setPendingStatusUpdate({ id: orderId, status: newStatus });
@@ -212,12 +241,43 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
     }
   };
 
+  const confirmOverride = () => {
+    if (overridePrompt) {
+      if (overridePrompt.newStatus === "out_for_delivery") {
+        const currentOrder = orders.find(
+          (o) => o.id === overridePrompt.orderId,
+        );
+        setRiderName(currentOrder?.courier_name || "");
+        setRiderPhone(currentOrder?.courier_phone || "");
+        setPendingStatusUpdate({
+          id: overridePrompt.orderId,
+          status: overridePrompt.newStatus,
+          forceOverride: true,
+        });
+        setRiderDialogOpen(true);
+      } else {
+        executeStatusChange(
+          overridePrompt.orderId,
+          overridePrompt.newStatus,
+          undefined,
+          true,
+        );
+      }
+      setOverridePrompt(null);
+    }
+  };
+
   const confirmRiderAssignment = () => {
     if (pendingStatusUpdate) {
-      executeStatusChange(pendingStatusUpdate.id, pendingStatusUpdate.status, {
-        name: riderName,
-        phone: riderPhone,
-      });
+      executeStatusChange(
+        pendingStatusUpdate.id,
+        pendingStatusUpdate.status,
+        {
+          name: riderName,
+          phone: riderPhone,
+        },
+        pendingStatusUpdate.forceOverride,
+      );
       setRiderDialogOpen(false);
       setPendingStatusUpdate(null);
     }
@@ -227,6 +287,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
     orderId: number,
     newStatus: string,
     courierDetails?: { name: string; phone: string },
+    forceOverride: boolean = false,
   ) => {
     // Optimistic update
     setOrders((prev) =>
@@ -243,7 +304,12 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
     );
 
     const { updateOrderStatus } = await import("@/lib/admin-actions");
-    const res = await updateOrderStatus(orderId, newStatus, courierDetails);
+    const res = await updateOrderStatus(
+      orderId,
+      newStatus,
+      courierDetails,
+      forceOverride,
+    );
 
     if (res.error) {
       toast({
@@ -258,6 +324,39 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
         description: `Order status changed to ${titleCase(newStatus)}`,
       });
     }
+  };
+
+  const executeBulkStatusChange = async (
+    status: string,
+    forceOverride: boolean = false,
+  ) => {
+    setBulkSaving(true);
+    const { bulkUpdateOrderStatus } = await import("@/lib/admin-actions");
+    const res = await bulkUpdateOrderStatus(
+      Array.from(selectedIds),
+      status,
+      forceOverride,
+    );
+    if (res.error) {
+      toast({
+        variant: "destructive",
+        title: "Bulk update failed",
+        description: res.error,
+      });
+    } else {
+      toast({
+        title: "Bulk Updated",
+        description: res.warning
+          ? res.warning
+          : `Set orders to ${titleCase(status)}`,
+      });
+      // Optimistic update
+      setOrders((prev) =>
+        prev.map((o) => (selectedIds.has(o.id) ? { ...o, status } : o)),
+      );
+      setSelectedIds(new Set());
+    }
+    setBulkSaving(false);
   };
 
   const handleAssignPharmacy = async (
@@ -351,6 +450,88 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
 
   return (
     <div className="space-y-4">
+      {/* Override Dialog */}
+      <Dialog
+        open={!!overridePrompt}
+        onOpenChange={(open) => !open && setOverridePrompt(null)}
+        modal={false}
+      >
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertCircle className="h-5 w-5" />
+              Override Workflow
+            </DialogTitle>
+            <DialogDescription>
+              This order belongs to{" "}
+              <span className="font-semibold text-foreground">
+                {overridePrompt?.pharmacyName}
+              </span>
+              . The pharmacy is normally responsible for moving the status to{" "}
+              {overridePrompt ? titleCase(overridePrompt.newStatus) : ""}.
+              <br />
+              <br />
+              Are you sure you want to force this status update and override
+              their workflow?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOverridePrompt(null)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmOverride}>
+              Force Update
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Override Dialog */}
+      <Dialog
+        open={!!bulkOverridePrompt}
+        onOpenChange={(open) => !open && setBulkOverridePrompt(null)}
+        modal={false}
+      >
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertCircle className="h-5 w-5" />
+              Override Workflow
+            </DialogTitle>
+            <DialogDescription>
+              {bulkOverridePrompt?.restrictedCount} of the{" "}
+              {bulkOverridePrompt?.totalCount} selected orders are assigned to
+              pharmacies. Pharmacies usually handle{" "}
+              {bulkOverridePrompt ? titleCase(bulkOverridePrompt.status) : ""}{" "}
+              updates.
+              <br />
+              <br />
+              Do you want to override and force the update on these orders
+              anyway?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setBulkOverridePrompt(null)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (bulkOverridePrompt) {
+                  executeBulkStatusChange(bulkOverridePrompt.status, true);
+                  setBulkOverridePrompt(null);
+                }
+              }}
+            >
+              Force Update All
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Rider Dialog */}
       <Dialog
         open={riderDialogOpen}
@@ -483,33 +664,28 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                 <DropdownMenuItem
                   key={s}
                   disabled={bulkSaving}
-                  onClick={async () => {
-                    // Bulk logic currently doesn't support rider assignment for simplicity, or we can prompt?
-                    // For now, simple bulk update.
-                    setBulkSaving(true);
-                    const res = await bulkUpdateOrderStatus(
-                      Array.from(selectedIds),
-                      s,
+                  onClick={() => {
+                    const isRestrictedTransition = [
+                      "processing",
+                      "out_for_delivery",
+                      "completed",
+                    ].includes(s);
+                    const selectedOrdersWithPharmacies = orders.filter(
+                      (o) => selectedIds.has(o.id) && o.pharmacy_id,
                     );
-                    if (res.error) {
-                      toast({
-                        variant: "destructive",
-                        title: "Bulk update failed",
-                        description: res.error,
+
+                    if (
+                      isRestrictedTransition &&
+                      selectedOrdersWithPharmacies.length > 0
+                    ) {
+                      setBulkOverridePrompt({
+                        status: s,
+                        restrictedCount: selectedOrdersWithPharmacies.length,
+                        totalCount: selectedIds.size,
                       });
                     } else {
-                      toast({
-                        title: "Bulk Updated",
-                        description: `Set ${selectedIds.size} orders to ${titleCase(s)}`,
-                      });
-                      setOrders((prev) =>
-                        prev.map((o) =>
-                          selectedIds.has(o.id) ? { ...o, status: s } : o,
-                        ),
-                      );
-                      setSelectedIds(new Set());
+                      executeBulkStatusChange(s, false);
                     }
-                    setBulkSaving(false);
                   }}
                 >
                   {titleCase(s)}
