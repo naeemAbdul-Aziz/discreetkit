@@ -63,9 +63,14 @@ We do not rely on application-level logic for security. We enforce it at the **D
 **Provider:** Paystack (PCI-DSS Level 1 Certified)
 
 *   **No Stored Cards:** We **never** touch or store raw credit card numbers. All sensitive data is handled directly by Paystack's tokenized vaults.
-*   **Webhook Integrity:**
+*   **Webhook Integrity & Idempotency:**
     *   All payments are verified asynchronously via Webhooks (`src/app/api/paystack/webhook`).
-    *   We verify the `x-paystack-signature` cryptographic hash on every request to prevent "Replay Attacks" or spoofed payment confirmations.
+    *   We verify the `x-paystack-signature` cryptographic hash on every request using timing-attack safe comparisons to prevent spoofed payment confirmations.
+    *   **Replay Attack Prevention:** A Redis-backed idempotency key system strictly ensures each payment event is processed exactly once, protecting against network retries or malicious replay attempts.
+
+## 2.5 Input Validation & SQL Database Security
+*   **Anti-Tampering Controls:** The checkout system uses robust server-side recalculation. Client-submitted prices are completely discarded and verified dynamically against the secure database. This prevents malicious actors from manipulating cart totals.
+*   **SQL Injection Prevention:** All database requests are parameterized via our Data Access Layer (PostgREST), meaning traditional SQL injection vulnerabilities are effectively neutralized by design.
 
 ---
 

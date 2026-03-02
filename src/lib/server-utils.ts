@@ -183,7 +183,8 @@ export async function sendDeliveryNotificationSMS(orderId: string): Promise<void
             return;
         }
 
-        const deliveredMessage = `Your order ${order.code} has been delivered successfully. Thank you for choosing DiscreetKit for your health needs. Need support? We're here to help.`;
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://discreetkit.com';
+        const deliveredMessage = `Your order ${order.code} has been delivered successfully. Thank you for choosing DiscreetKit for your health needs. Need support? Contact us at ${siteUrl}/partner-care, hello@discreetkit.com or 0539384839.`;
 
         await sendSMS(order.phone_masked, deliveredMessage);
     } catch (error) {

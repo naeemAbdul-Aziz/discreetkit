@@ -342,7 +342,13 @@ We trust the database, not the client. RLS policies are the primary defense, enf
 ### 5.2. API Security
 
 * **Server Actions:** All mutations occur in `src/lib/actions.ts`. We do NOT use the Supabase Client for writes from the browser. This ensures all business logic (inventory checks, price validation) runs in a trusted environment.
-* **Webhook Verification:** All Paystack webhooks are validated using HMAC-SHA512 signatures to prevent replay attacks or spoofing.
+* **Input Validation & Anti-Tampering:**
+  * Strict schema validation using `zod` ensures only expected payloads are processed.
+  * **Price Recalculation:** Client-submitted cart totals are discarded. Prices are recalculated dynamically on the server against the database to completely prevent client-side price tampering.
+  * Inputs like phone numbers are sanitized and validated using strict regex.
+* **SQL Injection Prevention:** All database queries utilize the Supabase JavaScript Client (PostgREST wrapper), which inherently parameterizes queries, effectively neutralizing traditional SQL injection vectors.
+* **Webhook Verification:** All Paystack webhooks are validated using HMAC-SHA512 signatures, combined with `timingSafeEqual` to prevent timing attacks.
+* **Idempotency Protection:** A Redis cache tracks webhook event IDs to prevent duplicate webhook processing, effectively mitigating retry-based replay attacks.
 
 ---
 

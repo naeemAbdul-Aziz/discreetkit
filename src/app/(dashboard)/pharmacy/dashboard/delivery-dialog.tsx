@@ -10,13 +10,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -250,18 +249,20 @@ export function DeliveryDialog({
 
   if (isMobile) {
     return (
-      <Sheet open={isOpen} onOpenChange={onOpenChange}>
-        <SheetContent side="bottom" className="h-[90vh] overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle>Assign Dispatch Rider</SheetTitle>
-            <SheetDescription>
-              Enter the details of the rider picking up this package. This helps
-              track the delivery.
-            </SheetDescription>
-          </SheetHeader>
-          {formContent}
-        </SheetContent>
-      </Sheet>
+      <Drawer open={isOpen} onOpenChange={onOpenChange}>
+        <DrawerContent className="h-[90vh]">
+          <div className="flex flex-col h-full w-full max-w-sm mx-auto px-4 pb-8 overflow-y-auto">
+            <DrawerHeader className="px-0 pt-6 text-left shrink-0">
+              <DrawerTitle>Assign Dispatch Rider</DrawerTitle>
+              <DrawerDescription>
+                Enter the details of the rider picking up this package. This
+                helps track the delivery.
+              </DrawerDescription>
+            </DrawerHeader>
+            <div className="flex-1 pb-4">{formContent}</div>
+          </div>
+        </DrawerContent>
+      </Drawer>
     );
   }
 

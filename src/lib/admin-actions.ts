@@ -752,10 +752,16 @@ export async function getDashboardStats() {
     };
 }
 
-export async function updateOrderStatus(id: number, status: string, courierDetails?: { name: string; phone: string; trackingUrl?: string }) {
+export async function updateOrderStatus(id: number, status: string, courierDetails?: { name: string; phone: string; trackingUrl?: string }, forceOverride: boolean = false) {
     await requireAdmin();
     const supabase = await createSupabaseServerClient()
     const supabaseAdmin = getSupabaseAdminClient()
+
+    // Enforce Pharmacy Workflow Restriction
+    const { data: order } = await supabase.from('orders').select('pharmacy_id').eq('id', id).single();
+    if (order?.pharmacy_id && ['processing', 'out_for_delivery', 'completed'].includes(status) && !forceOverride) {
+        return { error: 'Status is managed by the assigned pharmacy. Use override to force update.' }
+    }
 
     const updatePayload: any = { status }
     if (courierDetails) {
@@ -924,7 +930,7 @@ export async function assignPharmacy(orderId: number, pharmacyId: number) {
 import { sendShippingNotificationSMS, sendDeliveryNotificationSMS } from "@/lib/server-utils"
 
 // Bulk update order statuses
-export async function bulkUpdateOrderStatus(ids: number[], status: string) {
+export async function bulkUpdateOrderStatus(ids: number[], status: string, forceOverride: boolean = false) {
     await requireAdmin();
     const allowed = ['pending_payment', 'received', 'processing', 'out_for_delivery', 'completed']
     if (!allowed.includes(status)) {
@@ -932,20 +938,46 @@ export async function bulkUpdateOrderStatus(ids: number[], status: string) {
     }
     if (!ids.length) return { error: 'No orders selected' }
     const supabase = await createSupabaseServerClient()
+
+    // If not forcing override, exclude orders that have a pharmacy assigned and are restricted
+    let targetIds = ids;
+    if (['processing', 'out_for_delivery', 'completed'].includes(status) && !forceOverride) {
+        const { data: ordersWithPharmacies } = await supabase
+            .from('orders')
+            .select('id, pharmacy_id')
+            .in('id', ids)
+            .not('pharmacy_id', 'is', null);
+
+        if (ordersWithPharmacies && ordersWithPharmacies.length > 0) {
+            const restrictedIds = new Set(ordersWithPharmacies.map(o => o.id));
+            targetIds = ids.filter(id => !restrictedIds.has(id));
+
+            if (targetIds.length === 0) {
+                return { error: 'All selected orders are managed by a pharmacy. Use override to force update.' };
+            }
+        }
+    }
+
     const { error } = await supabase
         .from('orders')
         .update({ status })
-        .in('id', ids)
+        .in('id', targetIds)
     if (error) return { error: error.message }
 
     // Trigger SMS notifications asynchronously
     if (status === 'out_for_delivery') {
-        ids.forEach(id => sendShippingNotificationSMS(String(id)).catch(console.error))
+        targetIds.forEach(id => sendShippingNotificationSMS(String(id)).catch(console.error))
     } else if (status === 'completed') {
-        ids.forEach(id => sendDeliveryNotificationSMS(String(id)).catch(console.error))
+        targetIds.forEach(id => sendDeliveryNotificationSMS(String(id)).catch(console.error))
     }
 
     revalidatePath('/admin/orders')
+    
+    // Return extra info if some were skipped
+    if (targetIds.length < ids.length) {
+        return { success: true, warning: `${ids.length - targetIds.length} orders were skipped because they are managed by a pharmacy.` }
+    }
+    
     return { success: true }
 }
 
