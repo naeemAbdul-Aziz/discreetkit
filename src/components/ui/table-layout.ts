@@ -19,7 +19,7 @@ export const ordersTableCols = {
   dateCell: "text-muted-foreground text-sm whitespace-nowrap w-[110px]",
   customerCell: "truncate max-w-[220px]",
   noteCell: "w-[110px]",
-  statusCell: "w-[170px]",
+  statusCell: "w-[170px] min-w-[170px] max-w-[170px] whitespace-nowrap overflow-hidden",
   pharmacyCell: "w-[180px]",
   totalCell: "text-right w-[100px] whitespace-nowrap",
   actionsCell: "w-[44px]",

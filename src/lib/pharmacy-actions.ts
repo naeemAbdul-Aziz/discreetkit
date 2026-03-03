@@ -216,8 +216,23 @@ export async function requestNewProduct(_prevState: any, formData: FormData) {
         });
 
     if (error) return { success: false, message: error.message };
+    
+    revalidatePath('/pharmacy/inventory');
 
     return { success: true, message: 'Request submitted successfully' };
+}
+
+export async function getPharmacyProductRequests() {
+    const { pharmacy, supabase } = await requirePharmacy();
+
+    const { data: requests, error } = await supabase
+        .from('product_requests')
+        .select('*')
+        .eq('pharmacy_id', pharmacy.id)
+        .order('created_at', { ascending: false });
+
+    if (error) throw new Error(error.message);
+    return requests || [];
 }
 
 // --- Settings & Operational Actions ---

@@ -1971,3 +1971,75 @@ export async function getLiveDeliveries() {
          };
     });
 }
+
+// --- Product Requests Management ---
+
+export async function getProductRequests() {
+    await requireAdmin();
+    const supabase = await createSupabaseServerClient();
+    
+    const { data: requests, error } = await supabase
+        .from('product_requests')
+        .select(`
+            id,
+            pharmacy_id,
+            product_name,
+            description,
+            status,
+            admin_notes,
+            created_at,
+            pharmacy:pharmacies(name)
+        `)
+        .order('created_at', { ascending: false });
+
+    if (error) return { error: error.message };
+
+    // Format data to flatten pharmacy name
+    const formattedRequests = requests.map(req => ({
+        ...req,
+        pharmacy_name: Array.isArray(req.pharmacy) ? req.pharmacy[0]?.name : req.pharmacy?.name
+    }));
+
+    return { requests: formattedRequests };
+}
+
+export async function moderateProductRequest(id: number, status: 'approved' | 'rejected', notes?: string, productData?: any) {
+    await requireAdmin();
+    const supabase = await createSupabaseServerClient();
+
+    // If approved and product data provided, create the product first
+    if (status === 'approved' && productData) {
+        // Assume productData is valid, use upsertProduct logic roughly
+        const { error: prodError } = await supabase
+            .from('products')
+            .insert({
+                name: productData.name,
+                category: productData.category,
+                price_ghs: productData.price_ghs,
+                stock_level: productData.stock_level,
+                image_url: productData.image_url || null,
+                description: productData.description || null,
+                featured: productData.featured || false,
+                requires_prescription: productData.requires_prescription || false,
+                is_student_product: productData.is_student_product || false
+            });
+            
+        if (prodError) return { success: false, error: "Failed to create product: " + prodError.message };
+    }
+
+    const { error } = await supabase
+        .from('product_requests')
+        .update({
+            status,
+            admin_notes: notes || null
+        })
+        .eq('id', id);
+
+    if (error) return { success: false, error: error.message };
+
+    revalidatePath('/admin/products');
+    // Also revalidate pharmacy inventory so they see the status change
+    revalidatePath('/pharmacy/inventory'); 
+    
+    return { success: true };
+}

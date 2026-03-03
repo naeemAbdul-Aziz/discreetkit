@@ -22,7 +22,7 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { upsertProduct, approveProductRequest } from "@/lib/admin-actions";
+import { upsertProduct, moderateProductRequest } from "@/lib/admin-actions";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 
@@ -100,7 +100,12 @@ export function ProductSheet({
 
       if (requestId) {
         // Approve Request Flow
-        res = await approveProductRequest(requestId, data);
+        res = await moderateProductRequest(
+          requestId,
+          "approved",
+          "Product created and listed via admin panel",
+          data,
+        );
       } else {
         // Standard Upsert Flow
         res = await upsertProduct(data);
