@@ -1484,24 +1484,49 @@ export async function rejectProductRequest(requestId: number) {
 }
 
 // Unified moderation helper used by the admin UI
+type ProductModerationResult = { success: boolean; message?: string; error?: string };
+
 export async function moderateProductRequest(
     requestId: number,
     status: 'approved' | 'rejected',
     _reason?: string,
     productData?: ProductFormValues
-) {
+): Promise<ProductModerationResult> {
     if (status === 'approved') {
         if (!productData) {
-            return { success: false, message: 'Missing product data for approval' };
+            return {
+                success: false,
+                error: 'Missing product data for approval',
+                message: 'Missing product data for approval',
+            };
         }
-        return approveProductRequest(requestId, productData);
+
+        const result = await approveProductRequest(requestId, productData);
+        if (!result.success) {
+            return {
+                success: false,
+                error: result.message || 'Failed to approve product request',
+                message: result.message,
+            };
+        }
+
+        return { success: true, message: result.message };
     }
 
     if (status === 'rejected') {
-        return rejectProductRequest(requestId);
+        const result = await rejectProductRequest(requestId);
+        if (!result.success) {
+            return {
+                success: false,
+                error: result.message || 'Failed to reject product request',
+                message: result.message,
+            };
+        }
+
+        return { success: true, message: result.message };
     }
 
-    return { success: false, message: 'Invalid moderation status' };
+    return { success: false, error: 'Invalid moderation status', message: 'Invalid moderation status' };
 }
 
 // --- Pharmacy Inventory / Pricing Management ---
