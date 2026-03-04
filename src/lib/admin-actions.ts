@@ -1483,6 +1483,27 @@ export async function rejectProductRequest(requestId: number) {
     return { success: true, message: 'Request rejected' };
 }
 
+// Unified moderation helper used by the admin UI
+export async function moderateProductRequest(
+    requestId: number,
+    status: 'approved' | 'rejected',
+    _reason?: string,
+    productData?: ProductFormValues
+) {
+    if (status === 'approved') {
+        if (!productData) {
+            return { success: false, message: 'Missing product data for approval' };
+        }
+        return approveProductRequest(requestId, productData);
+    }
+
+    if (status === 'rejected') {
+        return rejectProductRequest(requestId);
+    }
+
+    return { success: false, message: 'Invalid moderation status' };
+}
+
 // --- Pharmacy Inventory / Pricing Management ---
 
 export async function getPharmacyInventory(pharmacyId: number) {
