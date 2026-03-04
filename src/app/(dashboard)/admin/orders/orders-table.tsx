@@ -826,7 +826,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="px-2 h-8 items-center w-full justify-start"
+                        className="-ml-2 px-2 h-8 items-center w-fit justify-start focus-visible:ring-0"
                         title={
                           order.status === "out_for_delivery" &&
                           order.courier_name
