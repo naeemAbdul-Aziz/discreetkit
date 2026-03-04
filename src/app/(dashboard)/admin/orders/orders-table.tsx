@@ -826,7 +826,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="px-2 h-8 items-center"
+                        className="px-2 h-8 items-center w-full justify-start"
                         title={
                           order.status === "out_for_delivery" &&
                           order.courier_name
@@ -834,7 +834,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                             : undefined
                         }
                       >
-                        <span className="inline-flex items-center gap-2">
+                        <span className="inline-flex items-center gap-2 w-full">
                           {getStatusBadge(order.status)}
                           {order.status === "out_for_delivery" &&
                             order.courier_name && (

@@ -11,7 +11,7 @@ export const ordersTableCols = {
   dateHead: "w-[110px]",
   customerHead: "w-[220px]",
   noteHead: "w-[110px]",
-  statusHead: "w-[170px]",
+  statusHead: "w-[170px] min-w-[170px] max-w-[170px]",
   pharmacyHead: "w-[180px]",
   totalHead: "text-right w-[100px]",
   actionsHead: "w-[44px]",
