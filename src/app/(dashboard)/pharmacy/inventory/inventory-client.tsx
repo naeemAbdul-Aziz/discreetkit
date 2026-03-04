@@ -385,14 +385,14 @@ export default function InventoryClient({
                 {requests.map((req) => (
                   <div
                     key={req.id}
-                    className="flex flex-col sm:flex-row justify-between p-4 border rounded-lg bg-card gap-4"
+                    className="flex flex-col md:flex-row justify-between p-5 border rounded-lg bg-card gap-6 items-start md:items-center w-full"
                   >
-                    <div>
-                      <h4 className="font-semibold text-foreground">
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-foreground truncate">
                         {req.product_name}
                       </h4>
                       {req.description && (
-                        <p className="text-sm text-muted-foreground mt-1">
+                        <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
                           {req.description}
                         </p>
                       )}
@@ -401,15 +401,17 @@ export default function InventoryClient({
                         {new Date(req.created_at).toLocaleDateString()}
                       </div>
                     </div>
-                    <div className="flex flex-col items-start sm:items-end gap-2 shrink-0">
+
+                    <div className="flex flex-col items-start md:items-end gap-2 shrink-0 w-full md:w-auto mt-2 md:mt-0">
                       <Badge
                         variant={
                           req.status === "approved"
                             ? "success"
                             : req.status === "rejected"
                               ? "destructive"
-                              : "pending"
+                              : "secondary"
                         }
+                        className="w-fit"
                       >
                         {req.status === "pending"
                           ? "Pending Review"
@@ -417,12 +419,15 @@ export default function InventoryClient({
                             ? "Approved & Listed"
                             : "Declined"}
                       </Badge>
+
                       {req.admin_notes && (
-                        <div className="text-xs bg-muted/50 p-2 rounded-md max-w-xs text-right mt-1 border border-border/50">
-                          <span className="font-semibold text-foreground">
-                            Admin Note:
-                          </span>{" "}
-                          {req.admin_notes}
+                        <div className="text-sm bg-muted/30 p-3 rounded-md w-full md:max-w-md md:text-right border border-border/40 mt-1">
+                          <span className="font-semibold text-foreground block mb-0.5 text-xs uppercase tracking-wider">
+                            Admin Note
+                          </span>
+                          <span className="text-muted-foreground">
+                            {req.admin_notes}
+                          </span>
                         </div>
                       )}
                     </div>
