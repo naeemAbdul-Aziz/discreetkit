@@ -735,10 +735,10 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
       </div>
 
       <div className={dashboardTable.container}>
-        <Table className={cn(dashboardTable.table, "min-w-[600px]")}>
+        <Table className={cn(dashboardTable.table, "min-w-[900px]")}>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-8">
+              <TableHead className={ordersTableCols.checkbox}>
                 <input
                   type="checkbox"
                   aria-label="Select all"
@@ -779,7 +779,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                 key={order.id}
                 className={selectedIds.has(order.id) ? "bg-muted/30" : ""}
               >
-                <TableCell>
+                <TableCell className={ordersTableCols.checkbox}>
                   <input
                     type="checkbox"
                     aria-label={`Select order ${order.code}`}
@@ -826,7 +826,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="px-2 h-8 items-center w-full justify-start"
+                        className="-ml-2 px-2 h-8 items-center w-fit justify-start focus-visible:ring-0"
                         title={
                           order.status === "out_for_delivery" &&
                           order.courier_name
