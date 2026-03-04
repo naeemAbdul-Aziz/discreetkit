@@ -1,8 +1,8 @@
 // Shared table layout classes to keep UI consistent across dashboards
 
 export const dashboardTable = {
-  container: "rounded-md border bg-card overflow-x-auto",
-  table: "table-fixed",
+  container: "w-full rounded-md border bg-card overflow-x-auto",
+  table: "w-full table-fixed",
 };
 
 export const ordersTableCols = {

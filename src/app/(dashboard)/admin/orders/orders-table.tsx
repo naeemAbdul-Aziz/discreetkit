@@ -735,7 +735,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
       </div>
 
       <div className={dashboardTable.container}>
-        <Table className="min-w-[600px] table-fixed">
+        <Table className={cn(dashboardTable.table, "min-w-[600px]")}>
           <TableHeader>
             <TableRow>
               <TableHead className="w-8">
