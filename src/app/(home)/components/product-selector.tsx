@@ -303,31 +303,31 @@ export function ProductSelector({
         {/* Dedicated Medication Refills Section */}
         {refillCategory && (
           <div className="max-w-6xl mx-auto px-4 lg:px-0 mt-6 lg:mt-12">
-            <Card className="relative overflow-hidden rounded-[2.5rem] group border-0 shadow-2xl">
+            <Card className="relative overflow-hidden rounded-3xl md:rounded-[2.5rem] group border-0 shadow-2xl">
               <div className="absolute inset-0 z-0 bg-black">
                 <CategoryShape category="Medication Refills" className="w-full h-full opacity-60 transition-transform duration-[20s] ease-linear group-hover:scale-110" />
               </div>
-              <div className="relative z-10 p-8 md:p-14 flex flex-col md:flex-row items-center justify-between gap-10 bg-black/40 backdrop-blur-md">
+              <div className="relative z-10 p-6 sm:p-8 md:p-14 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-10 bg-black/40 backdrop-blur-md">
                 <div className="w-full md:w-2/3 text-center md:text-left text-white">
-                  <h3 className="text-3xl md:text-4xl lg:text-5xl font-headline font-bold tracking-tight">
+                  <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-headline font-bold tracking-tight">
                     {refillCategory.name}
                   </h3>
-                  <p className="mt-4 text-lg text-white/90 max-w-2xl">
+                  <p className="mt-2 text-sm sm:mt-3 sm:text-base md:text-lg text-white/90 max-w-2xl px-2 md:px-0">
                     {refillCategory.description} Continuous confidential supply exactly when you need it.
                   </p>
-                  <ul className="mt-6 flex flex-wrap gap-3 justify-center md:justify-start">
+                  <ul className="mt-6 flex flex-wrap gap-2 sm:gap-3 justify-center md:justify-start">
                     {refillCategory.examples.map((example) => (
-                      <li key={example} className="flex items-center gap-2 bg-black/50 px-5 py-2.5 rounded-full border border-white/10 hover:border-white/30 transition-colors shadow-sm">
-                        <Check className="h-4 w-4 text-emerald-400 font-bold" />
-                        <span className="text-sm font-medium">{example}</span>
+                      <li key={example} className="flex items-center gap-2 bg-black/50 px-3 py-1.5 sm:px-4 sm:py-2 md:px-5 md:py-2.5 rounded-full border border-white/10 hover:border-white/30 transition-colors shadow-sm">
+                        <Check className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-400 font-bold flex-shrink-0" />
+                        <span className="text-xs sm:text-sm font-medium whitespace-nowrap">{example}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
-                <div className="w-full md:w-1/3 flex justify-center md:justify-end">
-                  <Button asChild size="lg" className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 text-white rounded-full px-10 py-7 text-xl font-bold shadow-[0_0_30px_-5px_var(--tw-shadow-color)] shadow-emerald-500/40 transition-all hover:scale-105 hover:-translate-y-1 block md:inline-flex border-0 text-center">
-                    <Link href={refillCategory.href} className="justify-center">
-                      Get Your Refill <ArrowRight className="ml-2 h-6 w-6" />
+                <div className="w-full md:w-1/3 flex justify-center md:justify-end mt-2 md:mt-0">
+                  <Button asChild className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 text-white rounded-full px-6 py-6 sm:px-8 sm:py-7 md:px-10 text-base sm:text-lg md:text-xl font-bold shadow-[0_0_30px_-5px_var(--tw-shadow-color)] shadow-emerald-500/40 transition-all hover:scale-105 hover:-translate-y-1 flex items-center justify-center border-0 group/btn">
+                    <Link href={refillCategory.href} className="flex items-center justify-center">
+                      Get Your Refill <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 transition-transform group-hover/btn:translate-x-1" />
                     </Link>
                   </Button>
                 </div>
