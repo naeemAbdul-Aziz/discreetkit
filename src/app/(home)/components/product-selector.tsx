@@ -60,13 +60,40 @@ const fallbackCategories: DisplayCategory[] = [
     href: "/products/test-kits",
   },
   {
-    name: "Intimacy Essentials",
-    description: "Condoms and personal care items.",
-    examples: ["Emergency Contraception", "Condoms & Lube"],
+    name: "Emergency Contraceptive",
+    description: "Fast, discreet delivery of emergency contraception.",
+    examples: ["Postpill", "Morning After Pill"],
     image_url:
       "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png",
     image_hint: "emergency contraception pill",
-    href: "/products/intimacy-essentials",
+    href: "/products/emergency-contraceptives",
+  },
+  {
+    name: "Condoms",
+    description: "Premium protection delivered in 100% plain packaging.",
+    examples: ["Durex", "Fiesta", "Kiss"],
+    image_url:
+      "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png",
+    image_hint: "condoms",
+    href: "/products/condoms",
+  },
+  {
+    name: "Male Enhancement",
+    description: "Boost confidence and performance with privacy.",
+    examples: ["Delay Sprays", "Supplements"],
+    image_url:
+      "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png",
+    image_hint: "male enhancement",
+    href: "/products/male-enhancement",
+  },
+  {
+    name: "Lubricants",
+    description: "Enhance comfort and intimacy safely.",
+    examples: ["K-Y Jelly", "Durex Play"],
+    image_url:
+      "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759405784/postpill_jqk0n6.png",
+    image_hint: "lubricants",
+    href: "/products/lubricants",
   },
   {
     name: "Value Bundles",
@@ -75,7 +102,7 @@ const fallbackCategories: DisplayCategory[] = [
     image_url:
       "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1759407282/complete_bundle_gtbo9r.png",
     image_hint: "health product bundle",
-    href: "/products/bundles",
+    href: "/products/value-bundles",
   },
   {
     name: "Medication Refills",
@@ -85,7 +112,7 @@ const fallbackCategories: DisplayCategory[] = [
     image_url:
       "https://res.cloudinary.com/dzfa6wqb8/image/upload/v1760350797/prophylaxis_care_kit_qoksc6.png",
     image_hint: "prescription medication bottle",
-    href: "/products/medication",
+    href: "/products/medication-refills",
   },
 ];
 
@@ -93,9 +120,12 @@ const fallbackCategories: DisplayCategory[] = [
 function mapCategoriesToDisplay(dbCategories: Category[]): DisplayCategory[] {
   const categoryExamples: Record<string, string[]> = {
     "Test Kits": ["HIV Self-test", "Pregnancy Test"],
-    "Intimacy Essentials": ["Condoms", "Lube", "Emergency Contraception"],
+    "Emergency Contraceptive": ["Postpill", "Morning After Pill"],
+    "Condoms": ["Durex", "Fiesta", "Kiss"],
+    "Male enhancement drugs": ["Delay Sprays", "Supplements"],
+    "Lubricants": ["K-Y Jelly", "Durex Play"],
     "Value Bundles": ["Emergency Kit", "Couple Bundle", "The All-In-One"],
-    "Medication Refills": ["HIV Treatment", "PrEP", "Long-term Support"],
+    "Medication Refills": ["HIV Treatment", "PrEP"],
   };
 
   return dbCategories.map((cat) => ({
