@@ -170,10 +170,13 @@ export function ProductSelector({
   const [state, formAction, isPending] = useActionState(saveSuggestion, null);
 
   // Use database categories if available, otherwise fallback
-  const categories =
+  const allCategories =
     dbCategories.length > 0
       ? mapCategoriesToDisplay(dbCategories)
       : fallbackCategories;
+
+  const mainCategories = allCategories.filter((c) => c.name !== "Medication Refills");
+  const refillCategory = allCategories.find((c) => c.name === "Medication Refills");
 
   useEffect(() => {
     if (state?.success) {
@@ -221,18 +224,18 @@ export function ProductSelector({
           </p>
         </div>
 
-        {/* Mobile Carousel */}
-        <div className="lg:hidden">
+        {/* Unified Responsive Carousel */}
+        <div className="w-full">
           <Carousel
             setApi={setApi}
-            opts={{ align: "center", loop: false }}
+            opts={{ align: "start", loop: false }}
             className="w-full"
           >
-            <CarouselContent>
-              {categories.map((category) => (
+            <CarouselContent className="-ml-4">
+              {mainCategories.map((category) => (
                 <CarouselItem
                   key={category.name}
-                  className="basis-4/5 md:basis-1/2"
+                  className="pl-4 basis-[85%] sm:basis-1/2 md:basis-[45%] lg:basis-[30%] xl:basis-[25%]"
                 >
                   <div className="p-1 h-full">
                     <Link href={category.href} className="h-full block group">
@@ -269,15 +272,15 @@ export function ProductSelector({
               ))}
             </CarouselContent>
           </Carousel>
-          <div className="flex items-center justify-center gap-2 mt-8">
-            {categories.map((_, index) => (
+          <div className="flex flex-wrap items-center justify-center gap-2 mt-10">
+            {mainCategories.map((_, index) => (
               <button
                 key={index}
                 onClick={() => api?.scrollTo(index)}
                 className={cn(
                   "h-2 w-2 rounded-full bg-border transition-all",
                   index === selectedIndex
-                    ? "w-4 bg-primary"
+                    ? "w-6 bg-primary"
                     : "hover:bg-primary/50",
                 )}
                 aria-label={`go to slide ${index + 1}`}
@@ -286,57 +289,52 @@ export function ProductSelector({
           </div>
         </div>
 
-        {/* Desktop Grid */}
-        <div className="hidden lg:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-          {categories.map((category, index) => (
-            <motion.div
-              key={category.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="h-full"
-            >
-              <Link href={category.href} className="h-full block group">
-                <Card className="h-full flex flex-col rounded-3xl bg-card overflow-hidden">
-                  <div className="relative aspect-square w-full bg-muted/50 rounded-3xl overflow-hidden p-0">
-                    <CategoryShape category={category.name} />
-                  </div>
-                  <div className="p-6 flex flex-col flex-grow">
-                    <h3 className="text-xl font-bold text-foreground">
-                      {category.name}
-                    </h3>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      {category.description}
-                    </p>
+        {/* Desktop Grid (Removed in favor of universal carousel) */}
 
-                    <ul className="mt-4 space-y-2 text-sm text-muted-foreground flex-grow">
-                      {category.examples.map((example) => (
-                        <li key={example} className="flex items-center gap-2">
-                          <Check className="h-4 w-4 text-primary" />
-                          <span>{example}</span>
-                        </li>
-                      ))}
-                    </ul>
-
-                    <div className="mt-6 text-sm font-semibold text-primary flex items-center gap-2 group-hover:underline">
-                      Shop Now <ArrowRight className="h-4 w-4" />
-                    </div>
-                  </div>
-                </Card>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
-
-        <div className="text-center mt-16">
-          <Button asChild variant="outline" size="lg">
+        <div className="text-center mt-12 mb-16">
+          <Button asChild variant="outline" size="lg" className="rounded-full px-8 shadow-sm">
             <Link href="/products">
-              Shop All Products
-              <ArrowRight />
+              Explore The Catalog
+              <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
           </Button>
         </div>
+
+        {/* Dedicated Medication Refills Section */}
+        {refillCategory && (
+          <div className="max-w-6xl mx-auto px-4 lg:px-0 mt-6 lg:mt-12">
+            <Card className="relative overflow-hidden rounded-[2.5rem] group border-0 shadow-2xl">
+              <div className="absolute inset-0 z-0 bg-black">
+                <CategoryShape category="Medication Refills" className="w-full h-full opacity-60 transition-transform duration-[20s] ease-linear group-hover:scale-110" />
+              </div>
+              <div className="relative z-10 p-8 md:p-14 flex flex-col md:flex-row items-center justify-between gap-10 bg-black/40 backdrop-blur-md">
+                <div className="w-full md:w-2/3 text-center md:text-left text-white">
+                  <h3 className="text-3xl md:text-4xl lg:text-5xl font-headline font-bold tracking-tight">
+                    {refillCategory.name}
+                  </h3>
+                  <p className="mt-4 text-lg text-white/90 max-w-2xl">
+                    {refillCategory.description} Continuous confidential supply exactly when you need it.
+                  </p>
+                  <ul className="mt-6 flex flex-wrap gap-3 justify-center md:justify-start">
+                    {refillCategory.examples.map((example) => (
+                      <li key={example} className="flex items-center gap-2 bg-black/50 px-5 py-2.5 rounded-full border border-white/10 hover:border-white/30 transition-colors shadow-sm">
+                        <Check className="h-4 w-4 text-emerald-400 font-bold" />
+                        <span className="text-sm font-medium">{example}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="w-full md:w-1/3 flex justify-center md:justify-end">
+                  <Button asChild size="lg" className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 text-white rounded-full px-10 py-7 text-xl font-bold shadow-[0_0_30px_-5px_var(--tw-shadow-color)] shadow-emerald-500/40 transition-all hover:scale-105 hover:-translate-y-1 block md:inline-flex border-0 text-center">
+                    <Link href={refillCategory.href} className="justify-center">
+                      Get Your Refill <ArrowRight className="ml-2 h-6 w-6" />
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          </div>
+        )}
 
         {/* Product Suggestion Box */}
         <div className="mt-20 max-w-4xl mx-auto">
