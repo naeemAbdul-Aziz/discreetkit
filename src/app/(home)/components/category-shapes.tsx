@@ -64,8 +64,8 @@ export function CategoryShape({ category, className }: CategoryShapeProps) {
     );
   }
 
-  // 2. Intimacy Essentials: Soft Pink/Rose with Organic Shapes (Warm, intimate)
-  if (category === "Intimacy Essentials") {
+  // 2. Condoms: Soft Pink/Rose with Organic Shapes (Warm, intimate)
+  if (category === "Condoms") {
     return (
       <div
         className={cn(
@@ -120,6 +120,167 @@ export function CategoryShape({ category, className }: CategoryShapeProps) {
                 rest: { rotate: 0 },
                 hover: { rotate: 5 },
               }}
+            />
+          </svg>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // 3. Lubricants: Smooth, flowing waves in Teal/Cyan (fluid, slick)
+  if (category === "Lubricants") {
+    return (
+      <div
+        className={cn(
+          "relative w-full h-full overflow-hidden bg-[#0f766e]",
+          className,
+        )}
+      >
+        <motion.div
+          className="absolute inset-0"
+          initial="rest"
+          whileHover="hover"
+          animate="rest"
+        >
+          <svg
+            viewBox="0 0 200 200"
+            className="w-full h-full"
+            preserveAspectRatio="none"
+          >
+            <rect width="200" height="200" fill="#0f766e" /> {/* Teal-700 */}
+            
+            <motion.path
+              d="M0,150 C50,120 100,180 200,130 L200,200 L0,200 Z"
+              className="fill-[#2dd4bf]" // Teal-400
+              variants={{
+                rest: { y: 0 },
+                hover: { y: -15 },
+              }}
+              transition={{ duration: 0.8, type: "spring" }}
+            />
+            <motion.path
+              d="M0,170 C80,140 120,200 200,160 L200,200 L0,200 Z"
+              className="fill-[#99f6e4] opacity-50" // Teal-200
+              variants={{
+                rest: { y: 0 },
+                hover: { y: -10 },
+              }}
+              transition={{ duration: 0.6 }}
+            />
+          </svg>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // 4. Male Enhancement: Rising Amber/Gold gradients (energy, vitality)
+  if (category === "Male Enhancement" || category === "Male enhancement drugs") {
+    return (
+      <div
+        className={cn(
+          "relative w-full h-full overflow-hidden bg-[#9a3412]",
+          className,
+        )}
+      >
+        <motion.div
+          className="absolute inset-0"
+          initial="rest"
+          whileHover="hover"
+          animate="rest"
+        >
+          <svg
+            viewBox="0 0 200 200"
+            className="w-full h-full"
+            preserveAspectRatio="none"
+          >
+            <rect width="200" height="200" fill="#9a3412" /> {/* Orange-800 */}
+            
+            <motion.polygon
+              points="0,200 100,50 200,200"
+              className="fill-[#f97316]" // Orange-500
+              variants={{
+                rest: { scaleY: 1, originY: "200px" as any },
+                hover: { scaleY: 1.15, originY: "200px" as any },
+              }}
+              transition={{ duration: 0.5 }}
+            />
+            <motion.polygon
+              points="50,200 150,100 250,200"
+              className="fill-[#fdba74] opacity-60" // Orange-300
+              variants={{
+                rest: { scaleY: 1, originY: "200px" as any },
+                hover: { scaleY: 1.2, originY: "200px" as any },
+              }}
+              transition={{ duration: 0.6 }}
+            />
+            <motion.circle
+              cx="100"
+              cy="50"
+              r="20"
+              className="fill-[#fef08a]" // Yellow-200
+              variants={{
+                rest: { y: 0, scale: 1 },
+                hover: { y: -10, scale: 1.2 },
+              }}
+              transition={{ duration: 0.4 }}
+            />
+          </svg>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // 5. Emergency Contraceptive: Deep Indigo with striking diagonal split (urgency, calm control)
+  if (category === "Emergency Contraceptive") {
+    return (
+      <div
+        className={cn(
+          "relative w-full h-full overflow-hidden bg-[#312e81]",
+          className,
+        )}
+      >
+        <motion.div
+          className="absolute inset-0"
+          initial="rest"
+          whileHover="hover"
+          animate="rest"
+        >
+          <svg
+            viewBox="0 0 200 200"
+            className="w-full h-full"
+            preserveAspectRatio="none"
+          >
+            <rect width="200" height="200" fill="#312e81" /> {/* Indigo-900 */}
+            
+            <motion.polygon
+              points="0,200 200,0 200,200"
+              className="fill-[#6366f1]" // Indigo-500
+              variants={{
+                rest: { x: 0, y: 0 },
+                hover: { x: 10, y: 10 },
+              }}
+              transition={{ duration: 0.4 }}
+            />
+            <motion.line
+              x1="0" y1="0" x2="200" y2="200"
+              stroke="#c7d2fe" // Indigo-200
+              strokeWidth="10"
+              variants={{
+                rest: { strokeWidth: 10 },
+                hover: { strokeWidth: 15 },
+              }}
+              transition={{ duration: 0.3 }}
+            />
+            <motion.circle
+              cx="50"
+              cy="150"
+              r="30"
+              className="fill-[#818cf8]" // Indigo-400
+              variants={{
+                rest: { scale: 1 },
+                hover: { scale: 1.2 },
+              }}
+              transition={{ duration: 0.5 }}
             />
           </svg>
         </motion.div>
