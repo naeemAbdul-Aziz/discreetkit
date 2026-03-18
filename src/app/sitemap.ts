@@ -45,7 +45,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Product category pages (medium-high priority)
     { url: `${siteUrl}/products/test-kits`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${siteUrl}/products/medication-refills`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
-    { url: `${siteUrl}/products/intimacy-essentials`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
+    { url: `${siteUrl}/products/condoms`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${siteUrl}/products/lubricants`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
+    { url: `${siteUrl}/products/male-enhancement`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${siteUrl}/products/emergency-contraceptives`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${siteUrl}/products/value-bundles`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
 
     // Legal and info pages (important for trust/SEO)

@@ -140,6 +140,20 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: '/products/intimacy-essentials',
+        destination: '/products/condoms',
+        permanent: true,
+      },
+      {
+        source: '/products/bundles', // Old GSC mismatch maybe
+        destination: '/products/value-bundles',
+        permanent: true,
+      }
+    ];
+  },
   async rewrites() {
     return [
       {

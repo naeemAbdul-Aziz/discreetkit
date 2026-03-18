@@ -1,16 +1,15 @@
-// app/(client)/products/wellness/layout.tsx
 import type { Metadata } from 'next';
 import { generateMetadata, generateBreadcrumbSchema } from '@/lib/seo';
 import { StructuredData } from '@/components/seo/structured-data';
 
 export const metadata: Metadata = generateMetadata({
-  title: 'Wellness Products & Health Supplements | DiscreetKit Ghana',
-  description: 'Shop premium wellness products and health supplements delivered discreetly to your door. Quality products for your health and wellbeing in Ghana.',
-  keywords: ['wellness products Ghana', 'health supplements', 'nutrition products', 'wellness delivery'],
-  url: '/products/wellness',
+  title: 'Male Enhancement Products Ghana | DiscreetKit',
+  description: 'Discreetly order male enhancement products, sprays, and supplements in Ghana. Viagra, Cialis, Kamagra, and delay sprays with fast, private delivery.',
+  keywords: ['male enhancement Ghana', 'buy Viagra online Ghana', 'delay spray Ghana', 'Kamagra oral jelly', 'confidential wellness'],
+  url: '/products/male-enhancement',
 });
 
-export default function WellnessLayout({
+export default function MaleEnhancementLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -18,7 +17,7 @@ export default function WellnessLayout({
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: 'Home', url: '/' },
     { name: 'Products', url: '/products' },
-    { name: 'Wellness', url: '/products/wellness' }
+    { name: 'Male Enhancement', url: '/products/male-enhancement' }
   ]);
 
   return (
