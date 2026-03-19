@@ -48,15 +48,15 @@ export function Footer() {
   const lastName = rest.join(" ") || "Kit";
 
   return (
-    <footer className="bg-muted/30 text-foreground pt-12 pb-8 md:pt-24 md:pb-12 overflow-hidden border-t border-border">
+    <footer className="bg-muted/30 text-foreground pt-10 pb-6 md:pt-16 md:pb-10 overflow-hidden border-t border-border">
       <div className="container mx-auto px-6">
         {/* Massive Headline */}
         {/* Massive Headline Removed */}
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 mb-12 md:mb-24">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-10 mb-8 md:mb-12">
           {/* Brand Column */}
           <div className="md:col-span-4">
-            <p className="text-lg md:text-2xl font-medium leading-relaxed max-w-sm mb-6 md:mb-8">
+            <p className="text-base md:text-xl font-medium leading-relaxed max-w-sm mb-4 md:mb-6">
               The modern standard for private health delivery. Skip the awkward,
               stay supported.
             </p>
@@ -69,14 +69,14 @@ export function Footer() {
                 {email}
               </a>
             </div>
-            <div className="flex gap-4">
+            <div className="flex gap-3">
               {socialLinks.map((social) => (
                 <Link
                   key={social.label}
                   href={social.href}
-                  className="h-10 w-10 md:h-12 md:w-12 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
+                  className="h-9 w-9 md:h-10 md:w-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
                 >
-                  <social.icon className="w-4 h-4 md:w-5 md:h-5" />
+                  <social.icon className="w-3.5 h-3.5 md:w-4 md:h-4" />
                 </Link>
               ))}
             </div>
@@ -89,15 +89,15 @@ export function Footer() {
                 <h3 className="font-bold text-base md:text-lg mb-4 md:mb-6 text-muted-foreground">
                   {section.title}
                 </h3>
-                <ul className="space-y-3 md:space-y-4">
+                <ul className="space-y-2 md:space-y-3">
                   {section.links.map((link) => (
                     <li key={link.href}>
                       <Link
                         href={link.href}
-                        className="group flex items-center text-base md:text-lg hover:text-primary transition-colors"
+                        className="group flex items-center text-sm md:text-base hover:text-primary transition-colors"
                       >
                         {link.label}
-                        <ArrowUpRight className="w-3 h-3 md:w-4 md:h-4 ml-1 opacity-0 -translate-y-1 translate-x-1 transition-all group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0" />
+                        <ArrowUpRight className="w-3 h-3 md:w-3.5 md:h-3.5 ml-1 opacity-0 -translate-y-1 translate-x-1 transition-all group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0" />
                       </Link>
                     </li>
                   ))}

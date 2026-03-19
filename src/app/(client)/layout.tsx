@@ -28,7 +28,7 @@ export default function ClientLayout({
   }
 
   return (
-    <div className="flex min-h-dvh vk-safe overscroll-contain vk-scroll flex-col bg-background pt-20 md:pt-24">
+    <div className="flex min-h-dvh vk-safe overscroll-contain vk-scroll flex-col bg-background pt-16 md:pt-20">
       <DevBanner />
       
       <MagneticCursor />

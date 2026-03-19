@@ -209,18 +209,14 @@ export function ProductSelector({
   }, [api, onSelect]);
 
   return (
-    <section id="products" className="py-8 md:pt-8 md:pb-16">
+    <section id="products" className="py-6 md:pt-6 md:pb-12">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="text-center mb-12">
-          <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-primary">
-            Our Products
-          </p>
-          <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+        <div className="text-center mb-6">
+          <h2 className="font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
             Safe. Anonymous. Fast.
           </h2>
-          <p className="mt-4 max-w-2xl mx-auto text-base text-muted-foreground">
-            Your confidential health essentials, delivered with trust. Browse
-            our categories to get started.
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            Your confidential health essentials — pick a category.
           </p>
         </div>
 
@@ -243,26 +239,15 @@ export function ProductSelector({
                         <div className="relative aspect-square w-full bg-muted/50 rounded-3xl overflow-hidden p-0">
                           <CategoryShape category={category.name} />
                         </div>
-                        <div className="p-6 flex flex-col flex-grow">
-                          <h3 className="text-xl font-bold text-foreground">
+                        <div className="p-4 flex flex-col flex-grow">
+                          <h3 className="text-base font-semibold text-foreground">
                             {category.name}
                           </h3>
-                          <p className="mt-2 text-sm text-muted-foreground">
+                          <p className="mt-1 text-xs text-muted-foreground">
                             {category.description}
                           </p>
-                          <ul className="mt-4 space-y-2 text-sm text-muted-foreground flex-grow">
-                            {category.examples.map((example) => (
-                              <li
-                                key={example}
-                                className="flex items-center gap-2"
-                              >
-                                <Check className="h-4 w-4 text-primary" />
-                                <span>{example}</span>
-                              </li>
-                            ))}
-                          </ul>
-                          <div className="mt-6 text-sm font-semibold text-primary flex items-center gap-2 group-hover:underline">
-                            Shop Now <ArrowRight className="h-4 w-4" />
+                          <div className="mt-3 text-xs font-semibold text-primary flex items-center gap-1 group-hover:underline">
+                            Shop <ArrowRight className="h-3 w-3" />
                           </div>
                         </div>
                       </Card>
@@ -291,18 +276,18 @@ export function ProductSelector({
 
         {/* Desktop Grid (Removed in favor of universal carousel) */}
 
-        <div className="text-center mt-12 mb-16">
-          <Button asChild variant="outline" size="lg" className="rounded-full px-8 shadow-sm">
+        <div className="text-center mt-6 mb-8">
+          <Button asChild variant="outline" size="sm" className="rounded-full px-6">
             <Link href="/products">
-              Explore The Catalog
-              <ArrowRight className="ml-2 w-5 h-5" />
+              See All Products
+              <ArrowRight className="ml-2 w-4 h-4" />
             </Link>
           </Button>
         </div>
 
         {/* Dedicated Medication Refills Section */}
         {refillCategory && (
-          <div className="max-w-6xl mx-auto px-4 lg:px-0 mt-6 lg:mt-12">
+          <div className="mt-8 max-w-6xl mx-auto px-4 lg:px-0">
             <Card className="relative overflow-hidden rounded-3xl md:rounded-[2.5rem] group border-0 shadow-2xl">
               <div className="absolute inset-0 z-0 bg-black">
                 <CategoryShape category="Medication Refills" className="w-full h-full opacity-60 transition-transform duration-[20s] ease-linear group-hover:scale-110" />
@@ -337,7 +322,7 @@ export function ProductSelector({
         )}
 
         {/* Product Suggestion Box */}
-        <div className="mt-20 max-w-4xl mx-auto">
+        <div className="mt-10 max-w-4xl mx-auto">
           <Card className="p-6 sm:p-8 bg-card rounded-2xl shadow-lg">
             <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 text-center sm:text-left">
               <Lightbulb className="h-12 w-12 sm:h-16 sm:w-16 text-primary flex-shrink-0" />
