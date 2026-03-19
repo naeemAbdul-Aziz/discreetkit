@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useEffect, useMemo, useId } from "react"
+import { useState, useEffect, useMemo, useId, useTransition } from "react"
+import { useRouter } from "next/navigation"
 import {
   Table,
   TableBody,
@@ -42,6 +43,8 @@ export function ProductTable({ initialProducts, categories = [] }: { initialProd
   const [searchTerm, setSearchTerm] = useState("")
   const [debouncedSearch, setDebouncedSearch] = useState("")
   const [products, setProducts] = useState<Product[]>(initialProducts)
+  const [isPending, startTransition] = useTransition()
+  const router = useRouter()
   const [saving, setSaving] = useState<Record<number, Record<string, boolean>>>({})
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
@@ -57,6 +60,10 @@ export function ProductTable({ initialProducts, categories = [] }: { initialProd
     }, 300)
     return () => clearTimeout(t)
   }, [searchTerm])
+
+  useEffect(() => {
+    setProducts(initialProducts)
+  }, [initialProducts])
 
   const filteredProducts = products.filter(p => 
     p.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
@@ -86,9 +93,15 @@ export function ProductTable({ initialProducts, categories = [] }: { initialProd
     const res = await updateProductField(id, { [field]: value } as any)
     if (res.error) {
       toast({ variant: "destructive", title: "Update failed", description: res.error })
+      startTransition(() => {
+        router.refresh()
+      })
     } else {
       setProducts(prev => prev.map(p => p.id === id ? { ...p, [field]: value } : p))
       toast({ title: "Saved", description: `${field} updated` })
+      startTransition(() => {
+        router.refresh()
+      })
     }
     markSaving(id, field, false)
   }
@@ -111,6 +124,9 @@ export function ProductTable({ initialProducts, categories = [] }: { initialProd
       toast({ variant: "destructive", title: "Error", description: res.error })
     } else {
       toast({ title: "Deleted", description: "Product removed." })
+      startTransition(() => {
+        router.refresh()
+      })
     }
   }
 
@@ -133,10 +149,13 @@ export function ProductTable({ initialProducts, categories = [] }: { initialProd
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <Button onClick={handleAdd}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Product
-        </Button>
+        <div className="flex items-center gap-2">
+          {isPending && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground mr-2" />}
+          <Button onClick={handleAdd}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Product
+          </Button>
+        </div>
       </div>
 
       <div className="rounded-md border bg-card overflow-x-auto">

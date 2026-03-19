@@ -457,8 +457,24 @@ export async function handleChat(
 ) {
   'use server';
   try {
+    const supabase = getSupabaseAdminClient();
+    // Fetch live product data for real-time context
+    const { data: products } = await supabase
+      .from('products')
+      .select('name, price_ghs, is_out_of_stock, category')
+      .order('name');
+    
+    const liveContext = products ? 
+      "\nLIVE PRODUCT DATA (Current Stock & Prices):\n" + 
+      products.map(p => `- ${p.name}: GHS ${p.price_ghs} (${p.is_out_of_stock ? 'OUT OF STOCK' : 'In Stock'})`).join('\n')
+      : "";
+
     const answerQuestions = await getAnswerQuestions();
-    const result = await answerQuestions({ query: message, history: history });
+    const result = await answerQuestions({ 
+      query: message, 
+      history: history,
+      liveContext: liveContext 
+    });
     return result.answer;
   } catch (error) {
     console.error('AI Error:', error);

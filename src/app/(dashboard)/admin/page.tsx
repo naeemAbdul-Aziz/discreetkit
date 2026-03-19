@@ -92,7 +92,7 @@ export default function AdminDashboardPage() {
         const { getOrders, getDashboardStats } =
           await import("@/lib/admin-actions");
         const orders = await getOrders();
-        const stats = await getDashboardStats();
+        const stats = await getDashboardStats(orders);
 
         // Calculate metrics
         const totalRevenue = orders.reduce(

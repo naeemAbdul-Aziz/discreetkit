@@ -9,10 +9,7 @@ import { usePathname } from 'next/navigation';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { DevBanner } from '@/components/dev-banner';
-
-import { Chatbot } from '@/components/chatbot';
 import { useEffect, useState } from 'react';
-import { MagneticCursor } from '@/components/ui/cursor';
 
 export default function ClientLayout({
   children,
@@ -31,12 +28,12 @@ export default function ClientLayout({
     <div className="flex min-h-dvh vk-safe overscroll-contain vk-scroll flex-col bg-background pt-16 md:pt-20">
       <DevBanner />
       
-      <MagneticCursor />
+
       <Header />
       <div className="flex-1">{children}</div>
       <Footer />
 
-      <Chatbot />
+
       <CartAnnouncer />
     </div>
   );

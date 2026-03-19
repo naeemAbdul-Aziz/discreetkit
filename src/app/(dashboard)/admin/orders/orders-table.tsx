@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   Table,
@@ -24,6 +24,7 @@ import {
   MessageSquare,
   Check,
   ChevronsUpDown,
+  Loader2,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
@@ -79,9 +80,11 @@ import {
 const titleCase = (s: string) =>
   s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
+
 export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
   const router = useRouter();
   const { toast } = useToast();
+  const [isPending, startTransition] = useTransition();
   const [orders, setOrders] = useState(initialOrders);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -214,6 +217,11 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
     };
   }, [toast]);
 
+  // Sync props to state (CRITICAL for revalidatePath to work in Client Components)
+  useEffect(() => {
+    setOrders(initialOrders);
+  }, [initialOrders]);
+
   const handleStatusChangeClick = (orderId: number, newStatus: string) => {
     const currentOrder = orders.find((o) => o.id === orderId);
 
@@ -267,6 +275,12 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
     }
   };
 
+  const handleManualRefresh = () => {
+    startTransition(() => {
+      router.refresh();
+    });
+  };
+
   const confirmRiderAssignment = () => {
     if (pendingStatusUpdate) {
       executeStatusChange(
@@ -317,11 +331,17 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
         title: "Update failed",
         description: res.error,
       });
-      router.refresh();
+      startTransition(() => {
+        router.refresh();
+      });
     } else {
       toast({
         title: "Status Updated",
         description: `Order status changed to ${titleCase(newStatus)}`,
+      });
+      // Ensure server component data is refreshed too
+      startTransition(() => {
+        router.refresh();
       });
     }
   };
@@ -355,6 +375,9 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
         prev.map((o) => (selectedIds.has(o.id) ? { ...o, status } : o)),
       );
       setSelectedIds(new Set());
+      startTransition(() => {
+        router.refresh();
+      });
     }
     setBulkSaving(false);
   };
@@ -385,6 +408,9 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
               : o,
           ),
         );
+        startTransition(() => {
+          router.refresh();
+        });
       } else {
         toast({
           variant: "destructive",
@@ -731,6 +757,12 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
               {s === "all" ? "All" : titleCase(s)}
             </Button>
           ))}
+        </div>
+        <div className="flex items-center gap-2">
+          {isPending && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground mr-2" />}
+          <Button variant="outline" size="sm" onClick={handleManualRefresh} disabled={isPending}>
+             Refresh
+          </Button>
         </div>
       </div>
 

@@ -68,9 +68,15 @@ export function Chatbot() {
   // initial message to greet the user.
   const initialMessage: Message = {
     role: "model",
-    parts:
-      "Heyy there! I'm Pacely, your friendly assistant. I'm here to listen and help you get sorted discreetly. You can ask me about our test kits, ordering process, or delivery locations.",
+    parts: "Hi, I'm Pacely. How can I help you?",
   };
+
+  const suggestions = [
+    "How does it work?",
+    "HIV Test Kit",
+    "Emergency Contraception",
+    "Delivery & Privacy",
+  ];
 
   // effect to set the initial message when the chat opens.
   useEffect(() => {
@@ -120,18 +126,18 @@ export function Chatbot() {
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetContent className="flex w-full flex-col sm:max-w-md p-0">
           <SheetHeader className="sticky top-0 z-50 bg-background border-b p-4">
-            <SheetTitle className="flex items-center gap-2">
-              <Avatar className="h-8 w-8 border border-border">
+            <SheetTitle className="flex items-center gap-2 text-[#7C3AED]">
+              <Avatar className="h-8 w-8 border border-purple-100 bg-purple-50">
                 <AvatarImage
                   src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png"
                   alt="Pacely"
                 />
-                <AvatarFallback className="bg-transparent"></AvatarFallback>
+                <AvatarFallback className="bg-transparent text-[#7C3AED]">P</AvatarFallback>
               </Avatar>
               Pacely
             </SheetTitle>
             <SheetDescription>
-              Your friendly AI assistant for questions about DiscreetKit.
+              Your friendly AI assistant for DiscreetKit.
             </SheetDescription>
             <SheetClose
               className={cn("absolute right-4 top-4", closeButtonClasses)}
@@ -142,7 +148,21 @@ export function Chatbot() {
           </SheetHeader>
           <div className="flex-1 overflow-hidden">
             <ScrollArea className="h-full" ref={scrollAreaRef}>
-              <div className="space-y-4 p-4">
+              <div className="space-y-6 p-4">
+                {/* Social Proof Section */}
+                <div className="flex flex-col items-center justify-center py-4 space-y-3 opacity-90">
+                  <div className="flex -space-x-2">
+                    {[11, 12, 13, 14, 15].map((i) => (
+                      <div key={i} className="h-7 w-7 rounded-full border-2 border-background bg-muted overflow-hidden">
+                        <img src={`https://i.pravatar.cc/100?img=${i}`} alt="user" className="h-full w-full object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">
+                    Trusted by thousands of customers
+                  </p>
+                </div>
+
                 {history.map((msg, index) => (
                   <div
                     key={index}
@@ -162,10 +182,10 @@ export function Chatbot() {
                     )}
                     <div
                       className={cn(
-                        "max-w-[80%] rounded-lg p-3 text-sm",
+                        "max-w-[85%] rounded-2xl p-4 text-sm shadow-sm",
                         msg.role === "user"
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted"
+                          ? "bg-[#7C3AED] text-white rounded-tr-none"
+                          : "bg-muted rounded-tl-none font-medium"
                       )}
                     >
                       <FormattedMessage text={msg.parts} />
@@ -197,9 +217,32 @@ export function Chatbot() {
               </div>
             </ScrollArea>
           </div>
-          <form onSubmit={handleSubmit} className="border-t p-4">
+
+          <div className="border-t p-4 space-y-4">
+            {/* Suggestion Chips */}
+            <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+              {suggestions.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => {
+                    setInput(s);
+                    // auto-height
+                    const el = document.getElementById("chat-input");
+                    if (el) {
+                      el.style.height = "auto";
+                    }
+                  }}
+                  className="whitespace-nowrap rounded-full border border-purple-100 bg-purple-50/50 px-3.5 py-1.5 text-xs font-medium text-[#7C3AED] hover:bg-purple-100 transition-colors shadow-sm"
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+
+            <form onSubmit={handleSubmit}>
             <div className="relative">
               <Textarea
+                id="chat-input"
                 value={input}
                 onChange={(e) => {
                   setInput(e.target.value);
@@ -216,26 +259,27 @@ export function Chatbot() {
                     handleSubmit(e);
                   }
                 }}
-                placeholder="Ask Pacely about our tests..."
+                placeholder="Ask me anything..."
                 disabled={isPending}
-                className="min-h-[44px] max-h-[120px] pr-12 resize-none py-3"
+                className="min-h-[50px] max-h-[120px] pr-12 resize-none py-3.5 px-4 rounded-xl border-purple-100 focus-visible:ring-[#7C3AED]"
                 rows={1}
               />
               <Button
                 type="submit"
                 size="icon"
-                className="absolute right-2 bottom-1.5 h-8 w-8"
+                className="absolute right-2 bottom-2 h-9 w-9 bg-[#7C3AED] hover:bg-[#6D28D9] shadow-md rounded-lg transition-all"
                 disabled={isPending || !input.trim()}
               >
                 {isPending ? (
                   <BrandSpinner size="sm" />
                 ) : (
-                  <Send className="h-4 w-4" />
+                  <Send className="h-4 w-4 text-white" />
                 )}
                 <span className="sr-only">Send Message</span>
               </Button>
             </div>
           </form>
+          </div>
         </SheetContent>
       </Sheet>
     </>
