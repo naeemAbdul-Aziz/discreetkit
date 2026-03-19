@@ -13,7 +13,7 @@ import { z } from 'zod';
 import { assignPharmacyForDeliveryArea, sendPharmacyOrderNotification } from './notifications';
 import { sendSMS } from './server-utils'; // Internal use only
 // Use OpenAI when API key is configured, otherwise fallback
-let _answerQuestions: ((input: { query: string; history: { role: 'user' | 'model'; parts: string }[] }) => Promise<{ answer: string }>) | null = null;
+let _answerQuestions: ((input: { query: string; history: { role: 'user' | 'model'; parts: string }[]; liveContext?: string }) => Promise<{ answer: string }>) | null = null;
 async function getAnswerQuestions() {
   if (_answerQuestions) return _answerQuestions;
   const hasOpenAI = !!process.env.OPENAI_API_KEY;
