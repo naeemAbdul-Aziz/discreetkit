@@ -6,6 +6,21 @@ import { Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
+const AbstractIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="0.5" strokeDasharray="1 2" opacity="0.3" />
+    <circle cx="12" cy="12" r="3.5" fill="currentColor" />
+    <circle cx="12" cy="4" r="1.5" fill="currentColor" />
+    <circle cx="12" cy="20" r="1.5" fill="currentColor" />
+    <circle cx="4" cy="12" r="1.5" fill="currentColor" />
+    <circle cx="20" cy="12" r="1.5" fill="currentColor" />
+    <circle cx="6.34" cy="6.34" r="1.2" fill="currentColor" />
+    <circle cx="17.66" cy="17.66" r="1.2" fill="currentColor" />
+    <circle cx="6.34" cy="17.66" r="1.2" fill="currentColor" />
+    <circle cx="17.66" cy="6.34" r="1.2" fill="currentColor" />
+  </svg>
+);
+
 export function FloatingChatTrigger() {
   const { setIsOpen, isOpen } = useChatbot();
 
@@ -16,45 +31,18 @@ export function FloatingChatTrigger() {
           initial={{ opacity: 0, y: 20, scale: 0.8 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 20, scale: 0.8 }}
-          className="fixed bottom-6 right-6 z-[100] flex flex-col items-end gap-3"
+          className="fixed bottom-6 right-6 z-[100]"
         >
-          {/* Trust Indicators (Social Proof) */}
-          <motion.div 
-            initial={{ opacity: 0, x: 10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5 }}
-            className="flex items-center gap-2 bg-white/90 backdrop-blur-sm border border-purple-100 rounded-full py-1.5 px-3 shadow-sm mb-1"
-          >
-            <div className="flex -space-x-1.5">
-              {[1, 2, 3].map((i) => (
-                <div 
-                  key={i} 
-                  className="h-5 w-5 rounded-full border-2 border-white bg-purple-100 overflow-hidden"
-                >
-                  <img 
-                    src={`https://i.pravatar.cc/100?img=${i + 10}`} 
-                    alt="User" 
-                    className="h-full w-full object-cover grayscale-[0.5]"
-                  />
-                </div>
-              ))}
-            </div>
-            <span className="text-[10px] font-medium text-purple-900/80">Trusted by 10k+ Ghanaians</span>
-          </motion.div>
-
-          {/* Main Pill Button */}
           <Button
             onClick={() => setIsOpen(true)}
             className={cn(
-              "h-12 px-6 rounded-full bg-[#7C3AED] hover:bg-[#6D28D9] text-white shadow-lg",
-              "flex items-center gap-2.5 transition-all duration-300 hover:scale-105 active:scale-95",
-              "border border-white/20"
+              "h-14 w-14 rounded-full bg-brand-indigo hover:opacity-90 text-white shadow-2xl transition-all duration-500 hover:scale-110 active:scale-95 border border-white/10 group p-0"
             )}
+            aria-label="Ask Pacely"
           >
-            <div className="relative flex h-6 w-6 items-center justify-center rounded-full bg-white/20">
-              <Sparkles className="h-3.5 w-3.5 text-white" />
+            <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-white/10 transition-transform duration-500 group-hover:rotate-180">
+              <AbstractIcon className="h-5 w-5 text-white" />
             </div>
-            <span className="font-semibold tracking-tight">Ask Pacely</span>
           </Button>
         </motion.div>
       )}

@@ -27,6 +27,21 @@ import { cn } from "@/lib/utils";
 import { useChatbot } from "@/hooks/use-chatbot";
 import { closeButtonClasses } from "@/components/ui/close-button";
 
+const AbstractIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="0.5" strokeDasharray="1 2" opacity="0.3" />
+    <circle cx="12" cy="12" r="3.5" fill="currentColor" />
+    <circle cx="12" cy="4" r="1.5" fill="currentColor" />
+    <circle cx="12" cy="20" r="1.5" fill="currentColor" />
+    <circle cx="4" cy="12" r="1.5" fill="currentColor" />
+    <circle cx="20" cy="12" r="1.5" fill="currentColor" />
+    <circle cx="6.34" cy="6.34" r="1.2" fill="currentColor" />
+    <circle cx="17.66" cy="17.66" r="1.2" fill="currentColor" />
+    <circle cx="6.34" cy="17.66" r="1.2" fill="currentColor" />
+    <circle cx="17.66" cy="6.34" r="1.2" fill="currentColor" />
+  </svg>
+);
+
 // type definition for a chat message.
 type Message = {
   role: "user" | "model";
@@ -68,7 +83,7 @@ export function Chatbot() {
   // initial message to greet the user.
   const initialMessage: Message = {
     role: "model",
-    parts: "Hi, I'm Pacely. How can I help you?",
+    parts: "Hi, I'm **pacely**. How can I help you?",
   };
 
   const suggestions = [
@@ -125,22 +140,17 @@ export function Chatbot() {
     <>
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetContent className="flex w-full flex-col sm:max-w-md p-0">
-          <SheetHeader className="sticky top-0 z-50 bg-background border-b p-4">
-            <SheetTitle className="flex items-center gap-2 text-[#7C3AED]">
-              <Avatar className="h-8 w-8 border border-purple-100 bg-purple-50">
-                <AvatarImage
-                  src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png"
-                  alt="Pacely"
-                />
-                <AvatarFallback className="bg-transparent text-[#7C3AED]">P</AvatarFallback>
-              </Avatar>
-              Pacely
-            </SheetTitle>
-            <SheetDescription>
-              Your friendly AI assistant for DiscreetKit.
-            </SheetDescription>
+          <SheetHeader className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b px-6 py-4">
+            <div className="flex flex-col items-center justify-center w-full">
+              <SheetTitle className="flex flex-col items-center gap-2 text-brand-indigo font-headline">
+                <div className="h-10 w-10 rounded-full bg-brand-indigo/5 flex items-center justify-center text-brand-indigo">
+                  <AbstractIcon className="h-6 w-6" />
+                </div>
+                {/* <span className="text-lg tracking-tight">Pacely</span> */}
+              </SheetTitle>
+            </div>
             <SheetClose
-              className={cn("absolute right-4 top-4", closeButtonClasses)}
+              className={cn("absolute right-4 top-5 opacity-70 hover:opacity-100 transition-opacity", closeButtonClasses)}
             >
               <X className="h-4 w-4" />
               <span className="sr-only">Close</span>
@@ -149,68 +159,72 @@ export function Chatbot() {
           <div className="flex-1 overflow-hidden">
             <ScrollArea className="h-full" ref={scrollAreaRef}>
               <div className="space-y-6 p-4">
-                {/* Social Proof Section */}
-                <div className="flex flex-col items-center justify-center py-4 space-y-3 opacity-90">
-                  <div className="flex -space-x-2">
-                    {[11, 12, 13, 14, 15].map((i) => (
-                      <div key={i} className="h-7 w-7 rounded-full border-2 border-background bg-muted overflow-hidden">
-                        <img src={`https://i.pravatar.cc/100?img=${i}`} alt="user" className="h-full w-full object-cover" />
+                {history.map((msg, index) => {
+                  const isInitial = index === 0 && msg.role === "model";
+                  
+                  if (isInitial) {
+                    return (
+                      <div key={index} className="flex flex-col items-center justify-center py-12 space-y-8">
+                        <div className="space-y-4 text-center">
+                          <div className="h-14 w-14 rounded-full bg-brand-indigo/5 flex items-center justify-center text-brand-indigo mx-auto mb-6">
+                            <AbstractIcon className="h-8 w-8" />
+                          </div>
+                          <h2 className="text-2xl md:text-3xl font-headline tracking-tight text-brand-indigo max-w-[280px] mx-auto leading-tight">
+                            Hi, I'm <span className="font-bold">pacely.</span><br />
+                            How can I help you?
+                          </h2>
+                        </div>
+                        
+                        <div className="flex flex-col items-center space-y-3">
+                          <div className="flex -space-x-2">
+                            {[11, 12, 13, 14, 15].map((i) => (
+                              <div key={i} className="h-8 w-8 rounded-full border-2 border-background bg-muted overflow-hidden">
+                                <img src={`https://i.pravatar.cc/100?img=${i}`} alt="user" className="h-full w-full object-cover" />
+                              </div>
+                            ))}
+                          </div>
+                          <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-[0.1em] opacity-80">
+                            Trusted by thousands of customers
+                          </p>
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                  <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">
-                    Trusted by thousands of customers
-                  </p>
-                </div>
+                    );
+                  }
 
-                {history.map((msg, index) => (
-                  <div
-                    key={index}
-                    className={cn(
-                      "flex items-start gap-3",
-                      msg.role === "user" ? "justify-end" : "justify-start"
-                    )}
-                  >
-                    {msg.role === "model" && (
-                      <Avatar className="h-8 w-8 border border-border">
-                        <AvatarImage
-                          src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png"
-                          alt="Pacely"
-                        />
-                        <AvatarFallback className="bg-transparent"></AvatarFallback>
-                      </Avatar>
-                    )}
+                  return (
                     <div
+                      key={index}
                       className={cn(
-                        "max-w-[85%] rounded-2xl p-4 text-sm shadow-sm",
-                        msg.role === "user"
-                          ? "bg-[#7C3AED] text-white rounded-tr-none"
-                          : "bg-muted rounded-tl-none font-medium"
+                        "flex items-start gap-3",
+                        msg.role === "user" ? "justify-end" : "justify-start"
                       )}
                     >
-                      <FormattedMessage text={msg.parts} />
+                      {msg.role === "model" && (
+                        <div className="h-8 w-8 rounded-full bg-brand-indigo/5 flex items-center justify-center text-brand-indigo border border-brand-indigo/10 flex-shrink-0 mt-1">
+                          <AbstractIcon className="h-4 w-4" />
+                        </div>
+                      )}
+                      <div
+                        className={cn(
+                          "max-w-[85%] rounded-2xl p-4 text-sm shadow-sm",
+                          msg.role === "user"
+                            ? "bg-brand-indigo text-white rounded-tr-none"
+                            : "bg-brand-silver text-brand-indigo rounded-tl-none font-medium"
+                        )}
+                      >
+                        <FormattedMessage text={msg.parts} />
+                      </div>
                     </div>
-                    {msg.role === "user" && (
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback>
-                          <User size={20} />
-                        </AvatarFallback>
-                      </Avatar>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
                 {/* show a loading indicator while the ai is "thinking". */}
                 {isPending && (
                   <div className="flex items-start gap-3 justify-start">
-                    <Avatar className="h-8 w-8 border border-border">
-                      <AvatarImage
-                        src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png"
-                        alt="Pacely"
-                      />
-                      <AvatarFallback className="bg-transparent"></AvatarFallback>
-                    </Avatar>
-                    <div className="max-w-[80%] rounded-lg p-3 text-sm bg-muted flex items-center">
-                      <BrandSpinner size="sm" /> Thinking...
+                    <div className="h-8 w-8 rounded-full bg-brand-indigo/5 flex items-center justify-center text-brand-indigo border border-brand-indigo/10 flex-shrink-0 mt-1">
+                      <AbstractIcon className="h-4 w-4 animate-pulse" />
+                    </div>
+                    <div className="max-w-[80%] rounded-2xl p-4 text-sm bg-brand-silver text-brand-indigo font-medium flex items-center gap-2">
+                       Thinking...
                     </div>
                   </div>
                 )}
@@ -220,65 +234,59 @@ export function Chatbot() {
 
           <div className="border-t p-4 space-y-4">
             {/* Suggestion Chips */}
-            <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+            <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar px-1">
               {suggestions.map((s) => (
                 <button
                   key={s}
                   onClick={() => {
                     setInput(s);
-                    // auto-height
                     const el = document.getElementById("chat-input");
-                    if (el) {
-                      el.style.height = "auto";
-                    }
+                    if (el) el.style.height = "auto";
                   }}
-                  className="whitespace-nowrap rounded-full border border-purple-100 bg-purple-50/50 px-3.5 py-1.5 text-xs font-medium text-[#7C3AED] hover:bg-purple-100 transition-colors shadow-sm"
+                  className="whitespace-nowrap rounded-full border border-brand-indigo/10 bg-brand-indigo/[0.03] px-4 py-2 text-xs font-semibold text-brand-teal hover:bg-brand-indigo/10 transition-colors shadow-sm flex items-center gap-1.5"
                 >
+                  <Send className="h-3 w-3 opacity-50" />
                   {s}
                 </button>
               ))}
             </div>
 
-            <form onSubmit={handleSubmit}>
-            <div className="relative">
-              <Textarea
-                id="chat-input"
-                value={input}
-                onChange={(e) => {
-                  setInput(e.target.value);
-                  // automatic height adjustment
-                  e.target.style.height = "auto";
-                  e.target.style.height = `${Math.min(
-                    e.target.scrollHeight,
-                    120
-                  )}px`;
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSubmit(e);
-                  }
-                }}
-                placeholder="Ask me anything..."
-                disabled={isPending}
-                className="min-h-[50px] max-h-[120px] pr-12 resize-none py-3.5 px-4 rounded-xl border-purple-100 focus-visible:ring-[#7C3AED]"
-                rows={1}
-              />
-              <Button
-                type="submit"
-                size="icon"
-                className="absolute right-2 bottom-2 h-9 w-9 bg-[#7C3AED] hover:bg-[#6D28D9] shadow-md rounded-lg transition-all"
-                disabled={isPending || !input.trim()}
-              >
-                {isPending ? (
-                  <BrandSpinner size="sm" />
-                ) : (
-                  <Send className="h-4 w-4 text-white" />
-                )}
-                <span className="sr-only">Send Message</span>
-              </Button>
-            </div>
-          </form>
+            <form onSubmit={handleSubmit} className="relative">
+              <div className="relative flex items-center bg-brand-silver/50 rounded-full border border-brand-indigo/5 focus-within:border-brand-indigo/20 transition-all p-1.5 pl-5">
+                <Textarea
+                  id="chat-input"
+                  value={input}
+                  onChange={(e) => {
+                    setInput(e.target.value);
+                    e.target.style.height = "auto";
+                    e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSubmit(e);
+                    }
+                  }}
+                  placeholder="Ask me anything..."
+                  disabled={isPending}
+                  className="min-h-[44px] max-h-[120px] flex-1 border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-brand-indigo resize-none py-2.5 px-0 text-sm placeholder:text-brand-indigo/40"
+                  rows={1}
+                />
+                <Button
+                  type="submit"
+                  size="icon"
+                  className="h-10 w-10 bg-brand-indigo hover:opacity-90 shadow-md rounded-full transition-all flex-shrink-0 ml-2"
+                  disabled={isPending || !input.trim()}
+                >
+                  {isPending ? (
+                    <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4 text-white" />
+                  )}
+                  <span className="sr-only">Send Message</span>
+                </Button>
+              </div>
+            </form>
           </div>
         </SheetContent>
       </Sheet>
