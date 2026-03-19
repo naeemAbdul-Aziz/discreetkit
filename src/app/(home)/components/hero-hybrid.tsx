@@ -31,11 +31,11 @@ export function HeroHybrid() {
   return (
     <section
       ref={containerRef}
-      className="relative w-full flex flex-col overflow-hidden bg-background pt-20 md:pt-32 pb-12 md:pb-20"
+      className="relative w-full flex flex-col overflow-hidden bg-background pt-12 md:pt-20 pb-8 md:pb-14"
     >
       <div className="container relative z-10 px-4 md:px-6 flex flex-col items-center">
         {/* 1. TEXT SECTION (From Original Hero) */}
-        <div className="flex flex-col items-center text-center max-w-4xl mx-auto mb-8 md:mb-12">
+        <div className="flex flex-col items-center text-center max-w-4xl mx-auto mb-6 md:mb-8">
           <motion.div
             initial="hidden"
             animate="visible"
@@ -44,7 +44,7 @@ export function HeroHybrid() {
           >
             <motion.h1
               variants={variants.fadeUp}
-              className="font-headline text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter text-foreground leading-[0.95] mb-8"
+              className="font-headline text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter text-foreground leading-[0.95] mb-4"
             >
               Get Sorted{" "}
               <Highlighter className="text-primary italic font-light">
@@ -61,7 +61,7 @@ export function HeroHybrid() {
               <Button
                 asChild
                 size="lg"
-                className="h-11 md:h-14 px-6 md:px-10 text-base md:text-lg rounded-full w-full sm:w-auto shadow-xl hover:scale-105 transition-all duration-300"
+                className="h-10 md:h-12 px-6 md:px-9 text-sm md:text-base rounded-full w-full sm:w-auto shadow-lg hover:scale-105 transition-all duration-300"
               >
                 <Link href="/#products">
                   Order Anonymously

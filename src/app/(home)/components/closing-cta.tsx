@@ -14,7 +14,7 @@ import { SparklesCore } from '@/components/ui/sparkles';
 
 export function ClosingCta() {
   return (
-    <section className="relative py-16 md:py-24 overflow-hidden bg-primary">
+    <section className="relative py-12 md:py-16 overflow-hidden bg-primary text-white">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-primary/90 mix-blend-multiply z-10" />
@@ -48,7 +48,7 @@ export function ClosingCta() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="font-headline text-3xl md:text-6xl font-black tracking-tighter text-white mb-6 md:mb-8 leading-[0.9]"
+            className="font-headline text-2xl md:text-5xl font-black tracking-tighter text-white mb-4 md:mb-6 leading-[0.9]"
           >
             The Infrastructure<br />
             <span className="text-background">
@@ -61,7 +61,7 @@ export function ClosingCta() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-base md:text-lg text-white/80 max-w-2xl mb-8 md:mb-12 leading-relaxed"
+            className="text-sm md:text-base text-white/80 max-w-2xl mb-6 md:mb-8 leading-relaxed"
           >
             No account needed. No data stored. Just the essential health products you need, delivered without a trace.
           </motion.p>
@@ -73,13 +73,13 @@ export function ClosingCta() {
             transition={{ delay: 0.3 }}
             className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto"
           >
-            <Button asChild size="lg" className="h-11 md:h-14 px-5 md:px-8 text-sm md:text-lg rounded-full w-full sm:w-auto bg-white text-primary hover:bg-white/90 hover:scale-105 transition-all duration-300">
+            <Button asChild size="lg" className="h-10 md:h-12 px-6 md:px-8 text-sm md:text-base rounded-full w-full sm:w-auto bg-white text-primary hover:bg-white/90 hover:scale-105 transition-all duration-300">
               <Link href="/products">
                 Shop Essentials
-                <ArrowRight className="ml-2 w-4 h-4 md:w-5 md:h-5" />
+                <ArrowRight className="ml-2 w-4 h-4" />
               </Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="h-11 md:h-14 px-5 md:px-8 text-sm md:text-lg rounded-full w-full sm:w-auto border-white/30 text-white bg-white/10 hover:bg-white/20 hover:text-white backdrop-blur-sm transition-all duration-300">
+            <Button asChild variant="outline" size="lg" className="h-10 md:h-12 px-6 md:px-8 text-sm md:text-base rounded-full w-full sm:w-auto border-white/30 text-white bg-white/10 hover:bg-white/20 hover:text-white backdrop-blur-sm transition-all duration-300">
               <Link href="/partner-care">
                 Talk to a Professional
               </Link>

@@ -31,16 +31,16 @@ const shimmer = (w: number, h: number) => `
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-8 md:pt-10 md:pb-16 bg-background relative overflow-hidden">
+    <section id="how-it-works" className="py-6 md:pt-8 md:pb-12 bg-background relative overflow-hidden">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="text-center mb-10 md:mb-16 relative z-10">
+        <div className="text-center mb-6 md:mb-8 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.5 }}
           >
-            <h2 className="mt-2 font-headline text-3xl font-bold text-foreground md:text-5xl tracking-tight">
+            <h2 className="mt-2 font-headline text-2xl font-bold text-foreground md:text-4xl tracking-tight">
               A Responsible Path to Your Health Answers
             </h2>
           </motion.div>
@@ -51,7 +51,7 @@ export function HowItWorks() {
           <div className="relative">
             {/* The vertical connecting line */}
             <div className="absolute left-5 top-0 h-full w-0.5 bg-border -translate-x-1/2" aria-hidden="true" />
-            <div className="space-y-12">
+            <div className="space-y-8">
               {steps.map((step, i) => (
                 <motion.div
                   key={step.number}
@@ -65,7 +65,7 @@ export function HowItWorks() {
                     0{step.number}
                   </div>
                   <div className="flex-1 pt-1 space-y-4">
-                    <h3 className="text-xl font-bold text-foreground">{step.title}</h3>
+                    <h3 className="text-lg font-bold text-foreground">{step.title}</h3>
                     <div className="relative aspect-[4/3] w-full max-w-sm rounded-2xl overflow-hidden shadow-md border border-border/50">
                       <Image
                         src={step.imageUrl}
@@ -148,7 +148,7 @@ export function HowItWorks() {
                                 <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-white/10 text-white font-bold backdrop-blur-md">
                                     0{step.number}
                                 </span>
-                                <h3 className="text-2xl md:text-3xl font-bold text-white tracking-tight drop-shadow-md">
+                                <h3 className="text-xl md:text-2xl font-bold text-white tracking-tight drop-shadow-md">
                                     {step.title}
                                 </h3>
                              </div>

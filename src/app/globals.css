@@ -43,8 +43,8 @@
     /* Sky 600 */
     --info-foreground: 0 0% 100%;
 
-    --radius: 1rem;
-    /* Slightly rounder for modern feel */
+    --radius: 0.875rem;
+    /* Tighter radius for premium, Apple-like feel */
   }
 
   .dark {
@@ -105,7 +105,7 @@
   }
 
   html {
-    font-size: 15px;
+    font-size: 14px;
     /* Native smooth scrolling - better performance than Tailwind's */
     scroll-behavior: smooth;
     /* Prevent horizontal scroll */
@@ -116,15 +116,15 @@
     /* Guard with @supports to avoid Safari warning */
 
     @screen sm {
-      font-size: 15.5px;
+      font-size: 14.5px;
     }
 
     @screen md {
-      font-size: 16px;
+      font-size: 15px;
     }
 
     @screen lg {
-      font-size: 17px;
+      font-size: 16px;
     }
   }
 
@@ -137,6 +137,8 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    letter-spacing: -0.015em;
+    /* Apple-style tight tracking */
     /* Prevent horizontal scroll */
     overflow-x: hidden;
     /* Better font rendering */

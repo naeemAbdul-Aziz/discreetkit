@@ -82,8 +82,8 @@ const Logo = () => (
   <Image
     src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1762345271/Artboard_2_3_fvyg9i.png"
     alt="DiscreetKit Logo"
-    width={120}
-    height={28}
+    width={100}
+    height={23}
     priority
     style={{ height: "auto" }}
   />
@@ -185,7 +185,7 @@ export function Header() {
           backgroundColor: isMounted ? headerBg : "rgba(255,255,255,0)",
           boxShadow: isMounted ? headerShadow : "none",
         }}
-        className="pointer-events-auto flex h-16 max-w-7xl items-center justify-between px-6 transition-all duration-300"
+        className="pointer-events-auto flex h-14 max-w-7xl items-center justify-between px-6 transition-all duration-300"
       >
         {/* desktop navigation */}
         <nav className="hidden md:flex items-center gap-1">

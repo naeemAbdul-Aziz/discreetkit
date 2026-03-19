@@ -23,20 +23,19 @@ export default async function BundlesPage() {
 
   return (
     <div className="bg-background min-h-screen">
-      <div className="container mx-auto px-4 py-12 md:px-6 md:py-24">
+      <div className="container mx-auto px-4 pt-8 pb-10 md:px-6 md:pt-12 md:pb-16">
         <div className="mx-auto max-w-7xl">
-          <div className="text-center mb-16">
+          <div className="text-center mb-6">
             <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground md:text-4xl">
               Value Bundles
             </h1>
-            <p className="mt-4 max-w-2xl mx-auto text-base text-muted-foreground">
-              Be ready for anything and save money. Our bundles are curated to
-              provide complete peace of mind.
+            <p className="mt-2 max-w-lg mx-auto text-sm text-muted-foreground">
+              Everything you need, bundled and delivered discreetly. Save more.
             </p>
           </div>
 
           {sorted.length > 0 ? (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
               {sorted.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}

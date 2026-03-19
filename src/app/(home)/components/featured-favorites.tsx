@@ -14,18 +14,18 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 
 export function FeaturedFavoritesSection({ products }: { products: (Product & { badge: string })[] }) {
   return (
-    <section className="py-12 md:py-16 bg-background">
+    <section className="py-8 md:py-12 bg-background">
       <div className="container mx-auto px-4 md:px-6">
         
         {/* Section Header */}
-        <div className="mb-8 md:mb-12">
-          <span className="mb-4 inline-block h-1 w-12 bg-primary" />
-          <h2 className="mb-4 font-headline text-3xl md:text-5xl font-bold leading-tight tracking-tight">
-            Our Most <br />
+        <div className="mb-6 md:mb-8">
+          <span className="mb-3 inline-block h-0.5 w-8 bg-primary" />
+          <h2 className="mb-2 font-headline text-2xl md:text-4xl font-bold leading-tight tracking-tight">
+            Our Most{" "}
             <span className="text-primary italic">Trusted</span> Essentials.
           </h2>
-          <p className="text-base md:text-lg text-muted-foreground max-w-2xl">
-            Hand-picked for privacy, reliability, and peace of mind. These are the products our community relies on.
+          <p className="text-sm text-muted-foreground max-w-2xl">
+            The ones our community orders again and again.
           </p>
         </div>
 
@@ -60,16 +60,6 @@ export function FeaturedFavoritesSection({ products }: { products: (Product & { 
               </CarouselItem>
             </CarouselContent>
           </Carousel>
-          
-          {/* Swipe Indicator */}
-          <div className="flex items-center justify-center gap-2 mt-6 text-sm text-muted-foreground">
-            <div className="flex gap-1">
-              <div className="h-1 w-8 rounded-full bg-primary" />
-              <div className="h-1 w-1 rounded-full bg-muted-foreground/30" />
-              <div className="h-1 w-1 rounded-full bg-muted-foreground/30" />
-            </div>
-            <span>Swipe to explore</span>
-          </div>
         </div>
 
         {/* Desktop: Grid */}
