@@ -16,24 +16,34 @@ export default async function MedicationPage() {
     <div className="bg-background min-h-screen">
       <div className="container mx-auto px-4 pt-8 pb-10 md:px-6 md:pt-12 md:pb-16">
         <div className="mx-auto max-w-7xl">
-          <div className="text-center mb-6">
-            <h1 className="font-headline text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+          <div className="text-center mb-6 md:mb-8">
+            <h1 className="font-headline text-2xl font-bold tracking-tight text-foreground md:text-4xl">
               Medication Refills
             </h1>
-            <p className="mt-2 max-w-lg mx-auto text-sm text-muted-foreground">
-              Private subscription delivery for your essential medications. Enroll once, we handle the rest.
+            <p className="mt-1.5 max-w-lg mx-auto text-sm text-muted-foreground">
+              Private subscription delivery for your essential medications.
             </p>
           </div>
 
-          <Alert className="max-w-4xl mx-auto mb-12 bg-card">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Enrollment & Verification</AlertTitle>
-            <AlertDescription>
-              To ensure compliance, you must upload a valid prescription or
-              medical report during enrollment. Our partner pharmacies will
-              verify your documents before the first delivery.
-            </AlertDescription>
-          </Alert>
+          <div className="max-w-4xl mx-auto mb-10 md:mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
+              {[
+                { step: "01", title: "Select Meds", desc: "Choose your refill." },
+                { step: "02", title: "Upload Info", desc: "Prescription required." },
+                { step: "03", title: "Verify & Go", desc: "We deliver monthly." },
+              ].map((s) => (
+                <div key={s.step} className="flex items-center gap-3 p-3 bg-muted/20 rounded-xl">
+                  <span className="text-xs font-bold text-primary bg-primary/10 w-7 h-7 flex items-center justify-center rounded-full shrink-0">
+                    {s.step}
+                  </span>
+                  <div>
+                    <h4 className="text-xs font-bold">{s.title}</h4>
+                    <p className="text-[10px] text-muted-foreground">{s.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
 
           {medications.length > 0 ? (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

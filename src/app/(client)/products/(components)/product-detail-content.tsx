@@ -117,18 +117,18 @@ export function ProductDetailContent({
 
       <div className="container mx-auto px-4 py-8 md:py-12">
         {/* Breadcrumbs */}
-        <nav className="flex items-center text-sm text-muted-foreground mb-8 overflow-x-auto whitespace-nowrap">
+        <nav className="flex items-center text-[13px] text-muted-foreground mb-6 overflow-x-auto whitespace-nowrap">
           <Link href="/" className="hover:text-primary transition-colors">
             Home
           </Link>
-          <ChevronRight className="h-4 w-4 mx-2" />
+          <ChevronRight className="h-3 w-3 mx-1.5 opacity-50" />
           <Link
             href="/products"
             className="hover:text-primary transition-colors"
           >
             Products
           </Link>
-          <ChevronRight className="h-4 w-4 mx-2" />
+          <ChevronRight className="h-3 w-3 mx-1.5 opacity-50" />
           <span className="font-medium text-foreground">{product.name}</span>
         </nav>
 
@@ -138,14 +138,14 @@ export function ProductDetailContent({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="relative aspect-square bg-white rounded-3xl overflow-hidden shadow-xl border border-border/50 lg:sticky lg:top-8 lg:self-start"
+            className="relative aspect-square bg-[#f5f5f1] rounded-2xl overflow-hidden shadow-sm border-0 lg:sticky lg:top-8 lg:self-start"
           >
             {product.image_url ? (
               <Image
                 src={product.image_url}
                 alt={product.name}
                 fill
-                className="object-contain p-12"
+                className="object-contain p-8"
                 priority
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
@@ -179,7 +179,7 @@ export function ProductDetailContent({
                   {product.category}
                 </Badge>
               )}
-              <h1 className="text-4xl md:text-5xl font-bold text-foreground tracking-tight leading-tight">
+              <h1 className="text-3xl md:text-4xl font-bold text-foreground tracking-[-0.02em] leading-tight">
                 {product.name}
               </h1>
             </div>
@@ -187,7 +187,7 @@ export function ProductDetailContent({
             {/* Pricing */}
             <div className="space-y-3">
               <div className="flex items-baseline gap-3">
-                <span className="text-5xl font-bold text-primary">
+                <span className="text-3xl md:text-4xl font-bold text-primary tracking-[-0.02em]">
                   GHS {product.price_ghs.toFixed(2)}
                 </span>
               </div>
@@ -216,7 +216,7 @@ export function ProductDetailContent({
               <Button
                 size="lg"
                 className={cn(
-                  "w-full h-16 text-lg font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl",
+                  "w-full h-12 md:h-14 text-base md:text-lg font-semibold rounded-full transition-all duration-300 shadow-md hover:shadow-lg",
                   isAdded ? "bg-success hover:bg-success/90" : "",
                 )}
                 onClick={handleAddToCart}
@@ -254,25 +254,25 @@ export function ProductDetailContent({
             <Separator />
 
             {/* Compliance & Trust Info */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="flex items-start gap-4 p-4 rounded-xl bg-muted/30 border border-border/50">
-                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                  <ShieldCheck className="h-6 w-6" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/20 border-0">
+                <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                  <ShieldCheck className="h-5 w-5" />
                 </div>
-                <div className="space-y-1">
-                  <p className="font-semibold text-sm">Discreet Packaging</p>
-                  <p className="text-xs text-muted-foreground">
-                    Plain, unlabeled boxes for your privacy
+                <div className="space-y-0.5">
+                  <p className="font-semibold text-xs transition-colors group-hover:text-primary">Discreet Packaging</p>
+                  <p className="text-[10px] text-muted-foreground leading-tight">
+                    Unlabeled boxes for privacy
                   </p>
                 </div>
               </div>
-              <div className="flex items-start gap-4 p-4 rounded-xl bg-muted/30 border border-border/50">
-                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                  <Truck className="h-6 w-6" />
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/20 border-0">
+                <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                  <Truck className="h-5 w-5" />
                 </div>
-                <div className="space-y-1">
-                  <p className="font-semibold text-sm">Fast Delivery</p>
-                  <p className="text-xs text-muted-foreground">
+                <div className="space-y-0.5">
+                  <p className="font-semibold text-xs transition-colors group-hover:text-primary">Fast Delivery</p>
+                  <p className="text-[10px] text-muted-foreground leading-tight">
                     Delivered within 24 hours
                   </p>
                 </div>

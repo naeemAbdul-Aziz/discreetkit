@@ -200,7 +200,7 @@ export default function ProductsPage() {
 
           {/* Product Grid */}
           {isFetchingProducts ? (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div
                   key={i}
@@ -213,7 +213,7 @@ export default function ProductsPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
-              className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4"
+              className="grid grid-cols-1 gap-3 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4"
             >
               {products.length > 0 ? (
                 products.map((product) => (

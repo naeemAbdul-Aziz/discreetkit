@@ -85,11 +85,11 @@ export function CartView() {
     }
 
     return (
-    <Card className="overflow-hidden rounded-3xl">
-            <CardHeader>
-                <CardTitle className="font-headline text-3xl font-bold md:text-4xl">Review Your Cart</CardTitle>
-                <CardDescription>
-                    Adjust quantities before proceeding to checkout.
+    <Card className="overflow-hidden rounded-[2rem] border-0 shadow-lg">
+            <CardHeader className="pb-4 pt-8 px-6">
+                <CardTitle className="font-headline text-2xl font-bold md:text-3xl tracking-tight">Review Your Cart</CardTitle>
+                <CardDescription className="text-sm">
+                    Adjust quantities before proceeding.
                 </CardDescription>
             </CardHeader>
             <CardContent className="p-0">
@@ -99,9 +99,9 @@ export function CartView() {
                         const price = item.price_ghs || 0;
 
                         return (
-                             <div key={item.id} className="p-4 sm:p-6">
-                                <div className="grid grid-cols-[80px_1fr_auto] items-center gap-4 sm:gap-6">
-                                    <div className="relative aspect-square w-[80px] rounded-lg bg-muted overflow-hidden">
+                             <div key={item.id} className="p-4 sm:p-5">
+                                <div className="grid grid-cols-[70px_1fr_auto] items-center gap-4 sm:gap-6">
+                                    <div className="relative aspect-square w-[70px] rounded-xl bg-[#f5f5f1] overflow-hidden shadow-sm">
                                         {item.image_url && (
                                             <Image
                                                 src={item.image_url}
@@ -110,27 +110,28 @@ export function CartView() {
                                                 className="object-contain p-2"
                                                 data-ai-hint="medical test kit"
                                                 placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(80, 80))}`}
-                                                sizes="80px"
+                                                sizes="70px"
                                             />
                                         )}
                                     </div>
                                     <div className="flex flex-col justify-center">
-                                        <h3 className="text-base font-bold text-foreground">{item.name}</h3>
+                                        <h3 className="text-sm font-bold text-foreground leading-tight line-clamp-2">{item.name}</h3>
+                                        <p className="text-[11px] text-muted-foreground mt-0.5">Confidential Delivery</p>
                                     </div>
-                                    <div className="flex flex-col items-end justify-between space-y-2 self-stretch">
+                                    <div className="flex flex-col items-end justify-between py-1 self-stretch">
                                          <div className="text-right">
-                                            <p className="font-bold text-base text-foreground">
+                                            <p className="font-bold text-sm text-foreground">
                                                 GHS {price.toFixed(2)}
                                             </p>
                                         </div>
                                         <div className="flex items-center">
-                                            <div className="flex h-10 items-center justify-between rounded-full border border-primary/50 bg-background p-1 shadow-sm">
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-primary" onClick={() => updateQuantity(item.id, quantity - 1)}>
-                                                    {quantity === 1 ? <Trash2 className="h-4 w-4" /> : <Minus className="h-4 w-4" />}
+                                            <div className="flex h-8 items-center justify-between rounded-full border border-primary/20 bg-background p-0.5 shadow-sm">
+                                                <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full text-primary" onClick={() => updateQuantity(item.id, quantity - 1)}>
+                                                    {quantity === 1 ? <Trash2 className="h-3 w-3" /> : <Minus className="h-3 w-3" />}
                                                 </Button>
-                                                <span className="w-5 text-center font-bold text-foreground">{quantity}</span>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-primary" onClick={() => updateQuantity(item.id, quantity + 1)}>
-                                                    <Plus className="h-4 w-4" />
+                                                <span className="w-4 text-center text-xs font-bold text-foreground">{quantity}</span>
+                                                <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full text-primary" onClick={() => updateQuantity(item.id, quantity + 1)}>
+                                                    <Plus className="h-3 w-3" />
                                                 </Button>
                                             </div>
                                         </div>
@@ -141,30 +142,30 @@ export function CartView() {
                     })}
                 </div>
                 
-                 <div className="p-6 bg-muted/50 border-t space-y-4">
-                    <h3 className="text-lg font-semibold">Order Summary</h3>
-                     <div className="space-y-2 text-sm">
+                 <div className="p-6 bg-[#f5f5f1] border-t-0 space-y-4">
+                    <h3 className="text-base font-bold tracking-tight uppercase text-[10px] text-muted-foreground">Order Summary</h3>
+                     <div className="space-y-2 text-xs">
                         <div className="flex justify-between">
                             <p className="text-muted-foreground">Subtotal ({totalItems} items)</p>
-                            <p className="font-medium text-foreground">GHS {subtotal.toFixed(2)}</p>
+                            <p className="font-bold text-foreground">GHS {subtotal.toFixed(2)}</p>
                         </div>
                         {studentDiscount > 0 && (
-                            <div className="flex justify-between text-success font-medium">
-                                <p>Student Discount (Free Delivery)</p>
+                            <div className="flex justify-between text-success font-bold">
+                                <p>Student Saving</p>
                                 <p>- GHS {studentDiscount.toFixed(2)}</p>
                             </div>
                         )}
                         <div className="flex justify-between">
-                            <p className="text-muted-foreground">Delivery Fee</p>
-                            <p className="font-medium text-foreground">GHS {deliveryFee.toFixed(2)}</p>
+                            <p className="text-muted-foreground">Delivery</p>
+                            <p className="font-bold text-foreground">GHS {deliveryFee.toFixed(2)}</p>
                         </div>
                     </div>
-                    <Separator />
-                     <div className="flex items-baseline justify-between font-bold text-lg">
+                    <Separator className="bg-primary/5" />
+                     <div className="flex items-baseline justify-between font-bold text-lg tracking-tight">
                         <p>Total</p>
                         <p>GHS {totalPrice.toFixed(2)}</p>
                     </div>
-                    <Button size="lg" className={cn("w-full", isLoading && "bg-primary/80")} asChild disabled={isLoading || totalItems === 0}>
+                    <Button size="lg" className={cn("w-full h-12 md:h-14 rounded-full font-bold shadow-md", isLoading && "bg-primary/80")} asChild disabled={isLoading || totalItems === 0}>
                       <Link href="/order" onClick={handleClick}>
                         {isLoading ? (
                             <>
@@ -173,8 +174,8 @@ export function CartView() {
                             </>
                         ) : (
                             <>
-                                Proceed to Checkout
-                                <ArrowRight />
+                                Checkout
+                                <ArrowRight className="h-4 w-4 ml-1" />
                             </>
                         )}
                       </Link>
