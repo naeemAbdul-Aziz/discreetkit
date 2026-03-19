@@ -13,7 +13,7 @@ import { z } from 'zod';
 import { assignPharmacyForDeliveryArea, sendPharmacyOrderNotification } from './notifications';
 import { sendSMS } from './server-utils'; // Internal use only
 // Use OpenAI when API key is configured, otherwise fallback
-let _answerQuestions: ((input: { query: string; history: { role: 'user' | 'model'; parts: string }[] }) => Promise<{ answer: string }>) | null = null;
+let _answerQuestions: ((input: { query: string; history: { role: 'user' | 'model'; parts: string }[]; liveContext?: string }) => Promise<{ answer: string }>) | null = null;
 async function getAnswerQuestions() {
   if (_answerQuestions) return _answerQuestions;
   const hasOpenAI = !!process.env.OPENAI_API_KEY;
@@ -457,8 +457,24 @@ export async function handleChat(
 ) {
   'use server';
   try {
+    const supabase = getSupabaseAdminClient();
+    // Fetch live product data for real-time context
+    const { data: products } = await supabase
+      .from('products')
+      .select('name, price_ghs, is_out_of_stock, category')
+      .order('name');
+    
+    const liveContext = products ? 
+      "\nLIVE PRODUCT DATA (Current Stock & Prices):\n" + 
+      products.map(p => `- ${p.name}: GHS ${p.price_ghs} (${p.is_out_of_stock ? 'OUT OF STOCK' : 'In Stock'})`).join('\n')
+      : "";
+
     const answerQuestions = await getAnswerQuestions();
-    const result = await answerQuestions({ query: message, history: history });
+    const result = await answerQuestions({ 
+      query: message, 
+      history: history,
+      liveContext: liveContext 
+    });
     return result.answer;
   } catch (error) {
     console.error('AI Error:', error);

@@ -638,8 +638,8 @@ export async function getOrders() {
     return normalizedOrders
 }
 
-export async function getDashboardStats() {
-    const orders = await getOrders();
+export async function getDashboardStats(prefetchedOrders?: any[]) {
+    const orders = prefetchedOrders || await getOrders();
 
     // Top Pharmacies by Revenue
     const pharmacyRevenue: Record<string, number> = {};

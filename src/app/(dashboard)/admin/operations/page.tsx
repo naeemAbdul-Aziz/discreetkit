@@ -1,10 +1,7 @@
 import { getOperationsStats, getLiveDeliveries } from "@/lib/admin-actions";
 import OpsMetrics from "./ops-metrics";
 import LiveDeliveriesTable from "./live-deliveries-table";
-import { RefreshCcw } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Link from "next/link"; // Changed from 'next/link' to standard import for refresh button if needed,
-// actually using a simple refresh link is easiest for server components without client logic.
+import { RefreshButton } from "./refresh-button";
 
 export const dynamic = "force-dynamic";
 
@@ -23,11 +20,7 @@ export default async function OperationsDashboard() {
             Real-time logistics and escalation management.
           </p>
         </div>
-        <Link href="/admin/operations">
-          <Button variant="outline" size="sm">
-            <RefreshCcw className="mr-2 h-4 w-4" /> Refresh
-          </Button>
-        </Link>
+        <RefreshButton />
       </div>
 
       <OpsMetrics stats={stats} />

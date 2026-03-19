@@ -53,7 +53,9 @@ export const metadata: Metadata = generateMetadata({
 
 export const viewport = siteViewport;
 
-import { MagneticCursor } from "@/components/ui/cursor";
+
+import { FloatingChatTrigger } from "@/components/floating-chat-trigger";
+import { Chatbot } from "@/components/chatbot";
 import NextTopLoader from "nextjs-toploader";
 
 export default function RootLayout({
@@ -158,12 +160,14 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <MagneticCursor />
+
         <TourProvider>
           <main id="main" role="main" className="min-h-dvh vk-safe">
             {children}
           </main>
           <Toaster />
+          <FloatingChatTrigger />
+          <Chatbot />
         </TourProvider>
         <PerformanceMonitoring />
       </body>
