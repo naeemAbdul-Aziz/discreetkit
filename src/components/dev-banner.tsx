@@ -18,10 +18,10 @@ export function DevBanner() {
     if (!dismissed) {
       setIsVisible(true);
       
-      // Auto-dismiss after 10 seconds
+      // Auto-dismiss after 30 seconds for verification
       const timer = setTimeout(() => {
         handleDismiss();
-      }, 10000);
+      }, 30000);
       return () => clearTimeout(timer);
     }
   }, []);
@@ -33,7 +33,7 @@ export function DevBanner() {
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -50, opacity: 0 }}
-          className="bg-amber-500 text-white text-center py-2 px-4 text-sm font-medium fixed top-0 left-0 right-0 z-[60] shadow-md flex items-center justify-between sm:justify-center gap-4"
+          className="bg-brand-indigo text-white/95 text-center py-1.5 px-4 text-[10px] font-bold uppercase tracking-widest fixed top-0 left-0 right-0 z-[100] shadow-lg flex items-center justify-between sm:justify-center gap-4 border-b border-white/10 backdrop-blur-md"
         >
           <span>🚧 Still under development. We know you can't wait. Check back later!</span>
           <button 

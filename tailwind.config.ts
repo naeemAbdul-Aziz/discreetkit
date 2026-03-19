@@ -66,6 +66,13 @@ export default {
           DEFAULT: 'hsl(var(--info))',
           foreground: 'hsl(var(--info-foreground))',
         },
+        brand: {
+          indigo: '#1e3a5f',
+          teal: '#187f76',
+          gold: '#c48c52',
+          silver: '#d7d9db',
+          yellow: '#ffce07',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',
