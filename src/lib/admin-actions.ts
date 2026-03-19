@@ -122,7 +122,7 @@ export type ProductFormValues = z.infer<typeof productSchema>;
 
 export async function upsertProduct(data: ProductFormValues) {
     await requireAdmin();
-    const supabase = await createSupabaseServerClient();
+    const supabase = getSupabaseAdminClient();
     const validated = productSchema.parse(data);
 
     const payload: any = {
@@ -158,7 +158,7 @@ export async function upsertProduct(data: ProductFormValues) {
 
 export async function deleteProduct(id: number) {
     await requireAdmin();
-    const supabase = await createSupabaseServerClient()
+    const supabase = getSupabaseAdminClient();
     const { error } = await supabase
         .from('products')
         .delete()
@@ -173,7 +173,7 @@ export async function deleteProduct(id: number) {
 // Partial field update for inline editing
 export async function updateProductField(id: number, patch: Partial<ProductFormValues>) {
     await requireAdmin();
-    const supabase = await createSupabaseServerClient();
+    const supabase = getSupabaseAdminClient();
     // Validate only provided keys by merging with existing schema defaults
     // Fetch existing product to build a full object if necessary
     const { data: existing, error: fetchError } = await supabase
@@ -358,7 +358,7 @@ export async function searchPharmacies(query: string, deliveryArea?: string) {
 
 export async function upsertPharmacy(data: PharmacyFormValues) {
     await requireAdmin();
-    const supabase = await createSupabaseServerClient()
+    const supabase = getSupabaseAdminClient();
     const validated = pharmacySchema.parse(data)
 
     const payload: any = {
@@ -581,7 +581,7 @@ export async function linkPharmacyUser(pharmacyId: number, userEmail: string, pa
 
 export async function unlinkPharmacyUser(pharmacyId: number) {
     await requireAdmin();
-    const supabase = await createSupabaseServerClient()
+    const supabase = getSupabaseAdminClient();
 
     const { error } = await supabase
         .from('pharmacies')
@@ -598,7 +598,7 @@ export async function unlinkPharmacyUser(pharmacyId: number) {
 
 export async function deletePharmacy(id: number) {
     await requireAdmin();
-    const supabase = await createSupabaseServerClient()
+    const supabase = getSupabaseAdminClient();
     const { error } = await supabase
         .from('pharmacies')
         .delete()
