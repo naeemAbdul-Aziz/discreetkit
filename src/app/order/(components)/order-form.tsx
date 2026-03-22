@@ -615,7 +615,7 @@ export function OrderForm() {
                           id="phone_masked"
                           name="phone_masked"
                           type="tel"
-                          label="Rider Contact Number"
+                          label="Mobile Number"
                           placeholder=" "
                           className={cn(state.errors?.phone_masked && "ring-1 ring-destructive")}
                         />
