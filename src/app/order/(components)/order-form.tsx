@@ -71,7 +71,7 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
   return (
     <Button
       type="submit"
-      className="w-full h-14 rounded-xl text-base shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all active:scale-[0.98]"
+      className="w-full h-14 rounded-xl text-base bg-[#1a254c] hover:bg-[#1a254c]/90 text-white shadow-lg shadow-[#1a254c]/20 hover:shadow-xl hover:shadow-[#1a254c]/30 transition-all active:scale-[0.98]"
       disabled={disabled}
       loading={pending}
     >
@@ -421,239 +421,234 @@ export function OrderForm() {
 
   return (
     <>
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-10 items-start mt-4 lg:mt-8">
-        {/* Left Column: Form */}
-        <div className="lg:col-span-7">
-          <form ref={formRef} action={dispatch} className="space-y-6 relative overflow-hidden pb-4">
-            <FormPendingOverlay />
-            <input type="hidden" name="cartItems" value={JSON.stringify(items)} />
-            <input type="hidden" name="subtotal" value={subtotal} />
-            <input type="hidden" name="studentDiscount" value={studentDiscount} />
-            <input type="hidden" name="deliveryFee" value={deliveryFee} />
-            <input type="hidden" name="totalPrice" value={totalPrice} />
+      <div className="max-w-xl mx-auto w-full mt-4 lg:mt-8">
+        <form ref={formRef} action={dispatch} className="space-y-6 relative overflow-hidden pb-4">
+          <FormPendingOverlay />
+          <input type="hidden" name="cartItems" value={JSON.stringify(items)} />
+          <input type="hidden" name="subtotal" value={subtotal} />
+          <input type="hidden" name="studentDiscount" value={studentDiscount} />
+          <input type="hidden" name="deliveryFee" value={deliveryFee} />
+          <input type="hidden" name="totalPrice" value={totalPrice} />
 
-            <AnimatePresence mode="wait" initial={false}>
-              {step === 1 && (
-                <motion.div
-                   key="step1"
-                   initial={{ x: -20, opacity: 0 }}
-                   animate={{ x: 0, opacity: 1 }}
-                   exit={{ x: -20, opacity: 0 }}
-                   transition={{ duration: 0.3, ease: "easeInOut" }}
-                   className="space-y-6"
-                >
-                  <div className="px-1">
-                    <h2 className="text-2xl font-semibold tracking-tight">Where to?</h2>
-                    <p className="text-muted-foreground mt-1">Tell us where to drop your package off.</p>
+          <AnimatePresence mode="wait" initial={false}>
+            {step === 1 && (
+              <motion.div
+                 key="step1"
+                 initial={{ x: -20, opacity: 0 }}
+                 animate={{ x: 0, opacity: 1 }}
+                 exit={{ x: -20, opacity: 0 }}
+                 transition={{ duration: 0.3, ease: "easeInOut" }}
+                 className="space-y-6"
+              >
+                <div className="px-1">
+                  <h2 className="text-3xl font-bold tracking-tight">Where to?</h2>
+                  <p className="text-muted-foreground mt-1 text-base">Tell us where to drop your package off.</p>
+                </div>
+
+                <div className="space-y-5">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="w-full h-16 rounded-2xl border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary justify-start gap-4 relative overflow-hidden group"
+                    onClick={handleUseLocation}
+                    disabled={locationLoading}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent -translate-x-full group-hover:animate-shimmer" />
+                    {locationLoading ? (
+                      <Loader2 className="h-6 w-6 animate-spin ml-2" />
+                    ) : (
+                      <div className="h-10 w-10 ml-1 rounded-full bg-primary/10 flex items-center justify-center">
+                         <MapPin className="h-5 w-5" />
+                      </div>
+                    )}
+                    <div className="flex flex-col items-start leading-tight">
+                      <span className="font-semibold text-base">Find nearest campus</span>
+                      <span className="text-xs font-normal opacity-80">Auto-detect location for discounts</span>
+                    </div>
+                    <ChevronRight className="h-5 w-5 ml-auto text-primary/50 group-hover:text-primary transition-colors" />
+                  </Button>
+
+                  <div className="relative flex items-center gap-4 py-1">
+                    <Separator className="flex-1" />
+                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">or select manually</span>
+                    <Separator className="flex-1" />
                   </div>
 
-                  <div className="space-y-5">
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      className="w-full h-16 rounded-2xl border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary justify-start gap-4 relative overflow-hidden group"
-                      onClick={handleUseLocation}
-                      disabled={locationLoading}
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent -translate-x-full group-hover:animate-shimmer" />
-                      {locationLoading ? (
-                        <Loader2 className="h-6 w-6 animate-spin ml-2" />
-                      ) : (
-                        <div className="h-10 w-10 ml-1 rounded-full bg-primary/10 flex items-center justify-center">
-                           <MapPin className="h-5 w-5" />
-                        </div>
-                      )}
-                      <div className="flex flex-col items-start leading-tight">
-                        <span className="font-semibold text-base">Find nearest campus</span>
-                        <span className="text-xs font-normal opacity-80">Auto-detect location for discounts</span>
-                      </div>
-                      <ChevronRight className="h-5 w-5 ml-auto text-primary/50 group-hover:text-primary transition-colors" />
-                    </Button>
-
-                    <div className="relative flex items-center gap-4 py-1">
-                      <Separator className="flex-1" />
-                      <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">or select manually</span>
-                      <Separator className="flex-1" />
+                  <div className="space-y-4">
+                    <div className="space-y-1.5">
+                      <Select
+                        name="deliveryArea"
+                        onValueChange={handleLocationChange}
+                        value={deliveryLocation || "Other"}
+                        disabled={!isMounted}
+                      >
+                        <SelectTrigger
+                          className={cn(
+                            "h-14 bg-muted/30 border-none rounded-xl px-4 focus:ring-1 focus:ring-primary focus:bg-transparent text-base",
+                            state.errors?.deliveryArea && "ring-1 ring-destructive"
+                          )}
+                        >
+                          <SelectValue placeholder="Select a location..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Other">Standard Delivery anywhere</SelectItem>
+                          {discounts.map((loc) => (
+                            <SelectItem key={loc.id} value={loc.campus}>
+                              {loc.campus}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FieldError message={state.errors?.deliveryArea?.[0]} />
                     </div>
 
-                    <div className="space-y-4">
+                    {showOther ? (
                       <div className="space-y-1.5">
-                        <Select
-                          name="deliveryArea"
-                          onValueChange={handleLocationChange}
-                          value={deliveryLocation || "Other"}
-                          disabled={!isMounted}
-                        >
+                        <FloatingInput
+                          id="otherDeliveryArea"
+                          name="otherDeliveryArea"
+                          label="Exact Delivery Address"
+                          placeholder=" "
+                          className={cn(state.errors?.otherDeliveryArea && "ring-1 ring-destructive")}
+                        />
+                        <FieldError message={state.errors?.otherDeliveryArea?.[0]} />
+                      </div>
+                    ) : (
+                      <div className="space-y-1.5">
+                        <Select name="otherDeliveryArea">
                           <SelectTrigger
                             className={cn(
                               "h-14 bg-muted/30 border-none rounded-xl px-4 focus:ring-1 focus:ring-primary focus:bg-transparent text-base",
-                              state.errors?.deliveryArea && "ring-1 ring-destructive"
+                              state.errors?.otherDeliveryArea && "ring-1 ring-destructive"
                             )}
                           >
-                            <SelectValue placeholder="Select a location..." />
+                            <SelectValue placeholder="Select specific pickup point..." />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="Other">Standard Delivery anywhere</SelectItem>
-                            {discounts.map((loc) => (
-                              <SelectItem key={loc.id} value={loc.campus}>
-                                {loc.campus}
-                              </SelectItem>
-                            ))}
+                            {discounts
+                              .find((d) => d.campus === deliveryLocation)
+                              ?.meetingPoints?.map((point) => (
+                                <SelectItem key={point} value={point}>
+                                  {point}
+                                </SelectItem>
+                              ))}
+                            <SelectItem value="Other">Other (Specify in notes)</SelectItem>
                           </SelectContent>
                         </Select>
-                        <FieldError message={state.errors?.deliveryArea?.[0]} />
+                        <FieldError message={state.errors?.otherDeliveryArea?.[0]} />
                       </div>
+                    )}
 
-                      {showOther ? (
-                        <div className="space-y-1.5">
-                          <FloatingInput
-                            id="otherDeliveryArea"
-                            name="otherDeliveryArea"
-                            label="Exact Delivery Address"
-                            placeholder=" "
-                            className={cn(state.errors?.otherDeliveryArea && "ring-1 ring-destructive")}
-                          />
-                          <FieldError message={state.errors?.otherDeliveryArea?.[0]} />
-                        </div>
+                    <div className="pt-2 pb-2">
+                      {!showNotes ? (
+                        <button 
+                          type="button"
+                          onClick={() => setShowNotes(true)} 
+                          className="text-sm font-medium text-primary hover:underline flex items-center gap-1"
+                        >
+                          + Add delivery instructions
+                        </button>
                       ) : (
-                        <div className="space-y-1.5">
-                          <Select name="otherDeliveryArea">
-                            <SelectTrigger
-                              className={cn(
-                                "h-14 bg-muted/30 border-none rounded-xl px-4 focus:ring-1 focus:ring-primary focus:bg-transparent text-base",
-                                state.errors?.otherDeliveryArea && "ring-1 ring-destructive"
-                              )}
-                            >
-                              <SelectValue placeholder="Select specific pickup point..." />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {discounts
-                                .find((d) => d.campus === deliveryLocation)
-                                ?.meetingPoints?.map((point) => (
-                                  <SelectItem key={point} value={point}>
-                                    {point}
-                                  </SelectItem>
-                                ))}
-                              <SelectItem value="Other">Other (Specify in notes)</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FieldError message={state.errors?.otherDeliveryArea?.[0]} />
+                        <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
+                          <Textarea
+                            id="deliveryAddressNote"
+                            name="deliveryAddressNote"
+                            placeholder="e.g. Call upon arrival, leave at main gate..."
+                            className="min-h-[100px] bg-muted/30 border-none rounded-xl p-4 focus-visible:ring-1 focus-visible:ring-primary focus-visible:bg-transparent transition-all resize-none"
+                          />
                         </div>
                       )}
-
-                      <div className="pt-2 pb-2">
-                        {!showNotes ? (
-                          <button 
-                            type="button"
-                            onClick={() => setShowNotes(true)} 
-                            className="text-sm font-medium text-primary hover:underline flex items-center gap-1"
-                          >
-                            + Add delivery instructions
-                          </button>
-                        ) : (
-                          <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
-                            <Textarea
-                              id="deliveryAddressNote"
-                              name="deliveryAddressNote"
-                              placeholder="e.g. Call upon arrival, leave at main gate..."
-                              className="min-h-[100px] bg-muted/30 border-none rounded-xl p-4 focus-visible:ring-1 focus-visible:ring-primary focus-visible:bg-transparent transition-all resize-none"
-                            />
-                          </div>
-                        )}
-                      </div>
-
-                      <Button 
-                        type="button" 
-                        className="w-full h-14 rounded-xl text-base mt-4 shadow-md hover:shadow-lg hover:shadow-primary/20 transition-all"
-                        onClick={() => setStep(2)}
-                      >
-                        Continue
-                        <ArrowRight className="h-4 w-4 ml-2" />
-                      </Button>
                     </div>
-                  </div>
-                </motion.div>
-              )}
 
-              {step === 2 && (
-                <motion.div
-                   key="step2"
-                   initial={{ x: 20, opacity: 0 }}
-                   animate={{ x: 0, opacity: 1 }}
-                   exit={{ x: 20, opacity: 0 }}
-                   transition={{ duration: 0.3, ease: "easeInOut" }}
-                   className="space-y-6"
-                >
-                  <div className="flex items-start gap-4 mb-2">
-                    <button 
+                    <Button 
                       type="button" 
-                      onClick={() => setStep(1)} 
-                      className="mt-1 flex-shrink-0 h-8 w-8 rounded-full bg-muted/50 flex items-center justify-center hover:bg-muted transition-colors"
+                      className="w-full h-14 rounded-xl text-base mt-2 shadow-md hover:shadow-lg hover:shadow-primary/20 transition-all font-semibold"
+                      onClick={() => setStep(2)}
                     >
-                      <ChevronLeft className="h-5 w-5 text-muted-foreground" />
-                    </button>
-                    <div>
-                      <h2 className="text-2xl font-semibold tracking-tight">Secure Contact</h2>
-                      <p className="text-muted-foreground mt-1">Where should we send your tracking link?</p>
-                    </div>
+                      Continue
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                    </Button>
                   </div>
+                </div>
+              </motion.div>
+            )}
 
-                  <div className="space-y-5 bg-card border border-border/50 rounded-3xl p-1">
-                    <div className="p-4 space-y-5">
-                       <div className="space-y-1.5">
-                          <FloatingInput
-                            id="email"
-                            name="email"
-                            type="email"
-                            label="Receipt Email Address"
-                            placeholder=" "
-                            className={cn(state.errors?.email && "ring-1 ring-destructive")}
-                          />
-                          <FieldError message={state.errors?.email?.[0]} />
-                       </div>
-                       
-                       <div className="space-y-1.5">
-                          <FloatingInput
-                            id="phone_masked"
-                            name="phone_masked"
-                            type="tel"
-                            label="Rider Contact Number"
-                            placeholder=" "
-                            className={cn(state.errors?.phone_masked && "ring-1 ring-destructive")}
-                          />
-                          <FieldError message={state.errors?.phone_masked?.[0]} />
-                          <p className="text-[0.75rem] text-muted-foreground/80 flex items-center gap-1.5 mt-2 ml-1">
-                            <ShieldCheck className="h-3.5 w-3.5 text-success/80" />
-                            Your number is permanently masked. The rider will not see your real details.
-                          </p>
-                       </div>
-                    </div>
+            {step === 2 && (
+              <motion.div
+                 key="step2"
+                 initial={{ x: 20, opacity: 0 }}
+                 animate={{ x: 0, opacity: 1 }}
+                 exit={{ x: 20, opacity: 0 }}
+                 transition={{ duration: 0.3, ease: "easeInOut" }}
+                 className="space-y-6"
+              >
+                <div className="flex items-start gap-4 mb-2">
+                  <button 
+                    type="button" 
+                    onClick={() => setStep(1)} 
+                    className="mt-1 flex-shrink-0 h-8 w-8 rounded-full bg-muted/70 flex items-center justify-center hover:bg-muted transition-colors"
+                  >
+                    <ChevronLeft className="h-5 w-5 text-muted-foreground" />
+                  </button>
+                  <div>
+                    <h2 className="text-3xl font-bold tracking-tight">Secure Contact</h2>
+                    <p className="text-muted-foreground mt-1 text-base">Where should we send your tracking link?</p>
                   </div>
+                </div>
 
-                  <div className="pt-4">
-                    <SubmitButton disabled={isSubmitDisabled} />
-                    <p className="text-center text-xs text-muted-foreground mt-4 leading-relaxed px-4">
-                      By proceeding to payment, you agree to our <Link href="/terms" className="underline hover:text-foreground transition-colors" target="_blank">Terms & Conditions</Link> and <Link href="/privacy" className="underline hover:text-foreground transition-colors" target="_blank">Privacy Notice</Link>.
+                <div className="space-y-5 bg-card border border-border/50 rounded-3xl p-1 shadow-sm">
+                  <div className="p-4 space-y-5">
+                     <div className="space-y-1.5">
+                        <FloatingInput
+                          id="email"
+                          name="email"
+                          type="email"
+                          label="Receipt Email Address"
+                          placeholder=" "
+                          className={cn(state.errors?.email && "ring-1 ring-destructive")}
+                        />
+                        <FieldError message={state.errors?.email?.[0]} />
+                     </div>
+                     
+                     <div className="space-y-1.5">
+                        <FloatingInput
+                          id="phone_masked"
+                          name="phone_masked"
+                          type="tel"
+                          label="Rider Contact Number"
+                          placeholder=" "
+                          className={cn(state.errors?.phone_masked && "ring-1 ring-destructive")}
+                        />
+                        <FieldError message={state.errors?.phone_masked?.[0]} />
+                        <p className="text-[0.75rem] text-muted-foreground/80 flex items-center gap-1.5 mt-2 ml-1">
+                          <ShieldCheck className="h-3.5 w-3.5 text-success/80" />
+                          Your number is permanently masked. The rider will not see your real details.
+                        </p>
+                     </div>
+                  </div>
+                </div>
+
+                <div className="pt-2 pb-2">
+                  <h3 className="text-lg font-bold px-1 mb-3">Order Summary</h3>
+                  <OrderSummaryCard />
+                  <div className="flex items-center gap-2 rounded-xl bg-[#1a254c]/5 p-4 mt-3 text-muted-foreground border border-[#1a254c]/10">
+                    <Lock className="h-5 w-5 text-[#1a254c] flex-shrink-0" />
+                    <p className="text-xs font-medium text-[#1a254c]/80">
+                      Secured via Paystack. Your privacy is guaranteed.
                     </p>
                   </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </form>
-        </div>
+                </div>
 
-        {/* Right Column: Order Summary */}
-        <div className="lg:col-span-5 lg:order-last">
-          <div className="sticky top-24 space-y-4 h-fit">
-            <OrderSummaryCard />
-            <div className="flex items-center gap-2 rounded-lg bg-muted/50 p-4 text-muted-foreground border border-border/50">
-              <Lock className="h-5 w-5 text-success flex-shrink-0" />
-              <p className="text-xs font-medium">
-                Secured via Paystack. Your privacy is guaranteed.
-              </p>
-            </div>
-          </div>
-        </div>
+                <div className="pt-2">
+                  <SubmitButton disabled={isSubmitDisabled} />
+                  <p className="text-center text-xs text-muted-foreground mt-4 leading-relaxed px-4">
+                    By proceeding to payment, you agree to our <Link href="/terms" className="underline hover:text-foreground transition-colors" target="_blank">Terms & Conditions</Link> and <Link href="/privacy" className="underline hover:text-foreground transition-colors" target="_blank">Privacy Notice</Link>.
+                  </p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </form>
       </div>
     </>
   );
