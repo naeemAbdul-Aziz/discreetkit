@@ -67,12 +67,15 @@ We implement a strict **Content Security Policy (CSP)**.
 ## 4. Performance & Frontend Mastery
 
 ### A. The "App-Like" Feel
+*   **100dvh Mobile Viewport Mastery:** Solves the notorious iOS Safari "hanging" keyboard issue by binding chat interfaces and sheets strictly to `min-h-[100dvh]` dynamically.
+*   **Frictionless Nav & Chat:** A fully refined Apple-style sticky header pushes users to highest-converting funnels (Bundles/Test Kits) while the Pacely chatbot floats via a premium pill-shaped trigger matching Everlywell's aesthetic.
 *   **Magnetic Cursor:** A subtle Micro-interaction (`src/components/ui/cursor.tsx`) that snaps to interactive elements, subconsciously signaling "Premium Quality."
 *   **Lazy Loading:** We use `dynamic()` imports for heavy modules (like the Map or huge JSON data) so the initial page load stays under 100KB.
 *   **Font Optimization:** We use `next/font/local` with `swap` display to prevent Layout Shift (CLS), ensuring text is visible instantly.
 
-### B. SEO Engineering
-We don't just "add meta tags." We inject complex **JSON-LD Structured Data** (`src/lib/seo`).
+### B. SEO Engineering (Next.js 15 Native)
+We don't just "add meta tags." We inject complex **JSON-LD Structured Data** (`src/lib/seo`) and rely on Next.js `MetadataRoute`.
+*   **Dynamic Sitemap & Robots:** Built natively in `src/app/sitemap.ts` and `robots.ts` to guarantee perfectly formatted XML structures that adapt conditionally to DB environments.
 *   **MedicalBusiness Schema:** Tells Google we are a licensed health service.
 *   **Product Schema:** Enables "Rich Snippets" (Price, Rating, Availability) directly in Google Search results.
 
