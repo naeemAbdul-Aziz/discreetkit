@@ -28,11 +28,13 @@ This repository contains the source code for the DiscreetKit Ghana web applicati
 *   **Private & Discreet Delivery:** All products are delivered in plain, unbranded packaging.
 *   **Student Discount Program:** Automatic discounts for students when a valid campus location is selected.
 *   **Secure Payments:** Integrated with Paystack for reliable and secure mobile money and card payments.
-*   **AI-Powered Assistant:** An integrated chatbot ("Pacely") powered by Google's Gemini to answer user questions about products, privacy, and the process.
+*   **AI-Powered Assistant:** An integrated chatbot ("Pacely") powered by Google's Gemini, featuring a minimal Everlywell-style aesthetic for an elevated, clean user experience.
 *   **Real-Time Order Tracking:** Users can track their order status with a unique, anonymous code.
 *   **Smart Pharmacy Management:** Real-time inventory tracking, auto-dispatch, and reservation system.
+*   **Next.js 15 Native SEO Validation:** Built-in dynamic `sitemap.ts`, `robots.ts`, and advanced JSON-LD structured data generation for immediate indexing visibility.
+*   **Optimized E-Commerce Navigation:** A frictionless, Apple-style sticky header directing active workflows (Bundles, Test Kits, Refills) without dead ends.
 *   **Supabase Backend:** Utilizes Supabase for database management and real-time updates.
-*   **Built with Next.js 16 & ShadCN UI:** A modern, performant, and responsive user interface.
+*   **Built with Next.js & ShadCN UI:** A modern, performant, and responsive interface optimized perfectly for `100dvh` mobile viewports.
 
 ## 🚀 Getting Started
 
