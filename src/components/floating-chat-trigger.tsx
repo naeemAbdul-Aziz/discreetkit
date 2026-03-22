@@ -2,7 +2,6 @@
 
 import { Button } from '@/components/ui/button';
 import { useChatbot } from '@/hooks/use-chatbot';
-import { Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -36,13 +35,14 @@ export function FloatingChatTrigger() {
           <Button
             onClick={() => setIsOpen(true)}
             className={cn(
-              "h-14 w-14 rounded-full bg-brand-indigo hover:opacity-90 text-white shadow-2xl transition-all duration-500 hover:scale-110 active:scale-95 border border-white/10 group p-0"
+              "h-14 rounded-full bg-brand-indigo hover:opacity-90 text-white shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 border border-white/10 group pl-2 pr-5 flex items-center gap-3"
             )}
             aria-label="Ask Pacely"
           >
             <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-white/10 transition-transform duration-500 group-hover:rotate-180">
               <AbstractIcon className="h-5 w-5 text-white" />
             </div>
+            <span className="font-semibold text-sm tracking-wide">Ask pacely</span>
           </Button>
         </motion.div>
       )}

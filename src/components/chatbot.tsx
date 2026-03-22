@@ -12,35 +12,15 @@ import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
   SheetClose,
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Bot, Send, User, X } from "lucide-react";
-import { BrandSpinner } from "@/components/brand-spinner";
+import { Send, X } from "lucide-react";
 import { handleChat } from "@/lib/actions";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { cn } from "@/lib/utils";
 import { useChatbot } from "@/hooks/use-chatbot";
 import { closeButtonClasses } from "@/components/ui/close-button";
-
-const AbstractIcon = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="0.5" strokeDasharray="1 2" opacity="0.3" />
-    <circle cx="12" cy="12" r="3.5" fill="currentColor" />
-    <circle cx="12" cy="4" r="1.5" fill="currentColor" />
-    <circle cx="12" cy="20" r="1.5" fill="currentColor" />
-    <circle cx="4" cy="12" r="1.5" fill="currentColor" />
-    <circle cx="20" cy="12" r="1.5" fill="currentColor" />
-    <circle cx="6.34" cy="6.34" r="1.2" fill="currentColor" />
-    <circle cx="17.66" cy="17.66" r="1.2" fill="currentColor" />
-    <circle cx="6.34" cy="17.66" r="1.2" fill="currentColor" />
-    <circle cx="17.66" cy="6.34" r="1.2" fill="currentColor" />
-  </svg>
-);
 
 // type definition for a chat message.
 type Message = {
@@ -139,24 +119,15 @@ export function Chatbot() {
   return (
     <>
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetContent className="flex w-full flex-col sm:max-w-md p-0">
-          <SheetHeader className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b px-6 py-4">
-            <div className="flex flex-col items-center justify-center w-full">
-              <SheetTitle className="flex flex-col items-center gap-2 text-brand-indigo font-headline">
-                <div className="h-10 w-10 rounded-full bg-brand-indigo/5 flex items-center justify-center text-brand-indigo">
-                  <AbstractIcon className="h-6 w-6" />
-                </div>
-                {/* <span className="text-lg tracking-tight">Pacely</span> */}
-              </SheetTitle>
-            </div>
-            <SheetClose
-              className={cn("absolute right-4 top-5 opacity-70 hover:opacity-100 transition-opacity", closeButtonClasses)}
-            >
-              <X className="h-4 w-4" />
-              <span className="sr-only">Close</span>
-            </SheetClose>
-          </SheetHeader>
-          <div className="flex-1 overflow-hidden">
+        <SheetContent className="flex w-full h-[100dvh] flex-col sm:max-w-md p-0 bg-background border-l-0 sm:border-l shadow-2xl">
+          <SheetClose
+            className="absolute right-4 top-4 z-50 rounded-full bg-background/50 p-2 backdrop-blur-md opacity-70 hover:opacity-100 transition-opacity"
+          >
+            <X className="h-5 w-5" />
+            <span className="sr-only">Close</span>
+          </SheetClose>
+          
+          <div className="flex-1 overflow-hidden relative">
             <ScrollArea className="h-full" ref={scrollAreaRef}>
               <div className="space-y-6 p-4">
                 {history.map((msg, index) => {
@@ -166,8 +137,8 @@ export function Chatbot() {
                     return (
                       <div key={index} className="flex flex-col items-center justify-center py-12 space-y-8">
                         <div className="space-y-4 text-center">
-                          <div className="h-14 w-14 rounded-full bg-brand-indigo/5 flex items-center justify-center text-brand-indigo mx-auto mb-6">
-                            <AbstractIcon className="h-8 w-8" />
+                          <div className="h-20 w-20 rounded-full overflow-hidden mx-auto mb-6 shadow-sm border border-brand-indigo/5">
+                            <img src="/pacely-avatar.png" alt="Pacely" className="h-full w-full object-cover" />
                           </div>
                           <h2 className="text-2xl md:text-3xl font-headline tracking-tight text-brand-indigo max-w-[280px] mx-auto leading-tight">
                             Hi, I'm <span className="font-bold">pacely.</span><br />
@@ -200,8 +171,8 @@ export function Chatbot() {
                       )}
                     >
                       {msg.role === "model" && (
-                        <div className="h-8 w-8 rounded-full bg-brand-indigo/5 flex items-center justify-center text-brand-indigo border border-brand-indigo/10 flex-shrink-0 mt-1">
-                          <AbstractIcon className="h-4 w-4" />
+                        <div className="h-8 w-8 rounded-full overflow-hidden flex-shrink-0 mt-1 shadow-sm border border-brand-indigo/10">
+                          <img src="/pacely-avatar.png" alt="Pacely" className="h-full w-full object-cover" />
                         </div>
                       )}
                       <div
@@ -217,11 +188,10 @@ export function Chatbot() {
                     </div>
                   );
                 })}
-                {/* show a loading indicator while the ai is "thinking". */}
                 {isPending && (
                   <div className="flex items-start gap-3 justify-start">
-                    <div className="h-8 w-8 rounded-full bg-brand-indigo/5 flex items-center justify-center text-brand-indigo border border-brand-indigo/10 flex-shrink-0 mt-1">
-                      <AbstractIcon className="h-4 w-4 animate-pulse" />
+                    <div className="h-8 w-8 rounded-full overflow-hidden flex-shrink-0 mt-1 shadow-sm border border-brand-indigo/10">
+                      <img src="/pacely-avatar.png" alt="Pacely" className="h-full w-full object-cover opacity-80" />
                     </div>
                     <div className="max-w-[80%] rounded-2xl p-4 text-sm bg-brand-silver text-brand-indigo font-medium flex items-center gap-2">
                        Thinking...
@@ -232,9 +202,9 @@ export function Chatbot() {
             </ScrollArea>
           </div>
 
-          <div className="border-t p-4 space-y-4">
+          <div className="p-4 pt-2 space-y-4 bg-background z-10 relative">
             {/* Suggestion Chips */}
-            <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar px-1">
+            <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar px-1 -mx-1">
               {suggestions.map((s) => (
                 <button
                   key={s}
