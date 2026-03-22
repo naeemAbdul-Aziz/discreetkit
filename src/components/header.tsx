@@ -24,12 +24,14 @@ import { TrustBadge } from "@/components/trust-badge";
 import { closeButtonClasses } from "@/components/ui/close-button";
 
 const navLinks = [
-  { href: "/products/test-kits", label: "Screening Kits" },
-  { href: "/products/bundles", label: "Bundles" },
-  { href: "/products/wellness", label: "Wellness" },
-  { href: "/products/medication", label: "Medication" },
+  // Left (Store)
+  { href: "/products", label: "Shop All" },
+  { href: "/products/value-bundles", label: "Bundles" },
+  { href: "/products/test-kits", label: "Test Kits" },
+  { href: "/products/medication-refills", label: "Refills" },
+  { href: "/products/emergency-contraceptives", label: "Emergency" },
+  // Right (Utility)
   { href: "/#how-it-works", label: "How It Works" },
-  { href: "/partner-care", label: "Our Partners" },
   { href: "/track", label: "Track Order" },
 ];
 
@@ -195,13 +197,13 @@ export function Header() {
           <div className="mr-6 hidden xl:block">
             <TrustBadge />
           </div>
-          {navLinks.slice(0, 4).map((link) => (
+          {navLinks.slice(0, 5).map((link) => (
             <NavLink key={link.href} {...link} />
           ))}
         </nav>
 
         <div className="hidden md:flex items-center gap-2">
-          {navLinks.slice(4).map((link) => (
+          {navLinks.slice(5).map((link) => (
             <NavLink key={link.href} {...link} />
           ))}
           <div className="w-px h-6 bg-border mx-2" />
