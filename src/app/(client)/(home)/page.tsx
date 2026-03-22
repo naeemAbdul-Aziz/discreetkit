@@ -140,11 +140,6 @@ const ContactUs = dynamic(
   { loading: () => <LoadingSkeleton height={componentMap.ContactUs.height} /> },
 );
 
-const PrivacyReveal = dynamic(() =>
-  import("@/app/(home)/components/privacy-reveal").then(
-    (mod) => mod.PrivacyReveal,
-  ),
-);
 
 const AnonymousReviewsSection = dynamic(
   () =>
@@ -214,9 +209,6 @@ export default async function Home() {
       </SectionWrapper>
 
       {/* Info Sections - Pushed down */}
-      <SectionWrapper className="bg-muted/20">
-        <PrivacyReveal />
-      </SectionWrapper>
 
       <SectionWrapper>
         <HowItWorks />
