@@ -26,8 +26,8 @@
 
     --border: 0 0% 92%;
     --input: 0 0% 92%;
-    --ring: 175 68% 30%;
-    --primary: 175 68% 30%;
+    --ring: 226 49% 20%;
+    --primary: 226 49% 20%;
     --primary-foreground: 0 0% 100%;
 
     /* Semantic Status Colors */
@@ -58,7 +58,7 @@
     --popover: 0 0% 4%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 175 68% 30%;
+    --primary: 226 49% 25%;
     --primary-foreground: 0 0% 98%;
 
     --secondary: 78 100% 69%;
@@ -88,7 +88,7 @@
 
     --border: 0 0% 12%;
     --input: 0 0% 12%;
-    --ring: 175 68% 30%;
+    --ring: 226 49% 25%;
   }
 }
 

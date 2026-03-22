@@ -51,49 +51,8 @@ function OrderPageLoading() {
 
 export default function OrderPage() {
   return (
-    <div className="bg-background min-h-dvh vk-safe overscroll-contain vk-scroll">
-      <div className="container mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-24">
-        <div className="text-center">
-            <h1 className="font-headline text-3xl font-bold md:text-4xl">Complete Your Order</h1>
-            <p className="mt-2 text-base text-muted-foreground md:text-lg">
-                Secure, private, and straightforward.
-            </p>
-        </div>
-
-        {/* Stepper */}
-        <nav aria-label="Progress" className="my-12 max-w-md mx-auto">
-            <ol role="list" className="grid grid-cols-3">
-                {steps.map((step, stepIdx) => (
-                <li key={step.name} className="relative">
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center w-full">
-                             {stepIdx > 0 && (
-                                 <div className={cn("flex-1 h-0.5", step.status === 'complete' || step.status === 'current' ? 'bg-primary' : 'bg-border')} />
-                             )}
-                            {step.status === 'complete' ? (
-                                <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                                    <CheckCircle className="h-5 w-5" />
-                                </div>
-                            ) : step.status === 'current' ? (
-                                <div className="relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary bg-background">
-                                    <span className="h-2.5 w-2.5 rounded-full bg-primary" aria-hidden="true" />
-                                </div>
-                            ) : (
-                                <div className="relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-border bg-background" />
-                            )}
-                             {stepIdx < steps.length - 1 && (
-                                <div className={cn("flex-1 h-0.5", step.status === 'complete' ? 'bg-primary' : 'bg-border')} />
-                             )}
-                        </div>
-                    </div>
-                    <div className="absolute top-10 w-max text-center left-1/2 -translate-x-1/2">
-                        <p className={cn("text-xs font-medium", step.status === 'current' ? 'text-primary' : 'text-muted-foreground', step.status === 'complete' ? 'text-foreground' : '')}>{step.name}</p>
-                    </div>
-                </li>
-                ))}
-            </ol>
-        </nav>
-
+    <div className="bg-background min-h-[100dvh] vk-safe overscroll-contain vk-scroll pb-12">
+      <div className="container mx-auto max-w-5xl px-4 py-6 md:py-16">
         <Suspense fallback={<OrderPageLoading />}>
           <OrderForm />
         </Suspense>

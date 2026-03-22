@@ -21,15 +21,14 @@ import {
   ArrowRight,
   GraduationCap,
   AlertTriangle,
-  Lock,
   Mail,
   MapPin,
+  Lock,
   Loader2,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
 import { BrandSpinner } from "@/components/brand-spinner";
-import { ChatTrigger } from "@/components/chat-trigger";
 import { useCart } from "@/hooks/use-cart";
 import { discounts, DiscountLocation } from "@/lib/data";
 import Image from "next/image";
@@ -573,10 +572,6 @@ export function OrderForm() {
                       </Button>
                     </div>
                   </div>
-                  
-                  <div className="mt-8 flex justify-center">
-                    <ChatTrigger />
-                  </div>
                 </motion.div>
               )}
 
@@ -640,10 +635,6 @@ export function OrderForm() {
                     <p className="text-center text-xs text-muted-foreground mt-4 leading-relaxed px-4">
                       By proceeding to payment, you agree to our <Link href="/terms" className="underline hover:text-foreground transition-colors" target="_blank">Terms & Conditions</Link> and <Link href="/privacy" className="underline hover:text-foreground transition-colors" target="_blank">Privacy Notice</Link>.
                     </p>
-                  </div>
-                  
-                  <div className="mt-8 flex justify-center">
-                    <ChatTrigger />
                   </div>
                 </motion.div>
               )}
