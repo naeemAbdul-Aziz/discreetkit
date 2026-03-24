@@ -39,8 +39,8 @@ export function FloatingChatTrigger() {
             )}
             aria-label="Ask Pacely"
           >
-            <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-white/10 transition-transform duration-500 group-hover:rotate-180">
-              <AbstractIcon className="h-5 w-5 text-white" />
+            <div className="relative flex h-8 w-8 items-center justify-center rounded-full overflow-hidden shadow-sm border border-white/20 transition-transform duration-300 group-hover:scale-110">
+              <img src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png" alt="Pacely" className="h-full w-full object-cover bg-white" />
             </div>
             <span className="font-semibold text-sm tracking-wide">Ask pacely</span>
           </Button>
