@@ -155,6 +155,10 @@
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
 
+  .pb-safe-tight {
+    padding-bottom: max(4px, env(safe-area-inset-bottom));
+  }
+
   /* Viewport-safe helpers (for mobile Safari & keyboard)
      Based on Vercel vk-safe/vk-scroll pattern */
   .vk-safe {
