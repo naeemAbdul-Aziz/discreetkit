@@ -119,9 +119,8 @@ export function Chatbot() {
   return (
     <>
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetContent 
+        <SheetContent
           className="flex w-full flex-col sm:max-w-md p-0 bg-background border-l-0 sm:border-l shadow-2xl"
-          style={{ height: '100dvh', maxHeight: '-webkit-fill-available' }}
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
           <SheetClose
@@ -206,7 +205,7 @@ export function Chatbot() {
             </ScrollArea>
           </div>
 
-          <div className="p-4 pt-2 space-y-4 bg-background z-10 relative">
+          <div className="p-4 pt-2 pb-safe space-y-4 bg-background z-10 relative">
             {/* Suggestion Chips */}
             <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar px-1 -mx-1">
               {suggestions.map((s) => (
