@@ -1,9 +1,9 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { useChatbot } from '@/hooks/use-chatbot';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 const AbstractIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
@@ -21,19 +21,18 @@ const AbstractIcon = ({ className }: { className?: string }) => (
 );
 
 export function FloatingChatTrigger() {
-  const { setIsOpen, isOpen } = useChatbot();
+  const router = useRouter();
 
   return (
     <AnimatePresence>
-      {!isOpen && (
-        <motion.div
+      <motion.div
           initial={{ opacity: 0, y: 20, scale: 0.8 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 20, scale: 0.8 }}
           className="fixed bottom-6 right-6 z-[100]"
         >
           <Button
-            onClick={() => setIsOpen(true)}
+            onClick={() => router.push('/chat')}
             className={cn(
               "h-14 rounded-full bg-brand-indigo hover:opacity-90 text-white shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 border border-white/10 group pl-2 pr-5 flex items-center gap-3"
             )}
@@ -45,7 +44,6 @@ export function FloatingChatTrigger() {
             <span className="font-semibold text-sm tracking-wide">Ask pacely</span>
           </Button>
         </motion.div>
-      )}
     </AnimatePresence>
   );
 }

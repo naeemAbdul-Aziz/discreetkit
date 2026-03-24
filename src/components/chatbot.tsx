@@ -9,18 +9,11 @@
 import { useState, useRef, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetClose,
-} from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, X } from "lucide-react";
+import { ArrowLeft, Send } from "lucide-react";
 import { handleChat } from "@/lib/actions";
 import { cn } from "@/lib/utils";
-import { useChatbot } from "@/hooks/use-chatbot";
-import { closeButtonClasses } from "@/components/ui/close-button";
 
 // type definition for a chat message.
 type Message = {
@@ -54,7 +47,6 @@ const FormattedMessage = ({ text }: { text: string }) => {
 
 export function Chatbot() {
   const router = useRouter();
-  const { isOpen, setIsOpen } = useChatbot();
   const [history, setHistory] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -73,12 +65,12 @@ export function Chatbot() {
     "Delivery & Privacy",
   ];
 
-  // effect to set the initial message when the chat opens.
+  // effect to set the initial message on first mount.
   useEffect(() => {
-    if (isOpen && history.length === 0) {
+    if (history.length === 0) {
       setHistory([initialMessage]);
     }
-  }, [isOpen, history.length]);
+  }, [history.length]);
 
   // effect to auto-scroll to the bottom of the chat on new messages.
   useEffect(() => {
@@ -98,7 +90,6 @@ export function Chatbot() {
     // Smart Action: Intercept "Shop" command to open the product menu
     const normalizedInput = input.trim().toLowerCase().replace(/['"]/g, "");
     if (["shop", "menu", "store", "order", "buy"].includes(normalizedInput)) {
-      setIsOpen(false);
       setInput("");
       router.push("/products");
       return;
@@ -117,20 +108,32 @@ export function Chatbot() {
   };
 
   return (
-    <>
-      <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetContent
-          className="flex w-full flex-col sm:max-w-md p-0 bg-background border-l-0 sm:border-l shadow-2xl"
-          onOpenAutoFocus={(e) => e.preventDefault()}
+    <div className="vk-safe flex flex-col bg-background">
+      <header className="flex items-center gap-3 px-4 pt-4 pb-3 border-b border-border/60 bg-background/80 backdrop-blur-sm sticky top-0 z-20">
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border/60 bg-background text-brand-indigo hover:bg-muted transition-colors"
+          aria-label="Go back"
         >
-          <SheetClose
-            className="absolute right-4 top-4 z-50 rounded-full bg-background/50 p-2 backdrop-blur-md opacity-70 hover:opacity-100 transition-opacity"
-          >
-            <X className="h-5 w-5" />
-            <span className="sr-only">Close</span>
-          </SheetClose>
-          
-          <div className="flex-1 overflow-hidden relative">
+          <ArrowLeft className="h-4 w-4" />
+        </button>
+        <div className="flex items-center gap-3">
+          <div className="h-9 w-9 rounded-full overflow-hidden shadow-sm border border-brand-indigo/10">
+            <img
+              src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png"
+              alt="Pacely"
+              className="h-full w-full object-cover"
+            />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-semibold text-brand-indigo">Pacely</span>
+            <span className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground/80">Your private health guide</span>
+          </div>
+        </div>
+      </header>
+
+      <div className="flex-1 overflow-hidden relative">
             <ScrollArea className="h-full" ref={scrollAreaRef}>
               <div className="space-y-6 p-4">
                 {history.map((msg, index) => {
@@ -203,9 +206,9 @@ export function Chatbot() {
                 )}
               </div>
             </ScrollArea>
-          </div>
+      </div>
 
-          <div className="p-4 pt-2 pb-safe space-y-4 bg-background z-10 relative">
+      <div className="p-4 pt-2 pb-safe space-y-4 bg-background z-10 relative border-t border-border/60">
             {/* Suggestion Chips */}
             <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar px-1 -mx-1">
               {suggestions.map((s) => (
@@ -261,8 +264,6 @@ export function Chatbot() {
               </div>
             </form>
           </div>
-        </SheetContent>
-      </Sheet>
-    </>
+    </div>
   );
 }

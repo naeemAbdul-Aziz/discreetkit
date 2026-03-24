@@ -6,11 +6,11 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { useChatbot } from '@/hooks/use-chatbot';
+import { useRouter } from 'next/navigation';
 import { MessageCircle } from 'lucide-react';
 
 export function ChatTrigger() {
-  const { setIsOpen } = useChatbot();
+  const router = useRouter();
 
   return (
     <div id="ask-pacely-cta" className="flex items-center justify-center rounded-lg border-2 border-dashed bg-muted p-6 text-center">
@@ -19,7 +19,7 @@ export function ChatTrigger() {
         <p className="text-sm text-muted-foreground">
           Pacely, our AI assistant, can help with questions about products, delivery, and privacy.
         </p>
-        <Button onClick={() => setIsOpen(true)} className="mt-2">
+        <Button onClick={() => router.push('/chat')} className="mt-2">
           <MessageCircle className="mr-2 h-4 w-4" />
           Ask Pacely
         </Button>
