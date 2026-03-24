@@ -264,7 +264,6 @@ export function Chatbot() {
               </div>
             </form>
           </div>
-      </div>
     </div>
   );
 }
