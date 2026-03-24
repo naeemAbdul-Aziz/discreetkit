@@ -150,6 +150,12 @@
   }
 }
 
+@layer utilities {
+  .pb-safe {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+
 /* Noise Texture Utility */
 .bg-noise {
   position: relative;

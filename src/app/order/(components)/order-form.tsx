@@ -68,11 +68,16 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
   return (
     <Button
       type="submit"
-      className="w-full h-14 rounded-2xl text-[15px] bg-primary hover:bg-primary/90 text-primary-foreground shadow-md transition-all active:scale-[0.98] font-semibold tracking-wide"
+      className="w-full h-12 md:h-14 rounded-full text-[15px] md:text-base font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-md transition-all active:scale-[0.98]"
       disabled={disabled}
       loading={pending}
     >
-      {pending ? "Processing..." : "Secure Paystack Checkout"}
+      {pending ? "Processing..." : (
+        <>
+          Proceed to Payment
+          <ArrowRight className="h-4 w-4 ml-1.5" />
+        </>
+      )}
     </Button>
   );
 }
