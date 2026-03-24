@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useRouter } from 'next/navigation';
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
+import { usePathname, useRouter } from "next/navigation";
 
 const AbstractIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
@@ -22,6 +22,12 @@ const AbstractIcon = ({ className }: { className?: string }) => (
 
 export function FloatingChatTrigger() {
   const router = useRouter();
+  const pathname = usePathname();
+
+  // Hide the floating trigger when already on the dedicated chat page
+  if (pathname?.startsWith("/chat")) {
+    return null;
+  }
 
   return (
     <AnimatePresence>

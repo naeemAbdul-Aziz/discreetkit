@@ -208,9 +208,9 @@ export function Chatbot() {
             </ScrollArea>
       </div>
 
-      <div className="p-4 pt-2 pb-safe space-y-4 bg-background z-10 relative border-t border-border/60">
-            {/* Suggestion Chips */}
-            <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar px-1 -mx-1">
+      <div className="px-3 pt-2 pb-safe-tight space-y-3 bg-background z-10 relative border-t border-border/60">
+        {/* Suggestion Chips */}
+        <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar px-1 -mx-1">
               {suggestions.map((s) => (
                 <button
                   key={s}
