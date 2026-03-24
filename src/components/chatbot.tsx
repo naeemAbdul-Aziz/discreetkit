@@ -119,7 +119,7 @@ export function Chatbot() {
   return (
     <>
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetContent className="flex w-full h-[100dvh] flex-col sm:max-w-md p-0 bg-background border-l-0 sm:border-l shadow-2xl">
+        <SheetContent className="flex w-full h-full flex-col sm:max-w-md p-0 bg-background border-l-0 sm:border-l shadow-2xl">
           <SheetClose
             className="absolute right-4 top-4 z-50 rounded-full bg-background/50 p-2 backdrop-blur-md opacity-70 hover:opacity-100 transition-opacity"
           >
@@ -138,7 +138,7 @@ export function Chatbot() {
                       <div key={index} className="flex flex-col items-center justify-center py-12 space-y-8">
                         <div className="space-y-4 text-center">
                           <div className="h-20 w-20 rounded-full overflow-hidden mx-auto mb-6 shadow-sm border border-brand-indigo/5">
-                            <img src="/pacely-avatar.png" alt="Pacely" className="h-full w-full object-cover" />
+                            <img src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png" alt="Pacely" className="h-full w-full object-cover" />
                           </div>
                           <h2 className="text-2xl md:text-3xl font-headline tracking-tight text-brand-indigo max-w-[280px] mx-auto leading-tight">
                             Hi, I'm <span className="font-bold">pacely.</span><br />
@@ -172,7 +172,7 @@ export function Chatbot() {
                     >
                       {msg.role === "model" && (
                         <div className="h-8 w-8 rounded-full overflow-hidden flex-shrink-0 mt-1 shadow-sm border border-brand-indigo/10">
-                          <img src="/pacely-avatar.png" alt="Pacely" className="h-full w-full object-cover" />
+                          <img src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png" alt="Pacely" className="h-full w-full object-cover" />
                         </div>
                       )}
                       <div
@@ -191,7 +191,7 @@ export function Chatbot() {
                 {isPending && (
                   <div className="flex items-start gap-3 justify-start">
                     <div className="h-8 w-8 rounded-full overflow-hidden flex-shrink-0 mt-1 shadow-sm border border-brand-indigo/10">
-                      <img src="/pacely-avatar.png" alt="Pacely" className="h-full w-full object-cover opacity-80" />
+                      <img src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png" alt="Pacely" className="h-full w-full object-cover opacity-80" />
                     </div>
                     <div className="max-w-[80%] rounded-2xl p-4 text-sm bg-brand-silver text-brand-indigo font-medium flex items-center gap-2">
                        Thinking...
