@@ -119,7 +119,11 @@ export function Chatbot() {
   return (
     <>
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetContent className="flex w-full h-full flex-col sm:max-w-md p-0 bg-background border-l-0 sm:border-l shadow-2xl">
+        <SheetContent 
+          className="flex w-full flex-col sm:max-w-md p-0 bg-background border-l-0 sm:border-l shadow-2xl"
+          style={{ height: '100dvh', maxHeight: '-webkit-fill-available' }}
+          onOpenAutoFocus={(e) => e.preventDefault()}
+        >
           <SheetClose
             className="absolute right-4 top-4 z-50 rounded-full bg-background/50 p-2 backdrop-blur-md opacity-70 hover:opacity-100 transition-opacity"
           >
