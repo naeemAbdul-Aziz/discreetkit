@@ -154,6 +154,15 @@
   .pb-safe {
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
+
+  /* Viewport-safe helpers (for mobile Safari & keyboard)
+     Based on Vercel vk-safe/vk-scroll pattern */
+  .vk-safe {
+    min-height: 100dvh;
+  }
+
+  .vk-scroll {
+  }
 }
 
 /* Noise Texture Utility */

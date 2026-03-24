@@ -55,7 +55,6 @@ export const viewport = siteViewport;
 
 
 import { FloatingChatTrigger } from "@/components/floating-chat-trigger";
-import { Chatbot } from "@/components/chatbot";
 import NextTopLoader from "nextjs-toploader";
 
 export default function RootLayout({
@@ -167,7 +166,6 @@ export default function RootLayout({
           </main>
           <Toaster />
           <FloatingChatTrigger />
-          <Chatbot />
         </TourProvider>
         <PerformanceMonitoring />
       </body>
