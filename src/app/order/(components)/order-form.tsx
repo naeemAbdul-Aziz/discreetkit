@@ -47,15 +47,15 @@ import { motion, AnimatePresence } from "framer-motion";
 
 function LabelledInput({ label, id, ...props }: React.InputHTMLAttributes<HTMLInputElement> & { label: string, id: string }) {
   return (
-    <div className="space-y-2 w-full">
-      <Label htmlFor={id} className="text-sm font-medium ml-1">
+    <div className="space-y-1.5 w-full">
+      <Label htmlFor={id} className="text-[13px] font-medium text-muted-foreground ml-0.5">
         {label}
       </Label>
       <Input
         id={id}
         {...props}
         className={cn(
-          "h-14 rounded-2xl border-border/60 bg-transparent px-4 py-2 transition-all hover:border-border focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary",
+          "h-12 rounded-xl border-border/40 bg-muted/20 px-4 transition-colors focus-visible:bg-transparent focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary shadow-sm text-[15px]",
           props.className
         )}
       />
@@ -68,18 +68,11 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
   return (
     <Button
       type="submit"
-      className="w-full h-14 rounded-2xl text-base bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all active:scale-[0.98] font-semibold"
+      className="w-full h-14 rounded-2xl text-[15px] bg-primary hover:bg-primary/90 text-primary-foreground shadow-md transition-all active:scale-[0.98] font-semibold tracking-wide"
       disabled={disabled}
       loading={pending}
     >
-      {pending ? (
-        "Securing Order..."
-      ) : (
-        <>
-          Proceed to Checkout
-          <ArrowRight className="w-4 h-4 ml-2 opacity-80" />
-        </>
-      )}
+      {pending ? "Processing..." : "Secure Paystack Checkout"}
     </Button>
   );
 }
@@ -131,84 +124,64 @@ function OrderSummaryCard() {
   }
 
   return (
-    <Card className="rounded-3xl">
-      <CardHeader>
-        <CardTitle>Order Summary</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {isStudent && (
-          <div className="flex items-center gap-2 rounded-lg bg-success/10 p-3 text-success">
-            <GraduationCap className="h-5 w-5" />
-            <p className="text-sm font-medium">
-              Student discount (Free Delivery) applied!
-            </p>
+    <div className="w-full">
+      <h3 className="text-lg font-semibold tracking-tight mb-5">Summary</h3>
+      {isStudent && (
+        <div className="flex items-center gap-2 rounded-lg bg-success/10 px-3 py-2 text-success mb-5">
+          <GraduationCap className="h-4 w-4" />
+          <p className="text-[13px] font-medium">Free student delivery applied</p>
+        </div>
+      )}
+      <div className="space-y-4">
+        {items.map((item) => (
+          <div key={item.id} className="flex justify-between items-start gap-4">
+            <div className="flex items-center gap-3">
+              <div className="relative h-12 w-12 rounded-lg bg-background border border-border/40 overflow-hidden flex-shrink-0 shadow-sm">
+                {item.image_url && (
+                  <Image
+                    src={item.image_url}
+                    alt={item.name}
+                    fill
+                    className="object-contain p-1"
+                  />
+                )}
+              </div>
+              <div className="flex flex-col justify-center">
+                <p className="font-medium text-[14px] leading-tight text-foreground">{item.name}</p>
+                <p className="text-[13px] text-muted-foreground mt-0.5">Qty {item.quantity}</p>
+              </div>
+            </div>
+            <p className="font-medium text-[14px] pt-1">GHS {(item.price_ghs * item.quantity).toFixed(2)}</p>
+          </div>
+        ))}
+      </div>
+
+      <Separator className="my-5" />
+
+      <div className="space-y-2.5 text-[14px]">
+        <div className="flex justify-between text-muted-foreground">
+          <p>Subtotal</p>
+          <p className="text-foreground font-medium">GHS {subtotal.toFixed(2)}</p>
+        </div>
+        {studentDiscount > 0 && (
+          <div className="flex justify-between text-success">
+            <p>Student Discount</p>
+            <p className="font-medium">- GHS {studentDiscount.toFixed(2)}</p>
           </div>
         )}
-        <div className="space-y-4 text-sm">
-          {items.map((item) => (
-            <div
-              key={item.id}
-              className="flex justify-between items-center gap-4"
-            >
-              <div className="flex items-center gap-4">
-                <div className="relative h-12 w-12 flex-shrink-0 rounded-md bg-muted overflow-hidden">
-                  {item.image_url && (
-                    <Image
-                      src={item.image_url}
-                      alt={item.name}
-                      fill
-                      className="object-contain p-1"
-                      placeholder={`data:image/svg+xml;base64,${toBase64(
-                        shimmer(48, 48),
-                      )}`}
-                    />
-                  )}
-                </div>
-                <div>
-                  <p className="font-semibold text-foreground">{item.name}</p>
-                  <p className="text-muted-foreground">Qty: {item.quantity}</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="font-medium text-foreground">
-                  GHS {(item.price_ghs * item.quantity).toFixed(2)}
-                </p>
-              </div>
-            </div>
-          ))}
+        <div className="flex justify-between text-muted-foreground">
+          <p>Delivery Fee</p>
+          <p className="text-foreground font-medium">GHS {deliveryFee.toFixed(2)}</p>
         </div>
+      </div>
 
-        <Separator />
+      <Separator className="my-5" />
 
-        <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <p className="text-muted-foreground">Subtotal</p>
-            <p className="font-medium text-foreground">
-              GHS {subtotal.toFixed(2)}
-            </p>
-          </div>
-          {studentDiscount > 0 && (
-            <div className="flex justify-between text-success font-medium">
-              <p>Student Discount (Free Delivery)</p>
-              <p>- GHS {studentDiscount.toFixed(2)}</p>
-            </div>
-          )}
-          <div className="flex justify-between">
-            <p className="text-muted-foreground">Delivery Fee</p>
-            <p className="font-medium text-foreground">
-              GHS {deliveryFee.toFixed(2)}
-            </p>
-          </div>
-        </div>
-
-        <Separator />
-
-        <div className="flex items-baseline justify-between font-bold text-lg">
-          <p>Total</p>
-          <p className="text-primary">GHS {totalPrice.toFixed(2)}</p>
-        </div>
-      </CardContent>
-    </Card>
+      <div className="flex items-baseline justify-between font-bold text-lg">
+        <p>Total</p>
+        <p className="text-primary">GHS {totalPrice.toFixed(2)}</p>
+      </div>
+    </div>
   );
 }
 
@@ -417,258 +390,128 @@ export function OrderForm() {
   const isSubmitDisabled = items.length === 0;
 
   return (
-    <>
-      <div className="max-w-2xl mx-auto w-full mt-4 lg:mt-12 px-2 sm:px-0">
-        <form ref={formRef} action={dispatch} className="bg-card border border-border/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] rounded-[2.5rem] p-6 sm:p-10 space-y-8 relative overflow-hidden">
-          <FormPendingOverlay />
-          <input type="hidden" name="cartItems" value={JSON.stringify(items)} />
-          <input type="hidden" name="subtotal" value={subtotal} />
-          <input type="hidden" name="studentDiscount" value={studentDiscount} />
-          <input type="hidden" name="deliveryFee" value={deliveryFee} />
-          <input type="hidden" name="totalPrice" value={totalPrice} />
+    <div className="max-w-[460px] mx-auto w-full mt-2 lg:mt-8 px-4 sm:px-0">
+      <form ref={formRef} action={dispatch} className="space-y-8 pb-12 relative">
+        <FormPendingOverlay />
+        <input type="hidden" name="cartItems" value={JSON.stringify(items)} />
+        <input type="hidden" name="subtotal" value={subtotal} />
+        <input type="hidden" name="studentDiscount" value={studentDiscount} />
+        <input type="hidden" name="deliveryFee" value={deliveryFee} />
+        <input type="hidden" name="totalPrice" value={totalPrice} />
 
-          {/* Clean Progress Bar matching screenshot */}
-          <div className="space-y-3">
-            <span className="text-[13px] font-medium text-muted-foreground uppercase tracking-wider ml-1">
-              Step {step}/2
-            </span>
-            <div className="h-1.5 w-full bg-muted/80 rounded-full overflow-hidden flex">
-              <div 
-                className="h-full bg-primary transition-all duration-700 ease-out" 
-                style={{ width: step === 1 ? "50%" : "100%" }}
-              />
-            </div>
+        {/* Section 1: Delivery Details */}
+        <div className="space-y-5">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight">Delivery Details</h2>
+            <p className="text-[14px] text-muted-foreground mt-1">Where should we drop this off?</p>
           </div>
 
-          <AnimatePresence mode="wait" initial={false}>
-            {step === 1 && (
-              <motion.div
-                 key="step1"
-                 initial={{ opacity: 0, scale: 0.98 }}
-                 animate={{ opacity: 1, scale: 1 }}
-                 exit={{ opacity: 0, scale: 0.98 }}
-                 transition={{ duration: 0.3, ease: "easeOut" }}
-                 className="space-y-8"
-              >
-                <div className="px-1">
-                  <h2 className="text-3xl font-bold tracking-tight text-foreground">Where to?</h2>
-                  <p className="text-muted-foreground mt-2 text-base leading-relaxed">
-                    Tell us what kind of location you're targeting so we can coordinate your discreet drop-off.
-                  </p>
-                </div>
+          <div className="space-y-4">
+            <div className="space-y-1.5 w-full">
+              <Label className="text-[13px] font-medium text-muted-foreground ml-0.5">Delivery Region</Label>
+              <Select name="deliveryArea" onValueChange={handleLocationChange} value={deliveryLocation || "Other"} disabled={!isMounted}>
+                <SelectTrigger className={cn("h-12 rounded-xl border-border/40 bg-muted/20 px-4 transition-colors focus:bg-transparent shadow-sm text-[15px]", state.errors?.deliveryArea && "border-destructive")}>
+                  <SelectValue placeholder="Select location" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="Other">Standard Delivery</SelectItem>
+                  {discounts.map(d => <SelectItem key={d.id} value={d.campus}>{d.campus}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <FieldError message={state.errors?.deliveryArea?.[0]} />
+            </div>
 
-                <div className="space-y-6">
-                  {/* Pills instead of large Select dropdowns! */}
-                  <div className="space-y-3">
-                    <Label className="text-[15px] font-medium ml-1">Delivery type:</Label>
-                    <div className="flex flex-wrap gap-2.5">
-                      {discounts.map((loc) => (
-                        <button
-                          key={loc.id}
-                          type="button"
-                          onClick={() => handleLocationChange(loc.campus)}
-                          className={cn(
-                            "px-5 py-3 flex items-center gap-2.5 outline-none rounded-full border transition-all duration-200",
-                            deliveryLocation === loc.campus 
-                              ? "border-primary bg-primary/5 text-foreground ring-1 ring-primary/20" 
-                              : "border-border hover:border-primary/50 text-muted-foreground hover:bg-muted/50"
-                          )}
-                        >
-                          {deliveryLocation === loc.campus && (
-                            <div className="h-4 w-4 shrink-0 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-                              <svg viewBox="0 0 24 24" fill="none" className="w-3 h-3 text-white" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" stroke="currentColor">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                              </svg>
-                            </div>
-                          )}
-                          <span className="font-medium text-[15px]">{loc.campus}</span>
-                        </button>
-                      ))}
-                      <button
-                        type="button"
-                        onClick={() => handleLocationChange("Other")}
-                        className={cn(
-                          "px-5 py-3 flex items-center gap-2.5 outline-none rounded-full border transition-all duration-200",
-                          showOther 
-                            ? "border-primary bg-primary/5 text-foreground ring-1 ring-primary/20" 
-                            : "border-border hover:border-primary/50 text-muted-foreground hover:bg-muted/50"
-                        )}
-                      >
-                        {showOther && (
-                          <div className="h-4 w-4 shrink-0 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-                            <svg viewBox="0 0 24 24" fill="none" className="w-3 h-3 text-white" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" stroke="currentColor">
-                              <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                          </div>
-                        )}
-                        <span className="font-medium text-[15px]">Standard Delivery</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  <input type="hidden" name="deliveryArea" value={deliveryLocation || "Other"} />
-
-                  <div className="space-y-4 pt-2">
-                    {showOther ? (
-                      <div className="space-y-1.5">
-                        <LabelledInput
-                          id="otherDeliveryArea"
-                          name="otherDeliveryArea"
-                          label="Your exact address:"
-                          placeholder="e.g. Accra Mall, Spintex Road"
-                          className={cn(state.errors?.otherDeliveryArea && "border-destructive")}
-                        />
-                        <FieldError message={state.errors?.otherDeliveryArea?.[0]} />
-                      </div>
-                    ) : (
-                      <div className="space-y-1.5">
-                        <div className="space-y-2 w-full">
-                          <Label className="text-sm font-medium ml-1">Specific pickup area:</Label>
-                          <Select name="otherDeliveryArea">
-                            <SelectTrigger
-                              className={cn(
-                                "h-14 rounded-2xl border-border/60 bg-transparent px-4 transition-all hover:border-border",
-                                state.errors?.otherDeliveryArea && "border-destructive focus:ring-destructive"
-                              )}
-                            >
-                              <SelectValue placeholder="e.g. Jubilee Hall entrance..." />
-                            </SelectTrigger>
-                            <SelectContent className="rounded-2xl">
-                              {discounts
-                                .find((d) => d.campus === deliveryLocation)
-                                ?.meetingPoints?.map((point) => (
-                                  <SelectItem key={point} value={point} className="py-2.5">
-                                    {point}
-                                  </SelectItem>
-                                ))}
-                              <SelectItem value="Other" className="py-2.5">Other (Specify below)</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <FieldError message={state.errors?.otherDeliveryArea?.[0]} />
-                      </div>
-                    )}
-
-                    <div className="pt-2">
-                      {!showNotes ? (
-                        <button 
-                          type="button"
-                          onClick={() => setShowNotes(true)} 
-                          className="text-[15px] font-medium text-muted-foreground hover:text-foreground transition-all flex items-center gap-1.5 outline-none rounded-lg p-1"
-                        >
-                          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-primary"><path d="M7.49991 0.876892C3.84222 0.876892 0.877075 3.84204 0.877075 7.49972C0.877075 11.1574 3.84222 14.1226 7.49991 14.1226C11.1576 14.1226 14.1227 11.1574 14.1227 7.49972C14.1227 3.84204 11.1576 0.876892 7.49991 0.876892ZM1.82707 7.49972C1.82707 4.36671 4.36689 1.82689 7.49991 1.82689C10.6329 1.82689 13.1727 4.36671 13.1727 7.49972C13.1727 10.6327 10.6329 13.1726 7.49991 13.1726C4.36689 13.1726 1.82707 10.6327 1.82707 7.49972ZM7.50003 4C7.77617 4 8.00003 4.22386 8.00003 4.5V7H10.5C10.7762 7 11 7.22386 11 7.5C11 7.77614 10.7762 8 10.5 8H8.00003V10.5C8.00003 10.7761 7.77617 11 7.50003 11C7.22389 11 7.00003 10.7761 7.00003 10.5V8H4.50003C4.22389 8 4.00003 7.77614 4.00003 7.5C4.00003 7.22386 4.22389 7 4.50003 7H7.00003V4.5C7.00003 4.22386 7.22389 4 7.50003 4Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path></svg>
-                          Add drop-off note
-                        </button>
-                      ) : (
-                        <div className="space-y-1.5 animate-in fade-in zoom-in-95 duration-200">
-                          <LabelledInput
-                            id="deliveryAddressNote"
-                            name="deliveryAddressNote"
-                            label="Drop-off instructions:"
-                            placeholder="e.g. Call upon arrival, leave at main gate..."
-                          />
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex items-center justify-between pt-6">
-                      <Button 
-                        type="button" 
-                        variant="ghost" 
-                        onClick={handleUseLocation}
-                        disabled={locationLoading}
-                        className="h-14 rounded-2xl px-5 text-[15px] font-medium hover:bg-muted text-muted-foreground hidden sm:flex"
-                      >
-                        {locationLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <MapPin className="h-4 w-4 mr-2" />}
-                        Locate me
-                      </Button>
-                      <Button 
-                        type="button"
-                        className="h-14 w-full sm:w-36 rounded-2xl text-[15px] bg-primary hover:bg-primary/90 text-primary-foreground transition-all ml-auto font-semibold"
-                        onClick={() => setStep(2)}
-                      >
-                        Next
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
+            {showOther ? (
+              <LabelledInput
+                 id="otherDeliveryArea"
+                 name="otherDeliveryArea"
+                 label="Exact Address"
+                 placeholder="e.g. Accra Mall, Spintex Road"
+                 className={cn(state.errors?.otherDeliveryArea && "border-destructive")}
+              />
+            ) : (
+              <div className="space-y-1.5 w-full">
+                 <Label className="text-[13px] font-medium text-muted-foreground ml-0.5">Pickup Point</Label>
+                 <Select name="otherDeliveryArea">
+                   <SelectTrigger className={cn("h-12 rounded-xl border-border/40 bg-muted/20 px-4 transition-colors focus:bg-transparent shadow-sm text-[15px]", state.errors?.otherDeliveryArea && "border-destructive")}>
+                     <SelectValue placeholder="Select specific point" />
+                   </SelectTrigger>
+                   <SelectContent className="rounded-xl">
+                     {discounts.find(d => d.campus === deliveryLocation)?.meetingPoints?.map(p => (
+                       <SelectItem key={p} value={p}>{p}</SelectItem>
+                     ))}
+                     <SelectItem value="Other">Other (Specify in notes)</SelectItem>
+                   </SelectContent>
+                 </Select>
+                 <FieldError message={state.errors?.otherDeliveryArea?.[0]} />
+              </div>
             )}
 
-            {step === 2 && (
-              <motion.div
-                 key="step2"
-                 initial={{ opacity: 0, scale: 0.98 }}
-                 animate={{ opacity: 1, scale: 1 }}
-                 exit={{ opacity: 0, scale: 0.98 }}
-                 transition={{ duration: 0.3, ease: "easeOut" }}
-                 className="space-y-8"
-              >
-                <div className="px-1">
-                  <h2 className="text-3xl font-bold tracking-tight text-foreground">Secure Contact</h2>
-                  <p className="text-muted-foreground mt-2 text-base leading-relaxed">
-                    How should the assigned dispatch rider reach you?
-                  </p>
-                </div>
+            <LabelledInput
+               id="deliveryAddressNote"
+               name="deliveryAddressNote"
+               label="Drop-off Notes (Optional)"
+               placeholder="e.g. Call upon arrival..."
+            />
 
-                <div className="space-y-5">
-                   <div className="space-y-1.5">
-                      <LabelledInput
-                        id="email"
-                        name="email"
-                        type="email"
-                        label="Receipt Email:"
-                        placeholder="you@example.com"
-                        className={cn(state.errors?.email && "border-destructive")}
-                      />
-                      <FieldError message={state.errors?.email?.[0]} />
-                   </div>
-                   
-                   <div className="space-y-1.5">
-                      <LabelledInput
-                        id="phone_masked"
-                        name="phone_masked"
-                        type="tel"
-                        label="Your Mobile Number:"
-                        placeholder="+233 xx xxx xxxx"
-                        className={cn(state.errors?.phone_masked && "border-destructive")}
-                      />
-                      <FieldError message={state.errors?.phone_masked?.[0]} />
-                      <p className="text-[13px] text-muted-foreground/80 flex items-center gap-1.5 mt-2 ml-1">
-                        <Lock className="h-3 w-3" />
-                        Permanently masked for your privacy.
-                      </p>
-                   </div>
-                </div>
+            <div className="pt-1">
+              <Button type="button" variant="ghost" onClick={handleUseLocation} disabled={locationLoading} className="h-9 px-3 rounded-lg text-[13px] font-medium text-primary hover:bg-primary/10 transition-colors -ml-3">
+                {locationLoading ? <Loader2 className="h-3 w-3 animate-spin mr-1.5" /> : <MapPin className="h-3 w-3 mr-1.5" />}
+                Auto-detect my campus
+              </Button>
+            </div>
+          </div>
+        </div>
 
-                <div className="pt-2">
-                  <h3 className="text-lg font-bold px-1 mb-4 hidden">Order Details</h3>
-                  <div className="rounded-3xl border border-border/60 bg-muted/20 overflow-hidden">
-                     <OrderSummaryCard />
-                  </div>
-                </div>
+        <Separator className="bg-border/60" />
 
-                <div className="flex items-center gap-3 pt-6">
-                  <Button 
-                    type="button" 
-                    variant="outline"
-                    onClick={() => setStep(1)} 
-                    className="h-14 px-6 sm:px-8 rounded-2xl text-[15px] font-medium border-border/80 hover:bg-muted text-foreground transition-all shrink-0"
-                  >
-                    Back
-                  </Button>
-                  <SubmitButton disabled={isSubmitDisabled} />
-                </div>
-                
-                <p className="text-center text-[12px] text-muted-foreground leading-relaxed px-4 pt-2">
-                  Secured via Paystack. By proceeding, you agree to our <Link href="/terms" className="underline hover:text-foreground transition-colors" target="_blank">Terms</Link>.
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </form>
-      </div>
-    </>
+        {/* Section 2: Contact Info */}
+        <div className="space-y-5">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight">Contact</h2>
+            <p className="text-[14px] text-muted-foreground mt-1">For your receipt and rider updates.</p>
+          </div>
+          
+          <div className="space-y-4">
+             <LabelledInput
+               id="email"
+               name="email"
+               type="email"
+               label="Email Address"
+               placeholder="you@example.com"
+               className={cn(state.errors?.email && "border-destructive")}
+             />
+             <div className="space-y-0.5">
+               <LabelledInput
+                 id="phone_masked"
+                 name="phone_masked"
+                 type="tel"
+                 label="Mobile Number"
+                 placeholder="+233 xx xxx xxxx"
+                 className={cn(state.errors?.phone_masked && "border-destructive")}
+               />
+               <p className="text-[12px] text-muted-foreground/80 flex items-center gap-1.5 pt-1.5 ml-0.5">
+                 <Lock className="h-3 w-3" />
+                 Masked; riders will only see a proxy number.
+               </p>
+             </div>
+          </div>
+        </div>
+
+        {/* Order Summary Flat Box */}
+        <div className="bg-muted/30 border border-border/40 rounded-[2rem] p-6 sm:p-7 mt-8">
+           <OrderSummaryCard />
+        </div>
+
+        {/* Action Area */}
+        <div className="pt-2">
+           <SubmitButton disabled={isSubmitDisabled} />
+           <p className="text-center text-[12px] text-muted-foreground mt-4 px-4 leading-relaxed">
+             Payments processed securely via Paystack. <br/>By placing your order you agree to our <Link href="/terms" className="underline hover:text-foreground transition-colors">Terms of Service</Link>.
+           </p>
+        </div>
+      </form>
+    </div>
   );
 }
 
