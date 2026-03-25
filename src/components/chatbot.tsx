@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowLeft, Send } from "lucide-react";
+import { Send, X } from "lucide-react";
 import { handleChat } from "@/lib/actions";
 import { cn } from "@/lib/utils";
 
@@ -109,26 +109,17 @@ export function Chatbot() {
 
   return (
     <div className="vk-safe flex flex-col bg-background">
-      <header className="flex items-center gap-3 px-4 pt-4 pb-3 border-b border-border/60 bg-background/80 backdrop-blur-sm sticky top-0 z-20">
+      {/* Minimal close button — Everlywell style */}
+      <div className="flex justify-end px-4 pt-4 pb-2 absolute top-0 right-0 z-30">
         <button
           type="button"
           onClick={() => router.back()}
-          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border/60 bg-background text-brand-indigo hover:bg-muted transition-colors"
-          aria-label="Go back"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          aria-label="Close"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <X className="h-4 w-4" />
         </button>
-        <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-full overflow-hidden shadow-sm border border-primary/10">
-            <img
-              src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png"
-              alt="Pacely"
-              className="h-full w-full object-cover"
-            />
-          </div>
-          <span className="text-sm font-semibold text-foreground">Pacely</span>
-        </div>
-      </header>
+      </div>
 
       <div className="flex-1 overflow-hidden relative">
             <ScrollArea className="h-full" ref={scrollAreaRef}>
