@@ -1,22 +1,71 @@
-
 'use client';
 
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle2, Copy, Truck, Home, Plus, Check, AlertCircle } from 'lucide-react';
 import { BrandSpinner } from '@/components/brand-spinner';
 import { useToast } from '@/hooks/use-toast';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useCart } from '@/hooks/use-cart';
 import { getOrderAction } from '@/lib/actions';
 import { type Order } from '@/lib/data';
+import { CheckCircle2, Copy, Check, AlertCircle, Truck, Home, RotateCcw } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
+/* ─────────────────────────────────────────────────────────
+   Sub-component: Code display pill with copy functionality
+───────────────────────────────────────────────────────── */
+function CodeBlock({
+  label,
+  value,
+  onCopy,
+  copied,
+  accent = false,
+}: {
+  label: string;
+  value: string;
+  onCopy?: () => void;
+  copied?: boolean;
+  accent?: boolean;
+}) {
+  return (
+    <div className={cn(
+      'rounded-2xl border px-5 py-4 text-left w-full',
+      accent
+        ? 'border-primary/20 bg-primary/5'
+        : 'border-border/40 bg-muted/30'
+    )}>
+      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground mb-2">
+        {label}
+      </p>
+      <div className="flex items-center justify-between gap-4">
+        <p className={cn(
+          'font-mono text-xl font-bold tracking-widest',
+          accent ? 'text-primary' : 'text-foreground'
+        )}>
+          {value}
+        </p>
+        {onCopy && (
+          <button
+            onClick={onCopy}
+            className="shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-background border border-border/40 text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Copy code"
+          >
+            {copied
+              ? <Check className="h-3.5 w-3.5 text-success" />
+              : <Copy className="h-3.5 w-3.5" />}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────
+   Main success content
+───────────────────────────────────────────────────────── */
 function SuccessContent() {
   const searchParams = useSearchParams();
-  // Paystack returns 'reference' or 'trxref' in the query string
   const code = searchParams.get('reference') || searchParams.get('trxref');
   const { toast } = useToast();
   const { clearCart } = useCart();
@@ -27,254 +76,230 @@ function SuccessContent() {
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [orderData, setOrderData] = useState<Order | null>(null);
 
-  // Polling logic for "instant" confirmation
   useEffect(() => {
     let active = true;
     let attempts = 0;
-    const maxAttempts = 20; // 20 * 3s = 60 seconds max polling
+    const maxAttempts = 20;
 
     const checkStatus = async () => {
       if (!active || !code || isConfirmed || attempts >= maxAttempts) return;
-
       try {
-        // We only check the Order status from DB, as verifying with Paystack repeatedly might be rate-limited
-        // or unnecessary if the webhook already fired.
         const order = await getOrderAction(code);
-        
         if (order && order.status !== 'pending_payment') {
           setPaymentStatus('success');
           setIsConfirmed(true);
-          setOrderData(order); // Store order data for partner code
-          return; // Stop polling
+          setOrderData(order);
+          return;
         }
       } catch (err) {
         console.error('Polling error:', err);
       }
-
       attempts++;
       if (active && !isConfirmed && attempts < maxAttempts) {
-        setTimeout(checkStatus, 3000); // Poll every 3 seconds
+        setTimeout(checkStatus, 3000);
       } else if (attempts >= maxAttempts && !isConfirmed && paymentStatus !== 'success') {
-         // Stop verifying spinner if we time out, show pending state
-         setIsVerifying(false);
-         if (!paymentStatus) setPaymentStatus('pending');
+        setIsVerifying(false);
+        if (!paymentStatus) setPaymentStatus('pending');
       }
     };
 
     const initialVerify = async () => {
-        try {
-            // First check: Verify with Paystack API (once)
-            const safeCode = code || '';
-            const res = await fetch(`/api/payment/verify?reference=${encodeURIComponent(safeCode)}`, { cache: 'no-store' });
-            const data = await res.json().catch(() => null);
-
-            if (res.ok && data?.ok) {
-                setPaymentStatus('success');
-                setIsConfirmed(true);
-                setIsVerifying(false); // Done
-                // Fetch order data to get partner code
-                if (safeCode) {
-                    const order = await getOrderAction(safeCode);
-                    if (order) setOrderData(order);
-                }
-                return;
-            }
-        } catch (e) {
-            console.warn('Initial verify failed, falling back to polling', e);
+      try {
+        const safeCode = code || '';
+        const res = await fetch(`/api/payment/verify?reference=${encodeURIComponent(safeCode)}`, { cache: 'no-store' });
+        const data = await res.json().catch(() => null);
+        if (res.ok && data?.ok) {
+          setPaymentStatus('success');
+          setIsConfirmed(true);
+          setIsVerifying(false);
+          if (safeCode) {
+            const order = await getOrderAction(safeCode);
+            if (order) setOrderData(order);
+          }
+          return;
         }
-        
-        // If API verify failed/pending, start polling DB
-        checkStatus();
-    }
+      } catch (e) {
+        console.warn('Initial verify failed, falling back to polling', e);
+      }
+      checkStatus();
+    };
 
-    if (code && !isConfirmed) {
-        initialVerify();
-    }
-
+    if (code && !isConfirmed) initialVerify();
     return () => { active = false; };
-  }, [code, isConfirmed]); // Dependencies: if code changes or confirmed, reset/stop
+  }, [code, isConfirmed]);
 
-  // Clear the cart once payment is confirmed (verify or webhook path)
   useEffect(() => {
     if (paymentStatus === 'success' && isConfirmed && !clearedRef.current) {
       try {
         clearCart();
         clearedRef.current = true;
-        toast({ title: 'Cart cleared', description: 'Your cart has been cleared after successful payment.' });
       } catch {}
     }
-  }, [paymentStatus, isConfirmed, clearCart, toast]);
-
-  if (isVerifying) {
-    return (
-        <Card className="w-full max-w-lg text-center">
-            <CardHeader className="items-center">
-                <BrandSpinner size="lg" />
-                <CardTitle className="mt-4 text-3xl">Verifying Payment...</CardTitle>
-                <CardDescription className="max-w-md">
-                    Please wait a moment while we confirm your transaction. Do not close this page.
-                </CardDescription>
-            </CardHeader>
-        </Card>
-    )
-  }
-
-  if (!code || paymentStatus === 'failed') {
-    return (
-      <Card className="w-full max-w-lg text-center">
-        <CardHeader className="items-center">
-            <AlertCircle className="h-16 w-16 text-destructive" />
-            <CardTitle className="mt-4 text-2xl text-destructive">Payment Issue</CardTitle>
-            <CardDescription>
-                There seems to be an issue with your payment or order code. Please check your confirmation or contact support if you believe this is an error.
-            </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button asChild>
-            <Link href="/order">
-              <Plus />
-              Place a New Order
-            </Link>
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (paymentStatus === 'pending') {
-    return (
-      <Card className="w-full max-w-lg text-center">
-        <CardHeader className="items-center">
-            <AlertCircle className="h-16 w-16 text-yellow-500" />
-            <CardTitle className="mt-4 text-2xl">Payment Pending</CardTitle>
-            <CardDescription className="max-w-md">
-                Your payment is still being processed. This usually takes a few moments. Please check your order status using the tracking code below, or contact support if the issue persists.
-            </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <p className="text-sm text-muted-foreground">Your Tracking Code:</p>
-            <div className="mt-2 flex items-center justify-center rounded-lg border bg-muted p-3">
-              <p className="text-xl font-bold tracking-widest text-foreground">{code}</p>
-            </div>
-          </div>
-          <div className="space-y-3">
-            <Button asChild className="w-full">
-              <Link href={`/track?code=${code}`}>
-                <Truck />
-                Check Order Status
-              </Link>
-            </Button>
-            <Button 
-                variant="secondary" 
-                className="w-full"
-                onClick={() => window.location.reload()}
-            >
-                <CheckCircle2 className="mr-2 h-4 w-4" />
-                I've Paid, Check Again
-            </Button>
-            <Button asChild variant="outline" className="w-full">
-              <Link href="/partner-care">
-                Contact Support
-              </Link>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  }, [paymentStatus, isConfirmed, clearCart]);
 
   const handleCopy = () => {
+    if (!code) return;
     navigator.clipboard.writeText(code);
     setIsCopied(true);
-    toast({
-      title: 'Copied to clipboard!',
-      description: 'Your tracking code has been copied.',
-    });
+    toast({ title: 'Copied', description: 'Tracking code copied to clipboard.' });
     setTimeout(() => setIsCopied(false), 2000);
   };
 
-  return (
-    <Card className="w-full max-w-lg text-center">
-      <CardHeader className="items-center">
-        <CheckCircle2 className="h-16 w-16 text-success" />
-        <CardTitle className="mt-4 text-3xl">Order Confirmed!</CardTitle>
-        <CardDescription className="max-w-md">
-          Your order has been successfully placed. Your privacy is our priority, and your details are secure.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
+  /* ── Verifying state ── */
+  if (isVerifying) {
+    return (
+      <div className="flex flex-col items-center text-center gap-5">
+        <BrandSpinner size="lg" />
         <div>
-          <p className="text-sm text-muted-foreground">Your Unique Tracking Code:</p>
-          <div className="mt-2 flex items-center justify-center rounded-lg border bg-muted p-3">
-            <p className="text-2xl font-bold tracking-widest text-foreground">{code}</p>
-            <Button variant="ghost" size="icon" onClick={handleCopy} className="ml-4">
-              {isCopied ? <Check className="h-5 w-5 text-green-500" /> : <Copy className="h-5 w-5" />}
-              <span className="sr-only">Copy tracking code</span>
-            </Button>
-          </div>
-          <p className="mt-2 text-xs text-muted-foreground">
-            Keep this code safe. You'll need it to track your order.
+          <h1 className="text-2xl font-bold tracking-tight">Verifying Payment</h1>
+          <p className="text-[14px] text-muted-foreground mt-1.5 max-w-[260px] mx-auto">
+            Hang tight — this only takes a second.
           </p>
         </div>
-        
-        {/* Partner Access Code Section */}
-        {orderData?.partnerCode && (
-          <div className="pt-4 border-t border-dashed">
-            <p className="text-sm font-semibold text-foreground mb-1">🎁 Your Partner Access Code</p>
-            <p className="text-xs text-muted-foreground mb-3">
-              Show this code at Marie Stopes for priority, confidential care.
-            </p>
-            <div className="flex items-center justify-center rounded-lg border-2 border-primary/20 bg-primary/5 p-3">
-              <p className="text-xl font-bold tracking-widest text-primary">{orderData.partnerCode}</p>
-            </div>
-            <Link href="/partner-care" className="text-xs text-primary hover:underline mt-2 inline-block">
-              Learn more about our partner benefits →
-            </Link>
-          </div>
-        )}
+      </div>
+    );
+  }
 
-        <div className="space-y-4">
-          <Button asChild className="w-full">
+  /* ── Failed / No code state ── */
+  if (!code || paymentStatus === 'failed') {
+    return (
+      <div className="flex flex-col items-center text-center gap-6 w-full max-w-[360px]">
+        <div className="h-16 w-16 rounded-full bg-destructive/10 flex items-center justify-center">
+          <AlertCircle className="h-8 w-8 text-destructive" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Payment Issue</h1>
+          <p className="text-[14px] text-muted-foreground mt-2 max-w-[280px] mx-auto leading-relaxed">
+            We couldn't confirm your payment. Contact support if you believe this is a mistake.
+          </p>
+        </div>
+        <Button asChild className="w-full rounded-full h-12 font-bold">
+          <Link href="/order">Try Again</Link>
+        </Button>
+      </div>
+    );
+  }
+
+  /* ── Pending state ── */
+  if (paymentStatus === 'pending') {
+    return (
+      <div className="flex flex-col items-center text-center gap-6 w-full max-w-[380px]">
+        <div className="h-16 w-16 rounded-full bg-yellow-500/10 flex items-center justify-center">
+          <AlertCircle className="h-8 w-8 text-yellow-500" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Payment Pending</h1>
+          <p className="text-[14px] text-muted-foreground mt-2 leading-relaxed max-w-[280px] mx-auto">
+            Your payment is still processing. Use your tracking code to check your order status.
+          </p>
+        </div>
+        <CodeBlock label="Tracking Code" value={code} onCopy={handleCopy} copied={isCopied} />
+        <div className="w-full space-y-3">
+          <Button asChild className="w-full rounded-full h-12 font-bold">
             <Link href={`/track?code=${code}`}>
-              <Truck />
-              Track Your Order Now
+              <Truck className="h-4 w-4 mr-2" />
+              Check Order Status
             </Link>
           </Button>
-          <Button asChild variant="outline" className="w-full">
-            <Link href="/">
-                <Home />
-                Back to Homepage
-            </Link>
+          <Button variant="outline" className="w-full rounded-full h-12" onClick={() => window.location.reload()}>
+            <RotateCcw className="h-4 w-4 mr-2" />
+            Check Again
           </Button>
         </div>
-         <div className="text-sm text-muted-foreground pt-4">
-            <h3 className="font-semibold text-foreground">What's Next?</h3>
-            <ol className="text-left list-decimal list-inside mt-2 space-y-1">
-                <li>We'll start processing your order.</li>
-                <li>You'll see status updates on the tracking page.</li>
-                <li>Your kit will be delivered in a discreet, unbranded package.</li>
-            </ol>
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+    );
+  }
+
+  /* ── Success state ── */
+  return (
+    <div className="flex flex-col items-center text-center gap-7 w-full max-w-[400px]">
+      
+      {/* Icon */}
+      <div className="h-20 w-20 rounded-full bg-success/10 flex items-center justify-center">
+        <CheckCircle2 className="h-10 w-10 text-success" />
+      </div>
+
+      {/* Heading */}
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">You're all set.</h1>
+        <p className="text-[14px] text-muted-foreground mt-2 max-w-[300px] mx-auto leading-relaxed">
+          Your order is confirmed. Delivered in a discreet, unbranded package.
+        </p>
+      </div>
+
+      {/* Codes */}
+      <div className="w-full space-y-3">
+        <CodeBlock
+          label="Order Tracking Code"
+          value={code}
+          onCopy={handleCopy}
+          copied={isCopied}
+        />
+        {orderData?.partnerCode && (
+          <CodeBlock
+            label="Partner Access Code · Marie Stopes"
+            value={orderData.partnerCode}
+            accent
+          />
+        )}
+      </div>
+
+      {/* What happens next — stripped to 3 clean lines */}
+      <div className="w-full text-left bg-muted/30 border border-border/40 rounded-2xl px-5 py-4 space-y-2">
+        {[
+          'We'll start preparing your order now.',
+          'Your kit ships in a discreet, unbranded package.',
+          'Track real-time updates with your code above.',
+        ].map((step, i) => (
+          <div key={i} className="flex items-start gap-3">
+            <span className="text-[11px] font-bold text-muted-foreground/60 mt-0.5 w-4 shrink-0">{`0${i + 1}`}</span>
+            <p className="text-[13px] text-muted-foreground leading-snug">{step}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* CTAs */}
+      <div className="w-full space-y-3">
+        <Button asChild className="w-full h-12 rounded-full font-bold">
+          <Link href={`/track?code=${code}`}>
+            <Truck className="h-4 w-4 mr-2" />
+            Track Your Order
+          </Link>
+        </Button>
+        <Button asChild variant="ghost" className="w-full h-12 rounded-full text-muted-foreground">
+          <Link href="/">
+            <Home className="h-4 w-4 mr-2" />
+            Back to Home
+          </Link>
+        </Button>
+      </div>
+
+      {orderData?.partnerCode && (
+        <Link
+          href="/partner-care"
+          className="text-[12px] text-primary hover:underline"
+        >
+          Learn about your partner care benefits →
+        </Link>
+      )}
+    </div>
   );
 }
 
 function SuccessPageLoading() {
-    return (
-        <div className="flex h-64 items-center justify-center">
-            <BrandSpinner size="md" />
-        </div>
-    )
+  return (
+    <div className="flex h-64 items-center justify-center">
+      <BrandSpinner size="md" />
+    </div>
+  );
 }
 
 export default function OrderSuccessPage() {
-    return (
-        <div className="flex min-h-[calc(100dvh-10rem)] items-center justify-center bg-background p-4">
-            <Suspense fallback={<SuccessPageLoading />}>
-                <SuccessContent />
-            </Suspense>
-        </div>
-    )
+  return (
+    <div className="flex min-h-[calc(100dvh-10rem)] items-center justify-center bg-background px-4 py-12">
+      <Suspense fallback={<SuccessPageLoading />}>
+        <SuccessContent />
+      </Suspense>
+    </div>
+  );
 }
