@@ -119,17 +119,14 @@ export function Chatbot() {
           <ArrowLeft className="h-4 w-4" />
         </button>
         <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-full overflow-hidden shadow-sm border border-brand-indigo/10">
+          <div className="h-9 w-9 rounded-full overflow-hidden shadow-sm border border-primary/10">
             <img
               src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png"
               alt="Pacely"
               className="h-full w-full object-cover"
             />
           </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-semibold text-brand-indigo">Pacely</span>
-            <span className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground/80">Your private health guide</span>
-          </div>
+          <span className="text-sm font-semibold text-foreground">Pacely</span>
         </div>
       </header>
 
