@@ -247,9 +247,9 @@ function SuccessContent() {
       {/* What happens next — stripped to 3 clean lines */}
       <div className="w-full text-left bg-muted/30 border border-border/40 rounded-2xl px-5 py-4 space-y-2">
         {[
-          'We'll start preparing your order now.',
-          'Your kit ships in a discreet, unbranded package.',
-          'Track real-time updates with your code above.',
+          "We'll start preparing your order now.",
+          "Your kit ships in a discreet, unbranded package.",
+          "Track real-time updates with your code above.",
         ].map((step, i) => (
           <div key={i} className="flex items-start gap-3">
             <span className="text-[11px] font-bold text-muted-foreground/60 mt-0.5 w-4 shrink-0">{`0${i + 1}`}</span>
