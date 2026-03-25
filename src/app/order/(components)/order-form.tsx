@@ -72,7 +72,7 @@ function LabelledInput({
     </div>
   );
 }
-a;
+
 function SubmitButton({ disabled }: { disabled: boolean }) {
   const { pending } = useFormStatus();
   return (
