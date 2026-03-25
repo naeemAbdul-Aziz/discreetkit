@@ -40,7 +40,7 @@ export function FloatingChatTrigger() {
           <Button
             onClick={() => router.push('/chat')}
             className={cn(
-              "h-14 rounded-full bg-brand-indigo hover:opacity-90 text-white shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 border border-white/10 group pl-2 pr-5 flex items-center gap-3"
+              "h-14 rounded-full bg-brand-indigo hover:bg-brand-indigo/90 text-white shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 border border-white/10 group pl-2 pr-5 flex items-center gap-3"
             )}
             aria-label="Ask Pacely"
           >
