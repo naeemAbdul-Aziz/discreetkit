@@ -45,10 +45,20 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 
-function LabelledInput({ label, id, ...props }: React.InputHTMLAttributes<HTMLInputElement> & { label: string, id: string }) {
+function LabelledInput({
+  label,
+  id,
+  ...props
+}: React.InputHTMLAttributes<HTMLInputElement> & {
+  label: string;
+  id: string;
+}) {
   return (
     <div className="space-y-1.5 w-full">
-      <Label htmlFor={id} className="text-[13px] font-medium text-muted-foreground ml-0.5">
+      <Label
+        htmlFor={id}
+        className="text-[13px] font-medium text-muted-foreground ml-0.5"
+      >
         {label}
       </Label>
       <Input
@@ -56,7 +66,7 @@ function LabelledInput({ label, id, ...props }: React.InputHTMLAttributes<HTMLIn
         {...props}
         className={cn(
           "h-12 rounded-xl border-border/40 bg-muted/20 px-4 transition-colors focus-visible:bg-transparent focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary shadow-sm text-[15px]",
-          props.className
+          props.className,
         )}
       />
     </div>
@@ -72,7 +82,9 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
       disabled={disabled}
       loading={pending}
     >
-      {pending ? "Processing..." : (
+      {pending ? (
+        "Processing..."
+      ) : (
         <>
           Proceed to Payment
           <ArrowRight className="h-4 w-4 ml-1.5" />
@@ -134,7 +146,9 @@ function OrderSummaryCard() {
       {isStudent && (
         <div className="flex items-center gap-2 rounded-lg bg-success/10 px-3 py-2 text-success mb-5">
           <GraduationCap className="h-4 w-4" />
-          <p className="text-[13px] font-medium">Free student delivery applied</p>
+          <p className="text-[13px] font-medium">
+            Free student delivery applied
+          </p>
         </div>
       )}
       <div className="space-y-4">
@@ -152,11 +166,17 @@ function OrderSummaryCard() {
                 )}
               </div>
               <div className="flex flex-col justify-center">
-                <p className="font-medium text-[14px] leading-tight text-foreground">{item.name}</p>
-                <p className="text-[13px] text-muted-foreground mt-0.5">Qty {item.quantity}</p>
+                <p className="font-medium text-[14px] leading-tight text-foreground">
+                  {item.name}
+                </p>
+                <p className="text-[13px] text-muted-foreground mt-0.5">
+                  Qty {item.quantity}
+                </p>
               </div>
             </div>
-            <p className="font-medium text-[14px] pt-1">GHS {(item.price_ghs * item.quantity).toFixed(2)}</p>
+            <p className="font-medium text-[14px] pt-1">
+              GHS {(item.price_ghs * item.quantity).toFixed(2)}
+            </p>
           </div>
         ))}
       </div>
@@ -166,7 +186,9 @@ function OrderSummaryCard() {
       <div className="space-y-2.5 text-[14px]">
         <div className="flex justify-between text-muted-foreground">
           <p>Subtotal</p>
-          <p className="text-foreground font-medium">GHS {subtotal.toFixed(2)}</p>
+          <p className="text-foreground font-medium">
+            GHS {subtotal.toFixed(2)}
+          </p>
         </div>
         {studentDiscount > 0 && (
           <div className="flex justify-between text-success">
@@ -176,7 +198,9 @@ function OrderSummaryCard() {
         )}
         <div className="flex justify-between text-muted-foreground">
           <p>Delivery Fee</p>
-          <p className="text-foreground font-medium">GHS {deliveryFee.toFixed(2)}</p>
+          <p className="text-foreground font-medium">
+            GHS {deliveryFee.toFixed(2)}
+          </p>
         </div>
       </div>
 
@@ -370,7 +394,7 @@ export function OrderForm() {
           variant: "destructive",
         });
       }
-      
+
       // Auto-revert to Step 1 if there's a location error returned from server
       if (state.errors?.deliveryArea || state.errors?.otherDeliveryArea) {
         setStep(1);
@@ -396,7 +420,11 @@ export function OrderForm() {
 
   return (
     <div className="max-w-[460px] mx-auto w-full mt-2 lg:mt-8 px-4 sm:px-0">
-      <form ref={formRef} action={dispatch} className="space-y-8 pb-12 relative">
+      <form
+        ref={formRef}
+        action={dispatch}
+        className="space-y-8 pb-12 relative"
+      >
         <FormPendingOverlay />
         <input type="hidden" name="cartItems" value={JSON.stringify(items)} />
         <input type="hidden" name="subtotal" value={subtotal} />
@@ -407,20 +435,40 @@ export function OrderForm() {
         {/* Section 1: Delivery Details */}
         <div className="space-y-5">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight">Delivery Details</h2>
-            <p className="text-[14px] text-muted-foreground mt-1">Where should we drop this off?</p>
+            <h2 className="text-2xl font-bold tracking-tight">
+              Delivery Details
+            </h2>
+            <p className="text-[14px] text-muted-foreground mt-1">
+              Where should we drop this off?
+            </p>
           </div>
 
           <div className="space-y-4">
             <div className="space-y-1.5 w-full">
-              <Label className="text-[13px] font-medium text-muted-foreground ml-0.5">Delivery Region</Label>
-              <Select name="deliveryArea" onValueChange={handleLocationChange} value={deliveryLocation || "Other"} disabled={!isMounted}>
-                <SelectTrigger className={cn("h-12 rounded-xl border-border/40 bg-muted/20 px-4 transition-colors focus:bg-transparent shadow-sm text-[15px]", state.errors?.deliveryArea && "border-destructive")}>
+              <Label className="text-[13px] font-medium text-muted-foreground ml-0.5">
+                Delivery Region
+              </Label>
+              <Select
+                name="deliveryArea"
+                onValueChange={handleLocationChange}
+                value={deliveryLocation || "Other"}
+                disabled={!isMounted}
+              >
+                <SelectTrigger
+                  className={cn(
+                    "h-12 rounded-xl border-border/40 bg-muted/20 px-4 transition-colors focus:bg-transparent shadow-sm text-[15px]",
+                    state.errors?.deliveryArea && "border-destructive",
+                  )}
+                >
                   <SelectValue placeholder="Select location" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
                   <SelectItem value="Other">Standard Delivery</SelectItem>
-                  {discounts.map(d => <SelectItem key={d.id} value={d.campus}>{d.campus}</SelectItem>)}
+                  {discounts.map((d) => (
+                    <SelectItem key={d.id} value={d.campus}>
+                      {d.campus}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <FieldError message={state.errors?.deliveryArea?.[0]} />
@@ -428,40 +476,65 @@ export function OrderForm() {
 
             {showOther ? (
               <LabelledInput
-                 id="otherDeliveryArea"
-                 name="otherDeliveryArea"
-                 label="Exact Address"
-                 placeholder="e.g. Accra Mall, Spintex Road"
-                 className={cn(state.errors?.otherDeliveryArea && "border-destructive")}
+                id="otherDeliveryArea"
+                name="otherDeliveryArea"
+                label="Exact Address"
+                placeholder="e.g. Accra Mall, Spintex Road"
+                className={cn(
+                  state.errors?.otherDeliveryArea && "border-destructive",
+                )}
               />
             ) : (
               <div className="space-y-1.5 w-full">
-                 <Label className="text-[13px] font-medium text-muted-foreground ml-0.5">Pickup Point</Label>
-                 <Select name="otherDeliveryArea">
-                   <SelectTrigger className={cn("h-12 rounded-xl border-border/40 bg-muted/20 px-4 transition-colors focus:bg-transparent shadow-sm text-[15px]", state.errors?.otherDeliveryArea && "border-destructive")}>
-                     <SelectValue placeholder="Select specific point" />
-                   </SelectTrigger>
-                   <SelectContent className="rounded-xl">
-                     {discounts.find(d => d.campus === deliveryLocation)?.meetingPoints?.map(p => (
-                       <SelectItem key={p} value={p}>{p}</SelectItem>
-                     ))}
-                     <SelectItem value="Other">Other (Specify in notes)</SelectItem>
-                   </SelectContent>
-                 </Select>
-                 <FieldError message={state.errors?.otherDeliveryArea?.[0]} />
+                <Label className="text-[13px] font-medium text-muted-foreground ml-0.5">
+                  Pickup Point
+                </Label>
+                <Select name="otherDeliveryArea">
+                  <SelectTrigger
+                    className={cn(
+                      "h-12 rounded-xl border-border/40 bg-muted/20 px-4 transition-colors focus:bg-transparent shadow-sm text-[15px]",
+                      state.errors?.otherDeliveryArea && "border-destructive",
+                    )}
+                  >
+                    <SelectValue placeholder="Select specific point" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl">
+                    {discounts
+                      .find((d) => d.campus === deliveryLocation)
+                      ?.meetingPoints?.map((p) => (
+                        <SelectItem key={p} value={p}>
+                          {p}
+                        </SelectItem>
+                      ))}
+                    <SelectItem value="Other">
+                      Other (Specify in notes)
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <FieldError message={state.errors?.otherDeliveryArea?.[0]} />
               </div>
             )}
 
             <LabelledInput
-               id="deliveryAddressNote"
-               name="deliveryAddressNote"
-               label="Drop-off Notes (Optional)"
-               placeholder="e.g. Call upon arrival..."
+              id="deliveryAddressNote"
+              name="deliveryAddressNote"
+              label="Drop-off Notes (Optional)"
+              placeholder="e.g. Call upon arrival..."
             />
 
             <div className="pt-1">
-              <Button type="button" variant="ghost" onClick={handleUseLocation} disabled={locationLoading} className="h-9 px-3 rounded-lg text-[13px] font-medium text-primary hover:bg-primary/10 transition-colors -ml-3">
-                {locationLoading ? <Loader2 className="h-3 w-3 animate-spin mr-1.5" /> : <MapPin className="h-3 w-3 mr-1.5" />}
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={handleUseLocation}
+                disabled={locationLoading}
+                className="h-9 px-3 rounded-lg text-[13px] font-medium text-primary hover:bg-primary/10 transition-colors -ml-3"
+              >
+                {locationLoading ? (
+                  <Loader2 className="h-3 w-3 animate-spin mr-1.5" />
+                ) : (
+                  <MapPin className="h-3 w-3 mr-1.5" />
+                )}
                 Auto-detect my campus
               </Button>
             </div>
@@ -474,46 +547,58 @@ export function OrderForm() {
         <div className="space-y-5">
           <div>
             <h2 className="text-2xl font-bold tracking-tight">Contact</h2>
-            <p className="text-[14px] text-muted-foreground mt-1">For your receipt and rider updates.</p>
+            <p className="text-[14px] text-muted-foreground mt-1">
+              For your receipt and rider updates.
+            </p>
           </div>
-          
+
           <div className="space-y-4">
-             <LabelledInput
-               id="email"
-               name="email"
-               type="email"
-               label="Email Address"
-               placeholder="you@example.com"
-               className={cn(state.errors?.email && "border-destructive")}
-             />
-             <div className="space-y-0.5">
-               <LabelledInput
-                 id="phone_masked"
-                 name="phone_masked"
-                 type="tel"
-                 label="Mobile Number"
-                 placeholder="+233 xx xxx xxxx"
-                 className={cn(state.errors?.phone_masked && "border-destructive")}
-               />
-               <p className="text-[12px] text-muted-foreground/80 flex items-center gap-1.5 pt-1.5 ml-0.5">
-                 <Lock className="h-3 w-3" />
-                 Masked; riders will only see a proxy number.
-               </p>
-             </div>
+            <LabelledInput
+              id="email"
+              name="email"
+              type="email"
+              label="Email Address"
+              placeholder="you@example.com"
+              className={cn(state.errors?.email && "border-destructive")}
+            />
+            <div className="space-y-0.5">
+              <LabelledInput
+                id="phone_masked"
+                name="phone_masked"
+                type="tel"
+                label="Mobile Number"
+                placeholder="+233 xx xxx xxxx"
+                className={cn(
+                  state.errors?.phone_masked && "border-destructive",
+                )}
+              />
+              <p className="text-[12px] text-muted-foreground/80 flex items-center gap-1.5 pt-1.5 ml-0.5">
+                <Lock className="h-3 w-3" />
+                Masked; riders will only see a proxy number.
+              </p>
+            </div>
           </div>
         </div>
 
         {/* Order Summary Flat Box */}
         <div className="bg-muted/30 border border-border/40 rounded-[2rem] p-6 sm:p-7 mt-8">
-           <OrderSummaryCard />
+          <OrderSummaryCard />
         </div>
 
         {/* Action Area */}
         <div className="pt-2">
-           <SubmitButton disabled={isSubmitDisabled} />
-           <p className="text-center text-[12px] text-muted-foreground mt-4 px-4 leading-relaxed">
-             Payments processed securely via Paystack. <br/>By placing your order you agree to our <Link href="/terms" className="underline hover:text-foreground transition-colors">Terms of Service</Link>.
-           </p>
+          <SubmitButton disabled={isSubmitDisabled} />
+          <p className="text-center text-[12px] text-muted-foreground mt-4 px-4 leading-relaxed">
+            Payments processed securely via Paystack. <br />
+            By placing your order you agree to our{" "}
+            <Link
+              href="/terms"
+              className="underline hover:text-foreground transition-colors"
+            >
+              Terms of Service
+            </Link>
+            .
+          </p>
         </div>
       </form>
     </div>
