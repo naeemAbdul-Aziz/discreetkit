@@ -1,6 +1,48 @@
 # DiscreetKit System Design
 
+**Last Updated: March 30, 2026**
+
 This document outlines the architecture and system design of the DiscreetKit application. It details the core components and how they interact to provide a secure, anonymous, and efficient service.
+
+## March 2026 Sprint Updates
+
+### 3.12. Operational Intelligence Layer (NEW)
+
+**Zero-Bloat Analytics Principle:** All operational intelligence is derived from the existing `orders` + `order_events` dataset. No new tables, no new API calls, no additional dependencies or infrastructure cost.
+
+**Implemented in:** `src/lib/admin-actions.ts` → `getDashboardStats()`
+
+| Metric | Algorithm | Business Purpose |
+|:---|:---|:---|
+| **Fulfillment Velocity ("Anxiety Meter")** | `AVG(out_for_delivery_at - received_at)` in hours | North Star KPI for trust operations |
+| **Privacy Density** | `GROUP BY delivery_area ORDER BY count DESC LIMIT 8` | Data-driven pharmacy node expansion |
+| **Operational Pulse Feed** | Top 12 `order_events` from 20 most recent orders, DESC | Real-time system heartbeat for Admin |
+
+**UI Surfaces:**
+- *Anxiety Meter* — 4th stat card in the Admin KPI row.
+- *Live Operational Pulse* — Monospaced SSE-powered ticker using `AnimatePresence mode="popLayout"`.
+- *Privacy Density* — Recharts `AreaChart` with a custom glassmorphic tooltip and top-3 legend.
+- *RankingList* — Redesigned with relative horizontal performance bars (`bg-primary/[0.03]` tint, scaled to #1 performer), `TOP` / `VELOCITY` insight badges, and `font-mono font-black` primary values.
+
+### 3.13. Premium 2-Step Checkout (NEW)
+
+**Implemented in:** `src/app/order/(components)/order-form.tsx`
+
+The checkout flow is redesigned as a **2-Step Progressive Disclosure** pattern:
+
+| Step | Content | Notes |
+|:---|:---|:---|
+| **Step 1 — Delivery** | Region, Pickup Point, Drop-off Notes, GPS auto-detect | `AnimatePresence` slide-out |
+| **Step 2 — Contact & Summary** | Email, Masked Phone, Order Summary, Paystack CTA | Server error reverts to Step 1 |
+
+**Design System:**
+- Inputs: `h-12 rounded-2xl bg-[#f5f5f1] border-0` (warm-grey, no border)
+- Labels: `text-[10px] font-bold uppercase tracking-[0.2em]`
+- Card: `rounded-[2.5rem] shadow-xl border-0`
+- CTAs: `h-14 rounded-full font-bold`
+- Hidden form fields maintain compatibility with `createOrderAction` across both steps.
+
+---
 
 ## 1. Core Principles
 
@@ -10,6 +52,7 @@ The system is designed around these foundational principles:
 * **Data Minimization:** Only the absolute necessary information for delivery and payment is collected.
 * **Security:** All backend operations are handled through secure server-side logic, and payment processing is delegated to a trusted third party.
 * **Scalability:** Built on modern, serverless-friendly technologies (Next.js, Supabase, Vercel/Firebase App Hosting).
+* **Operational Intelligence (NEW):** The platform surfaces derived operational metrics from existing data — Fulfillment Velocity, Privacy Density, Live Pulse — with zero additional infrastructure cost.
 
 ---
 

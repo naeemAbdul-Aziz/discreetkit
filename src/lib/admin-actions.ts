@@ -728,17 +728,55 @@ export async function getDashboardStats(prefetchedOrders?: any[]) {
 
     const categoryChart = Object.entries(categoryStats).map(([name, value]) => ({ name, value }));
 
-    // --- REGIONAL DATA ---
+    // --- INTENTIONAL OPERATIONAL METRICS (FAANG-STANDARD) ---
+    
+    // 1. Fulfillment Velocity (The "Anxiety Meter")
+    // Target: Avg time from 'received' to 'out_for_delivery'
+    let totalVelocityMs = 0;
+    let velocityCount = 0;
+    
+    orders.forEach((o: any) => {
+        const events = o.order_events || [];
+        const receivedEvent = events.find((e: any) => e.status === 'received') || { created_at: o.created_at };
+        const shippedEvent = events.find((e: any) => e.status === 'out_for_delivery');
+        
+        if (shippedEvent) {
+            const start = new Date(receivedEvent.created_at).getTime();
+            const end = new Date(shippedEvent.created_at).getTime();
+            totalVelocityMs += (end - start);
+            velocityCount++;
+        }
+    });
+    
+    const avgVelocityHours = velocityCount > 0 ? (totalVelocityMs / velocityCount / (1000 * 60 * 60)) : 0;
+
+    // 2. Anonymity Density (Regional Hotspots)
     const regionalStats: Record<string, number> = {};
     orders.forEach((o: any) => {
-        if (o.delivery_area) {
-            regionalStats[o.delivery_area] = (regionalStats[o.delivery_area] || 0) + 1;
-        }
+        const area = o.delivery_area || 'Standard Delivery';
+        regionalStats[area] = (regionalStats[area] || 0) + 1;
     });
     const regionChart = Object.entries(regionalStats)
         .map(([name, value]) => ({ name, value }))
         .sort((a, b) => b.value - a.value)
-        .slice(0, 10);
+        .slice(0, 8);
+
+    // 3. Operational Pulse (Live Event Feed)
+    const allEvents: any[] = [];
+    orders.slice(0, 20).forEach((o: any) => {
+        (o.order_events || []).forEach((e: any) => {
+            allEvents.push({
+                id: e.id,
+                orderCode: o.code,
+                status: e.status,
+                timestamp: e.created_at,
+                note: e.note
+            });
+        });
+    });
+    const pulseFeed = allEvents
+        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+        .slice(0, 12);
 
     return {
         topPharmacies,
@@ -746,9 +784,13 @@ export async function getDashboardStats(prefetchedOrders?: any[]) {
         revenueChart,
         categoryChart,
         regionChart,
-        totalRevenue: orders.reduce((acc: number, curr: any) => acc + (curr.total_price || 0), 0),
-        totalOrders: orders.length,
-        activePatients: new Set(orders.map((o: any) => o.user_id)).size
+        pulseFeed,
+        metrics: {
+            totalRevenue: orders.reduce((acc: number, curr: any) => acc + (curr.total_price || 0), 0),
+            totalOrders: orders.length,
+            activePatients: new Set(orders.map((o: any) => o.user_id)).size,
+            fulfillmentVelocity: avgVelocityHours.toFixed(1), // in hours
+        }
     };
 }
 

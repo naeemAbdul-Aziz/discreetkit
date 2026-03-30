@@ -1,3 +1,29 @@
+## March 2026 Architecture Enhancements
+
+### Operational Intelligence Layer (NEW)
+A purpose-built analytics layer added to the Admin Command Center, derived entirely from the existing data infrastructure:
+
+- **Fulfillment Velocity Engine:** Aggregates `order_events` to compute the average time between `received` and `out_for_delivery` per order. Expressed in hours. Serves as the "Anxiety Meter" — the North Star KPI for trust operations.
+- **Anonymity Density Aggregator:** Groups `orders` by `delivery_area` field, returning top 8 regions by volume. Renders as an Area chart in the Admin dashboard for geographic demand intelligence.
+- **Operational Pulse Feed:** Extracts the latest 12 `order_events` from the 20 most recent orders, sorted by timestamp. Rendered as a monospaced real-time ticker in the admin UI using existing SSE infrastructure.
+
+**System Design Principle:** Zero additional database tables, zero extra API calls, zero new dependencies. All three modules derive from the same `orders` + `order_events` payload already fetched by `getDashboardStats`.
+
+### Premium Consumer Checkout Architecture (NEW)
+- `order-form.tsx` refactored into a **2-Step Progressive Disclosure** pattern:
+  - **Step 1 — Delivery:** Region selector, meeting-point picker, collapsible drop-off notes, GPS campus auto-detect (Haversine formula, <5km radius to nearest campus node).
+  - **Step 2 — Contact & Summary:** Email, masked phone, order summary review, Paystack redirect CTA.
+- **Framer Motion `AnimatePresence`** with `mode="wait"` for smooth horizontal slide transitions between steps.
+- Hidden form fields maintain server action compatibility (`cartItems`, `subtotal`, `deliveryFee`, `totalPrice`) across both steps.
+- Server validation errors on Step 1 fields auto-revert the user to Step 1.
+
+### RankingList Visualization Upgrade (NEW)
+- Relative performance bars: each row renders a `position: absolute` background div with `width = (item_value / max_value) * 100%`. Max value derived client-side from the items array using regex-based numeric extraction.
+- Insight badges: `TOP` for rank 0, `VELOCITY` for products with value >70% of the list maximum (rank > 0 only).
+- Hover state: left `w-0.5` primary accent bar appears on `group-hover`.
+
+---
+
 ## Scheduled Jobs Architecture (2026-02 update)
 
 - Workflows:
@@ -25,9 +51,9 @@ The application is structured as a **Monorepo** (Single Repository) housing thre
 
 | Component                      | Audience     | Tech Profile                                                                                        |
 | :----------------------------- | :----------- | :-------------------------------------------------------------------------------------------------- |
-| **Consumer Storefront**  | Public Users | Next.js 16 (App Router), SSR for SEO, Framer Motion for high-fidelity UI. Optimized for conversion. |
-| **Admin Command Center** | Internal Ops | Real-time data visualization, Role-Based Access Control (RBAC), Global Inventory Management.        |
-| **Pharmacy Portal**      | B2B Partners | Focused on operational efficiency. Real-time order polling, simplified inventory interface.         |
+| **Consumer Storefront**  | Public Users | Next.js 16 (App Router), SSR for SEO, Framer Motion for high-fidelity UI. 2-step premium checkout. |
+| **Admin Command Center** | Internal Ops | Operational Intelligence Layer: Fulfillment Velocity, Privacy Density, Live Pulse. RBAC + FAANG analytics. |
+| **Pharmacy Portal**      | B2B Partners | Operational efficiency focus: real-time order polling, rider dispatch, simplified inventory interface. |
 
 ### 2. Backend & Data Layer (Supabase)
 
@@ -36,6 +62,7 @@ We utilize **Supabase** as a Backend-as-a-Service (BaaS) wrapper around **Postgr
 * **Database:** Relational data model (PostgreSQL) enforcing strict referential integrity between Orders, Products, and Pharmacy nodes.
 * **Auth:** Integrated Authentication handling JWT tokens for secure session management across web and mobile.
 * **Edge Functions & Server Actions:** Server-side logic runs on the Edge (Vercel Network) for low-latency responses globally.
+* **Caching:** Short-TTL Redis cache layer (`cache:pharmacies:list`, `cache:pharmacy:{id}:products`, `cache:pharmacy:{id}:analytics`) with explicit invalidation on writes.
 
 ### 3. Integration Grid
 
@@ -50,13 +77,15 @@ graph TD
     App -->|Reads/Writes| DB[(Supabase DB)]
     WA -->|Reads/Writes| DB
     Logic[Business Logic Layer] -->|Runs| DB
+    IntelLayer[Operational Intelligence] -->|Aggregates| DB
     end
   
     subgraph External Services
     Logic -->|Payments| Paystack[Paystack Fintech]
     Logic -->|SMS Alerts| Arkesel[Arkesel Gateway]
     Logic -->|AI/RAG| Genkit[Google Gemini / Genkit]
-    Logic -->|verification| MS[Marie Stopes API]
+    Logic -->|Verification| MS[Marie Stopes API]
+    Logic -->|Errors| Sentry[Sentry Observability]
     end
   
     Paystack -->|Webhook| Logic
@@ -79,10 +108,19 @@ The WhatsApp integration is architected as a **Headless Client**. It consumes th
 
 * **Benefit:** Zero data duplication. A price change in the Admin dashboard instantly reflects on the Website AND WhatsApp.
 
-### C. Security & Compliance
+### C. Operational Intelligence (NEW — March 2026)
+
+A zero-cost analytics layer derived purely from existing data:
+
+* **Fulfillment Velocity:** `AVG(out_for_delivery_at - received_at)` per order, computed in the `getDashboardStats` server action. No new tables; derives from `order_events`.
+* **Privacy Density:** `GROUP BY delivery_area` on `orders`, rendered as an Area chart. Drives geographic node expansion strategy.
+* **Live Pulse:** Sorted `order_events` stream; integrated with existing SSE endpoint for real-time dashboard updates.
+
+### D. Security & Compliance
 
 * **RLS (Row Level Security):** Database policies prevent data leaks at the engine level. A Pharmacy user *physically cannot* query orders belonging to another pharmacy, even if the API code were compromised.
 * **Strict Typing:** The entire stack is written in **TypeScript**, providing compile-time guarantees against runtime errors, crucial for handling health-related transactions.
+* **Idempotency:** Order status updates are idempotent; unchanged transitions do not resend SMS or create duplicate `order_events`.
 
 ## Data Privacy & Anonymity Architecture
 

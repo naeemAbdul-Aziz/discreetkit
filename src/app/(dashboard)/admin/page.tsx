@@ -14,7 +14,9 @@ import {
   Users,
   AlertCircle,
   TrendingUp,
+  MapPin,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Card,
   CardContent,
@@ -61,12 +63,15 @@ type DashboardData = {
     avgOrderValue: number;
     newCustomers: number;
     activeOrders: number;
+    fulfillmentVelocity: string;
   };
   recentOrders: RecentOrder[];
   revenueSeries: { date: string; amount: number }[];
   statusBreakdown?: { status: string; count: number }[];
   topPharmacies?: { name: string; revenue: number }[];
   topProducts?: { name: string; quantity: number; revenue: number }[];
+  regionChart?: { name: string; value: number }[];
+  pulseFeed?: { id: any; orderCode: string; status: string; timestamp: string; note?: string }[];
 };
 
 export default function AdminDashboardPage() {
@@ -157,12 +162,15 @@ export default function AdminDashboardPage() {
             avgOrderValue,
             newCustomers: uniqueCustomers,
             activeOrders,
+            fulfillmentVelocity: stats.metrics?.fulfillmentVelocity ?? '—',
           },
           recentOrders,
           revenueSeries,
           statusBreakdown,
           topPharmacies: stats.topPharmacies,
           topProducts: stats.topProducts,
+          regionChart: stats.regionChart,
+          pulseFeed: stats.pulseFeed,
         });
       } catch (err) {
         console.error(err);
@@ -258,22 +266,59 @@ export default function AdminDashboardPage() {
             trend={{ value: 180.1, label: "from last month", positive: true }}
           />
           <StatCard
-            title="Active Now"
-            value={data.metrics.activeOrders}
+            title="Anxiety Meter"
+            value={`${data.metrics.fulfillmentVelocity}h`}
             icon={Activity}
-            description="Processing orders"
+            description="Avg. fulfillment speed"
+            trend={{ value: 12, label: "faster than avg", positive: true }}
           />
           <StatCard
-            title="Avg. Order Value"
-            value={`GHS ${data.metrics.avgOrderValue.toFixed(2)}`}
+            title="Active Now"
+            value={data.metrics.activeOrders}
             icon={Users}
-            trend={{ value: 19, label: "from last month", positive: true }}
+            description="Orders in system"
           />
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
+        {/* Operational Pulse Ticker */}
+        <div className="bg-primary/[0.02] border border-primary/10 rounded-2xl p-4 overflow-hidden relative">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center gap-1.5">
+              <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Live Operational Pulse</span>
+            </div>
+            <div className="h-px flex-1 bg-primary/10" />
+          </div>
+          <div className="space-y-2 h-[80px] overflow-hidden">
+            <AnimatePresence mode="popLayout">
+              {(data.pulseFeed || []).map((event: any, i: number) => (
+                <motion.div
+                  key={event.id || i}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="flex items-center gap-3 text-[11px] font-mono text-muted-foreground/80"
+                >
+                  <span className="text-primary font-bold shrink-0">[{new Date(event.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}]</span>
+                  <span className="text-foreground font-medium shrink-0">ORDER {event.orderCode}</span>
+                  <span className="h-1 w-1 rounded-full bg-muted-foreground/30 shrink-0" />
+                  <span className="truncate uppercase tracking-tight">{event.status.replace(/_/g, ' ')}</span>
+                  {event.note && (
+                    <>
+                      <span className="h-1 w-1 rounded-full bg-muted-foreground/30 shrink-0" />
+                      <span className="truncate opacity-60 italic">{event.note}</span>
+                    </>
+                  )}
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+          <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-background/50 to-transparent pointer-events-none" />
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <RankingList
-            title="Top Performing Pharmacies"
+            title="Top Pharmacies"
             description="By total revenue generated"
             type="pharmacy"
             items={(data.topPharmacies || []).map((p) => ({
@@ -282,7 +327,7 @@ export default function AdminDashboardPage() {
             }))}
           />
           <RankingList
-            title="Top Selling Products"
+            title="Top Products"
             description="By quantity sold"
             type="product"
             items={(data.topProducts || []).map((p) => ({
@@ -291,6 +336,62 @@ export default function AdminDashboardPage() {
               meta: `GHS ${p.revenue.toLocaleString()}`,
             }))}
           />
+          
+          <Card className="border-0 shadow-sm bg-card/50 overflow-hidden">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground/80 flex items-center gap-2">
+                <MapPin className="h-3.5 w-3.5 text-emerald-500" />
+                Privacy Density
+              </CardTitle>
+              <CardDescription className="text-xs">Demand by regional hotspot</CardDescription>
+            </CardHeader>
+            <CardContent className="h-[240px] pt-4">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={data.regionChart}>
+                  <defs>
+                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.1}/>
+                      <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <XAxis 
+                    dataKey="name" 
+                    hide 
+                  />
+                  <YAxis hide />
+                  <RechartsTooltip 
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className="bg-background/90 border border-border/10 p-2 rounded-lg shadow-xl backdrop-blur-md">
+                            <p className="text-[10px] font-bold uppercase text-muted-foreground">{payload[0].payload.name}</p>
+                            <p className="text-sm font-black text-primary">{payload[0].value} Orders</p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="value" 
+                    stroke="#8b5cf6" 
+                    strokeWidth={2}
+                    fillOpacity={1} 
+                    fill="url(#colorValue)" 
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+              <div className="mt-2 space-y-1">
+                {data.regionChart?.slice(0, 3).map((r: any, i: number) => (
+                  <div key={i} className="flex items-center justify-between text-[10px]">
+                    <span className="text-muted-foreground truncate w-32">{r.name}</span>
+                    <span className="font-bold">{r.value} pkts</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
       <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
