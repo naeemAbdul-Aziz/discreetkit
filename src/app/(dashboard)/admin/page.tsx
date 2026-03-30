@@ -14,7 +14,9 @@ import {
   Users,
   AlertCircle,
   TrendingUp,
+  MapPin,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Card,
   CardContent,
@@ -61,12 +63,15 @@ type DashboardData = {
     avgOrderValue: number;
     newCustomers: number;
     activeOrders: number;
+    fulfillmentVelocity: string;
   };
   recentOrders: RecentOrder[];
   revenueSeries: { date: string; amount: number }[];
   statusBreakdown?: { status: string; count: number }[];
   topPharmacies?: { name: string; revenue: number }[];
   topProducts?: { name: string; quantity: number; revenue: number }[];
+  regionChart?: { name: string; value: number }[];
+  pulseFeed?: { id: any; orderCode: string; status: string; timestamp: string; note?: string }[];
 };
 
 export default function AdminDashboardPage() {
@@ -157,12 +162,15 @@ export default function AdminDashboardPage() {
             avgOrderValue,
             newCustomers: uniqueCustomers,
             activeOrders,
+            fulfillmentVelocity: stats.metrics?.fulfillmentVelocity ?? '—',
           },
           recentOrders,
           revenueSeries,
           statusBreakdown,
           topPharmacies: stats.topPharmacies,
           topProducts: stats.topProducts,
+          regionChart: stats.regionChart,
+          pulseFeed: stats.pulseFeed,
         });
       } catch (err) {
         console.error(err);

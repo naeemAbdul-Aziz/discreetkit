@@ -4,6 +4,18 @@ import AnalyticsDashboard from "./analytics-dashboard";
 export default async function AdminAnalyticsPage() {
   const stats = await getDashboardStats();
 
+  // Flatten stats to match AnalyticsDashboard's expected flat shape
+  const flatStats = {
+    totalRevenue: stats.metrics.totalRevenue,
+    totalOrders: stats.metrics.totalOrders,
+    activePatients: stats.metrics.activePatients,
+    revenueChart: stats.revenueChart,
+    categoryChart: stats.categoryChart,
+    regionChart: stats.regionChart,
+    topProducts: stats.topProducts,
+    topPharmacies: stats.topPharmacies,
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -13,7 +25,7 @@ export default async function AdminAnalyticsPage() {
         </p>
       </div>
 
-      <AnalyticsDashboard data={stats} />
+      <AnalyticsDashboard data={flatStats} />
     </div>
   );
 }
