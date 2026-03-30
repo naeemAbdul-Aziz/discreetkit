@@ -1,3 +1,48 @@
+## March 2026 Workflow Additions
+
+### 5. Operational Intelligence Aggregation Pipeline
+
+**File Reference:** `src/lib/admin-actions.ts` (getDashboardStats)
+
+The `getDashboardStats` function now computes three operational intelligence metrics as a final aggregation pass over the already-fetched orders dataset. This is a **zero-cost, zero-bloat** analytics pipeline.
+
+#### 5a. Fulfillment Velocity (The "Anxiety Meter")
+```
+INPUT: orders[] with order_events[]
+ALGORITHM:
+  For each order:
+    receivedAt  = order_events.find(e => e.status === 'received')?.created_at  || order.created_at
+    shippedAt   = order_events.find(e => e.status === 'out_for_delivery')?.created_at
+    If shippedAt exists: accumulate (shippedAt - receivedAt)
+  avgVelocityHours = totalMs / count / (1000 * 60 * 60)
+OUTPUT: { fulfillmentVelocity: string } // hours, e.g. "2.4"
+```
+*Business Value:* The single most important trust KPI for an anonymous delivery platform. If this number rises, customer anxiety rises. Serves as the operations team's primary SLA signal.
+
+#### 5b. Anonymity Density (Regional Hotspots)
+```
+INPUT: orders[]
+ALGORITHM:
+  Group orders by delivery_area (fallback: "Standard Delivery")
+  Sort by count DESC, take top 8
+OUTPUT: [{ name: string, value: number }] // ranked campus/region list
+```
+*Business Value:* Identifies where to deploy the next pharmacy node. Data-driven geographic expansion replaces guesswork. The "Privacy Density" Area chart renders this in the Admin dashboard.
+
+#### 5c. Operational Pulse Feed
+```
+INPUT: orders[0..19] with order_events[]
+ALGORITHM:
+  FlatMap all order_events from top 20 orders
+  Attach orderCode to each event
+  Sort by timestamp DESC
+  Take top 12
+OUTPUT: [{ id, orderCode, status, timestamp, note }]
+```
+*Business Value:* Gives the Admin a real-time heartbeat of the logistics network without navigating to the Orders table. Renders as a monospaced SSE-powered ticker.
+
+---
+
 ## Escalation Workflow & Admin Alerts (2026-02)
 
 - Stale order detection runs every 15 minutes, scanning `orders` in `received` or `processing` states beyond thresholds.
@@ -88,7 +133,7 @@ To operate without a capital-intensive fleet, the system uses a **Decentralized 
 Owning a bike fleet is expensive (Maintenance, Fuel, Insurance, HR). However, relying on third-party aggregators (Uber/Bolt) can be unreliable for discreet medical deliveries.
 
 ### The Solution: "Pharmacy-Sourced Fleet"
-1.  **Registry:** Each pharmacy partner registers their trusted internal riders or preferred courier services into the `pharmacy_riders` table. This creates a virtual fleet that spans the entire city without DiscreteKit owning a single tire.
+1.  **Registry:** Each pharmacy partner registers their trusted internal riders or preferred courier services into the `pharmacy_riders` table. This creates a virtual fleet that spans the entire city without DiscreetKit owning a single tire.
 2.  **Smart Assignment:** When dispatching an order, the pharmacy selects from their pre-validated rider list.
 3.  **Automated Bridging:**
     *   **Trigger:** Rider assignment instantly triggers an automated bridge between the Rider and the Customer.

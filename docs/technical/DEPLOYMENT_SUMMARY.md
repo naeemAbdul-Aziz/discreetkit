@@ -1,4 +1,35 @@
+## March 2026 Deployment — FAANG Sprint (Dashboard Intelligence + Premium Checkout)
+
+### What Shipped
+- **Premium 2-Step Checkout (`order-form.tsx`):** Full 2-step progressive flow (Delivery → Contact & Summary) with `AnimatePresence` slide transitions, `bg-[#f5f5f1]` warm-grey inputs, `rounded-2xl` fields, and `h-14 rounded-full` CTAs. Server-side validation errors on Step 1 fields auto-revert the user to Step 1.
+- **Operational Intelligence (`admin-actions.ts → getDashboardStats`):** Three zero-bloat metrics derived from existing `orders` + `order_events` dataset: Fulfillment Velocity (avg hours received→shipped), Privacy Density (regional demand aggregation), Operational Pulse Feed (top-12 recent events).
+- **Admin Dashboard (`admin/page.tsx`):** New 3-column layout (Rankings | Rankings | Density). "Anxiety Meter" stat card, Live Operational Pulse monospace ticker, Privacy Density Area chart w/ custom tooltip.
+- **RankingList (`ranking-list.tsx`):** Relative horizontal performance bars, `TOP`/`VELOCITY` insight badges, monospace primary values. Full redesign.
+
+### Build Result
+```
+✓ Compiled successfully in 20.4s
+✓ 49 pages generated
+Exit code: 0
+```
+
+### Deployment Path
+```bash
+# Committed to backend branch
+git push origin backend
+# CI/CD auto-deploys via Vercel on merge to main
+```
+
+### Post-Deploy Checks
+- Verify Admin Dashboard loads and shows the 4 KPI cards (Revenue, Sales, Anxiety Meter, Active Now).
+- Confirm Live Pulse ticker shows events with correct timestamps and order codes.
+- Confirm Privacy Density chart renders with the Area graph and top-3 legend rows.
+- Walk through 2-step checkout: Delivery → Continue → Contact & Summary → Payment redirect.
+
+---
+
 ## Cron Jobs Update (2026-02-01)
+
 
 ### Endpoints & Workflows
 
