@@ -26,15 +26,15 @@ This repository contains the source code for the DiscreetKit Ghana web applicati
 
 *   **100% Anonymous Ordering:** No user accounts, names, or stored personal data.
 *   **Private & Discreet Delivery:** All products are delivered in plain, unbranded packaging.
+*   **Premium 2-Step Checkout:** A frictionless, progressive disclosure flow with real-time validation and Step 1 persistence.
 *   **Student Discount Program:** Automatic discounts for students when a valid campus location is selected.
+*   **Operational Hub (FAANG-Level):** Real-time admin/pharmacy metrics including Fulfillment Velocity ("Anxiety Meter") and Privacy Density analytics.
 *   **Secure Payments:** Integrated with Paystack for reliable and secure mobile money and card payments.
 *   **AI-Powered Assistant:** An integrated chatbot ("Pacely") powered by Google's Gemini, featuring a minimal Everlywell-style aesthetic for an elevated, clean user experience.
-*   **Real-Time Order Tracking:** Users can track their order status with a unique, anonymous code.
+*   **Real-Time Order Tracking:** Users can track their order status with a unique, anonymous code via a sleek, native-feel success portal.
 *   **Smart Pharmacy Management:** Real-time inventory tracking, auto-dispatch, and reservation system.
-*   **Next.js 15 Native SEO Validation:** Built-in dynamic `sitemap.ts`, `robots.ts`, and advanced JSON-LD structured data generation for immediate indexing visibility.
-*   **Optimized E-Commerce Navigation:** A frictionless, Apple-style sticky header directing active workflows (Bundles, Test Kits, Refills) without dead ends.
+*   **Next.js 15 Native SEO:** Built-in dynamic `sitemap.ts`, `robots.ts`, and advanced JSON-LD structured data generation.
 *   **Supabase Backend:** Utilizes Supabase for database management and real-time updates.
-*   **Built with Next.js & ShadCN UI:** A modern, performant, and responsive interface optimized perfectly for `100dvh` mobile viewports.
 
 ## 🚀 Getting Started
 
@@ -111,7 +111,7 @@ The application will now be accessible via your ngrok URL, and Paystack will be 
 
 ## 🛠 Tech Stack
 
-*   **Framework:** [Next.js 16.0.7](https://nextjs.org/) (App Router)
+*   **Framework:** [Next.js 15.1.4](https://nextjs.org/) (App Router)
 *   **UI:** [React](https://reactjs.org/), [Tailwind CSS](https://tailwindcss.com/), [ShadCN UI](https://ui.shadcn.com/)
 *   **Generative AI:** [Firebase Genkit](https://firebase.google.com/docs/genkit) with [Google's Gemini models](https://ai.google.dev/)
 *   **Backend & Database:** [Supabase](https://supabase.io/)
@@ -229,7 +229,7 @@ For deep technical details, see [src/lib/whatsapp/README.md](src/lib/whatsapp/RE
 
 ## 🛠 Tech Stack
 
-*   **Framework:** [Next.js](https://nextjs.org/) (App Router)
+*   **Framework:** [Next.js 15.1.4](https://nextjs.org/) (App Router)
 *   **UI:** [React](https://reactjs.org/), [Tailwind CSS](https://tailwindcss.com/), [ShadCN UI](https://ui.shadcn.com/)
 *   **Generative AI:** [Firebase Genkit](https://firebase.google.com/docs/genkit) with [Google's Gemini models](https://ai.google.dev/)
 *   **Backend & Database:** [Supabase](https://supabase.io/)

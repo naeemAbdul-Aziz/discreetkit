@@ -1,6 +1,6 @@
 # DiscreetKit System Design
 
-**Last Updated: March 30, 2026**
+**Last Updated: March 31, 2026**
 
 This document outlines the architecture and system design of the DiscreetKit application. It details the core components and how they interact to provide a secure, anonymous, and efficient service.
 
@@ -28,19 +28,28 @@ This document outlines the architecture and system design of the DiscreetKit app
 
 **Implemented in:** `src/app/order/(components)/order-form.tsx`
 
-The checkout flow is redesigned as a **2-Step Progressive Disclosure** pattern:
+The checkout flow is a **2-Step Progressive Disclosure** pattern designed for frictionless mobile conversion:
 
 | Step | Content | Notes |
 |:---|:---|:---|
 | **Step 1 — Delivery** | Region, Pickup Point, Drop-off Notes, GPS auto-detect | `AnimatePresence` slide-out |
-| **Step 2 — Contact & Summary** | Email, Masked Phone, Order Summary, Paystack CTA | Server error reverts to Step 1 |
+| **Step 2 — Contact & Summary** | Email, Masked Phone, Order Summary, Paystack CTA | Persistence via hidden buffers |
 
-**Design System:**
-- Inputs: `h-12 rounded-2xl bg-[#f5f5f1] border-0` (warm-grey, no border)
-- Labels: `text-[10px] font-bold uppercase tracking-[0.2em]`
-- Card: `rounded-[2.5rem] shadow-xl border-0`
-- CTAs: `h-14 rounded-full font-bold`
-- Hidden form fields maintain compatibility with `createOrderAction` across both steps.
+**Design System Consistency:**
+- **Inputs**: `h-12 rounded-2xl bg-[#f5f5f1] border-0` (Warm Paper White, no border)
+- **Labels**: `text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80`
+- **Cards**: `rounded-[2rem] shadow-lg border-0` (Unified with Cart and Success views)
+- **CTAs**: `h-14 rounded-full font-bold shadow-md`
+
+### 3.14. Premium Order Success Portal (NEW)
+
+**Implemented in:** `src/app/order/success/page.tsx` & `layout.tsx`
+
+The final touchpoint uses a "Quiet Confidence" aesthetic to reinforce trust:
+
+- **Palette**: Replaces standard "Success Green" with the primary **Teal (#0d9488)** and **Warm Off-white (#f5f5f1)**.
+- **Architecture**: Separates order codes (Tracking/Partner) from "Next Steps" status updates using the same `rounded-[2rem]` card pattern.
+- **SEO**: Dedicated `layout.tsx` enforces `noindex` for user privacy while providing clean `title` metadata.
 
 ---
 
