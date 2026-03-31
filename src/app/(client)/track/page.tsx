@@ -299,18 +299,11 @@ function Tracker() {
         </div>
       )}
 
-      {isPending && !trackingData && (
-        <div className="py-12 flex flex-col items-center justify-center text-muted-foreground animate-pulse">
-          <BrandSpinner size="lg" />
-          <p className="mt-4 text-sm font-medium">Searching our records...</p>
-        </div>
-      )}
-
       {/* Render Order Tracking */}
-      {order && <OrderTrackingView order={order} />}
+      {trackingData?.type === "order" && <OrderTrackingView order={trackingData.data as Order} />}
 
       {/* Render Subscription Tracking */}
-      {subscription && <SubscriptionTrackingView subscription={subscription} />}
+      {trackingData?.type === "subscription" && <SubscriptionTrackingView subscription={trackingData.data} />}
     </div>
   );
 }
