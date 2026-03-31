@@ -43,11 +43,11 @@ function SuggestionForm() {
   if (state.success) {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-center gap-2 text-primary text-sm font-medium mt-6"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="flex items-center justify-center gap-2 text-brand-indigo text-sm font-semibold mt-6 bg-brand-indigo/5 py-3 px-6 rounded-full"
       >
-        <CheckIcon className="h-4 w-4" />
+        <CheckIcon className="h-5 w-5" />
         <span>Noted. We'll look into it.</span>
       </motion.div>
     );
@@ -55,22 +55,22 @@ function SuggestionForm() {
 
   return (
     <form action={formAction} className="mt-8 relative w-full max-w-sm mx-auto">
-      <div className="relative w-full">
+      <div className="relative w-full shadow-sm hover:shadow-md transition-shadow duration-300 rounded-[2rem]">
         <input
           name="suggestion"
-          placeholder="I'm looking forward to buying [Product]..."
-          className="h-12 w-full border-b border-border bg-transparent px-4 py-2 pr-12 text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none focus:ring-0"
+          placeholder="I'm looking forward to buying..."
+          className="h-14 w-full bg-[#f5f5f1] border border-black/5 rounded-[2rem] pl-6 pr-14 text-sm font-semibold text-foreground placeholder:text-muted-foreground/50 placeholder:font-medium focus:border-brand-indigo focus:ring-1 focus:ring-brand-indigo/20 focus:outline-none transition-all"
           required
         />
         <button
           type="submit"
-          className="absolute right-2 top-1/2 -translate-y-1/2 p-2 h-10 w-10 flex items-center justify-center text-muted-foreground hover:text-primary transition-colors hover:bg-transparent"
+          className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 flex items-center justify-center text-white bg-brand-indigo rounded-full hover:bg-brand-indigo/90 transition-all hover:scale-105 active:scale-[0.98] shadow"
         >
           <ArrowRight className="h-4 w-4" />
         </button>
       </div>
       {state.message && !state.success && (
-        <p className="text-xs text-red-500 mt-2">{state.message}</p>
+        <p className="text-[10px] uppercase font-bold tracking-wider text-red-500 mt-3 text-center">{state.message}</p>
       )}
     </form>
   );
