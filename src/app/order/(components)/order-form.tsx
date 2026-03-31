@@ -237,6 +237,10 @@ export function OrderForm() {
   const [isMounted, setIsMounted] = useState(false);
   const [step, setStep] = useState(1);
   const [showNotes, setShowNotes] = useState(false);
+  
+  // Persistence state for unmounted Step 1 inputs
+  const [otherDeliveryArea, setOtherDeliveryArea] = useState("");
+  const [deliveryAddressNote, setDeliveryAddressNote] = useState("");
 
   // Geolocation State
   const [locationLoading, setLocationLoading] = useState(false);
@@ -389,9 +393,16 @@ export function OrderForm() {
     if (value === "Other") {
       setShowOther(true);
       setDeliveryLocation(null);
+      setOtherDeliveryArea(""); // Reset on "Other" to avoid ghost campus meeting points
     } else {
       setShowOther(false);
       setDeliveryLocation(value);
+      
+      // Auto-select first meeting point if available
+      const loc = discounts.find(d => d.campus === value);
+      if (loc && loc.meetingPoints && loc.meetingPoints.length > 0) {
+        setOtherDeliveryArea(loc.meetingPoints[0]);
+      }
     }
   };
 
@@ -428,6 +439,11 @@ export function OrderForm() {
           <input type="hidden" name="studentDiscount" value={studentDiscount} />
           <input type="hidden" name="deliveryFee" value={deliveryFee} />
           <input type="hidden" name="totalPrice" value={totalPrice} />
+          
+          {/* Persisted Step 1 Data (Hidden when unmounted during Step 2) */}
+          <input type="hidden" name="deliveryArea" value={deliveryLocation || "Other"} />
+          <input type="hidden" name="otherDeliveryArea" value={otherDeliveryArea} />
+          <input type="hidden" name="deliveryAddressNote" value={deliveryAddressNote} />
 
           <AnimatePresence mode="wait">
             {step === 1 ? (
@@ -473,38 +489,42 @@ export function OrderForm() {
                     <FieldError message={state.errors?.deliveryArea?.[0]} />
                   </div>
 
-                  {showOther ? (
-                    <LabelledInput
-                      id="otherDeliveryArea"
-                      name="otherDeliveryArea"
-                      label="Exact Address"
-                      placeholder="e.g. Accra Mall, Spintex Road"
-                      className={cn(state.errors?.otherDeliveryArea && "ring-1 ring-destructive")}
-                    />
-                  ) : (
-                    <div className="space-y-1.5 w-full">
-                      <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 ml-1">
-                        Pickup Point
-                      </Label>
-                      <Select name="otherDeliveryArea">
-                        <SelectTrigger
-                          className={cn(
-                            "h-12 rounded-2xl border-0 bg-[#f5f5f1] px-5 text-sm",
-                            state.errors?.otherDeliveryArea && "border border-destructive",
-                          )}
+                    {showOther ? (
+                      <LabelledInput
+                        id="otherDeliveryArea_visible"
+                        label="Exact Address"
+                        placeholder="e.g. Accra Mall, Spintex Road"
+                        value={otherDeliveryArea}
+                        onChange={(e) => setOtherDeliveryArea(e.target.value)}
+                        className={cn(state.errors?.otherDeliveryArea && "ring-1 ring-destructive")}
+                      />
+                    ) : (
+                      <div className="space-y-1.5 w-full">
+                        <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 ml-1">
+                          Pickup Point
+                        </Label>
+                        <Select 
+                          value={otherDeliveryArea}
+                          onValueChange={setOtherDeliveryArea}
                         >
-                          <SelectValue placeholder="Select specific point" />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-2xl">
-                          {discounts.find((d) => d.campus === deliveryLocation)?.meetingPoints?.map((p) => (
-                            <SelectItem key={p} value={p}>{p}</SelectItem>
-                          ))}
-                          <SelectItem value="Other">Other (Specify below)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FieldError message={state.errors?.otherDeliveryArea?.[0]} />
-                    </div>
-                  )}
+                          <SelectTrigger
+                            className={cn(
+                              "h-12 rounded-2xl border-0 bg-[#f5f5f1] px-5 text-sm",
+                              state.errors?.otherDeliveryArea && "border border-destructive",
+                            )}
+                          >
+                            <SelectValue placeholder="Select specific point" />
+                          </SelectTrigger>
+                          <SelectContent className="rounded-2xl">
+                            {discounts.find((d) => d.campus === deliveryLocation)?.meetingPoints?.map((p) => (
+                              <SelectItem key={p} value={p}>{p}</SelectItem>
+                            ))}
+                            <SelectItem value="Other">Other (Specify below)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FieldError message={state.errors?.otherDeliveryArea?.[0]} />
+                      </div>
+                    )}
 
                   <div className="space-y-2">
                     <Button
@@ -518,10 +538,11 @@ export function OrderForm() {
                     {showNotes && (
                       <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}>
                         <LabelledInput
-                          id="deliveryAddressNote"
-                          name="deliveryAddressNote"
+                          id="deliveryAddressNote_visible"
                           label="Drop-off Notes"
                           placeholder="e.g. Call upon arrival..."
+                          value={deliveryAddressNote}
+                          onChange={(e) => setDeliveryAddressNote(e.target.value)}
                         />
                       </motion.div>
                     )}
