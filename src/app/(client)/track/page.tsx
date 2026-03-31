@@ -37,6 +37,7 @@ import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { getSupabaseClient } from "@/lib/supabase";
 import Image from "next/image";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -163,8 +164,6 @@ function Tracker() {
 
     startTransition(async () => {
       const trimmedCode = code.trim().toUpperCase();
-
-      // Detect code type: subscription codes start with "DK-SUB-"
       const isSubscription = trimmedCode.startsWith("DK-SUB-");
 
       if (isSubscription) {
@@ -190,7 +189,7 @@ function Tracker() {
       handleSearch();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [searchParams]);
 
   // Set up Supabase real-time subscription
   useEffect(() => {
@@ -210,10 +209,10 @@ function Tracker() {
             table: "orders",
             filter: `id=eq.${trackingData.data.id}`,
           },
-          (payload: any) => {
+          () => {
             // When an update is received, re-fetch the order data to get events
             startTransition(async () => {
-              const result = await getOrderAction(trackingData.data.code);
+              const result = await getOrderAction((trackingData.data as Order).code);
               if (result) {
                 setTrackingData({ type: "order", data: result });
               }
@@ -228,165 +227,194 @@ function Tracker() {
     }
   }, [trackingData]);
 
-  const order = trackingData?.type === "order" ? trackingData.data : null;
-  const subscription =
-    trackingData?.type === "subscription" ? trackingData.data : null;
-
-  const currentStatusIndex = order ? allStatuses.indexOf(order.status) : -1;
-
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-8 px-4 sm:px-6 lg:px-8">
-      {/* Search Card */}
-      <Card className="rounded-3xl border-muted shadow-sm overflow-hidden">
-        <CardHeader className="bg-muted/40 pb-8">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <CardTitle className="text-2xl font-bold">
-                Track Your Order
-              </CardTitle>
-              <CardDescription className="mt-1">
-                Your privacy matters. We're delivering with care and discretion.
-              </CardDescription>
-            </div>
-            <form
-              onSubmit={handleSearch}
-              className="flex w-full max-w-sm items-center gap-2"
-            >
-              <Input
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                placeholder="Enter Tracking Code (e.g., A9K...)"
-                className="bg-background shadow-sm"
-                disabled={isPending}
-                aria-label="Tracking Code"
-              />
-              <Button type="submit" disabled={isPending || !code}>
-                {isPending ? <BrandSpinner size="sm" /> : <>Track</>}
-              </Button>
-            </form>
+    <div className={cn(
+      "w-full transition-all duration-700 ease-out",
+      trackingData ? "max-w-7xl" : "max-w-lg mt-[10dvh]"
+    )}>
+      {/* Search Hub */}
+      <div className={cn(
+        "text-center mb-10 transition-all duration-500",
+        trackingData ? "text-left mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6" : ""
+      )}>
+        <div>
+          <h1 className={cn(
+            "font-black tracking-tighter mb-2",
+            trackingData ? "text-3xl" : "text-4xl px-4"
+          )}>
+            {trackingData ? "Order Status" : "Where is your order?"}
+          </h1>
+          <p className="text-muted-foreground font-medium px-4">
+            Private, discreet delivery tracking.
+          </p>
+        </div>
+
+        <form
+          onSubmit={handleSearch}
+          className={cn(
+            "flex items-center gap-2 p-2 mt-8 transition-all duration-300",
+            trackingData 
+              ? "max-w-sm w-full bg-white rounded-full shadow-sm border border-border/40" 
+              : "mx-4 bg-white rounded-[2rem] shadow-xl p-4 md:p-6"
+          )}
+        >
+          <div className="relative flex-1">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
+            <input
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder="Enter Code (e.g. A9K...)"
+              className="w-full h-12 pl-11 pr-4 bg-[#f5f5f1] border-0 rounded-full text-sm font-bold tracking-wide placeholder:font-medium focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+              disabled={isPending}
+            />
           </div>
-        </CardHeader>
-      </Card>
+          <Button 
+            type="submit" 
+            disabled={isPending || !code}
+            className="h-12 px-8 rounded-full font-bold shadow-md transition-all active:scale-95"
+          >
+            {isPending ? <BrandSpinner size="sm" /> : "Track"}
+          </Button>
+        </form>
+      </div>
 
       {error && (
-        <Alert variant="destructive" className="rounded-2xl">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Not Found</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
+        <div className="mx-4 mb-8">
+          <Alert variant="destructive" className="rounded-3xl border-0 shadow-lg bg-red-50 text-red-900">
+            <AlertCircle className="h-5 w-5 text-red-600" />
+            <AlertTitle className="font-bold">Not Found</AlertTitle>
+            <AlertDescription className="font-medium opacity-80">{error}</AlertDescription>
+          </Alert>
+        </div>
       )}
 
       {isPending && !trackingData && (
-        <div className="py-12 flex flex-col items-center justify-center text-muted-foreground animate-pulse">
-          <BrandSpinner size="lg" />
-          <p className="mt-4 text-sm font-medium">Searching our records...</p>
+        <div className="py-20 flex flex-col items-center justify-center text-muted-foreground">
+          <div className="relative mb-6">
+            <div className="h-16 w-16 rounded-full border-4 border-primary/10 border-t-primary animate-spin" />
+            <Search className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-6 w-6 text-primary" />
+          </div>
+          <p className="font-bold tracking-tight text-lg">Searching our records...</p>
+          <p className="text-sm opacity-60">Ensuring privacy and discretion</p>
         </div>
       )}
 
       {/* Render Order Tracking */}
-      {order && <OrderTrackingView order={order} />}
+      {trackingData?.type === "order" && <OrderTrackingView order={trackingData.data as Order} />}
 
       {/* Render Subscription Tracking */}
-      {subscription && <SubscriptionTrackingView subscription={subscription} />}
+      {trackingData?.type === "subscription" && <SubscriptionTrackingView subscription={trackingData.data} />}
     </div>
   );
 }
 
-// Order Tracking Component (existing UI)
 function OrderTrackingView({ order }: { order: Order }) {
-  const allStatuses: OrderStatus[] = [
-    "received",
-    "processing",
-    "out_for_delivery",
-    "completed",
-  ];
-  const currentStatusIndex = allStatuses.indexOf(order.status);
+  const latestEvent = [...order.events].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+  const currentStatus = statusMap[order.status] || statusMap['received'];
 
   return (
-    <div className="grid gap-8 lg:grid-cols-12">
-      {/* LEFT COLUMN: Status & Items (Span 8) */}
+    <div className="grid gap-8 lg:grid-cols-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+      
+      {/* 1. Status Hero (Full Width) */}
+      <div className="lg:col-span-12">
+        <div className="bg-white rounded-[2rem] shadow-lg border-0 p-8 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
+          {/* Animated Background Pulse */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-32 -mt-32 blur-3xl" />
+          
+          <div className="relative">
+            <div className="h-24 w-24 rounded-full bg-primary/5 flex items-center justify-center relative z-10">
+              <div className="h-16 w-16 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+                {React.createElement(currentStatus.icon, { className: "h-8 w-8 text-white stroke-[2.5px]" })}
+              </div>
+            </div>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-primary/5 rounded-full animate-pulse -z-0" />
+          </div>
+
+          <div className="flex-1 text-center md:text-left z-10">
+            <div className="flex flex-col md:flex-row md:items-baseline gap-2 mb-2">
+              <h2 className="text-3xl font-black tracking-tight">{currentStatus.label}</h2>
+              <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-0 rounded-full px-4 py-1 text-xs font-bold uppercase tracking-widest whitespace-nowrap">
+                Real-Time Update
+              </Badge>
+            </div>
+            <p className="text-muted-foreground font-medium text-lg leading-relaxed max-w-xl">
+              {currentStatus.description}
+            </p>
+          </div>
+          
+          <div className="hidden lg:block h-20 w-[1px] bg-border/40 mx-8" />
+          
+          <div className="text-center md:text-left">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60 mb-1">
+              Estimated Arrival
+            </p>
+            <p className="text-xl font-black tracking-tight">Today, by 6:00 PM</p>
+          </div>
+        </div>
+      </div>
+
+      {/* LEFT COLUMN: History & Details (Span 8) */}
       <div className="lg:col-span-8 space-y-8">
-        {/* 2. Vertical Timeline (The Hero) */}
-        <Card className="rounded-3xl border-muted shadow-sm overflow-hidden">
-          <CardHeader className="bg-muted/30 pb-6">
-            <CardTitle className="flex items-center gap-2 text-xl">
-              <ClipboardList className="h-5 w-5 text-primary" /> Tracking
-              History
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-8 pl-6">
-            <div className="relative border-l-2 border-primary/10 ml-3 space-y-12 pb-4">
+        {/* Tracking History */}
+        <div className="bg-white rounded-[2rem] shadow-lg border-0 overflow-hidden">
+          <div className="p-8 border-b border-[#f5f5f1]">
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 flex items-center gap-2">
+              <ClipboardList className="h-3 w-3" /> Tracking Timeline
+            </h3>
+          </div>
+          
+          <div className="p-8">
+            <div className="relative border-l-2 border-[#f5f5f1] ml-4 space-y-12 pb-4">
               {[...order.events]
-                .sort(
-                  (a, b) =>
-                    new Date(b.date).getTime() - new Date(a.date).getTime(),
-                ) // Newest first
-                .filter((event, index, self) => {
-                  // Deduplicate: Keep only the ONE latest occurrence of each status
-                  // We ignore usage of 'date' in the key to merge 'Payment Confirmed' duplicates
+                .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                .filter((event, i, self) => {
                   const key = event.status.toLowerCase().trim();
-                  return (
-                    index ===
-                    self.findIndex((e) => e.status.toLowerCase().trim() === key)
-                  );
+                  return i === self.findIndex((e) => e.status.toLowerCase().trim() === key);
                 })
                 .map((event, index) => {
                   const isLatest = index === 0;
                   const friendlyNote = getFriendlyNote(event.note);
 
                   return (
-                    <div
-                      key={`${event.status}-${event.date}-${index}`}
-                      className="relative pl-8 group"
-                    >
+                    <div key={index} className="relative pl-10 group">
                       {/* Dot */}
-                      <div
-                        className={cn(
-                          "absolute -left-[9px] top-1 h-4 w-4 rounded-full border-4 border-background transition-all duration-500",
-                          isLatest
-                            ? "bg-primary ring-4 ring-primary/10 shadow-lg scale-110"
-                            : "bg-muted-foreground/20 group-hover:bg-muted-foreground/40",
-                        )}
-                      />
+                      <div className={cn(
+                        "absolute -left-[11px] top-1.5 h-5 w-5 rounded-full border-4 border-white shadow-sm transition-all duration-500",
+                        isLatest ? "bg-primary scale-125 ring-8 ring-primary/5" : "bg-[#f5f5f1]"
+                      )} />
 
-                      <div
-                        className={cn(
-                          "flex flex-col gap-1 transition-all duration-500",
-                          !isLatest && "opacity-70 group-hover:opacity-100",
-                        )}
-                      >
-                        <h4
-                          className={cn(
-                            "font-bold text-lg tracking-tight",
-                            isLatest ? "text-primary" : "text-foreground",
-                          )}
-                        >
-                          {getFriendlyEventTitle(event.status)}
-                        </h4>
-
-                        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-1">
-                          {new Date(event.date).toLocaleDateString(undefined, {
-                            weekday: "short",
-                            month: "short",
-                            day: "numeric",
-                          })}{" "}
-                          at{" "}
-                          {new Date(event.date).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
+                      <div className={cn(
+                        "transition-all duration-500",
+                        !isLatest && "opacity-50 group-hover:opacity-100"
+                      )}>
+                        <div className="flex justify-between items-start gap-4 mb-2">
+                          <h4 className={cn(
+                            "font-black tracking-tight text-xl leading-none",
+                            isLatest ? "text-foreground" : "text-muted-foreground"
+                          )}>
+                            {getFriendlyEventTitle(event.status)}
+                          </h4>
+                          <time className="text-[11px] font-bold text-muted-foreground/60 uppercase tracking-wider whitespace-nowrap mt-1">
+                            {new Date(event.date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                          </time>
+                        </div>
+                        
+                        <p className="text-[13px] font-bold text-muted-foreground/80 mb-3">
+                          {new Date(event.date).toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" })}
                         </p>
 
-                        {/* Reassurance Message */}
                         {getReassuranceMessage(event.status) && (
-                          <div className="mt-2 text-sm text-foreground/90 bg-primary/5 p-3 rounded-r-xl rounded-bl-xl border border-primary/10 max-w-md">
+                          <div className={cn(
+                            "text-sm font-medium p-4 rounded-2xl border-0 max-w-lg",
+                            isLatest ? "bg-primary/5 text-primary/80" : "bg-[#f5f5f1] text-muted-foreground"
+                          )}>
                             {getReassuranceMessage(event.status)}
                           </div>
                         )}
 
                         {friendlyNote && (
-                          <div className="mt-2 text-sm text-muted-foreground bg-muted/30 p-3 rounded-r-xl rounded-bl-xl border border-muted/50 max-w-md">
-                            {friendlyNote}
+                          <div className="mt-2 text-sm text-muted-foreground/80 bg-[#f5f5f1]/50 p-3 rounded-xl italic max-w-lg">
+                            "{friendlyNote}"
                           </div>
                         )}
                       </div>
@@ -394,178 +422,133 @@ function OrderTrackingView({ order }: { order: Order }) {
                   );
                 })}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        {/* 2. Order Items */}
-        <Card className="rounded-3xl border-muted shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-lg">Items Ordered</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        {/* Order Items */}
+        <div className="bg-white rounded-[2rem] shadow-lg border-0 overflow-hidden">
+          <div className="p-8 border-b border-[#f5f5f1]">
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80">
+              Package Contents
+            </h3>
+          </div>
+          <div className="p-8 space-y-6">
             {order.items.map((item, i) => (
-              <div key={item.id + i} className="flex gap-3 items-start">
-                {/* Image */}
-                <div className="relative h-12 w-12 flex-shrink-0 rounded-lg bg-muted border overflow-hidden">
+              <div key={i} className="flex gap-6 items-center">
+                <div className="h-20 w-20 rounded-2xl bg-[#f5f5f1] flex items-center justify-center p-2 group relative">
                   {item.image_url ? (
-                    <Image
-                      src={item.image_url}
-                      alt={item.name}
-                      fill
-                      className="object-contain p-1"
-                    />
+                    <Image src={item.image_url} alt={item.name} fill className="object-contain p-3 transition-transform group-hover:scale-110" />
                   ) : (
-                    <Package className="h-full w-full p-3 text-muted-foreground/30" />
+                    <Package className="h-8 w-8 text-muted-foreground/20" />
                   )}
                 </div>
-
-                {/* Details */}
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm text-foreground leading-snug line-clamp-2">
-                    {item.name}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Qty: {item.quantity}
-                  </p>
+                <div className="flex-1">
+                  <p className="font-black tracking-tight text-lg leading-tight mb-1">{item.name}</p>
+                  <p className="text-sm font-bold text-muted-foreground/60">Quantity: {item.quantity}</p>
                 </div>
-
-                {/* Price */}
                 <div className="text-right">
-                  <p className="font-semibold text-sm whitespace-nowrap">
-                    <span className="text-[10px] text-muted-foreground font-normal mr-1">
-                      GHS
-                    </span>
-                    {item.price_ghs.toFixed(2)}
-                  </p>
+                  <p className="font-black tracking-tight text-xl">GHS {item.price_ghs.toFixed(2)}</p>
                 </div>
               </div>
             ))}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
-      {/* RIGHT COLUMN: Summary & History (Span 4) */}
+      {/* RIGHT COLUMN: Summary & Delivery (Span 4) */}
       <div className="lg:col-span-4 space-y-8">
-        {/* 3. Summary & Payment */}
-        <Card className="rounded-3xl border-muted shadow-sm bg-muted/20">
-          <CardHeader>
-            <CardTitle className="text-lg">Payment Summary</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm">
-            <div className="flex justify-between text-muted-foreground">
+        {/* Payment Summary */}
+        <div className="bg-[#f5f5f1] rounded-[2rem] shadow-sm p-8">
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 mb-6">
+            Order Total
+          </h3>
+          <div className="space-y-4 text-sm font-bold">
+            <div className="flex justify-between text-muted-foreground/60">
               <span>Subtotal</span>
               <span>GHS {order.subtotal.toFixed(2)}</span>
             </div>
             {order.studentDiscount > 0 && (
-              <div className="flex justify-between text-success font-medium">
+              <div className="flex justify-between text-primary">
                 <span>Student Discount</span>
                 <span>- GHS {order.studentDiscount.toFixed(2)}</span>
               </div>
             )}
-            <div className="flex justify-between text-muted-foreground">
+            <div className="flex justify-between text-muted-foreground/60">
               <span>Delivery Fee</span>
-              <span>
-                {order.deliveryFee === 0
-                  ? "Free"
-                  : `GHS ${order.deliveryFee.toFixed(2)}`}
-              </span>
+              <span>{order.deliveryFee === 0 ? "FREE" : `GHS ${order.deliveryFee.toFixed(2)}`}</span>
             </div>
-            <Separator className="my-2" />
-            <div className="flex justify-between items-baseline">
-              <span className="font-bold text-lg">Total</span>
-              <span className="font-bold text-lg">
-                GHS {order.totalPrice.toFixed(2)}
-              </span>
+            <div className="h-[1px] w-full bg-border/20 my-2" />
+            <div className="flex justify-between items-baseline pt-2">
+              <span className="text-muted-foreground uppercase text-[10px] tracking-widest">Total</span>
+              <span className="text-3xl font-black tracking-tighter">GHS {order.totalPrice.toFixed(2)}</span>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        {/* 4. Delivery Details */}
-        <Card className="rounded-3xl border-muted shadow-sm">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-primary" /> Delivery Details
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-sm space-y-3">
+        {/* Delivery Details */}
+        <div className="bg-white rounded-[2rem] shadow-lg p-8">
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 mb-6 flex items-center gap-2">
+            <MapPin className="h-3 w-3" /> Destination
+          </h3>
+          <div className="space-y-6">
             <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
-                Location
-              </p>
-              <p className="font-medium">{order.deliveryArea}</p>
+              <p className="font-black tracking-tight text-xl leading-tight mb-1">{order.deliveryArea}</p>
+              <p className="text-sm font-medium text-muted-foreground">Main Delivery Area</p>
             </div>
             {order.deliveryAddressNote && (
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
-                  Note
-                </p>
-                <p className="italic text-muted-foreground">
-                  "{order.deliveryAddressNote}"
-                </p>
+              <div className="bg-[#f5f5f1] p-4 rounded-2xl italic text-sm text-muted-foreground font-medium">
+                "{order.deliveryAddressNote}"
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        {/* 5. Helpful Links (Replaced old timeline) */}
-        <Card className="rounded-3xl border-muted shadow-sm overflow-hidden bg-primary text-primary-foreground">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
-                <MessageSquare className="h-5 w-5 text-white" />
+        {/* Support CTA */}
+        <Link href="https://wa.me/DISCREETKIT" target="_blank" className="block">
+          <div className="bg-primary hover:bg-primary/95 text-white rounded-[2rem] p-8 shadow-lg shadow-primary/20 transition-all active:scale-[0.98] group">
+            <div className="flex items-center gap-6">
+              <div className="h-14 w-14 rounded-full bg-white/10 flex items-center justify-center transition-transform group-hover:rotate-12">
+                <MessageSquare className="h-7 w-7 text-white" />
               </div>
               <div>
-                <h4 className="font-bold text-lg">Need Help?</h4>
-                <p className="text-sm text-white/80">
-                  Support is available 24/7 on WhatsApp.
-                </p>
+                <h4 className="font-black tracking-tight text-xl">Need Help?</h4>
+                <p className="text-white/60 font-medium text-sm leading-snug">Tap to chat with us <br/>on WhatsApp 24/7.</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
-
+          </div>
+        </Link>
         {/* 6. Dispatch Info (New) */}
         {order.courierName && (
-          <Card className="rounded-3xl border-primary/20 shadow-sm bg-primary/5">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2 text-primary">
-                <Truck className="h-4 w-4" /> Dispatch Rider
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm space-y-3">
+          <div className="bg-primary/5 rounded-[2rem] shadow-sm border border-primary/10 p-8">
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/80 mb-6 flex items-center gap-2">
+              <Truck className="h-3 w-3" /> Dispatch Rider
+            </h3>
+            <div className="space-y-6">
               <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
-                  Rider Name
+                <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1 text-primary">Rider Name</p>
+                <p className="font-black tracking-tight text-xl leading-tight text-primary">
+                  {order.courierName}
                 </p>
-                <p className="font-medium text-lg">{order.courierName}</p>
               </div>
               {order.courierPhone && (
                 <div>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
-                    Contact
+                  <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1 text-primary">Contact</p>
+                  <p className="font-mono font-bold tracking-widest text-lg text-primary">
+                    {order.courierPhone}
                   </p>
-                  <p className="font-medium font-mono">{order.courierPhone}</p>
                 </div>
               )}
               {order.courierTrackingUrl && (
-                <div className="pt-2">
-                  <a
-                    href={order.courierTrackingUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full gap-2"
-                    >
-                      <MapPin className="h-3 w-3" /> Track Live Location
+                <div className="pt-4">
+                  <a href={order.courierTrackingUrl} target="_blank" rel="noopener noreferrer">
+                    <Button variant="outline" className="w-full h-12 rounded-xl font-bold bg-white gap-2 text-primary hover:bg-primary/5 border-primary/20 shadow-sm">
+                      <MapPin className="h-4 w-4" /> Track Live Location
                     </Button>
                   </a>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
       </div>
     </div>
@@ -583,7 +566,7 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
       case "cancelled":
         return "bg-red-100 text-red-700 border-red-200";
       default:
-        return "bg-gray-100 text-gray-700 border-gray-200";
+        return "bg-[#f5f5f1] text-muted-foreground border-border/20";
     }
   };
 
@@ -595,249 +578,233 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
     : null;
 
   return (
-    <div className="grid gap-8 lg:grid-cols-12">
+    <div className="grid gap-8 lg:grid-cols-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
       {/* LEFT COLUMN: Status & Details */}
       <div className="lg:col-span-8 space-y-8">
         {/* Subscription Status Card */}
-        <Card className="rounded-3xl border-muted shadow-sm overflow-hidden">
-          <CardHeader className="bg-muted/30 pb-6">
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-xl">
-                <Pill className="h-5 w-5 text-primary" /> Subscription Status
-              </CardTitle>
-              <Badge
-                className={cn(
-                  "text-sm px-3 py-1",
-                  getStatusColor(subscription.status),
-                )}
-              >
-                {subscription.status.charAt(0).toUpperCase() +
-                  subscription.status.slice(1)}
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-6 space-y-4">
-            <div className="flex items-start gap-4">
-              <div className="relative h-20 w-20 flex-shrink-0 rounded-lg bg-muted border overflow-hidden">
+        <div className="bg-white rounded-[2rem] shadow-lg border-0 overflow-hidden">
+          <div className="p-8 border-b border-[#f5f5f1] flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 flex items-center gap-2">
+              <Pill className="h-3 w-3" /> Subscription Status
+            </h3>
+            <Badge
+              className={cn(
+                "text-xs px-4 py-1.5 font-bold uppercase tracking-widest rounded-full border-0",
+                getStatusColor(subscription.status),
+              )}
+            >
+              {subscription.status}
+            </Badge>
+          </div>
+          <div className="p-8 space-y-8">
+            <div className="flex items-center gap-6">
+              <div className="h-24 w-24 rounded-[2rem] bg-[#f5f5f1] flex items-center justify-center p-3 relative group">
                 {subscription.product?.image_url ? (
                   <Image
                     src={subscription.product.image_url}
                     alt={subscription.product.name}
                     fill
-                    className="object-contain p-2"
+                    className="object-contain p-4 transition-transform group-hover:scale-110"
                   />
                 ) : (
-                  <Pill className="h-full w-full p-4 text-muted-foreground/30" />
+                  <Pill className="h-10 w-10 text-muted-foreground/20" />
                 )}
               </div>
               <div className="flex-1">
-                <h3 className="font-bold text-lg">
+                <h3 className="font-black tracking-tight text-2xl mb-1 mt-2">
                   {subscription.product?.name || "Medication"}
                 </h3>
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="font-bold text-muted-foreground/80">
                   {subscription.frequency === "monthly"
                     ? "Monthly"
                     : "Quarterly"}{" "}
                   Refill Service
                 </p>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Enrolled on{" "}
-                  {new Date(subscription.enrolledAt).toLocaleDateString()}
+                <p className="text-[11px] font-bold text-muted-foreground/50 uppercase tracking-widest mt-2">
+                  Enrolled {new Date(subscription.enrolledAt).toLocaleDateString()}
                 </p>
               </div>
             </div>
 
-            {daysUntilNextDelivery !== null &&
-              subscription.status === "active" && (
-                <div className="mt-4 p-4 bg-primary/5 rounded-xl border border-primary/10">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Calendar className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">Next Delivery</p>
-                      <p className="text-lg font-bold text-primary">
-                        {daysUntilNextDelivery > 0
-                          ? `In ${daysUntilNextDelivery} day${daysUntilNextDelivery !== 1 ? "s" : ""}`
-                          : "Today"}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(
-                          subscription.nextDeliveryDate,
-                        ).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
+            {daysUntilNextDelivery !== null && subscription.status === "active" && (
+              <div className="mt-8 p-6 bg-primary/5 text-primary/80 rounded-[2rem] border-0 flex items-center gap-6">
+                <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                  <Calendar className="h-6 w-6 text-primary" />
                 </div>
-              )}
-          </CardContent>
-        </Card>
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-widest opacity-80 mb-1">Next Delivery</p>
+                  <p className="text-3xl font-black tracking-tighter text-primary leading-none">
+                    {daysUntilNextDelivery > 0
+                      ? `In ${daysUntilNextDelivery} day${daysUntilNextDelivery !== 1 ? "s" : ""}`
+                      : "Today"}
+                  </p>
+                  <p className="text-sm font-bold opacity-80 mt-2">
+                    {new Date(subscription.nextDeliveryDate).toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
 
         {/* Refill History */}
-        {subscription.refillHistory &&
-          subscription.refillHistory.length > 0 && (
-            <Card className="rounded-3xl border-muted shadow-sm overflow-hidden">
-              <CardHeader className="bg-muted/30 pb-6">
-                <CardTitle className="flex items-center gap-2 text-xl">
-                  <ClipboardList className="h-5 w-5 text-primary" /> Refill
-                  History
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-8 pl-6">
-                <div className="relative border-l-2 border-primary/10 ml-3 space-y-8 pb-4">
-                  {subscription.refillHistory.map(
-                    (refill: any, index: number) => (
-                      <div key={index} className="relative pl-8">
-                        <div className="absolute -left-[9px] top-1 h-4 w-4 rounded-full border-4 border-background bg-primary" />
-                        <div className="flex flex-col gap-1">
-                          <h4 className="font-bold text-lg">
+        {subscription.refillHistory && subscription.refillHistory.length > 0 && (
+          <div className="bg-white rounded-[2rem] shadow-lg border-0 overflow-hidden">
+            <div className="p-8 border-b border-[#f5f5f1]">
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 flex items-center gap-2">
+                <ClipboardList className="h-3 w-3" /> Refill History
+              </h3>
+            </div>
+            
+            <div className="p-8">
+              <div className="relative border-l-2 border-[#f5f5f1] ml-4 space-y-12 pb-4">
+                {subscription.refillHistory.map((refill: any, index: number) => {
+                  const isLatest = index === 0;
+                  return (
+                    <div key={index} className="relative pl-10 group">
+                      {/* Dot */}
+                      <div className={cn(
+                        "absolute -left-[11px] top-1.5 h-5 w-5 rounded-full border-4 border-white shadow-sm transition-all duration-500",
+                        isLatest ? "bg-primary scale-125 ring-8 ring-primary/5" : "bg-[#f5f5f1]"
+                      )} />
+
+                      <div className={cn(
+                        "transition-all duration-500",
+                        !isLatest && "opacity-50 group-hover:opacity-100"
+                      )}>
+                        <div className="flex justify-between items-start gap-4 mb-2">
+                          <h4 className={cn(
+                            "font-black tracking-tight text-xl leading-none",
+                            isLatest ? "text-foreground" : "text-muted-foreground"
+                          )}>
                             Refill Dispensed
                           </h4>
-                          <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-                            {new Date(refill.dispensed_at).toLocaleDateString(
-                              undefined,
-                              {
-                                weekday: "short",
-                                month: "short",
-                                day: "numeric",
-                              },
-                            )}{" "}
-                            at{" "}
-                            {new Date(refill.dispensed_at).toLocaleTimeString(
-                              [],
-                              {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              },
-                            )}
-                          </p>
-                          {refill.notes && (
-                            <div className="mt-2 text-sm text-foreground/80 bg-muted/30 p-3 rounded-r-xl rounded-bl-xl border border-muted/50 max-w-md">
-                              {refill.notes}
-                            </div>
-                          )}
+                          <time className="text-[11px] font-bold text-muted-foreground/60 uppercase tracking-wider whitespace-nowrap mt-1">
+                            {new Date(refill.dispensed_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                          </time>
                         </div>
+                        
+                        <p className="text-[13px] font-bold text-muted-foreground/80 mb-3">
+                          {new Date(refill.dispensed_at).toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" })}
+                        </p>
+
+                        {refill.notes && (
+                          <div className={cn(
+                            "text-sm font-medium p-4 rounded-2xl border-0 max-w-lg",
+                            isLatest ? "bg-primary/5 text-primary/80 italic" : "bg-[#f5f5f1] text-muted-foreground italic"
+                          )}>
+                            "{refill.notes}"
+                          </div>
+                        )}
                       </div>
-                    ),
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* RIGHT COLUMN: Details */}
-
       <div className="lg:col-span-4 space-y-8">
         {/* Prescription Status */}
-        <Card className="rounded-3xl border-muted shadow-sm">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              {subscription.prescriptionVerified ? (
-                <CheckCircle2 className="h-4 w-4 text-green-600" />
-              ) : (
-                <Clock className="h-4 w-4 text-yellow-600" />
-              )}
-              Prescription Status
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-sm">
+        <div className="bg-white rounded-[2rem] shadow-lg p-8">
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 mb-6 flex items-center gap-2">
+            {subscription.prescriptionVerified ? (
+              <CheckCircle2 className="h-3 w-3 text-green-600" />
+            ) : (
+              <Clock className="h-3 w-3 text-yellow-600" />
+            )}
+            Prescription
+          </h3>
+          <div>
             <Badge
               className={cn(
-                "text-sm px-3 py-1",
+                "text-xs px-4 py-1.5 font-bold uppercase tracking-widest rounded-full border-0 mb-4",
                 subscription.prescriptionVerified
-                  ? "bg-green-100 text-green-700 hover:bg-green-100"
-                  : "bg-yellow-100 text-yellow-700 hover:bg-yellow-100",
+                  ? "bg-green-100 text-green-700"
+                  : "bg-yellow-100 text-yellow-700",
               )}
             >
-              {subscription.prescriptionVerified
-                ? "Verified"
-                : "Pending Verification"}
+              {subscription.prescriptionVerified ? "Verified" : "Pending Verif"}
             </Badge>
-            {!subscription.prescriptionVerified && (
-              <p className="text-xs text-muted-foreground mt-2">
+            {!subscription.prescriptionVerified ? (
+              <p className="text-sm font-medium text-muted-foreground">
                 Our pharmacists are reviewing your document.
               </p>
+            ) : (
+              <p className="text-sm font-medium text-muted-foreground">
+                Valid prescription on file.
+              </p>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* MASKED Delivery Details */}
-        <Card className="rounded-3xl border-muted shadow-sm">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-primary" /> Delivery Info
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-sm space-y-3">
+        <div className="bg-[#f5f5f1] rounded-[2rem] shadow-sm p-8">
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60 mb-6 flex items-center gap-2">
+            <MapPin className="h-3 w-3" /> Delivery
+          </h3>
+          <div className="space-y-6">
             <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
-                Location (Masked)
-              </p>
-              <p className="font-medium">
+              <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1">Masked Location</p>
+              <p className="font-black tracking-tight text-xl leading-tight">
                 {subscription.deliveryAddress?.city}
-                {subscription.deliveryAddress?.street && (
-                  <span className="block text-muted-foreground text-xs">
-                    {subscription.deliveryAddress.street}
-                  </span>
-                )}
               </p>
+              {subscription.deliveryAddress?.street && (
+                <p className="text-sm font-bold text-muted-foreground/80 mt-1">
+                  {subscription.deliveryAddress.street}
+                </p>
+              )}
             </div>
             <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
-                Phone (Masked)
-              </p>
-              <p className="font-mono">
+              <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1">Masked Phone</p>
+              <p className="font-mono font-bold tracking-widest text-lg">
                 {subscription.deliveryAddress?.phone || "N/A"}
               </p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Assigned Pharmacy */}
         {subscription.pharmacy && (
-          <Card className="rounded-3xl border-muted shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-primary" /> Assigned Pharmacy
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm space-y-3">
+          <div className="bg-white rounded-[2rem] shadow-lg p-8">
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 mb-6 flex items-center gap-2">
+              <MapPin className="h-3 w-3" /> Pharmacy
+            </h3>
+            <div className="space-y-6">
               <div>
-                <p className="font-medium text-lg">
+                <p className="font-black tracking-tight text-xl leading-tight mb-2">
                   {subscription.pharmacy.name}
                 </p>
-              </div>
-              {subscription.pharmacy.phone && (
-                <div>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
-                    Contact
-                  </p>
-                  <p className="font-medium font-mono">
-                    {subscription.pharmacy.phone}
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Help Section */}
-        <Card className="rounded-3xl border-muted shadow-sm overflow-hidden bg-primary text-primary-foreground">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
-                <MessageSquare className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <h4 className="font-bold text-lg">Need Help?</h4>
-                <p className="text-sm text-white/80">
-                  Support is available 24/7 on WhatsApp.
-                </p>
+                {subscription.pharmacy.phone && (
+                  <div>
+                     <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/80 mb-1">Contact</p>
+                     <p className="font-mono font-bold tracking-widest text-lg">
+                      {subscription.pharmacy.phone}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        )}
+
+        {/* Support CTA */}
+        <Link href="https://wa.me/DISCREETKIT" target="_blank" className="block">
+          <div className="bg-primary hover:bg-primary/95 text-white rounded-[2rem] p-8 shadow-lg shadow-primary/20 transition-all active:scale-[0.98] group">
+            <div className="flex items-center gap-6">
+              <div className="h-14 w-14 rounded-full bg-white/10 flex items-center justify-center transition-transform group-hover:rotate-12">
+                <MessageSquare className="h-7 w-7 text-white" />
+              </div>
+              <div>
+                <h4 className="font-black tracking-tight text-xl">Need Help?</h4>
+                <p className="text-white/60 font-medium text-sm leading-snug">Tap to chat with us <br/>on WhatsApp 24/7.</p>
+              </div>
+            </div>
+          </div>
+        </Link>
       </div>
     </div>
   );
@@ -845,16 +812,19 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
 
 function TrackPageLoading() {
   return (
-    <div className="flex h-64 items-center justify-center">
-      <BrandSpinner size="lg" />
+    <div className="flex h-[50dvh] items-center justify-center">
+      <div className="relative">
+        <div className="h-16 w-16 rounded-full border-4 border-primary/10 border-t-primary animate-spin" />
+        <Search className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-6 w-6 text-primary" />
+      </div>
     </div>
   );
 }
 
 export default function TrackPage() {
   return (
-    <div className="bg-muted">
-      <div className="container mx-auto flex min-h-[calc(100dvh-10rem)] justify-center px-4 py-12 md:px-6 md:py-24">
+    <div className="bg-white min-h-[calc(100dvh-5rem)]">
+      <div className="container mx-auto px-4 py-8 md:py-16 overflow-x-hidden">
         <Suspense fallback={<TrackPageLoading />}>
           <Tracker />
         </Suspense>
@@ -862,3 +832,4 @@ export default function TrackPage() {
     </div>
   );
 }
+
