@@ -280,59 +280,73 @@ export default function AdminDashboardPage() {
           />
         </div>
 
-        {/* System Activity Stream */}
-        <div className="bg-white border rounded-xl shadow-sm p-6 lg:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6 mb-6">
-            <div>
-              <h2 className="text-lg font-semibold tracking-tight text-foreground flex items-center gap-2">
-                <Activity className="h-5 w-5 text-brand-indigo" />
-                System Activity Stream
-              </h2>
-              <p className="text-sm text-muted-foreground mt-1 font-medium">
-                Live audit trail of platform events. Use this to monitor operational bottlenecks or dispatch anomalies.
-              </p>
+        {/* High-Density Operational Log */}
+        <div className="bg-white border rounded-xl shadow-sm overflow-hidden flex flex-col mt-4">
+          <div className="flex items-center justify-between p-4 border-b bg-muted/20">
+            <h2 className="text-sm font-semibold tracking-tight text-foreground flex items-center gap-2">
+              <Activity className="h-4 w-4 text-brand-indigo" />
+              Operational Activity Stream
+            </h2>
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span className="text-[10px] uppercase tracking-widest font-bold text-emerald-600">
+                Live
+              </span>
             </div>
           </div>
           
-          <div className="relative space-y-0 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-border before:to-transparent">
-            {(data.pulseFeed || []).map((event: any, i: number) => (
-              <div
-                key={event.id || i}
-                className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active py-4"
-              >
-                {/* Timeline Node */}
-                <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-brand-indigo text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 transition-transform hover:scale-110">
-                  <span className="text-[10px] font-bold tracking-widest uppercase">
-                    {new Date(event.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }).replace(/\s(AM|PM)/, '')}
-                  </span>
-                </div>
+          <div className="max-h-[350px] overflow-y-auto w-full custom-scrollbar">
+            <table className="w-full text-left border-collapse">
+              <tbody className="divide-y divide-border/50 text-xs text-foreground font-medium">
+                {(data.pulseFeed || []).map((event: any, i: number) => {
+                  const isAlert = String(event.status).includes("ALERT");
+                  return (
+                    <tr key={event.id || i} className="hover:bg-muted/40 transition-colors group">
+                      {/* Timestamp */}
+                      <td className="py-2.5 px-4 w-[90px] text-muted-foreground whitespace-nowrap font-mono text-[11px]">
+                        {new Date(event.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                      </td>
+                      
+                      {/* Order Code */}
+                      <td className="py-2.5 px-4 w-[120px]">
+                        <span className="font-mono font-bold bg-muted px-1.5 py-0.5 rounded text-[11px] border border-border group-hover:bg-background">
+                          {event.orderCode}
+                        </span>
+                      </td>
+                      
+                      {/* Status */}
+                      <td className="py-2.5 px-4 w-[160px]">
+                        <span className={`text-[10px] uppercase font-bold tracking-widest ${isAlert ? 'text-rose-500' : 'text-brand-indigo'}`}>
+                          {event.status.replace(/_/g, ' ')}
+                        </span>
+                      </td>
+                      
+                      {/* Event Note */}
+                      <td className="py-2.5 px-4 w-full text-muted-foreground">
+                        {event.note ? (
+                          <span className={`truncate block max-w-md xl:max-w-2xl group-hover:text-foreground transition-colors ${isAlert ? 'font-semibold text-rose-500/80' : ''}`}>
+                            {event.note.replace('⚠️ ALERT: ', '')}
+                          </span>
+                        ) : (
+                          <span className="opacity-40">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
                 
-                {/* Card Payload */}
-                <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] hover:bg-muted/30 p-4 rounded-xl transition-colors border border-transparent hover:border-border">
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-3">
-                      <span className="font-mono text-xs font-bold text-foreground bg-foreground/5 px-2 py-0.5 rounded-md border border-foreground/10">
-                        {event.orderCode}
-                      </span>
-                      <span className="text-[10px] uppercase tracking-widest font-bold text-brand-indigo">
-                        {event.status.replace(/_/g, ' ')}
-                      </span>
-                    </div>
-                    {event.note && (
-                      <p className="text-sm text-muted-foreground font-medium mt-1 leading-relaxed">
-                        {event.note}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-            
-            {(!data.pulseFeed || data.pulseFeed.length === 0) && (
-              <div className="text-muted-foreground/60 text-sm font-medium py-12 text-center border border-dashed rounded-xl">
-                System is silent. Awaiting incoming traffic streams.
-              </div>
-            )}
+                {(!data.pulseFeed || data.pulseFeed.length === 0) && (
+                  <tr>
+                    <td colSpan={4} className="p-8 text-center text-muted-foreground text-sm font-medium">
+                      System is silent. Awaiting incoming traffic streams.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
 
