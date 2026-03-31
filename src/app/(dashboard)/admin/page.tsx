@@ -280,39 +280,57 @@ export default function AdminDashboardPage() {
           />
         </div>
 
-        {/* Operational Pulse Log */}
-        <div className="bg-white border rounded-xl shadow-sm p-5 space-y-4">
-          <div className="flex items-center gap-3 border-b pb-3">
-            <Activity className="h-4 w-4 text-primary" />
-            <span className="text-sm font-semibold uppercase tracking-wider text-foreground">
-              Live Operational Log
-            </span>
+        {/* System Activity Stream */}
+        <div className="bg-white border rounded-xl shadow-sm p-6 lg:p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6 mb-6">
+            <div>
+              <h2 className="text-lg font-semibold tracking-tight text-foreground flex items-center gap-2">
+                <Activity className="h-5 w-5 text-brand-indigo" />
+                System Activity Stream
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1 font-medium">
+                Live audit trail of platform events. Use this to monitor operational bottlenecks or dispatch anomalies.
+              </p>
+            </div>
           </div>
-          <div className="space-y-3 max-h-[160px] overflow-y-auto pr-2">
+          
+          <div className="relative space-y-0 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-border before:to-transparent">
             {(data.pulseFeed || []).map((event: any, i: number) => (
               <div
                 key={event.id || i}
-                className="flex items-start gap-4 text-xs font-mono leading-relaxed"
+                className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active py-4"
               >
-                <span className="text-primary font-bold whitespace-nowrap">
-                  [{new Date(event.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}]
-                </span>
-                <span className="font-bold whitespace-nowrap text-foreground shrink-0 border border-border px-2 py-0.5 rounded-md shadow-sm">
-                  {event.orderCode}
-                </span>
-                <span className="text-muted-foreground font-medium flex-1 pt-0.5 group">
-                  <span className="uppercase tracking-widest text-[#333] font-semibold">{event.status.replace(/_/g, ' ')}</span>
-                  {event.note && (
-                    <span className="ml-2 text-foreground/80 font-normal">
-                      · {event.note}
-                    </span>
-                  )}
-                </span>
+                {/* Timeline Node */}
+                <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-brand-indigo text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 transition-transform hover:scale-110">
+                  <span className="text-[10px] font-bold tracking-widest uppercase">
+                    {new Date(event.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }).replace(/\s(AM|PM)/, '')}
+                  </span>
+                </div>
+                
+                {/* Card Payload */}
+                <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] hover:bg-muted/30 p-4 rounded-xl transition-colors border border-transparent hover:border-border">
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-3">
+                      <span className="font-mono text-xs font-bold text-foreground bg-foreground/5 px-2 py-0.5 rounded-md border border-foreground/10">
+                        {event.orderCode}
+                      </span>
+                      <span className="text-[10px] uppercase tracking-widest font-bold text-brand-indigo">
+                        {event.status.replace(/_/g, ' ')}
+                      </span>
+                    </div>
+                    {event.note && (
+                      <p className="text-sm text-muted-foreground font-medium mt-1 leading-relaxed">
+                        {event.note}
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
             ))}
+            
             {(!data.pulseFeed || data.pulseFeed.length === 0) && (
-              <div className="text-muted-foreground/60 text-sm font-medium py-4 text-center">
-                System is silent. No recent events to log.
+              <div className="text-muted-foreground/60 text-sm font-medium py-12 text-center border border-dashed rounded-xl">
+                System is silent. Awaiting incoming traffic streams.
               </div>
             )}
           </div>
