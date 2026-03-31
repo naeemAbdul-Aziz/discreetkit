@@ -132,7 +132,6 @@ function OrderSummaryCard() {
     studentDiscount,
     deliveryFee,
     totalPrice,
-    isStudent,
   } = useCart();
 
   if (items.length === 0) {
@@ -141,54 +140,55 @@ function OrderSummaryCard() {
 
   return (
     <div className="w-full">
-      <div className="space-y-4">
+      <div className="space-y-3">
         {items.map((item) => (
-          <div key={item.id} className="flex justify-between items-start gap-4">
-            <div className="flex items-center gap-3">
-              <div className="relative h-12 w-12 rounded-xl bg-background border border-border/10 overflow-hidden flex-shrink-0 shadow-sm">
+          <div key={item.id} className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="relative h-10 w-10 rounded-xl bg-background/60 overflow-hidden flex-shrink-0">
                 {item.image_url && (
                   <Image
                     src={item.image_url}
                     alt={item.name}
                     fill
-                    className="object-contain p-1.5"
+                    className="object-contain p-1"
                   />
                 )}
               </div>
-              <div className="flex flex-col justify-center">
-                <p className="font-medium text-[14px] leading-tight text-foreground">{item.name}</p>
-                <p className="text-[13px] text-muted-foreground mt-0.5">Qty {item.quantity}</p>
+              <div className="min-w-0">
+                <p className="text-[13px] font-semibold leading-tight text-foreground truncate">{item.name}</p>
+                <p className="text-[11px] text-muted-foreground/70 mt-0.5">Qty {item.quantity}</p>
               </div>
             </div>
-            <p className="font-medium text-[14px] pt-1">GHS {(item.price_ghs * item.quantity).toFixed(2)}</p>
+            <p className="text-[13px] font-bold text-foreground shrink-0 whitespace-nowrap">GHS {(item.price_ghs * item.quantity).toFixed(2)}</p>
           </div>
         ))}
       </div>
 
-      <div className="mt-6 pt-6 border-t border-dashed border-border/20 space-y-2.5 text-[14px]">
+      <div className="mt-5 pt-4 border-t border-border/15 space-y-2 text-[13px]">
         <div className="flex justify-between text-muted-foreground">
           <p>Subtotal</p>
-          <p className="text-foreground font-medium">GHS {subtotal.toFixed(2)}</p>
+          <p className="text-foreground">GHS {subtotal.toFixed(2)}</p>
         </div>
         {studentDiscount > 0 && (
-          <div className="flex justify-between text-success">
+          <div className="flex justify-between text-emerald-600">
             <p>Student Discount</p>
-            <p className="font-medium">- GHS {studentDiscount.toFixed(2)}</p>
+            <p>- GHS {studentDiscount.toFixed(2)}</p>
           </div>
         )}
         <div className="flex justify-between text-muted-foreground">
-          <p>Delivery Fee</p>
-          <p className="text-foreground font-medium">GHS {deliveryFee.toFixed(2)}</p>
+          <p>Delivery</p>
+          <p className="text-foreground">GHS {deliveryFee.toFixed(2)}</p>
         </div>
       </div>
 
-      <div className="mt-5 pt-5 border-t border-border/10 flex items-baseline justify-between font-bold text-lg">
-        <p>Total</p>
-        <p className="text-primary text-2xl tracking-tighter">GHS {totalPrice.toFixed(2)}</p>
+      <div className="mt-4 pt-4 border-t border-border/10 flex items-center justify-between">
+        <p className="text-[13px] font-bold text-foreground">Total</p>
+        <p className="text-[15px] font-black text-primary tracking-tight">GHS {totalPrice.toFixed(2)}</p>
       </div>
     </div>
   );
 }
+
 
 const FieldError = ({ message }: { message?: string }) => {
   if (!message) return null;
@@ -395,28 +395,22 @@ export function OrderForm() {
   const isSubmitDisabled = items.length === 0;
 
   return (
-    <div className="bg-background min-h-[calc(100vh-80px)] py-12 px-4 flex flex-col items-center">
-      <div className="w-full max-w-xl">
-        {/* Progress Tracker */}
-        <div className="mb-10 text-center space-y-4">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            {[1, 2].map((s) => (
-              <div
-                key={s}
-                className={cn(
-                  "h-1 rounded-full transition-all duration-500",
-                  step >= s ? "w-10 bg-primary" : "w-4 bg-muted"
-                )}
-              />
-            ))}
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">Checkout</h1>
-          <p className="text-sm text-muted-foreground">
-            Complete your order in <span className="text-foreground font-bold">2 simple steps</span>
-          </p>
+    <div className="bg-background min-h-[calc(100vh-80px)] flex flex-col items-center">
+      <div className="w-full max-w-lg">
+        {/* Progress indicator — minimal pill stepper */}
+        <div className="flex items-center justify-center gap-1.5 pt-8 pb-6">
+          {[1, 2].map((s) => (
+            <div
+              key={s}
+              className={cn(
+                "h-[3px] rounded-full transition-all duration-500",
+                step >= s ? "w-8 bg-primary" : "w-3 bg-muted"
+              )}
+            />
+          ))}
         </div>
 
-        <Card className="border-0 shadow-xl bg-card rounded-[2.5rem] overflow-hidden">
+        <Card className="border-0 shadow-none bg-card rounded-3xl mx-4 overflow-hidden">
           <form
             ref={formRef}
             action={dispatch}
@@ -437,18 +431,18 @@ export function OrderForm() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.3 }}
-                  className="p-8 pt-10 sm:p-10 space-y-8"
+                  className="px-6 pt-8 pb-8 space-y-7"
                 >
                   <div className="space-y-5">
                     <div>
-                      <h2 className="text-2xl font-bold tracking-tight">Delivery</h2>
-                      <p className="text-sm text-muted-foreground mt-1">Where should we drop this off?</p>
+                      <h2 className="text-xl font-bold tracking-tight">Delivery</h2>
+                      <p className="text-[13px] text-muted-foreground mt-1">Where should we drop this off?</p>
                     </div>
 
                     <div className="space-y-4">
                       <div className="space-y-1.5 w-full">
                         <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 ml-1">
-                          Delivery Region
+                          Campus / Location
                         </Label>
                         <Select
                           name="deliveryArea"
@@ -565,12 +559,12 @@ export function OrderForm() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.3 }}
-                  className="p-8 pt-10 sm:p-10 space-y-8"
+                  className="px-6 pt-8 pb-8 space-y-7"
                 >
                   <div className="space-y-6">
                     <div>
-                      <h2 className="text-2xl font-bold tracking-tight">Contact</h2>
-                      <p className="text-sm text-muted-foreground mt-1">For your receipt and rider updates.</p>
+                      <h2 className="text-xl font-bold tracking-tight">Contact</h2>
+                      <p className="text-[13px] text-muted-foreground mt-1">For your receipt and rider updates.</p>
                     </div>
 
                     <div className="space-y-4">
@@ -599,19 +593,21 @@ export function OrderForm() {
                     </div>
                   </div>
 
-                  <div className="bg-[#f5f5f1] rounded-[2rem] p-6 sm:p-8">
-                    <OrderSummaryCard />
+                  <div className="pt-2 border-t border-border/10">
+                    <div className="pt-4">
+                      <OrderSummaryCard />
+                    </div>
                   </div>
 
                   <div className="space-y-4">
                     <div className="flex gap-3">
                        <Button 
                           type="button" 
-                          variant="outline"
+                          variant="ghost"
                           onClick={() => setStep(1)}
-                          className="h-14 w-14 rounded-full border-muted flex-shrink-0"
+                          className="h-12 w-12 rounded-full flex-shrink-0 text-muted-foreground hover:text-foreground"
                         >
-                           <ChevronLeft className="h-5 w-5" />
+                           <ChevronLeft className="h-4 w-4" />
                         </Button>
                         <SubmitButton disabled={isSubmitDisabled} />
                     </div>
