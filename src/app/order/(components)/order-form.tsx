@@ -132,60 +132,67 @@ function OrderSummaryCard() {
     studentDiscount,
     deliveryFee,
     totalPrice,
+    totalItems,
   } = useCart();
 
-  if (items.length === 0) {
-    return null;
-  }
+  if (items.length === 0) return null;
 
   return (
-    <div className="w-full">
-      <div className="space-y-3">
+    <>
+      {/* Item rows — white bg with dividers, matching CartView */}
+      <div className="divide-y divide-border">
         {items.map((item) => (
-          <div key={item.id} className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="relative h-10 w-10 rounded-xl bg-background/60 overflow-hidden flex-shrink-0">
+          <div key={item.id} className="p-4 sm:p-5">
+            <div className="grid grid-cols-[56px_1fr_auto] items-center gap-3 sm:gap-4">
+              <div className="relative aspect-square w-[56px] rounded-xl bg-[#f5f5f1] overflow-hidden">
                 {item.image_url && (
                   <Image
                     src={item.image_url}
                     alt={item.name}
                     fill
-                    className="object-contain p-1"
+                    className="object-contain p-1.5"
+                    sizes="56px"
                   />
                 )}
               </div>
               <div className="min-w-0">
-                <p className="text-[13px] font-semibold leading-tight text-foreground truncate">{item.name}</p>
-                <p className="text-[11px] text-muted-foreground/70 mt-0.5">Qty {item.quantity}</p>
+                <p className="text-sm font-bold text-foreground leading-tight line-clamp-2">{item.name}</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">Qty {item.quantity}</p>
               </div>
+              <p className="text-sm font-bold text-foreground shrink-0 whitespace-nowrap">
+                GHS {(item.price_ghs * item.quantity).toFixed(2)}
+              </p>
             </div>
-            <p className="text-[13px] font-bold text-foreground shrink-0 whitespace-nowrap">GHS {(item.price_ghs * item.quantity).toFixed(2)}</p>
           </div>
         ))}
       </div>
 
-      <div className="mt-5 pt-4 border-t border-border/15 space-y-2 text-[13px]">
-        <div className="flex justify-between text-muted-foreground">
-          <p>Subtotal</p>
-          <p className="text-foreground">GHS {subtotal.toFixed(2)}</p>
-        </div>
-        {studentDiscount > 0 && (
-          <div className="flex justify-between text-emerald-600">
-            <p>Student Discount</p>
-            <p>- GHS {studentDiscount.toFixed(2)}</p>
+      {/* Summary footer — same bg-[#f5f5f1] treatment as CartView */}
+      <div className="p-5 bg-[#f5f5f1] space-y-3">
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Order Summary</p>
+        <div className="space-y-1.5 text-xs">
+          <div className="flex justify-between">
+            <p className="text-muted-foreground">Subtotal ({totalItems} items)</p>
+            <p className="font-bold text-foreground">GHS {subtotal.toFixed(2)}</p>
           </div>
-        )}
-        <div className="flex justify-between text-muted-foreground">
-          <p>Delivery</p>
-          <p className="text-foreground">GHS {deliveryFee.toFixed(2)}</p>
+          {studentDiscount > 0 && (
+            <div className="flex justify-between text-emerald-600 font-bold">
+              <p>Student Saving</p>
+              <p>- GHS {studentDiscount.toFixed(2)}</p>
+            </div>
+          )}
+          <div className="flex justify-between">
+            <p className="text-muted-foreground">Delivery</p>
+            <p className="font-bold text-foreground">GHS {deliveryFee.toFixed(2)}</p>
+          </div>
+        </div>
+        <Separator className="bg-border/30" />
+        <div className="flex items-baseline justify-between font-bold text-base tracking-tight">
+          <p>Total</p>
+          <p>GHS {totalPrice.toFixed(2)}</p>
         </div>
       </div>
-
-      <div className="mt-4 pt-4 border-t border-border/10 flex items-center justify-between">
-        <p className="text-[13px] font-bold text-foreground">Total</p>
-        <p className="text-[15px] font-black text-primary tracking-tight">GHS {totalPrice.toFixed(2)}</p>
-      </div>
-    </div>
+    </>
   );
 }
 
@@ -395,234 +402,222 @@ export function OrderForm() {
   const isSubmitDisabled = items.length === 0;
 
   return (
-    <div className="bg-background min-h-[calc(100vh-80px)] flex flex-col items-center">
-      <div className="w-full max-w-lg">
-        {/* Progress indicator — minimal pill stepper */}
-        <div className="flex items-center justify-center gap-1.5 pt-8 pb-6">
-          {[1, 2].map((s) => (
-            <div
-              key={s}
-              className={cn(
-                "h-[3px] rounded-full transition-all duration-500",
-                step >= s ? "w-8 bg-primary" : "w-3 bg-muted"
-              )}
-            />
-          ))}
-        </div>
-
-        <Card className="border-0 shadow-none bg-card rounded-3xl mx-4 overflow-hidden">
-          <form
-            ref={formRef}
-            action={dispatch}
-            className="relative"
-          >
-            <FormPendingOverlay />
-            <input type="hidden" name="cartItems" value={JSON.stringify(items)} />
-            <input type="hidden" name="subtotal" value={subtotal} />
-            <input type="hidden" name="studentDiscount" value={studentDiscount} />
-            <input type="hidden" name="deliveryFee" value={deliveryFee} />
-            <input type="hidden" name="totalPrice" value={totalPrice} />
-
-            <AnimatePresence mode="wait">
-              {step === 1 ? (
-                <motion.div
-                  key="step1"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                  className="px-6 pt-8 pb-8 space-y-7"
-                >
-                  <div className="space-y-5">
-                    <div>
-                      <h2 className="text-xl font-bold tracking-tight">Delivery</h2>
-                      <p className="text-[13px] text-muted-foreground mt-1">Where should we drop this off?</p>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div className="space-y-1.5 w-full">
-                        <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 ml-1">
-                          Campus / Location
-                        </Label>
-                        <Select
-                          name="deliveryArea"
-                          onValueChange={handleLocationChange}
-                          value={deliveryLocation || "Other"}
-                          disabled={!isMounted}
-                        >
-                          <SelectTrigger
-                            className={cn(
-                              "h-12 rounded-2xl border-0 bg-[#f5f5f1] px-5 text-sm ring-0 focus:ring-primary/20",
-                              state.errors?.deliveryArea && "border border-destructive",
-                            )}
-                          >
-                            <SelectValue placeholder="Select location" />
-                          </SelectTrigger>
-                          <SelectContent className="rounded-2xl">
-                            <SelectItem value="Other">Standard Delivery</SelectItem>
-                            {discounts.map((d) => (
-                              <SelectItem key={d.id} value={d.campus}>{d.campus}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FieldError message={state.errors?.deliveryArea?.[0]} />
-                      </div>
-
-                      {showOther ? (
-                        <LabelledInput
-                          id="otherDeliveryArea"
-                          name="otherDeliveryArea"
-                          label="Exact Address"
-                          placeholder="e.g. Accra Mall, Spintex Road"
-                          className={cn(state.errors?.otherDeliveryArea && "ring-1 ring-destructive")}
-                        />
-                      ) : (
-                        <div className="space-y-1.5 w-full">
-                          <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 ml-1">
-                            Pickup Point
-                          </Label>
-                          <Select name="otherDeliveryArea">
-                            <SelectTrigger
-                              className={cn(
-                                "h-12 rounded-2xl border-0 bg-[#f5f5f1] px-5 text-sm",
-                                state.errors?.otherDeliveryArea && "border border-destructive",
-                              )}
-                            >
-                              <SelectValue placeholder="Select specific point" />
-                            </SelectTrigger>
-                            <SelectContent className="rounded-2xl">
-                              {discounts.find((d) => d.campus === deliveryLocation)?.meetingPoints?.map((p) => (
-                                <SelectItem key={p} value={p}>{p}</SelectItem>
-                              ))}
-                              <SelectItem value="Other">Other (Specify below)</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FieldError message={state.errors?.otherDeliveryArea?.[0]} />
-                        </div>
-                      )}
-
-                      <div className="space-y-3">
-                         <Button
-                            type="button"
-                            variant="ghost"
-                            onClick={() => setShowNotes(!showNotes)}
-                            className="text-xs text-primary font-bold hover:bg-transparent p-0 h-auto"
-                          >
-                            {showNotes ? "- Hide Notes" : "+ Add Drop-off Notes"}
-                          </Button>
-                          
-                          {showNotes && (
-                             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}>
-                                <LabelledInput
-                                  id="deliveryAddressNote"
-                                  name="deliveryAddressNote"
-                                  label="Drop-off Notes"
-                                  placeholder="e.g. Call upon arrival..."
-                                />
-                             </motion.div>
-                          )}
-                      </div>
-
-                      <div className="pt-2">
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          onClick={handleUseLocation}
-                          disabled={locationLoading}
-                          className="w-full h-14 rounded-full font-bold text-sm bg-primary/5 text-primary hover:bg-primary/10 border-0"
-                        >
-                          {locationLoading ? (
-                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                          ) : (
-                            <MapPin className="h-4 w-4 mr-2" />
-                          )}
-                          Auto-detect my campus
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="pt-4">
-                     <Button 
-                        type="button"
-                        onClick={() => setStep(2)}
-                        className="w-full h-14 rounded-full font-bold text-base shadow-lg"
-                      >
-                        Continue to Contact <ChevronRight className="h-4 w-4 ml-2" />
-                      </Button>
-                  </div>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="step2"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                  className="px-6 pt-8 pb-8 space-y-7"
-                >
-                  <div className="space-y-6">
-                    <div>
-                      <h2 className="text-xl font-bold tracking-tight">Contact</h2>
-                      <p className="text-[13px] text-muted-foreground mt-1">For your receipt and rider updates.</p>
-                    </div>
-
-                    <div className="space-y-4">
-                      <LabelledInput
-                        id="email"
-                        name="email"
-                        type="email"
-                        label="Email Address"
-                        placeholder="you@example.com"
-                        className={cn(state.errors?.email && "ring-1 ring-destructive")}
-                      />
-                      <div className="space-y-0.5">
-                        <LabelledInput
-                          id="phone_masked"
-                          name="phone_masked"
-                          type="tel"
-                          label="Mobile Number"
-                          placeholder="+233 xx xxx xxxx"
-                          className={cn(state.errors?.phone_masked && "ring-1 ring-destructive")}
-                        />
-                        <p className="text-[11px] text-muted-foreground/60 flex items-center gap-1.5 pt-2 ml-1">
-                          <Lock className="h-3 w-3" />
-                          Masked; riders will only see a proxy number.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="pt-2 border-t border-border/10">
-                    <div className="pt-4">
-                      <OrderSummaryCard />
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="flex gap-3">
-                       <Button 
-                          type="button" 
-                          variant="ghost"
-                          onClick={() => setStep(1)}
-                          className="h-12 w-12 rounded-full flex-shrink-0 text-muted-foreground hover:text-foreground"
-                        >
-                           <ChevronLeft className="h-4 w-4" />
-                        </Button>
-                        <SubmitButton disabled={isSubmitDisabled} />
-                    </div>
-                    
-                    <p className="text-center text-[11px] text-muted-foreground leading-relaxed px-4">
-                      Payments processed via Paystack. <br />
-                      By clicking you agree to our <Link href="/terms" className="underline font-medium hover:text-foreground">Terms</Link>.
-                    </p>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </form>
-        </Card>
+    <div className="w-full">
+      {/* Minimal pill stepper */}
+      <div className="flex items-center justify-center gap-1.5 pb-5">
+        {[1, 2].map((s) => (
+          <div
+            key={s}
+            className={cn(
+              "h-[3px] rounded-full transition-all duration-500",
+              step >= s ? "w-8 bg-primary" : "w-3 bg-muted"
+            )}
+          />
+        ))}
       </div>
+
+      <Card className="overflow-hidden rounded-[2rem] border-0 shadow-lg">
+        <form
+          ref={formRef}
+          action={dispatch}
+          className="relative"
+        >
+          <FormPendingOverlay />
+          <input type="hidden" name="cartItems" value={JSON.stringify(items)} />
+          <input type="hidden" name="subtotal" value={subtotal} />
+          <input type="hidden" name="studentDiscount" value={studentDiscount} />
+          <input type="hidden" name="deliveryFee" value={deliveryFee} />
+          <input type="hidden" name="totalPrice" value={totalPrice} />
+
+          <AnimatePresence mode="wait">
+            {step === 1 ? (
+              <motion.div
+                key="step1"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.28 }}
+              >
+                {/* Step 1 header — CartView CardHeader style */}
+                <div className="px-6 pb-4 pt-8">
+                  <h2 className="text-2xl font-bold tracking-tight">Delivery</h2>
+                  <p className="text-sm text-muted-foreground mt-1">Where should we drop this off?</p>
+                </div>
+
+                <div className="px-6 pb-8 space-y-4">
+                  <div className="space-y-1.5 w-full">
+                    <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 ml-1">
+                      Campus / Location
+                    </Label>
+                    <Select
+                      name="deliveryArea"
+                      onValueChange={handleLocationChange}
+                      value={deliveryLocation || "Other"}
+                      disabled={!isMounted}
+                    >
+                      <SelectTrigger
+                        className={cn(
+                          "h-12 rounded-2xl border-0 bg-[#f5f5f1] px-5 text-sm ring-0 focus:ring-primary/20",
+                          state.errors?.deliveryArea && "border border-destructive",
+                        )}
+                      >
+                        <SelectValue placeholder="Select location" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-2xl">
+                        <SelectItem value="Other">Standard Delivery</SelectItem>
+                        {discounts.map((d) => (
+                          <SelectItem key={d.id} value={d.campus}>{d.campus}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FieldError message={state.errors?.deliveryArea?.[0]} />
+                  </div>
+
+                  {showOther ? (
+                    <LabelledInput
+                      id="otherDeliveryArea"
+                      name="otherDeliveryArea"
+                      label="Exact Address"
+                      placeholder="e.g. Accra Mall, Spintex Road"
+                      className={cn(state.errors?.otherDeliveryArea && "ring-1 ring-destructive")}
+                    />
+                  ) : (
+                    <div className="space-y-1.5 w-full">
+                      <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 ml-1">
+                        Pickup Point
+                      </Label>
+                      <Select name="otherDeliveryArea">
+                        <SelectTrigger
+                          className={cn(
+                            "h-12 rounded-2xl border-0 bg-[#f5f5f1] px-5 text-sm",
+                            state.errors?.otherDeliveryArea && "border border-destructive",
+                          )}
+                        >
+                          <SelectValue placeholder="Select specific point" />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-2xl">
+                          {discounts.find((d) => d.campus === deliveryLocation)?.meetingPoints?.map((p) => (
+                            <SelectItem key={p} value={p}>{p}</SelectItem>
+                          ))}
+                          <SelectItem value="Other">Other (Specify below)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FieldError message={state.errors?.otherDeliveryArea?.[0]} />
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => setShowNotes(!showNotes)}
+                      className="text-xs text-primary font-bold hover:bg-transparent p-0 h-auto"
+                    >
+                      {showNotes ? "- Hide Notes" : "+ Add Drop-off Notes"}
+                    </Button>
+                    {showNotes && (
+                      <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}>
+                        <LabelledInput
+                          id="deliveryAddressNote"
+                          name="deliveryAddressNote"
+                          label="Drop-off Notes"
+                          placeholder="e.g. Call upon arrival..."
+                        />
+                      </motion.div>
+                    )}
+                  </div>
+
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={handleUseLocation}
+                    disabled={locationLoading}
+                    className="w-full h-12 rounded-full text-sm font-semibold bg-primary/5 text-primary hover:bg-primary/10 border-0"
+                  >
+                    {locationLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : (
+                      <MapPin className="h-4 w-4 mr-2" />
+                    )}
+                    Auto-detect my campus
+                  </Button>
+                </div>
+
+                {/* CTA — matches CartView Checkout button style */}
+                <div className="px-5 pb-6">
+                  <Button
+                    type="button"
+                    onClick={() => setStep(2)}
+                    className="w-full h-12 md:h-14 rounded-full font-bold shadow-md"
+                  >
+                    Continue <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="step2"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.28 }}
+              >
+                {/* Contact fields — white zone */}
+                <div className="px-6 pt-8 pb-6">
+                  <h2 className="text-2xl font-bold tracking-tight">Contact</h2>
+                  <p className="text-sm text-muted-foreground mt-1">For your receipt and rider updates.</p>
+                  <div className="mt-5 space-y-4">
+                    <LabelledInput
+                      id="email"
+                      name="email"
+                      type="email"
+                      label="Email Address"
+                      placeholder="you@example.com"
+                      className={cn(state.errors?.email && "ring-1 ring-destructive")}
+                    />
+                    <div>
+                      <LabelledInput
+                        id="phone_masked"
+                        name="phone_masked"
+                        type="tel"
+                        label="Mobile Number"
+                        placeholder="0201234567"
+                        className={cn(state.errors?.phone_masked && "ring-1 ring-destructive")}
+                      />
+                      <p className="text-[11px] text-muted-foreground/60 flex items-center gap-1.5 pt-2 ml-1">
+                        <Lock className="h-3 w-3" />
+                        Masked; riders will only see a proxy number.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Order summary — CartView footer pattern (items + bg-[#f5f5f1] section) */}
+                <OrderSummaryCard />
+
+                {/* CTA footer */}
+                <div className="px-5 pb-6 pt-4 space-y-3">
+                  <div className="flex gap-3">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => setStep(1)}
+                      className="h-12 w-12 rounded-full flex-shrink-0 text-muted-foreground hover:text-foreground"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <SubmitButton disabled={isSubmitDisabled} />
+                  </div>
+                  <p className="text-center text-[11px] text-muted-foreground leading-relaxed">
+                    Payments processed via Paystack. By clicking you agree to our{" "}
+                    <Link href="/terms" className="underline font-medium hover:text-foreground">Terms</Link>.
+                  </p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </form>
+      </Card>
     </div>
   );
 }
