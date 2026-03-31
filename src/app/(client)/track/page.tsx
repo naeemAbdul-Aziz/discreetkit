@@ -40,6 +40,11 @@ import Image from "next/image";
 import { DiscreetBoxIcon } from "@/components/icons/discreet-box-icon";
 import Link from "next/link";
 
+import { LifestylePaymentIcon } from "@/components/icons/lifestyle-payment-icon";
+import { LifestyleCourierIcon } from "@/components/icons/lifestyle-courier-icon";
+import { LifestyleWellnessIcon } from "@/components/icons/lifestyle-wellness-icon";
+import { LifestylePrivacyIcon } from "@/components/icons/lifestyle-privacy-icon";
+
 export const dynamic = "force-dynamic";
 
 const statusMap: Record<
@@ -47,27 +52,27 @@ const statusMap: Record<
   { icon: React.ElementType; label: string; description: string }
 > = {
   pending_payment: {
-    icon: CreditCard,
+    icon: LifestylePaymentIcon,
     label: "Confirming Payment",
     description: "We're verifying your payment securely.",
   },
   received: {
-    icon: Package,
+    icon: DiscreetBoxIcon,
     label: "Order Confirmed",
     description: "Your order is confirmed and in safe hands.",
   },
   processing: {
-    icon: Server,
+    icon: LifestyleWellnessIcon,
     label: "Being Prepared",
     description: "We're carefully packing your order with care.",
   },
   out_for_delivery: {
-    icon: Truck,
+    icon: LifestyleCourierIcon,
     label: "On the Way",
     description: "A trusted rider is bringing your package to you.",
   },
   completed: {
-    icon: PackageCheck,
+    icon: LifestylePrivacyIcon,
     label: "Delivered",
     description: "Delivered safely and discreetly. Thank you!",
   },
