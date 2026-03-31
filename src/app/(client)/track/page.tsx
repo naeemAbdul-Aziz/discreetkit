@@ -37,6 +37,7 @@ import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { getSupabaseClient } from "@/lib/supabase";
 import Image from "next/image";
+import { DiscreetBoxIcon } from "@/components/icons/discreet-box-icon";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -239,7 +240,7 @@ function Tracker() {
       )}>
         <div>
           <h1 className={cn(
-            "font-black tracking-tighter mb-2",
+            "font-semibold tracking-tighter mb-2",
             trackingData ? "text-3xl" : "text-4xl px-4"
           )}>
             {trackingData ? "Order Status" : "Where is your order?"}
@@ -332,7 +333,7 @@ function OrderTrackingView({ order }: { order: Order }) {
 
           <div className="flex-1 text-center md:text-left z-10">
             <div className="flex flex-col md:flex-row md:items-baseline gap-2 mb-2">
-              <h2 className="text-3xl font-black tracking-tight">{currentStatus.label}</h2>
+              <h2 className="text-3xl font-semibold tracking-tight">{currentStatus.label}</h2>
               <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-0 rounded-full px-4 py-1 text-xs font-bold uppercase tracking-widest whitespace-nowrap">
                 Real-Time Update
               </Badge>
@@ -348,7 +349,7 @@ function OrderTrackingView({ order }: { order: Order }) {
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60 mb-1">
               Estimated Arrival
             </p>
-            <p className="text-xl font-black tracking-tight">Today, by 6:00 PM</p>
+            <p className="text-xl font-semibold tracking-tight">Today, by 6:00 PM</p>
           </div>
         </div>
       </div>
@@ -389,7 +390,7 @@ function OrderTrackingView({ order }: { order: Order }) {
                       )}>
                         <div className="flex justify-between items-start gap-4 mb-2">
                           <h4 className={cn(
-                            "font-black tracking-tight text-xl leading-none",
+                            "font-semibold tracking-tight text-xl leading-none",
                             isLatest ? "text-foreground" : "text-muted-foreground"
                           )}>
                             {getFriendlyEventTitle(event.status)}
@@ -439,15 +440,15 @@ function OrderTrackingView({ order }: { order: Order }) {
                   {item.image_url ? (
                     <Image src={item.image_url} alt={item.name} fill className="object-contain p-3 transition-transform group-hover:scale-110" />
                   ) : (
-                    <Package className="h-8 w-8 text-muted-foreground/20" />
+                    <DiscreetBoxIcon className="h-10 w-10 text-primary/30" />
                   )}
                 </div>
                 <div className="flex-1">
-                  <p className="font-black tracking-tight text-lg leading-tight mb-1">{item.name}</p>
+                  <p className="font-semibold tracking-tight text-lg leading-tight mb-1">{item.name}</p>
                   <p className="text-sm font-bold text-muted-foreground/60">Quantity: {item.quantity}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-black tracking-tight text-xl">GHS {item.price_ghs.toFixed(2)}</p>
+                  <p className="font-semibold tracking-tight text-xl">GHS {item.price_ghs.toFixed(2)}</p>
                 </div>
               </div>
             ))}
@@ -480,7 +481,7 @@ function OrderTrackingView({ order }: { order: Order }) {
             <div className="h-[1px] w-full bg-border/20 my-2" />
             <div className="flex justify-between items-baseline pt-2">
               <span className="text-muted-foreground uppercase text-[10px] tracking-widest">Total</span>
-              <span className="text-3xl font-black tracking-tighter">GHS {order.totalPrice.toFixed(2)}</span>
+              <span className="text-3xl font-semibold tracking-tighter">GHS {order.totalPrice.toFixed(2)}</span>
             </div>
           </div>
         </div>
@@ -492,7 +493,7 @@ function OrderTrackingView({ order }: { order: Order }) {
           </h3>
           <div className="space-y-6">
             <div>
-              <p className="font-black tracking-tight text-xl leading-tight mb-1">{order.deliveryArea}</p>
+              <p className="font-semibold tracking-tight text-xl leading-tight mb-1">{order.deliveryArea}</p>
               <p className="text-sm font-medium text-muted-foreground">Main Delivery Area</p>
             </div>
             {order.deliveryAddressNote && (
@@ -511,7 +512,7 @@ function OrderTrackingView({ order }: { order: Order }) {
                 <MessageSquare className="h-7 w-7 text-white" />
               </div>
               <div>
-                <h4 className="font-black tracking-tight text-xl">Need Help?</h4>
+                <h4 className="font-semibold tracking-tight text-xl">Need Help?</h4>
                 <p className="text-white/60 font-medium text-sm leading-snug">Tap to chat with us <br/>on WhatsApp 24/7.</p>
               </div>
             </div>
@@ -526,7 +527,7 @@ function OrderTrackingView({ order }: { order: Order }) {
             <div className="space-y-6">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1 text-primary">Rider Name</p>
-                <p className="font-black tracking-tight text-xl leading-tight text-primary">
+                <p className="font-semibold tracking-tight text-xl leading-tight text-primary">
                   {order.courierName}
                 </p>
               </div>
@@ -611,7 +612,7 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
                 )}
               </div>
               <div className="flex-1">
-                <h3 className="font-black tracking-tight text-2xl mb-1 mt-2">
+                <h3 className="font-semibold tracking-tight text-2xl mb-1 mt-2">
                   {subscription.product?.name || "Medication"}
                 </h3>
                 <p className="font-bold text-muted-foreground/80">
@@ -633,7 +634,7 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
                 </div>
                 <div>
                   <p className="text-[11px] font-bold uppercase tracking-widest opacity-80 mb-1">Next Delivery</p>
-                  <p className="text-3xl font-black tracking-tighter text-primary leading-none">
+                  <p className="text-3xl font-semibold tracking-tighter text-primary leading-none">
                     {daysUntilNextDelivery > 0
                       ? `In ${daysUntilNextDelivery} day${daysUntilNextDelivery !== 1 ? "s" : ""}`
                       : "Today"}
@@ -674,7 +675,7 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
                       )}>
                         <div className="flex justify-between items-start gap-4 mb-2">
                           <h4 className={cn(
-                            "font-black tracking-tight text-xl leading-none",
+                            "font-semibold tracking-tight text-xl leading-none",
                             isLatest ? "text-foreground" : "text-muted-foreground"
                           )}>
                             Refill Dispensed
@@ -749,7 +750,7 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
           <div className="space-y-6">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1">Masked Location</p>
-              <p className="font-black tracking-tight text-xl leading-tight">
+              <p className="font-semibold tracking-tight text-xl leading-tight">
                 {subscription.deliveryAddress?.city}
               </p>
               {subscription.deliveryAddress?.street && (
@@ -775,7 +776,7 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
             </h3>
             <div className="space-y-6">
               <div>
-                <p className="font-black tracking-tight text-xl leading-tight mb-2">
+                <p className="font-semibold tracking-tight text-xl leading-tight mb-2">
                   {subscription.pharmacy.name}
                 </p>
                 {subscription.pharmacy.phone && (
@@ -799,7 +800,7 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
                 <MessageSquare className="h-7 w-7 text-white" />
               </div>
               <div>
-                <h4 className="font-black tracking-tight text-xl">Need Help?</h4>
+                <h4 className="font-semibold tracking-tight text-xl">Need Help?</h4>
                 <p className="text-white/60 font-medium text-sm leading-snug">Tap to chat with us <br/>on WhatsApp 24/7.</p>
               </div>
             </div>

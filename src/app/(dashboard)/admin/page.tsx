@@ -280,40 +280,42 @@ export default function AdminDashboardPage() {
           />
         </div>
 
-        {/* Operational Pulse Ticker */}
-        <div className="bg-primary/[0.02] border border-primary/10 rounded-2xl p-4 overflow-hidden relative">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="flex items-center gap-1.5">
-              <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Live Operational Pulse</span>
-            </div>
-            <div className="h-px flex-1 bg-primary/10" />
+        {/* Operational Pulse Log */}
+        <div className="bg-white border rounded-xl shadow-sm p-5 space-y-4">
+          <div className="flex items-center gap-3 border-b pb-3">
+            <Activity className="h-4 w-4 text-primary" />
+            <span className="text-sm font-semibold uppercase tracking-wider text-foreground">
+              Live Operational Log
+            </span>
           </div>
-          <div className="space-y-2 h-[80px] overflow-hidden">
-            <AnimatePresence mode="popLayout">
-              {(data.pulseFeed || []).map((event: any, i: number) => (
-                <motion.div
-                  key={event.id || i}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="flex items-center gap-3 text-[11px] font-mono text-muted-foreground/80"
-                >
-                  <span className="text-primary font-bold shrink-0">[{new Date(event.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}]</span>
-                  <span className="text-foreground font-medium shrink-0">ORDER {event.orderCode}</span>
-                  <span className="h-1 w-1 rounded-full bg-muted-foreground/30 shrink-0" />
-                  <span className="truncate uppercase tracking-tight">{event.status.replace(/_/g, ' ')}</span>
+          <div className="space-y-3 max-h-[160px] overflow-y-auto pr-2">
+            {(data.pulseFeed || []).map((event: any, i: number) => (
+              <div
+                key={event.id || i}
+                className="flex items-start gap-4 text-xs font-mono leading-relaxed"
+              >
+                <span className="text-primary font-bold whitespace-nowrap">
+                  [{new Date(event.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}]
+                </span>
+                <span className="font-bold whitespace-nowrap text-foreground shrink-0 border border-border px-2 py-0.5 rounded-md shadow-sm">
+                  {event.orderCode}
+                </span>
+                <span className="text-muted-foreground font-medium flex-1 pt-0.5 group">
+                  <span className="uppercase tracking-widest text-[#333] font-semibold">{event.status.replace(/_/g, ' ')}</span>
                   {event.note && (
-                    <>
-                      <span className="h-1 w-1 rounded-full bg-muted-foreground/30 shrink-0" />
-                      <span className="truncate opacity-60 italic">{event.note}</span>
-                    </>
+                    <span className="ml-2 text-foreground/80 font-normal">
+                      · {event.note}
+                    </span>
                   )}
-                </motion.div>
-              ))}
-            </AnimatePresence>
+                </span>
+              </div>
+            ))}
+            {(!data.pulseFeed || data.pulseFeed.length === 0) && (
+              <div className="text-muted-foreground/60 text-sm font-medium py-4 text-center">
+                System is silent. No recent events to log.
+              </div>
+            )}
           </div>
-          <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-background/50 to-transparent pointer-events-none" />
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
