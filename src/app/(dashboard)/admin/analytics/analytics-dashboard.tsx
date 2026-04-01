@@ -125,9 +125,9 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
                 {(data?.totalRevenue || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
             </div>
             <div className="flex items-center text-[0.65rem] text-slate-500 mt-1 tracking-wide">
-                <span className="mr-2 font-black px-1.5 py-0.5 rounded text-[0.65rem] bg-teal-50 text-brand-teal">
-                    +20.1% vs last month
-                </span>
+            <span className="mr-2 font-semibold px-1.5 py-0.5 rounded text-[0.65rem] bg-slate-100 text-slate-600">
+              Live revenue from all orders
+            </span>
             </div>
           </CardContent>
         </Card>
@@ -143,9 +143,9 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
                 {data?.totalOrders || 0}
             </div>
             <div className="flex items-center text-[0.65rem] text-slate-500 mt-1 tracking-wide">
-                <span className="mr-2 font-black px-1.5 py-0.5 rounded text-[0.65rem] bg-teal-50 text-brand-teal">
-                    +15 orders vs last week
-                </span>
+            <span className="mr-2 font-semibold px-1.5 py-0.5 rounded text-[0.65rem] bg-slate-100 text-slate-600">
+              Total orders recorded
+            </span>
             </div>
           </CardContent>
         </Card>
@@ -161,9 +161,9 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
                 {data?.activePatients || 0}
             </div>
             <div className="flex items-center text-[0.65rem] text-slate-500 mt-1 tracking-wide">
-                <span className="mr-2 font-black px-1.5 py-0.5 rounded text-[0.65rem] bg-teal-50 text-brand-teal">
-                    +19% vs last month
-                </span>
+            <span className="mr-2 font-semibold px-1.5 py-0.5 rounded text-[0.65rem] bg-slate-100 text-slate-600">
+              Unique patients served
+            </span>
             </div>
           </CardContent>
         </Card>
@@ -182,9 +182,9 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
                     : 0}
             </div>
             <div className="flex items-center text-[0.65rem] text-slate-500 mt-1 tracking-wide">
-                <span className="mr-2 font-semibold px-1.5 py-0.5 rounded text-[0.65rem] bg-slate-100 text-slate-600">
-                    Flat WoW
-                </span>
+              <span className="mr-2 font-semibold px-1.5 py-0.5 rounded text-[0.65rem] bg-slate-100 text-slate-600">
+                Based on current order book
+              </span>
             </div>
           </CardContent>
         </Card>
@@ -208,7 +208,7 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
                 Revenue Horizon
               </CardTitle>
               <CardDescription className="text-xs">
-                Historical performance with standard 7-day predictive overlay.
+                Daily revenue over the last 30 days.
               </CardDescription>
             </CardHeader>
             <CardContent className="pl-0 pb-0">
@@ -240,16 +240,6 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
                         dot={{ r: 3, strokeWidth: 0, fill: '#1e3a5f' }}
                         connectNulls
                       />
-                      <Area 
-                        type="linear" 
-                        dataKey="predictedRevenue" 
-                        stroke="#c48c52" 
-                        strokeDasharray="5 5"
-                        strokeWidth={2}
-                        fill="none" 
-                        dot={{ r: 3, strokeWidth: 0, fill: '#c48c52' }}
-                        connectNulls
-                      />
                     </AreaChart>
                   </ResponsiveContainer>
                 ) : (
@@ -269,8 +259,7 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
                  <CardContent>
                     <div className="space-y-6">
                         {topPharmacies.length > 0 ? topPharmacies.map((pharmacy: any, index: number) => {
-                            const mockMinutes = 15 + (pharmacy.name.length * 2);
-                            return (
+                          return (
                                 <div className="flex items-center group relative p-2 -mx-2 hover:bg-slate-50 rounded-lg transition-colors" key={index}>
                                     <div className="w-6 h-6 rounded bg-brand-indigo/10 flex items-center justify-center shrink-0">
                                         <span className="text-[10px] font-black text-brand-indigo">{index + 1}</span>
@@ -278,11 +267,11 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
                                     <div className="ml-3 space-y-0.5 flex-1 min-w-0">
                                         <p className="text-[13px] font-bold text-foreground truncate">{pharmacy.name}</p>
                                         <div className="flex items-center gap-3">
-                                            <p className="text-[10px] text-slate-400 font-medium">Partner</p>
-                                            <p className="text-[10px] text-brand-teal font-semibold flex items-center gap-1">
-                                                <Activity className="h-3 w-3" />
-                                                Avg wait: {mockMinutes}m
-                                            </p>
+                                          <p className="text-[10px] text-slate-400 font-medium">Partner pharmacy</p>
+                                          <p className="text-[10px] text-brand-teal font-semibold flex items-center gap-1">
+                                            <Activity className="h-3 w-3" />
+                                            Live revenue node
+                                          </p>
                                         </div>
                                     </div>
                                     <div className="ml-auto text-right shrink-0">
