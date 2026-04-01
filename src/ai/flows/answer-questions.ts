@@ -7,11 +7,37 @@ export type AnswerQuestionsInput = {
   query: string;
   history: { role: 'user' | 'model'; parts: string }[];
   liveContext?: string;
+  role?: 'client' | 'admin' | 'pharmacy';
 };
 
 export type AnswerQuestionsOutput = {
   answer: string;
 };
+
+function getSystemPrompt(role: 'client' | 'admin' | 'pharmacy' = 'client', liveContext?: string) {
+  const baseInstructions = `Your primary goal is to answer questions based *only* on the official information provided in the KNOWLEDGE BASE and the LIVE PRODUCT DATA below.
+CRITICAL: ALWAYS prioritize LIVE PRODUCT DATA for stock availability and current pricing.
+If a product is marked as "OUT OF STOCK", inform the user.`;
+
+  const personas = {
+    client: `You are Pacely, a helpful and empathetic AI assistant for DiscreetKit Ghana. Your tone is inviting and understandable (use warm greetings like "Heyy there"). You provide a stigma-free environment for university students and young professionals.`,
+    admin: `You are the Elite Operational Copilot for DiscreetKit administrative staff. Your tone is highly professional, structured, and strictly analytical (FAANG internal ops style). Focus on platform health, system metrics, and operational velocity. Do NOT act like a customer support bot.`,
+    pharmacy: `You are the Pharmacy Fulfillment Copilot for DiscreetKit's partner pharmacists. Your tone is precise, practical, and logistics-oriented. Help with order review, rider coordination, and medical packaging standards. Do NOT act like a customer support bot.`
+  };
+
+  return `${personas[role]}
+
+${baseInstructions}
+
+---
+LIVE PRODUCT DATA:
+${liveContext || "No live data available."}
+
+---
+KNOWLEDGE BASE:
+${KNOWLEDGE_BASE}
+---`;
+}
 
 export async function answerQuestions(
   input: AnswerQuestionsInput
@@ -20,22 +46,7 @@ export async function answerQuestions(
     const messages: any[] = [
       {
         role: 'system',
-        content: `You are Pacely, a helpful, empathetic, but stern female AI assistant for DiscreetKit Ghana. Your tone is inviting and understandable (use warm greetings like "Heyy there" where appropriate), but remain firm, professional, and accurate regarding health and service details. You provide a stigma-free environment.
-Your primary goal is to answer user questions based *only* on the official information provided in the KNOWLEDGE BASE and the LIVE PRODUCT DATA below.
-
-CRITICAL: ALWAYS prioritize LIVE PRODUCT DATA for stock availability and current pricing. The knowledge base may contain legacy pricing; the live data is the source of truth for current availability.
-If a product is marked as "OUT OF STOCK" in the live data, inform the user they can still add it to their wishlist or check back later.
-
-Keep your answers concise, reassuring, and tailored to university students and young professionals in Ghana.
-
----
-LIVE PRODUCT DATA:
-${input.liveContext || "No live data available."}
-
----
-KNOWLEDGE BASE:
-${KNOWLEDGE_BASE}
----`,
+        content: getSystemPrompt(input.role, input.liveContext),
       }
     ];
 
@@ -68,9 +79,8 @@ ${KNOWLEDGE_BASE}
     return { answer };
   } catch (error) {
     console.error('OpenAI API error:', error);
-    // Fallback to simple response
     return {
-      answer: "I'm here to help! For detailed information about our products, pricing, and services, please browse our website or contact our support team.",
+      answer: "I'm here to help! For detailed information about our products and services, please browse our website or contact our support team.",
     };
   }
 }

@@ -19,10 +19,13 @@ By managing state at the edge (Pharmacy Portal), we reduce the risk of out-of-sy
 - Controlled alerts: Admin SMS endpoints require bearer auth; no customer PII exposed in alert content.
 - Audit trails: Escalation and reservation events recorded in `order_events` with timestamps.
 
+## April 2026 Privacy Modernization ("Command Center" Sprint)
+- **Identifier Masking Protocol**: Implemented real-time server-side masking for Phone numbers and Street addresses across all non-essential operational viewports (e.g., `StatCard` and `RankingList` analytics).
+- **Role-Based Workspace Isolation**: Refined the RBAC layer to ensure pharmacists interact with logistics-specific metadata while sensitive PII remains logic-masked by default.
+- **Tenant Isolation Enforcement**: Verified strict RLS (Row Level Security) and ownership checks, ensuring zero data leakage between competitive pharmacy nodes.
+- **Business Impact**: Reduces legal PII risk and significantly lowers insurance costs for the core health-logistics platform.
+
 ## February 2026 Compliance Reinforcements
-- **Tenant Isolation:** Confirmed RLS on `orders` and full RLS on `pharmacy_riders`; optional orders UPDATE policy documented for cases where client-side writes are enabled, otherwise server-side updates with ownership checks.
-- **Observability with Privacy:** Sentry captures exceptions and operational breadcrumbs (status transitions, SMS attempts) without storing PII; logs use masked identifiers.
-- **Idempotent Notifications:** Prevent duplicate SMS on unchanged statuses to minimize exposure and noise; deduplicated events keep audits concise.
 # Compliance & Privacy Infrastructure Report
 **Subject:** How We Protect User Data (GDPR/HIPAA Standards)  
 **Security Level:** High Assurance

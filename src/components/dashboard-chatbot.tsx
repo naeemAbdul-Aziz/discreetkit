@@ -78,22 +78,27 @@ export function DashboardChatbot({ role }: { role: "admin" | "pharmacy" }) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-xl overflow-hidden shadow-sm border mt-4">
+    <div className="flex flex-col h-full bg-white">
       <div className="flex-1 overflow-hidden relative">
-        <ScrollArea className="h-full px-4" ref={scrollAreaRef}>
-          <div className="space-y-4 py-4">
+        <ScrollArea className="h-full" ref={scrollAreaRef}>
+          <div className="space-y-6 p-6">
             {history.map((msg, index) => {
               const isInitial = index === 0 && msg.role === "model";
 
               if (isInitial) {
                 return (
-                  <div key={index} className="flex flex-col items-center justify-center py-6 space-y-4 text-center">
-                    <div className="h-12 w-12 rounded-full overflow-hidden flex items-center justify-center bg-primary/10 border border-primary/20">
-                      <Terminal className="h-6 w-6 text-primary" />
+                  <div key={index} className="flex flex-col items-center justify-center py-12 space-y-4 text-center">
+                    <div className="h-16 w-16 rounded-full overflow-hidden shadow-sm border border-slate-100 mb-2">
+                       <img src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png" alt="Pacely" className="h-full w-full object-cover" />
                     </div>
-                    <p className="text-sm text-muted-foreground max-w-[250px] font-mono leading-relaxed">
-                      {msg.parts}
-                    </p>
+                    <div className="space-y-2">
+                      <h2 className="text-xl font-bold tracking-tight text-slate-900">
+                         Hi, I'm <span className="font-bold">pacely.</span>
+                      </h2>
+                      <p className="text-xs text-slate-400 max-w-[240px] mx-auto font-medium leading-relaxed">
+                        {msg.parts}
+                      </p>
+                    </div>
                   </div>
                 );
               }
@@ -102,16 +107,21 @@ export function DashboardChatbot({ role }: { role: "admin" | "pharmacy" }) {
                 <div
                   key={index}
                   className={cn(
-                    "flex max-w-[90%] md:max-w-[85%]",
-                    msg.role === "user" ? "ml-auto" : "mr-auto"
+                    "flex items-start gap-3",
+                    msg.role === "user" ? "justify-end" : "justify-start"
                   )}
                 >
+                  {msg.role === "model" && (
+                    <div className="h-8 w-8 rounded-full overflow-hidden flex-shrink-0 mt-1 shadow-sm border border-brand-indigo/10">
+                      <img src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png" alt="Pacely" className="h-full w-full object-cover" />
+                    </div>
+                  )}
                   <div
                     className={cn(
-                      "px-4 py-3 rounded-2xl",
+                      "max-w-[85%] rounded-2xl p-4 text-sm",
                       msg.role === "user"
-                        ? "bg-primary text-primary-foreground rounded-tr-sm"
-                        : "bg-muted text-muted-foreground rounded-tl-sm border"
+                        ? "bg-slate-900 text-white rounded-tr-none"
+                        : "bg-slate-100 text-slate-900 rounded-tl-none font-medium"
                     )}
                   >
                     <FormattedMessage text={msg.parts} />
@@ -121,11 +131,12 @@ export function DashboardChatbot({ role }: { role: "admin" | "pharmacy" }) {
             })}
             
             {isPending && (
-              <div className="flex mr-auto max-w-[85%]">
-                <div className="px-4 py-3 rounded-2xl bg-muted rounded-tl-sm border flex gap-1 items-center h-[44px]">
-                  <div className="h-1.5 w-1.5 rounded-full bg-muted-foreground/40 animate-bounce [animation-delay:-0.3s]" />
-                  <div className="h-1.5 w-1.5 rounded-full bg-muted-foreground/40 animate-bounce [animation-delay:-0.15s]" />
-                  <div className="h-1.5 w-1.5 rounded-full bg-muted-foreground/40 animate-bounce" />
+              <div className="flex items-start gap-3 justify-start">
+                <div className="h-8 w-8 rounded-full overflow-hidden flex-shrink-0 mt-1 shadow-sm border border-brand-indigo/10">
+                  <img src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png" alt="Pacely" className="h-full w-full object-cover opacity-80" />
+                </div>
+                <div className="max-w-[80%] rounded-2xl p-4 text-sm bg-brand-silver text-brand-indigo font-medium flex items-center gap-2">
+                   Thinking...
                 </div>
               </div>
             )}
@@ -135,26 +146,28 @@ export function DashboardChatbot({ role }: { role: "admin" | "pharmacy" }) {
 
       <div className="p-4 border-t bg-white">
         <form onSubmit={handleSubmit} className="relative flex items-end gap-2">
-          <Textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder={role === "admin" ? "Query system records..." : "Query pharmacy records..."}
-            className="min-h-[52px] w-full resize-none rounded-2xl border-muted bg-muted/50 px-4 py-3.5 pr-12 text-sm focus-visible:ring-primary/20 shadow-none font-medium"
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmit(e);
-              }
-            }}
-          />
-          <Button
-            type="submit"
-            disabled={!input.trim() || isPending}
-            size="icon"
-            className="absolute right-1.5 bottom-1.5 h-10 w-10 shrink-0 rounded-xl transition-all"
-          >
-            <Send className="h-4 w-4 ml-0.5" />
-          </Button>
+          <div className="relative flex-1 group">
+            <Textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={role === "admin" ? "Query system records..." : "Query pharmacy records..."}
+              className="min-h-[52px] w-full resize-none rounded-2xl border-brand-indigo/5 bg-brand-silver/30 px-5 py-4 text-sm focus-visible:ring-brand-indigo/10 shadow-none font-medium placeholder:text-brand-indigo/30"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubmit(e);
+                }
+              }}
+            />
+            <Button
+              type="submit"
+              disabled={!input.trim() || isPending}
+              size="icon"
+              className="absolute right-2 bottom-2 h-9 w-9 shrink-0 rounded-xl bg-brand-indigo hover:opacity-90 transition-all shadow-md group-active:scale-95"
+            >
+              <Send className="h-4 w-4 text-white" />
+            </Button>
+          </div>
         </form>
       </div>
     </div>

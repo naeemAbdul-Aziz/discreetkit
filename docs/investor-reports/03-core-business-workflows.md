@@ -13,6 +13,13 @@ The operational interface for Pharmacy partners now utilizes an **Optimistic Tra
 - **Resilience**: If the server-side update fails, the UI automatically rolls back and provides an error notification.
 - **Business Impact**: Reduces perceived latency to zero, maximizing throughput in high-volume delivery scenarios.
 
+### 3. Pacely Copilot Architecture (Multimodal AI)
+The platform uses a role-aware AI orchestration layer to provide context-specific operational support:
+- **Workspace-Aware Personas**: Sophisticated logic separation between **Admin (Strategic)** and **Pharmacy (Logistics)** personas ensures zero conversational "bleeding" and maximum utility.
+- **Executive Analytics**: The Admin persona leverages system-wide metrics (Velocity/Density) to generate sub-second insights into platform health.
+- **Fulfillment Logistics**: The Pharmacy persona provides tactical support for rider coordination, stock thresholds, and medical packaging standards.
+- **Business Impact**: Serves as a "Logistics Multiplier," reducing training time for new partners and minimizing operational friction.
+
 ---
 
 ## March 2026 Workflow Additions

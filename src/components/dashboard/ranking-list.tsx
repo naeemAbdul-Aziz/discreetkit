@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Trophy, TrendingUp } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 interface RankingItem {
   name: string
@@ -15,9 +16,10 @@ interface RankingListProps {
   description?: string
   items: RankingItem[]
   type: 'pharmacy' | 'product'
+  className?: string
 }
 
-export function RankingList({ title, description, items, type }: RankingListProps) {
+export function RankingList({ title, description, items, type, className }: RankingListProps) {
   // Calculate max value for relative bar scaling
   const maxVal = Math.max(
     ...items.map((item) => {
@@ -29,26 +31,29 @@ export function RankingList({ title, description, items, type }: RankingListProp
   );
 
   return (
-    <Card className="border border-slate-200 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] transition-all duration-200 hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.06)] hover:scale-[1.01] bg-card overflow-hidden">
-      <CardHeader className="pb-4">
+    <Card className={cn(
+      "border border-slate-200/50 shadow-sm transition-all duration-300 hover:shadow-md rounded-3xl overflow-hidden bg-white",
+      className
+    )}>
+      <CardHeader className="p-6 pb-4">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <CardTitle className="text-[0.75rem] font-semibold uppercase tracking-[0.05em] text-slate-500 flex items-center gap-2">
+            <CardTitle className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400 flex items-center gap-2">
               {type === 'pharmacy' ? (
-                <Trophy className="h-3.5 w-3.5 text-amber-500" />
+                <Trophy className="h-3.5 w-3.5 text-amber-500/70" />
               ) : (
-                <TrendingUp className="h-3.5 w-3.5 text-brand-teal" />
+                <TrendingUp className="h-3.5 w-3.5 text-brand-teal/70" />
               )}
               {title}
             </CardTitle>
-            {description && <CardDescription className="text-[0.65rem] opacity-80">{description}</CardDescription>}
+            {description && <CardDescription className="text-[10px] font-medium text-slate-400 pl-5.5">{description}</CardDescription>}
           </div>
-          <Badge variant="outline" className="bg-slate-50 border-slate-200 text-slate-500 text-[9px] uppercase tracking-wider font-bold px-2 py-0 h-5">
+          <Badge variant="outline" className="bg-slate-50/50 border-slate-100 text-slate-400 text-[8px] uppercase tracking-wider font-bold px-2 py-0.5 h-5 rounded-md">
             Live
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="px-0">
+      <CardContent className="px-0 pt-2">
         <div className="space-y-1">
           {items.length === 0 ? (
             <p className="text-xs text-muted-foreground text-center py-8">No performance data yet.</p>
