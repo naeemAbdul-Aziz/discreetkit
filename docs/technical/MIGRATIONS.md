@@ -1,3 +1,10 @@
+## 2026-04-01 — Unified Baseline & Migration Squash
+
+- **Baseline**: `20260401000000_consolidated_schema.sql`
+- **Purpose**: Consolidated all incremental migrations into a single structural baseline for the **Command Center** sprint.
+- **Key Logic**: Migrations are now 100% DDL/structural. All operational test data (Silver Pill Pharmacy, Rider John) has been relocated to `supabase/seed.sql`.
+
+---
 ## 2026-01-30 — ESLint v9 Flat Config & React Rule Enforcement
 
 - Migrated to ESLint v9 flat config and updated `package.json` to call it explicitly.

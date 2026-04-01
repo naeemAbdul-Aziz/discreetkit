@@ -239,19 +239,15 @@ To ensure orders transition out of `pending_payment` even if Paystack webhooks a
 * On the payment success page (`/order/success`), once payment is verified (or already confirmed via webhook), the cart is cleared programmatically to avoid accidental reorders and ensure a clean slate.
 * The clear operation is guarded so it only runs once per success visit.
 
-### 3.7. AI Chatbot (Genkit)
-
-* **Framework:** `Firebase Genkit` with the `googleAI` plugin.
-* **Implementation:**
-  * A Genkit flow is defined in `src/ai/flows/answer-questions.ts`.
-  * This flow uses a prompt that is heavily augmented with a **Knowledge Base** (`src/ai/knowledge.ts`) containing official information about DiscreetKit's products, policies, and process.
-  * This "Retrieval-Augmented Generation" (RAG) approach ensures the AI provides answers based on factual data, not external knowledge, preventing hallucinations.
-  * The `handleChat` server action provides the secure interface for the frontend to access this flow.
-
-#### AI Configuration
-
-* Ensure `GOOGLE_GENAI_API_KEY` is configured for the `@genkit-ai/googleai` plugin (see `src/ai/genkit.ts`).
-* During development or when the API key is unavailable, the app currently uses a temporary fallback (`src/ai/flows/answer-questions-fallback.ts`) wired in `src/lib/actions.ts`. You can switch to the full Genkit flow by importing from `src/ai/flows/answer-questions` once the environment is ready.
+### 3.7. AI Chatbot (Pacely Copilot)
+- **Engine**: Google Gemini 1.5 Flash via `Firebase Genkit`.
+- **Orchestration**: The system uses a **Multimodal Role-Aware Dispatcher** to switch personas based on the initiating portal.
+- **Role-Based Personas**:
+    - **Client Persona**: Friendly, empathetic, and health-focused.
+    - **Admin Persona**: Strategic and analytical (Executive insights).
+    - **Pharmacy Persona**: Logistics-oriented (Fulfillment precision).
+- **Context Isolation**: Strictly isolated via `AnswerQuestionsInput.role`. Prevents conversational bleeding between portals.
+- **RAG Architecture**: Retrieval-Augmented Generation using a static **Knowledge Base** (`src/ai/knowledge.ts`) ensures zero hallucinations regarding platform policies.
 
 ### 3.8. SMS Notifications (Arkesel)
 
@@ -271,64 +267,52 @@ To ensure orders transition out of `pending_payment` even if Paystack webhooks a
 
 ---
 
-This modular and secure design allows each part of the system to perform its function independently, ensuring the application is robust, maintainable, and can be scaled effectively in the future.
+### 3.10. Role-Based Data Access (RLS) & Masking
+* **Identifier Masking (NEW)**: PII (Phone/Address) is masked server-side in `actions.ts` / `admin-actions.ts` before reaching the dashboard, enforcing a "Need-to-Know" data access protocol.
+* **Orders**: RLS SELECT policies restrict pharmacies to their own orders.
+* **Riders**: Full RLS (SELECT/INSERT/UPDATE/DELETE) per pharmacy for `pharmacy_riders`, ensuring one pharmacy cannot manage or see another's fleet.
+* **Admin/Service Role**: Maintains full access via role checks; never exposed to the browser.
 
 ---
 
 ## 4. Visual Architecture & Diagrams
 
-### 4.1. Global System Topology
+### 4.1. Global System Topology (AI-Centric)
 
-This high-level view illustrates how the different client interfaces interact with the backend kernel and external services.
+This high-level view illustrates how **Pacely Copilot** serves as the central orchestration layer for all workspace interactions.
 
 ```mermaid
 graph TD
-    subgraph Clients
-        Web["Web Storefront (Next.js)"]
-        WA["WhatsApp Assistant (Twilio)"]
-        Admin["Admin Dashboard"]
-        Pharm["Pharmacy Portal"]
+    subgraph Users
+        Client["Web Client"]
+        AdminUser["Administrator"]
+        PharmaUser["Pharmacist"]
     end
 
-    subgraph BackendKernel
-        DB[("PostgreSQL")]
-        Auth["GoTrue Auth"]
-        Realitme["Realtime Engine"]
-        Storage["File Storage"]
+    subgraph PacelyCopilot["Pacely Copilot (AI Orchestrator)"]
+        PersonaDispatch{Persona Dispatcher}
+        PersonaDispatch -->|Client Context| ClientAI[Health Assistant]
+        PersonaDispatch -->|Admin Context| StrategicAI[Ops Copilot]
+        PersonaDispatch -->|Pharma Context| LogisticsAI[Fulfillment Copilot]
     end
 
-    subgraph EdgeLogic
+    subgraph BackendEngine["Backend Engine"]
         API["Next.js Server Actions"]
-        Cron["Cron Jobs"]
-        BaaS["Edge Functions"]
+        DB[("Supabase (PostgreSQL)")]
+        Realtime["Realtime Engine"]
     end
 
-    subgraph ExternalServices
-        Paystack["Paystack (Payments)"]
-        Arkesel["Arkesel (SMS)"]
-        Genkit["Google Gemini (AI)"]
-        Maps["Google Maps API"]
+    subgraph Systems["External Ecosystem"]
+        Paystack["Paystack Payments"]
+        Arkesel["Arkesel SMS"]
+        Maps["Google Maps"]
     end
 
-    Web -->|HTTPS| API
-    Admin -->|HTTPS| API
-    Pharm -->|HTTPS| API
-    
-    WA -->|Webhook| API
-    
-    API -->|Query/Mutate| DB
-    API -->|Auth Check| Auth
-    
-    API -->|Charge| Paystack
-    API -->|Notify| Arkesel
-    API -->|RAG| Genkit
-    
-    Paystack -->|Webhook| API
-    
-    DB -->|CDC Events| Realitme
-    Realitme -->|Websocket| Admin
-    Realitme -->|Websocket| Pharm
-    Realitme -->|Websocket| Web
+    Users -->|Request| PersonaDispatch
+    PacelyCopilot -->|Augment| API
+    API -->|Mutate/Query| DB
+    DB -->|Notify| Systems
+    DB -->|Realtime Update| Users
 ```
 
 ### 4.2. WhatsApp Commerce Flow (The "Ghost Order" Engine)

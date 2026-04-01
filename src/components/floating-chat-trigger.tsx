@@ -11,11 +11,20 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { DashboardChatbot } from "./dashboard-chatbot";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 export function FloatingChatTrigger() {
   const router = useRouter();
   const pathname = usePathname();
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   // Hide the floating trigger when already on the dedicated chat page
   if (pathname?.startsWith("/chat")) {
@@ -47,7 +56,7 @@ export function FloatingChatTrigger() {
   );
 
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.8 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -55,21 +64,39 @@ export function FloatingChatTrigger() {
         className="fixed bottom-6 right-6 z-[100]"
       >
         {isDashboard ? (
-          <Sheet>
-            <SheetTrigger asChild>
-              {triggerButton}
-            </SheetTrigger>
-            <SheetContent className="w-[400px] sm:w-[540px] flex flex-col p-6 bg-[#f5f5f1]">
-              <SheetHeader>
-                <SheetTitle className="text-xl font-bold tracking-tight">
-                  {isAdmin ? "Admin Command Center" : "Pharmacy Copilot"}
-                </SheetTitle>
-              </SheetHeader>
-              <div className="flex-1 overflow-hidden">
-                <DashboardChatbot role={role!} />
-              </div>
-            </SheetContent>
-          </Sheet>
+          isDesktop ? (
+            <Dialog>
+              <DialogTrigger asChild>
+                {triggerButton}
+              </DialogTrigger>
+              <DialogContent className="max-w-xl h-[640px] flex flex-col p-0 overflow-hidden bg-white rounded-3xl border border-slate-200/50 shadow-xl">
+                <DialogHeader className="p-6 pb-4 border-b bg-slate-50/50 text-center sm:text-center">
+                  <DialogTitle className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400">
+                    {isAdmin ? "Admin Operations" : "Pharmacy Protocol"}
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="flex-1 overflow-hidden relative">
+                  <DashboardChatbot role={role!} />
+                </div>
+              </DialogContent>
+            </Dialog>
+          ) : (
+            <Sheet>
+              <SheetTrigger asChild>
+                {triggerButton}
+              </SheetTrigger>
+              <SheetContent className="w-full sm:w-[500px] flex flex-col p-0 bg-white border-l border-slate-100">
+                <SheetHeader className="p-5 border-b">
+                  <SheetTitle className="text-sm font-bold text-slate-900">
+                    {isAdmin ? "Admin Command" : "Pharmacy Copilot"}
+                  </SheetTitle>
+                </SheetHeader>
+                <div className="flex-1 overflow-hidden">
+                  <DashboardChatbot role={role!} />
+                </div>
+              </SheetContent>
+            </Sheet>
+          )
         ) : (
           triggerButton
         )}

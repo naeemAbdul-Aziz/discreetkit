@@ -653,7 +653,7 @@ export async function getDashboardStats() {
             .select('status, total_price_ghs, created_at, items, delivery_area, code, pharmacies(name), order_events(status, created_at, note)')
             .order('created_at', { ascending: false }),
         supabase.from('pharmacies').select('id', { count: 'exact', head: true }),
-        supabase.from('riders').select('id', { count: 'exact', head: true })
+        supabase.from('pharmacy_riders').select('id', { count: 'exact', head: true })
     ]);
 
     if (ordersError) throw new Error(ordersError.message);

@@ -32,7 +32,7 @@ import {
 } from "recharts";
 import { cn } from "@/lib/utils";
 
-const COLORS = ['#1e3a5f', '#187f76', '#c48c52', '#d7d9db', '#ffce07', '#059669'];
+const COLORS = ['#4f46e5', '#188179', '#c48c52', '#94a3b8', '#fbbf24', '#059669'];
 
 interface AnalyticsDashboardProps {
   data: {
@@ -47,20 +47,24 @@ interface AnalyticsDashboardProps {
   };
 }
 
-// Custom tooltip for Revenue Chart
 const CustomRevenueTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     const isProjected = payload[0].dataKey === "predictedRevenue";
     return (
-      <div className="bg-white border border-slate-200 shadow-xl rounded-lg p-3 w-48">
-        <p className="text-[10px] font-bold uppercase text-slate-500 mb-1">{label}</p>
-        <p className="text-lg font-black tracking-tight text-brand-indigo tabular-nums">
-          GHS {payload[0].value.toLocaleString()}
+      <div className="bg-slate-900 border border-slate-800 shadow-2xl rounded-2xl p-4 w-52 animate-in fade-in zoom-in-95 duration-200">
+        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">{label}</p>
+        <p className="text-xl font-black tracking-tight text-white tabular-nums">
+          ₵{payload[0].value.toLocaleString()}
         </p>
         {isProjected ? (
-          <p className="text-[10px] text-amber-600 font-semibold mt-1">Projected Forecast</p>
+          <div className="flex items-center gap-2 mt-2">
+            <div className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse" />
+            <p className="text-[10px] text-amber-400 font-black uppercase tracking-widest">Projected Forecast</p>
+          </div>
         ) : (
-          <p className="text-[10px] text-emerald-600 font-semibold mt-1">▲ 12% vs last week</p>
+          <p className="text-[10px] text-brand-teal font-black uppercase tracking-widest mt-2 flex items-center gap-1.5">
+            <TrendingUp className="h-3 w-3" /> ▲ 12.4% yield
+          </p>
         )}
       </div>
     );
@@ -145,19 +149,19 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
           
           <div className="space-y-2">
             <div className="flex items-center gap-3">
-              <Badge className="bg-brand-gold/20 text-brand-gold border-brand-gold/30 font-black text-[10px] uppercase tracking-[0.2em] px-2.5">Neural Insight Engine</Badge>
-              <span className="text-white/40 text-[10px] font-black uppercase tracking-widest">Real-time Stream Analysis</span>
+              <Badge className="bg-amber-400/20 text-amber-400 border-amber-400/30 font-black text-[9px] uppercase tracking-[0.25em] px-3 py-1 rounded-md">Neural Insight Engine</Badge>
+              <span className="text-white/40 text-[9px] font-black uppercase tracking-[0.2em]">Real-time Stream Analysis</span>
             </div>
-            <h3 className="text-white text-xl font-black tracking-tight leading-tight">Executive Operations Forecast</h3>
-            <p className="text-slate-300 text-sm leading-relaxed font-medium max-w-3xl">
-              Platform revenue is pacing <span className="text-emerald-400 font-bold">+28.4% above quarterly mean</span>. 
-              Anomalous demand detected for <span className="text-white font-bold italic">HIV Self-Test Matrix</span> in <span className="text-white font-bold underline decoration-brand-teal decoration-2 italic underline-offset-4">University Regions</span>. 
-              Recommend <span className="text-brand-gold font-bold italic">Supply Priority Shift</span> to pharmacies within a 5km radius of UGMC hotspots to mitigate potential stock-outs.
+            <h3 className="text-white text-2xl font-black tracking-tight leading-tight">Executive Operations Forecast</h3>
+            <p className="text-slate-300 text-[13px] leading-relaxed font-medium max-w-3xl opacity-80">
+              Platform revenue is pacing <span className="text-brand-teal font-black tracking-widest">+28.4% above quarterly mean</span>. 
+              Anomalous demand detected for <span className="text-white font-black italic">HIV Self-Test Matrix</span> in <span className="text-white font-black underline decoration-brand-teal decoration-2 italic underline-offset-4 tracking-tighter">University Regions</span>. 
+              Recommend <span className="text-amber-400 font-black italic tracking-widest">Supply Priority Shift</span> to pharmacies within a 5km radius to mitigate stock-outs.
             </p>
           </div>
           
           <div className="ml-auto hidden xl:block">
-            <Button className="bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl font-black text-xs h-11 px-6 backdrop-blur-md transition-all active:scale-95 shadow-xl">
+            <Button className="bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-[1.25rem] font-black text-[10px] uppercase tracking-widest h-12 px-8 backdrop-blur-md transition-all active:scale-95 shadow-2xl">
               Run Probability Model
             </Button>
           </div>
@@ -177,7 +181,7 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
                 {(data?.totalRevenue || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
             </div>
             <div className="flex items-center text-[0.65rem] text-slate-500 mt-1 tracking-wide">
-                <span className="mr-2 font-semibold px-1.5 py-0.5 rounded text-[0.65rem] bg-emerald-50 text-emerald-600">
+                <span className="mr-2 font-black px-1.5 py-0.5 rounded text-[0.65rem] bg-teal-50 text-brand-teal">
                     +20.1% vs last month
                 </span>
             </div>
@@ -195,7 +199,7 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
                 {data?.totalOrders || 0}
             </div>
             <div className="flex items-center text-[0.65rem] text-slate-500 mt-1 tracking-wide">
-                <span className="mr-2 font-semibold px-1.5 py-0.5 rounded text-[0.65rem] bg-emerald-50 text-emerald-600">
+                <span className="mr-2 font-black px-1.5 py-0.5 rounded text-[0.65rem] bg-teal-50 text-brand-teal">
                     +15 orders vs last week
                 </span>
             </div>
@@ -213,7 +217,7 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
                 {data?.activePatients || 0}
             </div>
             <div className="flex items-center text-[0.65rem] text-slate-500 mt-1 tracking-wide">
-                <span className="mr-2 font-semibold px-1.5 py-0.5 rounded text-[0.65rem] bg-emerald-50 text-emerald-600">
+                <span className="mr-2 font-black px-1.5 py-0.5 rounded text-[0.65rem] bg-teal-50 text-brand-teal">
                     +19% vs last month
                 </span>
             </div>

@@ -57,23 +57,23 @@ export function OrderDetailsSheet({
 
   const getStatusBadge = (status: string, ackStatus?: string) => {
     if (status === "processing" && ackStatus === "accepted") {
-      return <Badge variant="success" className="gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 border-emerald-100 font-bold uppercase text-[10px] tracking-wider"><Package className="h-3 w-3" /> Preparing</Badge>;
+      return <Badge variant="success" className="gap-1.5 px-3 py-1 bg-teal-50 text-brand-teal border-teal-100 font-black uppercase text-[9px] tracking-widest rounded-md"><Package className="h-3 w-3" /> Fulfilling</Badge>;
     }
     const variants: any = {
-      received: { variant: "secondary", label: "New Order" },
-      processing: { variant: "info", label: "Preparing" },
-      out_for_delivery: { variant: "warning", label: "Out for Delivery" },
-      completed: { variant: "success", label: "Delivered" },
+      received: { variant: "secondary", label: "Awaiting Action", color: "bg-slate-100 text-slate-600" },
+      processing: { variant: "info", label: "In Preparation", color: "bg-indigo-50 text-brand-indigo" },
+      out_for_delivery: { variant: "warning", label: "In Transit", color: "bg-amber-50 text-amber-600" },
+      completed: { variant: "success", label: "Handed Over", color: "bg-emerald-50 text-emerald-600" },
     };
-    const config = variants[status] || { variant: "neutral", label: status };
-    return <Badge variant={config.variant} className="px-3 py-1 font-bold uppercase text-[10px] tracking-wider">{config.label}</Badge>;
+    const config = variants[status] || { variant: "neutral", label: status, color: "bg-slate-100 text-slate-500" };
+    return <Badge className={cn("px-3 py-1 font-black uppercase text-[9px] tracking-widest border-none rounded-md", config.color)}>{config.label}</Badge>;
   };
 
   const steps = [
-    { id: "received", label: "Received", icon: Clock },
-    { id: "processing", label: "Preparing", icon: Package },
-    { id: "delivery", label: "Delivery", icon: Truck },
-    { id: "completed", label: "Delivered", icon: CheckCircle },
+    { id: "received", label: "Queue", icon: Clock },
+    { id: "processing", label: "Prep", icon: Package },
+    { id: "delivery", label: "Logistics", icon: Truck },
+    { id: "completed", label: "Finalized", icon: CheckCircle },
   ];
 
   const getCurrentStepIndex = () => {
@@ -87,58 +87,60 @@ export function OrderDetailsSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full sm:max-w-xl overflow-y-auto p-0 border-none bg-slate-50/50">
-        <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-slate-100 p-6">
-          <SheetHeader className="space-y-4">
+      <SheetContent className="w-full sm:max-w-xl overflow-y-auto p-0 border-none bg-white shadow-2xl">
+        <div className="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-slate-100/50 p-8">
+          <SheetHeader className="space-y-6">
             <div className="flex items-center justify-between">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => onOpenChange(false)}
-                className="h-10 w-10 rounded-xl hover:bg-slate-100"
+                className="h-10 w-10 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-900 transition-all"
               >
                 <ChevronLeft className="h-5 w-5" />
               </Button>
               {getStatusBadge(order.status, order.pharmacy_ack_status)}
             </div>
-            <div>
-              <SheetTitle className="text-2xl font-black tracking-tighter text-slate-900 font-mono">
+            <div className="space-y-1">
+              <SheetTitle className="text-3xl font-extrabold tracking-tight text-slate-900 leading-none">
                 {order.code}
               </SheetTitle>
-              <SheetDescription className="font-medium text-slate-500">Dispatch Command Center</SheetDescription>
+              <div className="flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-brand-indigo animate-pulse" />
+                <SheetDescription className="font-bold text-[10px] uppercase tracking-[0.2em] text-slate-400">Dispatch Operations Matrix</SheetDescription>
+              </div>
             </div>
           </SheetHeader>
         </div>
 
-        <div className="p-6 space-y-8 pb-32">
-          {/* Progress Stepper */}
-          <div className="relative px-2">
-            <div className="absolute top-4 left-0 w-full h-0.5 bg-slate-200" />
+        <div className="p-8 space-y-10 pb-32 animate-in fade-in slide-in-from-right-4 duration-500">
+          {/* Progress Timeline */}
+          <div className="relative px-4">
+            <div className="absolute top-5 left-0 w-full h-[1px] bg-slate-100" />
             <div className="relative flex justify-between">
               {steps.map((step, idx) => {
                 const isActive = idx <= activeIndex;
                 const isCurrent = idx === activeIndex;
                 
                 return (
-                  <div key={step.id} className="flex flex-col items-center gap-3 z-10">
+                  <div key={step.id} className="flex flex-col items-center gap-4 z-10">
                     <motion.div 
                       initial={false}
                       animate={{ 
-                        backgroundColor: isActive ? "var(--brand-teal)" : "#f1f5f9",
-                        scale: isCurrent ? 1.1 : 1,
-                        borderColor: isCurrent ? "var(--brand-teal)" : "transparent"
+                        scale: isCurrent ? 1.15 : 1,
                       }}
-                      style={{ backgroundColor: isActive ? "#188179" : "#f1f5f9" }}
                       className={cn(
-                        "w-8 h-8 rounded-xl flex items-center justify-center border-2 transition-shadow shadow-sm",
-                        isActive ? "text-white shadow-brand-teal/20" : "text-slate-400 border-slate-200"
+                        "w-10 h-10 rounded-2xl flex items-center justify-center border-4 transition-all duration-500",
+                        isActive 
+                          ? "bg-brand-indigo border-indigo-50 text-white shadow-xl shadow-brand-indigo/10" 
+                          : "bg-white border-slate-50 text-slate-300"
                       )}
                     >
                       <step.icon className="h-4 w-4" />
                     </motion.div>
                     <span className={cn(
-                      "text-[10px] font-black uppercase tracking-widest",
-                      isActive ? "text-brand-teal" : "text-slate-400 alpha-60"
+                      "text-[9px] font-black uppercase tracking-[0.15em] transition-colors duration-500",
+                      isActive ? "text-brand-indigo" : "text-slate-300"
                     )}>
                       {step.label}
                     </span>
@@ -148,155 +150,168 @@ export function OrderDetailsSheet({
             </div>
           </div>
 
-          {/* Info Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 rounded-2xl bg-white border border-slate-100 space-y-3 shadow-sm">
-               <div className="flex items-center gap-2 text-brand-teal">
-                  <MapPin className="h-4 w-4" />
-                  <span className="text-[11px] font-black uppercase tracking-wider">Destination</span>
+          {/* Secure Registry Data Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="p-6 rounded-[2rem] bg-slate-50/50 border border-slate-100/50 space-y-4 group hover:bg-white hover:shadow-xl hover:shadow-slate-200/20 transition-all">
+               <div className="flex items-center gap-2 text-brand-indigo opacity-60 group-hover:opacity-100">
+                  <MapPin className="h-3.5 w-3.5" />
+                  <span className="text-[9px] font-black uppercase tracking-widest">Routing Target</span>
                </div>
-               <div className="space-y-1">
-                  <p className="text-sm font-bold text-slate-900">{order.delivery_area}</p>
+               <div className="space-y-2">
+                  <p className="text-base font-extrabold text-slate-900 tracking-tight">{order.delivery_area}</p>
                   {order.delivery_address_note && (
-                    <p className="text-xs text-slate-500 font-medium leading-relaxed italic border-l-2 border-slate-100 pl-3">
-                      &quot;{order.delivery_address_note}&quot;
-                    </p>
+                    <div className="p-3 bg-white rounded-xl border border-slate-100/50">
+                      <p className="text-[11px] text-slate-500 font-medium leading-relaxed italic">
+                        &quot;{order.delivery_address_note}&quot;
+                      </p>
+                    </div>
                   )}
                </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-white border border-slate-100 space-y-3 shadow-sm">
-               <div className="flex items-center gap-2 text-brand-teal">
-                  <Calendar className="h-4 w-4" />
-                  <span className="text-[11px] font-black uppercase tracking-wider">Timeline</span>
+            <div className="p-6 rounded-[2rem] bg-slate-50/50 border border-slate-100/50 space-y-4 group hover:bg-white hover:shadow-xl hover:shadow-slate-200/20 transition-all">
+               <div className="flex items-center gap-2 text-brand-indigo opacity-60 group-hover:opacity-100">
+                  <Calendar className="h-3.5 w-3.5" />
+                  <span className="text-[9px] font-black uppercase tracking-widest">Temporal Log</span>
                </div>
                <div className="space-y-1">
-                  <p className="text-sm font-bold text-slate-900">{new Date(order.created_at).toLocaleDateString()}</p>
-                  <p className="text-xs text-slate-500 font-medium">Logged at {new Date(order.created_at).toLocaleTimeString()}</p>
+                  <p className="text-base font-extrabold text-slate-900 tracking-tight">{new Date(order.created_at).toLocaleDateString('en-GB')}</p>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Indexed at {new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                </div>
             </div>
           </div>
 
-          {/* Items Section */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between px-1">
-               <h3 className="text-sm font-black uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                 <Package className="h-4 w-4" /> Order Items
+          {/* Asset Breakdown Section */}
+          <div className="space-y-6">
+            <div className="flex items-center justify-between px-2">
+               <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2.5">
+                 <Package className="h-3.5 w-3.5 text-brand-indigo" /> Package Inventory
                </h3>
-               <Badge variant="outline" className="rounded-full bg-white font-bold">{itemsArray.length} Pieces</Badge>
+               <span className="text-[10px] font-black bg-slate-900 text-white px-3 py-1 rounded-full uppercase tracking-tighter shadow-lg shadow-slate-900/10">
+                 {itemsArray.length} Selected Items
+               </span>
             </div>
-            <div className="rounded-2xl border border-slate-100 bg-white overflow-hidden shadow-sm">
+            <div className="rounded-[2.5rem] border border-slate-100/80 bg-white overflow-hidden shadow-sm">
               {itemsArray.map((item: any, index: number) => (
-                <div key={index} className="flex items-center justify-between p-4 border-b border-slate-50 last:border-0 hover:bg-slate-50 transition-colors">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center font-black text-slate-400 text-xs">
+                <div key={index} className="flex items-center justify-between p-6 border-b border-slate-50 last:border-0 hover:bg-slate-50/50 transition-all group">
+                  <div className="flex items-center gap-5">
+                    <div className="w-11 h-11 rounded-2xl bg-white border border-slate-100 flex items-center justify-center font-black text-slate-900 text-[10px] shadow-sm group-hover:scale-110 transition-transform">
                       {index + 1}
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-slate-900">{item.name}</p>
-                      <p className="text-xs text-slate-500 font-medium">Qty: {item.quantity}</p>
+                      <p className="text-sm font-extrabold text-slate-900 tracking-tight">{item.name}</p>
+                      <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-1">Quantity: <span className="text-brand-indigo">{item.quantity}</span></p>
                     </div>
                   </div>
                   <p className="text-sm font-black tabular-nums text-slate-900">₵{(Number(item.price_ghs || item.price || 0) * Number(item.quantity || 1)).toFixed(2)}</p>
                 </div>
               ))}
               
-              <div className="bg-slate-50/50 p-6 space-y-3">
-                <div className="flex justify-between text-xs font-bold text-slate-500">
-                  <span>Subtotal</span>
+              <div className="bg-slate-50/80 p-8 space-y-4">
+                <div className="flex justify-between text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+                  <span>Inventory Subtotal</span>
                   <span className="tabular-nums">₵{Number(order.subtotal || 0).toFixed(2)}</span>
                 </div>
                 {Number(order.delivery_fee) > 0 && (
-                  <div className="flex justify-between text-xs font-bold text-slate-500">
-                    <span>Delivery Service</span>
+                  <div className="flex justify-between text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+                    <span>Logistics Service</span>
                     <span className="tabular-nums">₵{Number(order.delivery_fee).toFixed(2)}</span>
                   </div>
                 )}
                 {Number(order.student_discount) > 0 && (
-                  <div className="flex justify-between text-xs font-bold text-emerald-600">
-                    <span>Student Discount</span>
+                  <div className="flex justify-between text-[11px] font-bold text-brand-teal uppercase tracking-widest">
+                    <span>Partnership Rebate</span>
                     <span className="tabular-nums">-₵{Number(order.student_discount).toFixed(2)}</span>
                   </div>
                 )}
-                <Separator className="bg-slate-200" />
+                <div className="h-[1px] w-full bg-slate-200/50 my-2" />
                 <div className="flex justify-between items-end">
-                  <span className="text-xs font-black uppercase tracking-widest text-slate-400">Total Command Value</span>
-                  <span className="text-2xl font-black tabular-nums text-slate-900">₵{Number(order.total_price || 0).toFixed(2)}</span>
+                  <div className="space-y-0.5">
+                    <span className="text-[9px] font-black uppercase tracking-[0.25em] text-slate-400 block leading-none mb-1">Settlement Total (GHS)</span>
+                    <span className="text-4xl font-extrabold tabular-nums text-slate-900 tracking-tighter leading-none block">₵{Number(order.total_price || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Action Center - Floating Bottom? */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-black uppercase tracking-wider text-slate-400 flex items-center gap-2 px-1">
-               <ArrowRight className="h-4 w-4" /> Command Execution
+          {/* Operational Decision Center */}
+          <div className="space-y-6 pb-12">
+            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2.5 px-2">
+               <ArrowRight className="h-3.5 w-3.5 text-brand-indigo" /> Operational Decision Center
             </h3>
-            <div className="grid gap-3">
+            <div className="grid gap-4">
               {order.status === "received" && order.pharmacy_ack_status === "pending" && (
-                <>
+                <div className="flex flex-col gap-3">
                   <Button
                     size="lg"
-                    className="h-14 bg-brand-teal hover:bg-brand-teal-dark font-black text-sm gap-3 shadow-xl shadow-brand-teal/20 rounded-2xl"
+                    className="h-16 bg-brand-indigo hover:bg-brand-indigo/90 font-black text-sm uppercase tracking-widest gap-3 shadow-2xl shadow-brand-indigo/20 rounded-2xl transition-all hover:scale-[1.01]"
                     onClick={onAccept}
                     loading={loading && loadingAction === "accept"}
                   >
                     {!loading && <CheckCircle className="h-5 w-5" />}
-                    Accept and Start Fulfilling
+                    Initialize Fulfillment
                   </Button>
                   <Button
                     size="lg"
-                    variant="outline"
-                    className="h-14 border-rose-200 text-rose-600 hover:bg-rose-50 font-black text-sm gap-3 rounded-2xl"
+                    variant="ghost"
+                    className="h-14 font-black text-[10px] uppercase tracking-[0.18em] text-rose-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl"
                     onClick={onDecline}
                     loading={loading && loadingAction === "decline"}
                   >
-                    {!loading && <XCircle className="h-5 w-5" />}
-                    Decline Order
+                    {!loading && <XCircle className="h-4 w-4" />}
+                    Decline Order Assignment
                   </Button>
-                </>
+                </div>
               )}
 
               {order.status === "processing" && (
                 <Button
                   size="lg"
-                  className="h-14 bg-brand-indigo hover:bg-brand-indigo-dark font-black text-sm gap-3 shadow-xl shadow-brand-indigo/20 rounded-2xl"
+                  className="h-16 bg-brand-indigo hover:bg-brand-indigo/90 font-black text-sm uppercase tracking-widest gap-3 shadow-2xl shadow-brand-indigo/20 rounded-2xl transition-all hover:scale-[1.01]"
                   onClick={onMarkOutForDelivery}
                   loading={loading && loadingAction === "out_for_delivery"}
                 >
-                  {!loading && <Truck className="h-6 w-6 animate-breathing" />}
-                  Dispatch to Courier
+                  {!loading && <Truck className="h-6 w-6" />}
+                  Finalize for Dispatch
                 </Button>
               )}
 
               {order.status === "out_for_delivery" && (
                 <Button
                   size="lg"
-                  className="h-14 bg-emerald-600 hover:bg-emerald-700 font-black text-sm gap-3 shadow-xl shadow-emerald-600/20 rounded-2xl"
+                  className="h-16 bg-brand-teal hover:bg-teal-700 font-black text-sm uppercase tracking-widest gap-3 shadow-2xl shadow-brand-teal/20 rounded-2xl transition-all hover:scale-[1.01]"
                   onClick={onMarkCompleted}
                   loading={loading && loadingAction === "completed"}
                 >
                    {!loading && <CheckCircle className="h-6 w-6" />}
-                   Confirm Successful Handover
+                   Confirm Handover Successfully
                 </Button>
               )}
             </div>
-          </div>
 
-          {/* Communication Hub */}
-          <div className="space-y-4">
-             <div className="flex items-center gap-2 px-1">
-                <GanttChartSquare className="h-4 w-4 text-brand-teal" />
-                <h3 className="text-sm font-black uppercase tracking-wider text-slate-400">Communication Hub</h3>
-             </div>
-             <OrderMessages orderId={order.id} userRole="pharmacy" />
-          </div>
-          
-          <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 flex items-start gap-3">
-             <Info className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
-             <p className="text-[11px] font-medium text-blue-700 leading-relaxed">
-               Every status update sends an automated notification to the customer. Please ensure accuracy before execution.
-             </p>
+            {/* Communication Hub Integration */}
+            <div className="pt-8 space-y-6 border-t border-slate-100">
+               <div className="flex items-center gap-2.5 px-2">
+                  <GanttChartSquare className="h-3.5 w-3.5 text-brand-indigo" />
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Secure Comms Hub</h3>
+               </div>
+               <div className="bg-slate-50/50 rounded-[2.5rem] border border-slate-100/50 overflow-hidden">
+                 <OrderMessages orderId={order.id} userRole="pharmacy" />
+               </div>
+            </div>
+            
+            <div className="bg-indigo-50/50 p-6 rounded-[2rem] border border-indigo-100/50 flex items-start gap-4 transition-all hover:bg-indigo-50">
+               <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center border border-indigo-100 shadow-sm shrink-0">
+                  <Info className="h-5 w-5 text-brand-indigo" />
+               </div>
+               <div className="space-y-1">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-indigo-900/60 block mb-1">Operational Protocol</p>
+                  <p className="text-[11px] font-semibold text-indigo-900 leading-relaxed">
+                    Status updates generate automated customer encryption keys. Ensure all physical items are validated against the inventory log before execution.
+                  </p>
+               </div>
+            </div>
           </div>
         </div>
       </SheetContent>

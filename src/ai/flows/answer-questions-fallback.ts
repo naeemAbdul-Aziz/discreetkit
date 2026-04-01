@@ -8,6 +8,7 @@ export type AnswerQuestionsInput = {
   query: string;
   history: { role: 'user' | 'model'; parts: string }[];
   liveContext?: string;
+  role?: 'client' | 'admin' | 'pharmacy';
 };
 
 export type AnswerQuestionsOutput = {

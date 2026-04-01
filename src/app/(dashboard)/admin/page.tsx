@@ -15,6 +15,7 @@ import {
   AlertCircle,
   TrendingUp,
   MapPin,
+  XCircle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -24,6 +25,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
@@ -92,7 +96,6 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     async function loadData() {
       try {
-        // Set loading only on first load or manual range change, not background refresh
         if (refreshTrigger === 0) setLoading(true);
         const { getOrders, getDashboardStats } =
           await import("@/lib/admin-actions");
@@ -107,15 +110,12 @@ export default function AdminDashboardPage() {
         const totalSales = orders.length;
         const avgOrderValue = totalSales > 0 ? totalRevenue / totalSales : 0;
 
-        // Active orders (processing or out_for_delivery)
         const activeOrders = orders.filter((o: any) =>
           ["processing", "out_for_delivery"].includes(o.status),
         ).length;
 
-        // New customers (unique emails in period) - simplified for now
         const uniqueCustomers = new Set(orders.map((o: any) => o.email)).size;
 
-        // Recent orders
         const recentOrders = orders.slice(0, 5).map((o: any) => ({
           id: o.id,
           code: o.code,
@@ -124,7 +124,6 @@ export default function AdminDashboardPage() {
           created_at: o.created_at,
         }));
 
-        // Revenue series (last 30 days)
         const seriesMap = new Map<string, number>();
         const now = new Date();
         for (let i = 29; i >= 0; i--) {
@@ -146,7 +145,6 @@ export default function AdminDashboardPage() {
           ([date, amount]) => ({ date, amount }),
         );
 
-        // Status breakdown
         const statusCounts: Record<string, number> = {};
         orders.forEach((o: any) => {
           statusCounts[o.status] = (statusCounts[o.status] || 0) + 1;
@@ -174,7 +172,7 @@ export default function AdminDashboardPage() {
         });
       } catch (err) {
         console.error(err);
-        setError("Failed to load dashboard data");
+        setError("Failed to load dashboard data. Check database connectivity.");
       } finally {
         setLoading(false);
       }
@@ -182,17 +180,12 @@ export default function AdminDashboardPage() {
     loadData();
   }, [rangePreset, refreshTrigger]);
 
-  // SSE for real-time updates
   useSSE("/api/admin/realtime/orders", {
     onMessage: (event) => {
       try {
         const data = JSON.parse(event.data);
         if (data.type === "orders") {
           router.refresh();
-          // Also re-fetch client-side stats
-          // We need to define loadData outside useEffect or trigger it via a state change
-          // Simplest hack: toggle a dummy state or move loadData out.
-          // Let's increment a refresh counter.
           setRefreshTrigger((prev) => prev + 1);
         }
       } catch (e) {
@@ -217,141 +210,140 @@ export default function AdminDashboardPage() {
     );
   }, [data, activeStatuses]);
 
-  const colors = ["#f97316", "#3b82f6", "#a855f7", "#f59e0b", "#10b981"];
-  const colorClasses = [
-    "bg-orange-500",
-    "bg-blue-500",
-    "bg-purple-500",
-    "bg-amber-500",
-    "bg-emerald-500",
-  ];
-
   if (loading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-6">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-32 rounded-xl" />
+            <Skeleton key={i} className="h-32 rounded-[2rem]" />
           ))}
         </div>
-        <Skeleton className="h-[400px] rounded-xl" />
+        <Skeleton className="h-[400px] rounded-[2rem]" />
       </div>
     );
   }
 
   if (error || !data) {
     return (
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>{error || "No data"}</AlertDescription>
-      </Alert>
+      <div className="p-12 text-center bg-white rounded-3xl border border-slate-100 shadow-sm space-y-4">
+        <div className="w-12 h-12 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mx-auto">
+          <AlertCircle className="h-6 w-6" />
+        </div>
+        <h3 className="text-lg font-bold text-slate-900">System Link Failed</h3>
+        <p className="text-slate-400 text-sm max-w-sm mx-auto font-medium">{error || "The operational data stream is currently inaccessible."}</p>
+        <Button onClick={() => setRefreshTrigger(prev => prev + 1)} variant="outline" className="rounded-xl font-bold">Reconnect Matrix</Button>
+      </div>
     );
   }
 
   return (
     <>
-      <div className="space-y-6">
-        {/* Metrics Cards */}
-        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+      <div className="space-y-8 animate-in fade-in duration-700">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <StatCard
             title="Total Revenue"
-            value={`GHS ${data.metrics.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
+            value={`₵${data.metrics.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
             icon={DollarSign}
             trend={{ value: 20.1, label: "from last month", positive: true }}
           />
           <StatCard
-            title="Sales"
+            title="Gross Sales"
             value={data.metrics.totalSales}
             icon={ShoppingCart}
             trend={{ value: 180.1, label: "from last month", positive: true }}
           />
           <StatCard
-            title="Anxiety Meter"
+            title="Operational Velocity"
             value={`${data.metrics.fulfillmentVelocity}h`}
             icon={Activity}
             description="Avg. fulfillment speed"
             trend={{ value: 12, label: "faster than avg", positive: true }}
           />
           <StatCard
-            title="Active Now"
+            title="Active Traffic"
             value={data.metrics.activeOrders}
             icon={Users}
-            description="Orders in system"
+            description="Live system orders"
           />
         </div>
 
-        {/* High-Density Operational Log */}
-        <div className="bg-card border border-slate-200 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] rounded-xl overflow-hidden flex flex-col mt-2 transition-all duration-200 hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.06)]">
-          <div className="flex items-center justify-between p-3.5 border-b bg-slate-50/50">
-            <h2 className="text-[0.8rem] font-bold tracking-[0.05em] uppercase text-slate-500 flex items-center gap-2">
-              <Activity className="h-3.5 w-3.5 text-brand-indigo" />
-              Operational Activity Stream
-            </h2>
-            <div className="flex items-center gap-2">
-              <span className="relative flex h-2 w-2">
+        <div className="bg-white border border-slate-200/50 shadow-sm rounded-3xl overflow-hidden flex flex-col group transition-all hover:shadow-md">
+          <div className="flex items-center justify-between p-6 border-b border-slate-50">
+            <div className="space-y-0.5">
+              <h2 className="text-[10px] font-bold tracking-[0.1em] uppercase text-slate-400 flex items-center gap-2">
+                <Activity className="h-3.5 w-3.5 text-brand-indigo/60" />
+                Operational Activity Stream
+              </h2>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1 bg-slate-50 rounded-full border border-slate-100/50">
+              <span className="relative flex h-1.5 w-1.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
               </span>
-              <span className="text-[9px] uppercase tracking-widest font-bold text-emerald-600">
-                Live
+              <span className="text-[8px] uppercase tracking-wider font-bold text-slate-500">
+                Live Data Link
               </span>
             </div>
           </div>
           
-          <div className="max-h-[350px] overflow-y-auto w-full custom-scrollbar">
-            <table className="w-full text-left border-collapse">
-              <tbody className="divide-y divide-border/50 text-xs text-foreground font-medium">
+          <div className="max-h-[450px] overflow-y-auto w-full custom-scrollbar">
+            <table className="w-full text-left border-separate border-spacing-0">
+              <thead>
+                <tr className="bg-slate-50/50 text-[9px] font-black uppercase tracking-[0.15em] text-slate-400">
+                  <th className="py-4 px-8 font-black">Temporal Index</th>
+                  <th className="py-4 px-6 font-black">Matrix ID</th>
+                  <th className="py-4 px-6 font-black">Status</th>
+                  <th className="py-4 px-6 font-black">Event Descriptor</th>
+                  <th className="py-4 px-8 text-right font-black">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50 text-xs text-foreground font-medium">
                 {(data.pulseFeed || []).map((event: any, i: number) => {
                   const isAlert = String(event.status).includes("ALERT");
-                  const activeColor = isAlert ? 'bg-rose-500' : 'bg-brand-indigo';
                   return (
-                    <tr key={event.id || i} className="hover:bg-slate-50/50 transition-colors group relative">
-                      {/* Vertical Indicator Bar */}
-                      <td className="w-0 p-0 absolute left-0 top-0 bottom-0">
-                        <div className={`h-full w-[3px] ${activeColor} opacity-70 group-hover:opacity-100 transition-opacity`} />
-                      </td>
-
-                      {/* Timestamp */}
-                      <td className="py-3 px-5 w-[90px] text-slate-400 whitespace-nowrap font-mono tabular-nums text-[10px] pl-6">
+                    <tr key={event.id || i} className="hover:bg-slate-50/80 transition-colors group">
+                      <td className="py-4 px-8 text-slate-400 whitespace-nowrap font-mono tabular-nums text-[10px]">
                         {new Date(event.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                       </td>
                       
-                      {/* Order Code */}
-                      <td className="py-3 px-4 w-[110px]">
-                        <span className="font-mono font-bold bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded text-[10px] border border-slate-200 group-hover:bg-white transition-colors">
+                      <td className="py-5 px-6">
+                        <span className="font-mono font-black text-slate-900 bg-white border border-slate-100 px-2.5 py-1 rounded-md text-[10px] shadow-sm">
                           {event.orderCode}
                         </span>
                       </td>
                       
-                      {/* Status */}
-                      <td className="py-3 px-4 w-[140px]">
-                        <span className={`text-[9px] uppercase font-black tracking-widest px-2 py-0.5 rounded-sm ${isAlert ? 'bg-rose-50 text-rose-600' : 'bg-slate-100 text-slate-600'}`}>
+                      <td className="py-5 px-6">
+                        <Badge variant={isAlert ? "destructive" : "secondary"} className={cn(
+                          "text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md border-none",
+                          !isAlert && "bg-slate-100 text-slate-600"
+                        )}>
                           {event.status.replace(/_/g, ' ')}
-                        </span>
+                        </Badge>
                       </td>
                       
-                      {/* Event Note */}
-                      <td className="py-3 px-4 w-full text-slate-500">
+                      <td className="py-5 px-6 w-full text-slate-500">
                         {event.note ? (
-                          <span className={`truncate block max-w-md xl:max-w-xl transition-colors ${isAlert ? 'font-semibold text-rose-600' : 'group-hover:text-brand-indigo'}`}>
+                          <span className={cn(
+                            "block max-w-sm xl:max-w-xl transition-colors font-semibold truncate",
+                            isAlert ? 'text-rose-600' : 'group-hover:text-slate-900'
+                          )}>
                             {event.note.replace('⚠️ ALERT: ', '')}
                           </span>
                         ) : (
-                          <span className="opacity-40">—</span>
+                          <span className="opacity-20">—</span>
                         )}
                       </td>
 
-                      {/* Action Buttons */}
-                      <td className="py-3 px-4 w-[140px] text-right">
-                        <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                      <td className="py-5 px-8 text-right">
+                        <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
                           {isAlert ? (
-                            <button className="text-[10px] font-bold text-rose-600 bg-rose-50 border border-rose-200 px-2 py-1 rounded hover:bg-rose-100 transition-colors">
+                            <Button className="h-8 px-4 text-[9px] font-black text-white bg-rose-600 hover:bg-rose-700 rounded-lg uppercase tracking-widest">
                               Resolve
-                            </button>
+                            </Button>
                           ) : (
-                            <button className="text-[10px] font-bold text-slate-600 bg-white border border-slate-200 px-2 py-1 rounded hover:bg-slate-50 transition-colors">
-                              Assign
-                            </button>
+                            <Button variant="ghost" className="h-8 px-4 text-[9px] font-black text-brand-indigo hover:bg-indigo-50 rounded-lg uppercase tracking-widest">
+                              Inspect
+                            </Button>
                           )}
                         </div>
                       </td>
@@ -361,8 +353,12 @@ export default function AdminDashboardPage() {
                 
                 {(!data.pulseFeed || data.pulseFeed.length === 0) && (
                   <tr>
-                    <td colSpan={5} className="p-8 text-center text-slate-400 text-sm font-medium">
-                      System is silent. Awaiting incoming traffic streams.
+                    <td colSpan={5} className="p-20 text-center space-y-2">
+                      <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Activity className="h-5 w-5 text-slate-200" />
+                      </div>
+                      <p className="text-slate-400 text-sm font-black uppercase tracking-widest">Awaiting Incoming Data Stream</p>
+                      <p className="text-slate-300 text-xs font-medium">The operational environment is currently stable.</p>
                     </td>
                   </tr>
                 )}
@@ -371,77 +367,77 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           <RankingList
-            title="Top Pharmacies"
-            description="By total revenue generated"
+            title="High-Yield Partners"
+            description="Contribution to network revenue"
             type="pharmacy"
             items={(data.topPharmacies || []).map((p) => ({
               name: p.name,
-              value: `GHS ${p.revenue.toLocaleString()}`,
+              value: `₵${p.revenue.toLocaleString()}`,
             }))}
           />
           <RankingList
-            title="Top Products"
-            description="By quantity sold"
+            title="High-Velocity Assets"
+            description="Market demand by fulfillment"
             type="product"
             items={(data.topProducts || []).map((p) => ({
               name: p.name,
-              value: `${p.quantity} sold`,
-              meta: `GHS ${p.revenue.toLocaleString()}`,
+              value: `${p.quantity} dispatched`,
+              meta: `₵${p.revenue.toLocaleString()}`,
             }))}
           />
           
-          <Card className="border border-slate-200 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] bg-card overflow-hidden">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-[0.75rem] font-semibold uppercase tracking-[0.05em] text-slate-500 flex items-center gap-2">
-                <MapPin className="h-3.5 w-3.5 text-emerald-500" />
-                Privacy Density
+          <Card className="border border-slate-200/50 shadow-sm bg-white overflow-hidden rounded-3xl p-6 group">
+            <CardHeader className="p-0 pb-4">
+              <CardTitle className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400 flex items-center gap-2">
+                <MapPin className="h-3.5 w-3.5 text-brand-teal/60" />
+                Privacy Hotspots
               </CardTitle>
-              <CardDescription className="text-[0.65rem] opacity-80">Demand by regional hotspot</CardDescription>
+              <CardDescription className="text-[10px] font-medium text-slate-400 pt-0.5">Distribution by regional density</CardDescription>
             </CardHeader>
-            <CardContent className="h-[240px] pt-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={data.regionChart}>
-                  <defs>
-                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.1}/>
-                      <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <XAxis 
-                    dataKey="name" 
-                    hide 
-                  />
-                  <YAxis hide />
-                  <RechartsTooltip 
-                    content={({ active, payload }) => {
-                      if (active && payload && payload.length) {
-                        return (
-                          <div className="bg-background/90 border border-border/10 p-2 rounded-lg shadow-xl backdrop-blur-md">
-                            <p className="text-[10px] font-bold uppercase text-muted-foreground">{payload[0].payload.name}</p>
-                            <p className="text-sm font-black text-primary">{payload[0].value} Orders</p>
-                          </div>
-                        );
-                      }
-                      return null;
-                    }}
-                  />
-                  <Area 
-                    type="monotone" 
-                    dataKey="value" 
-                    stroke="#8b5cf6" 
-                    strokeWidth={2}
-                    fillOpacity={1} 
-                    fill="url(#colorValue)" 
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-              <div className="mt-2 space-y-1">
-                {data.regionChart?.slice(0, 3).map((r: any, i: number) => (
-                  <div key={i} className="flex items-center justify-between text-[10px]">
-                    <span className="text-muted-foreground truncate w-32">{r.name}</span>
-                    <span className="font-bold">{r.value} pkts</span>
+            <CardContent className="p-0 space-y-4">
+              <div className="h-[160px] w-full bg-slate-50/50 rounded-2xl p-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={data.regionChart}>
+                    <defs>
+                      <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.05}/>
+                        <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <XAxis dataKey="name" hide />
+                    <YAxis hide />
+                    <RechartsTooltip 
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          return (
+                            <div className="bg-slate-900 border border-slate-800 p-2.5 rounded-xl shadow-xl">
+                              <p className="text-[8px] font-bold uppercase tracking-wider text-slate-500">{payload[0].payload.name}</p>
+                              <p className="text-sm font-bold text-white">{payload[0].value} <span className="text-[8px] opacity-40 font-medium">UNIT</span></p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="value" 
+                      stroke="#4f46e5" 
+                      strokeWidth={2}
+                      strokeOpacity={0.4}
+                      fillOpacity={1} 
+                      fill="url(#colorValue)" 
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="space-y-1.5">
+                {data.regionChart?.slice(0, 4).map((r: any, i: number) => (
+                  <div key={i} className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50/50 border border-slate-100/50 transition-colors hover:bg-white hover:border-slate-200">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide truncate w-40">{r.name}</span>
+                    <span className="text-[11px] font-bold text-slate-900 tabular-nums">{r.value} units</span>
                   </div>
                 ))}
               </div>
@@ -449,41 +445,50 @@ export default function AdminDashboardPage() {
           </Card>
         </div>
       </div>
+
       <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>Order Details</DrawerTitle>
-            <DrawerDescription>
+        <DrawerContent className="rounded-t-[3rem] p-10">
+          <DrawerHeader className="p-0 space-y-6">
+            <div className="flex items-center justify-between">
+              <DrawerTitle className="text-3xl font-extrabold tracking-tight">Operation Insight</DrawerTitle>
+              <DrawerClose asChild>
+                <Button variant="ghost" className="rounded-full h-10 w-10 p-0 hover:bg-slate-100">
+                  <XCircle className="h-6 w-6 text-slate-300" />
+                </Button>
+              </DrawerClose>
+            </div>
+            <DrawerDescription className="p-0">
               {selectedOrder ? (
-                <div className="space-y-2">
-                  <div>
-                    <span className="font-semibold">Order Code:</span>{" "}
-                    {selectedOrder.code}
+                <div className="grid grid-cols-2 gap-8">
+                  <div className="space-y-4">
+                    <div className="p-6 rounded-[2rem] bg-slate-50 border border-slate-100">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 block mb-2">Matrix Code</span>
+                      <span className="text-2xl font-black text-slate-900 font-mono tracking-tighter">{selectedOrder.code}</span>
+                    </div>
+                    <div className="p-6 rounded-[2rem] bg-slate-50 border border-slate-100">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 block mb-2">Operational Status</span>
+                      <Badge className="bg-brand-indigo text-white px-4 py-1 rounded-lg font-black uppercase text-[10px] tracking-widest border-none">
+                        {String(selectedOrder.status).replace("_", " ")}
+                      </Badge>
+                    </div>
                   </div>
-                  <div>
-                    <span className="font-semibold">Status:</span>{" "}
-                    <span className="capitalize">
-                      {String(selectedOrder.status).replace("_", " ")}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="font-semibold">Total:</span> GHS{" "}
-                    {selectedOrder.total_price.toFixed(2)}
-                  </div>
-                  <div>
-                    <span className="font-semibold">Created:</span>{" "}
-                    {new Date(selectedOrder.created_at).toLocaleString()}
+                  <div className="space-y-4">
+                    <div className="p-6 rounded-[2rem] bg-slate-50 border border-slate-100">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 block mb-2">Financial Settlement</span>
+                      <span className="text-2xl font-black text-slate-900 tabular-nums font-mono tracking-tighter">₵{selectedOrder.total_price.toFixed(2)}</span>
+                    </div>
+                    <div className="p-6 rounded-[2rem] bg-slate-50 border border-slate-100">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 block mb-2">Timestamp</span>
+                      <span className="text-lg font-bold text-slate-900">{new Date(selectedOrder.created_at).toLocaleString()}</span>
+                    </div>
                   </div>
                 </div>
               ) : (
-                <span>No order selected.</span>
+                <div className="p-20 text-center">
+                  <span className="text-slate-400 font-black uppercase tracking-widest">No order selected.</span>
+                </div>
               )}
             </DrawerDescription>
-            <DrawerClose asChild>
-              <button className="mt-4 px-4 py-2 rounded bg-primary text-white">
-                Close
-              </button>
-            </DrawerClose>
           </DrawerHeader>
         </DrawerContent>
       </Drawer>
