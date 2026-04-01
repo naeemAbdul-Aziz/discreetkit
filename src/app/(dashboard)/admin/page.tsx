@@ -244,20 +244,19 @@ export default function AdminDashboardPage() {
             title="Total Revenue"
             value={`₵${data.metrics.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
             icon={DollarSign}
-            trend={{ value: 20.1, label: "from last month", positive: true }}
+            description="Live revenue from all orders"
           />
           <StatCard
             title="Gross Sales"
             value={data.metrics.totalSales}
             icon={ShoppingCart}
-            trend={{ value: 180.1, label: "from last month", positive: true }}
+            description="Total orders recorded"
           />
           <StatCard
             title="Operational Velocity"
             value={`${data.metrics.fulfillmentVelocity}h`}
             icon={Activity}
             description="Avg. fulfillment speed"
-            trend={{ value: 12, label: "faster than avg", positive: true }}
           />
           <StatCard
             title="Active Traffic"
