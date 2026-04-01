@@ -14,24 +14,47 @@ export type AnswerQuestionsOutput = {
   answer: string;
 };
 
-function getSystemPrompt(role: 'client' | 'admin' | 'pharmacy' = 'client', liveContext?: string) {
-  const baseInstructions = `Your primary goal is to answer questions based *only* on the official information provided in the KNOWLEDGE BASE and the LIVE PRODUCT DATA below.
-CRITICAL: ALWAYS prioritize LIVE PRODUCT DATA for stock availability and current pricing.
-If a product is marked as "OUT OF STOCK", inform the user.`;
+function getSystemPrompt(
+  role: 'client' | 'admin' | 'pharmacy' = 'client',
+  liveContext?: string
+) {
+  const baseInstructions = `Your primary goal is to answer questions based *only* on the official information provided in the KNOWLEDGE BASE and the LIVE DATA blocks below.
+CRITICAL: ALWAYS prioritize LIVE DATA for stock availability and current pricing.
+If a product is marked as "OUT OF STOCK", clearly inform the user.`;
 
-  const personas = {
-    client: `You are Pacely, a helpful and empathetic AI assistant for DiscreetKit Ghana. Your tone is inviting and understandable (use warm greetings like "Heyy there"). You provide a stigma-free environment for university students and young professionals.`,
-    admin: `You are the Elite Operational Copilot for DiscreetKit administrative staff. Your tone is highly professional, structured, and strictly analytical (FAANG internal ops style). Focus on platform health, system metrics, and operational velocity. Do NOT act like a customer support bot.`,
-    pharmacy: `You are the Pharmacy Fulfillment Copilot for DiscreetKit's partner pharmacists. Your tone is precise, practical, and logistics-oriented. Help with order review, rider coordination, and medical packaging standards. Do NOT act like a customer support bot.`
+  const personas: Record<'client' | 'admin' | 'pharmacy', string> = {
+    client:
+      `IDENTITY: You are Pacely, a helpful and empathetic AI assistant for DiscreetKit Ghana.
+TONE: Warm, stigma-free, and approachable for university students and young professionals (you may use casual greetings like "Heyy there").
+FOCUS: Help clients understand products, testing, contraception, and logistics without judgment.`,
+    admin:
+      `IDENTITY: You are the Operations Intelligence Copilot for DiscreetKit HQ.
+TONE: Highly professional, concise, and technical. Avoid casual phrases like "heyy", emojis, or "dear".
+FOCUS: Assist with fleet metrics, revenue analytics, payouts, incidents, and system overrides.
+RESTRICTION: Do NOT use customer-facing empathy language. You are an internal tool for administrative staff only.`,
+    pharmacy:
+      `IDENTITY: You are the Fulfillment Copilot for DiscreetKit Pharmacy Partners.
+TONE: Practical, efficient, and precise. No marketing fluff or emotional language.
+FOCUS: Assist with order verification, rider dispatch, service areas, and inventory balancing.
+RESTRICTION: Maintain professional distance. You are a logistics optimization engine, not a customer chatbot.`,
   };
+
+  const cleanedLiveContext = (liveContext || '')
+    // Strip bold markdown and overly chatty prefixes if any leaked through
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/Heyy there[,!]?\s*/gi, '')
+    .trim();
+
+  const liveBlockLabel =
+    role === 'client' ? 'LIVE PRODUCT DATA' : 'LIVE OPERATIONS & PRODUCT DATA';
 
   return `${personas[role]}
 
 ${baseInstructions}
 
 ---
-LIVE PRODUCT DATA:
-${liveContext || "No live data available."}
+${liveBlockLabel}:
+${cleanedLiveContext || 'No live data available.'}
 
 ---
 KNOWLEDGE BASE:
@@ -69,7 +92,7 @@ export async function answerQuestions(
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: messages,
-      temperature: 0.7,
+      temperature: 0.3, // Lower temperature for more consistent professional tone in dashboard
       max_tokens: 500,
     });
 

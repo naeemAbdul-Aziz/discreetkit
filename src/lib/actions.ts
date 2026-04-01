@@ -271,10 +271,10 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     }
     
     const priceDetails = {
-      subtotal: calculatedSubtotal,
-      student_discount: appliedStudentDiscount, // We effectively applied it via lower delivery fee
-      delivery_fee: realDeliveryFee,
-      total_price: calculatedTotalPrice,
+      subtotal_ghs: calculatedSubtotal,
+      student_discount_ghs: appliedStudentDiscount, // We effectively applied it via lower delivery fee
+      delivery_fee_ghs: realDeliveryFee,
+      total_price_ghs: calculatedTotalPrice,
     };
     
     // --- END SECURITY CHECK ---
@@ -331,7 +331,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
       throw new Error('Payment processing is not configured.');
     }
 
-    const amountInKobo = Math.round(priceDetails.total_price * 100);
+    const amountInKobo = Math.round(priceDetails.total_price_ghs * 100);
 
     const paystackResponse = await fetch('https://api.paystack.co/transaction/initialize', {
       method: 'POST',
@@ -420,11 +420,11 @@ export async function getOrderAction(code: string): Promise<Order | null> {
       items: items,
       deliveryArea: order.delivery_area,
       deliveryAddressNote: order.delivery_address_note,
-      isStudent: !!order.student_discount && order.student_discount > 0, // Infer from discount
-      subtotal: order.subtotal,
-      studentDiscount: order.student_discount,
-      deliveryFee: order.delivery_fee,
-      totalPrice: order.total_price,
+      isStudent: !!order.student_discount_ghs && order.student_discount_ghs > 0, // Infer from discount
+      subtotal: order.subtotal_ghs,
+      studentDiscount: order.student_discount_ghs,
+      deliveryFee: order.delivery_fee_ghs,
+      totalPrice: order.total_price_ghs,
       courierName: order.courier_name,
       courierPhone: order.courier_phone,
       courierTrackingUrl: order.courier_tracking_url,

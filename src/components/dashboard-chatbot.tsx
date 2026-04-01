@@ -37,14 +37,14 @@ export function DashboardChatbot({ role }: { role: "admin" | "pharmacy" }) {
   const [history, setHistory] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isPending, startTransition] = useTransition();
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const initialMessage: Message = {
     role: "model",
     parts:
       role === "admin"
-        ? "Admin link established. How can I assist with platform operations today?"
-        : "Pharmacy link established. Ready to assist with prescription fulfillment or stock queries.",
+        ? "Systems Intelligence online. How can I assist with DiscreetKit HQ operations today?"
+        : "Pharmacy node linked. Ready to assist with order verification, riders, and stock balancing.",
   };
 
   useEffect(() => {
@@ -54,12 +54,7 @@ export function DashboardChatbot({ role }: { role: "admin" | "pharmacy" }) {
   }, [history.length, initialMessage]);
 
   useEffect(() => {
-    if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTo({
-        top: scrollAreaRef.current.scrollHeight,
-        behavior: "smooth",
-      });
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [history]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -80,7 +75,7 @@ export function DashboardChatbot({ role }: { role: "admin" | "pharmacy" }) {
   return (
     <div className="flex flex-col h-full bg-white">
       <div className="flex-1 overflow-hidden relative">
-        <ScrollArea className="h-full" ref={scrollAreaRef}>
+        <ScrollArea className="h-full">
           <div className="space-y-6 p-6">
             {history.map((msg, index) => {
               const isInitial = index === 0 && msg.role === "model";
@@ -91,11 +86,11 @@ export function DashboardChatbot({ role }: { role: "admin" | "pharmacy" }) {
                     <div className="h-16 w-16 rounded-full overflow-hidden shadow-sm border border-slate-100 mb-2">
                        <img src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png" alt="Pacely" className="h-full w-full object-cover" />
                     </div>
-                    <div className="space-y-2">
-                      <h2 className="text-xl font-bold tracking-tight text-slate-900">
-                         Hi, I'm <span className="font-bold">pacely.</span>
+                    <div className="space-y-1">
+                      <h2 className="text-xs font-black tracking-[0.2em] text-slate-400 uppercase">
+                         {role === "admin" ? "Systems Intelligence" : "Pharmacy Protocol"}
                       </h2>
-                      <p className="text-xs text-slate-400 max-w-[240px] mx-auto font-medium leading-relaxed">
+                      <p className="text-[13px] text-slate-600 max-w-[280px] mx-auto font-medium leading-relaxed">
                         {msg.parts}
                       </p>
                     </div>
@@ -133,13 +128,18 @@ export function DashboardChatbot({ role }: { role: "admin" | "pharmacy" }) {
             {isPending && (
               <div className="flex items-start gap-3 justify-start">
                 <div className="h-8 w-8 rounded-full overflow-hidden flex-shrink-0 mt-1 shadow-sm border border-brand-indigo/10">
-                  <img src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png" alt="Pacely" className="h-full w-full object-cover opacity-80" />
+                  <img
+                    src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png"
+                    alt="Pacely"
+                    className="h-full w-full object-cover opacity-80"
+                  />
                 </div>
                 <div className="max-w-[80%] rounded-2xl p-4 text-sm bg-brand-silver text-brand-indigo font-medium flex items-center gap-2">
-                   Thinking...
+                  Thinking...
                 </div>
               </div>
             )}
+            <div ref={messagesEndRef} />
           </div>
         </ScrollArea>
       </div>

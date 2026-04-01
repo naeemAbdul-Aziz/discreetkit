@@ -6,11 +6,11 @@ export async function getDashboardStats() {
     // 1. Total Revenue & Order Count
     const { data: orders, error: ordersError } = await supabase
         .from('orders')
-        .select('total_price, created_at, status')
+        .select('total_price_ghs, created_at, status')
 
     if (ordersError) throw ordersError
 
-    const totalRevenue = orders.reduce((sum, order) => sum + (Number(order.total_price) || 0), 0)
+    const totalRevenue = orders.reduce((sum, order) => sum + (Number(order.total_price_ghs) || 0), 0)
     const totalOrders = orders.length
 
     // 2. Active Partners
@@ -23,7 +23,7 @@ export async function getDashboardStats() {
     // 3. Recent Sales (Last 5 orders)
     const { data: recentSales, error: recentError } = await supabase
         .from('orders')
-        .select('id, code, total_price, email, created_at, status')
+        .select('id, code, total_price_ghs, email, created_at, status')
         .order('created_at', { ascending: false })
         .limit(5)
 
@@ -46,7 +46,7 @@ export async function getDashboardStats() {
 
     const { data: trendData } = await supabase
         .from('orders')
-        .select('created_at, total_price')
+        .select('created_at, total_price_ghs')
         .gte('created_at', sevenDaysAgo.toISOString())
         .order('created_at', { ascending: true })
 
@@ -70,8 +70,8 @@ export async function getDashboardStats() {
     })
 
     // Calculate Revenue Change
-    const currentRevenue = currentPeriodOrders.reduce((sum, o) => sum + (Number(o.total_price) || 0), 0)
-    const previousRevenue = previousPeriodOrders.reduce((sum, o) => sum + (Number(o.total_price) || 0), 0)
+    const currentRevenue = currentPeriodOrders.reduce((sum, o) => sum + (Number(o.total_price_ghs) || 0), 0)
+    const previousRevenue = previousPeriodOrders.reduce((sum, o) => sum + (Number(o.total_price_ghs) || 0), 0)
     const revenueChange = previousRevenue === 0 ? 100 : ((currentRevenue - previousRevenue) / previousRevenue) * 100
 
     // Calculate Orders Change
@@ -118,7 +118,7 @@ function processRevenueTrend(data: any[]) {
         const d = new Date(order.created_at)
         const dayName = days[d.getDay()]
         if (trend.has(dayName)) {
-            trend.set(dayName, (trend.get(dayName) || 0) + Number(order.total_price))
+            trend.set(dayName, (trend.get(dayName) || 0) + Number(order.total_price_ghs))
         }
     })
 

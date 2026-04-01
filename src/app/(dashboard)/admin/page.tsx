@@ -104,7 +104,7 @@ export default function AdminDashboardPage() {
 
         // Calculate metrics
         const totalRevenue = orders.reduce(
-          (sum: number, o: any) => sum + (o.total_price || 0),
+          (sum: number, o: any) => sum + (o.total_price_ghs || 0),
           0,
         );
         const totalSales = orders.length;
@@ -120,7 +120,7 @@ export default function AdminDashboardPage() {
           id: o.id,
           code: o.code,
           status: o.status,
-          total_price: o.total_price,
+          total_price: o.total_price_ghs,
           created_at: o.created_at,
         }));
 
@@ -136,7 +136,7 @@ export default function AdminDashboardPage() {
           if (seriesMap.has(date)) {
             seriesMap.set(
               date,
-              (seriesMap.get(date) || 0) + (o.total_price || 0),
+              (seriesMap.get(date) || 0) + (o.total_price_ghs || 0),
             );
           }
         });

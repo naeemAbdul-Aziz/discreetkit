@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     const supabase = getSupabaseAdminClient();
     let query = supabase
       .from('orders')
-      .select('id, code, status, total_price, created_at')
+      .select('id, code, status, total_price_ghs, created_at')
       .order('created_at', { ascending: false })
       .limit(limit);
 

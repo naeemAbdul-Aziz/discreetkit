@@ -27,7 +27,7 @@ export async function GET() {
     const supabase = getSupabaseAdminClient();
     const { data, error } = await supabase
       .from('orders')
-      .select('id, email, phone_masked, code, total_price, created_at')
+      .select('id, email, phone_masked, code, total_price_ghs, created_at')
       .order('created_at', { ascending: false })
       .limit(2000);
     if (error) throw error;
@@ -45,7 +45,7 @@ export async function GET() {
         firstOrder: row.created_at as string,
         lastOrder: row.created_at as string,
       };
-      existing.totalSpent += Number(row.total_price || 0);
+      existing.totalSpent += Number((row as any).total_price_ghs || 0);
       existing.orders += 1;
       if (new Date(row.created_at) < new Date(existing.firstOrder)) existing.firstOrder = row.created_at as string;
       if (new Date(row.created_at) > new Date(existing.lastOrder)) existing.lastOrder = row.created_at as string;

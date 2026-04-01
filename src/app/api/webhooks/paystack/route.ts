@@ -105,7 +105,7 @@ export async function POST(req: Request) {
         // Find the order using the reference code
         const { data: order, error: findError } = await supabaseAdmin
           .from('orders')
-          .select('id, status, delivery_area, email, total_price, code, items')
+          .select('id, status, delivery_area, email, total_price_ghs, code, items')
           .eq('code', reference)
           .single();
 
@@ -148,7 +148,7 @@ export async function POST(req: Request) {
              sendCustomerOrderConfirmation({
                 email: order.email,
                 code: order.code,
-                totalPrice: order.total_price,
+                totalPrice: order.total_price_ghs,
                 items: order.items as any[],
                 deliveryArea: order.delivery_area
              }).then((res) => {
