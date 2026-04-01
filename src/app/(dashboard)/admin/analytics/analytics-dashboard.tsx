@@ -302,13 +302,13 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
                 </CardHeader>
                 <CardContent>
                     <div className="h-[230px] relative">
-                      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-6">
+                      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none pb-6">
                         <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">Orders</span>
                         <span className="text-2xl font-bold text-slate-900 tabular-nums tracking-tight">{totalCategories}</span>
                       </div>
                       {categoryChart.length > 0 ? (
                         <ResponsiveContainer width="100%" height="100%">
-                          <PieChart>
+                          <PieChart className="relative z-0">
                             <Pie
                               data={categoryChart}
                               cx="40%"
