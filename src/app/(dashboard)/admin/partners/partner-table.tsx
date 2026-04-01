@@ -241,7 +241,7 @@ export function PartnerTable({
                              <span className="text-xs font-black text-brand-indigo tabular-nums">{partner.activeOrders} Live</span>
                            </div>
                         ) : (
-                          <span className="text-[10px] uppercase tracking-tighter font-black text-slate-300">Idle</span>
+                          <span className="text-[11px] font-medium text-slate-400">No live orders</span>
                         )}
                       </div>
                     ) : (
@@ -252,7 +252,7 @@ export function PartnerTable({
                     )}
                   </TableCell>
                   <TableCell className="text-right pr-6 py-4">
-                    <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center justify-end gap-1">
                       <Button
                         variant="ghost"
                         size="icon"
