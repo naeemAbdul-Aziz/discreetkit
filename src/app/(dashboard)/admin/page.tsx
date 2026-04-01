@@ -97,7 +97,7 @@ export default function AdminDashboardPage() {
         const { getOrders, getDashboardStats } =
           await import("@/lib/admin-actions");
         const orders = await getOrders();
-        const stats = await getDashboardStats(orders);
+        const stats = await getDashboardStats();
 
         // Calculate metrics
         const totalRevenue = orders.reduce(
@@ -250,9 +250,9 @@ export default function AdminDashboardPage() {
 
   return (
     <>
-      <div className="space-y-8">
+      <div className="space-y-6">
         {/* Metrics Cards */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
           <StatCard
             title="Total Revenue"
             value={`GHS ${data.metrics.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
@@ -281,10 +281,10 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* High-Density Operational Log */}
-        <div className="bg-white border rounded-xl shadow-sm overflow-hidden flex flex-col mt-4">
-          <div className="flex items-center justify-between p-4 border-b bg-muted/20">
-            <h2 className="text-sm font-semibold tracking-tight text-foreground flex items-center gap-2">
-              <Activity className="h-4 w-4 text-brand-indigo" />
+        <div className="bg-card border border-slate-200 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] rounded-xl overflow-hidden flex flex-col mt-2 transition-all duration-200 hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.06)]">
+          <div className="flex items-center justify-between p-3.5 border-b bg-slate-50/50">
+            <h2 className="text-[0.8rem] font-bold tracking-[0.05em] uppercase text-slate-500 flex items-center gap-2">
+              <Activity className="h-3.5 w-3.5 text-brand-indigo" />
               Operational Activity Stream
             </h2>
             <div className="flex items-center gap-2">
@@ -292,7 +292,7 @@ export default function AdminDashboardPage() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
-              <span className="text-[10px] uppercase tracking-widest font-bold text-emerald-600">
+              <span className="text-[9px] uppercase tracking-widest font-bold text-emerald-600">
                 Live
               </span>
             </div>
@@ -303,36 +303,57 @@ export default function AdminDashboardPage() {
               <tbody className="divide-y divide-border/50 text-xs text-foreground font-medium">
                 {(data.pulseFeed || []).map((event: any, i: number) => {
                   const isAlert = String(event.status).includes("ALERT");
+                  const activeColor = isAlert ? 'bg-rose-500' : 'bg-brand-indigo';
                   return (
-                    <tr key={event.id || i} className="hover:bg-muted/40 transition-colors group">
+                    <tr key={event.id || i} className="hover:bg-slate-50/50 transition-colors group relative">
+                      {/* Vertical Indicator Bar */}
+                      <td className="w-0 p-0 absolute left-0 top-0 bottom-0">
+                        <div className={`h-full w-[3px] ${activeColor} opacity-70 group-hover:opacity-100 transition-opacity`} />
+                      </td>
+
                       {/* Timestamp */}
-                      <td className="py-2.5 px-4 w-[90px] text-muted-foreground whitespace-nowrap font-mono text-[11px]">
+                      <td className="py-3 px-5 w-[90px] text-slate-400 whitespace-nowrap font-mono tabular-nums text-[10px] pl-6">
                         {new Date(event.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                       </td>
                       
                       {/* Order Code */}
-                      <td className="py-2.5 px-4 w-[120px]">
-                        <span className="font-mono font-bold bg-muted px-1.5 py-0.5 rounded text-[11px] border border-border group-hover:bg-background">
+                      <td className="py-3 px-4 w-[110px]">
+                        <span className="font-mono font-bold bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded text-[10px] border border-slate-200 group-hover:bg-white transition-colors">
                           {event.orderCode}
                         </span>
                       </td>
                       
                       {/* Status */}
-                      <td className="py-2.5 px-4 w-[160px]">
-                        <span className={`text-[10px] uppercase font-bold tracking-widest ${isAlert ? 'text-rose-500' : 'text-brand-indigo'}`}>
+                      <td className="py-3 px-4 w-[140px]">
+                        <span className={`text-[9px] uppercase font-black tracking-widest px-2 py-0.5 rounded-sm ${isAlert ? 'bg-rose-50 text-rose-600' : 'bg-slate-100 text-slate-600'}`}>
                           {event.status.replace(/_/g, ' ')}
                         </span>
                       </td>
                       
                       {/* Event Note */}
-                      <td className="py-2.5 px-4 w-full text-muted-foreground">
+                      <td className="py-3 px-4 w-full text-slate-500">
                         {event.note ? (
-                          <span className={`truncate block max-w-md xl:max-w-2xl group-hover:text-foreground transition-colors ${isAlert ? 'font-semibold text-rose-500/80' : ''}`}>
+                          <span className={`truncate block max-w-md xl:max-w-xl transition-colors ${isAlert ? 'font-semibold text-rose-600' : 'group-hover:text-brand-indigo'}`}>
                             {event.note.replace('⚠️ ALERT: ', '')}
                           </span>
                         ) : (
                           <span className="opacity-40">—</span>
                         )}
+                      </td>
+
+                      {/* Action Buttons */}
+                      <td className="py-3 px-4 w-[140px] text-right">
+                        <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                          {isAlert ? (
+                            <button className="text-[10px] font-bold text-rose-600 bg-rose-50 border border-rose-200 px-2 py-1 rounded hover:bg-rose-100 transition-colors">
+                              Resolve
+                            </button>
+                          ) : (
+                            <button className="text-[10px] font-bold text-slate-600 bg-white border border-slate-200 px-2 py-1 rounded hover:bg-slate-50 transition-colors">
+                              Assign
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
@@ -340,7 +361,7 @@ export default function AdminDashboardPage() {
                 
                 {(!data.pulseFeed || data.pulseFeed.length === 0) && (
                   <tr>
-                    <td colSpan={4} className="p-8 text-center text-muted-foreground text-sm font-medium">
+                    <td colSpan={5} className="p-8 text-center text-slate-400 text-sm font-medium">
                       System is silent. Awaiting incoming traffic streams.
                     </td>
                   </tr>
@@ -371,13 +392,13 @@ export default function AdminDashboardPage() {
             }))}
           />
           
-          <Card className="border-0 shadow-sm bg-card/50 overflow-hidden">
+          <Card className="border border-slate-200 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] bg-card overflow-hidden">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground/80 flex items-center gap-2">
+              <CardTitle className="text-[0.75rem] font-semibold uppercase tracking-[0.05em] text-slate-500 flex items-center gap-2">
                 <MapPin className="h-3.5 w-3.5 text-emerald-500" />
                 Privacy Density
               </CardTitle>
-              <CardDescription className="text-xs">Demand by regional hotspot</CardDescription>
+              <CardDescription className="text-[0.65rem] opacity-80">Demand by regional hotspot</CardDescription>
             </CardHeader>
             <CardContent className="h-[240px] pt-4">
               <ResponsiveContainer width="100%" height="100%">

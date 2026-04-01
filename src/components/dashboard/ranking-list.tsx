@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Trophy, TrendingUp } from "lucide-react"
@@ -30,22 +29,22 @@ export function RankingList({ title, description, items, type }: RankingListProp
   );
 
   return (
-    <Card className="border-0 shadow-sm bg-card/50 overflow-hidden">
+    <Card className="border border-slate-200 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] transition-all duration-200 hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.06)] hover:scale-[1.01] bg-card overflow-hidden">
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground/80 flex items-center gap-2">
+            <CardTitle className="text-[0.75rem] font-semibold uppercase tracking-[0.05em] text-slate-500 flex items-center gap-2">
               {type === 'pharmacy' ? (
                 <Trophy className="h-3.5 w-3.5 text-amber-500" />
               ) : (
-                <TrendingUp className="h-3.5 w-3.5 text-blue-500" />
+                <TrendingUp className="h-3.5 w-3.5 text-brand-teal" />
               )}
               {title}
             </CardTitle>
-            {description && <CardDescription className="text-xs">{description}</CardDescription>}
+            {description && <CardDescription className="text-[0.65rem] opacity-80">{description}</CardDescription>}
           </div>
-          <Badge variant="outline" className="bg-background/50 border-border/10 text-[10px] font-bold px-2 py-0 h-5">
-            Realtime
+          <Badge variant="outline" className="bg-slate-50 border-slate-200 text-slate-500 text-[9px] uppercase tracking-wider font-bold px-2 py-0 h-5">
+            Live
           </Badge>
         </div>
       </CardHeader>
@@ -61,39 +60,39 @@ export function RankingList({ title, description, items, type }: RankingListProp
               const barWidth = Math.min((currentVal / maxVal) * 100, 100);
 
               return (
-                <div key={idx} className="relative group px-6 py-2.5 transition-colors hover:bg-muted/30">
+                <div key={idx} className="relative group px-6 py-2.5 transition-colors hover:bg-slate-50/50">
                   {/* Performance Bar Background */}
                   <div 
-                    className="absolute inset-y-0 left-0 bg-primary/[0.03] transition-all duration-700" 
+                    className="absolute inset-y-0 left-0 bg-slate-100/50 transition-all duration-700" 
                     style={{ width: `${barWidth}%` }}
                   />
                   <div 
-                    className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity" 
+                    className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-slate-300 opacity-0 group-hover:opacity-100 transition-opacity" 
                   />
 
                   <div className="relative flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4 min-w-0">
-                      <span className="text-[11px] font-mono font-bold text-muted-foreground/40 w-4 grayscale hover:grayscale-0 transition-all">
+                      <span className="text-[11px] font-mono font-bold text-slate-400 w-4 grayscale hover:grayscale-0 transition-all">
                         0{idx + 1}
                       </span>
                       <div className="flex flex-col min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="text-[13px] font-bold text-foreground truncate" title={item.name}>
+                          <span className="text-[13px] font-bold text-brand-indigo truncate" title={item.name}>
                             {item.name}
                           </span>
                           {idx === 0 && (
-                            <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-0 text-[9px] font-black h-4 px-1.5 rounded-sm">
+                            <Badge className="bg-emerald-50 text-emerald-600 border-0 text-[8px] tracking-wide font-black h-4 px-1.5 rounded-sm">
                               TOP
                             </Badge>
                           )}
                           {type === 'product' && currentVal > (maxVal * 0.7) && idx > 0 && (
-                            <Badge className="bg-blue-500/10 text-blue-500 border-0 text-[9px] font-black h-4 px-1.5 rounded-sm">
+                            <Badge className="bg-slate-100 text-slate-600 border-0 text-[8px] tracking-wide font-black h-4 px-1.5 rounded-sm">
                               VELOCITY
                             </Badge>
                           )}
                         </div>
                         {item.subtext && (
-                          <span className="text-[10px] text-muted-foreground/70 truncate mt-0.5">
+                          <span className="text-[10px] text-slate-500 truncate mt-0.5">
                             {item.subtext}
                           </span>
                         )}
@@ -101,11 +100,11 @@ export function RankingList({ title, description, items, type }: RankingListProp
                     </div>
                     
                     <div className="flex flex-col items-end shrink-0">
-                      <span className="text-[13px] font-black font-mono tracking-tight text-primary">
+                      <span className="text-[13px] font-bold font-mono tracking-tight text-brand-indigo tabular-nums">
                         {item.value}
                       </span>
                       {item.meta && (
-                        <span className="text-[10px] font-medium text-muted-foreground/60 italic">
+                        <span className="text-[9px] font-semibold uppercase tracking-wider text-slate-400">
                           {item.meta}
                         </span>
                       )}

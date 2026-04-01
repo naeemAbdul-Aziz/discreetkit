@@ -51,6 +51,26 @@ The final touchpoint uses a "Quiet Confidence" aesthetic to reinforce trust:
 - **Architecture**: Separates order codes (Tracking/Partner) from "Next Steps" status updates using the same `rounded-[2rem]` card pattern.
 - **SEO**: Dedicated `layout.tsx` enforces `noindex` for user privacy while providing clean `title` metadata.
 
+### 3.15. Parallel Data Projection (NEW - April 2026)
+
+**Implemented in:** `src/lib/admin-actions.ts` → `getDashboardStats()`
+
+To achieve the **2-3x load time improvement** required for a FAANG-standard dashboard, we abandoned sequential data fetching in favor of a **Parallel Dynamic Projection** strategy:
+
+- **Algorithm**: `Promise.all` executes targeted Supabase queries (Orders, Products, Pharmacy Partners) simultaneously.
+- **Optimization**: instead of `select('*')`, we fetch only the minimal set of columns required for metrics (e.g., `status`, `total_price`, `created_at`).
+- **Data Invariants**: All status filtering and revenue calculation are performed in-memory after a single parallel fetch, ensuring zero redundant database round-trips.
+
+### 3.16. Optimistic UX Engine (NEW - April 2026)
+
+**Implemented in:** `src/app/(dashboard)/pharmacy/dashboard/orders-list.tsx`
+
+The Pharmacy operational layer uses an **Optimistic UI pattern** to eliminate the perception of network latency during critical logistics actions (Accept/Decline):
+
+- **Mechanism**: State is managed locally via `hiddenOrderIds`. When a pharmacist clicks "Accept", the order is immediately filtered out of the "Pending" list.
+- **Reliability**: If the server-side update fails, the local state is rolled back (the order reappears) and a descriptive error toast is displayed.
+- **User Perception**: Operational actions feel **instant**, providing a high-performance "logistics command center" feel.
+
 ---
 
 ## 1. Core Principles

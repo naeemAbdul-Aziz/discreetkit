@@ -1,3 +1,16 @@
+## April 2026 Operational Standards (Addendum)
+
+### 1. High-Velocity Logistics Compliance
+Partners are now required to utilize the **Command Center Dashboard** for all operational actions:
+- **Instant Recognition**: Partners must utilize the **Optimistic UI Engine** features to acknowledge orders immediately.
+- **SLA Benchmark**: Target response time for order acceptance is reduced to **less than 10 minutes** to maintain fulfillment velocity.
+- **Performance Projection**: Partners acknowledge that operational metrics (e.g., "Anxiety Meter") are tracked in real-time and influence order routing priority.
+
+### 2. Modernized Comms Protocol
+- **Proactive Reporting**: Partners must use the integrated **Messaging Hub Quick Replies** for reporting stock-outs or rider delays, ensuring sub-30 second operational updates.
+
+---
+
 ## SLA & Reliability Addendum (2026-02)
 
 - Scheduled operations ensure timely inventory release and escalation handling (15-minute cadence).

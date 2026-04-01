@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useTransition } from "react";
+import React, { useState, useEffect, useMemo, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   Table,
@@ -25,7 +25,13 @@ import {
   Check,
   ChevronsUpDown,
   Loader2,
+  ChevronDown,
+  ChevronRight,
+  Filter,
+  XCircle,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
@@ -38,6 +44,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
   Dialog,
@@ -112,6 +119,14 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
   const [activeMessageOrderId, setActiveMessageOrderId] = useState<
     number | null
   >(null);
+  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
+
+  const toggleRow = (id: number) => {
+    const next = new Set(expandedRows);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setExpandedRows(next);
+  };
 
   // Override State
   const [overridePrompt, setOverridePrompt] = useState<{
@@ -434,7 +449,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
     switch (status) {
       case "completed":
         return (
-          <Badge variant="success" className="gap-1">
+          <Badge variant="success" className="gap-1 shadow-[inset_0_0_8px_rgba(34,197,94,0.2)]">
             <CheckCircle className="h-3 w-3" />
             {base}
           </Badge>
@@ -448,7 +463,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
         );
       case "out_for_delivery":
         return (
-          <Badge variant="warning" className="gap-1">
+          <Badge variant="warning" className="gap-1 animate-breathing shadow-[0_0_12px_rgba(245,158,11,0.3)] border-amber-200/50">
             <Truck className="h-3 w-3" />
             {base}
           </Badge>
@@ -462,7 +477,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
         );
       case "received":
         return (
-          <Badge variant="info" className="gap-1">
+          <Badge variant="info" className="gap-1 animate-breathing shadow-[0_0_12px_rgba(14,165,233,0.3)] border-sky-200/50">
             <Clock className="h-3 w-3" />
             {base}
           </Badge>
@@ -806,188 +821,237 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedOrders.map((order) => (
-              <TableRow
-                key={order.id}
-                className={selectedIds.has(order.id) ? "bg-muted/30" : ""}
-              >
-                <TableCell className={ordersTableCols.checkbox}>
-                  <input
-                    type="checkbox"
-                    aria-label={`Select order ${order.code}`}
-                    checked={selectedIds.has(order.id)}
-                    onChange={(e) => {
-                      setSelectedIds((prev) => {
-                        const next = new Set(prev);
-                        if (e.target.checked) next.add(order.id);
-                        else next.delete(order.id);
-                        return next;
-                      });
-                    }}
-                    className="h-4 w-4 rounded border"
-                  />
-                </TableCell>
-                <TableCell className={ordersTableCols.codeCell}>
-                  {order.code}
-                </TableCell>
-                <TableCell className={ordersTableCols.dateCell}>
-                  {new Date(order.created_at).toISOString().slice(0, 10)}
-                </TableCell>
-                <TableCell className={ordersTableCols.customerCell}>
-                  {order.email || "Anonymous"}
-                </TableCell>
-                <TableCell className={ordersTableCols.noteCell}>
-                  {order.delivery_address_note ? (
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant="outline" size="sm" className="text-xs">
-                          View Note
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="max-w-[360px] text-sm">
-                        {order.delivery_address_note}
-                      </PopoverContent>
-                    </Popover>
-                  ) : (
-                    <span className="text-muted-foreground text-xs">—</span>
-                  )}
-                </TableCell>
-                <TableCell className={ordersTableCols.statusCell}>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="-ml-2 px-2 h-8 items-center w-fit justify-start focus-visible:ring-0"
-                        title={
-                          order.status === "out_for_delivery" &&
-                          order.courier_name
-                            ? `Rider: ${order.courier_name} (${order.courier_phone || "No phone"})`
-                            : undefined
-                        }
-                      >
-                        <span className="inline-flex items-center gap-2 w-full">
-                          {getStatusBadge(order.status)}
-                          {order.status === "out_for_delivery" &&
-                            order.courier_name && (
-                              <span className="text-[10px] text-muted-foreground truncate max-w-[100px]">
-                                🚚 {order.courier_name}
-                              </span>
-                            )}
-                        </span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start">
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setActiveMessageOrderId(order.id);
-                          setMessageDialogOpen(true);
-                        }}
-                      >
+            <TooltipProvider>
+              {paginatedOrders.map((order) => {
+                const isExpanded = expandedRows.has(order.id);
+                const isDelayedUnassigned = !order.pharmacy_id && 
+                  (new Date().getTime() - new Date(order.created_at).getTime()) > 15 * 60 * 1000;
+                
+                return (
+                  <React.Fragment key={order.id}>
+                    <TableRow
+                      className={cn(
+                        "transition-colors hover:bg-slate-50/50 cursor-pointer group",
+                        selectedIds.has(order.id) && "bg-muted/30",
+                        isExpanded && "bg-slate-50 border-b-0"
+                      )}
+                      onClick={() => toggleRow(order.id)}
+                    >
+                      <TableCell className={cn(ordersTableCols.checkbox, "relative")} onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center gap-2">
-                          <MessageSquare className="h-4 w-4" />
-                          <span>Chat with Pharmacy</span>
+                           <button className="text-slate-400 group-hover:text-brand-indigo transition-colors" title={isExpanded ? "Collapse" : "Expand"}>
+                             {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                           </button>
+                          <input
+                            type="checkbox"
+                            aria-label={`Select order ${order.code}`}
+                            checked={selectedIds.has(order.id)}
+                            onChange={(e) => {
+                              setSelectedIds((prev) => {
+                                const next = new Set(prev);
+                                if (e.target.checked) next.add(order.id);
+                                else next.delete(order.id);
+                                return next;
+                              });
+                            }}
+                            className="h-4 w-4 rounded border"
+                          />
                         </div>
-                      </DropdownMenuItem>
-                      {[
-                        "pending_payment",
-                        "received",
-                        "processing",
-                        "out_for_delivery",
-                        "completed",
-                      ].map((s) => (
-                        <DropdownMenuItem
-                          key={s}
-                          onClick={() => handleStatusChangeClick(order.id, s)}
-                        >
-                          {titleCase(s)}
-                        </DropdownMenuItem>
-                      ))}
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setActiveAssignOrder({
-                            id: order.id,
-                            pharmacyId: order.pharmacy_id,
-                          });
-                          setAssignDialogOpen(true);
-                        }}
-                      >
-                        Assign Pharmacy
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-                <TableCell className={ordersTableCols.pharmacyCell}>
-                  <div className="flex items-center gap-2">
-                    <PharmacyCombobox
-                      orderId={order.id}
-                      currentPharmacyId={order.pharmacy_id}
-                      currentPharmacyName={order.pharmacies?.name}
-                      deliveryArea={order.delivery_area}
-                      onAssign={handleAssignPharmacy}
-                      loading={assigningId === order.id}
-                    />
-                    {order.pharmacy_ack_status === "declined" && (
-                      <div className="relative group cursor-help">
-                        <AlertCircle className="h-4 w-4 text-destructive" />
-                        <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block w-48 p-2 bg-destructive text-destructive-foreground text-xs rounded shadow-lg z-50 pointer-events-none">
-                          {(() => {
-                            // Find the decline event - look for "acknowledge" + "declined" in note OR status "Pharmacy Declined"
-                            const declineEvent = order.order_events
-                              ?.filter((e: any) => {
-                                const note = (e.note || "").toLowerCase();
-                                const status = (e.status || "").toLowerCase();
-                                return (
-                                  (note.includes("acknowledge") &&
-                                    note.includes("declined")) ||
-                                  status === "pharmacy declined"
-                                );
-                              })
-                              .sort(
-                                (a: any, b: any) =>
-                                  new Date(b.created_at).getTime() -
-                                  new Date(a.created_at).getTime(),
-                              )[0];
-
-                            if (!declineEvent || !declineEvent.note)
-                              return "Order declined by pharmacy";
-
-                            const note = declineEvent.note;
-
-                            // Pattern 1: "Pharmacy acknowledge: declined - [Reason]"
-                            const prefix1 = "Pharmacy acknowledge: declined - ";
-                            if (note.includes(prefix1)) {
-                              return note.split(prefix1)[1];
-                            }
-
-                            // Pattern 2: "Pharmacy Declined - [Reason]" (if we used that)
-                            // Pattern 3: Simple split by " - " if it looks like a structured message
-                            if (note.includes(" - ")) {
-                              const parts = note.split(" - ");
-                              // Return the last part as the reason
-                              return parts[parts.length - 1];
-                            }
-
-                            return note;
-                          })()}
-                          <div className="absolute left-1/2 -translate-x-1/2 top-full w-2 h-2 bg-destructive rotate-45"></div>
+                      </TableCell>
+                      <TableCell className={cn(ordersTableCols.codeCell, "font-mono font-bold text-slate-600 group-hover:text-brand-indigo transition-colors")}>
+                        {order.code}
+                      </TableCell>
+                      <TableCell className={ordersTableCols.dateCell}>
+                        {new Date(order.created_at).toISOString().slice(0, 10)}
+                      </TableCell>
+                      <TableCell className={ordersTableCols.customerCell}>
+                        {order.email || "Anonymous"}
+                      </TableCell>
+                      <TableCell className={ordersTableCols.noteCell} onClick={(e) => e.stopPropagation()}>
+                        {order.delivery_address_note ? (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-7 px-2 text-[10px] uppercase font-bold tracking-wider text-brand-indigo bg-brand-indigo/5 border border-brand-indigo/10 hover:bg-brand-indigo/10 rounded-full"
+                              >
+                                View Note
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-[300px] p-3 text-xs bg-white/80 backdrop-blur-md border-slate-200 shadow-xl text-slate-600 font-medium leading-relaxed">
+                              {order.delivery_address_note}
+                            </TooltipContent>
+                          </Tooltip>
+                        ) : (
+                          <span className="text-slate-300 text-[10px]">EMPTY</span>
+                        )}
+                      </TableCell>
+                      <TableCell className={ordersTableCols.statusCell} onClick={(e) => e.stopPropagation()}>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="-ml-2 px-2 h-8 items-center w-fit justify-start focus-visible:ring-0 hover:bg-transparent"
+                            >
+                              <span className="inline-flex items-center gap-2 w-full">
+                                {getStatusBadge(order.status)}
+                                {order.status === "out_for_delivery" &&
+                                  order.courier_name && (
+                                    <span className="text-[10px] text-slate-400 font-medium tabular-nums">
+                                       • {order.courier_name}
+                                    </span>
+                                  )}
+                              </span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="start" className="w-[200px]">
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setActiveMessageOrderId(order.id);
+                                setMessageDialogOpen(true);
+                              }}
+                            >
+                              <MessageSquare className="mr-2 h-4 w-4" />
+                              <span>Chat with Pharmacy</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            {[
+                              "pending_payment",
+                              "received",
+                              "processing",
+                              "out_for_delivery",
+                              "completed",
+                            ].map((s) => (
+                              <DropdownMenuItem
+                                key={s}
+                                onClick={() => handleStatusChangeClick(order.id, s)}
+                              >
+                                {titleCase(s)}
+                              </DropdownMenuItem>
+                            ))}
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setActiveAssignOrder({
+                                  id: order.id,
+                                  pharmacyId: order.pharmacy_id,
+                                });
+                                setAssignDialogOpen(true);
+                              }}
+                            >
+                              Assign Pharmacy
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                      <TableCell className={cn(ordersTableCols.pharmacyCell, isDelayedUnassigned && "animate-urgent bg-rose-50/50")} onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center gap-2">
+                          <PharmacyCombobox
+                            orderId={order.id}
+                            currentPharmacyId={order.pharmacy_id}
+                            currentPharmacyName={order.pharmacies?.name}
+                            deliveryArea={order.delivery_area}
+                            onAssign={handleAssignPharmacy}
+                            loading={assigningId === order.id}
+                            isUrgent={isDelayedUnassigned}
+                          />
+                          {order.pharmacy_ack_status === "declined" && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <AlertCircle className="h-4 w-4 text-rose-500" />
+                              </TooltipTrigger>
+                              <TooltipContent className="bg-rose-600 text-white border-0 text-[11px] font-bold">
+                                Declined by Pharmacy
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
                         </div>
-                      </div>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell className={ordersTableCols.totalCell}>
-                  GHS {Number(order.total_price || 0).toFixed(2)}
-                </TableCell>
-              </TableRow>
-            ))}
+                      </TableCell>
+                      <TableCell className={cn(ordersTableCols.totalCell, "font-bold tabular-nums text-slate-700")}>
+                        GHS {Number(order.total_price || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      </TableCell>
+                    </TableRow>
+                    
+                    {/* Expanded Detail View */}
+                    <AnimatePresence initial={false}>
+                      {isExpanded && (
+                        <TableRow className="bg-slate-50 border-t-0 hover:bg-slate-50">
+                          <TableCell colSpan={8} className="p-0 overflow-hidden">
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ type: "spring", duration: 0.4, bounce: 0.2 }}
+                            >
+                              <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8 border-l-4 border-brand-indigo ml-6 my-2 bg-white rounded-r-xl shadow-[inner_0_2px_4px_rgba(0,0,0,0.02)]">
+                                <div className="space-y-4">
+                                  <div>
+                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1 text-left">Customer Details</h4>
+                                    <p className="text-sm font-semibold text-slate-700 text-left">{order.email || "Anonymous Patient"}</p>
+                                    <p className="text-xs text-slate-500 mt-1 text-left">Delivery: <span className="font-bold">{order.delivery_area || "Not specified"}</span></p>
+                                  </div>
+                                  <div className="text-left">
+                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Order Note / Special Instructions</h4>
+                                    <p className="text-sm font-medium text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100 italic leading-relaxed">
+                                      {order.delivery_address_note || "No specific delivery notes provided for this order."}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="space-y-4 text-left">
+                                  <div className="flex justify-between items-start">
+                                    <div>
+                                      <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Partner Pharmacy</h4>
+                                      <p className="text-sm font-bold text-brand-indigo">{order.pharmacies?.name || "Pending Assignment"}</p>
+                                    </div>
+                                    <Button variant="outline" size="sm" className="h-8 text-xs font-bold gap-2" onClick={(e) => {
+                                      e.stopPropagation();
+                                      setActiveMessageOrderId(order.id);
+                                      setMessageDialogOpen(true);
+                                    }}>
+                                      <MessageSquare className="h-3.5 w-3.5" /> Chat
+                                    </Button>
+                                  </div>
+                                  <div className="pt-4 border-t border-slate-100 flex flex-wrap gap-2">
+                                    <button className="text-[10px] font-black uppercase tracking-widest text-white bg-brand-indigo px-3 py-1.5 rounded-md shadow-sm">Details Page</button>
+                                    <button className="text-[10px] font-black uppercase tracking-widest text-slate-600 bg-slate-100 px-3 py-1.5 rounded-md">Mark Flagged</button>
+                                  </div>
+                                </div>
+                              </div>
+                            </motion.div>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </AnimatePresence>
+                  </React.Fragment>
+                );
+              })}
+            </TooltipProvider>
             {filteredOrders.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center">
-                  <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                    <span className="text-sm">
-                      No orders match your criteria.
-                    </span>
+                <TableCell colSpan={8} className="h-64 text-center">
+                  <div className="flex flex-col items-center justify-center gap-4 text-slate-400">
+                    <div className="bg-slate-50 p-6 rounded-full border-2 border-dashed border-slate-200">
+                      <XCircle className="h-10 w-10 opacity-20" />
+                    </div>
+                    <div className="space-y-1">
+                      <h3 className="text-sm font-bold text-slate-600 uppercase tracking-widest">No Intelligence Found</h3>
+                      <p className="text-xs font-medium">Clear your filters to reveal hidden order streams.</p>
+                    </div>
+                    {filterStatus !== "all" || searchTerm !== "" ? (
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="mt-2 font-bold text-[10px] uppercase tracking-widest gap-2"
+                        onClick={() => {
+                          setSearchTerm("");
+                          setFilterStatus("all");
+                        }}
+                      >
+                        <Filter className="h-3 w-3" /> Clear Intel Filters
+                      </Button>
+                    ) : null}
                   </div>
                 </TableCell>
               </TableRow>
@@ -1052,6 +1116,7 @@ function PharmacyCombobox({
   deliveryArea,
   onAssign,
   loading,
+  isUrgent,
 }: {
   orderId: number;
   currentPharmacyId: number | null;
@@ -1059,6 +1124,7 @@ function PharmacyCombobox({
   deliveryArea?: string;
   onAssign: (orderId: number, pharmacyId: number, pharmacyName: string) => void;
   loading: boolean;
+  isUrgent?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -1113,14 +1179,18 @@ function PharmacyCombobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-40 h-8 justify-between items-center"
+          className={cn(
+            "w-40 h-8 justify-between items-center transition-all duration-300",
+            !currentPharmacyId && "border-slate-300 bg-slate-50",
+            isUrgent && "border-rose-300 ring-2 ring-rose-100"
+          )}
           size="sm"
           disabled={loading}
         >
-          <span className="truncate">
-            {loading ? "Assigning..." : currentPharmacyName || "Unassigned"}
+          <span className={cn("truncate font-medium", !currentPharmacyId && "text-slate-400")}>
+            {loading ? "Assigning..." : currentPharmacyName || "UNASSIGNED"}
           </span>
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <ChevronsUpDown className="ml-2 h-3.5 w-3.5 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[300px] p-0" align="start">

@@ -26,7 +26,6 @@ export default async function RefillsPage() {
 
       <RefillsTable
         initialSubscriptions={subscriptions}
-        pharmacies={pharmacies}
       />
     </div>
   );

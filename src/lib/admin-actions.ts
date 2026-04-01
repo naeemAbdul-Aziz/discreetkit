@@ -638,158 +638,152 @@ export async function getOrders() {
     return normalizedOrders
 }
 
-export async function getDashboardStats(prefetchedOrders?: any[]) {
-    const orders = prefetchedOrders || await getOrders();
+export async function getDashboardStats() {
+    await requireAdmin();
+    const supabase = await createSupabaseServerClient();
 
-    // Top Pharmacies by Revenue
+    // Parallelize core lookups with projection (only fetch what's needed)
+    const [
+        { data: orders, error: ordersError },
+        { data: pharmacists, error: pharmError },
+        { data: riders, error: riderError }
+    ] = await Promise.all([
+        supabase
+            .from('orders')
+            .select('status, total_price_ghs, created_at, items, delivery_area, code, pharmacies(name), order_events(status, created_at, note)')
+            .order('created_at', { ascending: false }),
+        supabase.from('pharmacies').select('id', { count: 'exact', head: true }),
+        supabase.from('riders').select('id', { count: 'exact', head: true })
+    ]);
+
+    if (ordersError) throw new Error(ordersError.message);
+
+    const totalOrders = orders?.length || 0;
+    const activePharmacists = pharmacists?.length || 0; // Head request count would be better but this works for now
+    const activeRiders = riders?.length || 0;
+
+    // --- REVENUE & ANALYTICS ---
+    let totalRevenue = 0;
+    const revenueByDay: Record<string, number> = {};
     const pharmacyRevenue: Record<string, number> = {};
-    orders.forEach((o: any) => {
-        if (o.pharmacies?.name) {
-            pharmacyRevenue[o.pharmacies.name] = (pharmacyRevenue[o.pharmacies.name] || 0) + (o.total_price || 0);
+    const productSales: Record<string, { quantity: number; revenue: number }> = {};
+    const regionalStats: Record<string, number> = {};
+    const categoryStats: Record<string, number> = {};
+    
+    // Performance: Only fetch product categories for items in these orders
+    const itemNames = new Set<string>();
+    
+    orders?.forEach((o: any) => {
+        const rev = Number(o.total_price_ghs || 0);
+        if (o.status === 'completed') {
+            totalRevenue += rev;
+        }
+
+        // Timeline
+        const dateStr = new Date(o.created_at).toISOString().split('T')[0];
+        revenueByDay[dateStr] = (revenueByDay[dateStr] || 0) + rev;
+
+        // Pharmacy Revenue
+        const pharmName = Array.isArray(o.pharmacies) ? o.pharmacies[0]?.name : o.pharmacies?.name;
+        if (pharmName) {
+            pharmacyRevenue[pharmName] = (pharmacyRevenue[pharmName] || 0) + rev;
+        }
+
+        // Product Sales
+        let items: any[] = [];
+        try { items = typeof o.items === 'string' ? JSON.parse(o.items) : o.items; } catch (e) { }
+        if (Array.isArray(items)) {
+            items.forEach((item) => {
+                const name = item.name || 'Unknown';
+                itemNames.add(name);
+                if (!productSales[name]) productSales[name] = { quantity: 0, revenue: 0 };
+                const qty = item.quantity || 1;
+                productSales[name].quantity += qty;
+                productSales[name].revenue += (item.price || item.price_ghs || 0) * qty;
+            });
+        }
+
+        // Regional
+        const area = o.delivery_area || 'Standard Delivery';
+        regionalStats[area] = (regionalStats[area] || 0) + 1;
+    });
+
+    // Bulk fetch categories to avoid "N+1" in JS
+    const { data: productCats } = await supabase
+        .from('products')
+        .select('name, category')
+        .in('name', Array.from(itemNames));
+    
+    const catMap = new Map(productCats?.map(p => [p.name, p.category]) || []);
+    
+    // Category distribution from sales
+    orders?.forEach((o: any) => {
+        let items: any[] = [];
+        try { items = typeof o.items === 'string' ? JSON.parse(o.items) : o.items; } catch (e) { }
+        if (Array.isArray(items)) {
+            items.forEach((item: any) => {
+                const cat = catMap.get(item.name) || 'Other';
+                categoryStats[cat] = (categoryStats[cat] || 0) + 1;
+            });
         }
     });
 
     const topPharmacies = Object.entries(pharmacyRevenue)
         .map(([name, revenue]) => ({ name, revenue }))
         .sort((a, b) => b.revenue - a.revenue)
-        .slice(0, 5); // Top 5
-
-    // Top Products by Quantity Sold
-    const productSales: Record<string, { quantity: number; revenue: number }> = {};
-    orders.forEach((o: any) => {
-        if (o.items) {
-            // items can be JSON string or object
-            let items: any[] = [];
-            try {
-                items = typeof o.items === 'string' ? JSON.parse(o.items) : o.items;
-            } catch (e) { }
-
-            if (Array.isArray(items)) {
-                items.forEach((item) => {
-                    const name = item.name || 'Unknown Product';
-                    if (!productSales[name]) {
-                        productSales[name] = { quantity: 0, revenue: 0 };
-                    }
-                    productSales[name].quantity += (item.quantity || 1);
-                    productSales[name].revenue += (item.price || item.price_ghs || 0) * (item.quantity || 1);
-                });
-            }
-        }
-    });
+        .slice(0, 5);
 
     const topProducts = Object.entries(productSales)
         .map(([name, stats]) => ({ name, ...stats }))
         .sort((a, b) => b.quantity - a.quantity)
-        .slice(0, 5); // Top 5
+        .slice(0, 5);
 
-    // --- TIME SERIES DATA (Daily Revenue & Orders) ---
-    // Explicitly create supabase client for internal queries
-    const supabase = await createSupabaseServerClient();
-
-    const dailyStats: Record<string, { date: string, revenue: number, orders: number }> = {};
-    const now = new Date();
-    // Initialize last 30 days
+    // Timeline chart initialization (last 30 days)
+    const revenueChart = [];
     for (let i = 29; i >= 0; i--) {
-        const d = new Date(now);
+        const d = new Date();
         d.setDate(d.getDate() - i);
         const dateStr = d.toISOString().split('T')[0];
-        dailyStats[dateStr] = { date: dateStr, revenue: 0, orders: 0 };
+        const displayDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        revenueChart.push({
+            date: displayDate,
+            revenue: revenueByDay[dateStr] || 0,
+            orders: orders?.filter(o => o.created_at.startsWith(dateStr)).length || 0
+        });
     }
 
-    orders.forEach((o: any) => {
-        const dateStr = new Date(o.created_at).toISOString().split('T')[0];
-        if (dailyStats[dateStr]) {
-            dailyStats[dateStr].revenue += (o.total_price || 0);
-            dailyStats[dateStr].orders += 1;
-        }
-    });
-
-    const revenueChart = Object.values(dailyStats);
-
-    // --- CATEGORY DISTRIBUTION ---
-    const categoryStats: Record<string, number> = {};
-
-    const { data: allProducts } = await supabase.from('products').select('id, name, category');
-    const productMap = new Map(allProducts?.map((p: any) => [p.name, p.category]) || []);
-
-    orders.forEach((o: any) => {
-        if (o.items) {
-            let items: any[] = [];
-            try { items = typeof o.items === 'string' ? JSON.parse(o.items) : o.items; } catch (e) { }
-
-            if (Array.isArray(items)) {
-                items.forEach((item: any) => {
-                    const cat = productMap.get(item.name) || 'Other';
-                    categoryStats[cat] = (categoryStats[cat] || 0) + 1;
-                });
-            }
-        }
-    });
-
-    const categoryChart = Object.entries(categoryStats).map(([name, value]) => ({ name, value }));
-
-    // --- INTENTIONAL OPERATIONAL METRICS (FAANG-STANDARD) ---
-    
-    // 1. Fulfillment Velocity (The "Anxiety Meter")
-    // Target: Avg time from 'received' to 'out_for_delivery'
-    let totalVelocityMs = 0;
-    let velocityCount = 0;
-    
-    orders.forEach((o: any) => {
+    // Operational Velocity
+    let totalVel = 0, velCount = 0;
+    orders?.forEach(o => {
         const events = o.order_events || [];
-        const receivedEvent = events.find((e: any) => e.status === 'received') || { created_at: o.created_at };
-        const shippedEvent = events.find((e: any) => e.status === 'out_for_delivery');
-        
-        if (shippedEvent) {
-            const start = new Date(receivedEvent.created_at).getTime();
-            const end = new Date(shippedEvent.created_at).getTime();
-            totalVelocityMs += (end - start);
-            velocityCount++;
+        const start = events.find((e: any) => e.status === 'received')?.created_at || o.created_at;
+        const end = events.find((e: any) => e.status === 'out_for_delivery')?.created_at;
+        if (end) {
+            totalVel += (new Date(end).getTime() - new Date(start).getTime());
+            velCount++;
         }
     });
-    
-    const avgVelocityHours = velocityCount > 0 ? (totalVelocityMs / velocityCount / (1000 * 60 * 60)) : 0;
 
-    // 2. Anonymity Density (Regional Hotspots)
-    const regionalStats: Record<string, number> = {};
-    orders.forEach((o: any) => {
-        const area = o.delivery_area || 'Standard Delivery';
-        regionalStats[area] = (regionalStats[area] || 0) + 1;
-    });
-    const regionChart = Object.entries(regionalStats)
-        .map(([name, value]) => ({ name, value }))
-        .sort((a, b) => b.value - a.value)
-        .slice(0, 8);
-
-    // 3. Operational Pulse (Live Event Feed)
-    const allEvents: any[] = [];
-    orders.slice(0, 20).forEach((o: any) => {
-        (o.order_events || []).forEach((e: any) => {
-            allEvents.push({
-                id: e.id,
-                orderCode: o.code,
-                status: e.status,
-                timestamp: e.created_at,
-                note: e.note
-            });
-        });
-    });
-    const pulseFeed = allEvents
-        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-        .slice(0, 12);
+    const pulseFeed = orders?.slice(0, 10).flatMap(o => (o.order_events || []).map((e: any) => ({
+        id: e.id,
+        orderCode: o.code,
+        status: e.status,
+        timestamp: e.created_at,
+        note: e.note
+    }))).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 12);
 
     return {
         topPharmacies,
         topProducts,
         revenueChart,
-        categoryChart,
-        regionChart,
+        categoryChart: Object.entries(categoryStats).map(([name, value]) => ({ name, value })),
+        regionChart: Object.entries(regionalStats).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value).slice(0, 8),
         pulseFeed,
         metrics: {
-            totalRevenue: orders.reduce((acc: number, curr: any) => acc + (curr.total_price || 0), 0),
-            totalOrders: orders.length,
-            activePatients: new Set(orders.map((o: any) => o.user_id)).size,
-            fulfillmentVelocity: avgVelocityHours.toFixed(1), // in hours
+            totalRevenue,
+            totalOrders,
+            activePatients: new Set(orders?.map(o => (o as any).user_id)).size,
+            fulfillmentVelocity: velCount > 0 ? (totalVel / velCount / (1000 * 60 * 60)).toFixed(1) : "0.0",
         }
     };
 }
@@ -1399,6 +1393,37 @@ export async function updateCategory(id: number, data: { name: string; descripti
         const { error: syncError } = await supabase
             .from('products')
             .update({ category: data.name })
+            .eq('category', oldCategory.name)
+
+        if (syncError) console.error('Failed to sync products category:', syncError)
+    }
+
+    revalidatePath('/admin/categories')
+    revalidatePath('/admin/products')
+    return { success: true }
+}
+
+export async function updateCategoryName(id: number, name: string) {
+    const supabase = getSupabaseAdminClient()
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
+
+    const { data: oldCategory } = await supabase
+        .from('categories')
+        .select('name')
+        .eq('id', id)
+        .single()
+
+    const { error } = await supabase
+        .from('categories')
+        .update({ name, slug })
+        .eq('id', id)
+
+    if (error) return { error: error.message }
+
+    if (oldCategory && oldCategory.name !== name) {
+        const { error: syncError } = await supabase
+            .from('products')
+            .update({ category: name })
             .eq('category', oldCategory.name)
 
         if (syncError) console.error('Failed to sync products category:', syncError)
