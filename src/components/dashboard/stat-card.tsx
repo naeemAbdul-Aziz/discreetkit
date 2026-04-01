@@ -17,11 +17,16 @@ interface StatCardProps {
 
 export function StatCard({ title, value, icon: Icon, description, trend, className }: StatCardProps) {
   return (
-    <Card className={cn("border border-slate-200/50 shadow-sm transition-all duration-300 hover:shadow-md bg-white rounded-3xl overflow-hidden group", className)}>
+    <Card
+      className={cn(
+        "border border-slate-200/60 shadow-sm bg-white rounded-3xl overflow-hidden group transition-colors duration-200 hover:bg-slate-50",
+        className
+      )}
+    >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 p-6 pb-2">
         <CardTitle className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400">{title}</CardTitle>
-        <div className="h-9 w-9 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center transition-colors group-hover:bg-brand-indigo/5">
-            <Icon className="h-4 w-4 text-brand-indigo/60 group-hover:text-brand-indigo transition-colors" />
+        <div className="h-9 w-9 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center transition-colors group-hover:bg-slate-100">
+          <Icon className="h-4 w-4 text-brand-indigo/70" />
         </div>
       </CardHeader>
       <CardContent className="p-6 pt-2">

@@ -173,7 +173,7 @@ export default function PharmacyDashboardPage() {
   if (!data) return null;
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+    <div className="p-8 max-w-7xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-2 duration-500">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
            <div className="flex items-center gap-3 mb-2">
@@ -209,7 +209,7 @@ export default function PharmacyDashboardPage() {
           { label: "Completed Hub", value: data.stats.completed, icon: CheckCircle, color: "text-emerald-600", bg: "bg-emerald-50/50", border: "border-emerald-100", note: "Delivered" },
         ].map((stat, i) => (
           <Card key={i} className={cn(
-            "relative overflow-hidden border-none shadow-sm transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 rounded-[2rem]",
+            "relative overflow-hidden border-none shadow-sm transition-all duration-300 hover:shadow-lg rounded-[2rem]",
             stat.bg
           )}>
             <div className={cn("absolute top-0 left-0 w-full h-1", stat.color.replace('text-', 'bg-'))} />

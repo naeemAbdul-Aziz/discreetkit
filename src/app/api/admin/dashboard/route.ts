@@ -43,7 +43,7 @@ export async function GET(req: Request) {
     // Fetch last 30 days orders for metrics + full recent list for table
     const { data: recentOrders, error: ordersErr } = await supabase
       .from('orders')
-      .select('id, code, status, total_price, created_at, email')
+      .select('id, code, status, total_price_ghs, created_at, email')
       .order('created_at', { ascending: false })
       .limit(200);
 
@@ -51,7 +51,7 @@ export async function GET(req: Request) {
 
     const { data: rangedOrders, error: lastErr } = await supabase
       .from('orders')
-      .select('id, total_price, created_at, status, email')
+      .select('id, total_price_ghs, created_at, status, email')
       .gte('created_at', fromIso)
       .lte('created_at', toIso)
       .order('created_at', { ascending: true });
@@ -61,7 +61,7 @@ export async function GET(req: Request) {
     const includedStatuses = new Set(['received', 'processing', 'out_for_delivery', 'completed']);
     const rangedFiltered = (rangedOrders ?? []).filter(o => includedStatuses.has(String(o.status)));
 
-    const totalRevenue = rangedFiltered.reduce((sum, o: any) => sum + Number(o.total_price || 0), 0);
+    const totalRevenue = rangedFiltered.reduce((sum, o: any) => sum + Number(o.total_price_ghs || 0), 0);
     const totalSales = rangedFiltered.length;
     const avgOrderValue = totalSales ? totalRevenue / totalSales : 0;
 
@@ -84,7 +84,7 @@ export async function GET(req: Request) {
     for (const row of rangedFiltered) {
       const key = new Date(row.created_at).toISOString().slice(0, 10);
       if (seriesMap.has(key)) {
-        seriesMap.set(key, (seriesMap.get(key) || 0) + Number(row.total_price || 0));
+        seriesMap.set(key, (seriesMap.get(key) || 0) + Number(row.total_price_ghs || 0));
       }
     }
     const revenueSeries = Array.from(seriesMap.entries()).map(([date, amount]) => ({ date, amount }));
@@ -102,7 +102,7 @@ export async function GET(req: Request) {
       id: o.id,
       code: o.code,
       status: o.status,
-      total_price: Number(o.total_price || 0),
+      total_price: Number(o.total_price_ghs || 0),
       created_at: o.created_at,
     }));
 

@@ -836,7 +836,7 @@ export async function updateOrderStatus(id: number, status: string, courierDetai
                 .select(`
                     code, 
                     delivery_area, 
-                    total_price, 
+                    total_price_ghs, 
                     pharmacies (name, location, phone_number)
                 `)
                 .eq('id', id)
@@ -846,7 +846,7 @@ export async function updateOrderStatus(id: number, status: string, courierDetai
                 // Handle array vs object for pharmacy relation just in case
                 const pharmacy = Array.isArray(orderData.pharmacies) ? orderData.pharmacies[0] : orderData.pharmacies;
                 
-                const pickupMsg = `New Delivery Assigned! Order ${orderData.code}. Pickup: ${pharmacy.name} (${pharmacy.location}). Deliver to: ${orderData.delivery_area}. Amount: GHS ${orderData.total_price}.`;
+                const pickupMsg = `New Delivery Assigned! Order ${orderData.code}. Pickup: ${pharmacy.name} (${pharmacy.location}). Deliver to: ${orderData.delivery_area}. Amount: GHS ${orderData.total_price_ghs}.`;
                 
                 // Use the internal sendSMS helper
                 const { sendSMS } = await import('@/lib/server-utils');
@@ -876,7 +876,7 @@ export async function assignPharmacyInternal(supabaseAdmin: any, orderId: number
     // Get order and pharmacy details for notifications
     const { data: order } = await supabaseAdmin
         .from('orders')
-        .select('code, delivery_area, items, total_price')
+        .select('code, delivery_area, items, total_price_ghs')
         .eq('id', orderId)
         .single()
 
@@ -916,7 +916,7 @@ export async function assignPharmacyInternal(supabaseAdmin: any, orderId: number
                 orderCode: order.code,
                 deliveryArea: order.delivery_area,
                 itemCount,
-                totalPrice: order.total_price,
+                totalPrice: order.total_price_ghs,
             })
 
             // Log assignment event
@@ -1236,7 +1236,7 @@ export async function getPharmacyAnalytics(pharmacyId: number) {
     // Get order stats
     const { data: orderStats } = await supabase
         .from('orders')
-        .select('status, total_price')
+        .select('status, total_price_ghs')
         .eq('pharmacy_id', pharmacyId)
 
     // Get product count
@@ -1247,7 +1247,7 @@ export async function getPharmacyAnalytics(pharmacyId: number) {
 
     const analytics = {
         totalOrders: orderStats?.length || 0,
-        totalRevenue: orderStats?.reduce((sum, order) => sum + (order.total_price || 0), 0) || 0,
+        totalRevenue: orderStats?.reduce((sum, order) => sum + (order.total_price_ghs || 0), 0) || 0,
         productCount: productCount?.length || 0,
         ordersByStatus: orderStats?.reduce((acc, order) => {
             acc[order.status] = (acc[order.status] || 0) + 1
@@ -1672,7 +1672,7 @@ export async function generatePayoutReport(startDate?: string, endDate?: string)
     const { data: orders, error: ordersError } = await supabase
         .from('orders')
         .select(`
-            id, code, total_price, pharmacy_id, created_at, status
+            id, code, total_price_ghs, pharmacy_id, created_at, status
         `)
         .eq('status', 'completed')
         .gte('created_at', start.toISOString())
@@ -1723,7 +1723,7 @@ export async function generatePayoutReport(startDate?: string, endDate?: string)
             };
         }
 
-        const amount = order.total_price || 0;
+        const amount = order.total_price_ghs || 0;
         const discountRate = (p.trade_discount_percentage || 20) / 100;
         const platformShare = amount * discountRate;
         const pharmacyShare = amount - platformShare;
@@ -2052,7 +2052,7 @@ export async function getLiveDeliveries() {
             status, 
             created_at, 
             delivery_area, 
-            total_price,
+            total_price_ghs,
             courier_name,
             courier_phone,
             pharmacies(name),

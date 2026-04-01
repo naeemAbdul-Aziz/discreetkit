@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     const [ordersResult, statsResult] = await Promise.all([
       supabase
         .from('orders')
-        .select('id, code, status, pharmacy_ack_status, total_price, created_at, items, delivery_area')
+        .select('id, code, status, pharmacy_ack_status, total_price_ghs, created_at, items, delivery_area')
         .eq('pharmacy_id', pharmacy.id)
         .order('created_at', { ascending: false })
         .limit(20),
@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
       stats,
       recentOrders: recentOrdersData.map(order => ({
         ...order,
-        total_price: Number((order as any).total_price || 0)
+        total_price: Number((order as any).total_price_ghs || 0)
       })),
       statusBreakdown: Object.entries(statusBreakdown).map(([status, count]) => ({ status, count }))
     });

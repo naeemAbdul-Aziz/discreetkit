@@ -37,7 +37,7 @@ interface Order {
   created_at: string;
   status: string;
   pharmacy_ack_status?: string;
-  total_price: number;
+  total_price_ghs: number;
   items: any;
   delivery_area?: string;
 }
@@ -326,7 +326,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
                     </p>
                     <p className="flex items-center gap-2 font-bold text-slate-800">
                       <GanttChartSquare className="h-3.5 w-3.5 text-slate-400" />
-                      {itemCount} Items • ₵{Number(order.total_price || 0).toFixed(2)}
+                      {itemCount} Items • ₵{Number(order.total_price_ghs || 0).toFixed(2)}
                     </p>
                     <p className="text-[11px] flex items-center gap-2 opacity-60">
                       <Clock className="h-3.5 w-3.5" />

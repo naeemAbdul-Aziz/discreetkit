@@ -185,10 +185,10 @@ CREATE TABLE public.orders (
     delivery_address_note text,
     phone_masked text,
     email text,
-    subtotal numeric(10, 2) not null default 0.00,
-    student_discount numeric(10, 2) not null default 0.00,
-    delivery_fee numeric(10, 2) not null default 0.00,
-    total_price numeric(10, 2) not null default 0.00,
+    subtotal_ghs numeric(10, 2) not null default 0.00,
+    student_discount_ghs numeric(10, 2) not null default 0.00,
+    delivery_fee_ghs numeric(10, 2) not null default 0.00,
+    total_price_ghs numeric(10, 2) not null default 0.00,
     pharmacy_id bigint references public.pharmacies(id) on delete set null,
     pharmacy_ack_status text check (pharmacy_ack_status in ('pending','accepted','declined')) default 'pending',
     pharmacy_ack_at timestamptz,
@@ -324,8 +324,8 @@ SELECT
     p.partner_code,
     p.trade_discount_percentage,
     COUNT(o.id) as total_orders,
-    SUM(o.total_price) as total_revenue,
-    SUM(o.total_price * (1 - (COALESCE(p.trade_discount_percentage, 20) / 100))) as payout_due,
+    SUM(o.total_price_ghs) as total_revenue,
+    SUM(o.total_price_ghs * (1 - (COALESCE(p.trade_discount_percentage, 20) / 100))) as payout_due,
     MIN(o.created_at) as period_start,
     MAX(o.created_at) as period_end
 FROM public.orders o
@@ -388,6 +388,11 @@ CREATE POLICY "Pharmacies view own riders" ON public.pharmacy_riders FOR SELECT 
 CREATE POLICY "Pharmacies manage own riders" ON public.pharmacy_riders FOR ALL USING (pharmacy_id IN (SELECT id FROM public.pharmacies WHERE user_id = auth.uid()));
 CREATE POLICY "Pharmacies view own orders" ON public.orders FOR SELECT USING (pharmacy_id IN (SELECT id FROM public.pharmacies WHERE user_id = auth.uid()));
 CREATE POLICY "Pharmacies update own orders" ON public.orders FOR UPDATE USING (pharmacy_id IN (SELECT id FROM public.pharmacies WHERE user_id = auth.uid()));
+
+-- Order Messages Policies
+CREATE POLICY "Admins manage all messages" ON public.order_messages FOR ALL USING (EXISTS (SELECT 1 FROM public.user_roles ur JOIN public.roles r ON ur.role_id = r.id WHERE ur.user_id = auth.uid() AND r.name = 'admin'));
+CREATE POLICY "Pharmacies view own order messages" ON public.order_messages FOR SELECT USING (EXISTS (SELECT 1 FROM public.orders o JOIN public.pharmacies p ON o.pharmacy_id = p.id WHERE o.id = public.order_messages.order_id AND p.user_id = auth.uid()));
+CREATE POLICY "Pharmacies insert own order messages" ON public.order_messages FOR INSERT WITH CHECK (EXISTS (SELECT 1 FROM public.orders o JOIN public.pharmacies p ON o.pharmacy_id = p.id WHERE o.id = public.order_messages.order_id AND p.user_id = auth.uid()));
 
 -- ==========================================
 -- 10. SYSTEM FUNCTIONS & TRIGGERS

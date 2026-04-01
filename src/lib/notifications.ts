@@ -11,7 +11,7 @@ export async function sendPharmacyOrderNotification(id: number, pharmacyId: numb
   // Fetch order & pharmacy details
   const { data: order, error: orderError } = await supabase
     .from('orders')
-    .select('id, code, delivery_area, subtotal, total_price, pharmacy_id')
+    .select('id, code, delivery_area, subtotal_ghs, total_price_ghs, pharmacy_id')
     .eq('id', id)
     .single()
   if (orderError || !order) {
@@ -52,7 +52,7 @@ export async function sendPharmacyOrderNotification(id: number, pharmacyId: numb
   }
 
   const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/admin/orders?code=${order.code}`
-  const msg = `New order ${order.code} for ${order.delivery_area}. Total: GHS ${order.total_price}. Review & accept: ${trackingUrl}`
+  const msg = `New order ${order.code} for ${order.delivery_area}. Total: GHS ${order.total_price_ghs}. Review & accept: ${trackingUrl}`
 
   const result = await sendSMS(pharmacy.phone_number || '', msg)
 
