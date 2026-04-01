@@ -302,8 +302,8 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
                               data={categoryChart}
                               cx="40%"
                               cy="45%"
-                              innerRadius={60}
-                              outerRadius={82}
+                              innerRadius={50}
+                              outerRadius={70}
                               stroke="none"
                               paddingAngle={3}
                               dataKey="value"
