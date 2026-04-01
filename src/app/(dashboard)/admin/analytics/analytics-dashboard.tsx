@@ -32,7 +32,15 @@ import {
 } from "recharts";
 import { cn } from "@/lib/utils";
 
-const COLORS = ['#4f46e5', '#188179', '#c48c52', '#94a3b8', '#fbbf24', '#059669'];
+const COLORS = ["#4f46e5", "#188179", "#c48c52", "#94a3b8", "#fbbf24", "#059669"];
+const COLOR_BG_CLASSES = [
+  "bg-indigo-600",
+  "bg-emerald-700",
+  "bg-amber-700",
+  "bg-slate-400",
+  "bg-amber-400",
+  "bg-emerald-500",
+];
 
 interface AnalyticsDashboardProps {
   data: {
@@ -48,28 +56,18 @@ interface AnalyticsDashboardProps {
 }
 
 const CustomRevenueTooltip = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
-    const isProjected = payload[0].dataKey === "predictedRevenue";
-    return (
-      <div className="bg-slate-900 border border-slate-800 shadow-2xl rounded-2xl p-4 w-52 animate-in fade-in zoom-in-95 duration-200">
-        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">{label}</p>
-        <p className="text-xl font-black tracking-tight text-white tabular-nums">
-          ₵{payload[0].value.toLocaleString()}
-        </p>
-        {isProjected ? (
-          <div className="flex items-center gap-2 mt-2">
-            <div className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse" />
-            <p className="text-[10px] text-amber-400 font-black uppercase tracking-widest">Projected Forecast</p>
-          </div>
-        ) : (
-          <p className="text-[10px] text-brand-teal font-black uppercase tracking-widest mt-2 flex items-center gap-1.5">
-            <TrendingUp className="h-3 w-3" /> ▲ 12.4% yield
-          </p>
-        )}
-      </div>
-    );
-  }
-  return null;
+  if (!active || !payload?.length) return null;
+
+  const value = payload[0].value ?? 0;
+
+  return (
+    <div className="rounded-lg border border-slate-200 bg-white/95 px-3 py-2 shadow-md">
+      <p className="text-[11px] font-medium text-slate-500 mb-0.5">{label}</p>
+      <p className="text-sm font-semibold text-slate-900 tabular-nums">
+        ₵{Number(value).toLocaleString()}
+      </p>
+    </div>
+  );
 };
 
 export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
@@ -100,74 +98,20 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
     setTimeout(() => setIsExporting(false), 2000); 
   };
 
-  // Generate 7-day projection
-  const chartData = useMemo(() => {
-    const historical = (data?.revenueChart ?? []).map(d => ({ 
-      ...d, 
-      revenue: Number(d.revenue || d.amount || 0) 
-    }));
-    
-    if (historical.length === 0) return [];
-    
-    const last3 = historical.slice(-3).map(h => h.revenue);
-    const avg = last3.reduce((a, b) => a + b, 0) / (last3.length || 1);
-    
-    const latestItem = historical[historical.length - 1];
-    if (!latestItem?.date) return historical;
-
-    const lastDate = new Date(latestItem.date);
-    const projected = [];
-    
-    for (let i = 1; i <= 7; i++) {
-        const nextDate = new Date(lastDate);
-        nextDate.setDate(nextDate.getDate() + i);
-        // Deterministic noise based on index to satisfy purity checks
-        const pattern = [0.05, -0.02, 0.08, 0.01, -0.04, 0.06, 0.03];
-        const noise = pattern[(i - 1) % pattern.length] * avg;
-        projected.push({
-            date: nextDate.toISOString().slice(0, 10),
-            predictedRevenue: Math.max(0, Math.round(avg + noise)),
-        });
-    }
-    
-    return [...historical, ...projected];
-  }, [data?.revenueChart]);
+  // Clean 30-day revenue series (no synthetic projections)
+  const chartData = useMemo(
+    () =>
+      (data?.revenueChart ?? []).map((d) => ({
+        ...d,
+        revenue: Number(d.revenue || d.amount || 0),
+      })),
+    [data?.revenueChart],
+  );
 
   const totalCategories = categoryChart.reduce((sum, item) => sum + (item.value || 0), 0);
 
   return (
     <div className="space-y-6">
-      {/* High-Impact AI Intelligence Layer */}
-      <div className="relative overflow-hidden group">
-        <div className="absolute inset-0 bg-gradient-to-r from-brand-indigo via-slate-900 to-slate-900 rounded-2xl" />
-        <div className="absolute -right-20 -top-20 w-64 h-64 bg-brand-teal/20 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-1000" />
-        
-        <div className="relative p-6 rounded-2xl border border-white/10 backdrop-blur-sm flex flex-col md:flex-row items-center gap-6">
-          <div className="bg-white/10 p-4 rounded-2xl backdrop-blur-md border border-white/20 shadow-2xl shrink-0 animate-pulse-subtle">
-            <Sparkles className="h-8 w-8 text-brand-gold drop-shadow-[0_0_8px_rgba(255,206,7,0.5)]" />
-          </div>
-          
-          <div className="space-y-2">
-            <div className="flex items-center gap-3">
-              <Badge className="bg-amber-400/20 text-amber-400 border-amber-400/30 font-black text-[9px] uppercase tracking-[0.25em] px-3 py-1 rounded-md">Neural Insight Engine</Badge>
-              <span className="text-white/40 text-[9px] font-black uppercase tracking-[0.2em]">Real-time Stream Analysis</span>
-            </div>
-            <h3 className="text-white text-2xl font-black tracking-tight leading-tight">Executive Operations Forecast</h3>
-            <p className="text-slate-300 text-[13px] leading-relaxed font-medium max-w-3xl opacity-80">
-              Platform revenue is pacing <span className="text-brand-teal font-black tracking-widest">+28.4% above quarterly mean</span>. 
-              Anomalous demand detected for <span className="text-white font-black italic">HIV Self-Test Matrix</span> in <span className="text-white font-black underline decoration-brand-teal decoration-2 italic underline-offset-4 tracking-tighter">University Regions</span>. 
-              Recommend <span className="text-amber-400 font-black italic tracking-widest">Supply Priority Shift</span> to pharmacies within a 5km radius to mitigate stock-outs.
-            </p>
-          </div>
-          
-          <div className="ml-auto hidden xl:block">
-            <Button className="bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-[1.25rem] font-black text-[10px] uppercase tracking-widest h-12 px-8 backdrop-blur-md transition-all active:scale-95 shadow-2xl">
-              Run Probability Model
-            </Button>
-          </div>
-        </div>
-      </div>
-
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {/* Total Revenue */}
@@ -354,56 +298,73 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
              </Card>
              <Card className="col-span-3 border border-slate-200 shadow-[0_4px_20_rgba(0,0,0,0.03)] bg-card h-full">
                 <CardHeader>
-                    <CardTitle className="text-[0.75rem] uppercase font-bold tracking-wider text-slate-500">Distribution</CardTitle>
+                    <CardTitle className="text-[0.75rem] uppercase font-bold tracking-wider text-slate-500">Order Distribution</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="h-[250px] relative">
-                        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-6">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Total</span>
-                            <span className="text-2xl font-black text-brand-indigo tabular-nums tracking-tight">{totalCategories}</span>
+                    <div className="h-[230px] relative">
+                      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-6">
+                        <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">Orders</span>
+                        <span className="text-2xl font-bold text-slate-900 tabular-nums tracking-tight">{totalCategories}</span>
+                      </div>
+                      {categoryChart.length > 0 ? (
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={categoryChart}
+                              cx="40%"
+                              cy="45%"
+                              innerRadius={60}
+                              outerRadius={82}
+                              stroke="none"
+                              paddingAngle={3}
+                              dataKey="value"
+                            >
+                              {categoryChart.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                              ))}
+                            </Pie>
+                            <Tooltip contentStyle={{ borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 11 }} />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      ) : (
+                        <div className="h-full flex items-center justify-center text-slate-400 text-xs italic">
+                          No categorical data.
                         </div>
-                        {categoryChart.length > 0 ? (
-                          <ResponsiveContainer width="100%" height="100%">
-                              <PieChart>
-                                  <Pie
-                                      data={categoryChart}
-                                      cx="50%"
-                                      cy="45%"
-                                      innerRadius={70}
-                                      outerRadius={90}
-                                      stroke="none"
-                                      fill="#8884d8"
-                                      paddingAngle={3}
-                                      dataKey="value"
-                                  >
-                                      {categoryChart.map((entry, index) => (
-                                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                      ))}
-                                  </Pie>
-                                  <Tooltip 
-                                      contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
-                                  />
-                                  <Legend 
-                                      layout="vertical" 
-                                      verticalAlign="middle" 
-                                      align="right"
-                                      iconType="circle"
-                                      wrapperStyle={{ fontSize: '11px', fontWeight: '500' }}
-                                      formatter={(value, entry: any) => (
-                                          <span className="text-slate-600 gap-1 inline-flex w-24">
-                                              <span className="truncate w-16">{value}</span>
-                                              <span className="font-bold text-brand-indigo">
-                                                  {totalCategories > 0 ? Math.round((entry.payload.value / totalCategories) * 100) : 0}%
-                                              </span>
-                                          </span>
-                                      )}
-                                  />
-                              </PieChart>
-                          </ResponsiveContainer>
-                        ) : (
-                          <div className="h-full flex items-center justify-center text-slate-400 text-xs italic">No categorical data.</div>
-                        )}
+                      )}
                     </div>
+
+                    {categoryChart.length > 0 && (
+                      <div className="mt-4 space-y-2">
+                        {categoryChart.map((entry: any, index: number) => {
+                          const percentage =
+                            totalCategories > 0
+                              ? Math.round(((entry.value || 0) / totalCategories) * 100)
+                              : 0;
+                          return (
+                            <div
+                              key={entry.name ?? index}
+                              className="flex items-center justify-between rounded-md px-2 py-1.5 bg-slate-50"
+                            >
+                              <div className="flex items-center gap-2">
+                                <span
+                                  className={cn(
+                                    "h-2.5 w-2.5 rounded-full",
+                                    COLOR_BG_CLASSES[index % COLOR_BG_CLASSES.length],
+                                  )}
+                                />
+                                <span className="text-[11px] font-medium text-slate-600 truncate max-w-[7rem]">
+                                  {entry.name}
+                                </span>
+                              </div>
+                              <div className="flex items-baseline gap-1 text-[11px] tabular-nums">
+                                <span className="font-semibold text-slate-700">{entry.value}</span>
+                                <span className="text-slate-400">({percentage}%)</span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                 </CardContent>
              </Card>
           </div>
