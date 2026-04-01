@@ -32,7 +32,15 @@ import {
 } from "recharts";
 import { cn } from "@/lib/utils";
 
-const COLORS = ['#4f46e5', '#188179', '#c48c52', '#94a3b8', '#fbbf24', '#059669'];
+const COLORS = ["#4f46e5", "#188179", "#c48c52", "#94a3b8", "#fbbf24", "#059669"];
+const COLOR_BG_CLASSES = [
+  "bg-indigo-600",
+  "bg-emerald-700",
+  "bg-amber-700",
+  "bg-slate-400",
+  "bg-amber-400",
+  "bg-emerald-500",
+];
 
 interface AnalyticsDashboardProps {
   data: {
@@ -339,8 +347,10 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
                             >
                               <div className="flex items-center gap-2">
                                 <span
-                                  className="h-2.5 w-2.5 rounded-full"
-                                  style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                                  className={cn(
+                                    "h-2.5 w-2.5 rounded-full",
+                                    COLOR_BG_CLASSES[index % COLOR_BG_CLASSES.length],
+                                  )}
                                 />
                                 <span className="text-[11px] font-medium text-slate-600 truncate max-w-[7rem]">
                                   {entry.name}
