@@ -351,7 +351,11 @@ async function sendCheckoutLink(to: string, session: SessionData) {
     const orderCode = `DK-WA-${Date.now().toString().slice(-6)}`; // Unique Code
 
     // Generate Paystack Link
-    const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
+    let paystackSecret = process.env.PAYSTACK_SECRET_KEY as string | undefined;
+    if (typeof paystackSecret === 'string') {
+        // Normalize in case env var is wrapped in quotes
+        paystackSecret = paystackSecret.replace(/^"|"$/g, '').trim();
+    }
 
     // [STUDENT LOGIC] Check if address indicates campus
     const isStudent = session.address?.startsWith('Campus:');
@@ -385,8 +389,10 @@ async function sendCheckoutLink(to: string, session: SessionData) {
         const { error: dbError } = await supabase.from('orders').insert({
             code: orderCode,
             status: 'pending_payment',
-            total_price: amount,
-            subtotal: amount,
+            subtotal_ghs: amount,
+            student_discount_ghs: 0,
+            delivery_fee_ghs: 0,
+            total_price_ghs: amount,
             phone_masked: to,
             email: email,
             delivery_address_note: deliveryNote,

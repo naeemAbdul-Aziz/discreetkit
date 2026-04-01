@@ -325,7 +325,12 @@ export async function createOrderAction(prevState: any, formData: FormData) {
 
 
     // 4. Initialize Paystack Transaction
-    const paystackSecretKey = process.env.PAYSTACK_SECRET_KEY;
+    let paystackSecretKey = process.env.PAYSTACK_SECRET_KEY as string | undefined;
+    if (typeof paystackSecretKey === 'string') {
+      // Some platforms wrap env vars in quotes; normalize before use
+      paystackSecretKey = paystackSecretKey.replace(/^"|"$/g, '').trim();
+    }
+
     if (!paystackSecretKey) {
       console.error('Paystack secret key is not configured in .env.local');
       throw new Error('Payment processing is not configured.');
@@ -373,8 +378,11 @@ export async function createOrderAction(prevState: any, formData: FormData) {
 
   } catch (error: any) {
     console.error('Create Order Action Error:', error);
+    const fallbackMessage = 'An unexpected server error occurred. Please try again later or contact support if the problem persists.';
     return {
-      message: 'An unexpected server error occurred. Please try again later or contact support if the problem persists.',
+      message: typeof error?.message === 'string' && error.message.trim()
+        ? error.message
+        : fallbackMessage,
       success: false,
       authorization_url: null,
     };
