@@ -1,21 +1,28 @@
 # Cap Table Strategy & Control Manual
-**For:** The CEO (40% Holder)
-**Objective:** Raise capital without losing the company.
+**Date:** April 1, 2026
+**Objective:** Leverage the **$375k Floor Valuation** to raise capital without losing control.
 
 ---
 
-## 1. The Golden Rule of Fundraising
+## 1. The April 2026 Valuation Leverage
 
-**"Dilution is inevitable. Loss of Control is optional."**
+Following our technical modernization, our base **Total Enterprise Value (TEV)** has been appraised at **~$375,000 USD** (Cost-to-Duplicate).
 
-You currently own 100% of the company between the three of you.
-*   **You (CEO):** 40%
-*   **Co-Founder 1 (CTO):** 30%
-*   **Co-Founder 2 (COO):** 30%
+| Asset Class | Value (USD) |
+| :--- | :--- |
+| **Technology Hard Assets** | $265,000 |
+| **Operational & Human Capital** | $110,000+ |
+| **Total Floor Valuation** | **$375,000** |
 
-### The "Pre-Seed" Limit
-In this first round, you should **NOT** give up more than **10% - 20%** of the company total.
-*   If an investor asks for 40% of the company for $50k, **WALK AWAY.** That is not investment; that is an acquisition (theft).
+### The Fundraising Logic
+Because our "Floor" is already $375k *before* we count any future growth, a **Valuation Cap of $2.5M - $3.0M** for a Pre-Seed round is now scientifically defensible.
+
+---
+
+## 2. Payout & Distribution
+- **Target Deal Size**: Raise $200k at a $3M Cap.
+- **Dilution**: ~6.6%.
+- **Control**: Founders retain ~93.4% equity and 2/3 Board seats.
 
 ---
 

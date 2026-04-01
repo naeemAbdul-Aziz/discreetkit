@@ -50,6 +50,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { getSupabaseClient } from "@/lib/supabase"
 import type { User } from "@supabase/supabase-js"
 import Image from 'next/image';
+import { CommandPalette } from "@/components/dashboard/command-palette"
 
 const adminNavLinks = [
   { href: "/admin/dashboard", icon: Home, label: "Dashboard" },
@@ -865,7 +866,7 @@ export const AdminShell = ({
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="w-full justify-start gap-2 px-2"
+                className="w-full justify-start gap-2 px-3 hover:bg-sidebar-accent"
               >
                 <CircleUser className="h-5 w-5" />
                 <div className="flex flex-col items-start duration-200 group-data-[collapsible=icon]:opacity-0">
@@ -925,8 +926,11 @@ export const AdminShell = ({
             </SheetContent>
           </Sheet>
 
-          <div className="w-full flex-1">
-            <h1 className="text-lg font-semibold md:text-2xl">{currentPage}</h1>
+          <div className="w-full flex-1 flex items-center justify-between">
+            <h1 className="text-lg font-semibold md:text-2xl tracking-tight text-brand-indigo">{currentPage}</h1>
+            <div className="ml-auto flex items-center gap-4">
+              <CommandPalette />
+            </div>
           </div>
         </header>
 

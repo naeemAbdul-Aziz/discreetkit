@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useId, useTransition } from "react"
 import { useRouter } from "next/navigation"
+import { cn } from "@/lib/utils"
 import {
   Table,
   TableBody,
@@ -130,10 +131,11 @@ export function ProductTable({ initialProducts, categories = [] }: { initialProd
     }
   }
 
-  const getStatus = (stock: number) => {
-    if (stock === 0) return { label: "Out of Stock", variant: "destructive" as const }
-    if (stock < 10) return { label: "Low Stock", variant: "warning" as const }
-    return { label: "Active", variant: "success" as const }
+  const getStockInfo = (stock: number) => {
+    if (stock <= 5) return { label: "CRITICAL", variant: "destructive" as const, color: "bg-rose-500 text-white shadow-[0_0_8px_rgba(244,63,94,0.3)]", icon: "⚠️" };
+    if (stock <= 20) return { label: "LOW STOCK", variant: "warning" as const, color: "bg-amber-500 text-white shadow-[0_0_8px_rgba(245,158,11,0.3)]", icon: "⏳" };
+    if (stock >= 50) return { label: "PLENTIFUL", variant: "success" as const, color: "bg-emerald-600 text-white shadow-[0_0_8px_rgba(5,150,105,0.3)]", icon: "✨" };
+    return { label: "IN STOCK", variant: "success" as const, color: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: "✅" };
   }
 
   return (
@@ -173,13 +175,13 @@ export function ProductTable({ initialProducts, categories = [] }: { initialProd
           </TableHeader>
           <TableBody>
             {paginatedProducts.map((product, idx) => {
-              const status = getStatus(product.stock_level)
+              const stockInfo = getStockInfo(product.stock_level)
               // Generate stable IDs for each dropdown
               const categoryMenuId = `${dropdownMenuId}-cat-${product.id}`;
               const statusMenuId = `${dropdownMenuId}-status-${product.id}`;
               const actionsMenuId = `${dropdownMenuId}-actions-${product.id}`;
               return (
-                <TableRow key={product.id}>
+                <TableRow key={product.id} className="hover:bg-slate-50/50 transition-colors">
                   <TableCell className="hidden md:table-cell">
                     <InlineImage src={product.image_url} alt={product.name} />
                   </TableCell>
@@ -208,20 +210,23 @@ export function ProductTable({ initialProducts, categories = [] }: { initialProd
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild id={statusMenuId}>
-                        <Badge variant={status.variant} className="cursor-pointer">
-                          {product.status || status.label}
+                        <Badge 
+                          variant={stockInfo.variant} 
+                          className={cn("cursor-pointer font-black tracking-widest text-[9px] px-2 py-0.5 transition-all duration-300 hover:brightness-110", stockInfo.color)}
+                        >
+                          {product.status ? product.status.toUpperCase() : stockInfo.label}
                         </Badge>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="start" aria-labelledby={statusMenuId}>
                         {statusOptions.map(s => (
                           <DropdownMenuItem key={s} onClick={() => handleInlineUpdate(product.id,'status',s)}>
-                            {(s || '').charAt(0).toUpperCase()+(s || '').slice(1)}
+                            {(s || '').toUpperCase()}
                           </DropdownMenuItem>
                         ))}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right font-bold tabular-nums text-slate-700">
                     <InlineNumber
                       value={product.price_ghs}
                       prefix="GHS"
@@ -229,16 +234,14 @@ export function ProductTable({ initialProducts, categories = [] }: { initialProd
                       onCommit={(val) => handleInlineUpdate(product.id,'price_ghs',val)}
                     />
                   </TableCell>
-                  <TableCell className="text-right hidden md:table-cell">
-                    <div className="flex items-center justify-end gap-2">
-                        {product.stock_level === 0 && <Badge variant="destructive" className="h-5 px-1 text-[10px]">Out</Badge>}
-                        {product.stock_level > 0 && product.stock_level < 10 && <Badge variant="warning" className="h-5 px-1 text-[10px]">Low</Badge>}
-                        {product.stock_level >= 10 && <Badge variant="outline" className="h-5 px-1 text-[10px] text-green-600 border-green-200 bg-green-50">In Stock</Badge>}
-                        
+                  <TableCell className="text-right hidden md:table-cell tabular-nums font-medium">
+                    <div className="flex items-center justify-end gap-3">
+                        <span className="text-[10px] opacity-40">{stockInfo.icon}</span>
                         <InlineNumber
-                        value={product.stock_level}
-                        saving={!!saving[product.id]?.stock_level}
-                        onCommit={(val) => handleInlineUpdate(product.id,'stock_level',val)}
+                          value={product.stock_level}
+                          saving={!!saving[product.id]?.stock_level}
+                          onCommit={(val) => handleInlineUpdate(product.id,'stock_level',val)}
+                          warning={product.stock_level < 10}
                         />
                     </div>
                   </TableCell>
@@ -267,10 +270,16 @@ export function ProductTable({ initialProducts, categories = [] }: { initialProd
             })}
             {filteredProducts.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center">
-                  <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                    <span className="text-sm">No products found</span>
-                    <Button variant="outline" size="sm" onClick={handleAdd}>Add your first product</Button>
+                <TableCell colSpan={7} className="h-64 text-center">
+                  <div className="flex flex-col items-center justify-center gap-4 text-slate-400">
+                    <div className="bg-slate-50 p-6 rounded-full border-2 border-dashed border-slate-200">
+                      <Search className="h-10 w-10 opacity-20" />
+                    </div>
+                    <div className="space-y-1">
+                      <h3 className="text-sm font-bold text-slate-600 uppercase tracking-widest">No Products Found</h3>
+                      <p className="text-xs font-medium italic">Adjust your sensors or seed new inventory into the stream.</p>
+                    </div>
+                    <Button variant="outline" size="sm" className="mt-2 font-bold text-[10px] uppercase tracking-widest" onClick={() => setSearchTerm("")}>Clear Search</Button>
                   </div>
                 </TableCell>
               </TableRow>
@@ -322,10 +331,16 @@ function InlineNumber({ value, onCommit, prefix, saving, warning }: { value: num
     if (!isNaN(num) && num !== value) onCommit(num)
   }
   return (
-    <div className={`inline-flex items-center justify-end gap-1 ${warning ? 'text-red-600' : ''}`}>  
-      {prefix && <span className="text-xs text-muted-foreground mr-1">{prefix}</span>}
+    <div className={cn(
+      "inline-flex items-center justify-end gap-1 px-2 py-1 rounded-md transition-all duration-300",
+      warning ? "bg-rose-50 text-rose-700" : "hover:bg-slate-100"
+    )}>  
+      {prefix && <span className="text-[10px] font-bold text-slate-400 mr-1">{prefix}</span>}
       <input
-        className={`w-20 bg-transparent text-right border border-transparent focus:border-primary/50 rounded px-1 py-0.5 text-sm outline-none transition ${warning ? 'font-semibold' : ''}`}
+        className={cn(
+          "w-20 bg-transparent text-right tabular-nums border-none focus:ring-0 rounded p-0 text-sm outline-none transition",
+          warning && "font-bold"
+        )}
         value={draft}
         onChange={e=> setDraft(e.target.value)}
         onBlur={commit}
@@ -333,8 +348,7 @@ function InlineNumber({ value, onCommit, prefix, saving, warning }: { value: num
         type="number"
         aria-label={prefix ? `${prefix} value` : 'number value'}
       />
-      {saving && <Loader2 className="h-3 w-3 animate-spin" />}
-      {warning && <span className="text-[10px] uppercase bg-red-100 text-red-700 px-1 rounded">Low</span>}
+      {saving && <Loader2 className="h-3 w-3 animate-spin text-slate-400" />}
     </div>
   )
 }
@@ -342,11 +356,17 @@ function InlineNumber({ value, onCommit, prefix, saving, warning }: { value: num
 function InlineImage({ src, alt }: { src: string | null; alt: string }) {
   const [errored, setErrored] = useState(false)
   return (
-    <div className="relative h-10 w-10 rounded overflow-hidden bg-muted flex items-center justify-center text-muted-foreground">
+    <div className="relative group/img h-12 w-12 rounded-[4px] overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 transition-all duration-300 hover:border-slate-300 hover:shadow-md">
       {src && !errored ? (
-        <Image src={src} alt={alt} fill className="object-cover" onError={()=> setErrored(true)} />
+        <Image 
+          src={src} 
+          alt={alt} 
+          fill 
+          className="object-cover transition-transform duration-500 group-hover/img:scale-110" 
+          onError={()=> setErrored(true)} 
+        />
       ) : (
-        <span className="text-[10px]">IMG</span>
+        <span className="text-[10px] font-bold opacity-30">IMG</span>
       )}
     </div>
   )

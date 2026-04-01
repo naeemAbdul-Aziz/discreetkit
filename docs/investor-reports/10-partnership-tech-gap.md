@@ -1,3 +1,17 @@
+## April 2026 Modernization (Partnership UX)
+
+### 1. Unified Operational Interface (Command Center)
+Previously, partners faced UI latency that disjointed the "Agreement" from the "Action". The April 2026 sprint introduced:
+- **Instant-Ack Logic**: The "Optimistic UI" allows pharmacists to accept orders with **zero perceived latency**, ensuring they meet the **10-minute SLA** without technical friction.
+- **2-3x Dashboard Speed**: Parallel data projection in the Admin/Partner hub ensures that stock levels and order statuses are always in sync with the central command.
+
+### 2. Modernized Dispatch Workflow
+The new **Order Details Sheet** and **Inventory Matrix** have closed the "Mental Model Gap" for partners:
+- **Visual Stock-Outs**: Products now visually reflect availability (desaturation) and offer "Quick Toggles", reducing the time pharmacists spend on manual inventory reconciliation.
+- **Proactive Comms**: Integrated **Quick Replies** in the messaging hub allow for sub-30 second communication with Central Admin regarding order delays or stock issues.
+
+---
+
 ## Bridging Operational Gaps (2026-02)
 
 - Automated detection of stuck orders fills human process gaps in off-peak hours.

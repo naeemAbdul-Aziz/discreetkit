@@ -4,8 +4,19 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { CheckCircle, XCircle, Truck, Package, Eye } from "lucide-react";
+import { 
+  CheckCircle, 
+  XCircle, 
+  Truck, 
+  Package, 
+  Eye, 
+  MapPin, 
+  Clock, 
+  Loader2,
+  GanttChartSquare
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -48,6 +59,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
   const [declineReason, setDeclineReason] = useState("");
   const [detailsSheetOpen, setDetailsSheetOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [hiddenOrderIds, setHiddenOrderIds] = useState<Set<number>>(new Set());
 
   // Delivery Dialog State
   const [deliveryDialogOpen, setDeliveryDialogOpen] = useState(false);
@@ -65,6 +77,11 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
     action: string,
     data: any = {},
   ) => {
+    // Optimistic UI: Immediately hide or update based on action
+    if (action === "acknowledge") {
+       setHiddenOrderIds(prev => new Set(prev).add(id));
+    }
+
     // Only set loading for specific action if it's a button click (not internal)
     // We map 'acknowledge' -> 'accept'/'decline' based on data for better granularity
     let actionType = action;
@@ -87,6 +104,14 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
       const result = await res.json();
 
       if (!res.ok) {
+        // Rollback optimistic hide on error
+        if (action === "acknowledge") {
+           setHiddenOrderIds(prev => {
+              const next = new Set(prev);
+              next.delete(id);
+              return next;
+           });
+        }
         throw new Error(result.error || "Failed to update order");
       }
 
@@ -232,9 +257,9 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
     );
   }
 
-  // Filter out declined orders from the list
+  // Filter out declined or optimistically hidden orders from the list
   const activeOrders = orders.filter(
-    (o) => o.pharmacy_ack_status !== "declined",
+    (o) => o.pharmacy_ack_status !== "declined" && !hiddenOrderIds.has(o.id),
   );
 
   if (activeOrders.length === 0) {
@@ -262,110 +287,115 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
               : order.items;
           const itemCount = Array.isArray(items) ? items.length : 0;
 
-          const isCompleted = order.status === "completed";
+            const isLate = () => {
+              if (order.status !== "processing") return false;
+              const created = new Date(order.created_at).getTime();
+              const now = new Date().getTime();
+              return (now - created) / (1000 * 60) > 20;
+            };
 
-          return (
-            <Card
-              key={order.id}
-              className={`p-4 shadow-none transition-all ${isCompleted ? "border-green-200 bg-green-50/30 dark:bg-green-950/10" : "border-border"}`}
-            >
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    {isCompleted && (
-                      <CheckCircle className="h-5 w-5 text-green-600 shrink-0" />
-                    )}
-                    <span className="font-mono font-semibold">
+            const late = isLate();
+            const isCompleted = order.status === "completed";
+
+            return (
+              <Card
+                key={order.id}
+                className={cn(
+                  "p-5 shadow-none transition-all group border-slate-200 cursor-pointer hover:border-slate-300 hover:shadow-md",
+                  isCompleted && "border-emerald-100 bg-emerald-50/30",
+                  late && "animate-urgent border-rose-500 shadow-rose-100 bg-rose-50/10"
+                )}
+                onClick={() => handleViewDetails(order)}
+              >
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                <div className="flex-1 space-y-4">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono font-black text-slate-900 tracking-tighter text-lg">
                       {order.code}
                     </span>
                     {getStatusBadge(order.status, order.pharmacy_ack_status)}
+                    {late && (
+                      <Badge variant="destructive" className="animate-pulse px-1.5 py-0 text-[9px] font-black tracking-widest uppercase">URGENT</Badge>
+                    )}
                   </div>
-                  <div className="text-sm text-muted-foreground space-y-1">
-                    <p>Delivery: {order.delivery_area || "Not specified"}</p>
-                    <p>
-                      Items: {itemCount} • Total: GHS{" "}
-                      {Number(order.total_price || 0).toFixed(2)}
+                  
+                  <div className="text-[13px] font-medium text-slate-500 space-y-1.5 pl-4 border-l-2 border-slate-100">
+                    <p className="flex items-center gap-2">
+                      <MapPin className="h-3.5 w-3.5 text-slate-400" />
+                      {order.delivery_area || "Not specified"}
                     </p>
-                    <p className="text-xs">
-                      {new Date(order.created_at).toLocaleString()}
+                    <p className="flex items-center gap-2 font-bold text-slate-800">
+                      <GanttChartSquare className="h-3.5 w-3.5 text-slate-400" />
+                      {itemCount} Items • ₵{Number(order.total_price || 0).toFixed(2)}
+                    </p>
+                    <p className="text-[11px] flex items-center gap-2 opacity-60">
+                      <Clock className="h-3.5 w-3.5" />
+                      Received {new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {new Date(order.created_at).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-auto gap-2 w-full sm:w-auto">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleViewDetails(order)}
-                    className="w-full sm:w-auto"
-                  >
-                    <Eye className="h-4 w-4 mr-1" />
-                    Details
-                  </Button>
-
-                  {/* Action Buttons based on Status */}
-                  {order.status === "received" &&
-                  order.pharmacy_ack_status === "pending" ? (
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
+                  {order.status === "received" && order.pharmacy_ack_status === "pending" ? (
                     <>
                       <Button
-                        size="sm"
-                        onClick={() => handleAccept(order.id)}
+                        size="lg"
+                        className="h-12 px-8 bg-brand-teal hover:bg-brand-teal-dark font-black text-sm gap-2 shadow-sm shadow-brand-teal/20"
+                        onClick={(e) => { e.stopPropagation(); handleAccept(order.id); }}
                         disabled={acceptLoading}
-                        className="bg-emerald-500 hover:bg-emerald-600 text-white w-full sm:w-auto"
                       >
-                        {acceptLoading ? (
-                          <div className="h-4 w-4 mr-1 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                        ) : (
-                          <CheckCircle className="h-4 w-4 mr-1" />
-                        )}
-                        Accept
+                        {acceptLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
+                        Accept Order
                       </Button>
                       <Button
-                        size="sm"
-                        onClick={() => handleDeclineClick(order.id)}
+                        size="lg"
+                        variant="outline"
+                        className="h-12 px-5 border-rose-100 text-rose-600 hover:bg-rose-50 font-bold text-sm gap-2"
+                        onClick={(e) => { e.stopPropagation(); handleDeclineClick(order.id); }}
                         disabled={declineLoading}
-                        className="bg-rose-500 hover:bg-rose-600 text-white w-full sm:w-auto"
                       >
-                        {declineLoading ? (
-                          <div className="h-4 w-4 mr-1 animate-spin rounded-full border-2 border-white/70 border-t-transparent" />
-                        ) : (
-                          <XCircle className="h-4 w-4 mr-1" />
-                        )}
+                        <XCircle className="h-4 w-4" />
                         Decline
                       </Button>
                     </>
-                  ) : order.status === "processing" &&
-                    order.pharmacy_ack_status === "accepted" ? (
+                  ) : order.status === "processing" ? (
                     <Button
-                      size="sm"
-                      className="bg-blue-500 hover:bg-blue-600 text-white w-full sm:w-auto"
-                      onClick={() => handleMarkOutForDelivery(order.id)}
-                      disabled={loading?.id === order.id}
+                      size="lg"
+                      className="h-12 px-10 bg-brand-teal hover:bg-brand-teal-dark font-black text-sm gap-2 shadow-sm shadow-brand-teal/20"
+                      onClick={(e) => { e.stopPropagation(); handleMarkOutForDelivery(order.id); }}
                     >
-                      {loading?.id === order.id &&
-                      loading?.action === "out_for_delivery" ? (
-                        <div className="h-4 w-4 mr-1 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                      ) : (
-                        <Truck className="h-4 w-4 mr-1" />
-                      )}
-                      Mark Out for Delivery
+                      <Truck className="h-5 w-5 animate-breathing" />
+                      Dispatch Order
                     </Button>
                   ) : order.status === "out_for_delivery" ? (
                     <Button
-                      size="sm"
-                      className="bg-emerald-500 hover:bg-emerald-600 text-white w-full sm:w-auto"
-                      onClick={() => handleMarkCompleted(order.id)}
-                      disabled={loading?.id === order.id}
+                      size="lg"
+                      className="h-12 px-10 bg-emerald-600 hover:bg-emerald-700 font-black text-sm gap-2 shadow-sm shadow-emerald-600/20"
+                      onClick={(e) => { e.stopPropagation(); handleMarkCompleted(order.id); }}
                     >
-                      {loading?.id === order.id &&
-                      loading?.action === "completed" ? (
-                        <div className="h-4 w-4 mr-1 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                      ) : (
-                        <CheckCircle className="h-4 w-4 mr-1" />
-                      )}
+                      <CheckCircle className="h-5 w-5" />
                       Confirm Delivery
                     </Button>
-                  ) : null}
+                  ) : (
+                    <Button
+                      size="lg"
+                      variant="ghost"
+                      className="h-12 px-8 text-slate-400 font-bold text-sm gap-2"
+                      disabled
+                    >
+                      <CheckCircle className="h-5 w-5" />
+                      Completed
+                    </Button>
+                  )}
+                  
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={(e) => { e.stopPropagation(); handleViewDetails(order); }}
+                    className="h-12 w-12 text-slate-400 hover:text-slate-900 rounded-xl"
+                  >
+                    <Eye className="h-5 w-5" />
+                  </Button>
                 </div>
               </div>
             </Card>

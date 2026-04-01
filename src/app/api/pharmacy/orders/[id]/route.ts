@@ -78,6 +78,10 @@ export async function PATCH(
 
       if (pharmacy_ack_status === 'accepted') {
         updateData.status = 'processing';
+      } else if (pharmacy_ack_status === 'declined') {
+        updateData.pharmacy_id = null;
+        updateData.pharmacy_ack_status = 'pending';
+        updateData.status = 'received';
       }
     } else if (action === 'update_status') {
       updateData.status = status;

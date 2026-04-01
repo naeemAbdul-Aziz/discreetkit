@@ -314,3 +314,22 @@ export async function removeServiceArea(areaId: number) {
     revalidatePath('/pharmacy/settings');
     return { success: true };
 }
+
+export async function updateServiceArea(areaId: number, data: { delivery_fee?: number, max_delivery_time_hours?: number, is_active?: boolean }) {
+    const { pharmacy, supabase } = await requirePharmacy();
+
+    const { error } = await supabase
+        .from('pharmacy_service_areas')
+        .update(data)
+        .eq('id', areaId)
+        .eq('pharmacy_id', pharmacy.id);
+
+    if (error) return { success: false, error: error.message };
+    
+    revalidatePath('/pharmacy/settings');
+    return { success: true };
+}
+
+export async function toggleServiceAreaStatus(areaId: number, currentStatus: boolean) {
+    return updateServiceArea(areaId, { is_active: !currentStatus });
+}

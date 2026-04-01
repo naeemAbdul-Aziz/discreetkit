@@ -23,24 +23,26 @@
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
+    --destructive-rgb: 239, 68, 68;
 
     --border: 0 0% 92%;
     --input: 0 0% 92%;
     --ring: 175 68% 30%;
     --primary: 175 68% 30%;
+    --primary-rgb: 24, 129, 121;
     --primary-foreground: 0 0% 100%;
 
     /* Semantic Status Colors */
     --success: 142 71% 45%;
-    /* Emerald 600 */
+    --success-rgb: 22, 163, 74;
     --success-foreground: 0 0% 100%;
 
     --warning: 45 93% 47%;
-    /* Amber 500 */
+    --warning-rgb: 217, 119, 6;
     --warning-foreground: 0 0% 100%;
 
     --info: 199 89% 48%;
-    /* Sky 600 */
+    --info-rgb: 2, 132, 199;
     --info-foreground: 0 0% 100%;
 
     --radius: 0.875rem;
@@ -166,6 +168,7 @@
   }
 
   .vk-scroll {
+    overflow-y: auto;
   }
 }
 
@@ -196,3 +199,35 @@
 .no-scrollbar {
   -ms-overflow-style: none;
 }
+
+/* Premium Animations */
+@keyframes breathing-glow {
+  0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0); }
+  50% { opacity: 0.85; transform: scale(1.02); box-shadow: 0 0 15px 2px rgba(var(--primary-rgb), 0.15); }
+}
+
+@keyframes urgent-pulse {
+  0%, 100% { border-color: rgba(var(--destructive-rgb), 0.1); background-color: transparent; }
+  50% { border-color: rgba(var(--destructive-rgb), 0.6); background-color: rgba(var(--destructive-rgb), 0.04); }
+}
+
+@keyframes live-status {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.7; }
+}
+
+.animate-breathing {
+  animation: breathing-glow 4s ease-in-out infinite;
+}
+
+.animate-urgent {
+  animation: urgent-pulse 1.5s ease-in-out infinite;
+}
+
+.animate-live {
+  animation: live-status 2s ease-in-out infinite;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}

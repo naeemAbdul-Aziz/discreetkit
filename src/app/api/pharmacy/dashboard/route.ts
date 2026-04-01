@@ -21,78 +21,58 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Pharmacy access required' }, { status: 403 });
     }
 
-    // Get pharmacy record for current user
+    // 1. Get pharmacy record for current user
     const { data: pharmacy, error: pharmacyError } = await supabase
       .from('pharmacies')
-      .select('*')
+      .select('id, name, location')
       .eq('user_id', user.id)
       .single();
 
     if (pharmacyError || !pharmacy) {
-      return NextResponse.json({ error: 'Pharmacy not found for user' }, { status: 404 });
+      return NextResponse.json({ error: 'Pharmacy not found' }, { status: 404 });
     }
 
-    // Get recent orders (limit 20)
-    const { data: recentOrdersData, error: recentError } = await supabase
-      .from('orders')
-      .select('*')
-      .eq('pharmacy_id', pharmacy.id)
-      .order('created_at', { ascending: false })
-      .limit(20);
+    // 2. Parallel fetch recent orders and status counts
+    const [ordersResult, statsResult] = await Promise.all([
+      supabase
+        .from('orders')
+        .select('id, code, status, pharmacy_ack_status, total_price, created_at, items, delivery_area')
+        .eq('pharmacy_id', pharmacy.id)
+        .order('created_at', { ascending: false })
+        .limit(20),
+      supabase
+        .from('orders')
+        .select('status, pharmacy_ack_status')
+        .eq('pharmacy_id', pharmacy.id)
+    ]);
 
-    if (recentError) {
-      throw new Error('Failed to fetch recent orders');
-    }
+    if (ordersResult.error) throw new Error('Recent orders failed');
+    if (statsResult.error) throw new Error('Stats fetch failed');
 
-    // Get all orders for stats (only necessary columns)
-    const { data: statsData, error: statsError } = await supabase
-      .from('orders')
-      .select('status, pharmacy_ack_status')
-      .eq('pharmacy_id', pharmacy.id);
+    const recentOrdersData = ordersResult.data || [];
+    const statsData = statsResult.data || [];
 
-    if (statsError) {
-      throw new Error('Failed to fetch order stats');
-    }
+    // 3. Fast grouping in memory (already minimized columns)
+    const stats = {
+      pending: statsData.filter(o => o.status === 'received' && o.pharmacy_ack_status === 'pending').length,
+      processing: statsData.filter(o => o.status === 'processing').length,
+      outForDelivery: statsData.filter(o => o.status === 'out_for_delivery').length,
+      completed: statsData.filter(o => o.status === 'completed').length,
+    };
 
-    // Calculate stats
-    const allOrders = statsData || [];
-    const pending = allOrders.filter(o => o.status === 'received' && o.pharmacy_ack_status === 'pending').length;
-    const accepted = allOrders.filter(o => o.pharmacy_ack_status === 'accepted').length;
-    const processing = allOrders.filter(o => o.status === 'processing').length;
-    const outForDelivery = allOrders.filter(o => o.status === 'out_for_delivery').length;
-
-    // Recent orders (last 20)
-    const recentOrders = (recentOrdersData || []).map(order => ({
-      id: order.id,
-      code: order.code,
-      status: order.status,
-      pharmacy_ack_status: order.pharmacy_ack_status,
-      total_price: Number(order.total_price),
-      created_at: order.created_at,
-      items: order.items,
-      delivery_area: order.delivery_area
-    }));
-
-    // Orders by status for charts
-    const statusBreakdown = allOrders.reduce((acc, order) => {
+    const statusBreakdown = statsData.reduce((acc, order) => {
       const status = order.status || 'unknown';
       acc[status] = (acc[status] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
 
     return NextResponse.json({
-      pharmacy: {
-        id: pharmacy.id,
-        name: pharmacy.name,
-        location: pharmacy.location
-      },
-      stats: {
-        pending,
-        accepted,
-        processing,
-        outForDelivery
-      },
-      recentOrders,
+      pharmacy,
+      stats,
+      recentOrders: recentOrdersData.map(order => ({
+        ...order,
+        total_price: Number((order as any).total_price || 0)
+      })),
       statusBreakdown: Object.entries(statusBreakdown).map(([status, count]) => ({ status, count }))
     });
 

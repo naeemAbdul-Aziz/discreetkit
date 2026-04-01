@@ -1,3 +1,16 @@
+## April 2026 Modernization (Compliance & Privacy)
+
+### 1. Least-Privilege Reporting (Performance vs. Privacy)
+The new **Parallel Execution Engine** in the Admin dashboard serves as a primary data minimization tool:
+- **Granular Fetching**: Instead of retrieving the full order record, the system now projects only specific, non-PII columns (e.g., `status`, `total_price`) for aggregate metrics.
+- **Result**: Administrators can monitor the **Anxiety Meter** (velocity) and **Privacy Density** (demand hotspots) without ever pulling sensitive contact data into the reporting view.
+
+### 2. Optimistic UI Reliability
+By managing state at the edge (Pharmacy Portal), we reduce the risk of out-of-sync PII exposure:
+- **Synchronized Anonymity**: Actions like "Accept" or "Decline" are atomic. If a pharmacist processes an order, the system instantly masks its details in all "Pending" views across other nodes, preventing unauthorized exposure of order codes during high-volume periods.
+
+---
+
 ## Operational Logging & Secret Hygiene (2026-02)
 **(Built over 6 Months of Hardening)**
 

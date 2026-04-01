@@ -14,6 +14,13 @@ export async function GET(request: Request) {
     // Verify authorization
     const authHeader = request.headers.get('authorization')
     const cronSecret = process.env.CRON_SECRET
+    
+    // Optional Global Disable Toggle
+    if (process.env.CRON_DISABLED === 'true') {
+      console.log('[Cron] Execution skipped: CRON_DISABLED is true')
+      return NextResponse.json({ message: 'Cron execution is globally disabled' }, { status: 200 })
+    }
+
     const sanitize = (v?: string | null) => (v ?? '').replace(/^"|"$/g, '').trim()
     const expectedAuth = `Bearer ${sanitize(cronSecret)}`
     const providedAuth = sanitize(authHeader)
