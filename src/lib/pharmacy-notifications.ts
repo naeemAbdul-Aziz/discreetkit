@@ -21,7 +21,7 @@ interface PharmacyNotificationData {
     orderCode: string;
     deliveryArea: string;
     itemCount: number;
-    totalPrice: number;
+    total_price_ghs: number;
 }
 
 /**
@@ -31,7 +31,7 @@ export async function sendPharmacyOrderSMS(data: PharmacyNotificationData) {
     try {
         const dashboardUrl = getPharmacyDashboardUrl();
 
-        const message = `New order ${data.orderCode} assigned to ${data.pharmacyName}. ${data.itemCount} items, GHS ${data.totalPrice.toFixed(2)}. Delivery: ${data.deliveryArea}. View: ${dashboardUrl}`;
+        const message = `New order ${data.orderCode} assigned to ${data.pharmacyName}. ${data.itemCount} items, GHS ${data.total_price_ghs.toFixed(2)}. Delivery: ${data.deliveryArea}. View: ${dashboardUrl}`;
 
         const result = await sendSMS(data.pharmacyPhone, message);
 
@@ -66,7 +66,7 @@ export async function sendPharmacyOrderEmail(data: PharmacyNotificationData) {
             orderCode: data.orderCode,
             deliveryArea: data.deliveryArea,
             itemCount: data.itemCount,
-            totalPrice: data.totalPrice,
+            total_price_ghs: data.total_price_ghs,
         });
 
         // Log email attempt

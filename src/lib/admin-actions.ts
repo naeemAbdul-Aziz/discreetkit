@@ -869,7 +869,9 @@ export async function updateOrderStatus(id: number, status: string, courierDetai
         sendDeliveryNotificationSMS(String(id)).catch(console.error)
     }
 
-    revalidatePath('/admin/orders')
+    revalidatePath('/admin/orders');
+    revalidatePath('/admin');
+    revalidatePath('/admin/analytics');
     return { success: true }
 }
 

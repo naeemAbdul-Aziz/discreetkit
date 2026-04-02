@@ -40,10 +40,10 @@ export type Order = {
   deliveryArea: string;
   deliveryAddressNote: string | null;
   isStudent: boolean;
-  subtotal: number;
-  studentDiscount: number;
-  deliveryFee: number;
-  totalPrice: number;
+  subtotal_ghs: number;
+  student_discount_ghs: number;
+  delivery_fee_ghs: number;
+  total_price_ghs: number;
   courierName?: string | null;
   courierPhone?: string | null;
   courierTrackingUrl?: string | null;

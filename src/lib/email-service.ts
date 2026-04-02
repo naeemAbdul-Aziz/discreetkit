@@ -24,7 +24,7 @@ interface OrderAssignedEmailData {
     orderCode: string;
     deliveryArea: string;
     itemCount: number;
-    totalPrice: number;
+    total_price_ghs: number;
 }
 
 interface OrderStatusEmailData {
@@ -77,7 +77,7 @@ export async function sendOrderAssignedEmail(data: OrderAssignedEmailData) {
                   <h2 style="margin-top: 0; color: #667eea;">Order ${data.orderCode}</h2>
                   <p><span class="label">Delivery Area:</span> ${data.deliveryArea}</p>
                   <p><span class="label">Items:</span> ${data.itemCount}</p>
-                  <p><span class="label">Total:</span> GHS ${data.totalPrice.toFixed(2)}</p>
+                  <p><span class="label">Total:</span> GHS ${data.total_price_ghs.toFixed(2)}</p>
                 </div>
 
                 <p>Please review this order and accept or decline it as soon as possible.</p>
@@ -219,7 +219,7 @@ export async function logEmailNotification(
 export async function sendCustomerOrderConfirmation(order: {
     email: string;
     code: string;
-    totalPrice: number;
+    total_price_ghs: number;
     items: { name: string; quantity: number; price_ghs: number }[];
     deliveryArea: string;
 }) {
@@ -283,7 +283,7 @@ export async function sendCustomerOrderConfirmation(order: {
                         
                         <div class="order-total">
                             <span>TOTAL</span>
-                            <span>GHS ${order.totalPrice.toFixed(2)}</span>
+                            <span>GHS ${order.total_price_ghs.toFixed(2)}</span>
                         </div>
                     </div>
 
@@ -320,7 +320,7 @@ export async function sendCustomerOrderConfirmation(order: {
 export async function sendCustomerReceipt(order: {
     email: string;
     code: string;
-    totalPrice: number;
+    total_price_ghs: number;
     items: { name: string; quantity: number; price_ghs: number }[];
     paymentDate: string;
 }) {
@@ -381,7 +381,7 @@ export async function sendCustomerReceipt(order: {
 
                         <div class="total">
                             <span>Paid</span>
-                            <span>GHS ${order.totalPrice.toFixed(2)}</span>
+                            <span>GHS ${order.total_price_ghs.toFixed(2)}</span>
                         </div>
                     </div>
 

@@ -1,6 +1,9 @@
 import { getDashboardStats } from "@/lib/admin-actions";
 import AnalyticsDashboard from "./analytics-dashboard";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function AdminAnalyticsPage() {
   const stats = await getDashboardStats();
 

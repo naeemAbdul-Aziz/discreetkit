@@ -210,25 +210,25 @@ export function OrderDetailsSheet({
               <div className="bg-slate-50/80 p-8 space-y-4">
                 <div className="flex justify-between text-[11px] font-bold text-slate-500 uppercase tracking-widest">
                   <span>Inventory Subtotal</span>
-                  <span className="tabular-nums">₵{Number(order.subtotal || 0).toFixed(2)}</span>
+                  <span className="tabular-nums">₵{Number(order.subtotal_ghs || 0).toFixed(2)}</span>
                 </div>
-                {Number(order.delivery_fee) > 0 && (
+                {Number(order.delivery_fee_ghs) > 0 && (
                   <div className="flex justify-between text-[11px] font-bold text-slate-500 uppercase tracking-widest">
                     <span>Logistics Service</span>
-                    <span className="tabular-nums">₵{Number(order.delivery_fee).toFixed(2)}</span>
+                    <span className="tabular-nums">₵{Number(order.delivery_fee_ghs).toFixed(2)}</span>
                   </div>
                 )}
-                {Number(order.student_discount) > 0 && (
+                {Number(order.student_discount_ghs) > 0 && (
                   <div className="flex justify-between text-[11px] font-bold text-brand-teal uppercase tracking-widest">
                     <span>Partnership Rebate</span>
-                    <span className="tabular-nums">-₵{Number(order.student_discount).toFixed(2)}</span>
+                    <span className="tabular-nums">-₵{Number(order.student_discount_ghs).toFixed(2)}</span>
                   </div>
                 )}
                 <div className="h-[1px] w-full bg-slate-200/50 my-2" />
                 <div className="flex justify-between items-end">
                   <div className="space-y-0.5">
                     <span className="text-[9px] font-black uppercase tracking-[0.25em] text-slate-400 block leading-none mb-1">Settlement Total (GHS)</span>
-                    <span className="text-4xl font-extrabold tabular-nums text-slate-900 tracking-tighter leading-none block">₵{Number(order.total_price || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                    <span className="text-4xl font-extrabold tabular-nums text-slate-900 tracking-tighter leading-none block">₵{Number(order.total_price_ghs || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                   </div>
                 </div>
               </div>

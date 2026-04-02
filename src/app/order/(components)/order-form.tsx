@@ -128,10 +128,10 @@ const toBase64 = (str: string) =>
 function OrderSummaryCard() {
   const {
     items,
-    subtotal,
-    studentDiscount,
-    deliveryFee,
-    totalPrice,
+    subtotal_ghs,
+    student_discount_ghs,
+    delivery_fee_ghs,
+    total_price_ghs,
     totalItems,
   } = useCart();
 
@@ -173,23 +173,23 @@ function OrderSummaryCard() {
         <div className="space-y-1.5 text-xs">
           <div className="flex justify-between">
             <p className="text-muted-foreground">Subtotal ({totalItems} items)</p>
-            <p className="font-bold text-foreground">GHS {subtotal.toFixed(2)}</p>
+            <p className="font-bold text-foreground">GHS {subtotal_ghs.toFixed(2)}</p>
           </div>
-          {studentDiscount > 0 && (
+          {student_discount_ghs > 0 && (
             <div className="flex justify-between text-emerald-600 font-bold">
               <p>Student Saving</p>
-              <p>- GHS {studentDiscount.toFixed(2)}</p>
+              <p>- GHS {student_discount_ghs.toFixed(2)}</p>
             </div>
           )}
           <div className="flex justify-between">
             <p className="text-muted-foreground">Delivery</p>
-            <p className="font-bold text-foreground">GHS {deliveryFee.toFixed(2)}</p>
+            <p className="font-bold text-foreground">GHS {delivery_fee_ghs.toFixed(2)}</p>
           </div>
         </div>
         <Separator className="bg-border/30" />
         <div className="flex items-baseline justify-between font-bold text-base tracking-tight">
           <p>Total</p>
-          <p>GHS {totalPrice.toFixed(2)}</p>
+          <p>GHS {total_price_ghs.toFixed(2)}</p>
         </div>
       </div>
     </>
@@ -213,20 +213,20 @@ export function OrderForm() {
 
   const {
     items,
-    subtotal,
-    studentDiscount,
-    deliveryFee,
-    totalPrice,
+    subtotal_ghs,
+    student_discount_ghs,
+    delivery_fee_ghs,
+    total_price_ghs,
     clearCart,
     deliveryLocation,
     setDeliveryLocation,
     isStudent,
   } = useCart((state) => ({
     items: state.items,
-    subtotal: state.subtotal,
-    studentDiscount: state.studentDiscount,
-    deliveryFee: state.deliveryFee,
-    totalPrice: state.totalPrice,
+    subtotal_ghs: state.subtotal_ghs,
+    student_discount_ghs: state.student_discount_ghs,
+    delivery_fee_ghs: state.delivery_fee_ghs,
+    total_price_ghs: state.total_price_ghs,
     clearCart: state.clearCart,
     deliveryLocation: state.deliveryLocation,
     setDeliveryLocation: state.setDeliveryLocation,
@@ -435,10 +435,10 @@ export function OrderForm() {
         >
           <FormPendingOverlay />
           <input type="hidden" name="cartItems" value={JSON.stringify(items)} />
-          <input type="hidden" name="subtotal" value={subtotal} />
-          <input type="hidden" name="studentDiscount" value={studentDiscount} />
-          <input type="hidden" name="deliveryFee" value={deliveryFee} />
-          <input type="hidden" name="totalPrice" value={totalPrice} />
+          <input type="hidden" name="subtotal_ghs" value={subtotal_ghs} />
+          <input type="hidden" name="student_discount_ghs" value={student_discount_ghs} />
+          <input type="hidden" name="delivery_fee_ghs" value={delivery_fee_ghs} />
+          <input type="hidden" name="total_price_ghs" value={total_price_ghs} />
           
           {/* Persisted Step 1 Data (Hidden when unmounted during Step 2) */}
           <input type="hidden" name="deliveryArea" value={deliveryLocation || "Other"} />

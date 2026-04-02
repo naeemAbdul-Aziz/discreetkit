@@ -251,11 +251,11 @@ export default function AdminDashboardPage() {
             <table className="w-full text-left border-separate border-spacing-0">
               <thead>
                 <tr className="bg-slate-50/50 text-[9px] font-black uppercase tracking-[0.15em] text-slate-400">
-                  <th className="py-4 px-8 font-black">Temporal Index</th>
-                  <th className="py-4 px-6 font-black">Matrix ID</th>
-                  <th className="py-4 px-6 font-black">Status</th>
+                  <th className="py-4 px-6 font-black w-32">Temporal Index</th>
+                  <th className="py-4 px-6 font-black w-40">Matrix ID</th>
+                  <th className="py-4 px-6 font-black w-32">Status</th>
                   <th className="py-4 px-6 font-black">Event Descriptor</th>
-                  <th className="py-4 px-8 text-right font-black">Actions</th>
+                  <th className="py-4 px-6 text-right font-black w-24">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50 text-xs text-foreground font-medium">
@@ -263,17 +263,29 @@ export default function AdminDashboardPage() {
                   const isAlert = String(event.status).includes("ALERT");
                   return (
                     <tr key={event.id || i} className="hover:bg-slate-50/80 transition-colors group">
-                      <td className="py-4 px-8 text-slate-400 whitespace-nowrap font-mono tabular-nums text-[10px]">
+                      <td className="py-4 px-6 text-slate-400 whitespace-nowrap font-mono tabular-nums text-[10px]">
                         {new Date(event.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                       </td>
                       
-                      <td className="py-5 px-6">
-                        <span className="font-mono font-black text-slate-900 bg-white border border-slate-100 px-2.5 py-1 rounded-md text-[10px] shadow-sm">
+                      <td className="py-4 px-6">
+                        <button 
+                          onClick={() => {
+                            setSelectedOrder({
+                              id: event.orderId || event.id,
+                              code: event.orderCode,
+                              status: event.status,
+                              total_price: 0, // Fallback
+                              created_at: event.timestamp
+                            });
+                            setDrawerOpen(true);
+                          }}
+                          className="font-mono font-black text-brand-indigo bg-indigo-50/30 border border-indigo-100/50 px-2.5 py-1.5 rounded-md text-[10px] shadow-sm hover:bg-brand-indigo hover:text-white transition-all whitespace-nowrap"
+                        >
                           {event.orderCode}
-                        </span>
+                        </button>
                       </td>
                       
-                      <td className="py-5 px-6">
+                      <td className="py-4 px-6">
                         <Badge variant={isAlert ? "destructive" : "secondary"} className={cn(
                           "text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md border-none",
                           !isAlert && "bg-slate-100 text-slate-600"
@@ -282,10 +294,10 @@ export default function AdminDashboardPage() {
                         </Badge>
                       </td>
                       
-                      <td className="py-5 px-6 w-full text-slate-500">
+                      <td className="py-4 px-6 w-full text-slate-500">
                         {event.note ? (
                           <span className={cn(
-                            "block max-w-sm xl:max-w-xl transition-colors font-semibold truncate",
+                            "block max-w-sm xl:max-w-2xl transition-colors font-semibold truncate",
                             isAlert ? 'text-rose-600' : 'group-hover:text-slate-900'
                           )}>
                             {event.note.replace('⚠️ ALERT: ', '')}
@@ -295,8 +307,8 @@ export default function AdminDashboardPage() {
                         )}
                       </td>
 
-                      <td className="py-5 px-8 text-right">
-                        <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
+                      <td className="py-4 px-6 text-right">
+                        <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-all duration-300">
                           {isAlert ? (
                             <Button className="h-8 px-4 text-[9px] font-black text-white bg-rose-600 hover:bg-rose-700 rounded-lg uppercase tracking-widest">
                               Resolve

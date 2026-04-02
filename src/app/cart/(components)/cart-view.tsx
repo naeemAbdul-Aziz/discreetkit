@@ -34,7 +34,7 @@ const toBase64 = (str: string) =>
 
 
 export function CartView() {
-    const { items, updateQuantity, totalItems, subtotal, studentDiscount, deliveryFee, totalPrice } = useCart();
+    const { items, updateQuantity, totalItems, subtotal_ghs, student_discount_ghs, delivery_fee_ghs, total_price_ghs } = useCart();
     const [isLoading, setIsLoading] = useState(false);
     const pathname = usePathname();
     const [isMounted, setIsMounted] = useState(false);
@@ -147,23 +147,23 @@ export function CartView() {
                      <div className="space-y-2 text-xs">
                         <div className="flex justify-between">
                             <p className="text-muted-foreground">Subtotal ({totalItems} items)</p>
-                            <p className="font-bold text-foreground">GHS {subtotal.toFixed(2)}</p>
+                            <p className="font-bold text-foreground">GHS {subtotal_ghs.toFixed(2)}</p>
                         </div>
-                        {studentDiscount > 0 && (
+                        {student_discount_ghs > 0 && (
                             <div className="flex justify-between text-success font-bold">
                                 <p>Student Saving</p>
-                                <p>- GHS {studentDiscount.toFixed(2)}</p>
+                                <p>- GHS {student_discount_ghs.toFixed(2)}</p>
                             </div>
                         )}
                         <div className="flex justify-between">
                             <p className="text-muted-foreground">Delivery</p>
-                            <p className="font-bold text-foreground">GHS {deliveryFee.toFixed(2)}</p>
+                            <p className="font-bold text-foreground">GHS {delivery_fee_ghs.toFixed(2)}</p>
                         </div>
                     </div>
                     <Separator className="bg-primary/5" />
                      <div className="flex items-baseline justify-between font-bold text-lg tracking-tight">
                         <p>Total</p>
-                        <p>GHS {totalPrice.toFixed(2)}</p>
+                        <p>GHS {total_price_ghs.toFixed(2)}</p>
                     </div>
                     <Button size="lg" className={cn("w-full h-12 md:h-14 rounded-full font-bold shadow-md", isLoading && "bg-primary/80")} asChild disabled={isLoading || totalItems === 0}>
                       <Link href="/order" onClick={handleClick}>
