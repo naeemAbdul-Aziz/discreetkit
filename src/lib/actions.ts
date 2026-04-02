@@ -132,10 +132,10 @@ const orderSchema = z.object({
   deliveryAddressNote: z.string().max(1000, "Note is too long.").optional(),
   phone_masked: z.string().regex(/^0\d{9}$/, 'Phone number must be exactly 10 digits and start with 0 (e.g., 0201234567).'),
   otherDeliveryArea: z.string().optional(),
-  subtotal: z.string(),
-  studentDiscount: z.string(),
-  deliveryFee: z.string(),
-  totalPrice: z.string(),
+  subtotal_ghs: z.string(),
+  student_discount_ghs: z.string(),
+  delivery_fee_ghs: z.string(),
+  total_price_ghs: z.string(),
   email: z.string().email({ message: "A valid email is required for payment." }),
 });
 
@@ -265,7 +265,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     const calculatedTotalPrice = calculatedSubtotal + realDeliveryFee;
 
     // Compare with client provided values (Optional: just overwrite, but logging discrepancies is good for security)
-    const clientTotal = parseFloat(validatedFields.data.totalPrice);
+    const clientTotal = parseFloat(validatedFields.data.total_price_ghs);
     if (Math.abs(calculatedTotalPrice - clientTotal) > 0.5) { // 0.5 tolerance for float math
          console.warn(`[Price Security] Client Total: ${clientTotal}, Server Total: ${calculatedTotalPrice}. Overwriting with Server Total.`);
     }
@@ -429,10 +429,10 @@ export async function getOrderAction(code: string): Promise<Order | null> {
       deliveryArea: order.delivery_area,
       deliveryAddressNote: order.delivery_address_note,
       isStudent: !!order.student_discount_ghs && order.student_discount_ghs > 0, // Infer from discount
-      subtotal: order.subtotal_ghs,
-      studentDiscount: order.student_discount_ghs,
-      deliveryFee: order.delivery_fee_ghs,
-      totalPrice: order.total_price_ghs,
+      subtotal_ghs: order.subtotal_ghs,
+      student_discount_ghs: order.student_discount_ghs,
+      delivery_fee_ghs: order.delivery_fee_ghs,
+      total_price_ghs: order.total_price_ghs,
       courierName: order.courier_name,
       courierPhone: order.courier_phone,
       courierTrackingUrl: order.courier_tracking_url,

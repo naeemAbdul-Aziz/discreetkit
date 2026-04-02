@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
       stats,
       recentOrders: recentOrdersData.map(order => ({
         ...order,
-        total_price: Number((order as any).total_price_ghs || 0)
+        total_price_ghs: Number((order as any).total_price_ghs || 0)
       })),
       statusBreakdown: Object.entries(statusBreakdown).map(([status, count]) => ({ status, count }))
     });

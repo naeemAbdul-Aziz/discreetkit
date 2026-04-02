@@ -9,6 +9,7 @@ import crypto from 'crypto';
 import { getSupabaseAdminClient } from '@/lib/supabase';
 import { paymentDebug } from '@/lib/utils';
 import { sendOrderConfirmationSMS } from '@/lib/server-utils';
+import { revalidatePath } from 'next/cache';
 
 export async function POST(req: Request) {
   // Sanitize secret key (some platforms add quotes)
@@ -148,7 +149,7 @@ export async function POST(req: Request) {
              sendCustomerOrderConfirmation({
                 email: order.email,
                 code: order.code,
-                totalPrice: order.total_price_ghs,
+                total_price_ghs: order.total_price_ghs,
                 items: order.items as any[],
                 deliveryArea: order.delivery_area
              }).then((res) => {
@@ -198,6 +199,11 @@ export async function POST(req: Request) {
               paymentDebug('Auto-assignment failed', { orderId: order.id, error: String(assignError) });
             }
           }
+          // Revalidate dashboard and order paths for real-time updates
+          revalidatePath('/admin');
+          revalidatePath('/admin/analytics');
+          revalidatePath('/admin/orders');
+
         } else {
           paymentDebug('Order already processed', { reference, orderId: order.id, currentStatus: order.status });
         }

@@ -471,22 +471,22 @@ function OrderTrackingView({ order }: { order: Order }) {
           <div className="space-y-4 text-sm font-bold">
             <div className="flex justify-between text-muted-foreground/60">
               <span>Subtotal</span>
-              <span>GHS {order.subtotal.toFixed(2)}</span>
+              <span>GHS {order.subtotal_ghs.toFixed(2)}</span>
             </div>
-            {order.studentDiscount > 0 && (
+            {order.student_discount_ghs > 0 && (
               <div className="flex justify-between text-primary">
                 <span>Student Discount</span>
-                <span>- GHS {order.studentDiscount.toFixed(2)}</span>
+                <span>- GHS {order.student_discount_ghs.toFixed(2)}</span>
               </div>
             )}
             <div className="flex justify-between text-muted-foreground/60">
               <span>Delivery Fee</span>
-              <span>{order.deliveryFee === 0 ? "FREE" : `GHS ${order.deliveryFee.toFixed(2)}`}</span>
+              <span>{order.delivery_fee_ghs === 0 ? "FREE" : `GHS ${order.delivery_fee_ghs.toFixed(2)}`}</span>
             </div>
             <div className="h-[1px] w-full bg-border/20 my-2" />
             <div className="flex justify-between items-baseline pt-2">
               <span className="text-muted-foreground uppercase text-[10px] tracking-widest">Total</span>
-              <span className="text-3xl font-semibold tracking-tighter">GHS {order.totalPrice.toFixed(2)}</span>
+              <span className="text-3xl font-semibold tracking-tighter">GHS {order.total_price_ghs.toFixed(2)}</span>
             </div>
           </div>
         </div>

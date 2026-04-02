@@ -869,7 +869,9 @@ export async function updateOrderStatus(id: number, status: string, courierDetai
         sendDeliveryNotificationSMS(String(id)).catch(console.error)
     }
 
-    revalidatePath('/admin/orders')
+    revalidatePath('/admin/orders');
+    revalidatePath('/admin');
+    revalidatePath('/admin/analytics');
     return { success: true }
 }
 
@@ -919,7 +921,7 @@ export async function assignPharmacyInternal(supabaseAdmin: any, orderId: number
                 orderCode: order.code,
                 deliveryArea: order.delivery_area,
                 itemCount,
-                totalPrice: order.total_price_ghs,
+                total_price_ghs: order.total_price_ghs,
             })
 
             // Log assignment event
