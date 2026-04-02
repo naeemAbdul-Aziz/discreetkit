@@ -661,6 +661,7 @@ export async function getDashboardStats() {
     const totalOrders = orders?.length || 0;
     const activePharmacists = pharmacists?.length || 0; // Head request count would be better but this works for now
     const activeRiders = riders?.length || 0;
+    const activeOrders = orders?.filter((o: any) => ["processing", "out_for_delivery"].includes(o.status)).length || 0;
 
     // --- REVENUE & ANALYTICS ---
     let totalRevenue = 0;
@@ -675,7 +676,8 @@ export async function getDashboardStats() {
     
     orders?.forEach((o: any) => {
         const rev = Number(o.total_price_ghs || 0);
-        if (o.status === 'completed') {
+        // Unified revenue calculation: Include all orders except cancelled or unpaid
+        if (o.status !== 'cancelled' && o.status !== 'pending_payment') {
             totalRevenue += rev;
         }
 
@@ -782,6 +784,7 @@ export async function getDashboardStats() {
         metrics: {
             totalRevenue,
             totalOrders,
+            activeOrders,
             activePatients: new Set(orders?.map(o => (o as any).user_id)).size,
             fulfillmentVelocity: velCount > 0 ? (totalVel / velCount / (1000 * 60 * 60)).toFixed(1) : "0.0",
         }

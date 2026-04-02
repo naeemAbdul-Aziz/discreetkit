@@ -70,7 +70,7 @@ type DashboardData = {
     fulfillmentVelocity: string;
   };
   recentOrders: RecentOrder[];
-  revenueSeries: { date: string; amount: number }[];
+  revenueSeries: { date: string; revenue: number; orders?: number }[];
   statusBreakdown?: { status: string; count: number }[];
   topPharmacies?: { name: string; revenue: number }[];
   topProducts?: { name: string; quantity: number; revenue: number }[];
@@ -97,74 +97,36 @@ export default function AdminDashboardPage() {
     async function loadData() {
       try {
         if (refreshTrigger === 0) setLoading(true);
-        const { getOrders, getDashboardStats } =
-          await import("@/lib/admin-actions");
-        const orders = await getOrders();
+        const { getDashboardStats, getOrders } = await import("@/lib/admin-actions");
+        
+        // Use centralized stats for consistency
         const stats = await getDashboardStats();
-
-        // Calculate metrics
-        const totalRevenue = orders.reduce(
-          (sum: number, o: any) => sum + (o.total_price_ghs || 0),
-          0,
-        );
-        const totalSales = orders.length;
-        const avgOrderValue = totalSales > 0 ? totalRevenue / totalSales : 0;
-
-        const activeOrders = orders.filter((o: any) =>
-          ["processing", "out_for_delivery"].includes(o.status),
-        ).length;
-
-        const uniqueCustomers = new Set(orders.map((o: any) => o.email)).size;
-
-        const recentOrders = orders.slice(0, 5).map((o: any) => ({
-          id: o.id,
-          code: o.code,
-          status: o.status,
-          total_price: o.total_price_ghs,
-          created_at: o.created_at,
-        }));
-
-        const seriesMap = new Map<string, number>();
-        const now = new Date();
-        for (let i = 29; i >= 0; i--) {
-          const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
-          seriesMap.set(d.toISOString().slice(0, 10), 0);
-        }
-
-        orders.forEach((o: any) => {
-          const date = new Date(o.created_at).toISOString().slice(0, 10);
-          if (seriesMap.has(date)) {
-            seriesMap.set(
-              date,
-              (seriesMap.get(date) || 0) + (o.total_price_ghs || 0),
-            );
-          }
-        });
-
-        const revenueSeries = Array.from(seriesMap.entries()).map(
-          ([date, amount]) => ({ date, amount }),
-        );
-
-        const statusCounts: Record<string, number> = {};
-        orders.forEach((o: any) => {
-          statusCounts[o.status] = (statusCounts[o.status] || 0) + 1;
-        });
-        const statusBreakdown = Object.entries(statusCounts).map(
-          ([status, count]) => ({ status, count }),
-        );
+        const orders = await getOrders(); // Still needed for the full list if we want it, but we can prioritize stats
 
         setData({
           metrics: {
-            totalRevenue,
-            totalSales,
-            avgOrderValue,
-            newCustomers: uniqueCustomers,
-            activeOrders,
-            fulfillmentVelocity: stats.metrics?.fulfillmentVelocity ?? '—',
+            totalRevenue: stats.metrics.totalRevenue,
+            totalSales: stats.metrics.totalOrders,
+            avgOrderValue: stats.metrics.totalOrders > 0 ? stats.metrics.totalRevenue / stats.metrics.totalOrders : 0,
+            newCustomers: stats.metrics.activePatients,
+            activeOrders: stats.metrics.activeOrders,
+            fulfillmentVelocity: stats.metrics.fulfillmentVelocity,
           },
-          recentOrders,
-          revenueSeries,
-          statusBreakdown,
+          recentOrders: orders.slice(0, 5).map((o: any) => ({
+            id: o.id,
+            code: o.code,
+            status: o.status,
+            total_price: Number(o.total_price_ghs || 0),
+            created_at: o.created_at,
+          })),
+          revenueSeries: stats.revenueChart.map((d: any) => ({
+            ...d,
+            revenue: Number(d.revenue || 0)
+          })),
+          statusBreakdown: stats.categoryChart.map((c: any) => ({
+            status: c.name,
+            count: c.value
+          })),
           topPharmacies: stats.topPharmacies,
           topProducts: stats.topProducts,
           regionChart: stats.regionChart,
