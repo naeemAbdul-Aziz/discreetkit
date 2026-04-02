@@ -70,7 +70,7 @@ type DashboardData = {
     fulfillmentVelocity: string;
   };
   recentOrders: RecentOrder[];
-  revenueSeries: { date: string; amount: number }[];
+  revenueSeries: { date: string; revenue: number; orders?: number }[];
   statusBreakdown?: { status: string; count: number }[];
   topPharmacies?: { name: string; revenue: number }[];
   topProducts?: { name: string; quantity: number; revenue: number }[];
@@ -119,7 +119,10 @@ export default function AdminDashboardPage() {
             total_price: Number(o.total_price_ghs || 0),
             created_at: o.created_at,
           })),
-          revenueSeries: stats.revenueChart,
+          revenueSeries: stats.revenueChart.map((d: any) => ({
+            ...d,
+            revenue: Number(d.revenue || 0)
+          })),
           statusBreakdown: stats.categoryChart.map((c: any) => ({
             status: c.name,
             count: c.value
