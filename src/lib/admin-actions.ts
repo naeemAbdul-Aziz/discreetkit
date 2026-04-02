@@ -921,7 +921,7 @@ export async function assignPharmacyInternal(supabaseAdmin: any, orderId: number
                 orderCode: order.code,
                 deliveryArea: order.delivery_area,
                 itemCount,
-                totalPrice: order.total_price_ghs,
+                total_price_ghs: order.total_price_ghs,
             })
 
             // Log assignment event
