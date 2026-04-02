@@ -291,7 +291,7 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
                 </CardHeader>
                 <CardContent>
                     <div className="h-[230px] relative">
-                      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none pb-6">
+                      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none">
                         <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">Orders</span>
                         <span className="text-2xl font-bold text-slate-900 tabular-nums tracking-tight">{totalCategories}</span>
                       </div>
@@ -300,8 +300,8 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
                           <PieChart className="relative z-0">
                             <Pie
                               data={categoryChart}
-                              cx="40%"
-                              cy="45%"
+                              cx="50%"
+                              cy="50%"
                               innerRadius={50}
                               outerRadius={70}
                               stroke="none"
