@@ -650,7 +650,7 @@ export async function getDashboardStats() {
     ] = await Promise.all([
         supabase
             .from('orders')
-            .select('status, total_price_ghs, created_at, items, delivery_area, code, pharmacies(name), order_events(status, created_at, note)')
+            .select('status, total_price, total_price_ghs, created_at, items, delivery_area, code, pharmacies(name), order_events(status, created_at, note)')
             .order('created_at', { ascending: false }),
         supabase.from('pharmacies').select('id', { count: 'exact', head: true }),
         supabase.from('pharmacy_riders').select('id', { count: 'exact', head: true })
@@ -675,7 +675,9 @@ export async function getDashboardStats() {
     const itemNames = new Set<string>();
     
     orders?.forEach((o: any) => {
-        const rev = Number(o.total_price_ghs || 0);
+        // Fallback: If total_price_ghs is 0/null but total_price exists, use total_price
+        const rev = Number(o.total_price_ghs || 0) || Number(o.total_price || 0);
+        
         // Unified revenue calculation: Include all orders except cancelled or unpaid
         if (o.status !== 'cancelled' && o.status !== 'pending_payment') {
             totalRevenue += rev;
