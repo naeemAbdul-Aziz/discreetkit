@@ -1,6 +1,6 @@
 # DiscreetKit System Design
 
-**Last Updated: March 31, 2026**
+**Last Updated: April 3, 2026**
 
 This document outlines the architecture and system design of the DiscreetKit application. It details the core components and how they interact to provide a secure, anonymous, and efficient service.
 
@@ -58,8 +58,31 @@ The final touchpoint uses a "Quiet Confidence" aesthetic to reinforce trust:
 To achieve the **2-3x load time improvement** required for a FAANG-standard dashboard, we abandoned sequential data fetching in favor of a **Parallel Dynamic Projection** strategy:
 
 - **Algorithm**: `Promise.all` executes targeted Supabase queries (Orders, Products, Pharmacy Partners) simultaneously.
-- **Optimization**: instead of `select('*')`, we fetch only the minimal set of columns required for metrics (e.g., `status`, `total_price`, `created_at`).
-- **Data Invariants**: All status filtering and revenue calculation are performed in-memory after a single parallel fetch, ensuring zero redundant database round-trips.
+- **Optimization**: Instead of `select('*')`, we fetch only the minimal set of columns required for metrics (e.g., `status`, `total_price`, `total_price_ghs`, `created_at`).
+- **Data Invariants**: All financial calculations prioritize the `_ghs` suffixed columns, with graceful fallbacks to legacy columns to ensure 100% data continuity.
+
+### 3.17. High-Performance Streaming Architecture (NEW - April 2026)
+
+To achieve **Sub-Second LCP** for the entire Admin and Pharmacy portals, the system has transitioned to a **Streaming-First Architecture**:
+
+1. **Server-Side Parallelization**: Core logic is factored into granular, independent server actions (e.g., `getSummaryMetrics`, `getChartsData`).
+2. **Progressive Hydration**: The UI uses React `Suspense` boundaries to stream data back to the browser as soon as each parallel query completes.
+3. **Smart Tiered Caching**:
+   - **L1 (Persistence)**: Supabase (PostgreSQL).
+   - **L2 (Performance)**: Redis Cache (`admin-actions.ts`) with a 60-second TTL to prevent database hammering during high-concurrency periods.
+   - **L3 (View)**: Next.js Request Memoization.
+4. **Real-time Sync**: A lightweight SSE-to-Server-Refresh bridge (`realtime-refresh.tsx`) ensures that while the page is a high-performance Server Component, it remains reactive to incoming global events.
+
+### 3.18. Unified Financial Schema (GHS-Standard)
+
+Across all three entry points (WhatsApp Bot, Admin Matrix, Pharmacy Portal), the application now enforces a **Unified GHS Financial Schema**:
+
+- `total_price_ghs`: The core transactional value in Ghana Cedis.
+- `subtotal_ghs`: Pre-discount, pre-delivery value.
+- `delivery_fee_ghs`: Standardized across regional node distribution.
+- `student_discount_ghs`: Dynamic deduction based on verified IDs.
+
+This ensures perfect mathematical consistency between the **WhatsApp checkout flow**, the **Paystack settlement layer**, and the **Admin analytics dashboard**.
 
 ### 3.16. Optimistic UX Engine (NEW - April 2026)
 

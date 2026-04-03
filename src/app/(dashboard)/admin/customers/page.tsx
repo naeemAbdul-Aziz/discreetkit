@@ -1,90 +1,55 @@
-"use client";
-
-/**
- * @file src/app/(dashboard)/admin/customers/page.tsx
- */
+import { Suspense } from "react";
+import { getCustomers } from "@/lib/admin-actions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useEffect, useMemo, useState } from 'react';
-import { useSSE } from '@/hooks/use-sse';
-import { Input } from '@/components/ui/input';
+import { CustomerTableClient } from "./customer-table-client";
 
-type CustomerRow = { identifier: string; email?: string | null; totalSpent: number; orders: number; firstOrder: string; lastOrder: string };
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-export default function AdminCustomersPage() {
-  const [rows, setRows] = useState<CustomerRow[] | null>(null);
-  const [q, setQ] = useState('');
-
-  useEffect(() => {
-    let timer: any;
-    const load = async () => {
-      const res = await fetch('/api/admin/customers', { cache: 'no-store' });
-      if (res.ok) setRows(await res.json()); else setRows([]);
-    };
-    load();
-    timer = setInterval(load, 60000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // Realtime: customers derive from orders; listen to customers SSE (orders under the hood)
-  useSSE('/api/admin/realtime/customers', { onMessage: () => {
-    fetch('/api/admin/customers', { cache: 'no-store' })
-      .then(r => r.ok ? r.json() : null)
-      .then(json => json && setRows(json))
-      .catch(() => {});
-  }});
-
-  const filtered = useMemo(() => {
-    if (!rows) return null;
-    const s = q.trim().toLowerCase();
-    if (!s) return rows;
-    return rows.filter(r => ((r.email ?? r.identifier).toLowerCase().includes(s)));
-  }, [rows, q]);
-
+/**
+ * High-Velocity Customer Intelligence (Server-Side Streaming)
+ */
+export default async function AdminCustomersPage() {
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between gap-4">
-        <div>
-          <CardTitle>Customers</CardTitle>
-          <CardDescription>Manage customer data and view order history.</CardDescription>
-        </div>
-        <Input placeholder="Search by email…" value={q} onChange={(e) => setQ(e.target.value)} className="max-w-xs" />
-      </CardHeader>
-      <CardContent>
-        {!filtered ? (
-          <div className="space-y-2">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="h-10 w-full" />
-            ))}
-          </div>
-        ) : (
-          <div className="overflow-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Orders</TableHead>
-                  <TableHead>Total Spent (GHS)</TableHead>
-                  <TableHead>First Order</TableHead>
-                  <TableHead>Last Order</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.map((c) => (
-                  <TableRow key={c.identifier}>
-                    <TableCell className="font-medium">{c.email ?? c.identifier}</TableCell>
-                    <TableCell>{c.orders}</TableCell>
-                    <TableCell>{c.totalSpent.toFixed(2)}</TableCell>
-                    <TableCell>{new Date(c.firstOrder).toLocaleDateString()}</TableCell>
-                    <TableCell>{new Date(c.lastOrder).toLocaleString()}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+    <div className="space-y-8 animate-in fade-in duration-700">
+      <div className="flex flex-col gap-1">
+        <h2 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 uppercase tracking-widest">
+            Customer Matrix
+        </h2>
+        <p className="text-[10px] uppercase font-bold text-slate-400 tracking-[0.2em]">
+            Strategic intelligence on user lifecycle & aggregate retention
+        </p>
+      </div>
+
+      <Card className="border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-white/50 backdrop-blur-md">
+        <CardHeader className="pb-2">
+            <CardTitle className="text-lg font-bold">Aggregate Analysis</CardTitle>
+            <CardDescription className="text-[10px] uppercase tracking-tighter">Derived from real-time order volume</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <Suspense fallback={<CustomerSkeleton />}>
+                <CustomerLoader />
+            </Suspense>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
+
+async function CustomerLoader() {
+  const customers = await getCustomers();
+  return <CustomerTableClient initialCustomers={customers} />;
+}
+
+function CustomerSkeleton() {
+  return (
+    <div className="space-y-3">
+      <Skeleton className="h-10 w-full rounded-xl bg-slate-50" />
+      {[...Array(6)].map((_, i) => (
+        <Skeleton key={i} className="h-16 w-full rounded-2xl bg-slate-50/50" />
+      ))}
+    </div>
+  );
+}

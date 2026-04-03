@@ -88,7 +88,15 @@ const titleCase = (s: string) =>
   s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
 
-export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
+export function OrdersTable({ 
+  initialOrders, 
+  totalOrders = initialOrders.length, 
+  page: currentPage = 1 
+}: { 
+  initialOrders: any[], 
+  totalOrders?: number, 
+  page?: number 
+}) {
   const router = useRouter();
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
@@ -141,9 +149,9 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
     totalCount: number;
   } | null>(null);
 
-  // Pagination
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  // Pagination state is now managed by server-side search params, 
+  // but we keep local pageSize for now if needed.
+  const [pageSize, setPageSize] = useState(50);
 
   // Filter logic
   const filteredOrders = useMemo(() => {
@@ -156,11 +164,17 @@ export function OrdersTable({ initialOrders }: { initialOrders: any[] }) {
     });
   }, [orders, searchTerm, filterStatus]);
 
-  const totalPages = Math.ceil(filteredOrders.length / pageSize);
-  const paginatedOrders = filteredOrders.slice(
-    (page - 1) * pageSize,
-    page * pageSize,
-  );
+  const totalPages = Math.ceil(totalOrders / pageSize);
+  // We use initialOrders directly as it is already filtered/sliced by the server
+  const paginatedOrders = filteredOrders;
+
+  const handlePageChange = (newPage: number) => {
+    startTransition(() => {
+        const params = new URLSearchParams(window.location.search);
+        params.set("page", newPage.toString());
+        router.push(`/admin/orders?${params.toString()}`);
+    });
+  };
 
   // Realtime Subscription
   useEffect(() => {
