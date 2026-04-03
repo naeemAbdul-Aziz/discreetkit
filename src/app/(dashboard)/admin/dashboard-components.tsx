@@ -22,7 +22,15 @@ import { cn } from "@/lib/utils";
 import { DynamicCharts } from "./dynamic-charts";
 
 export async function MetricsGrid() {
-    const metrics = await getSummaryMetrics();
+    const metrics = await getSummaryMetrics() || {
+        totalRevenue: 0,
+        totalOrders: 0,
+        activePatients: 0,
+        activeOrders: 0,
+        fulfillmentVelocity: "0.0",
+        activePharmacists: 0,
+        activeRiders: 0
+    };
 
     return (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
@@ -135,7 +143,7 @@ export async function ActivityPulse() {
                                 "h-8 w-8 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold",
                                 item.status === 'completed' ? 'bg-emerald-50 text-emerald-600' : 'bg-brand-indigo/5 text-brand-indigo'
                             )}>
-                                {item.orderCode.slice(-2)}
+                                {item.orderCode ? item.orderCode.slice(-2) : '??'}
                             </div>
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between gap-2">

@@ -675,9 +675,10 @@ async function getRawOrdersCached() {
  */
 
 export async function getSummaryMetrics() {
-    await requireAdmin();
-    const orders = await getRawOrdersCached();
-    const supabase = await createSupabaseServerClient();
+    try {
+        await requireAdmin();
+        const orders = await getRawOrdersCached();
+        const supabase = await createSupabaseServerClient();
 
     const [
         { count: pharmacistCount },
@@ -709,20 +710,33 @@ export async function getSummaryMetrics() {
         }
     });
 
-    return {
-        totalRevenue,
-        totalOrders: orders?.length || 0,
-        activeOrders,
-        activePatients: new Set(orders?.map(o => (o as any).user_id)).size,
-        fulfillmentVelocity: velCount > 0 ? (totalVel / velCount / (1000 * 60 * 60)).toFixed(1) : "0.0",
-        activePharmacists: pharmacistCount || 0,
-        activeRiders: riderCount || 0
-    };
+        return {
+            totalRevenue,
+            totalOrders: orders?.length || 0,
+            activeOrders,
+            activePatients: new Set(orders?.map(o => (o as any).user_id)).size,
+            fulfillmentVelocity: velCount > 0 ? (totalVel / velCount / (1000 * 60 * 60)).toFixed(1) : "0.0",
+            activePharmacists: pharmacistCount || 0,
+            activeRiders: riderCount || 0
+        };
+    } catch (err) {
+        console.error('[SummaryMetrics] Critical Error:', err);
+        return {
+            totalRevenue: 0,
+            totalOrders: 0,
+            activeOrders: 0,
+            activePatients: 0,
+            fulfillmentVelocity: "0.0",
+            activePharmacists: 0,
+            activeRiders: 0
+        };
+    }
 }
 
 export async function getChartsData() {
-    await requireAdmin();
-    const orders = await getRawOrdersCached();
+    try {
+        await requireAdmin();
+        const orders = await getRawOrdersCached();
 
     const revenueByDay: Record<string, number> = {};
     const ordersByDay: Record<string, number> = {};
@@ -750,26 +764,36 @@ export async function getChartsData() {
         });
     }
 
-    return revenueChart;
+        return revenueChart;
+    } catch (err) {
+        console.error('[ChartsData] Critical Error:', err);
+        return [];
+    }
 }
 
 export async function getPulseFeed() {
-    await requireAdmin();
-    const orders = await getRawOrdersCached();
+    try {
+        await requireAdmin();
+        const orders = await getRawOrdersCached();
 
-    return orders?.slice(0, 10).flatMap(o => (o.order_events || []).map((e: any) => ({
-        id: e.id,
-        orderCode: o.code,
-        status: e.status,
-        timestamp: e.created_at,
-        note: e.note
-    }))).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 12);
+        return orders?.slice(0, 10).flatMap(o => (o.order_events || []).map((e: any) => ({
+            id: e.id,
+            orderCode: o.code,
+            status: e.status,
+            timestamp: e.created_at,
+            note: e.note
+        }))).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 12);
+    } catch (err) {
+        console.error('[PulseFeed] Critical Error:', err);
+        return [];
+    }
 }
 
 export async function getRankingStats() {
-    await requireAdmin();
-    const orders = await getRawOrdersCached();
-    const supabase = await createSupabaseServerClient();
+    try {
+        await requireAdmin();
+        const orders = await getRawOrdersCached();
+        const supabase = await createSupabaseServerClient();
 
     const pharmacyRevenue: Record<string, number> = {};
     const productSales: Record<string, { quantity: number; revenue: number }> = {};
@@ -804,7 +828,11 @@ export async function getRankingStats() {
         .sort((a, b) => b.quantity - a.quantity)
         .slice(0, 5);
 
-    return { topPharmacies, topProducts };
+        return { topPharmacies, topProducts };
+    } catch (err) {
+        console.error('[RankingStats] Critical Error:', err);
+        return { topPharmacies: [], topProducts: [] };
+    }
 }
 
 export async function getDashboardStats() {
