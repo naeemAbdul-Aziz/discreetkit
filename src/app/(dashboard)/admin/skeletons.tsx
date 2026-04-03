@@ -28,11 +28,11 @@ export function ChartSkeleton() {
         <Skeleton className="h-4 w-64 bg-slate-100" />
       </CardHeader>
       <CardContent className="h-[300px] flex items-end gap-2 px-6 pb-6">
-        {[...Array(12)].map((_, i) => (
+        {[60, 80, 45, 70, 55, 90, 40, 85, 50, 75, 65, 95].map((h, i) => (
           <Skeleton 
             key={i} 
             className="flex-1 bg-slate-100 rounded-t-md" 
-            style={{ height: `${Math.random() * 60 + 20}%` }}
+            style={{ height: `${h}%` }}
           />
         ))}
       </CardContent>

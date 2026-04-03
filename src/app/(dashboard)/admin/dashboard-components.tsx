@@ -148,7 +148,7 @@ export async function ActivityPulse() {
                                     <Badge variant="outline" className="text-[8px] h-4 uppercase tracking-wider font-bold border-slate-100 text-slate-500 bg-slate-50/50">
                                         {item.status.replace(/_/g, ' ')}
                                     </Badge>
-                                    {item.note && <span className="text-[10px] text-slate-500 truncate italic">"{item.note}"</span>}
+                                    {item.note && <span className="text-[10px] text-slate-500 truncate italic">&quot;{item.note}&quot;</span>}
                                 </div>
                             </div>
                         </div>
