@@ -107,7 +107,7 @@ export function OrderDetailsSheet({
               </SheetTitle>
               <div className="flex items-center gap-2">
                 <span className="h-1.5 w-1.5 rounded-full bg-brand-indigo animate-pulse" />
-                <SheetDescription className="font-bold text-[10px] uppercase tracking-[0.2em] text-slate-400">Dispatch Operations Matrix</SheetDescription>
+                <SheetDescription className="font-bold text-[10px] uppercase tracking-[0.2em] text-slate-400">Order Details</SheetDescription>
               </div>
             </div>
           </SheetHeader>
@@ -150,12 +150,12 @@ export function OrderDetailsSheet({
             </div>
           </div>
 
-          {/* Secure Registry Data Grid */}
+          {/* Delivery & Timeline */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="p-6 rounded-[2rem] bg-slate-50/50 border border-slate-100/50 space-y-4 group hover:bg-white hover:shadow-xl hover:shadow-slate-200/20 transition-all">
                <div className="flex items-center gap-2 text-brand-indigo opacity-60 group-hover:opacity-100">
                   <MapPin className="h-3.5 w-3.5" />
-                  <span className="text-[9px] font-black uppercase tracking-widest">Routing Target</span>
+                  <span className="text-[9px] font-black uppercase tracking-widest">Delivery Address</span>
                </div>
                <div className="space-y-2">
                   <p className="text-base font-extrabold text-slate-900 tracking-tight">{order.delivery_area}</p>
@@ -172,20 +172,20 @@ export function OrderDetailsSheet({
             <div className="p-6 rounded-[2rem] bg-slate-50/50 border border-slate-100/50 space-y-4 group hover:bg-white hover:shadow-xl hover:shadow-slate-200/20 transition-all">
                <div className="flex items-center gap-2 text-brand-indigo opacity-60 group-hover:opacity-100">
                   <Calendar className="h-3.5 w-3.5" />
-                  <span className="text-[9px] font-black uppercase tracking-widest">Temporal Log</span>
+                  <span className="text-[9px] font-black uppercase tracking-widest">Order Timeline</span>
                </div>
                <div className="space-y-1">
                   <p className="text-base font-extrabold text-slate-900 tracking-tight">{new Date(order.created_at).toLocaleDateString('en-GB')}</p>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Indexed at {new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Placed at {new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                </div>
             </div>
           </div>
 
-          {/* Asset Breakdown Section */}
+          {/* Order Summary Section */}
           <div className="space-y-6">
             <div className="flex items-center justify-between px-2">
                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2.5">
-                 <Package className="h-3.5 w-3.5 text-brand-indigo" /> Package Inventory
+                 <Package className="h-3.5 w-3.5 text-brand-indigo" /> Order Items
                </h3>
                <span className="text-[10px] font-black bg-slate-900 text-white px-3 py-1 rounded-full uppercase tracking-tighter shadow-lg shadow-slate-900/10">
                  {itemsArray.length} Selected Items
@@ -209,7 +209,7 @@ export function OrderDetailsSheet({
               
               <div className="bg-slate-50/80 p-8 space-y-4">
                 <div className="flex justify-between text-[11px] font-bold text-slate-500 uppercase tracking-widest">
-                  <span>Inventory Subtotal</span>
+                  <span>Subtotal</span>
                   <span className="tabular-nums">₵{Number(order.subtotal_ghs || 0).toFixed(2)}</span>
                 </div>
                 {Number(order.delivery_fee_ghs) > 0 && (
@@ -227,7 +227,7 @@ export function OrderDetailsSheet({
                 <div className="h-[1px] w-full bg-slate-200/50 my-2" />
                 <div className="flex justify-between items-end">
                   <div className="space-y-0.5">
-                    <span className="text-[9px] font-black uppercase tracking-[0.25em] text-slate-400 block leading-none mb-1">Settlement Total (GHS)</span>
+                    <span className="text-[9px] font-black uppercase tracking-[0.25em] text-slate-400 block leading-none mb-1">Total Amount (GHS)</span>
                     <span className="text-4xl font-extrabold tabular-nums text-slate-900 tracking-tighter leading-none block">₵{Number(order.total_price_ghs || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                   </div>
                 </div>
@@ -235,10 +235,10 @@ export function OrderDetailsSheet({
             </div>
           </div>
 
-          {/* Operational Decision Center */}
+          {/* Order Actions */}
           <div className="space-y-6 pb-12">
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2.5 px-2">
-               <ArrowRight className="h-3.5 w-3.5 text-brand-indigo" /> Operational Decision Center
+               <ArrowRight className="h-3.5 w-3.5 text-brand-indigo" /> Order Actions
             </h3>
             <div className="grid gap-4">
               {order.status === "received" && order.pharmacy_ack_status === "pending" && (
@@ -250,7 +250,7 @@ export function OrderDetailsSheet({
                     loading={loading && loadingAction === "accept"}
                   >
                     {!loading && <CheckCircle className="h-5 w-5" />}
-                    Initialize Fulfillment
+                    Accept Order
                   </Button>
                   <Button
                     size="lg"
@@ -260,7 +260,7 @@ export function OrderDetailsSheet({
                     loading={loading && loadingAction === "decline"}
                   >
                     {!loading && <XCircle className="h-4 w-4" />}
-                    Decline Order Assignment
+                    Decline Order
                   </Button>
                 </div>
               )}
@@ -273,7 +273,7 @@ export function OrderDetailsSheet({
                   loading={loading && loadingAction === "out_for_delivery"}
                 >
                   {!loading && <Truck className="h-6 w-6" />}
-                  Finalize for Dispatch
+                  Ready for Delivery
                 </Button>
               )}
 
@@ -285,7 +285,7 @@ export function OrderDetailsSheet({
                   loading={loading && loadingAction === "completed"}
                 >
                    {!loading && <CheckCircle className="h-6 w-6" />}
-                   Confirm Handover Successfully
+                   Mark as Delivered
                 </Button>
               )}
             </div>
@@ -294,7 +294,7 @@ export function OrderDetailsSheet({
             <div className="pt-8 space-y-6 border-t border-slate-100">
                <div className="flex items-center gap-2.5 px-2">
                   <GanttChartSquare className="h-3.5 w-3.5 text-brand-indigo" />
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Secure Comms Hub</h3>
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Order Chat</h3>
                </div>
                <div className="bg-slate-50/50 rounded-[2.5rem] border border-slate-100/50 overflow-hidden">
                  <OrderMessages orderId={order.id} userRole="pharmacy" />
@@ -306,9 +306,9 @@ export function OrderDetailsSheet({
                   <Info className="h-5 w-5 text-brand-indigo" />
                </div>
                <div className="space-y-1">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-indigo-900/60 block mb-1">Operational Protocol</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-indigo-900/60 block mb-1">Processing Note</p>
                   <p className="text-[11px] font-semibold text-indigo-900 leading-relaxed">
-                    Status updates generate automated customer encryption keys. Ensure all physical items are validated against the inventory log before execution.
+                    Status updates trigger automated notifications. Ensure all physical items are checked before updating.
                   </p>
                </div>
             </div>

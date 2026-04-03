@@ -1,28 +1,28 @@
 // Shared table layout classes to keep UI consistent across dashboards
 
 export const dashboardTable = {
-  container: "w-full rounded-md border bg-card overflow-x-auto",
-  table: "w-full table-fixed",
+  container: "w-full rounded-[2.5rem] border border-slate-100 bg-white/70 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.02)] overflow-x-auto",
+  table: "w-full border-separate border-spacing-0",
 };
 
 export const ordersTableCols = {
-  checkbox: "w-8",
-  codeHead: "w-[120px]",
-  dateHead: "w-[110px]",
-  customerHead: "w-[220px]",
-  noteHead: "w-[110px]",
-  statusHead: "w-[160px]",
-  pharmacyHead: "w-[180px]",
-  totalHead: "text-right w-[100px]",
-  actionsHead: "w-[44px]",
-  codeCell: "font-medium font-mono text-sm whitespace-nowrap w-[120px]",
-  dateCell: "text-muted-foreground text-sm whitespace-nowrap w-[110px]",
-  customerCell: "truncate max-w-[220px]",
-  noteCell: "w-[110px]",
-  statusCell: "w-[160px] whitespace-nowrap",
-  pharmacyCell: "w-[180px]",
-  totalCell: "text-right w-[100px] whitespace-nowrap",
-  actionsCell: "w-[44px]",
+  checkbox: "w-10 px-4",
+  codeHead: "w-[130px] px-4 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400",
+  dateHead: "w-[120px] px-4 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400",
+  customerHead: "w-[240px] px-4 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400",
+  noteHead: "w-[120px] px-4 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400",
+  statusHead: "w-[180px] px-4 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400",
+  pharmacyHead: "w-[200px] px-4 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400",
+  totalHead: "text-right w-[120px] px-6 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400",
+  actionsHead: "w-[60px] px-4 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400",
+  codeCell: "font-black font-mono text-xs whitespace-nowrap w-[130px] px-4 py-4 text-slate-900 tracking-tighter",
+  dateCell: "text-slate-400 font-bold text-[11px] whitespace-nowrap w-[120px] px-4 py-4",
+  customerCell: "truncate max-w-[240px] px-4 py-4 text-sm font-semibold text-slate-700",
+  noteCell: "w-[120px] px-4 py-4",
+  statusCell: "w-[180px] whitespace-nowrap px-4 py-4",
+  pharmacyCell: "w-[200px] px-4 py-4",
+  totalCell: "text-right w-[120px] whitespace-nowrap px-6 py-4 font-black text-slate-900 tracking-tight",
+  actionsCell: "w-[60px] px-4 py-4",
 };
 
 export const adminRefillsCols = {
