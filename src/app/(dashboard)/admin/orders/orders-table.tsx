@@ -476,41 +476,41 @@ export function OrdersTable({
     switch (status) {
       case "completed":
         return (
-          <Badge variant="success" className="gap-1.5 shadow-[inset_0_0_12px_rgba(34,197,94,0.3)] bg-emerald-50 text-emerald-700 border-emerald-100 font-black uppercase text-[10px] tracking-widest px-2.5 py-1">
+          <Badge variant="success" className="gap-1.5 bg-emerald-50 text-emerald-700 border-emerald-200 font-black uppercase text-[10px] tracking-widest px-2.5 py-1">
             <CheckCircle className="h-3.5 w-3.5" />
             {base}
           </Badge>
         );
       case "processing":
         return (
-          <Badge variant="secondary" className="gap-1.5 shadow-[inset_0_0_12px_rgba(99,102,241,0.2)] bg-indigo-50 text-brand-indigo border-indigo-100 font-black uppercase text-[10px] tracking-widest px-2.5 py-1">
+          <Badge variant="secondary" className="gap-1.5 bg-indigo-50 text-indigo-700 border-indigo-200 font-black uppercase text-[10px] tracking-widest px-2.5 py-1">
             <Package className="h-3.5 w-3.5" />
             {base}
           </Badge>
         );
       case "out_for_delivery":
         return (
-          <Badge variant="warning" className="gap-1.5 animate-breathing shadow-[0_4px_12px_rgba(245,158,11,0.2),inset_0_0_8px_rgba(245,158,11,0.3)] bg-amber-50 text-amber-700 border-amber-200/50 font-black uppercase text-[10px] tracking-widest px-2.5 py-1">
+          <Badge variant="warning" className="gap-1.5 bg-amber-50 text-amber-700 border-amber-200 font-black uppercase text-[10px] tracking-widest px-2.5 py-1">
             <Truck className="h-3.5 w-3.5" />
             {base}
           </Badge>
         );
       case "pending_payment":
         return (
-          <Badge variant="pending" className="gap-1.5 bg-rose-50 text-rose-600 border-rose-100 font-black uppercase text-[10px] tracking-widest px-2.5 py-1">
+          <Badge variant="pending" className="gap-1.5 bg-rose-50 text-rose-700 border-rose-200 font-black uppercase text-[10px] tracking-widest px-2.5 py-1">
             <CreditCard className="h-3.5 w-3.5" />
             {base}
           </Badge>
         );
       case "received":
         return (
-          <Badge variant="info" className="gap-1.5 animate-breathing shadow-[0_4px_12px_rgba(14,165,233,0.2),inset_0_0_8px_rgba(14,165,233,0.3)] bg-sky-50 text-sky-700 border-sky-200/50 font-black uppercase text-[10px] tracking-widest px-2.5 py-1">
+          <Badge variant="info" className="gap-1.5 bg-sky-50 text-sky-700 border-sky-200 font-black uppercase text-[10px] tracking-widest px-2.5 py-1">
             <Clock className="h-3.5 w-3.5" />
             {base}
           </Badge>
         );
       default:
-        return <Badge variant="outline" className="font-black uppercase text-[10px] tracking-widest px-2.5 py-1">{base}</Badge>;
+        return <Badge variant="outline" className="font-black uppercase text-[10px] tracking-widest px-2.5 py-1 border-slate-200 text-slate-500">{base}</Badge>;
     }
   };
 
@@ -918,111 +918,112 @@ export function OrdersTable({
                         )}
                       </TableCell>
                       <TableCell className={ordersTableCols.statusCell} onClick={(e) => e.stopPropagation()}>
-                        <DropdownMenu>
-                           <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="-ml-2 px-2 h-8 items-center w-fit justify-start focus-visible:ring-0 hover:bg-transparent"
-                            >
-                              <span className="inline-flex items-center gap-2 w-full">
-                                {getStatusBadge(order.status)}
-                                {order.status === "out_for_delivery" &&
-                                  order.courier_name && (
-                                    <Popover>
-                                       <PopoverTrigger asChild>
-                                          <button 
-                                            className="ml-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-[10px] font-black border border-amber-100 hover:bg-amber-100 transition-all flex items-center gap-1.5"
-                                            onClick={(e) => e.stopPropagation()}
-                                          >
-                                            <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                                            {order.courier_name}
-                                          </button>
-                                       </PopoverTrigger>
-                                       <PopoverContent className="w-64 p-0 border-none bg-white rounded-[2rem] shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
-                                          <div className="p-5 bg-amber-50/50 border-b border-amber-100 flex items-center gap-4">
-                                             <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center shadow-inner">
-                                                <Truck className="h-6 w-6" />
-                                             </div>
-                                             <div>
-                                                <p className="text-[10px] font-black uppercase tracking-widest text-amber-500">Assigned Rider</p>
-                                                <p className="text-sm font-black text-slate-900">{order.courier_name}</p>
-                                             </div>
-                                          </div>
-                                          <div className="p-5 space-y-4">
-                                             <div className="flex items-center justify-between">
-                                                <div className="space-y-0.5">
-                                                   <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Contact Number</p>
-                                                   <p className="text-sm font-bold text-slate-700 tabular-nums">{order.courier_phone}</p>
-                                                </div>
-                                                <Button 
-                                                  variant="outline" 
-                                                  size="icon" 
-                                                  className="h-9 w-9 rounded-xl border-slate-100 bg-slate-50 hover:bg-white transition-all text-brand-indigo"
-                                                  onClick={() => {
-                                                     navigator.clipboard.writeText(order.courier_phone);
-                                                     toast({ title: "Copied!", description: "Rider contact number saved to clipboard." });
-                                                  }}
-                                                >
-                                                   <Check className="h-4 w-4" />
-                                                </Button>
-                                             </div>
-                                             <Button 
-                                               asChild 
-                                               className="w-full h-11 rounded-xl bg-brand-indigo hover:bg-brand-indigo/90 font-black text-xs uppercase tracking-widest gap-2 shadow-lg shadow-brand-indigo/20"
-                                             >
-                                                <a href={`tel:${order.courier_phone}`}>
-                                                   Call Dispatcher
-                                                </a>
-                                             </Button>
-                                          </div>
-                                       </PopoverContent>
-                                    </Popover>
-                                  )}
-                              </span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="start" className="w-[200px]">
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setActiveMessageOrderId(order.id);
-                                setMessageDialogOpen(true);
-                              }}
-                            >
-                              <MessageSquare className="mr-2 h-4 w-4" />
-                              <span>Chat with Pharmacy</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            {[
-                              "pending_payment",
-                              "received",
-                              "processing",
-                              "out_for_delivery",
-                              "completed",
-                            ].map((s) => (
-                              <DropdownMenuItem
-                                key={s}
-                                onClick={() => handleStatusChangeClick(order.id, s)}
+                        <div className="flex items-center gap-2">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="-ml-2 px-2 h-8 items-center w-fit justify-start focus-visible:ring-0 hover:bg-transparent"
                               >
-                                {titleCase(s)}
+                                {getStatusBadge(order.status)}
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="start" className="w-[200px]">
+                              <DropdownMenuItem
+                                onSelect={(e) => {
+                                  e.preventDefault();
+                                  setActiveMessageOrderId(order.id);
+                                  setMessageDialogOpen(true);
+                                }}
+                              >
+                                <MessageSquare className="mr-2 h-4 w-4" />
+                                <span>Chat with Pharmacy</span>
                               </DropdownMenuItem>
-                            ))}
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setActiveAssignOrder({
-                                  id: order.id,
-                                  pharmacyId: order.pharmacy_id,
-                                });
-                                setAssignDialogOpen(true);
-                              }}
-                            >
-                              Assign Pharmacy
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                              <DropdownMenuSeparator />
+                              {[
+                                "pending_payment",
+                                "received",
+                                "processing",
+                                "out_for_delivery",
+                                "completed",
+                              ].map((s) => (
+                                <DropdownMenuItem
+                                  key={s}
+                                  onClick={() => handleStatusChangeClick(order.id, s)}
+                                >
+                                  {titleCase(s)}
+                                </DropdownMenuItem>
+                              ))}
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setActiveAssignOrder({
+                                    id: order.id,
+                                    pharmacyId: order.pharmacy_id,
+                                  });
+                                  setAssignDialogOpen(true);
+                                }}
+                              >
+                                Assign Pharmacy
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+
+                          {order.status === "out_for_delivery" && order.courier_name && (
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <button
+                                  className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-[10px] font-black border border-amber-100 hover:bg-amber-100 transition-all flex items-center gap-1.5"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                                  {order.courier_name}
+                                </button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-64 p-0 border-none bg-white rounded-[2rem] shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+                                <div className="p-5 bg-amber-50/50 border-b border-amber-100 flex items-center gap-4">
+                                  <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center shadow-inner">
+                                    <Truck className="h-6 w-6" />
+                                  </div>
+                                  <div>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-amber-500">Assigned Rider</p>
+                                    <p className="text-sm font-black text-slate-900">{order.courier_name}</p>
+                                  </div>
+                                </div>
+                                <div className="p-5 space-y-4">
+                                  <div className="flex items-center justify-between">
+                                    <div className="space-y-0.5">
+                                      <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Contact Number</p>
+                                      <p className="text-sm font-bold text-slate-700 tabular-nums">{order.courier_phone}</p>
+                                    </div>
+                                    <Button
+                                      variant="outline"
+                                      size="icon"
+                                      className="h-9 w-9 rounded-xl border-slate-100 bg-slate-50 hover:bg-white transition-all text-brand-indigo"
+                                      onClick={() => {
+                                        navigator.clipboard.writeText(order.courier_phone || "");
+                                        toast({ title: "Copied!", description: "Rider contact number saved to clipboard." });
+                                      }}
+                                    >
+                                      <Check className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                  <Button
+                                    asChild
+                                    className="w-full h-11 rounded-xl bg-brand-indigo hover:bg-brand-indigo/90 font-black text-xs uppercase tracking-widest gap-2 shadow-lg shadow-brand-indigo/20"
+                                  >
+                                    <a href={`tel:${order.courier_phone}`}>
+                                      Call Dispatcher
+                                    </a>
+                                  </Button>
+                                </div>
+                              </PopoverContent>
+                            </Popover>
+                          )}
+                        </div>
                       </TableCell>
-                      <TableCell className={cn(ordersTableCols.pharmacyCell, isDelayedUnassigned && "animate-urgent bg-rose-50/50")} onClick={(e) => e.stopPropagation()}>
+                      <TableCell className={cn(ordersTableCols.pharmacyCell)} onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center gap-2">
                           <PharmacyCombobox
                             orderId={order.id}
@@ -1073,7 +1074,11 @@ export function OrdersTable({
                                     </div>
                                     <div className="pl-5 border-l border-slate-100 space-y-1">
                                       <p className="text-base font-extrabold text-slate-900 tracking-tight">{order.email || "Anonymous Patient"}</p>
-                                      <p className="text-xs font-bold text-slate-400 tabular-nums">Order ID: {order.id}</p>
+                                      <div className="flex items-center gap-3">
+                                        <p className="text-xs font-bold text-slate-400 tabular-nums">Order ID: {order.id}</p>
+                                        <span className="text-slate-200">|</span>
+                                        <p className="text-xs font-bold text-slate-500 tabular-nums">{order.phone_masked || "No Phone Provided"}</p>
+                                      </div>
                                     </div>
                                   </div>
                                   
@@ -1330,15 +1335,23 @@ function PharmacyCombobox({
           aria-expanded={open}
           className={cn(
             "w-40 h-8 justify-between items-center transition-all duration-300",
-            !currentPharmacyId && "border-slate-300 bg-slate-50",
-            isUrgent && "border-rose-300 ring-2 ring-rose-100"
+            !currentPharmacyId && "border-slate-300 bg-slate-50 hover:bg-slate-100",
+            isUrgent && !currentPharmacyId && "border-rose-400 bg-rose-50/50 hover:bg-rose-100"
           )}
           size="sm"
           disabled={loading}
         >
-          <span className={cn("truncate font-medium", !currentPharmacyId && "text-slate-400")}>
-            {loading ? "Assigning..." : currentPharmacyName || "UNASSIGNED"}
-          </span>
+          <div className="flex items-center gap-2 truncate">
+            {isUrgent && !currentPharmacyId && (
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-rose-500"></span>
+              </span>
+            )}
+            <span className={cn("truncate font-bold", !currentPharmacyId && (isUrgent ? "text-rose-700" : "text-slate-400"))}>
+              {loading ? "Assigning..." : currentPharmacyName || "UNASSIGNED"}
+            </span>
+          </div>
           <ChevronsUpDown className="ml-2 h-3.5 w-3.5 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
