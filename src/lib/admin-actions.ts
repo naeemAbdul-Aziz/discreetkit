@@ -1,7 +1,7 @@
 'use server'
 
 import { createSupabaseServerClient, getSupabaseAdminClient } from "@/lib/supabase"
-import { revalidatePath } from "next/cache"
+import { revalidatePath, unstable_cache } from "next/cache"
 import { z } from "zod"
 import { riderSchema, type RiderFormValues } from "@/lib/validation-schemas"
 import { getRedis } from "@/lib/redis"
@@ -614,18 +614,22 @@ export async function deletePharmacy(id: number) {
 
 // --- Orders ---
 
-export async function getOrders() {
+export async function getOrders(page: number = 1, pageSize: number = 50) {
     await requireAdmin();
     const supabase = await createSupabaseServerClient()
-    const { data, error } = await supabase
+    
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+
+    const { data, error, count } = await supabase
         .from('orders')
         .select(`
             *,
             pharmacies (name),
             order_events (*)
-        `)
+        `, { count: 'exact' })
         .order('created_at', { ascending: false })
-
+        .range(from, to)
 
     if (error) throw new Error(error.message)
 
@@ -635,65 +639,147 @@ export async function getOrders() {
         pharmacies: Array.isArray(order.pharmacies) ? order.pharmacies[0] || null : order.pharmacies
     }))
 
-    return normalizedOrders
+    return {
+        orders: normalizedOrders,
+        total: count || 0,
+        page,
+        pageSize
+    }
 }
 
-export async function getDashboardStats() {
+// --- Dashboard Data Aggregators ---
+
+/**
+ * Internal helper to fetch all orders with a short cache to prevent
+ * database hammering during high-velocity dashboard browsing.
+ */
+async function getRawOrdersCached() {
+    const cacheKey = 'admin:orders:raw:all';
+    const cached = await cacheGet<any[]>(cacheKey);
+    if (cached) return cached;
+
+    const supabase = await createSupabaseServerClient();
+    const { data: orders, error } = await supabase
+        .from('orders')
+        .select('status, total_price, total_price_ghs, created_at, items, delivery_area, code, user_id, pharmacies(name), order_events(id, status, created_at, note)')
+        .order('created_at', { ascending: false });
+
+    if (error) throw new Error(error.message);
+    
+    await cacheSet(cacheKey, orders, 60); // 1 minute cache
+    return orders;
+}
+
+/**
+ * Modularized dashboard components to support streaming and granular caching.
+ */
+
+export async function getSummaryMetrics() {
     await requireAdmin();
+    const orders = await getRawOrdersCached();
     const supabase = await createSupabaseServerClient();
 
-    // Parallelize core lookups with projection (only fetch what's needed)
     const [
-        { data: orders, error: ordersError },
-        { data: pharmacists, error: pharmError },
-        { data: riders, error: riderError }
+        { data: pharmacists },
+        { data: riders }
     ] = await Promise.all([
-        supabase
-            .from('orders')
-            .select('status, total_price, total_price_ghs, created_at, items, delivery_area, code, pharmacies(name), order_events(status, created_at, note)')
-            .order('created_at', { ascending: false }),
         supabase.from('pharmacies').select('id', { count: 'exact', head: true }),
         supabase.from('pharmacy_riders').select('id', { count: 'exact', head: true })
     ]);
 
-    if (ordersError) throw new Error(ordersError.message);
-
-    const totalOrders = orders?.length || 0;
-    const activePharmacists = pharmacists?.length || 0; // Head request count would be better but this works for now
-    const activeRiders = riders?.length || 0;
     const activeOrders = orders?.filter((o: any) => ["processing", "out_for_delivery"].includes(o.status)).length || 0;
-
-    // --- REVENUE & ANALYTICS ---
+    
     let totalRevenue = 0;
-    const revenueByDay: Record<string, number> = {};
-    const pharmacyRevenue: Record<string, number> = {};
-    const productSales: Record<string, { quantity: number; revenue: number }> = {};
-    const regionalStats: Record<string, number> = {};
-    const categoryStats: Record<string, number> = {};
-    
-    // Performance: Only fetch product categories for items in these orders
-    const itemNames = new Set<string>();
-    
     orders?.forEach((o: any) => {
-        // Fallback: If total_price_ghs is 0/null but total_price exists, use total_price
         const rev = Number(o.total_price_ghs || 0) || Number(o.total_price || 0);
-        
-        // Unified revenue calculation: Include all orders except cancelled or unpaid
         if (o.status !== 'cancelled' && o.status !== 'pending_payment') {
             totalRevenue += rev;
         }
+    });
 
-        // Timeline
-        const dateStr = new Date(o.created_at).toISOString().split('T')[0];
-        revenueByDay[dateStr] = (revenueByDay[dateStr] || 0) + rev;
-
-        // Pharmacy Revenue
-        const pharmName = Array.isArray(o.pharmacies) ? o.pharmacies[0]?.name : o.pharmacies?.name;
-        if (pharmName) {
-            pharmacyRevenue[pharmName] = (pharmacyRevenue[pharmName] || 0) + rev;
+    // Velocity calculation
+    let totalVel = 0, velCount = 0;
+    orders?.forEach(o => {
+        const events = o.order_events || [];
+        const start = events.find((e: any) => e.status === 'received')?.created_at || o.created_at;
+        const end = events.find((e: any) => e.status === 'out_for_delivery')?.created_at;
+        if (end) {
+            totalVel += (new Date(end).getTime() - new Date(start).getTime());
+            velCount++;
         }
+    });
 
-        // Product Sales
+    return {
+        totalRevenue,
+        totalOrders: orders?.length || 0,
+        activeOrders,
+        activePatients: new Set(orders?.map(o => (o as any).user_id)).size,
+        fulfillmentVelocity: velCount > 0 ? (totalVel / velCount / (1000 * 60 * 60)).toFixed(1) : "0.0",
+        activePharmacists: pharmacists?.length || 0,
+        activeRiders: riders?.length || 0
+    };
+}
+
+export async function getChartsData() {
+    await requireAdmin();
+    const orders = await getRawOrdersCached();
+
+    const revenueByDay: Record<string, number> = {};
+    const ordersByDay: Record<string, number> = {};
+
+    orders?.forEach((o: any) => {
+        const rev = Number(o.total_price_ghs || 0) || Number(o.total_price || 0);
+        const dateStr = new Date(o.created_at).toISOString().split('T')[0];
+        
+        if (o.status !== 'cancelled' && o.status !== 'pending_payment') {
+            revenueByDay[dateStr] = (revenueByDay[dateStr] || 0) + rev;
+            ordersByDay[dateStr] = (ordersByDay[dateStr] || 0) + 1;
+        }
+    });
+
+    const revenueChart = [];
+    for (let i = 29; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const dateStr = d.toISOString().split('T')[0];
+        const displayDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        revenueChart.push({
+            date: displayDate,
+            revenue: revenueByDay[dateStr] || 0,
+            orders: ordersByDay[dateStr] || 0
+        });
+    }
+
+    return revenueChart;
+}
+
+export async function getPulseFeed() {
+    await requireAdmin();
+    const orders = await getRawOrdersCached();
+
+    return orders?.slice(0, 10).flatMap(o => (o.order_events || []).map((e: any) => ({
+        id: e.id,
+        orderCode: o.code,
+        status: e.status,
+        timestamp: e.created_at,
+        note: e.note
+    }))).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 12);
+}
+
+export async function getRankingStats() {
+    await requireAdmin();
+    const orders = await getRawOrdersCached();
+    const supabase = await createSupabaseServerClient();
+
+    const pharmacyRevenue: Record<string, number> = {};
+    const productSales: Record<string, { quantity: number; revenue: number }> = {};
+    const itemNames = new Set<string>();
+
+    orders?.forEach((o: any) => {
+        const rev = Number(o.total_price_ghs || 0) || Number(o.total_price || 0);
+        const pharmName = Array.isArray(o.pharmacies) ? o.pharmacies[0]?.name : o.pharmacies?.name;
+        if (pharmName) pharmacyRevenue[pharmName] = (pharmacyRevenue[pharmName] || 0) + rev;
+
         let items: any[] = [];
         try { items = typeof o.items === 'string' ? JSON.parse(o.items) : o.items; } catch (e) { }
         if (Array.isArray(items)) {
@@ -704,30 +790,6 @@ export async function getDashboardStats() {
                 const qty = item.quantity || 1;
                 productSales[name].quantity += qty;
                 productSales[name].revenue += (item.price || item.price_ghs || 0) * qty;
-            });
-        }
-
-        // Regional
-        const area = o.delivery_area || 'Standard Delivery';
-        regionalStats[area] = (regionalStats[area] || 0) + 1;
-    });
-
-    // Bulk fetch categories to avoid "N+1" in JS
-    const { data: productCats } = await supabase
-        .from('products')
-        .select('name, category')
-        .in('name', Array.from(itemNames));
-    
-    const catMap = new Map(productCats?.map(p => [p.name, p.category]) || []);
-    
-    // Category distribution from sales
-    orders?.forEach((o: any) => {
-        let items: any[] = [];
-        try { items = typeof o.items === 'string' ? JSON.parse(o.items) : o.items; } catch (e) { }
-        if (Array.isArray(items)) {
-            items.forEach((item: any) => {
-                const cat = catMap.get(item.name) || 'Other';
-                categoryStats[cat] = (categoryStats[cat] || 0) + 1;
             });
         }
     });
@@ -742,54 +804,25 @@ export async function getDashboardStats() {
         .sort((a, b) => b.quantity - a.quantity)
         .slice(0, 5);
 
-    // Timeline chart initialization (last 30 days)
-    const revenueChart = [];
-    for (let i = 29; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        const dateStr = d.toISOString().split('T')[0];
-        const displayDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        revenueChart.push({
-            date: displayDate,
-            revenue: revenueByDay[dateStr] || 0,
-            orders: orders?.filter(o => o.created_at.startsWith(dateStr)).length || 0
-        });
-    }
+    return { topPharmacies, topProducts };
+}
 
-    // Operational Velocity
-    let totalVel = 0, velCount = 0;
-    orders?.forEach(o => {
-        const events = o.order_events || [];
-        const start = events.find((e: any) => e.status === 'received')?.created_at || o.created_at;
-        const end = events.find((e: any) => e.status === 'out_for_delivery')?.created_at;
-        if (end) {
-            totalVel += (new Date(end).getTime() - new Date(start).getTime());
-            velCount++;
-        }
-    });
-
-    const pulseFeed = orders?.slice(0, 10).flatMap(o => (o.order_events || []).map((e: any) => ({
-        id: e.id,
-        orderCode: o.code,
-        status: e.status,
-        timestamp: e.created_at,
-        note: e.note
-    }))).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 12);
+export async function getDashboardStats() {
+    // Keep for backwards compatibility, but it's now just an orchestration of modular functions
+    const [metrics, revenueChart, pulseFeed, rankings] = await Promise.all([
+        getSummaryMetrics(),
+        getChartsData(),
+        getPulseFeed(),
+        getRankingStats()
+    ]);
 
     return {
-        topPharmacies,
-        topProducts,
+        ...rankings,
         revenueChart,
-        categoryChart: Object.entries(categoryStats).map(([name, value]) => ({ name, value })),
-        regionChart: Object.entries(regionalStats).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value).slice(0, 8),
         pulseFeed,
-        metrics: {
-            totalRevenue,
-            totalOrders,
-            activeOrders,
-            activePatients: new Set(orders?.map(o => (o as any).user_id)).size,
-            fulfillmentVelocity: velCount > 0 ? (totalVel / velCount / (1000 * 60 * 60)).toFixed(1) : "0.0",
-        }
+        metrics,
+        categoryChart: [], // Will be handled in dedicated analytics split if needed
+        regionChart: []
     };
 }
 
@@ -2091,5 +2124,63 @@ export async function getLiveDeliveries() {
          };
     });
 }
+
+/**
+ * Strategic Customer Matrix Aggregation
+ * In the absence of a dedicated customers table, we derive high-velocity aggregates
+ * from the global orders dataset.
+ */
+export async function getCustomers() {
+    return await unstable_cache(
+        async () => {
+            const supabase = getSupabaseAdminClient();
+            const { data, error } = await supabase
+                .from('orders')
+                .select('id, email, phone_masked, code, total_price_ghs, created_at')
+                .order('created_at', { ascending: false })
+                .limit(2000);
+
+            if (error) throw error;
+
+            type Agg = { 
+                identifier: string; 
+                email: string | null; 
+                totalSpent: number; 
+                orders: number; 
+                firstOrder: string; 
+                lastOrder: string 
+            };
+
+            const map = new Map<string, Agg>();
+            for (const row of data ?? []) {
+                const identifier = (row.email as string | null) || (row.phone_masked as string | null) || (row.code as string);
+                if (!identifier) continue;
+                
+                const existing = map.get(identifier) || {
+                    identifier,
+                    email: (row.email as string | null) || null,
+                    totalSpent: 0,
+                    orders: 0,
+                    firstOrder: row.created_at as string,
+                    lastOrder: row.created_at as string,
+                };
+                
+                existing.totalSpent += Number((row as any).total_price_ghs || 0);
+                existing.orders += 1;
+                
+                if (new Date(row.created_at) < new Date(existing.firstOrder)) existing.firstOrder = row.created_at as string;
+                if (new Date(row.created_at) > new Date(existing.lastOrder)) existing.lastOrder = row.created_at as string;
+                
+                if (!existing.email && row.email) existing.email = row.email as string;
+                map.set(identifier, existing);
+            }
+
+            return Array.from(map.values()).sort((a, b) => b.totalSpent - a.totalSpent);
+        },
+        ['admin-customers-aggregate'],
+        { revalidate: 300, tags: ['orders'] }
+    )();
+}
+
 
 

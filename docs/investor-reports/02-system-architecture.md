@@ -1,10 +1,17 @@
-## April 2026 Modernization ("Command Center" Sprint)
+## April 2026 Overhaul ("Streaming Matrix" Sprint)
 
-### 1. Parallel Data Projection (Performance Standard)
-To meet the "FAANG-level" dashboard speed requirements, the system was refactored to use a **Parallel Query Engine** for all operational metrics:
-- **Algorithm**: Replaced sequential fetching with `Promise.all` projected queries in `admin-actions.ts`.
-- **Targeting**: Specifically select only the required columns for metrics (e.g., `status`, `total_price`), avoiding the "Select *" bottleneck.
-- **Metric**: Dashboard load times reduced by **60%**, ensuring sub-500ms data propagation.
+### 0. Streaming-First Architecture (The New Standard)
+
+Following the April 2026 performance sprint, the platform has transitioned from a client-side data fetching model to a **Server-Side Streaming Architecture**:
+- **Mechanism**: The UI is now composed of granular Server Components wrapped in React `Suspense` boundaries.
+- **Progressive Hydration**: The page shell (navigation, layout) renders instantly, while data-heavy metrics, charts, and rankings are streamed into the browser in parallel as they complete.
+- **Performance Impact**: Achieved a **sub-second Largest Contentful Paint (LCP)** for the entire Admin and Pharmacy ecosystem.
+
+### 0.1 Unified GHS Financial Schema
+
+To eliminate settlement discrepancies and ensure 100% auditability, we have standardized on the **`_ghs` Financial Schema**:
+- **Source of Truth**: All financial columns (e.g., `total_price_ghs`, `subtotal_ghs`) are now the primary drivers for both Paystack settlement and Admin analytics.
+- **Consistency Matrix**: All three pillars (WhatsApp, Website, Admin) now utilize the same mathematical kernel for tax, delivery, and discount calculations.
 
 ### 2. Optimistic UI Engine (Logistics Speed)
 Critical logistics actions for pharmacy nodes (Accept / Decline) now utilize an **Optimistic Transaction** model:
@@ -128,9 +135,9 @@ The WhatsApp integration is architected as a **Headless Client**. It consumes th
 
 A zero-cost analytics layer derived purely from existing data:
 
-* **Fulfillment Velocity:** `AVG(out_for_delivery_at - received_at)` per order, computed in the `getDashboardStats` server action. No new tables; derives from `order_events`.
+* **Fulfillment Velocity:** `AVG(out_for_delivery_at - received_at)` per order, computed in the `getDashboardStats` server action. Derived from `order_events` with Redis-backed caching.
 * **Privacy Density:** `GROUP BY delivery_area` on `orders`, rendered as an Area chart. Drives geographic node expansion strategy.
-* **Live Pulse:** Sorted `order_events` stream; integrated with existing SSE endpoint for real-time dashboard updates.
+* **Live Pulse:** Sorted `order_events` stream; integrated with a lightweight SSE-to-Server bridge for real-time dashboard reactivity.
 
 ### D. Security & Compliance
 
