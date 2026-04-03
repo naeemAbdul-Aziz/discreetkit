@@ -130,7 +130,7 @@ const orderSchema = z.object({
   cartItems: z.string().min(1, 'Cart cannot be empty.'),
   deliveryArea: z.string().min(3, 'Delivery area is required.'),
   deliveryAddressNote: z.string().max(1000, "Note is too long.").optional(),
-  phone_masked: z.string().regex(/^0\d{9}$/, 'Phone number must be exactly 10 digits and start with 0 (e.g., 0201234567).'),
+  phone_masked: z.string().min(10, 'A valid phone number is required (at least 10 digits).'),
   otherDeliveryArea: z.string().optional(),
   subtotal_ghs: z.string(),
   student_discount_ghs: z.string(),
@@ -161,9 +161,31 @@ import { generateTrackingCode, generatePartnerCode, type Order, DELIVERY_FEES, d
  * @returns An object containing success status, a message, any validation errors, and the Paystack authorization URL.
  */
 export async function createOrderAction(prevState: any, formData: FormData) {
-  const validatedFields = orderSchema.safeParse(
-    Object.fromEntries(formData.entries())
-  );
+  // Extract raw form data first for manual cleaning
+  const rawData = Object.fromEntries(formData.entries());
+  
+  // 1. Sanitize Phone Number: Handle various formats (+233, spaces, dashes)
+  if (typeof rawData.phone_masked === 'string') {
+    let cleanPhone = rawData.phone_masked.replace(/\D/g, ''); // Strip all non-digits
+    
+    // Convert 233... to 0... for consistent internal use
+    if (cleanPhone.startsWith('233') && cleanPhone.length === 12) {
+      cleanPhone = '0' + cleanPhone.substring(3);
+    }
+    
+    // Ensure it's exactly 10 digits starting with 0 if possible
+    if (cleanPhone.length === 10 && cleanPhone.startsWith('0')) {
+       rawData.phone_masked = cleanPhone;
+    } else if (cleanPhone.length === 9 && !cleanPhone.startsWith('0')) {
+       // Support 9 digits without leading 0 as fallback (e.g. 201234567)
+       rawData.phone_masked = '0' + cleanPhone;
+    } else {
+       // Let Zod handle the error for other lengths
+       rawData.phone_masked = cleanPhone;
+    }
+  }
+
+  const validatedFields = orderSchema.safeParse(rawData);
 
   if (!validatedFields.success) {
     return {
