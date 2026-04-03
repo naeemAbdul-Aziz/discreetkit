@@ -90,12 +90,14 @@ const titleCase = (s: string) =>
 
 export function OrdersTable({ 
   initialOrders, 
-  totalOrders = initialOrders.length, 
-  page: currentPage = 1 
+  totalOrders = 0, 
+  page = 1,
+  limit = 20
 }: { 
   initialOrders: any[], 
   totalOrders?: number, 
-  page?: number 
+  page?: number,
+  limit?: number
 }) {
   const router = useRouter();
   const { toast } = useToast();
@@ -149,9 +151,7 @@ export function OrdersTable({
     totalCount: number;
   } | null>(null);
 
-  // Pagination state is now managed by server-side search params, 
-  // but we keep local pageSize for now if needed.
-  const [pageSize, setPageSize] = useState(50);
+  // Pagination logic consolidated below
 
   // Filter logic
   const filteredOrders = useMemo(() => {
@@ -164,7 +164,7 @@ export function OrdersTable({
     });
   }, [orders, searchTerm, filterStatus]);
 
-  const totalPages = Math.ceil(totalOrders / pageSize);
+  const totalPages = Math.ceil(totalOrders / limit);
   // We use initialOrders directly as it is already filtered/sliced by the server
   const paginatedOrders = filteredOrders;
 
@@ -172,6 +172,16 @@ export function OrdersTable({
     startTransition(() => {
         const params = new URLSearchParams(window.location.search);
         params.set("page", newPage.toString());
+        params.set("limit", limit.toString());
+        router.push(`/admin/orders?${params.toString()}`);
+    });
+  };
+
+  const handleLimitChange = (newLimit: number) => {
+    startTransition(() => {
+        const params = new URLSearchParams(window.location.search);
+        params.set("page", "1");
+        params.set("limit", newLimit.toString());
         router.push(`/admin/orders?${params.toString()}`);
     });
   };
@@ -1074,45 +1084,44 @@ export function OrdersTable({
         </Table>
       </div>
 
-      {/* Pagination Controls */}
-      {filteredOrders.length > pageSize && (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-2 gap-2">
-          {/* ... existing pagination ... */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm">Rows per page:</span>
+      {totalOrders > limit && (
+        <div className="flex flex-col sm:flex-row items-center justify-between mt-6 px-4 py-4 bg-slate-50/50 rounded-2xl border border-slate-100 gap-4">
+          <div className="flex items-center gap-3">
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Rows per intel cycle</span>
             <select
-              className="border rounded px-2 py-1 text-sm"
-              value={pageSize}
-              onChange={(e) => {
-                setPageSize(Number(e.target.value));
-                setPage(1);
-              }}
-              title="Rows per page"
+              className="bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-700 shadow-sm focus:ring-2 focus:ring-brand-indigo/20 outline-none transition-all"
+              value={limit}
+              onChange={(e) => handleLimitChange(Number(e.target.value))}
             >
               {[10, 20, 50, 100].map((size) => (
                 <option key={size} value={size}>
-                  {size}
+                  {size} ROWS
                 </option>
               ))}
             </select>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Button
               size="sm"
-              variant="ghost"
-              disabled={page === 1}
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              variant="outline"
+              className="h-9 w-9 p-0 rounded-xl border-slate-200 hover:bg-white hover:text-brand-indigo font-bold shadow-sm disabled:opacity-30"
+              disabled={page <= 1}
+              onClick={() => handlePageChange(page - 1)}
             >
               &lt;
             </Button>
-            <span className="text-sm">
-              Page {page} of {totalPages}
-            </span>
+            <div className="flex items-center px-4 h-9 bg-white border border-slate-200 rounded-xl shadow-sm">
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mr-2">Vantage</span>
+                <span className="text-xs font-black text-slate-900">{page}</span>
+                <span className="text-[10px] font-black text-slate-300 mx-2">/</span>
+                <span className="text-xs font-black text-slate-500">{totalPages}</span>
+            </div>
             <Button
               size="sm"
-              variant="ghost"
-              disabled={page === totalPages}
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              variant="outline"
+              className="h-9 w-9 p-0 rounded-xl border-slate-200 hover:bg-white hover:text-brand-indigo font-bold shadow-sm disabled:opacity-30"
+              disabled={page >= totalPages}
+              onClick={() => handlePageChange(page + 1)}
             >
               &gt;
             </Button>

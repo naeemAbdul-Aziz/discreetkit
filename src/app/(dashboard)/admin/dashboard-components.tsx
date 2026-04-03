@@ -1,3 +1,6 @@
+import { 
+    getSummaryMetrics, 
+    getChartsData, 
     getRankingStats, 
     getPulseFeed,
     getOrders
@@ -16,17 +19,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import dynamic from 'next/dynamic';
-import type { DashboardChartsClientProps } from "./dashboard-charts-client";
-
-// Explicitly type the dynamic import to fix IntrinsicAttributes error
-const DashboardChartsClient = dynamic<DashboardChartsClientProps>(
-    () => import("./dashboard-charts-client").then(mod => mod.default), 
-    { 
-        ssr: false,
-        loading: () => <div className="h-[300px] w-full bg-slate-50 animate-pulse rounded-xl" />
-    }
-);
+import { DynamicCharts } from "./dynamic-charts";
 
 export async function MetricsGrid() {
     const metrics = await getSummaryMetrics();
@@ -88,7 +81,7 @@ export async function RevenueTimeline() {
                 <CardTitle className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400">Revenue Timeline</CardTitle>
             </CardHeader>
             <CardContent className="p-6 pt-0">
-                <DashboardChartsClient data={chartData} />
+                <DynamicCharts data={chartData} />
             </CardContent>
         </Card>
     );
