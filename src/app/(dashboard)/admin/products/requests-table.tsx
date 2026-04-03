@@ -146,6 +146,7 @@ export function RequestsTable({
                             ? "destructive"
                             : "pending"
                       }
+                      className="font-black uppercase text-[10px] tracking-widest px-2.5 py-1"
                     >
                       {req.status}
                     </Badge>

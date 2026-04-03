@@ -222,8 +222,11 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
     // New assignment - needs accept/decline
     if (status === "received" && ackStatus === "pending") {
       return (
-        <Badge variant="info" className="gap-1.5 animate-breathing shadow-[0_4px_12px_rgba(14,165,233,0.3),inset_0_0_8px_rgba(14,165,233,0.2)] bg-sky-50 text-sky-700 border-sky-200/50 font-black uppercase text-[9px] tracking-widest px-2.5 py-1">
-          <div className="h-1.5 w-1.5 rounded-full bg-sky-500 animate-pulse" />
+        <Badge variant="info" className="gap-1.5 bg-sky-50 text-sky-700 border-sky-200 font-black uppercase text-[9px] tracking-widest px-2.5 py-1">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-sky-500"></span>
+          </span>
           Queueing: Inbound
         </Badge>
       );
@@ -232,7 +235,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
     // Just accepted - preparing order
     if (status === "processing" && ackStatus === "accepted") {
       return (
-        <Badge variant="success" className="gap-1.5 shadow-[inset_0_0_12px_rgba(99,102,241,0.2)] bg-indigo-50 text-brand-indigo border-indigo-100 font-black uppercase text-[9px] tracking-widest px-2.5 py-1">
+        <Badge variant="secondary" className="gap-1.5 bg-indigo-50 text-indigo-700 border-indigo-200 font-black uppercase text-[9px] tracking-widest px-2.5 py-1">
           <Package className="h-3.5 w-3.5" />
           Internal Prep
         </Badge>
@@ -248,13 +251,33 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
         className?: string;
       }
     > = {
-      received: { variant: "info", label: "New Inbound", className: "animate-breathing shadow-[0_4px_12px_rgba(14,165,233,0.2),inset_0_0_8px_rgba(14,165,233,0.3)] bg-sky-50 text-sky-700 border-sky-200/50 font-black uppercase text-[9px] tracking-widest px-2.5 py-1" },
-      processing: { variant: "secondary", label: "Internal Prep", className: "shadow-[inset_0_0_12px_rgba(99,102,241,0.2)] bg-indigo-50 text-brand-indigo border-indigo-100 font-black uppercase text-[9px] tracking-widest px-2.5 py-1" },
-      out_for_delivery: { variant: "warning", label: "Outbound Ops", className: "animate-breathing shadow-[0_4px_12px_rgba(245,158,11,0.2),inset_0_0_8px_rgba(245,158,11,0.3)] bg-amber-50 text-amber-700 border-amber-200/50 font-black uppercase text-[9px] tracking-widest px-2.5 py-1" },
-      completed: { variant: "success", label: "Dispatch Done", className: "shadow-[inset_0_0_12px_rgba(34,197,94,0.3)] bg-emerald-50 text-emerald-700 border-emerald-100 font-black uppercase text-[9px] tracking-widest px-2.5 py-1" },
-      cancelled: { variant: "destructive", label: "Aborted", className: "bg-rose-50 text-rose-600 border-rose-100 font-black uppercase text-[9px] tracking-widest px-2.5 py-1" },
+      received: { 
+        variant: "info", 
+        label: "New Inbound", 
+        className: "bg-sky-50 text-sky-700 border-sky-200 font-black uppercase text-[9px] tracking-widest px-2.5 py-1" 
+      },
+      processing: { 
+        variant: "secondary", 
+        label: "Internal Prep", 
+        className: "bg-indigo-50 text-indigo-700 border-indigo-200 font-black uppercase text-[9px] tracking-widest px-2.5 py-1" 
+      },
+      out_for_delivery: { 
+        variant: "warning", 
+        label: "Outbound Ops", 
+        className: "bg-amber-50 text-amber-700 border-amber-200 font-black uppercase text-[9px] tracking-widest px-2.5 py-1" 
+      },
+      completed: { 
+        variant: "success", 
+        label: "Dispatch Done", 
+        className: "bg-emerald-50 text-emerald-700 border-emerald-200 font-black uppercase text-[9px] tracking-widest px-2.5 py-1" 
+      },
+      cancelled: { 
+        variant: "destructive", 
+        label: "Aborted", 
+        className: "bg-rose-50 text-rose-700 border-rose-200 font-black uppercase text-[9px] tracking-widest px-2.5 py-1" 
+      },
     };
-    const config = variants[status] || { variant: "secondary", label: status, className: "font-black uppercase text-[9px] tracking-widest" };
+    const config = variants[status] || { variant: "secondary", label: status, className: "font-black uppercase text-[9px] tracking-widest border-slate-200 text-slate-500" };
     return <Badge variant={config.variant} className={config.className}>{config.label}</Badge>;
   };
 

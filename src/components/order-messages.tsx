@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { MessageSquare, Send, Clock } from "lucide-react"
+import { MessageSquare, Send, Clock, Loader2, ShieldAlert } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { getSupabaseClient } from "@/lib/supabase"
 import { cn } from "@/lib/utils"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
 
 interface Message {
   id: number
@@ -29,6 +31,7 @@ export function OrderMessages({ orderId, userRole }: OrderMessagesProps) {
   const [loading, setLoading] = useState(false)
   const [sending, setSending] = useState(false)
   const [isConnected, setIsConnected] = useState(false)
+  const [isInternal, setIsInternal] = useState(false)
   const { toast } = useToast()
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -54,6 +57,7 @@ export function OrderMessages({ orderId, userRole }: OrderMessagesProps) {
   useEffect(() => {
     loadMessages()
     const supabase = getSupabaseClient()
+    console.log(`[Chat] Subscribing to order_messages:${orderId} as ${userRole}`);
     const channel = supabase
       .channel(`order_messages:${orderId}`)
       .on(
@@ -65,6 +69,7 @@ export function OrderMessages({ orderId, userRole }: OrderMessagesProps) {
           filter: `order_id=eq.${orderId}`
         },
         (payload: any) => {
+          console.log('[Chat] New message received via Realtime:', payload);
           const newMsg = payload.new as Message
           if (userRole === 'pharmacy' && newMsg.is_internal) return
           setMessages(prev => {
@@ -75,10 +80,12 @@ export function OrderMessages({ orderId, userRole }: OrderMessagesProps) {
         }
       )
       .subscribe((status: any) => {
+        console.log(`[Chat] Subscription status for order ${orderId}:`, status);
         setIsConnected(status === 'SUBSCRIBED')
       })
 
     return () => {
+      console.log(`[Chat] Unsubscribing from order ${orderId}`);
       supabase.removeChannel(channel)
     }
   }, [orderId, userRole])
@@ -91,11 +98,16 @@ export function OrderMessages({ orderId, userRole }: OrderMessagesProps) {
     try {
       setLoading(true)
       const response = await fetch(`/api/orders/${orderId}/messages`)
-      if (!response.ok) throw new Error('Failed to load messages')
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        console.error('[Chat] Failed to load messages:', response.status, errData);
+        throw new Error('Failed to load messages');
+      }
       const data = await response.json()
+      console.log(`[Chat] Loaded ${data.messages?.length || 0} messages for order ${orderId}`);
       setMessages(data.messages || [])
     } catch (error) {
-      console.error('Error loading messages:', error)
+      console.error('[Chat] Error loading messages:', error)
     } finally {
       setLoading(false)
     }
@@ -110,7 +122,10 @@ export function OrderMessages({ orderId, userRole }: OrderMessagesProps) {
       const response = await fetch(`/api/orders/${orderId}/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: finalMsg })
+        body: JSON.stringify({ 
+          message: finalMsg,
+          is_internal: userRole === 'admin' ? isInternal : false
+        })
       })
 
       if (!response.ok) throw new Error('Failed to send message')
@@ -223,10 +238,16 @@ export function OrderMessages({ orderId, userRole }: OrderMessagesProps) {
                   className={cn(
                     "px-4 py-3 rounded-2xl max-w-[85%] text-sm font-medium shadow-sm transition-all",
                     isOwnMessage
-                      ? 'bg-brand-indigo text-white rounded-tr-none shadow-brand-indigo/10'
-                      : 'bg-white border border-slate-100 text-slate-700 rounded-tl-none hover:border-slate-200'
+                      ? (msg.is_internal ? 'bg-amber-100 text-amber-900 border border-amber-200 rounded-tr-none' : 'bg-brand-indigo text-white rounded-tr-none shadow-brand-indigo/10')
+                      : (msg.is_internal ? 'bg-amber-50 text-amber-900 border border-amber-100 rounded-tl-none' : 'bg-white border border-slate-100 text-slate-700 rounded-tl-none hover:border-slate-200')
                   )}
                 >
+                  {msg.is_internal && (
+                    <div className="flex items-center gap-1 mb-1 opacity-60">
+                      <ShieldAlert className="h-3 w-3" />
+                      <span className="text-[8px] font-black uppercase tracking-widest">Internal Note</span>
+                    </div>
+                  )}
                   <p className="leading-relaxed whitespace-pre-wrap">{msg.message}</p>
                 </div>
               </div>
@@ -256,10 +277,26 @@ export function OrderMessages({ orderId, userRole }: OrderMessagesProps) {
 
       {/* Primary Input Container */}
       <div className="relative group mt-4">
+         {userRole === 'admin' && (
+           <div className="flex items-center gap-2 mb-2 px-2">
+             <Switch 
+               id="internal-mode" 
+               checked={isInternal} 
+               onCheckedChange={setIsInternal}
+               className="data-[state=checked]:bg-amber-500"
+             />
+             <Label htmlFor="internal-mode" className="text-[10px] font-black uppercase tracking-widest text-slate-400 cursor-pointer flex items-center gap-1.5">
+               Internal Only <ShieldAlert className={cn("h-3 w-3 transition-colors", isInternal ? "text-amber-500" : "text-slate-300")} />
+             </Label>
+           </div>
+         )}
          <div className="absolute -inset-1 bg-gradient-to-r from-brand-indigo/10 to-brand-teal/10 rounded-[2rem] blur opacity-0 group-focus-within:opacity-100 transition duration-500" />
-         <div className="relative flex items-end gap-2 bg-white/80 backdrop-blur-md p-3 rounded-[1.5rem] border border-slate-200 shadow-sm focus-within:border-brand-indigo/50 focus-within:bg-white transition-all">
+         <div className={cn(
+           "relative flex items-end gap-2 p-3 rounded-[1.5rem] border transition-all",
+           isInternal ? "bg-amber-50/80 border-amber-200" : "bg-white/80 backdrop-blur-md border-slate-200 shadow-sm focus-within:border-brand-indigo/50 focus-within:bg-white"
+         )}>
             <Textarea
-              placeholder={`Message to ${userRole === 'admin' ? 'Pharmacy' : 'Admin Support'}...`}
+              placeholder={isInternal ? "Type internal note (admin only)..." : `Message to ${userRole === 'admin' ? 'Pharmacy' : 'Admin Support'}...`}
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               onKeyDown={(e) => {
@@ -275,7 +312,10 @@ export function OrderMessages({ orderId, userRole }: OrderMessagesProps) {
               onClick={() => sendMessage()}
               disabled={!newMessage.trim() || sending}
               size="icon"
-              className="h-11 w-11 rounded-xl bg-brand-indigo hover:bg-brand-indigo-dark shrink-0 shadow-lg shadow-brand-indigo/20 transition-all active:scale-95"
+              className={cn(
+                "h-11 w-11 rounded-xl shrink-0 shadow-lg transition-all active:scale-95",
+                isInternal ? "bg-amber-500 hover:bg-amber-600 shadow-amber-500/20" : "bg-brand-indigo hover:bg-brand-indigo-dark shadow-brand-indigo/20"
+              )}
             >
               {sending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5 ml-0.5" />}
             </Button>
@@ -284,20 +324,3 @@ export function OrderMessages({ orderId, userRole }: OrderMessagesProps) {
     </Card>
   )
 }
-
-const Loader2 = ({ className }: { className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={cn("animate-spin", className)}
-  >
-    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-  </svg>
-)
