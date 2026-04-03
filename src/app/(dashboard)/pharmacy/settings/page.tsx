@@ -20,7 +20,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const NAV_ITEMS = [
     { id: "profile", label: "Store Profile", icon: Store },
-    { id: "operational", label: "Dispatch & Matrix", icon: MapPin },
+    { id: "operational", label: "Dispatch & Zones", icon: MapPin },
     { id: "notifications", label: "Notifications", icon: Bell },
     { id: "security", label: "Security", icon: ShieldCheck },
 ];

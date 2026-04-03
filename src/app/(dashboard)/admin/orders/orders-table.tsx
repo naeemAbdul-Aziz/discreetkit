@@ -77,8 +77,17 @@ import {
   assignPharmacy,
   bulkUpdateOrderStatus,
   searchPharmacies,
+  flagOrderIssue,
 } from "@/lib/admin-actions";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { getSupabaseClient } from "@/lib/supabase";
+import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import {
   dashboardTable,
@@ -147,6 +156,28 @@ export function OrdersTable({
     newStatus: string;
     pharmacyName: string;
   } | null>(null);
+
+  // New Operational States
+  const [auditSheetOpen, setAuditSheetOpen] = useState(false);
+  const [activeAuditOrder, setActiveAuditOrder] = useState<any>(null);
+  const [flagDialogOpen, setFlagDialogOpen] = useState(false);
+  const [activeFlagOrder, setActiveFlagOrder] = useState<any>(null);
+  const [flagNote, setFlagNote] = useState("");
+  const [isSubmittingFlag, setIsSubmittingFlag] = useState(false);
+
+  const handleFlagIssue = async () => {
+    if (!activeFlagOrder || !flagNote.trim()) return;
+    setIsSubmittingFlag(true);
+    const res = await flagOrderIssue(activeFlagOrder.id, flagNote);
+    setIsSubmittingFlag(false);
+    if (res.success) {
+      toast({ title: "Issue Flagged", description: "Successfully logged the operational issue." });
+      setFlagDialogOpen(false);
+      setFlagNote("");
+    } else {
+      toast({ variant: "destructive", title: "Action Failed", description: res.error });
+    }
+  };
 
   const [bulkOverridePrompt, setBulkOverridePrompt] = useState<{
     status: string;
@@ -904,7 +935,7 @@ export function OrdersTable({
                               <Button 
                                 variant="ghost" 
                                 size="sm" 
-                                className="h-7 px-2 text-[10px] uppercase font-bold tracking-wider text-brand-indigo bg-brand-indigo/5 border border-brand-indigo/10 hover:bg-brand-indigo/10 rounded-full"
+                                className="h-7 px-2 text-[10px] uppercase font-bold tracking-wider text-indigo-600 bg-indigo-50 border border-indigo-100 hover:bg-indigo-100/50 rounded-full"
                               >
                                 View Note
                               </Button>
@@ -974,7 +1005,7 @@ export function OrdersTable({
                             <Popover>
                               <PopoverTrigger asChild>
                                 <button
-                                  className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-[10px] font-black border border-amber-100 hover:bg-amber-100 transition-all flex items-center gap-1.5"
+                                  className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-[10px] font-bold border border-amber-100 hover:bg-amber-100 transition-all flex items-center gap-1.5"
                                   onClick={(e) => e.stopPropagation()}
                                 >
                                   <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
@@ -987,20 +1018,20 @@ export function OrdersTable({
                                     <Truck className="h-6 w-6" />
                                   </div>
                                   <div>
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-amber-500">Assigned Rider</p>
-                                    <p className="text-sm font-black text-slate-900">{order.courier_name}</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-amber-500">Assigned Rider</p>
+                                    <p className="text-sm font-bold text-slate-900">{order.courier_name}</p>
                                   </div>
                                 </div>
                                 <div className="p-5 space-y-4">
                                   <div className="flex items-center justify-between">
                                     <div className="space-y-0.5">
-                                      <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Contact Number</p>
+                                      <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Contact Number</p>
                                       <p className="text-sm font-bold text-slate-700 tabular-nums">{order.courier_phone}</p>
                                     </div>
                                     <Button
                                       variant="outline"
                                       size="icon"
-                                      className="h-9 w-9 rounded-xl border-slate-100 bg-slate-50 hover:bg-white transition-all text-brand-indigo"
+                                      className="h-9 w-9 rounded-xl border-slate-100 bg-slate-50 hover:bg-white transition-all text-indigo-600"
                                       onClick={() => {
                                         navigator.clipboard.writeText(order.courier_phone || "");
                                         toast({ title: "Copied!", description: "Rider contact number saved to clipboard." });
@@ -1011,7 +1042,7 @@ export function OrdersTable({
                                   </div>
                                   <Button
                                     asChild
-                                    className="w-full h-11 rounded-xl bg-brand-indigo hover:bg-brand-indigo/90 font-black text-xs uppercase tracking-widest gap-2 shadow-lg shadow-brand-indigo/20"
+                                    className="w-full h-11 rounded-xl bg-indigo-600 hover:bg-brand-indigo/90 font-bold text-xs uppercase tracking-widest gap-2 shadow-lg shadow-brand-indigo/20"
                                   >
                                     <a href={`tel:${order.courier_phone}`}>
                                       Call Dispatcher
@@ -1047,7 +1078,7 @@ export function OrdersTable({
                         </div>
                       </TableCell>
                       <TableCell className={cn(ordersTableCols.totalCell, "font-bold tabular-nums text-slate-700")}>
-                        GHS {Number(order.total_price || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        GHS {Number(order.total_price_ghs || order.total_price || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </TableCell>
                     </TableRow>
                     
@@ -1068,12 +1099,12 @@ export function OrdersTable({
                                 {/* Col 1: Customer & Logistics */}
                                 <div className="space-y-6">
                                   <div className="space-y-4">
-                                    <div className="flex items-center gap-2 text-brand-indigo">
+                                    <div className="flex items-center gap-2 text-indigo-600">
                                       <User className="h-3.5 w-3.5" />
-                                      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60">Customer Details</h4>
+                                      <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60">Customer Details</h4>
                                     </div>
                                     <div className="pl-5 border-l border-slate-100 space-y-1">
-                                      <p className="text-base font-extrabold text-slate-900 tracking-tight">{order.email || "Anonymous Patient"}</p>
+                                      <p className="text-base font-bold text-slate-900 tracking-tight">{order.email || "Anonymous Patient"}</p>
                                       <div className="flex items-center gap-3">
                                         <p className="text-xs font-bold text-slate-400 tabular-nums">Order ID: {order.id}</p>
                                         <span className="text-slate-200">|</span>
@@ -1083,14 +1114,14 @@ export function OrdersTable({
                                   </div>
                                   
                                   <div className="space-y-4">
-                                    <div className="flex items-center gap-2 text-brand-indigo">
+                                    <div className="flex items-center gap-2 text-indigo-600">
                                       <MapPin className="h-3.5 w-3.5" />
-                                      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60">Delivery Address</h4>
+                                      <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60">Delivery Address</h4>
                                     </div>
                                     <div className="pl-5 border-l border-slate-100 space-y-3">
                                       <p className="text-sm font-bold text-slate-700">{order.delivery_area || "Standard Zone"}</p>
                                       <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-100/50 relative group/note">
-                                        <div className="absolute -top-2 left-3 px-2 bg-white border border-slate-100 rounded-md text-[8px] font-black uppercase tracking-tighter text-slate-400">Recipient Note</div>
+                                        <div className="absolute -top-2 left-3 px-2 bg-white border border-slate-100 rounded-md text-[8px] font-bold uppercase tracking-tighter text-slate-400">Recipient Note</div>
                                         <p className="text-[11px] font-medium text-slate-500 italic leading-relaxed">
                                           &quot;{order.delivery_address_note || "No specific delivery notes provided."}&quot;
                                         </p>
@@ -1102,54 +1133,54 @@ export function OrdersTable({
                                 {/* Col 2: Inventory Summary */}
                                 <div className="space-y-6">
                                   <div className="space-y-4">
-                                    <div className="flex items-center gap-2 text-brand-indigo">
+                                    <div className="flex items-center gap-2 text-indigo-600">
                                       <Package className="h-3.5 w-3.5" />
-                                      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60">Order Items</h4>
+                                      <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60">Order Items</h4>
                                     </div>
-                                    <div className="pl-5 border-l border-slate-100 space-y-2">
-                                      {(() => {
-                                        const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
-                                        const itemsArray = Array.isArray(items) ? items : [];
-                                        return (
-                                          <div className="space-y-2">
-                                            {itemsArray.slice(0, 3).map((item: any, i: number) => (
-                                              <div key={i} className="flex justify-between items-center text-[11px] font-bold text-slate-600">
-                                                <span className="truncate max-w-[120px]">{item.name}</span>
-                                                <span className="text-slate-400 tabular-nums">x{item.quantity}</span>
-                                              </div>
-                                            ))}
-                                            {itemsArray.length > 3 && (
-                                              <p className="text-[9px] font-black text-brand-indigo uppercase tracking-widest pt-1">+{itemsArray.length - 3} additional items</p>
-                                            )}
-                                          </div>
-                                        );
-                                      })()}
-                                    </div>
+                                  <div className="pl-5 border-l border-slate-100 space-y-2">
+                                    {(() => {
+                                      const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
+                                      const itemsArray = Array.isArray(items) ? items : [];
+                                      return (
+                                        <div className="space-y-2">
+                                          {itemsArray.slice(0, 3).map((item: any, i: number) => (
+                                            <div key={i} className="flex justify-between items-center text-[11px] font-bold text-slate-600">
+                                              <span className="truncate max-w-[120px]">{item.name}</span>
+                                              <span className="text-slate-400 tabular-nums">x{item.quantity}</span>
+                                            </div>
+                                          ))}
+                                          {itemsArray.length > 3 && (
+                                            <p className="text-[9px] font-bold text-indigo-600 uppercase tracking-widest pt-1">+{itemsArray.length - 3} additional items</p>
+                                          )}
+                                        </div>
+                                      );
+                                    })()}
                                   </div>
-                                  
-                                  <div className="space-y-4">
-                                    <div className="flex items-center gap-2 text-brand-indigo">
-                                      <CreditCard className="h-3.5 w-3.5" />
-                                      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60">Payment Summary</h4>
-                                    </div>
-                                    <div className="pl-5 border-l border-slate-100 space-y-1">
-                                      <p className="text-sm font-black text-slate-900 tracking-tight">₵{Number(order.total_price || 0).toFixed(2)}</p>
-                                      <p className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Cash on Delivery</p>
-                                    </div>
+                                </div>
+                                
+                                <div className="space-y-4">
+                                  <div className="flex items-center gap-2 text-indigo-600">
+                                    <CreditCard className="h-3.5 w-3.5" />
+                                    <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60">Payment Summary</h4>
                                   </div>
+                                  <div className="pl-5 border-l border-slate-100 space-y-1">
+                                    <p className="text-sm font-bold text-slate-900 tracking-tight">₵{Number(order.total_price_ghs || order.total_price || 0).toFixed(2)}</p>
+                                    <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest">Cash on Delivery</p>
+                                  </div>
+                                </div>
                                 </div>
 
                                 {/* Col 3: Operational Controls */}
-                                <div className="space-y-6 bg-slate-50/50 p-6 rounded-[2rem] border border-slate-100/50">
+                                <div className="space-y-6 bg-slate-50/40 p-6 rounded-[2rem] border border-slate-100/50">
                                   <div className="space-y-4">
-                                    <div className="flex items-center gap-2 text-brand-indigo">
+                                    <div className="flex items-center gap-2 text-indigo-600">
                                       <GanttChartSquare className="h-3.5 w-3.5" />
-                                      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60">Assigned Pharmacy</h4>
+                                      <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60">Assigned Pharmacy</h4>
                                     </div>
                                     <div className="space-y-3">
                                       <div className="flex items-center justify-between">
-                                        <p className="text-xs font-extrabold text-slate-900">{order.pharmacies?.name || "Unassigned"}</p>
-                                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-brand-indigo hover:bg-brand-indigo/10" onClick={(e) => {
+                                        <p className="text-xs font-bold text-slate-900">{order.pharmacies?.name || "No Partner Assigned"}</p>
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-indigo-600 hover:bg-brand-indigo/10" onClick={(e) => {
                                           e.stopPropagation();
                                           setActiveMessageOrderId(order.id);
                                           setMessageDialogOpen(true);
@@ -1158,14 +1189,35 @@ export function OrdersTable({
                                         </Button>
                                       </div>
                                       <div className="grid grid-cols-2 gap-2">
-                                        <Button size="sm" className="h-9 rounded-xl bg-brand-indigo hover:bg-brand-indigo/90 font-black text-[9px] uppercase tracking-widest shadow-lg shadow-brand-indigo/20">Audit Trail</Button>
-                                        <Button variant="outline" size="sm" className="h-9 rounded-xl border-slate-200 bg-white hover:bg-slate-50 font-black text-[9px] uppercase tracking-widest">Flag Issue</Button>
+                                        <Button 
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setActiveAuditOrder(order);
+                                            setAuditSheetOpen(true);
+                                          }}
+                                          size="sm" 
+                                          className="h-9 rounded-xl bg-indigo-600 hover:bg-brand-indigo/90 font-bold text-[9px] uppercase tracking-widest shadow-lg shadow-brand-indigo/20"
+                                        >
+                                          Audit Trail
+                                        </Button>
+                                        <Button 
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setActiveFlagOrder(order);
+                                            setFlagDialogOpen(true);
+                                          }}
+                                          variant="outline" 
+                                          size="sm" 
+                                          className="h-9 rounded-xl border-slate-200 bg-white hover:bg-slate-50 font-bold text-[9px] uppercase tracking-widest text-slate-600"
+                                        >
+                                          Flag Issue
+                                        </Button>
                                       </div>
                                     </div>
                                   </div>
                                   
                                   <div className="pt-4 border-t border-slate-200/50">
-                                    <Button asChild variant="link" className="px-0 h-auto text-brand-indigo text-[10px] font-black uppercase tracking-[0.2em] hover:no-underline hover:opacity-70 gap-2 group/link">
+                                    <Button asChild variant="link" className="px-0 h-auto text-indigo-600 text-[10px] font-bold uppercase tracking-[0.2em] hover:no-underline hover:opacity-70 gap-2 group/link">
                                       <a href={`/admin/orders/${order.id}`}>
                                         View Full Order Details
                                         <ChevronRight className="h-3 w-3 transition-transform group-hover/link:translate-x-1" />
@@ -1259,6 +1311,90 @@ export function OrdersTable({
           </div>
         </div>
       )}
+      {/* Audit Trail Sheet */}
+      <Sheet open={auditSheetOpen} onOpenChange={setAuditSheetOpen}>
+        <SheetContent className="w-[400px] sm:w-[540px]">
+          <SheetHeader className="pb-6 border-b">
+            <SheetTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
+              <Clock className="h-4 w-4 text-indigo-600" />
+              Order Audit Trail
+            </SheetTitle>
+            <SheetDescription className="text-xs font-medium">
+              Complete operational history for Order #{activeAuditOrder?.id}
+            </SheetDescription>
+          </SheetHeader>
+          <div className="mt-8 space-y-6">
+            {activeAuditOrder?.order_events && activeAuditOrder.order_events.length > 0 ? (
+              <div className="relative pl-6 space-y-8 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-100">
+                {activeAuditOrder.order_events
+                  .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                  .map((event: any, i: number) => (
+                  <div key={i} className="relative group">
+                    <div className={cn(
+                      "absolute -left-6 h-4 w-4 rounded-full border-2 border-white shadow-sm ring-4 ring-white z-10",
+                      event.status.includes('flagged') ? "bg-rose-500" : "bg-emerald-500"
+                    )} />
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-3">
+                        <span className="text-[11px] font-bold text-slate-900 uppercase tracking-tight">
+                          {event.status.replace(/_/g, ' ')}
+                        </span>
+                        <span className="text-[10px] font-medium text-slate-400">
+                          {new Date(event.created_at).toLocaleString()}
+                        </span>
+                      </div>
+                      {event.note && (
+                        <p className="text-xs text-slate-500 font-medium leading-relaxed italic">
+                          &quot;{event.note}&quot;
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-48 text-slate-400 gap-2">
+                <Clock className="h-8 w-8 opacity-20" />
+                <p className="text-xs font-bold uppercase tracking-widest">No history recorded</p>
+              </div>
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Flag Issue Dialog */}
+      <Dialog open={flagDialogOpen} onOpenChange={setFlagDialogOpen}>
+        <DialogContent className="max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle className="text-sm font-bold uppercase tracking-widest">Flag Operational Issue</DialogTitle>
+            <DialogDescription className="text-xs font-medium">
+              Record an issue or discrepancy regarding Order #{activeFlagOrder?.id}.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <div className="space-y-2">
+              <Label className="text-[10px] font-bold uppercase text-slate-400">Reason / Note</Label>
+              <Textarea 
+                placeholder="e.g. Rider delayed, items missing, pharmacy uncontactable..." 
+                className="min-h-[100px] text-xs font-medium resize-none"
+                value={flagNote}
+                onChange={(e) => setFlagNote(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" className="text-xs font-bold" onClick={() => setFlagDialogOpen(false)}>Cancel</Button>
+            <Button 
+              className="bg-rose-600 hover:bg-rose-700 text-xs font-bold gap-2" 
+              onClick={handleFlagIssue}
+              disabled={isSubmittingFlag || !flagNote.trim()}
+            >
+              {isSubmittingFlag && <Loader2 className="h-3 w-3 animate-spin" />}
+              Submit Flag
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

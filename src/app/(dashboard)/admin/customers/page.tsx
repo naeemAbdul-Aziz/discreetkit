@@ -16,7 +16,7 @@ export default async function AdminCustomersPage() {
     <div className="space-y-8 animate-in fade-in duration-700">
       <div className="flex flex-col gap-1">
         <h2 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 uppercase tracking-widest">
-            Customer Matrix
+            Customer Directory
         </h2>
         <p className="text-[10px] uppercase font-bold text-slate-400 tracking-[0.2em]">
             Strategic intelligence on user lifecycle & aggregate retention

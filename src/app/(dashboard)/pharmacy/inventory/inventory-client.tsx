@@ -246,7 +246,7 @@ export default function InventoryClient({
     <div className="max-w-7xl mx-auto py-6 px-4 space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-           <h1 className="text-3xl font-black tracking-tight text-slate-900">Inventory Matrix</h1>
+           <h1 className="text-3xl font-black tracking-tight text-slate-900">Product Inventory</h1>
            <p className="text-slate-500 font-medium mt-1">Real-time stock management and global catalog integration.</p>
         </div>
 
@@ -343,7 +343,7 @@ export default function InventoryClient({
                           <div className="flex items-center gap-3">
                              <h4 className="text-lg font-black text-slate-900 tracking-tight">{req.product_name}</h4>
                              <Badge variant={req.status === "approved" ? "success" : req.status === "rejected" ? "destructive" : "secondary"} className="px-3 py-0.5 rounded-lg font-black text-[10px] uppercase tracking-widest">
-                                {req.status === "pending" ? "Awaiting Review" : req.status === "approved" ? "Added to Matrix" : "Declined"}
+                                {req.status === "pending" ? "Awaiting Review" : req.status === "approved" ? "Added to Inventory" : "Declined"}
                              </Badge>
                           </div>
                           {req.description && <p className="text-sm font-medium text-slate-500 line-clamp-1">{req.description}</p>}
@@ -419,7 +419,7 @@ function ProductRequestModal({ open, onOpenChange, isMobile, toast }: any) {
         <DrawerContent className="p-6 h-[70vh]">
           <DrawerHeader className="px-0">
              <DrawerTitle className="text-2xl font-black">Sync New Product</DrawerTitle>
-             <DrawerDescription className="font-medium">Request an item to be added to the DiscreetKit global pharmaceutical matrix.</DrawerDescription>
+             <DrawerDescription className="font-medium">Request an item to be added to the DiscreetKit global catalog.</DrawerDescription>
           </DrawerHeader>
           <div className="mt-4">{Content}</div>
         </DrawerContent>

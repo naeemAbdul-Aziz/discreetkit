@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic"
 export const revalidate = 0
 
 /**
- * High-Performance Product Matrix (Server-Side Streaming)
+ * Product Inventory (Server-Side Streaming)
  */
 export default async function ProductsPage() {
   // Start fetches immediately, but don't await them yet.
@@ -26,7 +26,7 @@ export default async function ProductsPage() {
       
       <div className="flex flex-col gap-1">
         <h2 className="text-2xl font-black tracking-tight text-slate-900 uppercase tracking-widest">
-            Inventory Matrix
+            Product Inventory
         </h2>
         <p className="text-[10px] uppercase font-bold text-slate-400 tracking-[0.2em]">
             Global catalog control & partner product requests

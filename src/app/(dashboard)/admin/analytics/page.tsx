@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 /**
- * High-Speed Analytics Matrix (Server-Side Streaming)
+ * Platform Analytics Hub (Server-Side Streaming)
  */
 export default async function AdminAnalyticsPage() {
   // Pre-fetch some global stats for the interactive dashboard wrapper if needed,
@@ -19,10 +19,10 @@ export default async function AdminAnalyticsPage() {
     <div className="space-y-8 animate-in fade-in duration-1000">
       <div className="flex flex-col gap-1">
         <h2 className="text-2xl font-black tracking-tight text-slate-900 uppercase tracking-widest">
-            Strategic Intelligence Hub
+            Analytics Overview
         </h2>
         <p className="text-[10px] uppercase font-bold text-slate-400 tracking-[0.2em]">
-            Detailed Performance Metrics & Platform Valuation Data
+            Detailed Performance Metrics & Platform Operational Data
         </p>
       </div>
 
@@ -48,16 +48,14 @@ export default async function AdminAnalyticsPage() {
       </div>
 
       {/* Legacy Analytics Interface (Hydrated wrapper) */}
-      {/* We can eventually migrate this entire component to server-side parts, 
-          but for now we stream the most critical visuals above. */}
       <Suspense fallback={<div className="h-48 animate-pulse bg-slate-50 rounded-3xl" />}>
-          <AnalyticsHydrator statsPromise={statsPromise} />
+          <AnalyticsDataSync statsPromise={statsPromise} />
       </Suspense>
     </div>
   );
 }
 
-async function AnalyticsHydrator({ statsPromise }: { statsPromise: Promise<any> }) {
+async function AnalyticsDataSync({ statsPromise }: { statsPromise: Promise<any> }) {
     const stats = await statsPromise;
     const flatStats = {
         totalRevenue: stats.metrics.totalRevenue,

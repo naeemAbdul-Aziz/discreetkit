@@ -661,7 +661,7 @@ async function getRawOrdersCached() {
     const supabase = await createSupabaseServerClient();
     const { data: orders, error } = await supabase
         .from('orders')
-        .select('status, total_price, total_price_ghs, created_at, items, delivery_area, code, user_id, pharmacies(name), order_events(id, status, created_at, note)')
+        .select('status, total_price_ghs, created_at, items, delivery_area, code, user_id, pharmacies(name), order_events(id, status, created_at, note)')
         .order('created_at', { ascending: false });
 
     if (error) throw new Error(error.message);
@@ -680,8 +680,8 @@ export async function getSummaryMetrics() {
     const supabase = await createSupabaseServerClient();
 
     const [
-        { data: pharmacists },
-        { data: riders }
+        { count: pharmacistCount },
+        { count: riderCount }
     ] = await Promise.all([
         supabase.from('pharmacies').select('id', { count: 'exact', head: true }),
         supabase.from('pharmacy_riders').select('id', { count: 'exact', head: true })
@@ -715,8 +715,8 @@ export async function getSummaryMetrics() {
         activeOrders,
         activePatients: new Set(orders?.map(o => (o as any).user_id)).size,
         fulfillmentVelocity: velCount > 0 ? (totalVel / velCount / (1000 * 60 * 60)).toFixed(1) : "0.0",
-        activePharmacists: pharmacists?.length || 0,
-        activeRiders: riders?.length || 0
+        activePharmacists: pharmacistCount || 0,
+        activeRiders: riderCount || 0
     };
 }
 
@@ -2126,7 +2126,7 @@ export async function getLiveDeliveries() {
 }
 
 /**
- * Strategic Customer Matrix Aggregation
+ * Customer Behavior Analytics
  * In the absence of a dedicated customers table, we derive high-velocity aggregates
  * from the global orders dataset.
  */
@@ -2180,6 +2180,32 @@ export async function getCustomers() {
         ['admin-customers-aggregate'],
         { revalidate: 300, tags: ['orders'] }
     )();
+}
+
+/**
+ * Flag an issue on an order.
+ * Logs the event to order_events for audit visibility.
+ */
+export async function flagOrderIssue(orderId: number, note: string) {
+    await requireAdmin();
+    const supabase = getSupabaseAdminClient();
+
+    const { error } = await supabase
+        .from('order_events')
+        .insert({
+            order_id: orderId,
+            status: 'issue_flagged',
+            note: note,
+            created_at: new Date().toISOString()
+        });
+
+    if (error) {
+        console.error('Flag Issue Error:', error);
+        return { error: error.message };
+    }
+
+    revalidatePath('/admin/orders');
+    return { success: true };
 }
 
 

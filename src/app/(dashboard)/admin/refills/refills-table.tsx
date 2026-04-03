@@ -222,7 +222,7 @@ export function RefillsTable({
         setSubscriptions(prev => prev.map(s => s.id === subId ? { ...s, pharmacy_id: pharmacyId, pharmacy: { name: pharmacyName } } : s));
       }
     } catch (e) {
-      toast({ title: "Network Error", description: "Failed to update node.", variant: "destructive" });
+      toast({ title: "Network Error", description: "Failed to update partner.", variant: "destructive" });
     } finally {
       setAssigningId(null);
     }
@@ -280,7 +280,7 @@ export function RefillsTable({
                 <TableHead className="text-[11px] uppercase tracking-widest font-bold text-slate-400 py-4">Patient (Masked)</TableHead>
                 <TableHead className="text-[11px] uppercase tracking-widest font-bold text-slate-400 py-4">Product</TableHead>
                 <TableHead className="text-[11px] uppercase tracking-widest font-bold text-slate-400 py-4">Status & Health</TableHead>
-                <TableHead className="text-[11px] uppercase tracking-widest font-bold text-slate-400 py-4">Partner Node</TableHead>
+                <TableHead className="text-[11px] uppercase tracking-widest font-bold text-slate-400 py-4">Fulfillment Partner</TableHead>
                 <TableHead className="text-right pr-6 text-[11px] uppercase tracking-widest font-bold text-slate-400 py-4">Actions</TableHead>
               </TableRow>
             </TableHeader>

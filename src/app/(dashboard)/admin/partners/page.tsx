@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic"
 export const revalidate = 0
 
 /**
- * Platinum Performance Partner Matrix (Server-Side Streaming)
+ * Pharmacy Partners Dashboard (Server-Side Streaming)
  */
 export default async function PartnersPage() {
   return (
@@ -17,7 +17,7 @@ export default async function PartnersPage() {
             Partner Network
         </h2>
         <p className="text-[10px] uppercase font-bold text-slate-400 tracking-[0.2em]">
-            Managing pharmacy nodes & distributed fulfillment centers
+            Managing pharmacy partners & distributed fulfillment centers
         </p>
       </div>
 
