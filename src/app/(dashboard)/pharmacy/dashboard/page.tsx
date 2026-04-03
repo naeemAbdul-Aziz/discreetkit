@@ -139,14 +139,14 @@ export default function PharmacyDashboardPage() {
              <Info className="h-10 w-10" />
            </div>
            <div className="space-y-2">
-              <h2 className="text-3xl font-black tracking-tight text-slate-900">Account Restricted</h2>
-              <p className="text-slate-500 font-bold max-w-sm mx-auto">Your account is active but hasn&apos;t been assigned a pharmacy matrix yet.</p>
+              <h2 className="text-3xl font-black tracking-tight text-slate-900">Account Pending</h2>
+              <p className="text-slate-500 font-bold max-w-sm mx-auto">Your account is active but hasn&apos;t been assigned to a pharmacy profile yet.</p>
            </div>
            <Button 
             onClick={() => router.push("/settings")} 
             className="h-14 px-10 rounded-2xl bg-brand-teal hover:bg-brand-teal-dark font-black transition-all active:scale-95"
            >
-             Contact Support Node
+             Contact Support
            </Button>
         </div>
       </div>
@@ -158,12 +158,12 @@ export default function PharmacyDashboardPage() {
       <div className="p-8 max-w-2xl mx-auto mt-20 text-center">
         <Alert variant="destructive" className="rounded-3xl p-8 border-none bg-rose-50 text-rose-900 shadow-xl">
           <AlertCircle className="h-8 w-8 mb-4 mx-auto" />
-          <AlertTitle className="text-2xl font-black">Sync Failure</AlertTitle>
+          <AlertTitle className="text-2xl font-black">Sync Error</AlertTitle>
           <AlertDescription className="font-bold text-rose-700/70 mt-2 mb-6">
-            We encountered a disruption while syncing your local matrix with headquarters.
+            We encountered a problem while syncing your data with the central system.
           </AlertDescription>
           <Button onClick={() => loadData()} variant="outline" className="border-rose-200 text-rose-900 hover:bg-rose-100 h-12 px-8 rounded-xl font-black">
-            Re-sync Matrix
+            Refresh Dashboard
           </Button>
         </Alert>
       </div>
@@ -182,11 +182,11 @@ export default function PharmacyDashboardPage() {
               </h2>
               <div className="flex items-center gap-2 bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full border border-emerald-100 shadow-sm">
                  <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
-                 <span className="text-[10px] font-black uppercase tracking-widest">Live Node</span>
+                 <span className="text-[10px] font-black uppercase tracking-widest">Active</span>
               </div>
            </div>
            <p className="text-slate-400 font-black flex items-center gap-2 uppercase text-xs tracking-widest">
-             <Activity className="h-4 w-4" /> Logistics Command Center • {data.pharmacy.location}
+             <Activity className="h-4 w-4" /> Operations Dashboard • {data.pharmacy.location}
            </p>
         </div>
 
@@ -234,7 +234,7 @@ export default function PharmacyDashboardPage() {
 
       <div className="relative mt-8">
         <div className="absolute -top-12 right-0 flex items-center gap-3">
-           <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Sync Frequency</span>
+           <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Update Frequency</span>
            <div className="flex gap-1">
               {[...Array(5)].map((_, i) => (
                 <div key={i} className={cn("w-1 h-3 rounded-full", i < 3 ? "bg-brand-teal" : "bg-slate-200")} />

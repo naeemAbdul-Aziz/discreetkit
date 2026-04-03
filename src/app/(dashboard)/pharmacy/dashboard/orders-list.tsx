@@ -13,7 +13,8 @@ import {
   MapPin, 
   Clock, 
   Loader2,
-  GanttChartSquare
+  GanttChartSquare,
+  MessageSquare,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -28,6 +29,14 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { OrderMessages } from "@/components/order-messages";
 import { OrderDetailsSheet } from "./order-details-sheet";
 import { DeliveryDialog } from "./delivery-dialog";
 
@@ -61,11 +70,19 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [hiddenOrderIds, setHiddenOrderIds] = useState<Set<number>>(new Set());
 
+  // Chat Dialog State
+  const [chatDialogOpen, setChatDialogOpen] = useState(false);
+  const [activeChatOrderId, setActiveChatOrderId] = useState<number | null>(null);
+
   // Delivery Dialog State
   const [deliveryDialogOpen, setDeliveryDialogOpen] = useState(false);
-  const [pendingDeliveryId, setPendingDeliveryId] = useState<number | null>(
-    null,
-  );
+  const [pendingDeliveryId, setPendingDeliveryId] = useState<number | null>(null);
+
+  const handleOpenChat = (e: React.MouseEvent, id: number) => {
+    e.stopPropagation();
+    setActiveChatOrderId(id);
+    setChatDialogOpen(true);
+  };
 
   const handleViewDetails = (order: Order) => {
     setSelectedOrder(order);
@@ -205,9 +222,9 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
     // New assignment - needs accept/decline
     if (status === "received" && ackStatus === "pending") {
       return (
-        <Badge variant="info" className="gap-1">
-          <div className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse" />
-          New Assignment
+        <Badge variant="info" className="gap-1.5 animate-breathing shadow-[0_4px_12px_rgba(14,165,233,0.3),inset_0_0_8px_rgba(14,165,233,0.2)] bg-sky-50 text-sky-700 border-sky-200/50 font-black uppercase text-[9px] tracking-widest px-2.5 py-1">
+          <div className="h-1.5 w-1.5 rounded-full bg-sky-500 animate-pulse" />
+          Queueing: Inbound
         </Badge>
       );
     }
@@ -215,9 +232,9 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
     // Just accepted - preparing order
     if (status === "processing" && ackStatus === "accepted") {
       return (
-        <Badge variant="success" className="gap-1">
-          <Package className="h-3 w-3" />
-          Preparing Order
+        <Badge variant="success" className="gap-1.5 shadow-[inset_0_0_12px_rgba(99,102,241,0.2)] bg-indigo-50 text-brand-indigo border-indigo-100 font-black uppercase text-[9px] tracking-widest px-2.5 py-1">
+          <Package className="h-3.5 w-3.5" />
+          Internal Prep
         </Badge>
       );
     }
@@ -225,27 +242,20 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
     const variants: Record<
       string,
       {
-        variant:
-          | "secondary"
-          | "default"
-          | "destructive"
-          | "outline"
-          | "success"
-          | "warning"
-          | "info"
-          | "neutral";
+        variant: any;
         label: string;
         icon?: any;
+        className?: string;
       }
     > = {
-      received: { variant: "secondary", label: "Received" },
-      processing: { variant: "info", label: "Preparing" },
-      out_for_delivery: { variant: "warning", label: "Out for Delivery" },
-      completed: { variant: "success", label: "Delivered" },
-      cancelled: { variant: "destructive", label: "Cancelled" },
+      received: { variant: "info", label: "New Inbound", className: "animate-breathing shadow-[0_4px_12px_rgba(14,165,233,0.2),inset_0_0_8px_rgba(14,165,233,0.3)] bg-sky-50 text-sky-700 border-sky-200/50 font-black uppercase text-[9px] tracking-widest px-2.5 py-1" },
+      processing: { variant: "secondary", label: "Internal Prep", className: "shadow-[inset_0_0_12px_rgba(99,102,241,0.2)] bg-indigo-50 text-brand-indigo border-indigo-100 font-black uppercase text-[9px] tracking-widest px-2.5 py-1" },
+      out_for_delivery: { variant: "warning", label: "Outbound Ops", className: "animate-breathing shadow-[0_4px_12px_rgba(245,158,11,0.2),inset_0_0_8px_rgba(245,158,11,0.3)] bg-amber-50 text-amber-700 border-amber-200/50 font-black uppercase text-[9px] tracking-widest px-2.5 py-1" },
+      completed: { variant: "success", label: "Dispatch Done", className: "shadow-[inset_0_0_12px_rgba(34,197,94,0.3)] bg-emerald-50 text-emerald-700 border-emerald-100 font-black uppercase text-[9px] tracking-widest px-2.5 py-1" },
+      cancelled: { variant: "destructive", label: "Aborted", className: "bg-rose-50 text-rose-600 border-rose-100 font-black uppercase text-[9px] tracking-widest px-2.5 py-1" },
     };
-    const config = variants[status] || { variant: "secondary", label: status };
-    return <Badge variant={config.variant}>{config.label}</Badge>;
+    const config = variants[status] || { variant: "secondary", label: status, className: "font-black uppercase text-[9px] tracking-widest" };
+    return <Badge variant={config.variant} className={config.className}>{config.label}</Badge>;
   };
 
   if (!orders || orders.length === 0) {
@@ -391,6 +401,15 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
                   <Button
                     size="icon"
                     variant="ghost"
+                    onClick={(e) => handleOpenChat(e, order.id)}
+                    className="h-12 w-12 text-slate-400 hover:text-brand-indigo rounded-xl bg-slate-50/50 hover:bg-brand-indigo/5"
+                  >
+                    <MessageSquare className="h-5 w-5" />
+                  </Button>
+
+                  <Button
+                    size="icon"
+                    variant="ghost"
                     onClick={(e) => { e.stopPropagation(); handleViewDetails(order); }}
                     className="h-12 w-12 text-slate-400 hover:text-slate-900 rounded-xl"
                   >
@@ -459,6 +478,23 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
           setDetailsSheetOpen(false); // Close details if open, to show list update or just refresh
         }}
       />
+
+      {/* Chat Dialog */}
+      <Dialog open={chatDialogOpen} onOpenChange={setChatDialogOpen}>
+        <DialogContent className="sm:max-w-[500px] border-none bg-white p-0 overflow-hidden rounded-[2.5rem] shadow-2xl">
+          <div className="p-8 border-b border-slate-50 bg-slate-50/30">
+            <DialogHeader className="space-y-1">
+              <DialogTitle className="text-xl font-black text-slate-900 tracking-tight">Admin Support</DialogTitle>
+              <DialogDescription className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed">Direct support channel for real-time coordination.</DialogDescription>
+            </DialogHeader>
+          </div>
+          <div className="p-8 pb-10">
+            {activeChatOrderId && (
+              <OrderMessages orderId={activeChatOrderId} userRole="pharmacy" />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

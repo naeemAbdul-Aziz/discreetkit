@@ -29,6 +29,9 @@ import {
   ChevronRight,
   Filter,
   XCircle,
+  User,
+  MapPin,
+  GanttChartSquare,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -473,41 +476,41 @@ export function OrdersTable({
     switch (status) {
       case "completed":
         return (
-          <Badge variant="success" className="gap-1 shadow-[inset_0_0_8px_rgba(34,197,94,0.2)]">
-            <CheckCircle className="h-3 w-3" />
+          <Badge variant="success" className="gap-1.5 shadow-[inset_0_0_12px_rgba(34,197,94,0.3)] bg-emerald-50 text-emerald-700 border-emerald-100 font-black uppercase text-[10px] tracking-widest px-2.5 py-1">
+            <CheckCircle className="h-3.5 w-3.5" />
             {base}
           </Badge>
         );
       case "processing":
         return (
-          <Badge variant="secondary" className="gap-1">
-            <Package className="h-3 w-3" />
+          <Badge variant="secondary" className="gap-1.5 shadow-[inset_0_0_12px_rgba(99,102,241,0.2)] bg-indigo-50 text-brand-indigo border-indigo-100 font-black uppercase text-[10px] tracking-widest px-2.5 py-1">
+            <Package className="h-3.5 w-3.5" />
             {base}
           </Badge>
         );
       case "out_for_delivery":
         return (
-          <Badge variant="warning" className="gap-1 animate-breathing shadow-[0_0_12px_rgba(245,158,11,0.3)] border-amber-200/50">
-            <Truck className="h-3 w-3" />
+          <Badge variant="warning" className="gap-1.5 animate-breathing shadow-[0_4px_12px_rgba(245,158,11,0.2),inset_0_0_8px_rgba(245,158,11,0.3)] bg-amber-50 text-amber-700 border-amber-200/50 font-black uppercase text-[10px] tracking-widest px-2.5 py-1">
+            <Truck className="h-3.5 w-3.5" />
             {base}
           </Badge>
         );
       case "pending_payment":
         return (
-          <Badge variant="pending" className="gap-1">
-            <CreditCard className="h-3 w-3" />
+          <Badge variant="pending" className="gap-1.5 bg-rose-50 text-rose-600 border-rose-100 font-black uppercase text-[10px] tracking-widest px-2.5 py-1">
+            <CreditCard className="h-3.5 w-3.5" />
             {base}
           </Badge>
         );
       case "received":
         return (
-          <Badge variant="info" className="gap-1 animate-breathing shadow-[0_0_12px_rgba(14,165,233,0.3)] border-sky-200/50">
-            <Clock className="h-3 w-3" />
+          <Badge variant="info" className="gap-1.5 animate-breathing shadow-[0_4px_12px_rgba(14,165,233,0.2),inset_0_0_8px_rgba(14,165,233,0.3)] bg-sky-50 text-sky-700 border-sky-200/50 font-black uppercase text-[10px] tracking-widest px-2.5 py-1">
+            <Clock className="h-3.5 w-3.5" />
             {base}
           </Badge>
         );
       default:
-        return <Badge variant="outline">{base}</Badge>;
+        return <Badge variant="outline" className="font-black uppercase text-[10px] tracking-widest px-2.5 py-1">{base}</Badge>;
     }
   };
 
@@ -515,6 +518,9 @@ export function OrdersTable({
 
   return (
     <div className="space-y-4">
+      {/* Rider Info Component */}
+      <RiderHover />
+
       {/* Override Dialog */}
       <Dialog
         open={!!overridePrompt}
@@ -913,7 +919,7 @@ export function OrdersTable({
                       </TableCell>
                       <TableCell className={ordersTableCols.statusCell} onClick={(e) => e.stopPropagation()}>
                         <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
+                           <DropdownMenuTrigger asChild>
                             <Button
                               variant="ghost"
                               size="sm"
@@ -923,9 +929,55 @@ export function OrdersTable({
                                 {getStatusBadge(order.status)}
                                 {order.status === "out_for_delivery" &&
                                   order.courier_name && (
-                                    <span className="text-[10px] text-slate-400 font-medium tabular-nums">
-                                       • {order.courier_name}
-                                    </span>
+                                    <Popover>
+                                       <PopoverTrigger asChild>
+                                          <button 
+                                            className="ml-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-[10px] font-black border border-amber-100 hover:bg-amber-100 transition-all flex items-center gap-1.5"
+                                            onClick={(e) => e.stopPropagation()}
+                                          >
+                                            <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                                            {order.courier_name}
+                                          </button>
+                                       </PopoverTrigger>
+                                       <PopoverContent className="w-64 p-0 border-none bg-white rounded-[2rem] shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+                                          <div className="p-5 bg-amber-50/50 border-b border-amber-100 flex items-center gap-4">
+                                             <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center shadow-inner">
+                                                <Truck className="h-6 w-6" />
+                                             </div>
+                                             <div>
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-amber-500">Assigned Rider</p>
+                                                <p className="text-sm font-black text-slate-900">{order.courier_name}</p>
+                                             </div>
+                                          </div>
+                                          <div className="p-5 space-y-4">
+                                             <div className="flex items-center justify-between">
+                                                <div className="space-y-0.5">
+                                                   <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Contact Number</p>
+                                                   <p className="text-sm font-bold text-slate-700 tabular-nums">{order.courier_phone}</p>
+                                                </div>
+                                                <Button 
+                                                  variant="outline" 
+                                                  size="icon" 
+                                                  className="h-9 w-9 rounded-xl border-slate-100 bg-slate-50 hover:bg-white transition-all text-brand-indigo"
+                                                  onClick={() => {
+                                                     navigator.clipboard.writeText(order.courier_phone);
+                                                     toast({ title: "Copied!", description: "Rider contact number saved to clipboard." });
+                                                  }}
+                                                >
+                                                   <Check className="h-4 w-4" />
+                                                </Button>
+                                             </div>
+                                             <Button 
+                                               asChild 
+                                               className="w-full h-11 rounded-xl bg-brand-indigo hover:bg-brand-indigo/90 font-black text-xs uppercase tracking-widest gap-2 shadow-lg shadow-brand-indigo/20"
+                                             >
+                                                <a href={`tel:${order.courier_phone}`}>
+                                                   Call Dispatcher
+                                                </a>
+                                             </Button>
+                                          </div>
+                                       </PopoverContent>
+                                    </Popover>
                                   )}
                               </span>
                             </Button>
@@ -1001,45 +1053,119 @@ export function OrdersTable({
                     {/* Expanded Detail View */}
                     <AnimatePresence initial={false}>
                       {isExpanded && (
-                        <TableRow className="bg-slate-50 border-t-0 hover:bg-slate-50">
+                        <TableRow className="bg-slate-50/30 border-t-0 hover:bg-slate-50/50 transition-colors">
                           <TableCell colSpan={8} className="p-0 overflow-hidden">
                             <motion.div
                               initial={{ height: 0, opacity: 0 }}
                               animate={{ height: "auto", opacity: 1 }}
                               exit={{ height: 0, opacity: 0 }}
-                              transition={{ type: "spring", duration: 0.4, bounce: 0.2 }}
+                              transition={{ type: "spring", duration: 0.4, bounce: 0.1 }}
                             >
-                              <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8 border-l-4 border-brand-indigo ml-6 my-2 bg-white rounded-r-xl shadow-[inner_0_2px_4px_rgba(0,0,0,0.02)]">
-                                <div className="space-y-4">
-                                  <div>
-                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1 text-left">Customer Details</h4>
-                                    <p className="text-sm font-semibold text-slate-700 text-left">{order.email || "Anonymous Patient"}</p>
-                                    <p className="text-xs text-slate-500 mt-1 text-left">Delivery: <span className="font-bold">{order.delivery_area || "Not specified"}</span></p>
+                              <div className="mx-6 my-4 p-8 grid grid-cols-1 md:grid-cols-3 gap-10 bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04),inset_0_0_0_1px_rgba(0,0,0,0.03)] border border-slate-100 relative overflow-hidden group/detail">
+                                <div className="absolute top-0 left-0 w-1.5 h-full bg-brand-indigo opacity-80" />
+                                
+                                {/* Col 1: Customer & Logistics */}
+                                <div className="space-y-6">
+                                  <div className="space-y-4">
+                                    <div className="flex items-center gap-2 text-brand-indigo">
+                                      <User className="h-3.5 w-3.5" />
+                                      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60">Customer Details</h4>
+                                    </div>
+                                    <div className="pl-5 border-l border-slate-100 space-y-1">
+                                      <p className="text-base font-extrabold text-slate-900 tracking-tight">{order.email || "Anonymous Patient"}</p>
+                                      <p className="text-xs font-bold text-slate-400 tabular-nums">Order ID: {order.id}</p>
+                                    </div>
                                   </div>
-                                  <div className="text-left">
-                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Order Note / Special Instructions</h4>
-                                    <p className="text-sm font-medium text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100 italic leading-relaxed">
-                                      {order.delivery_address_note || "No specific delivery notes provided for this order."}
-                                    </p>
+                                  
+                                  <div className="space-y-4">
+                                    <div className="flex items-center gap-2 text-brand-indigo">
+                                      <MapPin className="h-3.5 w-3.5" />
+                                      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60">Delivery Address</h4>
+                                    </div>
+                                    <div className="pl-5 border-l border-slate-100 space-y-3">
+                                      <p className="text-sm font-bold text-slate-700">{order.delivery_area || "Standard Zone"}</p>
+                                      <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-100/50 relative group/note">
+                                        <div className="absolute -top-2 left-3 px-2 bg-white border border-slate-100 rounded-md text-[8px] font-black uppercase tracking-tighter text-slate-400">Recipient Note</div>
+                                        <p className="text-[11px] font-medium text-slate-500 italic leading-relaxed">
+                                          &quot;{order.delivery_address_note || "No specific delivery notes provided."}&quot;
+                                        </p>
+                                      </div>
+                                    </div>
                                   </div>
                                 </div>
-                                <div className="space-y-4 text-left">
-                                  <div className="flex justify-between items-start">
-                                    <div>
-                                      <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Partner Pharmacy</h4>
-                                      <p className="text-sm font-bold text-brand-indigo">{order.pharmacies?.name || "Pending Assignment"}</p>
+
+                                {/* Col 2: Inventory Summary */}
+                                <div className="space-y-6">
+                                  <div className="space-y-4">
+                                    <div className="flex items-center gap-2 text-brand-indigo">
+                                      <Package className="h-3.5 w-3.5" />
+                                      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60">Order Items</h4>
                                     </div>
-                                    <Button variant="outline" size="sm" className="h-8 text-xs font-bold gap-2" onClick={(e) => {
-                                      e.stopPropagation();
-                                      setActiveMessageOrderId(order.id);
-                                      setMessageDialogOpen(true);
-                                    }}>
-                                      <MessageSquare className="h-3.5 w-3.5" /> Chat
-                                    </Button>
+                                    <div className="pl-5 border-l border-slate-100 space-y-2">
+                                      {(() => {
+                                        const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
+                                        const itemsArray = Array.isArray(items) ? items : [];
+                                        return (
+                                          <div className="space-y-2">
+                                            {itemsArray.slice(0, 3).map((item: any, i: number) => (
+                                              <div key={i} className="flex justify-between items-center text-[11px] font-bold text-slate-600">
+                                                <span className="truncate max-w-[120px]">{item.name}</span>
+                                                <span className="text-slate-400 tabular-nums">x{item.quantity}</span>
+                                              </div>
+                                            ))}
+                                            {itemsArray.length > 3 && (
+                                              <p className="text-[9px] font-black text-brand-indigo uppercase tracking-widest pt-1">+{itemsArray.length - 3} additional items</p>
+                                            )}
+                                          </div>
+                                        );
+                                      })()}
+                                    </div>
                                   </div>
-                                  <div className="pt-4 border-t border-slate-100 flex flex-wrap gap-2">
-                                    <button className="text-[10px] font-black uppercase tracking-widest text-white bg-brand-indigo px-3 py-1.5 rounded-md shadow-sm">Details Page</button>
-                                    <button className="text-[10px] font-black uppercase tracking-widest text-slate-600 bg-slate-100 px-3 py-1.5 rounded-md">Mark Flagged</button>
+                                  
+                                  <div className="space-y-4">
+                                    <div className="flex items-center gap-2 text-brand-indigo">
+                                      <CreditCard className="h-3.5 w-3.5" />
+                                      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60">Payment Summary</h4>
+                                    </div>
+                                    <div className="pl-5 border-l border-slate-100 space-y-1">
+                                      <p className="text-sm font-black text-slate-900 tracking-tight">₵{Number(order.total_price || 0).toFixed(2)}</p>
+                                      <p className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Cash on Delivery</p>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Col 3: Operational Controls */}
+                                <div className="space-y-6 bg-slate-50/50 p-6 rounded-[2rem] border border-slate-100/50">
+                                  <div className="space-y-4">
+                                    <div className="flex items-center gap-2 text-brand-indigo">
+                                      <GanttChartSquare className="h-3.5 w-3.5" />
+                                      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60">Assigned Pharmacy</h4>
+                                    </div>
+                                    <div className="space-y-3">
+                                      <div className="flex items-center justify-between">
+                                        <p className="text-xs font-extrabold text-slate-900">{order.pharmacies?.name || "Unassigned"}</p>
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-brand-indigo hover:bg-brand-indigo/10" onClick={(e) => {
+                                          e.stopPropagation();
+                                          setActiveMessageOrderId(order.id);
+                                          setMessageDialogOpen(true);
+                                        }}>
+                                          <MessageSquare className="h-4 w-4" />
+                                        </Button>
+                                      </div>
+                                      <div className="grid grid-cols-2 gap-2">
+                                        <Button size="sm" className="h-9 rounded-xl bg-brand-indigo hover:bg-brand-indigo/90 font-black text-[9px] uppercase tracking-widest shadow-lg shadow-brand-indigo/20">Audit Trail</Button>
+                                        <Button variant="outline" size="sm" className="h-9 rounded-xl border-slate-200 bg-white hover:bg-slate-50 font-black text-[9px] uppercase tracking-widest">Flag Issue</Button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="pt-4 border-t border-slate-200/50">
+                                    <Button asChild variant="link" className="px-0 h-auto text-brand-indigo text-[10px] font-black uppercase tracking-[0.2em] hover:no-underline hover:opacity-70 gap-2 group/link">
+                                      <a href={`/admin/orders/${order.id}`}>
+                                        View Full Order Details
+                                        <ChevronRight className="h-3 w-3 transition-transform group-hover/link:translate-x-1" />
+                                      </a>
+                                    </Button>
                                   </div>
                                 </div>
                               </div>
@@ -1060,8 +1186,8 @@ export function OrdersTable({
                       <XCircle className="h-10 w-10 opacity-20" />
                     </div>
                     <div className="space-y-1">
-                      <h3 className="text-sm font-bold text-slate-600 uppercase tracking-widest">No Intelligence Found</h3>
-                      <p className="text-xs font-medium">Clear your filters to reveal hidden order streams.</p>
+                      <h3 className="text-sm font-bold text-slate-600 uppercase tracking-widest">No Results Found</h3>
+                      <p className="text-xs font-medium">Clear your filters to search all orders.</p>
                     </div>
                     {filterStatus !== "all" || searchTerm !== "" ? (
                       <Button 
@@ -1073,7 +1199,7 @@ export function OrdersTable({
                           setFilterStatus("all");
                         }}
                       >
-                        <Filter className="h-3 w-3" /> Clear Intel Filters
+                        <Filter className="h-3 w-3" /> Clear Filters
                       </Button>
                     ) : null}
                   </div>
@@ -1087,7 +1213,7 @@ export function OrdersTable({
       {totalOrders > limit && (
         <div className="flex flex-col sm:flex-row items-center justify-between mt-6 px-4 py-4 bg-slate-50/50 rounded-2xl border border-slate-100 gap-4">
           <div className="flex items-center gap-3">
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Rows per intel cycle</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Results per page</span>
             <select
               className="bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-700 shadow-sm focus:ring-2 focus:ring-brand-indigo/20 outline-none transition-all"
               value={limit}
@@ -1275,4 +1401,8 @@ function PharmacyCombobox({
       </PopoverContent>
     </Popover>
   );
+}
+
+function RiderHover() {
+  return null; // Interface is natively integrated for performance
 }
