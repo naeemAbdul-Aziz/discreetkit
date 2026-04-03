@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic"
 export const revalidate = 0
 
 /**
- * High-Density Refill Matrix (Server-Side Streaming)
+ * Subscription Refill Management (Server-Side Streaming)
  */
 export default async function RefillsPage() {
   return (

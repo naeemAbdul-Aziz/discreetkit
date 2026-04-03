@@ -44,7 +44,7 @@ export function DashboardChatbot({ role }: { role: "admin" | "pharmacy" }) {
     parts:
       role === "admin"
         ? "Systems Intelligence online. How can I assist with DiscreetKit HQ operations today?"
-        : "Pharmacy node linked. Ready to assist with order verification, riders, and stock balancing.",
+        : "Pharmacy partner active. Ready to assist with order verification, riders, and stock balancing.",
   };
 
   useEffect(() => {

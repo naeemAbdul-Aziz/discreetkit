@@ -246,7 +246,7 @@ export default function RidersPage() {
            />
            <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">Fleet Command Silent</h3>
            <p className="text-slate-400 max-w-sm mt-3 font-semibold leading-relaxed">
-             You haven&amp;pos;t commissioned any riders yet. Add your first courier to start dispatching orders through the DiscreetKit matrix.
+             You haven&apos;t commissioned any riders yet. Add your first courier to start dispatching orders through the DiscreetKit system.
            </p>
         </div>
       ) : (
@@ -326,7 +326,7 @@ export default function RidersPage() {
            <div className="space-y-1">
               <h4 className="text-xs font-black text-white uppercase tracking-widest">Fleet Operations Protocol</h4>
               <p className="text-xs font-medium text-slate-400 leading-relaxed max-w-xl">
-                Unauthorized personnel assignment may lead to matrix revocation. All courier interactions are strictly monitored for partner compliance and security integrity.
+                Unauthorized personnel assignment may lead to account revocation. All courier interactions are strictly monitored for partner compliance and security integrity.
               </p>
            </div>
          </div>

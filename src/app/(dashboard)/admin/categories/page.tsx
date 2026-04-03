@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic"
 export const revalidate = 0
 
 /**
- * High-Speed Category Matrix (Server-Side Streaming)
+ * Category Management (Server-Side Streaming)
  */
 export default async function CategoriesPage() {
   return (

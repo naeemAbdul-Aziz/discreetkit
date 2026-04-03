@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export const dynamic = "force-dynamic";
 
 /**
- * Logistics Control Matrix (Server-Side Streaming)
+ * Logistics Overview (Server-Side Streaming)
  */
 export default async function OperationsDashboard() {
   return (

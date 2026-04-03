@@ -36,7 +36,7 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
 
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-black tracking-tight text-slate-900 uppercase tracking-widest">
-            Executive Control Matrix
+            Management Dashboard
         </h1>
         <p className="text-[10px] uppercase font-bold text-slate-400 tracking-[0.2em]">
             Real-time Operational Overview & Strategic Data Link

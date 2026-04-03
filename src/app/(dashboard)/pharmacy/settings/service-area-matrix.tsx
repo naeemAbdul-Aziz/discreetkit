@@ -132,7 +132,7 @@ export function ServiceAreaMatrix({ initialAreas }: ServiceAreaMatrixProps) {
         <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm">
             <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
                 <div>
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-slate-600">Delivery Matrix</h3>
+                    <h3 className="text-sm font-bold uppercase tracking-wider text-slate-600">Delivery Zones</h3>
                     <p className="text-xs text-slate-500 mt-0.5">Manage your active service zones and fees.</p>
                 </div>
                 <Button 

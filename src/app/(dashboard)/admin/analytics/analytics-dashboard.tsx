@@ -270,7 +270,7 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
                                           <p className="text-[10px] text-slate-400 font-medium">Partner pharmacy</p>
                                           <p className="text-[10px] text-brand-teal font-semibold flex items-center gap-1">
                                             <Activity className="h-3 w-3" />
-                                            Live revenue node
+                                            Live revenue summary
                                           </p>
                                         </div>
                                     </div>

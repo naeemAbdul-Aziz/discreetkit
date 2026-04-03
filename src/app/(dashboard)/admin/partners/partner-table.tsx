@@ -286,7 +286,7 @@ export function PartnerTable({
                            </DropdownMenuItem>
                            <DropdownMenuSeparator />
                            <DropdownMenuItem className="rounded-lg text-rose-600 focus:text-rose-600 focus:bg-rose-50" onClick={() => handleDelete(partner.id)}>
-                             Delete Network Node
+                             Delete Partner Profile
                            </DropdownMenuItem>
                          </DropdownMenuContent>
                       </DropdownMenu>
@@ -303,7 +303,7 @@ export function PartnerTable({
         selectedCount={selectedIds.length}
         onClear={() => setSelectedIds([])}
         actions={[
-          { label: "Deactivate Node", onClick: handleBulkDelete, icon: <Trash2 className="h-4 w-4" />, variant: "destructive" }
+          { label: "Deactivate Partner", onClick: handleBulkDelete, icon: <Trash2 className="h-4 w-4" />, variant: "destructive" }
         ]}
       />
 

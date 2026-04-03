@@ -24,7 +24,7 @@ export default async function OrdersPage({ searchParams }: PageProps) {
       ]} />
       <div>
         <h2 className="text-3xl font-bold tracking-tight uppercase tracking-widest text-slate-900">
-            Order Matrix
+            Order Management Center
         </h2>
         <p className="text-[10px] uppercase font-bold text-slate-400 tracking-[0.2em] mt-1">
             Real-time transaction log & fulfillment management
