@@ -116,7 +116,7 @@ export default function AdminDashboardPage() {
             id: o.id,
             code: o.code,
             status: o.status,
-            total_price: Number(o.total_price_ghs || 0),
+            total_price: Number(o.total_price_ghs || 0) || Number(o.total_price || 0),
             created_at: o.created_at,
           })),
           revenueSeries: stats.revenueChart.map((d: any) => ({
