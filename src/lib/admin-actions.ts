@@ -778,10 +778,10 @@ export async function getPulseFeed() {
 
         return orders?.slice(0, 10).flatMap(o => (o.order_events || []).map((e: any) => ({
             id: e.id,
-            orderCode: o.code,
-            status: e.status,
+            orderCode: o.code || '???',
+            status: e.status || 'unknown',
             timestamp: e.created_at,
-            note: e.note
+            note: e.note || ''
         }))).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 12);
     } catch (err) {
         console.error('[PulseFeed] Critical Error:', err);
