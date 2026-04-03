@@ -149,12 +149,14 @@ export async function ActivityPulse() {
                                 <div className="flex items-center justify-between gap-2">
                                     <p className="text-[13px] font-bold text-brand-indigo truncate">Order {item.orderCode}</p>
                                     <span className="text-[10px] font-medium text-slate-400 whitespace-nowrap">
-                                        {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        {item.timestamp && !isNaN(new Date(item.timestamp).getTime()) 
+                                            ? new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                                            : '--:--'}
                                     </span>
                                 </div>
                                 <div className="flex items-center gap-2 mt-0.5">
                                     <Badge variant="outline" className="text-[8px] h-4 uppercase tracking-wider font-bold border-slate-100 text-slate-500 bg-slate-50/50">
-                                        {item.status.replace(/_/g, ' ')}
+                                        {(item.status || 'unknown').replace(/_/g, ' ')}
                                     </Badge>
                                     {item.note && <span className="text-[10px] text-slate-500 truncate italic">&quot;{item.note}&quot;</span>}
                                 </div>
