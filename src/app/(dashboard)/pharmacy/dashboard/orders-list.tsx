@@ -222,7 +222,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
     // New assignment - needs accept/decline
     if (status === "received" && ackStatus === "pending") {
       return (
-        <Badge variant="info" className="gap-1.5 bg-sky-50 text-sky-700 border-sky-200 font-black uppercase text-[9px] tracking-widest px-2.5 py-1">
+        <Badge variant="info" className="gap-1 bg-sky-50/40 text-sky-600 border-sky-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
           <span className="relative flex h-1.5 w-1.5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-sky-500"></span>
@@ -235,8 +235,8 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
     // Just accepted - preparing order
     if (status === "processing" && ackStatus === "accepted") {
       return (
-        <Badge variant="secondary" className="gap-1.5 bg-indigo-50 text-indigo-700 border-indigo-200 font-black uppercase text-[9px] tracking-widest px-2.5 py-1">
-          <Package className="h-3.5 w-3.5" />
+        <Badge variant="secondary" className="gap-1 bg-indigo-50/40 text-indigo-600 border-indigo-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
+          <Package className="h-3 w-3" />
           Internal Prep
         </Badge>
       );
@@ -254,30 +254,30 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
       received: { 
         variant: "info", 
         label: "New Inbound", 
-        className: "bg-sky-50 text-sky-700 border-sky-200 font-black uppercase text-[9px] tracking-widest px-2.5 py-1" 
+        className: "bg-sky-50/40 text-sky-600 border-sky-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5" 
       },
       processing: { 
         variant: "secondary", 
         label: "Internal Prep", 
-        className: "bg-indigo-50 text-indigo-700 border-indigo-200 font-black uppercase text-[9px] tracking-widest px-2.5 py-1" 
+        className: "bg-indigo-50/40 text-indigo-600 border-indigo-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5" 
       },
       out_for_delivery: { 
         variant: "warning", 
         label: "Outbound Ops", 
-        className: "bg-amber-50 text-amber-700 border-amber-200 font-black uppercase text-[9px] tracking-widest px-2.5 py-1" 
+        className: "bg-amber-50/40 text-amber-600 border-amber-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5" 
       },
       completed: { 
         variant: "success", 
         label: "Dispatch Done", 
-        className: "bg-emerald-50 text-emerald-700 border-emerald-200 font-black uppercase text-[9px] tracking-widest px-2.5 py-1" 
+        className: "bg-emerald-50/40 text-emerald-600 border-emerald-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5" 
       },
       cancelled: { 
         variant: "destructive", 
         label: "Aborted", 
-        className: "bg-rose-50 text-rose-700 border-rose-200 font-black uppercase text-[9px] tracking-widest px-2.5 py-1" 
+        className: "bg-rose-50/40 text-rose-600 border-rose-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5" 
       },
     };
-    const config = variants[status] || { variant: "secondary", label: status, className: "font-black uppercase text-[9px] tracking-widest border-slate-200 text-slate-500" };
+    const config = variants[status] || { variant: "secondary", label: status, className: "font-bold uppercase text-[9px] tracking-widest border-slate-100 text-slate-400" };
     return <Badge variant={config.variant} className={config.className}>{config.label}</Badge>;
   };
 
