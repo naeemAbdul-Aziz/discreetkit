@@ -476,41 +476,41 @@ export function OrdersTable({
     switch (status) {
       case "completed":
         return (
-          <Badge variant="success" className="gap-1.5 bg-emerald-50 text-emerald-700 border-emerald-200 font-black uppercase text-[10px] tracking-widest px-2.5 py-1">
-            <CheckCircle className="h-3.5 w-3.5" />
+          <Badge variant="success" className="gap-1 bg-emerald-50/40 text-emerald-600 border-emerald-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
+            <CheckCircle className="h-3 w-3" />
             {base}
           </Badge>
         );
       case "processing":
         return (
-          <Badge variant="secondary" className="gap-1.5 bg-indigo-50 text-indigo-700 border-indigo-200 font-black uppercase text-[10px] tracking-widest px-2.5 py-1">
-            <Package className="h-3.5 w-3.5" />
+          <Badge variant="secondary" className="gap-1 bg-indigo-50/40 text-indigo-600 border-indigo-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
+            <Package className="h-3 w-3" />
             {base}
           </Badge>
         );
       case "out_for_delivery":
         return (
-          <Badge variant="warning" className="gap-1.5 bg-amber-50 text-amber-700 border-amber-200 font-black uppercase text-[10px] tracking-widest px-2.5 py-1">
-            <Truck className="h-3.5 w-3.5" />
+          <Badge variant="warning" className="gap-1 bg-amber-50/40 text-amber-600 border-amber-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
+            <Truck className="h-3 w-3" />
             {base}
           </Badge>
         );
       case "pending_payment":
         return (
-          <Badge variant="pending" className="gap-1.5 bg-rose-50 text-rose-700 border-rose-200 font-black uppercase text-[10px] tracking-widest px-2.5 py-1">
-            <CreditCard className="h-3.5 w-3.5" />
+          <Badge variant="pending" className="gap-1 bg-rose-50/40 text-rose-600 border-rose-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
+            <CreditCard className="h-3 w-3" />
             {base}
           </Badge>
         );
       case "received":
         return (
-          <Badge variant="info" className="gap-1.5 bg-sky-50 text-sky-700 border-sky-200 font-black uppercase text-[10px] tracking-widest px-2.5 py-1">
-            <Clock className="h-3.5 w-3.5" />
+          <Badge variant="info" className="gap-1 bg-sky-50/40 text-sky-600 border-sky-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
+            <Clock className="h-3 w-3" />
             {base}
           </Badge>
         );
       default:
-        return <Badge variant="outline" className="font-black uppercase text-[10px] tracking-widest px-2.5 py-1 border-slate-200 text-slate-500">{base}</Badge>;
+        return <Badge variant="outline" className="font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 border-slate-100 text-slate-400">{base}</Badge>;
     }
   };
 
@@ -1335,8 +1335,8 @@ function PharmacyCombobox({
           aria-expanded={open}
           className={cn(
             "w-40 h-8 justify-between items-center transition-all duration-300",
-            !currentPharmacyId && "border-slate-300 bg-slate-50 hover:bg-slate-100",
-            isUrgent && !currentPharmacyId && "border-rose-400 bg-rose-50/50 hover:bg-rose-100"
+            !currentPharmacyId && "border-slate-200/60 bg-slate-50/30 hover:bg-slate-100/50",
+            isUrgent && !currentPharmacyId && "border-slate-200/80"
           )}
           size="sm"
           disabled={loading}
@@ -1348,7 +1348,7 @@ function PharmacyCombobox({
                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-rose-500"></span>
               </span>
             )}
-            <span className={cn("truncate font-bold", !currentPharmacyId && (isUrgent ? "text-rose-700" : "text-slate-400"))}>
+            <span className={cn("truncate font-bold tracking-tight", !currentPharmacyId && (isUrgent ? "text-rose-600" : "text-slate-400"))}>
               {loading ? "Assigning..." : currentPharmacyName || "UNASSIGNED"}
             </span>
           </div>
