@@ -3,14 +3,22 @@ import { TwilioWebhookSchema } from '@/lib/whatsapp/types';
 import { handleIncomingMessage } from '@/lib/whatsapp/manager';
 
 export async function POST(req: NextRequest) {
+    const traceId = Math.random().toString(36).substring(7);
+    console.log(`[WhatsApp Webhook][${traceId}] Incoming POST request detected`);
+
     try {
-        // 1. Parse Form Data with error handling for malformed payloads
+        // 1. Parse Form Data
         let payload: Record<string, any>;
         try {
             const formData = await req.formData();
             payload = Object.fromEntries(formData.entries());
+            console.log(`[WhatsApp Webhook][${traceId}] Payload Parsed:`, { 
+                from: payload.From, 
+                body: payload.Body, 
+                waId: payload.WaId 
+            });
         } catch (e) {
-            console.error('Failed to parse WhatsApp Form Data:', e);
+            console.error(`[WhatsApp Webhook][${traceId}] Failed to parse Form Data:`, e);
             return new NextResponse('<Response></Response>', { 
                 headers: { 'Content-Type': 'text/xml' }, status: 200 
             });
@@ -20,7 +28,7 @@ export async function POST(req: NextRequest) {
         const result = TwilioWebhookSchema.safeParse(payload);
 
         if (!result.success) {
-            console.error('Invalid Twilio Webhook Payload:', result.error.format());
+            console.error(`[WhatsApp Webhook][${traceId}] Zod Validation Failed:`, result.error.format());
             // We still return 200 to prevent Twilio retry loops, but log the error
             return new NextResponse('<Response></Response>', {
                 headers: { 'Content-Type': 'text/xml' },
@@ -29,8 +37,6 @@ export async function POST(req: NextRequest) {
         }
 
         const { From, Body, ProfileName, Latitude, Longitude, ButtonPayload, ListId } = result.data;
-        
-        // Handle Interactive Button/List IDs if present (override Body)
         const finalBody = ButtonPayload || ListId || Body;
 
         let location = undefined;
@@ -39,11 +45,20 @@ export async function POST(req: NextRequest) {
         }
 
         // 3. Process Message (Async)
-        // We catch errors inside to prevent the whole route from crashing
         try {
+            console.log(`[WhatsApp Webhook][${traceId}] Routing to Manager...`);
             await handleIncomingMessage(From, finalBody, ProfileName, location);
-        } catch (logicError) {
-            console.error('WhatsApp Logic Error:', logicError);
+            console.log(`[WhatsApp Webhook][${traceId}] Logic processed successfully.`);
+        } catch (logicError: any) {
+            console.error(`[WhatsApp Webhook][${traceId}] Logic Error:`, logicError);
+            
+            // EMERGENCY TALKBACK: Try to inform the user
+            try {
+                const { sendMessage } = await import('@/lib/whatsapp/service');
+                await sendMessage(From, "⚠️ *Assistant Error*: Our system encountered a temporary issue. Please try again in 5 minutes. (Ref: " + traceId + ")");
+            } catch (notifyError) {
+                console.error(`[WhatsApp Webhook][${traceId}] Failed to send error notification:`, notifyError);
+            }
         }
 
         // 4. Return TwiML (Empty Response to stop Twilio from doing anything else)
@@ -53,8 +68,7 @@ export async function POST(req: NextRequest) {
         });
 
     } catch (error) {
-        console.error('Critical WhatsApp Webhook Error:', error);
-        // Always return 200 TwiML to keep the pipe open for Twilio
+        console.error(`[WhatsApp Webhook][${traceId}] Critical Endpoint Error:`, error);
         return new NextResponse('<Response></Response>', {
             headers: { 'Content-Type': 'text/xml' },
             status: 200,
