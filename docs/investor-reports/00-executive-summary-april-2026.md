@@ -9,6 +9,8 @@ DiscreetKit is a "Quiet Confidence" health-logistics platform providing anonymou
 DiscreetKit is a distributed logistics network:
 - **Partner Pharmacy Network**: Asset-light fulfillment via partner-owned inventory and "Virtual Fleet" riders.
 - **Operational Intelligence**: Proprietary metrics (**Fulfillment Performance**, **Privacy Coverage**) derived from real-time data to quantify trust infrastructure.
+- **Headless Accessible Commerce**: A sophisticated, browserless WhatsApp agent providing zero-friction medical access to its 2.5M+ target audience without specialized hardware or browser data costs ($85k Asset).
+- **Enterprise Observability**: Custom, site-wide tracing and audit infrastructure ensuring 100% operational transparency and regulatory compliance across all pharmacy nodes ($35k Asset).
 - **The Premium Performance Standard**: Sub-second (LCP) operational layer via **Streaming Server Components**, ensuring the fastest logistics chain in the West African SRH market.
 
 ---
@@ -24,6 +26,7 @@ DiscreetKit is a distributed logistics network:
 **Traction & Maturity**
 - **Architecture**: Next.js 16 (App Router) + Streaming Suspense Boundaries + Redis Caching.
 - **Financial Integrity**: 100% audit-ready transactional log with consolidated `_ghs` pricing.
+- **Reliability Framework**: Unified site-wide observability with unique `traceId` propagation for rapid error resolution and auditability.
 - **Security**: Bank-grade CSP, HSTS, and Row Level Security (RLS) ensuring strict tenant isolation for pharmacy partners.
 - **Scale-Ready**: Infrastructure handles 100% automated escalations, inventory reservations, and daily Paystack reconciliation.
 

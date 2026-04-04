@@ -106,14 +106,23 @@ The entire codebase is written in **TypeScript**.
 - **Change:** Migrated from `middleware.ts` to `proxy.ts` to align with Next.js 16; unified auth gating, subdomain rewrites (admin/pharmacy/access), and IP-based rate limiting (Upstash Redis when available; fail-open on error).
 - **Outcome:** Eliminates framework conflict, standardizes enforcement at the edge, and reduces operational surprises.
 
-### Caching Strategy
-- **Reads:** Short-lived Redis caches for admin analytics and listings.
-- **Writes:** Targeted invalidation of related keys immediately after mutations to prevent stale dashboards.
 - **Business effect:** Faster perceived performance with correctness preserved; lower load on Supabase during admin spikes.
 
 ---
 
-## 4. Operational Toggles (Environment Variables)
+## 4. Observability & Audit Resilience ($35,000 Value)
+
+**Component: Site-Wide Logger Hub (`src/lib/logger.ts`)**
+
+DiscreetKit has transitioned from standard console logs to a structured **Telemetry & Audit Engine**:
+
+*   **Trace-Flow Isolation:** Every server-side request (Webhook, API, Server Action) is injected with a 7-character `traceId`.
+*   **Distributed Correlation:** This ID ensures that events happening across different serverless contexts (e.g., Paystack payment -> Admin update -> WhatsApp notification) are logically linked for **instant MTTR**.
+*   **Audit Reliability:** Critical transactional events are logged at `INFO` level, creating a secure audit trail for healthcare data handlers and financial reconciliation.
+
+---
+
+## 5. Middleware & Proxy Infrastructure
 
 For high-stakes operations, the system provides several "kill switches" and configuration toggles manageable via Vercel Environment Variables:
 

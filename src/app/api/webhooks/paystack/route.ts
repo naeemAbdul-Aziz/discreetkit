@@ -169,8 +169,28 @@ export async function POST(req: Request) {
             try {
               const { sendOrderConfirmation } = await import('@/lib/whatsapp/manager');
               const orderAmount = (amount / 100);
-              await sendOrderConfirmation(whatsappId, reference, orderAmount, 'Privacy Mode');
-              logger.info('WhatsApp confirmation sent', { context, traceId, data: { whatsappId } });
+              
+              // Construct Item Summary for WhatsApp (e.g. "1x HIV Test, 2x Condoms")
+              let itemsSummary = 'Multiple Items';
+              if (order.items && Array.isArray(order.items)) {
+                itemsSummary = order.items
+                  .map((item: any) => `${item.quantity || 1}x ${item.name || 'Item'}`)
+                  .join(', ');
+              } else if (typeof order.items === 'string') {
+                try {
+                    const parsed = JSON.parse(order.items);
+                    if (Array.isArray(parsed)) {
+                        itemsSummary = parsed
+                          .map((item: any) => `${item.quantity || 1}x ${item.name || 'Item'}`)
+                          .join(', ');
+                    }
+                } catch(e) {
+                    itemsSummary = order.items;
+                }
+              }
+
+              await sendOrderConfirmation(whatsappId, reference, orderAmount, itemsSummary);
+              logger.info('WhatsApp confirmation sent', { context, traceId, data: { whatsappId, items: itemsSummary } });
             } catch (waError) {
               logger.error('Failed to send WhatsApp confirmation', { context, traceId, data: waError });
             }

@@ -82,6 +82,10 @@ export async function handleIncomingMessage(
             await handleCampusSelection(from, body, session);
             break;
 
+        case 'AWAITING_TRACKING_CODE':
+            await handleTrackingCodeInput(from, body);
+            break;
+
         default:
             await sendMainMenu(from, profileName);
             break;
@@ -118,8 +122,9 @@ async function handleIdleState(to: string, body: string) {
     } else if (selection.includes('care') || body === 'menu_care') {
         await sendPartnerCareMenu(to);
     } else if (selection.includes('track') || body === 'menu_track') {
-        await sendMessage(to, "To track your order, please reply with your Order Code (e.g., #DK-A1B2-C3).");
-        // In a real app, we'd transition to 'AWAITING_TRACKING_CODE'
+        await sendMessage(to, "📦 *Order Tracking*\n\nPlease reply with your **Order Code** (e.g., MWP-ABC-123 or DK-xxxx).\n\n_You can find this code in your confirmation email or previous message._");
+        await transitionState(to, 'AWAITING_TRACKING_CODE');
+        return;
     } else if (selection.includes('faq') || body === 'menu_help') {
         await sendMessage(to, "*FAQ*\n\nQ: Is it discreet?\nA: Yes, 100% unbranded packaging.\n\nQ: Who is the sender?\nA: 'DK Retail' on statements.\n\n(Reply 'menu' to go back)");
     } else {
@@ -151,7 +156,7 @@ async function handleIdleState(to: string, body: string) {
                 const dateStr = new Date(order.created_at).toLocaleDateString('en-GB', { 
                     day: 'numeric', month: 'short', year: 'numeric' 
                 });
-                await sendMessage(to, `*Order Status*\nCode: ${code}\nStatus: *${statusText}*\nDate: ${dateStr}\n\nReply 'Menu' for other options.`);
+                await sendMessage(to, `📦 *Order Status*\n\nOrder Code: *${code}*\nStatus: *${statusText}*\nPlaced on: ${dateStr}\n\nNeed more help? Reply *Menu* to see all options.`);
             }
         } else {
             // [HYBRID ROUTER]
@@ -579,18 +584,18 @@ async function handleCollectingAddressState(
             location: location,
             address: 'GPS Pin Received'
         });
-        await sendMessage(to, "📍 Location received! Generating your secure checkout link...");
+        await sendMessage(to, "📍 *Location Received!*\n\nGenerating your secure and private checkout link...");
         await sendCheckoutLink(to, { ...session, location });
     } else {
         // User sent TEXT
         if (body.length < 3) {
-            await sendMessage(to, "Please enter a valid delivery address or select an option.");
+            await sendMessage(to, "Please enter a valid delivery address or select an option below.");
             return;
         }
         await updateSession(to, {
             address: body
         });
-        await sendMessage(to, "🏠 Address received! Generating your secure checkout link...");
+        await sendMessage(to, "🏘️ *Address Saved!*\n\nGenerating your secure and private checkout link...");
         await sendCheckoutLink(to, { ...session, address: body });
     }
 }
@@ -601,7 +606,7 @@ async function sendCampusList(to: string) {
     const rows = discounts.map((d: any) => ({
         id: `campus_${d.id}`,
         title: d.campus,
-        description: 'Free Delivery 🎓'
+        description: 'Free Campus Delivery 🏢'
     }));
 
     await transitionState(to, 'SELECTING_CAMPUS');
@@ -627,7 +632,7 @@ async function handleCampusSelection(to: string, body: string, session: SessionD
             // We need to re-fetch session with updated data or pass it manually
             // But wait, updateSession merges data.
             // Let's pass the specific address to sendCheckoutLink directly to be safe/fast.
-            await sendMessage(to, `🎓 Verified: ${campus.campus}. Free Delivery Applied!`);
+            await sendMessage(to, `🏛️ *Verified: ${campus.campus}*\n\nFree Campus Delivery Applied!`);
             await sendCheckoutLink(to, { ...session, address: `Campus: ${campus.campus}` });
         } else {
             await sendMessage(to, "Invalid Selection. Please try again.");
@@ -640,18 +645,89 @@ async function handleCampusSelection(to: string, body: string, session: SessionD
 
 // --- WEBHOOK HELPER ---
 export async function sendOrderConfirmation(to: string, orderCode: string, amount: number, items: string) {
-    const message = `✅ *Payment Confirmed!*
-    
-Your order *${orderCode}* for GHS ${amount} has been received.
-
-📦 *Items*: Unspecified (Privacy Mode) -- or we can list them if passed.
-🚚 *Status*: Processing
-
-*What next?*
-reply "Track" to see updates.
-reply "Shop" to buy again.
-
-Thank you for choosing DiscreetKit.`;
+    const message = `✅ *Payment Confirmed!*\n\n` +
+                    `Your order *${orderCode}* for *GHS ${amount}* has been received.\n\n` +
+                    `📦 *Items*: ${items}\n` +
+                    `🚚 *Status*: Processing\n\n` +
+                    `*What next?*\n` +
+                    `• Reply "Track" to see updates.\n` +
+                    `• Reply "Shop" to buy again.\n\n` +
+                    `Thank you for choosing *DiscreetKit*.`;
 
     await sendMessage(to, message);
+}
+
+/**
+ * Handle Order Tracking Code Input
+ */
+async function handleTrackingCodeInput(to: string, body: string) {
+    const code = body.toUpperCase().replace('#', '').trim();
+    logger.debug('Handling tracking code input', { context: 'WhatsApp-Manager', data: { code } });
+
+    // Validate if it looks like an order code (multiple formats)
+    // Format 1: MWP-XXX-XXX (Website/New format)
+    // Format 2: DK-MS-XXXX (Partner format)
+    // Format 3: ABCDEFGHI (Generic fallback)
+    const isCode = code.includes('-') || (code.length >= 8 && code.length <= 12);
+
+    if (isCode) {
+        await sendMessage(to, `🔍 *Searching for order ${code}...*`);
+
+        const supabase = getSupabaseAdminClient();
+        const { data: order, error } = await supabase
+            .from('orders')
+            .select('status, created_at, total_price_ghs, delivery_area')
+            .eq('code', code)
+            .single();
+
+        if (error || !order) {
+            // Try again with partner code if not found as order code
+            const { data: partnerOrder } = await supabase
+                .from('orders')
+                .select('status, created_at, code')
+                .eq('partner_code', code)
+                .single();
+
+            if (partnerOrder) {
+                await reportOrderStatus(to, partnerOrder.code, partnerOrder.status, partnerOrder.created_at);
+                await transitionState(to, 'IDLE');
+                return;
+            }
+
+            await sendMessage(to, `❌ *Order Not Found*\n\nWe couldn't find an order with code *${code}*.\n\n_Please double check your code and try again, or reply *Menu* to go back._`);
+        } else {
+            await reportOrderStatus(to, code, order.status, order.created_at);
+            await transitionState(to, 'IDLE');
+        }
+    } else {
+        // Not a code, maybe they want to go back?
+        if (body.toLowerCase() === 'menu' || body.toLowerCase() === 'back') {
+            await sendMainMenu(to);
+        } else {
+            await sendMessage(to, "🤔 That doesn't look like a valid order code. Please enter your code (e.g., MWP-ABC-123) or reply *Menu* to exit tracking.");
+        }
+    }
+}
+
+async function reportOrderStatus(to: string, code: string, status: string, date: string) {
+    const statusMap: Record<string, string> = {
+        'pending_payment': 'Pending Payment ⏳',
+        'received': 'Order Received ✅',
+        'processing': 'Processing 📦',
+        'shipped': 'Out for Delivery 🚚',
+        'delivered': 'Delivered Successfully 🎉',
+        'cancelled': 'Cancelled ❌'
+    };
+    const statusText = statusMap[status] || status;
+    const dateStr = new Date(date).toLocaleDateString('en-GB', { 
+        day: 'numeric', month: 'short', year: 'numeric' 
+    });
+
+    const msg = `📦 *Status Update*\n\n` +
+                `Order Code: *${code}*\n` +
+                `Current Status: *${statusText}*\n` +
+                `Date Ordered: ${dateStr}\n\n` +
+                `Need anything else? Just let me know or reply *Menu*.`;
+    
+    await sendMessage(to, msg);
 }
