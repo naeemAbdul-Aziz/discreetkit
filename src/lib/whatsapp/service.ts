@@ -1,14 +1,25 @@
 import { TwilioWebhookSchema, type InteractiveButton, type InteractiveListSection } from './types';
 
-const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
-const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN;
-const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER; // e.g., "whatsapp:+14155238886"
-
 /**
- * Helper to validate environment variables.
+ * Helper to validate and normalize environment variables.
+ * Some platforms wrap env vars in quotes; this ensures clean strings.
  */
+function getEnv(key: string): string | undefined {
+    const val = process.env[key];
+    return typeof val === 'string' ? val.replace(/^"|"$/g, '').trim() : undefined;
+}
+
+const TWILIO_ACCOUNT_SID = getEnv('TWILIO_ACCOUNT_SID');
+const TWILIO_AUTH_TOKEN = getEnv('TWILIO_AUTH_TOKEN');
+const TWILIO_PHONE_NUMBER = getEnv('TWILIO_PHONE_NUMBER');
+
 function validateEnv() {
     if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !TWILIO_PHONE_NUMBER) {
+        console.error('[Twilio Service] Missing credentials:', {
+            sid: !!TWILIO_ACCOUNT_SID,
+            token: !!TWILIO_AUTH_TOKEN,
+            phone: !!TWILIO_PHONE_NUMBER
+        });
         throw new Error('Twilio credentials are not configured.');
     }
 }

@@ -76,6 +76,25 @@ export async function findBestPharmacyForOrder(
 
     if (areaError || !serviceAreas || serviceAreas.length === 0) {
         console.warn(`[findBestPharmacyForOrder] No service areas found matching: ${deliveryArea}`);
+        
+        // --- WHATSAPP FALLBACK ---
+        if (deliveryArea === 'WhatsApp') {
+            console.log('[findBestPharmacyForOrder] WhatsApp order detected, falling back to any active pharmacy with stock.');
+            // Get all active pharmacies
+            const { data: activePharmacies } = await supabase
+                .from('pharmacies')
+                .select('id')
+                .eq('is_active', true);
+            
+            if (activePharmacies && activePharmacies.length > 0) {
+                // Return the first one for now (or rank by total deliveries if we had that)
+                return { 
+                    pharmacyId: activePharmacies[0].id, 
+                    reason: 'WhatsApp Fallback: Assigned to first active pharmacy' 
+                };
+            }
+        }
+        
         return { pharmacyId: null, reason: `No pharmacy covers area: ${deliveryArea}` }
     }
 
