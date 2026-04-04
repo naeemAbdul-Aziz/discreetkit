@@ -1,7 +1,8 @@
 import { sendMessage, sendInteractiveButtons, sendInteractiveList } from './service';
 import { getSession, updateSession, clearSession, transitionState } from './session';
 import type { ConversationState, SessionData } from './types';
-import { getSupabaseAdminClient } from '../supabase'; // Admin client for secure data access
+import { getSupabaseAdminClient } from '../supabase';
+import { generateTrackingCode, generatePartnerCode } from '../data';
 
 /**
  * Main entry point for handling incoming messages.
@@ -141,7 +142,10 @@ async function handleIdleState(to: string, body: string) {
                     'cancelled': 'Cancelled ❌'
                 };
                 const statusText = statusMap[order.status] || order.status;
-                await sendMessage(to, `*Order Status*\nCode: ${code}\nStatus: *${statusText}*\nDate: ${new Date(order.created_at).toLocaleDateString()}\n\nReply 'Menu' for other options.`);
+                const dateStr = new Date(order.created_at).toLocaleDateString('en-GB', { 
+                    day: 'numeric', month: 'short', year: 'numeric' 
+                });
+                await sendMessage(to, `*Order Status*\nCode: ${code}\nStatus: *${statusText}*\nDate: ${dateStr}\n\nReply 'Menu' for other options.`);
             }
         } else {
             // [HYBRID ROUTER]
@@ -177,9 +181,8 @@ async function sendCategories(to: string) {
     // Real DB fetch
     const supabase = getSupabaseAdminClient();
     const { data: categories, error } = await supabase
-        .from('products')
-        .select('category')
-        .not('category', 'is', null);
+        .from('categories')
+        .select('name');
 
     if (error || !categories) {
         console.error('Category fetch error:', error);
@@ -187,8 +190,8 @@ async function sendCategories(to: string) {
         return;
     }
 
-    // Deduplicate categories
-    const distinct = [...new Set(categories.map(c => c.category))].slice(0, 10) as string[];
+    // Extract names
+    const distinct = categories.map(c => c.name).slice(0, 10);
 
     const rows = distinct.map(c => ({
         id: `cat_${c}`,
@@ -238,7 +241,6 @@ async function sendProductsInCategory(to: string, category: string) {
         .from('products')
         .select('id, name, price_ghs, description')
         .eq('category', category)
-        .limit(10); // WhatsApp list limit
 
     if (!products || products.length === 0) {
         await sendMessage(to, `No products found in ${category}.`);
@@ -279,8 +281,8 @@ async function sendProductDetails(to: string, productId: string) {
 
     // We transition to VIEWING_PRODUCT to handle the "Buy" response
     const buttons = [
-        { type: 'reply', reply: { id: 'btn_back', title: 'Back' } },
-        { type: 'reply', reply: { id: 'btn_buy', title: 'Buy Now' } }
+        { type: 'reply', reply: { id: 'btn_back', title: '⬅️ Back' } },
+        { type: 'reply', reply: { id: 'btn_buy', title: '🛍️ Buy Now' } }
     ];
 
     // For buttons, we also want number support (1. Back, 2. Buy)
@@ -348,7 +350,8 @@ async function sendCheckoutLink(to: string, session: SessionData) {
 
     const amount = session.cart.total; // In GHS
     const email = `whatsapp_${to.replace(/\D/g, '')}@discretekit.com`; // Dummy email for guest checkout
-    const orderCode = `DK-WA-${Date.now().toString().slice(-6)}`; // Unique Code
+    const orderCode = generateTrackingCode();
+    const partnerCode = generatePartnerCode();
 
     // Generate Paystack Link
     let paystackSecret = process.env.PAYSTACK_SECRET_KEY as string | undefined;
@@ -388,16 +391,23 @@ async function sendCheckoutLink(to: string, session: SessionData) {
         const supabase = getSupabaseAdminClient();
         const { error: dbError } = await supabase.from('orders').insert({
             code: orderCode,
+            partner_code: partnerCode,
             status: 'pending_payment',
             subtotal_ghs: amount,
             student_discount_ghs: 0,
             delivery_fee_ghs: 0,
             total_price_ghs: amount,
-            phone_masked: to,
+            phone_masked: to, // Note: Website sanitizes to 0..., bot keeps whatsapp:+
             email: email,
             delivery_address_note: deliveryNote,
             delivery_area: 'WhatsApp',
-            items: session.cart.items.map(id => ({ product_id: id, quantity: 1, price: amount }))
+            items: session.cart.items.map(id => {
+                const itemData = session.listOptions?.find(opt => opt === `prod_${id}`);
+                // Ideally we'd have the product details in session, but since we re-fetch in sendProductDetails, 
+                // and session cart only has IDs, we'll try to find a name if possible or just use ID.
+                // WE SHOULD ALIGN THIS: { id, name, price, quantity }
+                return { id: parseInt(id), quantity: 1, price: amount }; 
+            })
         });
 
         if (dbError) {
@@ -418,11 +428,10 @@ async function sendCheckoutLink(to: string, session: SessionData) {
                 currency: 'GHS',
                 reference: orderCode, // Link via Code
                 metadata: {
-                    source: 'whatsapp',
+                    order_code: orderCode,
+                    tracking_code: orderCode,
                     whatsapp_id: to,
-                    custom_fields: [
-                        { display_name: "Order Code", variable_name: "order_code", value: orderCode }
-                    ]
+                    source: 'whatsapp'
                 }
             })
         });
