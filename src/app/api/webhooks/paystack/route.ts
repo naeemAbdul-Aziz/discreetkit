@@ -7,11 +7,15 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { getSupabaseAdminClient } from '@/lib/supabase';
-import { paymentDebug } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 import { sendOrderConfirmationSMS } from '@/lib/server-utils';
 import { revalidatePath } from 'next/cache';
 
 export async function POST(req: Request) {
+  const context = 'Paystack-Webhook';
+  const traceId = Math.random().toString(36).substring(7);
+  
+  logger.info('Webhook received', { context, traceId });
   // Sanitize secret key (some platforms add quotes)
   let paystackSecret = process.env.PAYSTACK_SECRET_KEY as string | undefined;
   if (typeof paystackSecret === 'string') {
@@ -42,7 +46,7 @@ export async function POST(req: Request) {
                   crypto.timingSafeEqual(signatureBuffer, hashBuffer);
 
   if (!isValid) {
-    paymentDebug('Invalid Paystack webhook signature');
+    logger.warn('Invalid Paystack webhook signature', { context, traceId });
     return new NextResponse('Webhook Error: Invalid signature', { status: 400 });
   }
 
@@ -53,7 +57,7 @@ export async function POST(req: Request) {
   const eventType = event?.event;
 
   // Log all webhook events for debugging
-  paymentDebug('Webhook received', { eventType, reference, status: eventStatus });
+  logger.debug('Webhook process start', { context, traceId, data: { eventType, reference, status: eventStatus } });
 
   // 2.5 Idempotency Check (Redis)
   try {
@@ -65,7 +69,7 @@ export async function POST(req: Request) {
     // Check if processed
     const processed = await redis.get(idempotencyKey);
     if (processed) {
-      paymentDebug('Wait! Duplicate webhook detected. Skipping.', { reference });
+      logger.info('Duplicate webhook detected. Skipping.', { context, traceId, data: { reference } });
       return new NextResponse('Webhook already processed', { status: 200 });
     }
 
@@ -101,7 +105,7 @@ export async function POST(req: Request) {
           console.warn('Failed to log payment event:', auditError);
         }
 
-        paymentDebug('Webhook payment success received', { reference, amount, eventType });
+        logger.info('Payment success verified', { context, traceId, data: { reference, amount, eventType } });
 
         // Find the order using the reference code
         const { data: order, error: findError } = await supabaseAdmin
@@ -111,7 +115,7 @@ export async function POST(req: Request) {
           .single();
 
         if (findError || !order) {
-          paymentDebug('Webhook order not found', { reference });
+          logger.error('Webhook order not found', { context, traceId, data: { reference } });
           // Return 200 so Paystack doesn't retry for a non-existent order
           return new NextResponse('Order not found', { status: 200 });
         }
@@ -135,28 +139,28 @@ export async function POST(req: Request) {
             amount: amount / 100,
           });
 
-          paymentDebug('Webhook updated order to received', { reference, orderId: order.id });
+          logger.info('Order marked as received', { context, traceId, data: { reference, orderId: order.id } });
 
           // Send SMS confirmation after successful payment
           // NON-BLOCKING:
           sendOrderConfirmationSMS(order.id)
-            .then(() => paymentDebug('SMS confirmation sent', { orderId: order.id }))
-            .catch(smsError => console.error('Failed to send SMS confirmation:', smsError));
+            .then(() => logger.info('SMS confirmation sent', { context, traceId, data: { orderId: order.id } }))
+            .catch(smsError => logger.error('Failed to send SMS confirmation', { context, traceId, data: smsError }));
 
           // [NEW] Send Customer Order Confirmation Email (Branded)
           if (order.email) {
              const { sendCustomerOrderConfirmation } = await import('@/lib/email-service');
-             sendCustomerOrderConfirmation({
-                email: order.email,
-                code: order.code,
-                total_price_ghs: order.total_price_ghs,
-                items: order.items as any[],
-                deliveryArea: order.delivery_area
-             }).then((res) => {
-                if (res.success) paymentDebug('Customer email confirmation sent', { emailId: res.emailId });
-                else console.error('Failed to send customer email:', res.error);
-             }).catch(err => console.error('Customer email exception:', err));
-          }
+              sendCustomerOrderConfirmation({
+                 email: order.email,
+                 code: order.code,
+                 total_price_ghs: order.total_price_ghs,
+                 items: order.items as any[],
+                 deliveryArea: order.delivery_area
+              }).then((res) => {
+                 if (res.success) logger.info('Customer email confirmation sent', { context, traceId, data: { emailId: res.emailId } });
+                 else logger.error('Failed to send customer email', { context, traceId, data: res.error });
+              }).catch(err => logger.error('Customer email exception', { context, traceId, data: err }));
+           }
 
           // [NEW] Send WhatsApp Rich Receipt
           // Check if it's a WhatsApp order via metadata
@@ -166,9 +170,9 @@ export async function POST(req: Request) {
               const { sendOrderConfirmation } = await import('@/lib/whatsapp/manager');
               const orderAmount = (amount / 100);
               await sendOrderConfirmation(whatsappId, reference, orderAmount, 'Privacy Mode');
-              paymentDebug('WhatsApp confirmation sent', { whatsappId });
+              logger.info('WhatsApp confirmation sent', { context, traceId, data: { whatsappId } });
             } catch (waError) {
-              console.error('Failed to send WhatsApp confirmation:', waError);
+              logger.error('Failed to send WhatsApp confirmation', { context, traceId, data: waError });
             }
           }
 
@@ -188,15 +192,14 @@ export async function POST(req: Request) {
                 const assignResult = await autoAssignOrder(order.id, order.delivery_area, orderWithItems.items as any[]);
 
                 if (assignResult.success) {
-                  paymentDebug('Auto-assigned pharmacy', { orderId: order.id, pharmacyId: assignResult.pharmacyId });
+                  logger.info('Auto-assigned pharmacy', { context, traceId, data: { orderId: order.id, pharmacyId: assignResult.pharmacyId } });
                 } else {
-                  paymentDebug('Manual assignment required', { orderId: order.id, deliveryArea: order.delivery_area, reason: assignResult.reason || assignResult.error });
+                  logger.info('Manual assignment required', { context, traceId, data: { orderId: order.id, reason: assignResult.reason || assignResult.error } });
                 }
               }
             } catch (assignError) {
               // Log and continue - admin will handle manual assignment
-              console.warn('Auto-assignment failed, requires manual assignment:', assignError);
-              paymentDebug('Auto-assignment failed', { orderId: order.id, error: String(assignError) });
+              logger.warn('Auto-assignment failed', { context, traceId, data: assignError });
             }
           }
           // Revalidate dashboard and order paths for real-time updates
@@ -205,19 +208,19 @@ export async function POST(req: Request) {
           revalidatePath('/admin/orders');
 
         } else {
-          paymentDebug('Order already processed', { reference, orderId: order.id, currentStatus: order.status });
+          logger.info('Order already processed', { context, traceId, data: { reference, status: order.status } });
         }
 
       } catch (err) {
-        console.error('Webhook processing error:', err);
+        logger.error('Webhook processing error', { context, traceId, data: err });
         return new NextResponse('Webhook Error: Internal Server Error', { status: 500 });
       }
     } else {
-      paymentDebug('Webhook received non-success status', { reference, status });
+      logger.debug('Non-success webhook event', { context, traceId, data: { reference, status } });
     }
   } else {
     // Log unhandled events for monitoring
-    paymentDebug('Webhook event not handled', { eventType, reference });
+    logger.debug('Unhandled webhook event', { context, traceId, data: { eventType, reference } });
   }
 
   // 4. Acknowledge receipt of the event

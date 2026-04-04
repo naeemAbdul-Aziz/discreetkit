@@ -1,5 +1,6 @@
 import { sendMessage, sendInteractiveButtons, sendInteractiveList } from './service';
 import { getSession, updateSession, clearSession, transitionState } from './session';
+import { logger } from '@/lib/logger';
 import type { ConversationState, SessionData } from './types';
 import { getSupabaseAdminClient } from '../supabase';
 import { generateTrackingCode, generatePartnerCode } from '../data';
@@ -13,7 +14,12 @@ export async function handleIncomingMessage(
     profileName?: string,
     location?: { lat: number, long: number } // [NEW] Location Data
 ) {
+    logger.info('Handling incoming message', { context: 'WhatsApp-Manager', data: { from, body } });
+
+    // 1. Load Session
     const session = await getSession(from);
+    logger.debug('Session loaded', { context: 'WhatsApp-Manager', data: { state: session.state } });
+
     // [NEW] If location is present, use it for logic (override body if empty or generic)
     if (location) {
         console.log(`[Location Received] ${location.lat}, ${location.long}`);
@@ -353,6 +359,8 @@ async function sendCheckoutLink(to: string, session: SessionData) {
     const orderCode = generateTrackingCode();
     const partnerCode = generatePartnerCode();
 
+    logger.info('Initializing checkout', { context: 'WhatsApp-Manager', data: { from: to, amount } });
+    
     // Generate Paystack Link
     let paystackSecret = process.env.PAYSTACK_SECRET_KEY as string | undefined;
     if (typeof paystackSecret === 'string') {
@@ -411,9 +419,12 @@ async function sendCheckoutLink(to: string, session: SessionData) {
         });
 
         if (dbError) {
-            console.error("Order Creation Failed:", dbError);
-            throw new Error(`Database insert failed: ${dbError.message}`);
+            logger.error('Database error during order creation', { context: 'WhatsApp-Manager', data: dbError });
+            await sendMessage(to, "❌ *System Error*: We couldn't create your order record. Please contact support.");
+            return;
         }
+        
+        logger.info('Order record created', { context: 'WhatsApp-Manager', data: { code: orderCode } });
 
         // 2. Initialize Paystack Transaction
         const response = await fetch('https://api.paystack.co/transaction/initialize', {
@@ -438,7 +449,11 @@ async function sendCheckoutLink(to: string, session: SessionData) {
 
         const data = await response.json();
         if (data.status && data.data.authorization_url) {
-            await sendMessage(to, `Please click the link below to complete your secure payment of *GHS ${amount}*:\n\n${data.data.authorization_url}`);
+            const checkoutUrl = data.data.authorization_url;
+            
+            logger.info('Checkout link generated', { context: 'WhatsApp-Manager', data: { code: orderCode } });
+
+            await sendMessage(to, `🚀 *Almost done!*\n\nClick the secure link below to complete your payment of *GHS ${amount}*.\n\n🔗 ${checkoutUrl}\n\n_Your order will be processed immediately after payment._`);
 
             await updateSession(to, { state: 'IDLE', cart: { items: [], total: 0 } }); // Clear cart after link generation
         } else {
@@ -446,8 +461,8 @@ async function sendCheckoutLink(to: string, session: SessionData) {
         }
 
     } catch (error) {
-        console.error("Payment Link Generation Error:", error);
-        await sendMessage(to, "Sorry, we couldn't generate a payment link right now.");
+        logger.error('Checkout error', { context: 'WhatsApp-Manager', data: error });
+        await sendMessage(to, "❌ *Checkout Error*: We couldn't generate your payment link. Please try again or contact support.");
     }
 }
 

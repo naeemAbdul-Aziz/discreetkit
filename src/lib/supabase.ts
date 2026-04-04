@@ -6,9 +6,10 @@
  * 1. `getSupabaseClient`: Returns a singleton instance of the public, client-safe Supabase client.
  * 2. `getSupabaseAdminClient`: Creates a new server-only admin client. This should only be called within server actions or API routes.
  */
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 import { createServerClient, type CookieOptions, createBrowserClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { logger } from './logger';
 
 
 // These are the public-facing variables, safe to be exposed in the browser.
@@ -177,7 +178,7 @@ export async function getUserRoles(supabase: any, userId: string): Promise<strin
     .eq('user_id', userId);
 
   if (error) {
-    console.error('[getUserRoles] Error fetching roles:', error);
+    logger.error('Error fetching roles', { context: 'Auth-Roles', data: { userId, error } });
     return [];
   }
   if (!data) return [];
@@ -191,13 +192,17 @@ export async function getUserRoles(supabase: any, userId: string): Promise<strin
  * This function should only be called from server-side code (Server Actions, API Routes).
  */
 export function getSupabaseAdminClient() {
-  const serviceKey = process.env.SUPABASE_SERVICE_KEY!;
+  const serviceKey = process.env.SUPABASE_SERVICE_KEY;
+  if (!serviceKey) {
+    logger.error('Supabase service key missing', { context: 'Supabase-Admin' });
+  }
 
   // Create a new client each time to ensure it's used in a secure server context.
-  return createClient(supabaseUrl, serviceKey, {
+  return createClient(supabaseUrl, serviceKey!, {
+    auditLog: 'Admin Client Created',
     auth: {
       autoRefreshToken: false,
       persistSession: false,
     },
-  });
+  } as any);
 }
