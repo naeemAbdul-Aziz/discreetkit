@@ -34,6 +34,8 @@ async function sendToTwilio(payload: URLSearchParams) {
     const url = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`;
     const auth = Buffer.from(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`).toString('base64');
 
+    console.log(`[Twilio Service] Sending message to ${payload.get('To')}...`);
+
     try {
         const response = await fetch(url, {
             method: 'POST',
@@ -46,14 +48,15 @@ async function sendToTwilio(payload: URLSearchParams) {
 
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('Twilio API Error:', errorText);
+            console.error('[Twilio Service] API Error:', errorText);
             throw new Error(`Twilio API request failed: ${response.statusText}`);
         }
 
         const data = await response.json();
+        console.log(`[Twilio Service] Message Sent! SID: ${data.sid}`);
         return data;
     } catch (error) {
-        console.error('Failed to send WhatsApp message:', error);
+        console.error('[Twilio Service] Transport Error:', error);
         throw error;
     }
 }
