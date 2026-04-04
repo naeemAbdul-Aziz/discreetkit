@@ -1,3 +1,5 @@
+import { URLSearchParams } from 'url';
+import { logger } from '@/lib/logger';
 import { TwilioWebhookSchema, type InteractiveButton, type InteractiveListSection } from './types';
 
 /**
@@ -15,10 +17,9 @@ const TWILIO_PHONE_NUMBER = getEnv('TWILIO_PHONE_NUMBER');
 
 function validateEnv() {
     if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !TWILIO_PHONE_NUMBER) {
-        console.error('[Twilio Service] Missing credentials:', {
-            sid: !!TWILIO_ACCOUNT_SID,
-            token: !!TWILIO_AUTH_TOKEN,
-            phone: !!TWILIO_PHONE_NUMBER
+        logger.error('Twilio credentials missing', { 
+            context: 'Twilio-Service',
+            data: { sid: !!TWILIO_ACCOUNT_SID, token: !!TWILIO_AUTH_TOKEN, phone: !!TWILIO_PHONE_NUMBER } 
         });
         throw new Error('Twilio credentials are not configured.');
     }
@@ -34,7 +35,7 @@ async function sendToTwilio(payload: URLSearchParams) {
     const url = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`;
     const auth = Buffer.from(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`).toString('base64');
 
-    console.log(`[Twilio Service] Sending message to ${payload.get('To')}...`);
+    logger.debug('Sending message', { context: 'Twilio-Service', data: { to: payload.get('To') } });
 
     try {
         const response = await fetch(url, {
@@ -48,15 +49,15 @@ async function sendToTwilio(payload: URLSearchParams) {
 
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('[Twilio Service] API Error:', errorText);
+            logger.error('Twilio API rejected request', { context: 'Twilio-Service', data: { status: response.status, error: errorText } });
             throw new Error(`Twilio API request failed: ${response.statusText}`);
         }
 
         const data = await response.json();
-        console.log(`[Twilio Service] Message Sent! SID: ${data.sid}`);
+        logger.info('Message sent successfully', { context: 'Twilio-Service', data: { sid: data.sid } });
         return data;
     } catch (error) {
-        console.error('[Twilio Service] Transport Error:', error);
+        logger.error('Twilio transport error', { context: 'Twilio-Service', data: error });
         throw error;
     }
 }

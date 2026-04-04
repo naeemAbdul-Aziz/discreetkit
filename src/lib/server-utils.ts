@@ -1,5 +1,6 @@
 import 'server-only';
 import { getSupabaseAdminClient } from './supabase';
+import { logger } from './logger';
 
 // SMS utility function - Internal use only
 export async function sendSMS(phone: string, message: string): Promise<{ ok: boolean; recipient: string; status?: number; body?: any; error?: string }> {
@@ -7,13 +8,11 @@ export async function sendSMS(phone: string, message: string): Promise<{ ok: boo
     // Trim accidental quotes from env var (some deploy UIs add quotes)
     if (typeof arkeselApiKey === 'string') arkeselApiKey = arkeselApiKey.replace(/^"|"$/g, '').trim();
 
-    console.log('sendSMS called — phone:', phone.replace(/.(?=.{4})/g, '*'), 'messagePreview:', message?.slice(0, 120));
-    // console.log('Arkesel key present:', !!arkeselApiKey, 'key length:', (arkeselApiKey || '').length);
+    logger.info('sendSMS called', { context: 'SMS-Service', data: { phone: phone.replace(/.(?=.{4})/g, '*') } });
 
     if (!arkeselApiKey || arkeselApiKey.length === 0) {
-        const msg = 'SMS not sent: Arkesel API key not configured';
-        console.warn(msg);
-        return { ok: false, recipient: phone, error: msg };
+        logger.warn('SMS not sent: Arkesel API key not configured', { context: 'SMS-Service' });
+        return { ok: false, recipient: phone, error: 'SMS not sent: Arkesel API key not configured' };
     }
 
     // Format phone number for Ghana (add 233 prefix if starts with 0)
@@ -22,7 +21,7 @@ export async function sendSMS(phone: string, message: string): Promise<{ ok: boo
     
     // PII MASKING: Only log last 4 digits
     const maskedPhone = recipient.replace(/.(?=.{4})/g, '*');
-    console.log('Arkesel SMS - recipient:', maskedPhone, 'sender:', senderId, 'messagePreview:', message.slice(0, 50) + '...');
+    logger.debug('Sending SMS', { context: 'SMS-Service', data: { recipient: maskedPhone, sender: senderId } });
 
     try {
         // Build URL with query parameters as per Arkesel documentation
@@ -53,7 +52,7 @@ export async function sendSMS(phone: string, message: string): Promise<{ ok: boo
         }
 
         if (!response.ok) {
-            console.warn('Arkesel SMS API Error:', { status: response.status, body: responseBody });
+            logger.error('Arkesel API Error', { context: 'SMS-Service', data: { status: response.status, body: responseBody } });
             return {
                 ok: false,
                 recipient,
@@ -67,7 +66,7 @@ export async function sendSMS(phone: string, message: string): Promise<{ ok: boo
         const isSuccess = responseBody?.code === 'ok' || responseBody?.message?.toLowerCase().includes('success');
 
         if (!isSuccess) {
-            console.warn('Arkesel SMS failed based on response:', responseBody);
+            logger.warn('Arkesel SMS failed based on response', { context: 'SMS-Service', data: responseBody });
             return {
                 ok: false,
                 recipient,
@@ -81,10 +80,7 @@ export async function sendSMS(phone: string, message: string): Promise<{ ok: boo
         return { ok: true, recipient, status: response.status, body: responseBody };
 
     } catch (smsError: any) {
-        console.error('Failed to send SMS notification:', smsError);
-        if (smsError.response) {
-            console.error('SMS Error Response Body:', await smsError.response.text().catch(() => 'No body'));
-        }
+        logger.error('Failed to send SMS notification', { context: 'SMS-Service', data: smsError });
         return { ok: false, recipient, error: String(smsError) };
     }
 }
@@ -103,19 +99,19 @@ export async function sendOrderConfirmationSMS(orderId: string): Promise<void> {
             .single();
 
         if (error || !order) {
-            console.error('Failed to fetch order for SMS confirmation:', error);
+            logger.error('Failed to fetch order for SMS confirmation', { context: 'SMS-Service', data: { orderId, error } });
             return;
         }
 
         // SECURITY CHECK: Ensure order is actually paid (status 'received')
         if (order.status !== 'received') {
-            console.warn(`Security Risk: Attempted to send confirmation SMS for unpaid order ${order.code} (status: ${order.status})`);
+            logger.warn('Security Risk: Attempted to send confirmation SMS for unpaid order', { context: 'SMS-Service', data: { code: order.code, status: order.status } });
             return;
         }
 
         // Defensive check: ensure phone number exists
         if (!order.phone_masked || order.phone_masked.trim() === '') {
-            console.warn('SMS not sent: phone_masked is missing for order', { orderId, code: order.code });
+            logger.warn('SMS not sent: phone_masked is missing', { context: 'SMS-Service', data: { orderId, code: order.code } });
             return;
         }
 
@@ -125,12 +121,12 @@ export async function sendOrderConfirmationSMS(orderId: string): Promise<void> {
         const result = await sendSMS(order.phone_masked, confirmationMessage);
 
         if (!result.ok) {
-            console.error('SMS sending failed for order confirmation:', { orderId, code: order.code, error: result.error });
+            logger.error('SMS sending failed for order confirmation', { context: 'SMS-Service', data: { orderId, code: order.code, error: result.error } });
         } else {
-            console.log('Order confirmation SMS sent successfully:', { orderId, code: order.code, recipient: result.recipient.replace(/.(?=.{4})/g, '*') });
+            logger.info('Order confirmation SMS sent successfully', { context: 'SMS-Service', data: { orderId, code: order.code, recipient: result.recipient.replace(/.(?=.{4})/g, '*') } });
         }
     } catch (error) {
-        console.error('Error sending order confirmation SMS:', error);
+        logger.error('Error sending order confirmation SMS', { context: 'SMS-Service', data: error });
     }
 }
 
@@ -146,7 +142,7 @@ export async function sendShippingNotificationSMS(orderId: string): Promise<void
             .single();
 
         if (error || !order) {
-            console.error('Failed to fetch order for shipping SMS:', error);
+            logger.error('Failed to fetch order for shipping SMS', { context: 'SMS-Service', data: { orderId, error } });
             return;
         }
 
@@ -163,7 +159,7 @@ export async function sendShippingNotificationSMS(orderId: string): Promise<void
 
         await sendSMS(order.phone_masked, shippingMessage);
     } catch (error) {
-        console.error('Error sending shipping notification SMS:', error);
+        logger.error('Error sending shipping notification SMS', { context: 'SMS-Service', data: error });
     }
 }
 
@@ -179,7 +175,7 @@ export async function sendDeliveryNotificationSMS(orderId: string): Promise<void
             .single();
 
         if (error || !order) {
-            console.error('Failed to fetch order for delivery SMS:', error);
+            logger.error('Failed to fetch order for delivery SMS', { context: 'SMS-Service', data: { orderId, error } });
             return;
         }
 
@@ -188,6 +184,6 @@ export async function sendDeliveryNotificationSMS(orderId: string): Promise<void
 
         await sendSMS(order.phone_masked, deliveredMessage);
     } catch (error) {
-        console.error('Error sending delivery notification SMS:', error);
+        logger.error('Error sending delivery notification SMS', { context: 'SMS-Service', data: error });
     }
 }

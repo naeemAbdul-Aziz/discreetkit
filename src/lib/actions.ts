@@ -30,6 +30,7 @@ async function getAnswerQuestions() {
 import { revalidatePath } from 'next/cache';
 import { type CartItem } from '@/hooks/use-cart';
 import { getSupabaseAdminClient, createSupabaseServerClient } from './supabase';
+import { logger } from './logger';
 import { redirect } from 'next/navigation';
 
 
@@ -43,7 +44,7 @@ export async function recordPharmacyAcknowledgement(orderId: number, decision: '
     .update({ pharmacy_ack_status: decision, pharmacy_ack_at: new Date().toISOString() })
     .eq('id', orderId);
   if (updateError) {
-    console.error('Pharmacy ack update error', updateError);
+    logger.error('Pharmacy ack update error', { context: 'Pharmacy-Actions', data: updateError });
     return { ok: false };
   }
   // Log event
@@ -58,6 +59,11 @@ export async function recordPharmacyAcknowledgement(orderId: number, decision: '
       customNote: reason || undefined,
     });
   }
+  
+  logger.info('Pharmacy acknowledgement recorded', { 
+    context: 'Pharmacy-Actions', 
+    data: { orderId, decision, reason } 
+  });
   
   return { ok: true };
 }
@@ -88,7 +94,7 @@ export async function login(formData: FormData) {
   });
 
   if (error) {
-    console.error('Login error:', error.message);
+    logger.error('Login error', { context: 'Auth-Actions', data: { email, error: error.message } });
     redirect('/login?error=Invalid credentials. Please try again.');
     return;
   }
@@ -114,6 +120,8 @@ export async function login(formData: FormData) {
       .filter(Boolean);
     const isAdmin = roles.includes('admin') || adminWhitelist.includes(email);
     const isPharmacy = roles.includes('pharmacy') || pharmacyWhitelist.includes(email);
+
+    logger.info('Login successful', { context: 'Auth-Actions', data: { email, isAdmin, isPharmacy } });
 
     if (isAdmin) {
       redirect(process.env.NEXT_PUBLIC_ADMIN_URL || '/admin/dashboard');
@@ -161,6 +169,11 @@ import { generateTrackingCode, generatePartnerCode, type Order, DELIVERY_FEES, d
  * @returns An object containing success status, a message, any validation errors, and the Paystack authorization URL.
  */
 export async function createOrderAction(prevState: any, formData: FormData) {
+  const context = 'Order-Actions';
+  const traceId = Math.random().toString(36).substring(7);
+  
+  logger.info('Create order attempt', { context, traceId });
+
   // Extract raw form data first for manual cleaning
   const rawData = Object.fromEntries(formData.entries());
   
@@ -188,6 +201,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
   const validatedFields = orderSchema.safeParse(rawData);
 
   if (!validatedFields.success) {
+    logger.warn('Order validation failed', { context, traceId, data: validatedFields.error.flatten().fieldErrors });
     return {
       errors: validatedFields.error.flatten().fieldErrors,
       message: 'Please check your delivery information and try again.',
@@ -228,6 +242,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
       .in('id', productIds);
 
     if (prodError || !dbProducts) {
+      logger.error('Product verification failed', { context, traceId, data: prodError });
       throw new Error('Unable to verify product information. Please try again.');
     }
 
@@ -289,7 +304,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     // Compare with client provided values (Optional: just overwrite, but logging discrepancies is good for security)
     const clientTotal = parseFloat(validatedFields.data.total_price_ghs);
     if (Math.abs(calculatedTotalPrice - clientTotal) > 0.5) { // 0.5 tolerance for float math
-         console.warn(`[Price Security] Client Total: ${clientTotal}, Server Total: ${calculatedTotalPrice}. Overwriting with Server Total.`);
+         logger.warn('Price discrepancy detected', { context, traceId, data: { clientTotal, serverTotal: calculatedTotalPrice } });
     }
     
     const priceDetails = {
@@ -327,9 +342,14 @@ export async function createOrderAction(prevState: any, formData: FormData) {
       .select('id, pharmacy_id')
       .single();
 
-    if (orderError) throw orderError;
-    if (!orderData)
+    if (orderError) {
+      logger.error('Order creation failed', { context, traceId, data: orderError });
+      throw orderError;
+    }
+    if (!orderData) {
+      logger.error('No order data returned after creation', { context, traceId });
       throw new Error('Failed to retrieve order ID after creation.');
+    }
 
     // 2. Add an initial "Order Received" event
     const { createOrderEvent } = await import('@/lib/event-messages');
@@ -341,7 +361,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
 
     // FIRE AND FORGET: Don't await this. Let it run in background to speed up order creation.
     sendSMS(validatedFields.data.phone_masked, initialSmsMessage)
-      .catch(err => console.error('Background SMS failed:', err));
+      .catch(err => logger.error('Background order SMS failed', { context, traceId, data: err }));
 
     // 4. Auto-Assignment skipped here. Will be handled by webhook after payment.
 
@@ -354,7 +374,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     }
 
     if (!paystackSecretKey) {
-      console.error('Paystack secret key is not configured in .env.local');
+      logger.error('Paystack secret key missing', { context, traceId });
       throw new Error('Payment processing is not configured.');
     }
 
@@ -384,11 +404,13 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     const paystackData = await paystackResponse.json();
 
     if (!paystackResponse.ok || !paystackData.status) {
-      console.error('Paystack API Error:', paystackData);
+      logger.error('Paystack transaction initialization failed', { context, traceId, data: paystackData });
       // Attempt to delete the pending order if Paystack fails to prevent orphaned orders
       await supabaseAdmin.from('orders').delete().eq('id', orderData.id);
       throw new Error(paystackData.message || 'Unable to initialize payment. Please check your connection and try again.');
     }
+
+    logger.info('Order created successfully', { context, traceId, data: { orderId: orderData.id, code } });
 
     revalidatePath('/order');
     return {
@@ -399,7 +421,7 @@ export async function createOrderAction(prevState: any, formData: FormData) {
     };
 
   } catch (error: any) {
-    console.error('Create Order Action Error:', error);
+    logger.error('createOrderAction error', { context, traceId, data: error });
     const fallbackMessage = 'An unexpected server error occurred. Please try again later or contact support if the problem persists.';
     return {
       message: typeof error?.message === 'string' && error.message.trim()
@@ -436,7 +458,7 @@ export async function getOrderAction(code: string): Promise<Order | null> {
       .single();
 
     if (error || !order) {
-      console.error('Error fetching order:', error);
+      logger.error('Error fetching order', { context: 'Order-Actions', data: { code, error } });
       return null;
     }
 
@@ -469,7 +491,7 @@ export async function getOrderAction(code: string): Promise<Order | null> {
         .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()),
     };
   } catch (error) {
-    console.error('Action Error in getOrderAction:', error);
+    logger.error('Action Error in getOrderAction', { context: 'Order-Actions', data: error });
     return null;
   }
 }
@@ -486,6 +508,9 @@ export async function handleChat(
   message: string
 ) {
   'use server';
+  const traceId = Math.random().toString(36).substring(7);
+  logger.info('AI Chat session', { context: 'AI-Actions', traceId });
+  
   try {
     const supabase = getSupabaseAdminClient();
     // Fetch live product data for real-time context
@@ -508,7 +533,7 @@ export async function handleChat(
     });
     return result.answer;
   } catch (error) {
-    console.error('AI Error:', error);
+    logger.error('AI Chat Error', { context: 'AI-Actions', data: error });
     return "I'm sorry, I'm having trouble connecting right now. Please try again later.";
   }
 }
@@ -543,6 +568,7 @@ export async function saveSuggestion(prevState: any, formData: FormData) {
     revalidatePath('/#products');
     return { success: true, message: 'Suggestion saved!' };
   } catch (error: any) {
+    logger.error('Failed to save suggestion', { context: 'Order-Actions', data: error });
     return {
       message: error.message || 'Failed to save suggestion.',
       success: false,
@@ -571,7 +597,7 @@ export async function joinWaitlist(nickname: string, phone: string) {
 
     return { success: true };
   } catch (error: any) {
-    console.error('Waitlist Join Error:', error);
+    logger.error('Waitlist Join Error', { context: 'Order-Actions', data: error });
     return { success: false, message: "Something went wrong. Please try again." };
   }
 }
@@ -616,9 +642,10 @@ export async function uploadPrescriptionAction(formData: FormData) {
 
     if (error) throw error;
 
+    logger.info('Prescription uploaded', { context: 'Medication-Actions', data: { path: data.path } });
     return { success: true, path: data.path };
   } catch (error: any) {
-    console.error('Upload Error:', error);
+    logger.error('Upload Error', { context: 'Medication-Actions', data: error });
     return { success: false, message: error.message || 'Unable to upload file. Please try again.' };
   }
 }
@@ -665,7 +692,7 @@ export async function createRefillSubscription(prevState: any, formData: FormDat
       .single();
 
     if (error) {
-        console.error('Subscription error:', error);
+        logger.error('Subscription error', { context: 'Medication-Actions', data: error });
         // Check if it's a duplicate constraint error (same phone + product)
         if (error.code === '23505') {
           return { 
@@ -676,6 +703,7 @@ export async function createRefillSubscription(prevState: any, formData: FormDat
         return { success: false, message: 'Unable to complete enrollment. Please try again or contact support if the issue persists.' };
     }
 
+    logger.info('Refill subscription created', { context: 'Medication-Actions', data: { code: data.subscription_code } });
     return { success: true, message: 'Enrolled successfully!', code: data.subscription_code };
 
   } catch (error: any) {
@@ -698,7 +726,7 @@ export async function getUserRefillSubscriptions() {
     .order('enrolled_at', { ascending: false });
 
   if (error) {
-    console.error('Error fetching user subscriptions:', error);
+    logger.error('Error fetching user subscriptions', { context: 'Medication-Actions', data: error });
     return [];
   }
 
@@ -731,7 +759,7 @@ export async function getSubscriptionAction(code: string) {
       .single();
 
     if (error || !subscription) {
-      console.error('Error fetching subscription:', error);
+      logger.error('Error fetching subscription', { context: 'Medication-Actions', data: { code, error } });
       return null;
     }
 
@@ -784,7 +812,7 @@ export async function getSubscriptionAction(code: string) {
       refillHistory: refillLogs || [],
     };
   } catch (error) {
-    console.error('Action Error in getSubscriptionAction:', error);
+    logger.error('Action Error in getSubscriptionAction', { context: 'Medication-Actions', data: error });
     return null;
   }
 }

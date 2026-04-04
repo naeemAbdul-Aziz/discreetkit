@@ -1,6 +1,7 @@
 'use server'
 
 import { createSupabaseServerClient, getSupabaseAdminClient } from "@/lib/supabase"
+import { logger } from "@/lib/logger"
 
 /**
  * Find the best pharmacy for an order based on:
@@ -22,14 +23,14 @@ export async function findBestPharmacyForOrder(
         .eq('is_active', true);
 
     if (pharmacyError) {
-        console.error('[findBestPharmacyForOrder] Error fetching pharmacies:', pharmacyError);
+        logger.error('Error fetching pharmacies', { context: 'Order-Assignment', data: pharmacyError });
         return { pharmacyId: null, reason: 'Database error' };
     }
 
     // If only one pharmacy, assign directly (skip service area check)
     if (allPharmacies && allPharmacies.length === 1) {
         const singlePharmacyId = allPharmacies[0].id;
-        console.log(`[findBestPharmacyForOrder] Single pharmacy detected (#${singlePharmacyId}), assigning directly`);
+        logger.info('Single pharmacy auto-assignment', { context: 'Order-Assignment', data: { pharmacyId: singlePharmacyId } });
         
         // Still check stock availability
         const { data: stockData } = await supabase
@@ -46,7 +47,7 @@ export async function findBestPharmacyForOrder(
                 const productStock = stockData.find(p => p.product_id === item.id);
                 if (!productStock || !productStock.is_available || productStock.stock_level < item.quantity) {
                     hasStock = false;
-                    console.log(`[findBestPharmacyForOrder] Single pharmacy lacks stock for product #${item.id}`);
+                    logger.warn('Single pharmacy lacks stock', { context: 'Order-Assignment', data: { pharmacyId: singlePharmacyId, productId: item.id } });
                     break;
                 }
             }
@@ -63,7 +64,7 @@ export async function findBestPharmacyForOrder(
     }
 
     // MULTI-PHARMACY LOGIC: Find pharmacies that cover the delivery area
-    console.log(`[findBestPharmacyForOrder] Multiple pharmacies detected, using service area matching for: ${deliveryArea}`);
+    logger.debug('Multi-pharmacy area match start', { context: 'Order-Assignment', data: { deliveryArea } });
     const { data: serviceAreas, error: areaError } = await supabase
         .from('pharmacy_service_areas')
         .select('pharmacy_id, delivery_fee, max_delivery_time_hours')
@@ -71,15 +72,15 @@ export async function findBestPharmacyForOrder(
         .eq('is_active', true)
 
     if (areaError) {
-        console.error('[findBestPharmacyForOrder] Error fetching service areas:', areaError);
+        logger.error('Error fetching service areas', { context: 'Order-Assignment', data: areaError });
     }
 
     if (areaError || !serviceAreas || serviceAreas.length === 0) {
-        console.warn(`[findBestPharmacyForOrder] No service areas found matching: ${deliveryArea}`);
+        logger.warn('No service areas found', { context: 'Order-Assignment', data: { deliveryArea } });
         
         // --- WHATSAPP FALLBACK ---
         if (deliveryArea === 'WhatsApp') {
-            console.log('[findBestPharmacyForOrder] WhatsApp order detected, falling back to any active pharmacy with stock.');
+            logger.info('WhatsApp order fallback trial', { context: 'Order-Assignment' });
             // Get all active pharmacies
             const { data: activePharmacies } = await supabase
                 .from('pharmacies')
@@ -139,12 +140,12 @@ export async function findBestPharmacyForOrder(
                 maxTime: areaDetails.max_delivery_time_hours
             })
         } else {
-            console.log(`[findBestPharmacyForOrder] Pharmacy #${pharmacyId} covers area but lacks stock.`);
+            logger.debug('Candidate lacks stock', { context: 'Order-Assignment', data: { pharmacyId } });
         }
     }
 
     if (validCandidates.length === 0) {
-        console.warn(`[findBestPharmacyForOrder] Pharmacies found in area but none have sufficient stock.`);
+        logger.warn('No valid candidates found with stock', { context: 'Order-Assignment', data: { deliveryArea } });
         return { pharmacyId: null, reason: "Pharmacies found in area but none have sufficient stock." }
     }
 
@@ -157,7 +158,7 @@ export async function findBestPharmacyForOrder(
         return a.maxTime - b.maxTime
     })
 
-    console.log(`[findBestPharmacyForOrder] Found ${validCandidates.length} valid candidates for area ${deliveryArea}. Best match: Pharmacy #${validCandidates[0].pharmacyId}`);
+    logger.info('Best match found', { context: 'Order-Assignment', data: { deliveryArea, pharmacyId: validCandidates[0].pharmacyId } });
 
     return {
         pharmacyId: validCandidates[0].pharmacyId,
@@ -183,7 +184,7 @@ export async function autoAssignOrder(orderId: number, deliveryArea: string, ite
         const { createOrderEvent } = await import('@/lib/event-messages');
         await createOrderEvent(supabase, orderId, 'optimization_in_progress');
         // Log technical reason internally
-        console.warn(`[Auto-Assign] Failed for order ${orderId}: ${reason}`);
+        logger.warn('Auto-assignment failed', { context: 'Order-Assignment', data: { orderId, reason } });
         return { success: false, reason }
     }
 

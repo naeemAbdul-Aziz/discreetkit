@@ -4,6 +4,7 @@
  */
 
 import { Resend } from 'resend';
+import { logger } from '@/lib/logger';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -100,14 +101,14 @@ export async function sendOrderAssignedEmail(data: OrderAssignedEmailData) {
         });
 
         if (error) {
-            console.error('[sendOrderAssignedEmail] Error:', error);
+            logger.error('Failed to send order assigned email', { context: 'Email-Service', data: { error, pharmacy: data.pharmacyEmail } });
             return { success: false, error: error.message };
         }
 
-        console.log('[sendOrderAssignedEmail] Email sent successfully:', emailData?.id);
+        logger.info('Order assigned email sent', { context: 'Email-Service', data: { emailId: emailData?.id, order: data.orderCode } });
         return { success: true, emailId: emailData?.id };
     } catch (error: any) {
-        console.error('[sendOrderAssignedEmail] Exception:', error);
+        logger.error('Exception in sendOrderAssignedEmail', { context: 'Email-Service', data: error });
         return { success: false, error: error.message };
     }
 }
@@ -175,14 +176,14 @@ export async function sendOrderStatusEmail(data: OrderStatusEmailData) {
         });
 
         if (error) {
-            console.error('[sendOrderStatusEmail] Error:', error);
+            logger.error('Failed to send order status email', { context: 'Email-Service', data: { error, pharmacy: data.pharmacyEmail, status: data.newStatus } });
             return { success: false, error: error.message };
         }
 
-        console.log('[sendOrderStatusEmail] Email sent successfully:', emailData?.id);
+        logger.info('Order status email sent', { context: 'Email-Service', data: { emailId: emailData?.id, order: data.orderCode } });
         return { success: true, emailId: emailData?.id };
     } catch (error: any) {
-        console.error('[sendOrderStatusEmail] Exception:', error);
+        logger.error('Exception in sendOrderStatusEmail', { context: 'Email-Service', data: error });
         return { success: false, error: error.message };
     }
 }
@@ -209,7 +210,7 @@ export async function logEmailNotification(
                 : `Email notification failed: ${error}`,
         });
     } catch (err) {
-        console.error('[logEmailNotification] Failed to log:', err);
+        logger.error('Failed to log email notification event', { context: 'Email-Service', data: err });
     }
 }
 
@@ -303,12 +304,13 @@ export async function sendCustomerOrderConfirmation(order: {
         });
 
         if (error) {
-            console.error('[sendCustomerOrderConfirmation] Error:', error);
+            logger.error('Failed to send customer confirmation email', { context: 'Email-Service', data: { error, customer: order.email } });
             return { success: false, error: error.message };
         }
+        logger.info('Customer confirmation email sent', { context: 'Email-Service', data: { emailId: emailData?.id, order: order.code } });
         return { success: true, emailId: emailData?.id };
     } catch (err: any) {
-        console.error('[sendCustomerOrderConfirmation] Exception:', err);
+        logger.error('Exception in sendCustomerOrderConfirmation', { context: 'Email-Service', data: err });
         return { success: false, error: err.message };
     }
 }
@@ -400,13 +402,14 @@ export async function sendCustomerReceipt(order: {
         });
         
         if (error) {
-             console.error('[sendCustomerReceipt] Error:', error);
+             logger.error('Failed to send customer receipt email', { context: 'Email-Service', data: { error, customer: order.email } });
              return { success: false, error: error.message };
         }
+        logger.info('Customer receipt email sent', { context: 'Email-Service', data: { emailId: emailData?.id, order: order.code } });
         return { success: true, emailId: emailData?.id };
 
     } catch (err: any) {
-        console.error('[sendCustomerReceipt] Exception:', err);
+        logger.error('Exception in sendCustomerReceipt', { context: 'Email-Service', data: err });
         return { success: false, error: err.message };
     }
 }
