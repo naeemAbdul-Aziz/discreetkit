@@ -12,13 +12,19 @@ import {
   LayoutDashboard,
   ShoppingBag,
   Users,
-  Settings,
   LogOut,
   Package,
   Layers,
   BarChart,
   Repeat,
   Truck,
+  Fingerprint,
+  ShieldCheck,
+  ShieldAlert,
+  Zap,
+  Radar,
+  Lock,
+  Settings,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -70,17 +76,17 @@ export function DashboardSidebar() {
       const basePharmacyItems = [
         {
           href: "/pharmacy/dashboard",
-          label: isHub ? "Hub Insights" : "Dashboard",
-          icon: isHub ? BarChart3 : LayoutDashboard,
+          label: isHub ? "Privacy Cockpit" : "Dashboard",
+          icon: isHub ? Radar : LayoutDashboard,
         },
         { 
           href: "/pharmacy/refills", 
-          label: isHub ? "Medication Refills" : "Refills", 
-          icon: Repeat 
+          label: isHub ? "Discreet Refills" : "Refills", 
+          icon: Zap 
         },
         ...(isHub ? [
-          { href: "/pharmacy/verification", label: "Verification Queue", icon: ClipboardCheck },
-          { href: "/pharmacy/partner-care", label: "Partner Care", icon: HeartHandshake },
+          { href: "/pharmacy/verification", label: "Identity Queue", icon: Fingerprint },
+          { href: "/pharmacy/partner-care", label: "Security Support", icon: HeartHandshake },
         ] : [
           { href: "/pharmacy/inventory", label: "Inventory", icon: Package },
           { href: "/pharmacy/riders", label: "Riders", icon: Truck },
