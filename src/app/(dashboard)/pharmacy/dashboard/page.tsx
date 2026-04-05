@@ -17,7 +17,13 @@ import {
   Zap,
   Users,
   ShieldCheck,
-  Repeat
+  Repeat,
+  Fingerprint,
+  Radar,
+  Lock,
+  ShieldAlert,
+  Verified,
+  EyeOff
 } from "lucide-react";
 import { OrdersList } from "./orders-list";
 import { useEffect, useState, useCallback } from "react";
@@ -192,16 +198,16 @@ export default function PharmacyDashboardPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
            <div className="flex items-center gap-3 mb-2">
-              <h2 className="text-4xl font-black tracking-tighter text-slate-900 font-mono uppercase">
+               <h2 className="text-4xl font-black tracking-tighter text-slate-900 font-mono uppercase">
                 {data.pharmacy.name}
               </h2>
               <div className="flex items-center gap-2 bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full border border-emerald-100 shadow-sm">
                  <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
-                 <span className="text-[10px] font-black uppercase tracking-widest">Active</span>
+                 <span className="text-[10px] font-black uppercase tracking-widest">Privacy Secured</span>
               </div>
            </div>
            <p className="text-slate-400 font-black flex items-center gap-2 uppercase text-xs tracking-widest">
-             <Activity className="h-4 w-4" /> Operations Dashboard • {data.pharmacy.location}
+             <EyeOff className="h-4 w-4" /> Secure Operations Corridor • {data.pharmacy.location}
            </p>
         </div>
 
@@ -220,21 +226,23 @@ export default function PharmacyDashboardPage() {
         {isHub ? (
           <>
             {[
-              { label: "Total Enrolled", value: hubStats?.totalEnrolled || 0, icon: Users, color: "text-brand-teal", bg: "bg-brand-teal/5", note: "ART Patients" },
-              { label: "Adherence Rate", value: `${hubStats?.adherenceRate || 0}%`, icon: Activity, color: "text-emerald-600", bg: "bg-emerald-50/50", note: "95-95-95 Goal" },
-              { label: "Pending Auth", value: data.recentOrders.filter(o => o.status === 'pending_verification').length, icon: ShieldCheck, color: "text-brand-indigo", bg: "bg-brand-indigo/5", note: "Verification Queue" },
-              { label: "Monthly Refills", value: data.stats.completed, icon: Repeat, color: "text-amber-600", bg: "bg-amber-50/50", note: "Active Cycle" },
+              { label: "Anonymous IDs", value: hubStats?.totalEnrolled || 0, icon: Fingerprint, color: "text-emerald-600", bg: "bg-white/40", note: "Encrypted Enrollees" },
+              { label: "Adherence Pulse", value: `${hubStats?.adherenceRate || 0}%`, icon: Radar, color: "text-emerald-500", bg: "bg-white/40", note: "Privacy-First Monitoring" },
+              { label: "Identity Verification", value: data.recentOrders.filter(o => o.status === 'pending_verification').length, icon: ShieldAlert, color: "text-emerald-600", bg: "bg-white/40", note: "Pending Handshake" },
+              { label: "Discreet Refills", value: data.stats.completed, icon: Zap, color: "text-emerald-500", bg: "bg-white/40", note: "Secured Deliveries" },
             ].map((stat, i) => (
-              <Card key={i} className={cn("relative overflow-hidden border-none shadow-sm transition-all duration-300 hover:shadow-lg rounded-[2rem]", stat.bg)}>
-                <div className={cn("absolute top-0 left-0 w-full h-1", stat.color.replace('text-', 'bg-'))} />
+              <Card key={i} className={cn("relative overflow-hidden border border-emerald-100/50 backdrop-blur-xl shadow-xl transition-all duration-500 hover:shadow-emerald-200/20 rounded-[2.5rem]", stat.bg)}>
+                <div className={cn("absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-400 to-emerald-600")} />
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                  <CardTitle className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{stat.label}</CardTitle>
-                  <stat.icon className={cn("h-5 w-5", stat.color)} />
+                  <CardTitle className="text-[10px] font-black text-emerald-800/40 uppercase tracking-[0.2em]">{stat.label}</CardTitle>
+                  <div className="p-2 bg-emerald-50 rounded-xl">
+                    <stat.icon className={cn("h-5 w-5", stat.color)} />
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="text-4xl font-black text-slate-900 tracking-tighter mb-1">{stat.value}</div>
-                  <p className="text-[10px] font-black text-slate-400/80 uppercase tracking-widest flex items-center gap-2">
-                    <span className={cn("w-1.5 h-1.5 rounded-full", stat.color.replace('text-', 'bg-'))} />
+                  <p className="text-[10px] font-black text-emerald-600/60 uppercase tracking-widest flex items-center gap-2">
+                    <span className={cn("w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]")} />
                     {stat.note}
                   </p>
                 </CardContent>

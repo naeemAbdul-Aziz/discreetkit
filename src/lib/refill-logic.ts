@@ -32,7 +32,11 @@ export async function validateHospitalCode(code: string) {
   // Basic format validation: DK-[HOSPITAL_ID]-XXXX
   const regex = /^DK-[A-Z0-9]+-[A-Z0-9]+$/i;
   if (!regex.test(code)) {
-    return { valid: false, message: 'Invalid code format. Please check your hospital card.' };
+    let hint = 'Invalid code format. Please check your hospital card.';
+    if (!code.toUpperCase().startsWith('DK-')) {
+      hint = 'All clinical codes start with "DK-". Please verify your hospital token.';
+    }
+    return { valid: false, message: hint };
   }
 
   return { valid: true };
