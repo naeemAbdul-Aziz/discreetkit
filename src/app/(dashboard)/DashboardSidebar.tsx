@@ -26,10 +26,17 @@ import * as React from "react";
 import { getSupabaseClient } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { usePharmacy } from "@/components/dashboard/pharmacy-context";
+import { 
+  ClipboardCheck, 
+  BarChart3, 
+  HeartHandshake
+} from "lucide-react";
 
 export function DashboardSidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { isHub, loading } = usePharmacy();
   const [subdomain, setSubdomain] = React.useState<"admin" | "pharmacy" | null>(
     null,
   );
@@ -63,12 +70,21 @@ export function DashboardSidebar() {
       const basePharmacyItems = [
         {
           href: "/pharmacy/dashboard",
-          label: "Dashboard",
-          icon: LayoutDashboard,
+          label: isHub ? "Hub Insights" : "Dashboard",
+          icon: isHub ? BarChart3 : LayoutDashboard,
         },
-        { href: "/pharmacy/refills", label: "Refills", icon: Repeat },
-        { href: "/pharmacy/inventory", label: "Inventory", icon: Package },
-        { href: "/pharmacy/riders", label: "Riders", icon: Truck },
+        { 
+          href: "/pharmacy/refills", 
+          label: isHub ? "Medication Refills" : "Refills", 
+          icon: Repeat 
+        },
+        ...(isHub ? [
+          { href: "/pharmacy/verification", label: "Verification Queue", icon: ClipboardCheck },
+          { href: "/pharmacy/partner-care", label: "Partner Care", icon: HeartHandshake },
+        ] : [
+          { href: "/pharmacy/inventory", label: "Inventory", icon: Package },
+          { href: "/pharmacy/riders", label: "Riders", icon: Truck },
+        ]),
         { href: "/pharmacy/settings", label: "Settings", icon: Settings },
       ];
 

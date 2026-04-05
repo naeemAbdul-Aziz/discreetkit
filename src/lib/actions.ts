@@ -608,8 +608,10 @@ const refillSchema = z.object({
   productId: z.string().min(1, 'Product is required'),
   frequency: z.enum(['monthly', 'quarterly']),
   deliveryAddress: z.string().min(10, 'Valid delivery address is required'), // JSON string
+  phone: z.string().min(10, 'Valid phone number is required'),
+  hospitalRefillCode: z.string().min(5, 'Valid hospital refill code is required'),
   doctor: z.string().optional().or(z.literal('')),
-  prescriptionUrl: z.string().optional(), // Should be required technically, but optional for migration/flexibility? Let's make it optional for now, enforced by UI.
+  prescriptionUrl: z.string().optional(),
 });
 
 
@@ -657,6 +659,8 @@ export async function createRefillSubscription(prevState: any, formData: FormDat
       productId: formData.get('productId'),
       frequency: formData.get('frequency'),
       deliveryAddress: formData.get('deliveryAddress'),
+      phone: formData.get('phone'),
+      hospitalRefillCode: formData.get('hospitalRefillCode'),
       doctor: formData.get('doctor'),
       prescriptionUrl: formData.get('prescriptionUrl'),
     };
@@ -671,6 +675,17 @@ export async function createRefillSubscription(prevState: any, formData: FormDat
       };
     }
 
+    // [MODIFIED] Hospital Code Validation (Anonymity Model)
+    const { validateHospitalCode } = await import('./refill-logic');
+    const { valid, message } = await validateHospitalCode(validated.data.hospitalRefillCode);
+    if (!valid) {
+      return {
+        success: false,
+        message: message || 'Invalid hospital refill code.',
+        errors: { hospitalRefillCode: [message || 'Invalid code'] }
+      };
+    }
+
     const address = JSON.parse(validated.data.deliveryAddress); // Verify JSON
 
     // Always use admin client for anonymous subscriptions
@@ -680,10 +695,12 @@ export async function createRefillSubscription(prevState: any, formData: FormDat
     const { data, error } = await dbClient
       .from('medication_refill_subscriptions')
       .insert({
-        user_id: null, // Always null - refills are completely anonymous
+        user_id: null,
         product_id: parseInt(validated.data.productId), 
         frequency: validated.data.frequency,
         delivery_address: address,
+        phone: validated.data.phone,
+        hospital_refill_code: validated.data.hospitalRefillCode?.toUpperCase(),
         prescribing_doctor: validated.data.doctor || null,
         prescription_document_url: validated.data.prescriptionUrl || null,
         status: 'active'

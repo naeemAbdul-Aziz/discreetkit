@@ -107,19 +107,21 @@ Indicative valuation impact:
 
 The DiscreetKit platform is a sophisticated, enterprise-grade distributed commerce system. **Built over 7+ months of intensive R&D**, it is not merely a website but a multi-interface synchronized platform integrating real-time inventory management, decentralized logistics (pharmacy network), an advanced "Headless Commerce" module via WhatsApp, and an **Operational Intelligence Layer** that quantifies the privacy infrastructure in real-time.
 
-**Estimated Total Enterprise Value (TEV):** **~$570,000 USD (Floor Valuation)**
-*(Technology + Human Capital + Network Assets + Operational Intelligence)*
+**Estimated Total Enterprise Value (TEV):** **~$725,000 USD (Floor Valuation)**
+*(Technology + Chronic Med Infrastructure + Human Capital + Institutional Partnerships)*
 
-This valuation represents the **Cost-to-Duplicate** the entire venture, including software, operational infrastructure, and brand equity.
+This valuation represents the **Cost-to-Duplicate** the entire venture, including software, operational infrastructure, clinical partner hubs, and high-retention subscriber assets.
 
 ---
 
 ## 2. Detailed Breakdown
 
 ### A. Technology Stack (Hard Assets)
-**Valuation:** **$245,000** *(+$20k from previous)*
+**Valuation:** **$285,000** *(+$40k from clinical infrastructure)*
 
 The system leverages a **Serverless Event-Driven Architecture** utilizing Supabase (PostgreSQL) and Next.js 16 Server Actions.
+*   **Clinical Partner Hub Layer ($45,500 Asset):** Specialized "Verification Queue" and "Hub Mode" dashboard for hospital partners. Enables anonymous, token-based fulfillment for ART meds without PII overhead.
+*   **Adherence Intelligence Engine ($25,000 Asset):** Automated WhatsApp-driven check-in system for chronic care patients (UNAIDS 95-95-95 protocol integration).
 *   **Data Modeling:** Complex multi-tenant schema handling "Global vs. Local" inventory. The system aggregates stock levels from dispersed pharmacy nodes while maintaining a centralized product catalog.
 *   **Security Layer:** Implementation of Row Level Security (RLS) policies ensures rigorous data isolation between Admin, Pharmacy, and Customer roles.
 *   **Performance (April 2026 Overhaul):** Transition to a **Streaming-First Server Component Architecture** (Next.js 15+). Achieved **Sub-Second Largest Contentful Paint (LCP)** for operational portals through parallel data fetching, progressive hydration, and tiered Redis caching.
@@ -155,8 +157,9 @@ The "Brain" of the company involves algorithms that automate complex operational
 *   **Smart Order Routing:** The `autoAssignOrder` logic acts as an automated dispatcher, routing orders to specific partners based on business rules (Coverage → Stock → Cost → Speed).
 *   **Fulfillment Velocity Algorithm:** The "Anxiety Meter" — proprietary metric quantifying average time from `received` to `out_for_delivery`. First-of-its-kind KPI for privacy health commerce operations.
 *   **Privacy Density Engine:** Real-time regional demand aggregation revealing anonymity hotspots by campus/location — drives data-informed pharmacy node deployment strategy.
-*   **Partner Verification System:** Automated verification logic for Marie Stopes partner codes (`DK-MS-XXXX`).
-*   **Anonymous Subscription Engine:** Privacy-first recurring billing with entropy-based tokens; no user accounts required.
+*   **Partner Verification System:** Automated verification logic for Marie Stopes and UGMC partner codes (`DK-UGMC-XXXX`).
+*   **Clinical Token Engine:** Entropy-based hospital-to-rider verification tokens for chronic medication delivery.
+*   **Anonymous Subscription Engine:** Privacy-first recurring billing and automated monthly logistics dispatch; no user accounts required.
 *   **Inventory Synchronization:** Multi-channel (Web, WhatsApp, Admin) real-time stock reconciliation.
 *   **Asset-Light Logistics Engine:** Decentralized pharmacy-sourced rider registry.
 
@@ -183,13 +186,14 @@ Unlike typical early-stage startups with just "two guys in a garage," DiscreetKi
 
 This organizational maturity reduces "Key Man Risk" significantly.
 
-### G. Network Assets (The "Moat")
-**Valuation:** **~$15,000** (Estimated)
+### G. Network Assets (The "Institutional Moat")
+**Valuation:** **~$45,000** *(Significant Uplift)*
 
-The software is useless without the fulfillment network.
-*   **Asset:** Signed Memorandums of Understanding (MoUs) with pharmacy nodes.
-*   **Asset:** **Virtual Fleet Registry:** A growing database of verified pharmacy riders ready for dispatch.
-*   **Value:** Solves the "Cold Start Problem." A competitor can copy the code but cannot replicate the trust relationships overnight.
+The software is useless without the fulfillment and clinical network.
+*   **Institutional Asset:** Strategic Pilot Partnership with **University of Ghana Medical Centre (UGMC)** for ART medication delivery.
+*   **Fulfillment Asset:** Signed Memorandums of Understanding (MoUs) with primary pharmacy nodes.
+*   **Logistics Asset:** **Virtual Fleet Registry:** A growing database of verified pharmacy riders ready for dispatch.
+*   **Value:** Solves the "Cold Start Problem" via institutional validation. A competitor can copy the code but cannot replicate the UGMC trust relationship overnight.
 *   **Metric:** ~$2,000 Cost-of-Acquisition per active node partner.
 
 ### H. Brand & Regulatory Assets
@@ -204,8 +208,8 @@ The software is useless without the fulfillment network.
 
 | Asset Class | Description | Estimated Value (USD) |
 | :--- | :--- | :--- |
-| **Technology Stack** | Source Code, Headless WA Engine ($85k), Observability Hub ($35k), RLS Security, Streaming-First Architecture | **$480,000** |
-| **Human Capital** | 16-Person Team Org + Senior Advisors | **$65,000** |
-| **Network Assets** | Pharmacy Partner Contracts & Integration | **$15,000** |
-| **Brand & IP** | Trademark, Domain, Compliance Framework | **$10,000** |
-| **TOTAL PRE-MONEY VALUATION** | **"Floor" Valuation for Negotiation** | **~$570,000** |
+| **Technology Stack** | Source Code, Clinical Hub Layer ($45k), Adherence Engine ($25k), Headless WA ($85k) | **$580,000** |
+| **Human Capital** | 16-Person Team Org + Senior Advisors | **$85,000** |
+| **Network Assets** | UGMC Partnership + Pharmacy Node Contracts | **$45,000** |
+| **Brand & IP** | Trademark, Compliance Framework, Privacy IP | **$15,000** |
+| **TOTAL PRE-MONEY VALUATION** | **"Floor" Valuation for Negotiation** | **~$725,000** |

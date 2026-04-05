@@ -7,19 +7,17 @@ DiscreetKit is a "Quiet Confidence" health-logistics platform providing anonymou
 
 **The Moat: High-Performance Logistics Infrastructure**
 DiscreetKit is a distributed logistics network:
-- **Partner Pharmacy Network**: Asset-light fulfillment via partner-owned inventory and "Virtual Fleet" riders.
-- **Operational Intelligence**: Proprietary metrics (**Fulfillment Performance**, **Privacy Coverage**) derived from real-time data to quantify trust infrastructure.
-- **Headless Accessible Commerce**: A sophisticated, browserless WhatsApp agent providing zero-friction medical access to its 2.5M+ target audience without specialized hardware or browser data costs ($85k Asset).
-- **Enterprise Observability**: Custom, site-wide tracing and audit infrastructure ensuring 100% operational transparency and regulatory compliance across all pharmacy nodes ($35k Asset).
-- **The Premium Performance Standard**: Sub-second (LCP) operational layer via **Streaming Server Components**, ensuring the fastest logistics chain in the West African SRH market.
+- **Partner Hub Ecosystem**: Asset-light fulfillment via both local pharmacies and **Clinical Partner Hubs (e.g., UGMC)**.
+- **Chronic Care Infrastructure**: Proprietary **Clinical Adherence Protocol** ($25k IP) and **Anonymous Refill Subscription Engine**, transforming one-off STI testing users into long-term subscribers with high LTV.
+- **Headless Accessible Commerce**: A sophisticated, browserless WhatsApp agent providing zero-friction medical access.
+- **Institutional Trust**: Strategic partnership with **University of Ghana Medical Centre (UGMC)** validates the platform's ability to handle high-sensitivity medication logistics at scale.
 
 ---
 
 **Recent Modernization (April 2026 — "Real-time Dashboard" Sprint)**
-- **Enterprise Streaming Architecture**: Re-architected the entire Admin and Pharmacy ecosystem into a **Streaming-First** model (Next.js 15+). Operational hubs now hydrate progressively with parallel data retrieval, achieving **Sub-Second Largest Contentful Paint (LCP)** for global oversight.
-- **Unified GHS Fiscal Schema**: Standardized 100% of platform financial data on the **`_ghs` schema**. This eliminates calculation drift and ensures perfect mathematical consistency between WhatsApp commerce, Paystack settlements, and Admin analytics.
-- **Strategic Hub Orchestration**: Refactored the Command Center into granular, cached functional blocks. Metrics, Revenue Timelines, and Regional Density maps now load independently and instantly via a tiered Redis caching layer.
-- **Optimistic Logistics Engine**: Continued refinement of the real-time logistics layer with SSE-to-Server revalidation, providing a "Native App" feel for high-volume transactions.
+- **Clinical Hub Dashboard Mode**: Launched a specialized UI for hospital partners to verify, track, and manage large-scale medication refills with zero PII exposure.
+- **Automated Adherence Engine**: Integrated real-time WhatsApp check-ins and monthly refill reminders, aligning platform operations with UNAIDS 95-95-95 public health goals.
+- **Unified GHS Fiscal Schema**: Standardized 100% of platform financial data on the **`_ghs` schema**, ensuring perfect consistency between WhatsApp orders, Refill subscriptions, and Paystack settlements.
 
 ---
 
@@ -33,9 +31,9 @@ DiscreetKit is a distributed logistics network:
 ---
 
 **The Opportunity**
-- **Current Partner Network**: Growing campus cluster (UG, UPSA, GIMPA, KNUST).
-- **Target Reach**: 2.5M+ young adults in Ghana's urban hotspots.
-- **Funding Ask**: $150k Seed to formalize the lab network partnership, expand to 10 additional pharmacy locations, and build the "Retention Loop" analytics suite.
+- **Current Partner Network**: 25+ Pharmacy Nodes + **UGMC Clinical Hub**.
+- **Target Reach**: 2.5M+ young adults and 350k+ patients on ART in Ghana.
+- **Funding Ask**: $200k Seed (increased from $150k) to scale the Clinical Hub network to 5 additional regional hospitals and automate the national medication distribution grid.
 
 ---
 

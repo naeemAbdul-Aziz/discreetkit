@@ -126,9 +126,11 @@ CREATE TABLE public.pharmacies (
     operating_hours jsonb,
     partner_code text UNIQUE,
     trade_discount_percentage numeric(5, 2) DEFAULT 20.00,
+    is_momo_active boolean DEFAULT true,
     bank_details jsonb DEFAULT '{}'::jsonb,
     momo_details jsonb DEFAULT '{}'::jsonb,
-    is_active boolean DEFAULT true
+    is_active boolean DEFAULT true,
+    is_partner_hub boolean DEFAULT false
 );
 
 CREATE TABLE public.pharmacy_products (
@@ -288,18 +290,22 @@ CREATE TABLE IF NOT EXISTS public.medication_refill_subscriptions (
   user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
   product_id bigint NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
   enrolled_at timestamptz DEFAULT now(),
-  status text DEFAULT 'active' CHECK (status IN ('active', 'paused', 'cancelled')),
+  status text DEFAULT 'active' CHECK (status IN ('active', 'paused', 'cancelled', 'pending_verification')),
   frequency text DEFAULT 'monthly' CHECK (frequency IN ('monthly', 'quarterly')),
   next_delivery_date date,
   delivery_address jsonb NOT NULL,
+  phone text,
+  hospital_refill_code text UNIQUE,
+  hospital_id bigint REFERENCES public.pharmacies(id),
   prescription_verified boolean DEFAULT false,
   prescription_document_url text,
   prescribing_doctor text,
-  prescription_expiry_date date,
   pharmacy_id bigint REFERENCES public.pharmacies(id),
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
+
+CREATE INDEX idx_medication_refill_phone ON public.medication_refill_subscriptions(phone);
 
 CREATE TABLE IF NOT EXISTS public.refill_logs (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -308,6 +314,8 @@ CREATE TABLE IF NOT EXISTS public.refill_logs (
   filled_at timestamptz DEFAULT now(),
   status text DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'ready_for_pickup', 'completed', 'cancelled')),
   pharmacist_notes text,
+  adherence_status text DEFAULT 'unknown' CHECK (adherence_status IN ('confirmed', 'missed', 'unknown')),
+  adherence_confirmed_at timestamptz,
   next_refill_authorized_date date,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()

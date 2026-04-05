@@ -4,6 +4,7 @@ import { logger } from '@/lib/logger';
 import type { ConversationState, SessionData } from './types';
 import { getSupabaseAdminClient } from '../supabase';
 import { generateTrackingCode, generatePartnerCode } from '../data';
+import { generateRefillOrder, checkInAdherence } from '../refill-logic';
 
 /**
  * Main entry point for handling incoming messages.
@@ -56,6 +57,12 @@ export async function handleIncomingMessage(
         return;
     }
 
+    // Global Refill Command [NEW]
+    if (normalizedBody === 'refill' || normalizedBody === 'meds') {
+        await handleRefillKeyword(from);
+        return;
+    }
+
     // 2. STATE BASED ROUTING
     switch (session.state) {
         case 'IDLE':
@@ -84,6 +91,10 @@ export async function handleIncomingMessage(
 
         case 'AWAITING_TRACKING_CODE':
             await handleTrackingCodeInput(from, body);
+            break;
+
+        case 'REFILL_CONFIRMATION':
+            await handleRefillConfirmation(from, body, session);
             break;
 
         default:
@@ -730,4 +741,90 @@ async function reportOrderStatus(to: string, code: string, status: string, date:
                 `Need anything else? Just let me know or reply *Menu*.`;
     
     await sendMessage(to, msg);
+}
+
+// --- REFILL FLOW HANDLERS ---
+
+async function handleRefillKeyword(from: string) {
+    const supabase = getSupabaseAdminClient();
+    const phone = from.replace(/\D/g, '');
+    
+    // Look for active subscription with this phone number (checking both exact and last 9 digits)
+    const { data: sub, error } = await supabase
+        .from('medication_refill_subscriptions')
+        .select(`
+            id,
+            subscription_code,
+            frequency,
+            next_delivery_date,
+            product:products(name)
+        `)
+        .or(`phone.eq.${phone},phone.ilike.%${phone.slice(-9)}`)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+    if (error || !sub) {
+        await sendMessage(from, "❌ *No Active Refills Found*\n\nWe couldn't find an active medication subscription for this number.\n\n_If you have a hospital code, please enroll at discreetkit.com/refills first._");
+        return;
+    }
+
+    const nextDate = new Date(sub.next_delivery_date);
+    const today = new Date();
+    const diffDays = Math.ceil((nextDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+    const product = Array.isArray(sub.product) ? sub.product[0] : sub.product;
+    let statusMsg = `📦 *Refill Status: ${product?.name || 'Medication'}*\n\n`;
+    statusMsg += `Your next refill is due on: *${nextDate.toLocaleDateString('en-GB')}*\n`;
+    
+    if (diffDays <= 7 && diffDays > 0) {
+        statusMsg += `\n⚠️ Your refill is coming up in ${diffDays} days!`;
+    } else if (diffDays <= 0) {
+        statusMsg += `\n🚨 Your refill is *DUE*!`;
+    }
+
+    const buttons = [
+        { type: 'reply', reply: { id: 'refill_confirm', title: '✅ Confirm Refill' } },
+        { type: 'reply', reply: { id: 'refill_adherence', title: '👍 I took my meds' } },
+        { type: 'reply', reply: { id: 'menu', title: '🏠 Main Menu' } }
+    ];
+
+    await updateSession(from, { 
+        state: 'REFILL_CONFIRMATION', 
+        tempOrderCode: sub.id, // Store subscription ID for confirmation
+        listOptions: buttons.map(b => b.reply.id)
+    });
+
+    await sendInteractiveButtons(from, statusMsg + "\n\nWould you like to trigger your delivery or report adherence?", buttons as any);
+}
+
+async function handleRefillConfirmation(from: string, body: string, session: SessionData) {
+    const subscriptionId = session.tempOrderCode;
+    if (!subscriptionId) {
+        await sendMainMenu(from);
+        return;
+    }
+
+    if (body === 'refill_confirm') {
+        await sendMessage(from, "🔄 *Processing your refill...*");
+        const result = await generateRefillOrder(subscriptionId);
+        
+        if (result.success) {
+            await sendMessage(from, `✅ *Success!*\n\nYour refill order *${result.orderCode}* has been sent to the hospital hub.\n\n🚚 Delivery Fee: *GHS 15*\n_Please have your fee ready for the rider._`);
+            await transitionState(from, 'IDLE');
+        } else {
+            await sendMessage(from, "❌ *Error*: We couldn't generate your refill order. Please contact support.");
+        }
+    } else if (body === 'refill_adherence') {
+        const result = await checkInAdherence(subscriptionId);
+        if (result.success) {
+            await sendMessage(from, "🌟 *Great job!*\n\nYour adherence has been logged for your clinical record. Keep it up!");
+            await transitionState(from, 'IDLE');
+        } else {
+            await sendMessage(from, "❌ *Error*: We couldn't log your adherence. Please try again later.");
+        }
+    } else {
+        await handleIdleState(from, body);
+    }
 }

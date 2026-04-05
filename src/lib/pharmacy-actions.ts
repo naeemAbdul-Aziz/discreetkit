@@ -41,6 +41,7 @@ export async function getAssignedSubscriptions() {
             user_id,
             prescription_verified,
             prescription_document_url,
+            hospital_refill_code,
             delivery_address,
             product:products(name, image_url)
         `)
