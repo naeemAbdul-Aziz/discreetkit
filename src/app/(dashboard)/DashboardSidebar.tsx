@@ -150,7 +150,7 @@ export function DashboardSidebar() {
     ];
 
     return baseItems;
-  }, [subdomain]);
+  }, [subdomain, isHub]);
 
   const handleSignOut = async () => {
     const supabase = getSupabaseClient();

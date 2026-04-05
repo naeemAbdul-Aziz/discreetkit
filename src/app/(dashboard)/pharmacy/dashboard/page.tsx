@@ -88,6 +88,8 @@ export default function PharmacyDashboardPage() {
           throw new Error(`HTTP ${response.status}`);
         }
 
+        const json = await response.json();
+
         if (json) {
           setData({ ...json, _timestamp: Date.now() });
           
@@ -107,7 +109,7 @@ export default function PharmacyDashboardPage() {
         }
       }
     },
-    [router],
+    [router, isHub],
   );
 
   useEffect(() => {
