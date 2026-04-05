@@ -36,8 +36,10 @@ export type ConversationState =
     | 'COLLECTING_ADDRESS' // [NEW] Zero-Friction Checkout Step
     | 'SELECTING_CAMPUS'   // [NEW] Student Discount Step
     | 'AWAITING_PAYMENT'
+    | 'AWAITING_TRACKING_CODE' // [NEW] Dedicated state for order lookup
     | 'PARTNER_CARE_MENU'
-    | 'PARTNER_CARE_VERIFICATION';
+    | 'PARTNER_CARE_VERIFICATION'
+    | 'REFILL_CONFIRMATION'; // [NEW] HIV Refill Step
 
 // --- Session Data Stored in Redis ---
 export interface SessionData {

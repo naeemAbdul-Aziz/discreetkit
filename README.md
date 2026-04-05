@@ -22,7 +22,8 @@ DiscreetKit is a "Quiet Confidence" health-tech platform designed to provide pri
 ### 1. Zero-Trust Anonymity Layer
 *   **100% Anonymous Ordering**: No accounts, no identity storage, no footprint.
 *   **Masked Communications**: Real-time SMS and WhatsApp updates using privacy-first masked identifiers.
-*   **Plain-Packaging Logistics**: Automated dispatch rules ensure all products are delivered in unbranded, discreet packaging.
+*   **Partner Hub Ecosystem**: Specialized dashboards for clinical partners (e.g., UGMC) to manage large-scale ARV refills with zero-PII exposure.
+*   **Automated Clinical Adherence**: 1-click WhatsApp check-ins and monthly refill reminders designed for long-term chronic care retention.
 
 ### 2. Hyperscale Operational Hub
 *   **The "Anxiety Meter"**: Real-time North Star KPI measuring fulfillment velocity (AVG time from Order → Delivery).

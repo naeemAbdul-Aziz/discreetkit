@@ -24,6 +24,19 @@ This document outlines the architecture and system design of the DiscreetKit app
 - *Privacy Density* — Recharts `AreaChart` with a custom glassmorphic tooltip and top-3 legend.
 - *RankingList* — Redesigned with relative horizontal performance bars (`bg-primary/[0.03]` tint, scaled to #1 performer), `TOP` / `VELOCITY` insight badges, and `font-mono font-black` primary values.
 
+### 3.19. Clinical Medication Refill Engine (NEW - April 2026)
+
+**Implemented in:** `src/lib/hub-actions.ts` & `src/app/(client)/refills/enroll/page.tsx`
+
+The platform now supports high-retention chronic medication logistics for stable patients. This system is designed for **maximum anonymity** and **clinical integrity**.
+
+| Feature | Implementation | Business Value |
+|:---|:---|:---|
+| **Hospital Token Auth** | Use of `hospital_refill_code` instead of National IDs | Zero-PII Clinical Validation |
+| **Partner Hub Mode** | Specialized Pharmacy Dashboard for hospitals | Institutional Scalability |
+| **Adherence Tracking** | WhatsApp 1-click "I took my med" check-in | 95-95-95 Goal Alignment |
+| **Recurring Logistics** | Automated 30/90 day dispatch cycles | Predictable MRR |
+
 ### 3.13. Premium 2-Step Checkout (NEW)
 
 **Implemented in:** `src/app/order/(components)/order-form.tsx`
@@ -163,6 +176,7 @@ DiscreetKit is a modern web application built on the Jamstack architecture, heav
 * **Key Innovations:**
   * **Virtual Buttons:** To bypass Twilio Trial limitations (which block interactive buttons), the system renders numbered lists (e.g., "1. View Products") and maps user input (e.g., "1") back to specific action IDs.
   * **Ghost-Order Prevention:** When a user checks out, a `pending_payment` order is created in Supabase *before* generating the Paystack link. This ensures the webhook can always find the order to update, preventing "orphan" payments.
+  * **REFILL Keyword:** A specialized state-machine for patients to check adherence or request their next monthly dispatch without re-entering delivery details.
   * **Partner Care Portal:** A gated menu for partners to access exclusive services using a specialized access code.
 
 ### 3.5. Pharmacy & Inventory System
@@ -378,21 +392,29 @@ sequenceDiagram
 
 This state diagram explains how we prevent overselling without locking strictly implementation details.
 
+    Deducted --> [*]: Sale Finalized
+
+### 4.4. Clinical Adherence Lifecycle
+
+This flow ensures chronic patients remain stable on their medication protocol via automated check-ins.
+
 ```mermaid
 stateDiagram-v2
-    [*] --> InStock
+    [*] --> Enrolled: Hospital Token Verified
     
-    InStock --> Reserved: Pharmacy Accepts Order (Stock - Qty)
+    Enrolled --> RefillDue: 25 Days Elapsed
+    RefillDue --> LogisticsDispatch: Patient Confirms (WA)
+    LogisticsDispatch --> OutForDelivery: Rider Assigned
     
-    state Reserved {
-        [*] --> TimerRunning
-        TimerRunning --> Released: 2 Hours Elapsed (Cron)
-        TimerRunning --> Deducted: Order Completed/Shipped
+    state AdherenceCheck {
+        [*] --> ReminderSent
+        ReminderSent --> Confirmed: User clicks "Taken"
+        ReminderSent --> Missed: 24h No Response
+        Missed --> Escalated: Admin Alert
     }
     
-    Released --> InStock: Return to Shelf (Stock + Qty)
-    
-    Deducted --> [*]: Sale Finalized
+    OutForDelivery --> AdherenceCheck: Delivered
+    Confirmed --> Enrolled: Cycle Restarts
 ```
 
 ---

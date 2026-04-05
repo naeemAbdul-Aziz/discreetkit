@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Pill, CalendarClock, Phone, User } from "lucide-react";
+import { Pill, CalendarClock, Phone, User, ShieldCheck } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -25,6 +25,9 @@ import { useToast } from "@/hooks/use-toast";
 import { logRefill } from "@/lib/pharmacy-actions";
 import { Label } from "@/components/ui/label";
 import { dashboardTable, pharmacyRefillsCols, actions as actionStyles } from "@/components/ui/table-layout";
+import { usePharmacy } from "@/components/dashboard/pharmacy-context";
+import { verifyRefillToken } from "@/lib/hub-actions";
+import { cn } from "@/lib/utils";
 
 export function PharmacyRefillsTable({
   initialSubscriptions,
@@ -32,10 +35,11 @@ export function PharmacyRefillsTable({
   initialSubscriptions: any[];
 }) {
   const { toast } = useToast();
+  const { isHub } = usePharmacy();
   const [subscriptions, setSubscriptions] = useState(initialSubscriptions);
   const [loggingId, setLoggingId] = useState<string | null>(null);
+  const [verifyingId, setVerifyingId] = useState<string | null>(null);
   const [notes, setNotes] = useState("");
-
   const handleLogRefill = async () => {
     if (!loggingId) return;
 
@@ -58,12 +62,33 @@ export function PharmacyRefillsTable({
     }
   };
 
+  const handleVerifyToken = async (id: string) => {
+    setVerifyingId(id);
+    const result = await verifyRefillToken(id);
+    setVerifyingId(null);
+
+    if (result.success) {
+      toast({
+        title: "Clinical Verification Success",
+        description: "The patient's refill token has been verified and active.",
+      });
+      window.location.reload();
+    } else {
+      toast({
+        title: "Verification Failed",
+        description: result.error || "An error occurred.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className={dashboardTable.container}>
       <Table className={dashboardTable.table}>
         <TableHeader>
           <TableRow>
             <TableHead className={pharmacyRefillsCols.patientHead}>Patient / Contact</TableHead>
+            {isHub && <TableHead className="w-[150px]">Hospital Code</TableHead>}
             <TableHead className={pharmacyRefillsCols.productHead}>Product</TableHead>
             <TableHead className={pharmacyRefillsCols.nextDueHead}>Next Due</TableHead>
             <TableHead className={pharmacyRefillsCols.statusHead}>Status</TableHead>
@@ -98,6 +123,20 @@ export function PharmacyRefillsTable({
                       </span>
                     </div>
                   </TableCell>
+                  {isHub && (
+                    <TableCell>
+                      <div className="flex flex-col gap-1">
+                        <span className="font-mono text-xs font-bold text-primary">
+                          {sub.hospital_refill_code || "N/A"}
+                        </span>
+                        {sub.prescription_verified ? (
+                          <Badge variant="outline" className="text-[9px] h-4 bg-green-50 text-green-700 border-green-200">Verified</Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-[9px] h-4 bg-orange-50 text-orange-700 border-orange-200">Pending Auth</Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                  )}
                   <TableCell className={pharmacyRefillsCols.productCell}>
                     <div className="flex flex-col">
                       <span className="font-medium truncate">{sub.product_name}</span>
@@ -118,16 +157,34 @@ export function PharmacyRefillsTable({
                     <Badge variant={sub.status === "active" ? "default" : "secondary"}>{sub.status}</Badge>
                   </TableCell>
                   <TableCell className={pharmacyRefillsCols.actionsCell}>
-                    <Button
-                      size="sm"
-                      className={`gap-2 ${actionStyles.actionButton}`}
-                      onClick={() => setLoggingId(sub.id)}
-                      disabled={sub.status !== "active"}
-                      title="Log Refill"
-                    >
-                      <Pill className="h-4 w-4" />
-                      <span className="truncate">Log Refill</span>
-                    </Button>
+                    <div className="flex items-center gap-2">
+                       {isHub && !sub.prescription_verified && (
+                         <Button
+                           size="sm"
+                           variant="outline"
+                           className="h-8 md:h-10 border-primary/20 text-primary hover:bg-primary/5 gap-2"
+                           onClick={() => handleVerifyToken(sub.id)}
+                           disabled={verifyingId === sub.id}
+                         >
+                           <ShieldCheck className="h-4 w-4" />
+                           <span className="truncate">{verifyingId === sub.id ? "Verifying..." : "Verify Code"}</span>
+                         </Button>
+                       )}
+                       <Button
+                        size="sm"
+                        className={cn(
+                          "gap-2 h-8 md:h-10",
+                          actionStyles.actionButton,
+                          sub.status !== "active" && "opacity-50"
+                        )}
+                        onClick={() => setLoggingId(sub.id)}
+                        disabled={sub.status !== "active"}
+                        title="Log Refill"
+                      >
+                        <Pill className="h-4 w-4" />
+                        <span className="truncate">Log Refill</span>
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               );

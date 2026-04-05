@@ -29,16 +29,15 @@ export default function EnrollmentPage() {
   const productName = searchParams.get("productName") || "Medication Refill";
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     frequency: "monthly",
-    full_name: "",
+    full_name: "Anonymous User", // Default to anonymous
     address: "",
     phone: "",
+    hospitalRefillCode: "",
     doctor: "",
   });
-  const [prescriptionFile, setPrescriptionFile] = useState<File | null>(null);
   const [successCode, setSuccessCode] = useState<string | null>(null);
 
   if (!productId) {
@@ -57,19 +56,14 @@ export default function EnrollmentPage() {
     );
   }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setPrescriptionFile(e.target.files[0]);
-    }
-  };
 
   const nextStep = () => {
     if (step === 1) setStep(2);
     else if (step === 2) {
-      if (!formData.full_name || !formData.phone || !formData.address) {
+      if (!formData.phone || !formData.address) {
         toast({
           title: "Missing Info",
-          description: "Full name, phone, and address are required.",
+          description: "Phone and delivery address are required.",
           variant: "destructive",
         });
         return;
@@ -81,35 +75,26 @@ export default function EnrollmentPage() {
   const prevStep = () => setStep((prev) => Math.max(1, prev - 1));
 
   const handleSubmit = async () => {
+    if (!formData.hospitalRefillCode) {
+      toast({ title: "Code Required", description: "Please enter your hospital refill code.", variant: "destructive" });
+      return;
+    }
+
     setIsSubmitting(true);
-    let uploadedUrl = "";
 
     try {
-      // 1. Upload if exists
-      if (prescriptionFile) {
-        setIsUploading(true);
-        const uploadData = new FormData();
-        uploadData.append("file", prescriptionFile);
-        const uploadResult = await uploadPrescriptionAction(uploadData);
-        if (!uploadResult.success || !uploadResult.path) throw new Error("File upload failed");
-        uploadedUrl = uploadResult.path;
-      } else {
-        toast({ title: "Document Required", description: "Please upload your prescription.", variant: "destructive" });
-        setIsSubmitting(false);
-        return;
-      }
-
-      // 2. Submit Enrollment
+      // Submit Enrollment (Code-Based Anonymity Model)
       const payload = new FormData();
       payload.append("productId", productId);
       payload.append("frequency", formData.frequency);
+      payload.append("phone", formData.phone);
+      payload.append("hospitalRefillCode", formData.hospitalRefillCode);
       payload.append("deliveryAddress", JSON.stringify({
         street: formData.address,
         phone: formData.phone,
-        full_name: formData.full_name
+        full_name: formData.full_name || "Anonymous User"
       }));
       if (formData.doctor) payload.append("doctor", formData.doctor);
-      payload.append("prescriptionUrl", uploadedUrl);
 
       const result = await createRefillSubscription(null, payload);
       if (result.success) {
@@ -125,7 +110,6 @@ export default function EnrollmentPage() {
       });
     } finally {
       setIsSubmitting(false);
-      setIsUploading(false);
     }
   };
 
@@ -152,7 +136,7 @@ export default function EnrollmentPage() {
               </p>
             </div>
             <p className="text-xs text-muted-foreground px-6 leading-relaxed">
-              Use this code to track your delivery or for anonymous pharmacy pickup. We have sent a confirmation.
+              Your refill order has been generated automatically. Reply <b>REFILL</b> to our WhatsApp or use this code to track your delivery.
             </p>
             <div className="flex flex-col gap-3 px-4">
               <Button
@@ -202,10 +186,10 @@ export default function EnrollmentPage() {
         <Card className="border-0 shadow-xl bg-card rounded-[2.5rem] overflow-hidden">
           <CardHeader className="pb-4 pt-10 px-8">
             <CardTitle className="text-xl font-bold">
-              {step === 1 ? "Schedule" : step === 2 ? "Delivery" : "Verification"}
+              {step === 1 ? "Schedule" : step === 2 ? "Delivery" : "Hospital Auth"}
             </CardTitle>
             <CardDescription className="text-sm">
-              {step === 1 ? "Choose your supply cycle." : step === 2 ? "Where should we send it?" : "Upload your medical report."}
+              {step === 1 ? "Choose your supply cycle." : step === 2 ? "Where should we send it?" : "Enter the code provided by your hospital."}
             </CardDescription>
           </CardHeader>
 
@@ -249,16 +233,16 @@ export default function EnrollmentPage() {
               <div className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div className="space-y-2">
-                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Full Name</Label>
+                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Recipient Name (Initial only ok)</Label>
                     <Input
-                      placeholder="e.g. John Mensah"
+                      placeholder="e.g. J. M."
                       className="rounded-2xl h-12 bg-[#f5f5f1] border-0 focus-visible:ring-primary/20 text-sm"
                       value={formData.full_name}
                       onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Phone</Label>
+                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Phone Number</Label>
                     <Input
                       placeholder="e.g. 0244000000"
                       className="rounded-2xl h-12 bg-[#f5f5f1] border-0 focus-visible:ring-primary/20 text-sm"
@@ -290,30 +274,27 @@ export default function EnrollmentPage() {
 
             {step === 3 && (
               <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <div className="rounded-[2rem] border-2 border-dashed border-muted bg-[#f5f5f1]/50 p-10 text-center transition-all hover:bg-[#f5f5f1] group">
-                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-sm transition-transform group-hover:scale-110">
-                    <Upload className="h-6 w-6 text-primary" />
-                  </div>
-                  <div className="mt-6">
-                    <Label htmlFor="pres" className="cursor-pointer text-sm font-bold text-primary hover:underline">
-                      Attach Prescription
-                    </Label>
-                    <p className="mt-2 text-[11px] text-muted-foreground leading-relaxed px-4">
-                      JPG, PNG or PDF. We verify this before your first delivery.
-                    </p>
-                  </div>
-                  <Input id="pres" type="file" className="hidden" onChange={handleFileChange} accept="image/*,application/pdf" />
-                  {prescriptionFile && (
-                    <div className="mt-6 flex items-center justify-center gap-2 text-xs text-green-600 font-bold bg-white py-3 px-4 rounded-2xl shadow-sm animate-in zoom-in duration-300">
-                      <FileText className="h-4 w-4" />
-                      {prescriptionFile.name}
-                    </div>
-                  )}
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Hospital Refill Code</Label>
+                  <Input
+                    placeholder="DK-HOSP-XXXX"
+                    className="rounded-2xl h-14 bg-[#f5f5f1] border-2 border-primary/20 focus-visible:ring-primary/20 text-lg font-mono text-center tracking-widest"
+                    value={formData.hospitalRefillCode}
+                    onChange={(e) => setFormData({ ...formData, hospitalRefillCode: e.target.value })}
+                  />
+                  <p className="text-[10px] text-muted-foreground px-2 pt-1">
+                    Enter the secret code issued by your partner hospital for this program.
+                  </p>
                 </div>
-                <div className="bg-primary/5 p-4 rounded-2xl">
-                    <p className="text-[10px] text-center text-primary/70 font-medium leading-relaxed">
-                      Your data is encrypted. Partner pharmacists verify records only to ensure clinical safety.
-                    </p>
+                <div className="bg-primary/5 p-5 rounded-[2rem] border border-primary/10">
+                    <div className="flex items-start gap-3">
+                      <div className="bg-primary/10 p-2 rounded-full">
+                        <CheckCircle2 className="h-4 w-4 text-primary" />
+                      </div>
+                      <p className="text-xs text-primary/80 font-medium leading-relaxed">
+                        <b>No ID Required.</b> DiscreetKit uses token-based verification. We never store photos of you or your documents.
+                      </p>
+                    </div>
                 </div>
               </div>
             )}
@@ -339,10 +320,10 @@ export default function EnrollmentPage() {
             ) : (
               <Button
                 onClick={handleSubmit}
-                className="flex-[2] h-14 rounded-full font-bold shadow-xl"
-                disabled={isSubmitting || !prescriptionFile}
+                className="flex-[2] h-14 rounded-full font-bold shadow-xl transition-all active:scale-95"
+                disabled={isSubmitting || !formData.hospitalRefillCode}
               >
-                {isSubmitting ? <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Finalizing...</> : "Complete Enrollment"}
+                {isSubmitting ? <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Validating Code...</> : "Verify & Enroll"}
               </Button>
             )}
           </CardFooter>

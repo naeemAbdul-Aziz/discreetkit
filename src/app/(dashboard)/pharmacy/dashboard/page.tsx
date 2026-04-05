@@ -14,7 +14,10 @@ import {
   AlertCircle,
   Info,
   Activity,
-  Zap
+  Zap,
+  Users,
+  ShieldCheck,
+  Repeat
 } from "lucide-react";
 import { OrdersList } from "./orders-list";
 import { useEffect, useState, useCallback } from "react";
@@ -23,6 +26,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { usePharmacy } from "@/components/dashboard/pharmacy-context";
+import { getHubAnalytics } from "@/lib/hub-actions";
 
 type PharmacyData = {
   pharmacy: { id: number; name: string; location: string };
@@ -41,7 +46,9 @@ import { useSSE } from "@/hooks/use-sse";
 
 export default function PharmacyDashboardPage() {
   const router = useRouter();
+  const { isHub, pharmacy: hubInfo } = usePharmacy();
   const [data, setData] = useState<PharmacyData | null>(null);
+  const [hubStats, setHubStats] = useState<{ totalEnrolled: number, adherenceRate: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -82,7 +89,15 @@ export default function PharmacyDashboardPage() {
         }
 
         const json = await response.json();
-        setData({ ...json, _timestamp: Date.now() });
+
+        if (json) {
+          setData({ ...json, _timestamp: Date.now() });
+          
+          if (isHub) {
+            const hStats = await getHubAnalytics();
+            setHubStats(hStats);
+          }
+        }
         setDataLoaded(true);
       } catch (err: any) {
         console.error("[PharmacyDashboard] Error:", err);
@@ -94,7 +109,7 @@ export default function PharmacyDashboardPage() {
         }
       }
     },
-    [router],
+    [router, isHub],
   );
 
   useEffect(() => {
@@ -202,34 +217,55 @@ export default function PharmacyDashboardPage() {
       </div>
 
       <div className="grid gap-6 grid-cols-2 lg:grid-cols-4">
-        {[
-          { label: "New Inbound", value: data.stats.pending, icon: Package, color: "text-brand-teal", bg: "bg-brand-teal/5", border: "border-brand-teal/10", note: "Awaiting Ack" },
-          { label: "Internal Prep", value: data.stats.processing, icon: Clock, color: "text-brand-indigo", bg: "bg-brand-indigo/5", border: "border-brand-indigo/10", note: "Active Lab" },
-          { label: "Outbound Ops", value: data.stats.outForDelivery, icon: Truck, color: "text-amber-600", bg: "bg-amber-50/50", border: "border-amber-100", note: "Last Mile" },
-          { label: "Completed Hub", value: data.stats.completed, icon: CheckCircle, color: "text-emerald-600", bg: "bg-emerald-50/50", border: "border-emerald-100", note: "Delivered" },
-        ].map((stat, i) => (
-          <Card key={i} className={cn(
-            "relative overflow-hidden border-none shadow-sm transition-all duration-300 hover:shadow-lg rounded-[2rem]",
-            stat.bg
-          )}>
-            <div className={cn("absolute top-0 left-0 w-full h-1", stat.color.replace('text-', 'bg-'))} />
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-              <CardTitle className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                {stat.label}
-              </CardTitle>
-              <stat.icon className={cn("h-5 w-5", stat.color)} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-4xl font-black text-slate-900 tracking-tighter mb-1">
-                {stat.value}
-              </div>
-              <p className="text-[10px] font-black text-slate-400/80 uppercase tracking-widest flex items-center gap-2">
-                 <span className={cn("w-1.5 h-1.5 rounded-full", stat.color.replace('text-', 'bg-'))} />
-                 {stat.note}
-              </p>
-            </CardContent>
-          </Card>
-        ))}
+        {isHub ? (
+          <>
+            {[
+              { label: "Total Enrolled", value: hubStats?.totalEnrolled || 0, icon: Users, color: "text-brand-teal", bg: "bg-brand-teal/5", note: "ART Patients" },
+              { label: "Adherence Rate", value: `${hubStats?.adherenceRate || 0}%`, icon: Activity, color: "text-emerald-600", bg: "bg-emerald-50/50", note: "95-95-95 Goal" },
+              { label: "Pending Auth", value: data.recentOrders.filter(o => o.status === 'pending_verification').length, icon: ShieldCheck, color: "text-brand-indigo", bg: "bg-brand-indigo/5", note: "Verification Queue" },
+              { label: "Monthly Refills", value: data.stats.completed, icon: Repeat, color: "text-amber-600", bg: "bg-amber-50/50", note: "Active Cycle" },
+            ].map((stat, i) => (
+              <Card key={i} className={cn("relative overflow-hidden border-none shadow-sm transition-all duration-300 hover:shadow-lg rounded-[2rem]", stat.bg)}>
+                <div className={cn("absolute top-0 left-0 w-full h-1", stat.color.replace('text-', 'bg-'))} />
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                  <CardTitle className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{stat.label}</CardTitle>
+                  <stat.icon className={cn("h-5 w-5", stat.color)} />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-4xl font-black text-slate-900 tracking-tighter mb-1">{stat.value}</div>
+                  <p className="text-[10px] font-black text-slate-400/80 uppercase tracking-widest flex items-center gap-2">
+                    <span className={cn("w-1.5 h-1.5 rounded-full", stat.color.replace('text-', 'bg-'))} />
+                    {stat.note}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </>
+        ) : (
+          <>
+            {[
+              { label: "New Inbound", value: data.stats.pending, icon: Package, color: "text-brand-teal", bg: "bg-brand-teal/5", border: "border-brand-teal/10", note: "Awaiting Ack" },
+              { label: "Internal Prep", value: data.stats.processing, icon: Clock, color: "text-brand-indigo", bg: "bg-brand-indigo/5", border: "border-brand-indigo/10", note: "Active Lab" },
+              { label: "Outbound Ops", value: data.stats.outForDelivery, icon: Truck, color: "text-amber-600", bg: "bg-amber-50/50", border: "border-amber-100", note: "Last Mile" },
+              { label: "Completed Hub", value: data.stats.completed, icon: CheckCircle, color: "text-emerald-600", bg: "bg-emerald-50/50", border: "border-emerald-100", note: "Delivered" },
+            ].map((stat, i) => (
+              <Card key={i} className={cn("relative overflow-hidden border-none shadow-sm transition-all duration-300 hover:shadow-lg rounded-[2rem]", stat.bg)}>
+                <div className={cn("absolute top-0 left-0 w-full h-1", stat.color.replace('text-', 'bg-'))} />
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                  <CardTitle className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{stat.label}</CardTitle>
+                  <stat.icon className={cn("h-5 w-5", stat.color)} />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-4xl font-black text-slate-900 tracking-tighter mb-1">{stat.value}</div>
+                  <p className="text-[10px] font-black text-slate-400/80 uppercase tracking-widest flex items-center gap-2">
+                    <span className={cn("w-1.5 h-1.5 rounded-full", stat.color.replace('text-', 'bg-'))} />
+                    {stat.note}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </>
+        )}
       </div>
 
       <div className="relative mt-8">

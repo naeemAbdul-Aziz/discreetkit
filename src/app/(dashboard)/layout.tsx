@@ -8,6 +8,7 @@ import * as React from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { getSupabaseClient } from "@/lib/supabase"
 import { DashboardSidebar } from "./DashboardSidebar"
+import { PharmacyProvider } from "@/components/dashboard/pharmacy-context"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   // Page title can be derived client-side; keep server layout minimal.
@@ -67,54 +68,56 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-muted/20">
-        {/* Sidebar: hidden on mobile, visible on md+ */}
-        <div className="hidden md:block">
-          <DashboardSidebar />
-        </div>
-        <SidebarInset>
-          <div className="flex-1 w-full overflow-auto p-4 md:p-8 pb-20 md:pb-8">
-            {children}
+    <PharmacyProvider>
+      <SidebarProvider>
+        <div className="flex min-h-screen w-full bg-muted/20">
+          {/* Sidebar: hidden on mobile, visible on md+ */}
+          <div className="hidden md:block">
+            <DashboardSidebar />
           </div>
-          {/* Mobile Bottom Navigation */}
-          {isMobile && (
-            <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-around bg-white/95 backdrop-blur border-t border-border/70 shadow-lg md:hidden px-1 py-1 pb-[calc(env(safe-area-inset-bottom)+6px)]">
-              {navItems.map((item) => {
-                const isActive = item.href !== "__logout__" && pathname.startsWith(item.href)
-                const baseClasses = "flex flex-col items-center justify-center flex-1 rounded-xl py-2 text-[11px] font-medium transition-all"
-                const activeClasses = isActive ? "text-primary bg-primary/10 shadow-sm" : "text-muted-foreground hover:text-primary hover:bg-muted/50"
+          <SidebarInset>
+            <div className="flex-1 w-full overflow-auto p-4 md:p-8 pb-20 md:pb-8">
+              {children}
+            </div>
+            {/* Mobile Bottom Navigation */}
+            {isMobile && (
+              <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-around bg-white/95 backdrop-blur border-t border-border/70 shadow-lg md:hidden px-1 py-1 pb-[calc(env(safe-area-inset-bottom)+6px)]">
+                {navItems.map((item) => {
+                  const isActive = item.href !== "__logout__" && pathname.startsWith(item.href)
+                  const baseClasses = "flex flex-col items-center justify-center flex-1 rounded-xl py-2 text-[11px] font-medium transition-all"
+                  const activeClasses = isActive ? "text-primary bg-primary/10 shadow-sm" : "text-muted-foreground hover:text-primary hover:bg-muted/50"
 
-                if (item.href === "__logout__") {
+                  if (item.href === "__logout__") {
+                    return (
+                      <button
+                        key={item.label}
+                        onClick={handleLogout}
+                        className={`${baseClasses} ${activeClasses}`}
+                        aria-label={item.label}
+                      >
+                        <item.icon className="h-5 w-5 mb-1" />
+                        {item.label}
+                      </button>
+                    )
+                  }
+
                   return (
-                    <button
-                      key={item.label}
-                      onClick={handleLogout}
+                    <Link
+                      key={item.href}
+                      href={item.href}
                       className={`${baseClasses} ${activeClasses}`}
                       aria-label={item.label}
                     >
                       <item.icon className="h-5 w-5 mb-1" />
                       {item.label}
-                    </button>
+                    </Link>
                   )
-                }
-
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`${baseClasses} ${activeClasses}`}
-                    aria-label={item.label}
-                  >
-                    <item.icon className="h-5 w-5 mb-1" />
-                    {item.label}
-                  </Link>
-                )
-              })}
-            </nav>
-          )}
-        </SidebarInset>
-      </div>
-    </SidebarProvider>
+                })}
+              </nav>
+            )}
+          </SidebarInset>
+        </div>
+      </SidebarProvider>
+    </PharmacyProvider>
   )
 }
