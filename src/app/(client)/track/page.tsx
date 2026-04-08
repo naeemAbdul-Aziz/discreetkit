@@ -318,43 +318,70 @@ function OrderTrackingView({ order }: { order: Order }) {
   const latestEvent = [...order.events].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
   const currentStatus = statusMap[order.status] || statusMap['received'];
 
+  // Calculate dynamic ETA: 2 hours after latest event, or delivered if status is completed
+  const calculateETA = () => {
+    if (order.status === 'completed') return "Delivered";
+    if (!latestEvent) return "Today, by 6:00 PM";
+    
+    const baseDate = new Date(latestEvent.date);
+    const etaDate = new Date(baseDate.getTime() + 2 * 60 * 60 * 1000); // +2 hours
+    
+    // If ETA is in the past compared to right now, set it to 1 hour from now
+    const now = new Date();
+    const finalDate = etaDate < now ? new Date(now.getTime() + 60 * 60 * 1000) : etaDate;
+
+    return finalDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  };
+
+  const etaDisplay = calculateETA();
+
   return (
     <div className="grid gap-8 lg:grid-cols-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
       
-      {/* 1. Status Hero (Full Width) */}
+      {/* 1. Status Hero (Centered & Polished) */}
       <div className="lg:col-span-12">
-        <div className="bg-white rounded-[2rem] shadow-lg border-0 p-8 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
-          {/* Animated Background Pulse */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-32 -mt-32 blur-3xl" />
+        <div className="bg-white rounded-[2.5rem] shadow-xl border-0 p-10 flex flex-col items-center text-center relative overflow-hidden group">
+          {/* Subtle Background Elements */}
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+          <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl opacity-50 transition-all group-hover:bg-primary/10" />
           
-          <div className="relative">
-            <div className="h-24 w-24 rounded-full bg-primary/5 flex items-center justify-center relative z-10">
-              <div className="h-16 w-16 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
-                {React.createElement(currentStatus.icon, { className: "h-8 w-8 text-white stroke-[2.5px]" })}
+          {/* Icon Section */}
+          <div className="relative mb-8">
+            <div className="h-28 w-28 rounded-full bg-primary/5 flex items-center justify-center relative z-10 transition-transform duration-500 group-hover:scale-110">
+              <div className="h-20 w-20 rounded-full bg-primary flex items-center justify-center shadow-2xl shadow-primary/30">
+                {React.createElement(currentStatus.icon, { className: "h-10 w-10 text-white stroke-[2px]" })}
               </div>
             </div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-primary/5 rounded-full animate-pulse -z-0" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-36 h-36 bg-primary/5 rounded-full animate-pulse -z-0" />
           </div>
 
-          <div className="flex-1 text-center md:text-left z-10">
-            <div className="flex flex-col md:flex-row md:items-baseline gap-2 mb-2">
-              <h2 className="text-3xl font-semibold tracking-tight">{currentStatus.label}</h2>
-              <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-0 rounded-full px-4 py-1 text-xs font-bold uppercase tracking-widest whitespace-nowrap">
+          {/* Text Content */}
+          <div className="max-w-2xl relative z-10">
+            <div className="flex flex-col items-center gap-3 mb-4">
+              <h2 className="text-4xl font-semibold tracking-tight text-slate-900">{currentStatus.label}</h2>
+              <Badge className="bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border-0 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest">
+                <span className="relative flex h-2 w-2 mr-1.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
                 Real-Time Update
               </Badge>
             </div>
-            <p className="text-muted-foreground font-medium text-lg leading-relaxed max-w-xl">
+            
+            <p className="text-muted-foreground font-medium text-lg leading-relaxed mb-8">
               {currentStatus.description}
             </p>
-          </div>
-          
-          <div className="hidden lg:block h-20 w-[1px] bg-border/40 mx-8" />
-          
-          <div className="text-center md:text-left">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60 mb-1">
-              Estimated Arrival
-            </p>
-            <p className="text-xl font-semibold tracking-tight">Today, by 6:00 PM</p>
+
+            {order.status !== 'completed' && (
+              <div className="pt-6 border-t border-slate-50 w-full max-w-xs mx-auto">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">
+                  Estimated Arrival
+                </p>
+                <p className="text-2xl font-semibold tracking-tight text-slate-800">
+                  Today, by {etaDisplay}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>

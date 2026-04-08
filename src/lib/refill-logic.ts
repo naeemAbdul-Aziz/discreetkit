@@ -22,7 +22,7 @@ export async function validateHospitalCode(code: string) {
 
   if (error) {
     logger.error('Error validating hospital code', { context: 'Refill-Logic', data: error });
-    return { valid: false, message: 'Internal validation error.' };
+    return { valid: false, message: `Validation System Error: ${error.message}. This typically occurs if the database schema is outdated.` };
   }
 
   if (data && data.length > 0) {
