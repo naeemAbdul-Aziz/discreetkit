@@ -671,12 +671,17 @@ export async function getSummaryMetrics() {
             supabase.from('pharmacy_riders').select('id', { count: 'exact', head: true }),
             supabase.from('orders').select('id', { count: 'exact', head: true }),
             supabase.from('orders').select('id', { count: 'exact', head: true }).in('status', ['processing', 'out_for_delivery']),
-            supabase.from('orders').select('total_price_ghs').not('status', 'in', '("cancelled","pending_payment")'),
-            supabase.from('orders').select('user_id')
+            supabase.from('orders').select('total_price_ghs').neq('status', 'cancelled').neq('status', 'pending_payment'),
+            supabase.from('orders').select('user_id, email, phone_masked')
         ]);
 
         const totalRevenue = revenueRes.data?.reduce((acc, row) => acc + (Number(row.total_price_ghs) || 0), 0) || 0;
-        const activePatients = new Set(usersRes.data?.map(o => o.user_id).filter(Boolean)).size;
+        
+        // Count unique authenticated users AND unique guests by phone/email
+        const activePatients = new Set(
+            usersRes.data?.map(o => o.user_id || o.phone_masked || o.email)
+            .filter(Boolean)
+        ).size;
 
         return {
             totalRevenue,
@@ -710,7 +715,8 @@ export async function getChartsData() {
         const { data: orders } = await supabase
             .from('orders')
             .select('created_at, total_price_ghs')
-            .not('status', 'in', '("cancelled","pending_payment")');
+            .neq('status', 'cancelled')
+            .neq('status', 'pending_payment');
 
         const revenueByDay: Record<string, number> = {};
         const ordersByDay: Record<string, number> = {};
@@ -778,7 +784,7 @@ export async function getRankingStats() {
         const { data: orders } = await supabase
             .from('orders')
             .select('items, total_price_ghs, pharmacy:pharmacies!pharmacy_id(name)')
-            .not('status', 'in', '("cancelled")');
+            .neq('status', 'cancelled');
 
         const pharmacyRevenue: Record<string, number> = {};
         const productSales: Record<string, { quantity: number; revenue: number }> = {};

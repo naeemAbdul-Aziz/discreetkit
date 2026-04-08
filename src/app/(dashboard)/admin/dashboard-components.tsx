@@ -35,7 +35,7 @@ export async function MetricsGrid() {
     return (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
             <StatCard
-                title="Total Revenue"
+                title="Total Sales"
                 value={`₵${metrics.totalRevenue.toLocaleString()}`}
                 icon={DollarSign}
                 description="Live revenue from all orders"
@@ -47,25 +47,25 @@ export async function MetricsGrid() {
                 description="Total orders recorded"
             />
             <StatCard
-                title="Active Patients"
+                title="Active Customers"
                 value={metrics.activePatients}
                 icon={Users}
                 description="Unique patients served"
             />
             <StatCard
-                title="Active Orders"
+                title="Processing Orders"
                 value={metrics.activeOrders}
                 icon={Activity}
                 description="Orders in fulfillment"
             />
             <StatCard
-                title="Avg. Order"
+                title="Avg. Order Value"
                 value={`₵${metrics.totalOrders > 0 ? (metrics.totalRevenue / metrics.totalOrders).toFixed(0) : 0}`}
                 icon={TrendingUp}
                 description="Based on current order book"
             />
             <StatCard
-                title="Velocity"
+                title="Avg. Wait Time"
                 value={`${metrics.fulfillmentVelocity}h`}
                 icon={Package}
                 description="Avg. fulfillment time"
@@ -86,7 +86,7 @@ export async function RevenueTimeline() {
     return (
         <Card className="border border-slate-200/60 shadow-sm bg-white rounded-3xl overflow-hidden">
             <CardHeader className="p-6 pb-2">
-                <CardTitle className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400">Revenue Timeline</CardTitle>
+                <CardTitle className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400">Sales Over Time</CardTitle>
             </CardHeader>
             <CardContent className="p-6 pt-0">
                 <DynamicCharts data={chartData} />
@@ -101,8 +101,8 @@ export async function RankingsGrid() {
     return (
         <div className="grid gap-6 md:grid-cols-2">
             <RankingList
-                title="Top Pharmacies"
-                description="Highest revenue generators"
+                title="Top Sellers"
+                description="Best performing pharmacies"
                 type="pharmacy"
                 items={topPharmacies.map(p => ({
                     name: p.name,
@@ -111,8 +111,8 @@ export async function RankingsGrid() {
                 }))}
             />
             <RankingList
-                title="Top Products"
-                description="Most ordered medical items"
+                title="Best Selling Products"
+                description="Most ordered items"
                 type="product"
                 items={topProducts.map(p => ({
                     name: p.name,
@@ -132,10 +132,10 @@ export async function ActivityPulse() {
             <CardHeader className="p-6 pb-4 border-b border-slate-50">
                 <CardTitle className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400 flex items-center gap-2">
                     <Activity className="h-3.5 w-3.5 text-brand-indigo/60" />
-                    Operations Pulse
+                    Recent Activity
                 </CardTitle>
             </CardHeader>
-            <CardContent className="p-0">
+            <CardContent className="p-0 max-h-[400px] overflow-y-auto">
                 <div className="divide-y divide-slate-50">
                     {pulse?.map((item, idx) => (
                         <div key={idx} className="p-4 flex items-start gap-4 hover:bg-slate-50/50 transition-colors">
