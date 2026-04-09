@@ -656,7 +656,7 @@ export async function getOrders(page: number = 1, pageSize: number = 50) {
 export async function getSummaryMetrics() {
     try {
         await requireAdmin();
-        const supabase = await createSupabaseServerClient();
+        const supabase = getSupabaseAdminClient();
 
         // FAANG Micro-queries: Concurrent precision fetching instead of monolithic payload
         const [
@@ -709,7 +709,7 @@ export async function getSummaryMetrics() {
 export async function getChartsData() {
     try {
         await requireAdmin();
-        const supabase = await createSupabaseServerClient();
+        const supabase = getSupabaseAdminClient();
 
         // Memory-efficient micro-query
         const { data: orders } = await supabase
@@ -751,7 +751,7 @@ export async function getChartsData() {
 export async function getPulseFeed() {
     try {
         await requireAdmin();
-        const supabase = await createSupabaseServerClient();
+        const supabase = getSupabaseAdminClient();
 
         // Direct query to order_events avoids the massive 'orders' payload
         const { data: events, error } = await supabase
@@ -778,7 +778,7 @@ export async function getPulseFeed() {
 export async function getRankingStats() {
     try {
         await requireAdmin();
-        const supabase = await createSupabaseServerClient();
+        const supabase = getSupabaseAdminClient();
 
         // Explicit join prevents PostgREST ambiguity crash while reducing payload by 95%
         const { data: orders } = await supabase
