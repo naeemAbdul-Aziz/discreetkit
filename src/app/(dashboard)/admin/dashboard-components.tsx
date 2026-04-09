@@ -141,7 +141,7 @@ export async function ActivityPulse() {
                         <div key={idx} className="p-4 flex items-start gap-4 hover:bg-slate-50/50 transition-colors">
                             <div className={cn(
                                 "h-8 w-8 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold",
-                                item.status === 'completed' ? 'bg-emerald-50 text-emerald-600' : 'bg-brand-indigo/5 text-brand-indigo'
+                                item.status === 'completed' ? 'bg-slate-100 text-slate-700' : 'bg-white border border-slate-200/60 shadow-[0_1px_2px_rgba(0,0,0,0.02)] text-slate-600'
                             )}>
                                 {item.orderCode ? item.orderCode.slice(-2) : '??'}
                             </div>
