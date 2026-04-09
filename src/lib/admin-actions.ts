@@ -672,14 +672,14 @@ export async function getSummaryMetrics() {
             supabase.from('orders').select('id', { count: 'exact', head: true }),
             supabase.from('orders').select('id', { count: 'exact', head: true }).in('status', ['processing', 'out_for_delivery']),
             supabase.from('orders').select('total_price_ghs').neq('status', 'pending_payment'),
-            supabase.from('orders').select('user_id, email, phone_masked')
+            supabase.from('orders').select('email, phone_masked')
         ]);
 
         const totalRevenue = revenueRes.data?.reduce((acc, row) => acc + (Number(row.total_price_ghs) || 0), 0) || 0;
         
         // Count unique authenticated users AND unique guests by phone/email
         const activePatients = new Set(
-            usersRes.data?.map(o => o.user_id || o.phone_masked || o.email)
+            usersRes.data?.map(o => o.phone_masked || o.email)
             .filter(Boolean)
         ).size;
 
@@ -879,7 +879,7 @@ export async function getDetailedAnalytics() {
         // Fetching only the columns we need to keep payload minimal.
         const { data: ordersRaw } = await supabase
             .from('orders')
-            .select('items, delivery_area, created_at, user_id, phone_masked');
+            .select('items, delivery_area, created_at, phone_masked, email');
 
         // SRH category buckets (keyword-based; Phase 2 → products.category join)
         const categoryMap: Record<string, number> = {
@@ -905,8 +905,8 @@ export async function getDetailedAnalytics() {
             const hour = new Date(o.created_at).getUTCHours();
             hourMap[hour] = (hourMap[hour] || 0) + 1;
 
-            // Repeat customer tracking (authenticated uid takes precedence)
-            const uid = o.user_id || o.phone_masked;
+            // Repeat customer tracking (email or phone)
+            const uid = o.phone_masked || o.email;
             if (uid) userFreq[uid] = (userFreq[uid] || 0) + 1;
 
             // Product category classification
