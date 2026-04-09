@@ -842,6 +842,169 @@ export async function getDashboardStats() {
     };
 }
 
+/**
+ * PHASE 1: Detailed analytics for stakeholder dashboards.
+ * Additive — does not modify any existing dashboard functions.
+ * Computes: status breakdown, SRH category demand, geo coverage,
+ * peak hours, repeat customers, refill adherence, low-stock alerts.
+ *
+ * NOTE(future): Product classification is keyword-based (brittle at scale).
+ * Phase 2 will use products.category as canonical ground truth.
+ * Stock levels may be stale (no auto-decrement trigger on order placement).
+ */
+export async function getDetailedAnalytics() {
+    try {
+        await requireAdmin();
+        const supabase = getSupabaseAdminClient();
+
+        // ── 1. Order status distribution ─────────────────────────────────────
+        const { data: statusOrders } = await supabase
+            .from('orders')
+            .select('status');
+
+        const statusMap: Record<string, number> = {};
+        statusOrders?.forEach(o => {
+            statusMap[o.status] = (statusMap[o.status] || 0) + 1;
+        });
+
+        const orderStatusBreakdown = [
+            { name: 'Received',          key: 'received',          value: statusMap['received']          || 0, color: '#4f46e5' },
+            { name: 'Processing',        key: 'processing',        value: statusMap['processing']        || 0, color: '#f59e0b' },
+            { name: 'En Route',          key: 'out_for_delivery',  value: statusMap['out_for_delivery']  || 0, color: '#0d9488' },
+            { name: 'Delivered',         key: 'completed',         value: statusMap['completed']         || 0, color: '#10b981' },
+            { name: 'Awaiting Payment',  key: 'pending_payment',   value: statusMap['pending_payment']   || 0, color: '#94a3b8' },
+        ].filter(s => s.value > 0);
+
+        // ── 2. Items, geo, peak-hours, repeat-customer analysis ──────────────
+        // Fetching only the columns we need to keep payload minimal.
+        const { data: ordersRaw } = await supabase
+            .from('orders')
+            .select('items, delivery_area, created_at, user_id, phone_masked');
+
+        // SRH category buckets (keyword-based; Phase 2 → products.category join)
+        const categoryMap: Record<string, number> = {
+            'HIV & STI':       0,
+            'Contraceptives':  0,
+            'Pregnancy Tests': 0,
+            'Lubricants':      0,
+            'General SRH':     0,
+        };
+        const areaMap:  Record<string, number> = {};
+        const hourMap:  Record<number, number> = {};
+        const userFreq: Record<string, number> = {};
+
+        ordersRaw?.forEach(o => {
+            // Geographic coverage
+            if (o.delivery_area) {
+                const a = o.delivery_area.trim();
+                areaMap[a] = (areaMap[a] || 0) + 1;
+            }
+
+            // Peak ordering hour (local Accra time, UTC+0 — no timezone conversion
+            // needed here; adjust offset in Phase 2 if server timezone changes)
+            const hour = new Date(o.created_at).getUTCHours();
+            hourMap[hour] = (hourMap[hour] || 0) + 1;
+
+            // Repeat customer tracking (authenticated uid takes precedence)
+            const uid = o.user_id || o.phone_masked;
+            if (uid) userFreq[uid] = (userFreq[uid] || 0) + 1;
+
+            // Product category classification
+            let items: any[] = [];
+            try { items = typeof o.items === 'string' ? JSON.parse(o.items) : (o.items || []); } catch {}
+            if (!Array.isArray(items)) return;
+
+            items.forEach(item => {
+                const n = (item.name || '').toLowerCase();
+                const qty = Number(item.quantity) || 1;
+                if (n.includes('hiv') || n.includes('sti') || n.includes('test kit') || n.includes('condom') || n.includes('pep') || n.includes('prep')) {
+                    categoryMap['HIV & STI'] += qty;
+                } else if (n.includes('postinor') || n.includes('morning after') || n.includes('contraceptive') || n.includes('levonorgestrel') || n.includes('pill')) {
+                    categoryMap['Contraceptives'] += qty;
+                } else if (n.includes('pregnancy')) {
+                    categoryMap['Pregnancy Tests'] += qty;
+                } else if (n.includes('lube') || n.includes('lubricant') || n.includes('durex')) {
+                    categoryMap['Lubricants'] += qty;
+                } else {
+                    categoryMap['General SRH'] += qty;
+                }
+            });
+        });
+
+        const categoryBreakdown = Object.entries(categoryMap)
+            .map(([name, value]) => ({ name, value }))
+            .filter(c => c.value > 0)
+            .sort((a, b) => b.value - a.value);
+
+        const topAreas = Object.entries(areaMap)
+            .map(([name, value]) => ({ name, value }))
+            .sort((a, b) => b.value - a.value)
+            .slice(0, 10);
+
+        // 24-slot hourly distribution
+        const peakHours = Array.from({ length: 24 }, (_, h) => ({
+            hour: `${String(h).padStart(2, '0')}:00`,
+            orders: hourMap[h] || 0,
+        }));
+
+        // Repeat vs new customers
+        const totalUniqueCustomers = Object.keys(userFreq).length;
+        const repeatCustomers = Object.values(userFreq).filter(c => c > 1).length;
+
+        // ── 3. Refill adherence ───────────────────────────────────────────────
+        const { data: refillData } = await supabase
+            .from('medication_refill_subscriptions')
+            .select('status');
+
+        const refillMap: Record<string, number> = {};
+        refillData?.forEach(r => { refillMap[r.status] = (refillMap[r.status] || 0) + 1; });
+
+        // ── 4. Low-stock alerts ───────────────────────────────────────────────
+        // NOTE: stock_level may be stale (no auto-decrement trigger).
+        // Threshold = 5 units as proxy for reorder level.
+        const { data: lowStockRaw } = await supabase
+            .from('pharmacy_products')
+            .select('stock_level, reorder_level, product:products!product_id(name), pharmacy:pharmacies!pharmacy_id(name)')
+            .lt('stock_level', 5)
+            .eq('is_available', true)
+            .limit(15);
+
+        const lowStockAlerts = (lowStockRaw || []).map((row: any) => ({
+            product: Array.isArray(row.product) ? row.product[0]?.name : row.product?.name || 'Unknown',
+            pharmacy: Array.isArray(row.pharmacy) ? row.pharmacy[0]?.name : row.pharmacy?.name || 'Unknown',
+            stockLevel: row.stock_level,
+            reorderLevel: row.reorder_level ?? 5,
+        }));
+
+        return {
+            orderStatusBreakdown,
+            categoryBreakdown,
+            topAreas,
+            peakHours,
+            totalUniqueCustomers,
+            repeatCustomers,
+            refillActive:    refillMap['active']    || 0,
+            refillPaused:    refillMap['paused']     || 0,
+            refillCancelled: refillMap['cancelled']  || 0,
+            lowStockAlerts,
+        };
+    } catch (err) {
+        console.error('[DetailedAnalytics] Error:', err);
+        return {
+            orderStatusBreakdown: [],
+            categoryBreakdown:    [],
+            topAreas:             [],
+            peakHours:            [],
+            totalUniqueCustomers: 0,
+            repeatCustomers:      0,
+            refillActive:         0,
+            refillPaused:         0,
+            refillCancelled:      0,
+            lowStockAlerts:       [],
+        };
+    }
+}
+
 export async function updateOrderStatus(id: number, status: string, courierDetails?: { name: string; phone: string; trackingUrl?: string }, forceOverride: boolean = false) {
     await requireAdmin();
     const supabase = await createSupabaseServerClient()
