@@ -640,7 +640,7 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
           {/* Platform snapshot for exports */}
           <Card className="border border-slate-200/80 shadow-sm bg-white">
             <CardHeader className="pb-3">
-              <CardTitle className="text-[13px] font-bold text-slate-700">What's Included in All Exports</CardTitle>
+              <CardTitle className="text-[13px] font-bold text-slate-700">What&apos;s Included in All Exports</CardTitle>
               <CardDescription className="text-[11px]">Aggregated, anonymized figures — no individual-level data</CardDescription>
             </CardHeader>
             <CardContent>
