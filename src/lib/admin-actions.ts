@@ -671,7 +671,7 @@ export async function getSummaryMetrics() {
             supabase.from('pharmacy_riders').select('id', { count: 'exact', head: true }),
             supabase.from('orders').select('id', { count: 'exact', head: true }),
             supabase.from('orders').select('id', { count: 'exact', head: true }).in('status', ['processing', 'out_for_delivery']),
-            supabase.from('orders').select('total_price_ghs').neq('status', 'cancelled').neq('status', 'pending_payment'),
+            supabase.from('orders').select('total_price_ghs').neq('status', 'pending_payment'),
             supabase.from('orders').select('user_id, email, phone_masked')
         ]);
 
@@ -715,7 +715,6 @@ export async function getChartsData() {
         const { data: orders } = await supabase
             .from('orders')
             .select('created_at, total_price_ghs')
-            .neq('status', 'cancelled')
             .neq('status', 'pending_payment');
 
         const revenueByDay: Record<string, number> = {};
@@ -784,7 +783,7 @@ export async function getRankingStats() {
         const { data: orders } = await supabase
             .from('orders')
             .select('items, total_price_ghs, pharmacy:pharmacies!pharmacy_id(name)')
-            .neq('status', 'cancelled');
+            .neq('status', 'pending_payment');
 
         const pharmacyRevenue: Record<string, number> = {};
         const productSales: Record<string, { quantity: number; revenue: number }> = {};
