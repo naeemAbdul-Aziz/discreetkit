@@ -267,7 +267,7 @@ export default function InventoryClient({
             onClick={() => setIsRequestOpen(true)}
           >
             <Plus className="h-5 w-5" />
-            <span className="hidden sm:inline">Request Product</span>
+            <span className="hidden sm:inline">Add New Product</span>
           </Button>
         </div>
       </div>
@@ -287,7 +287,7 @@ export default function InventoryClient({
           </TabsTrigger>
           <TabsTrigger value="requests" className="rounded-xl px-8 h-full gap-2 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-brand-indigo">
             <History className="h-4 w-4" />
-            Sync Requests
+            Product Requests
             {requests.filter((r) => r.status === "pending").length > 0 && (
               <Badge className="ml-1 px-1.5 py-0 rounded-lg bg-brand-indigo/10 text-brand-indigo border-none font-black text-[10px]">
                 {requests.filter((r) => r.status === "pending").length}
@@ -343,7 +343,7 @@ export default function InventoryClient({
                           <div className="flex items-center gap-3">
                              <h4 className="text-lg font-black text-slate-900 tracking-tight">{req.product_name}</h4>
                              <Badge variant={req.status === "approved" ? "success" : req.status === "rejected" ? "destructive" : "secondary"} className="px-3 py-0.5 rounded-lg font-black text-[10px] uppercase tracking-widest">
-                                {req.status === "pending" ? "Awaiting Review" : req.status === "approved" ? "Added to Inventory" : "Declined"}
+                                {req.status === "pending" ? "Pending" : req.status === "approved" ? "Added" : "Declined"}
                              </Badge>
                           </div>
                           {req.description && <p className="text-sm font-medium text-slate-500 line-clamp-1">{req.description}</p>}
@@ -399,16 +399,16 @@ function ProductRequestModal({ open, onOpenChange, isMobile, toast }: any) {
     <form action={handleSubmit} className="space-y-6">
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="productName" className="text-xs font-black uppercase tracking-widest text-slate-400 pl-1">Product Identity</Label>
+          <Label htmlFor="productName" className="text-xs font-black uppercase tracking-widest text-slate-400 pl-1">Product Name</Label>
           <Input id="productName" name="productName" placeholder="e.g. Lipitor 20mg Tablets" required className="h-12 border-slate-200 rounded-xl font-bold" />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="description" className="text-xs font-black uppercase tracking-widest text-slate-400 pl-1">Clinical Context (Optional)</Label>
+          <Label htmlFor="description" className="text-xs font-black uppercase tracking-widest text-slate-400 pl-1">Description (Optional)</Label>
           <Textarea id="description" name="description" placeholder="Specify brand preference, dosage form, or packaging requirements..." className="min-h-[120px] border-slate-200 rounded-xl font-medium" />
         </div>
       </div>
       <Button type="submit" disabled={loading} className="w-full h-14 rounded-2xl bg-brand-indigo hover:bg-brand-indigo-dark font-black text-sm gap-2">
-        {loading ? "Transmitting..." : "Send Synchronization Request"}
+        {loading ? "Sending..." : "Submit Request"}
       </Button>
     </form>
   );
@@ -431,8 +431,8 @@ function ProductRequestModal({ open, onOpenChange, isMobile, toast }: any) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md p-8 rounded-3xl border-none shadow-2xl">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-black tracking-tight">Sync New Product</DialogTitle>
-          <DialogDescription className="font-medium text-slate-500">Suggest a medication or health product to be added to our validated catalog.</DialogDescription>
+          <DialogTitle className="text-2xl font-black tracking-tight">Add New Product</DialogTitle>
+          <DialogDescription className="font-medium text-slate-500">Request a medication or health product to be added to our catalog.</DialogDescription>
         </DialogHeader>
         <div className="mt-6">{Content}</div>
       </DialogContent>

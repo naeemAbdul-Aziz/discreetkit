@@ -43,8 +43,8 @@ export function DashboardChatbot({ role }: { role: "admin" | "pharmacy" }) {
     role: "model",
     parts:
       role === "admin"
-        ? "Systems Intelligence online. How can I assist with DiscreetKit HQ operations today?"
-        : "Pharmacy partner active. Ready to assist with order verification, riders, and stock balancing.",
+        ? "Hello. How can I help with DiscreetKit operations today?"
+        : "Pharmacy assistant active. Ready to help with orders, riders, and stock.",
   };
 
   useEffect(() => {
@@ -88,7 +88,7 @@ export function DashboardChatbot({ role }: { role: "admin" | "pharmacy" }) {
                     </div>
                     <div className="space-y-1">
                       <h2 className="text-xs font-black tracking-[0.2em] text-slate-400 uppercase">
-                         {role === "admin" ? "Systems Intelligence" : "Pharmacy Protocol"}
+                         {role === "admin" ? "Admin Support" : "Pharmacy Support"}
                       </h2>
                       <p className="text-[13px] text-slate-600 max-w-[280px] mx-auto font-medium leading-relaxed">
                         {msg.parts}
