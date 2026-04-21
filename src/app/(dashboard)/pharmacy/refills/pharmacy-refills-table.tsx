@@ -140,71 +140,63 @@ export function PharmacyRefillsTable({
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Pill className="h-3.5 w-3.5 text-slate-400" />
-                        <span className="text-sm font-bold text-slate-700">{sub.product_name}</span>
+                        <div>
+                          <p className="text-sm font-bold text-slate-700">{sub.product_name}</p>
+                          <p className="text-[10px] font-medium text-slate-400 capitalize">{sub.frequency} Refill</p>
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2 text-slate-600">
-                        <CalendarClock className="h-3.5 w-3.5" />
+                        <CalendarClock className="h-3.5 w-3.5 text-orange-500" />
                         <span className="text-sm font-medium">
-                          {sub.next_delivery_date ? format(new Date(sub.next_delivery_date), 'MMM d, yyyy') : 'TBD'}
+                          {sub.next_delivery_date ? format(new Date(sub.next_delivery_date), 'MMM d, yyyy') : 'Pending'}
                         </span>
+                      </div>
                     </TableCell>
-                  )}
-                  <TableCell className={pharmacyRefillsCols.productCell}>
-                    <div className="flex flex-col">
-                      <span className="font-medium truncate">{sub.product_name}</span>
-                      <span className="text-xs text-muted-foreground capitalize">
-                        {sub.frequency} Refill
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className={pharmacyRefillsCols.nextDueCell}>
-                    <div className="flex items-center gap-2 text-sm">
-                      <CalendarClock className="h-4 w-4 text-orange-500" />
-                      {sub.next_delivery_date
-                        ? new Date(sub.next_delivery_date).toLocaleDateString()
-                        : "Pending"}
-                    </div>
-                  </TableCell>
-                  <TableCell className={pharmacyRefillsCols.statusCell}>
-                    <Badge variant={sub.status === "active" ? "default" : "secondary"}>{sub.status}</Badge>
-                  </TableCell>
-                  <TableCell className={pharmacyRefillsCols.actionsCell}>
-                    <div className="flex items-center gap-2">
-                       {isHub && !sub.prescription_verified && (
-                         <Button
-                           size="sm"
-                           variant="outline"
-                           className="h-8 md:h-10 border-primary/20 text-primary hover:bg-primary/5 gap-2"
-                           onClick={() => handleVerifyToken(sub.id)}
-                           disabled={verifyingId === sub.id}
-                         >
-                           <ShieldCheck className="h-4 w-4" />
-                           <span className="truncate">{verifyingId === sub.id ? "Verifying..." : "Verify Code"}</span>
-                         </Button>
-                       )}
-                       <Button
-                        size="sm"
-                        className={cn(
-                          "gap-2 h-8 md:h-10",
-                          actionStyles.actionButton,
-                          sub.status !== "active" && "opacity-50"
-                        )}
-                        onClick={() => setLoggingId(sub.id)}
-                        disabled={sub.status !== "active"}
-                        title="Log Refill"
+                    <TableCell>
+                      <Badge 
+                        variant={sub.status === "active" ? "success" : "neutral"}
+                        className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider"
                       >
-                        <Pill className="h-4 w-4" />
-                        <span className="truncate">Log Refill</span>
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              );
-            })
-          )}
-        </TableBody>
+                        {sub.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        {isHub && !sub.prescription_verified && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 border-indigo-100 text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700 gap-2 rounded-xl text-xs font-bold"
+                            onClick={() => handleVerifyToken(sub.id)}
+                            disabled={verifyingId === sub.id}
+                          >
+                            <ShieldCheck className="h-3.5 w-3.5" />
+                            <span className="truncate">{verifyingId === sub.id ? "Verifying..." : "Verify Code"}</span>
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          className={cn(
+                            "h-8 gap-2 rounded-xl text-xs font-bold shadow-sm",
+                            sub.status === "active" 
+                              ? "bg-slate-900 text-white hover:bg-slate-800" 
+                              : "bg-slate-100 text-slate-400 cursor-not-allowed"
+                          )}
+                          onClick={() => setLoggingId(sub.id)}
+                          disabled={sub.status !== "active"}
+                        >
+                          <Pill className="h-3.5 w-3.5" />
+                          <span className="truncate text-xs">Log Refill</span>
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
       </Table>
 
       <Dialog open={!!loggingId} onOpenChange={(o) => !o && setLoggingId(null)} modal={false}>
