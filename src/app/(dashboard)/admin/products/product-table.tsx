@@ -132,9 +132,9 @@ export function ProductTable({ initialProducts, categories = [] }: { initialProd
   }
 
   const getStockInfo = (stock: number) => {
-    if (stock <= 5) return { label: "CRITICAL", variant: "destructive" as const, color: "bg-rose-500 text-white shadow-[0_0_8px_rgba(244,63,94,0.3)]", icon: "⚠️" };
-    if (stock <= 20) return { label: "LOW STOCK", variant: "warning" as const, color: "bg-amber-500 text-white shadow-[0_0_8px_rgba(245,158,11,0.3)]", icon: "⏳" };
-    if (stock >= 50) return { label: "PLENTIFUL", variant: "success" as const, color: "bg-emerald-600 text-white shadow-[0_0_8px_rgba(5,150,105,0.3)]", icon: "✨" };
+    if (stock <= 5) return { label: "LOW STOCK", variant: "destructive" as const, color: "bg-rose-500 text-white shadow-[0_0_8px_rgba(244,63,94,0.3)]", icon: "⚠️" };
+    if (stock <= 20) return { label: "LIMITED", variant: "warning" as const, color: "bg-amber-500 text-white shadow-[0_0_8px_rgba(245,158,11,0.3)]", icon: "⏳" };
+    if (stock >= 50) return { label: "IN STOCK", variant: "success" as const, color: "bg-emerald-600 text-white shadow-[0_0_8px_rgba(5,150,105,0.3)]", icon: "✨" };
     return { label: "IN STOCK", variant: "success" as const, color: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: "✅" };
   }
 
@@ -277,7 +277,7 @@ export function ProductTable({ initialProducts, categories = [] }: { initialProd
                     </div>
                     <div className="space-y-1">
                       <h3 className="text-sm font-bold text-slate-600 uppercase tracking-widest">No Products Found</h3>
-                      <p className="text-xs font-medium italic">Adjust your sensors or seed new inventory into the stream.</p>
+                      <p className="text-xs font-medium italic">Try a different search or add a new product to the list.</p>
                     </div>
                     <Button variant="outline" size="sm" className="mt-2 font-bold text-[10px] uppercase tracking-widest" onClick={() => setSearchTerm("")}>Clear Search</Button>
                   </div>

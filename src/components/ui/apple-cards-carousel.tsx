@@ -260,10 +260,12 @@ export const Card = ({
   card,
   index,
   layout = false,
+  priority = false,
 }: {
   card: Card;
   index: number;
   layout?: boolean;
+  priority?: boolean;
 }) => {
   // Modal logic removed as per user request
 
@@ -302,8 +304,10 @@ export const Card = ({
           src={card.src}
           alt={card.title}
           fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-cover absolute z-10 inset-0"
           style={{ objectPosition: "center 55%" }}
+          priority={priority}
         />
       </motion.div>
     </>
@@ -316,6 +320,7 @@ export const BlurImage = ({
   src,
   className,
   alt,
+  priority,
   ...rest
 }: ImageProps) => {
   const [isLoading, setLoading] = useState(true);
@@ -330,7 +335,8 @@ export const BlurImage = ({
       src={src}
       width={width}
       height={height}
-      loading="lazy"
+      loading={priority ? undefined : "lazy"}
+      priority={priority}
       decoding="async"
       blurDataURL={typeof src === "string" ? src : undefined}
       alt={alt ? alt : "Background of a beautiful view"}

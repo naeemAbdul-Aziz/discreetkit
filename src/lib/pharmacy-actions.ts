@@ -56,27 +56,37 @@ export async function getAssignedSubscriptions() {
     let userMap: Record<string, { email: string | null, name: string | null }> = {};
 
     if (userIds.length > 0) {
-        const adminSupabase = getSupabaseAdminClient();
-        const { data: userData } = await adminSupabase.auth.admin.listUsers({ perPage: 1000 });
-        if (userData?.users) {
-            userData.users.forEach(u => {
-                if (userIds.includes(u.id)) {
-                    userMap[u.id] = { 
-                        email: u.email ?? null,
-                        name: u.user_metadata?.name || null
-                    };
-                }
-            });
+        try {
+            const adminSupabase = getSupabaseAdminClient();
+            const { data: userData, error: userError } = await adminSupabase.auth.admin.listUsers({ perPage: 1000 });
+            
+            if (userError) {
+                console.error('[PharmacyActions] Auth listUsers error:', userError.message);
+            } else if (userData?.users) {
+                userData.users.forEach(u => {
+                    if (userIds.includes(u.id)) {
+                        userMap[u.id] = { 
+                            email: u.email ?? null,
+                            name: u.user_metadata?.name || null
+                        };
+                    }
+                });
+            }
+        } catch (adminErr) {
+            console.error('[PharmacyActions] Critical failure in admin user enrichment:', adminErr);
         }
     }
 
-    return subscriptions.map((s: any) => ({
-        ...s,
-        user_email: s.user_id ? (userMap[s.user_id]?.email || 'Unknown User') : null,
-        user_name: s.user_id ? (userMap[s.user_id]?.name || 'Anonymous') : null,
-        product: Array.isArray(s.product) ? s.product[0] : s.product,
-        product_name: Array.isArray(s.product) ? s.product[0]?.name : s.product?.name,
-    }));
+    return subscriptions.map((s: any) => {
+        const productData = Array.isArray(s.product) ? s.product[0] : s.product;
+        return {
+            ...s,
+            user_email: s.user_id ? (userMap[s.user_id]?.email || 'Unknown User') : null,
+            user_name: s.user_id ? (userMap[s.user_id]?.name || 'Anonymous') : null,
+            product: productData,
+            product_name: productData?.name || 'Unknown Product',
+        };
+    });
 }
 
 export async function logRefill(subscriptionId: string, notes: string) {

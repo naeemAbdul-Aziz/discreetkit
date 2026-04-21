@@ -39,9 +39,9 @@ export function FeaturedFavoritesSection({ products }: { products: (Product & { 
             className="w-full"
           >
             <CarouselContent className="-ml-2 md:-ml-4">
-              {products.map((product) => (
+              {products.map((product, index) => (
                 <CarouselItem key={product.id} className="pl-2 md:pl-4 basis-[85%]">
-                  <ProductCard product={product} />
+                  <ProductCard product={product} priority={index < 2} />
                 </CarouselItem>
               ))}
               
@@ -64,9 +64,9 @@ export function FeaturedFavoritesSection({ products }: { products: (Product & { 
 
         {/* Desktop: Grid */}
         <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {products.map((product) => (
+          {products.map((product, index) => (
             <div key={product.id}>
-              <ProductCard product={product} />
+              <ProductCard product={product} priority={index < 4} />
             </div>
           ))}
           

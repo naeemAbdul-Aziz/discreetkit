@@ -20,7 +20,7 @@ export function HeroHybrid() {
   }, []);
 
   const cards = data.map((card, index) => (
-    <Card key={card.src} card={card} index={index} />
+    <Card key={card.src} card={card} index={index} priority={index < 3} />
   ));
 
   // Use original cards for standard carousel behavior

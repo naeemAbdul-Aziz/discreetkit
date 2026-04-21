@@ -12,3 +12,4 @@ export const metadata: Metadata = {
 export default function SuccessLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
+6
