@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { getProducts, getCategories, getProductRequests } from "@/lib/admin-actions"
+import { getProducts, getCategories, fetchProductRequests } from "@/lib/admin-actions"
 import { ProductTable } from "./product-table"
 import { RequestsTable } from "./requests-table"
 import { Breadcrumbs } from "@/components/ui/breadcrumbs"
@@ -15,7 +15,7 @@ export const revalidate = 0
 export default async function ProductsPage() {
   // Start fetches immediately, but don't await them yet.
   // We'll pass the promises or better, use granular loaders inside Suspense.
-  const requestsPromise = getProductRequests();
+  const requestsPromise = fetchProductRequests();
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">

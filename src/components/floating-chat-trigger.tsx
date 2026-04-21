@@ -19,6 +19,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { DashboardChatbot } from "./dashboard-chatbot";
+import { Chatbot } from "./chatbot";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
 export function FloatingChatTrigger() {
@@ -38,13 +39,15 @@ export function FloatingChatTrigger() {
 
   const triggerButton = (
     <Button
-      onClick={() => {
-        if (!isDashboard) router.push('/chat');
-      }}
       className={cn(
         "h-14 rounded-full bg-brand-teal hover:bg-brand-teal/90 text-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all duration-300 hover:scale-105 active:scale-95 border border-white/20 group pl-2 pr-5 flex items-center gap-3"
       )}
       aria-label="Ask Pacely"
+      onClick={() => {
+        if (!isDesktop && !isDashboard) {
+          router.push('/chat');
+        }
+      }}
     >
       <div className="relative flex h-9 w-9 items-center justify-center rounded-full overflow-hidden shadow-sm border border-white/30 transition-transform duration-300 group-hover:scale-110 bg-white">
         <img src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png" alt="Pacely" className="h-full w-full object-cover" />
@@ -63,24 +66,34 @@ export function FloatingChatTrigger() {
         exit={{ opacity: 0, y: 20, scale: 0.8 }}
         className="fixed bottom-6 right-6 z-[100]"
       >
-        {isDashboard ? (
-          isDesktop ? (
-            <Dialog>
-              <DialogTrigger asChild>
-                {triggerButton}
-              </DialogTrigger>
-              <DialogContent className="max-w-xl h-[640px] flex flex-col p-0 overflow-hidden bg-white rounded-3xl border border-slate-200/50 shadow-xl">
-                <DialogHeader className="p-6 pb-4 border-b bg-slate-50/50 text-center sm:text-center">
-                  <DialogTitle className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400">
-                    {isAdmin ? "Admin Operations" : "Pharmacy Protocol"}
-                  </DialogTitle>
-                </DialogHeader>
-                <div className="flex-1 overflow-hidden relative">
+        {isDesktop ? (
+          <Dialog>
+            <DialogTrigger asChild>
+              {triggerButton}
+            </DialogTrigger>
+            <DialogContent className={cn(
+              "max-w-xl h-[640px] flex flex-col p-0 overflow-hidden bg-white rounded-3xl border border-slate-200/50 shadow-2xl",
+              !isDashboard && "max-w-lg h-[600px]"
+            )}>
+              <DialogHeader className="p-6 pb-4 border-b bg-slate-50/50 text-center sm:text-center shrink-0">
+                <DialogTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+                  {isDashboard 
+                    ? (isAdmin ? "Admin Operations" : "Pharmacy Protocol")
+                    : "Customer Support Assistant"
+                  }
+                </DialogTitle>
+              </DialogHeader>
+              <div className="flex-1 overflow-hidden relative">
+                {isDashboard ? (
                   <DashboardChatbot role={role!} />
-                </div>
-              </DialogContent>
-            </Dialog>
-          ) : (
+                ) : (
+                  <Chatbot hideClose={true} />
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
+        ) : (
+          isDashboard ? (
             <Sheet>
               <SheetTrigger asChild>
                 {triggerButton}
@@ -96,9 +109,9 @@ export function FloatingChatTrigger() {
                 </div>
               </SheetContent>
             </Sheet>
+          ) : (
+            triggerButton
           )
-        ) : (
-          triggerButton
         )}
       </motion.div>
     </AnimatePresence>

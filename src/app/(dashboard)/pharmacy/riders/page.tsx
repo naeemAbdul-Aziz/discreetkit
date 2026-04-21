@@ -182,53 +182,50 @@ export default function RidersPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-12 space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+    <div className="max-w-6xl mx-auto p-4 md:p-12 space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 pb-2">
-        <div className="space-y-2">
-           <h1 className="text-4xl font-extrabold tracking-tight text-slate-900">Logistics Registry</h1>
-           <p className="text-slate-500 font-medium flex items-center gap-2">
-             <ShieldCheck className="h-4 w-4 text-brand-indigo" /> 
-             <span className="uppercase tracking-widest text-[10px] font-black text-brand-indigo">Authorized Personnel & Asset-Light Fleet</span>
-           </p>
+        <div className="space-y-1">
+           <h1 className="text-3xl font-bold tracking-tight text-slate-900">Delivery Team</h1>
+           <p className="text-slate-500 font-medium text-sm">Manage your delivery riders here.</p>
         </div>
 
         <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
           <DialogTrigger asChild>
-            <Button size="lg" className="h-12 px-8 rounded-xl bg-brand-indigo hover:bg-brand-indigo/90 font-black text-sm gap-3 transition-all hover:scale-[1.02] shadow-sm">
-              <Plus className="h-4 w-4" /> Commission New Unit
+            <Button size="lg" className="h-11 px-8 rounded-xl bg-brand-indigo hover:bg-brand-indigo/90 font-bold text-sm gap-2 transition-all shadow-sm">
+              <Plus className="h-4 w-4" /> Add Rider
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-md p-10 rounded-[2.5rem] border border-slate-100 shadow-2xl">
+          <DialogContent className="sm:max-w-md p-8 rounded-2xl border border-slate-100 shadow-2xl">
             <DialogHeader>
-              <DialogTitle className="text-3xl font-extrabold tracking-tight">New Fleet Entry</DialogTitle>
-              <DialogDescription className="font-semibold text-slate-400 pt-1">Register a new courier service or individual rider for order assignments.</DialogDescription>
+              <DialogTitle className="text-2xl font-bold tracking-tight">Add a new rider</DialogTitle>
+              <DialogDescription className="font-medium text-slate-500 pt-1">Register a new rider for your delivery team.</DialogDescription>
             </DialogHeader>
             <form onSubmit={handleAddRider} className="space-y-8 pt-6">
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1">Identified Name / Callsign</Label>
+                  <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 pl-1">Name</Label>
                   <Input
                     placeholder="e.g. Kojo or Bolt Dispatch"
                     value={newRider.name}
                     onChange={(e) => setNewRider({ ...newRider, name: e.target.value })}
                     required
-                    className="h-14 border-slate-200 bg-slate-50/30 rounded-2xl font-bold focus:ring-brand-indigo"
+                    className="h-12 border-slate-200 bg-slate-50/30 rounded-xl font-bold focus:ring-brand-indigo"
                   />
                 </div>
                 <div className="space-y-2">
-                   <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1">Direct Operational Contact</Label>
+                  <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 pl-1">Phone Number</Label>
                   <Input
                     placeholder="024 XXX XXXX"
                     value={newRider.phone}
                     onChange={(e) => setNewRider({ ...newRider, phone: e.target.value })}
                     required
-                    className="h-14 border-slate-200 bg-slate-50/30 rounded-2xl font-bold focus:ring-brand-indigo"
+                    className="h-12 border-slate-200 bg-slate-50/30 rounded-xl font-bold focus:ring-brand-indigo"
                   />
                 </div>
               </div>
               <DialogFooter>
-                <Button type="submit" disabled={processing} className="w-full h-14 rounded-2xl bg-brand-indigo hover:bg-brand-indigo/90 font-black text-sm">
-                   {processing ? "Registering..." : "Initialize Commission"}
+                <Button type="submit" disabled={processing} className="w-full h-12 rounded-xl bg-brand-indigo hover:bg-brand-indigo/90 font-bold text-sm">
+                   {processing ? "Adding..." : "Add Rider"}
                 </Button>
               </DialogFooter>
             </form>
@@ -237,36 +234,32 @@ export default function RidersPage() {
       </div>
 
       {riders.length === 0 ? (
-        <div className="flex flex-col items-center justify-center p-32 text-center bg-white rounded-[3rem] border border-slate-100 shadow-sm relative overflow-hidden group">
+        <div className="flex flex-col items-center justify-center p-24 text-center bg-white rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden group">
            <div className="absolute inset-0 bg-slate-50/30 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-           <img 
-             src="/fleet_empty_state.png" 
-             alt="Empty Registry" 
-             className="h-56 w-auto mb-8 opacity-40 grayscale group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700 hover:scale-105" 
-           />
-           <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">Fleet Command Silent</h3>
-           <p className="text-slate-400 max-w-sm mt-3 font-semibold leading-relaxed">
-             You haven&apos;t commissioned any riders yet. Add your first courier to start dispatching orders through the DiscreetKit system.
+           <Truck className="h-16 w-16 text-slate-200 mb-6" />
+           <h3 className="text-xl font-bold text-slate-900 tracking-tight">No riders yet</h3>
+           <p className="text-slate-500 max-w-sm mt-2 font-medium leading-relaxed">
+             You haven&apos;t added any riders to your team yet. Add your first rider to start delivering orders.
            </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {riders.map((rider) => (
             <Card key={rider.id} className={cn(
-              "group relative overflow-hidden transition-all hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)] bg-white border border-slate-100 rounded-[2.5rem] p-7 flex flex-col gap-8",
-              !rider.is_active && "bg-slate-50/80 grayscale opacity-80"
+              "group relative overflow-hidden transition-all hover:shadow-sm bg-white border border-slate-100 rounded-2xl p-6 flex flex-col gap-6",
+              !rider.is_active && "bg-slate-50 grayscale opacity-80"
             )}>
               <div className="flex items-start justify-between">
-                <div className="flex items-center gap-5">
+                <div className="flex items-center gap-4">
                   <div className={cn(
-                    "w-12 h-12 rounded-2xl flex items-center justify-center shadow-inner transition-colors",
+                    "w-10 h-10 rounded-xl flex items-center justify-center shadow-inner transition-colors",
                     rider.is_active ? "bg-emerald-50 text-brand-teal" : "bg-slate-200 text-slate-400"
                   )}>
-                    <User className="h-5 w-5" />
+                    <User className="h-4 w-4" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-extrabold text-slate-900 tracking-tighter leading-none">{rider.name}</h3>
-                    <p className="text-[10px] font-black text-slate-400 flex items-center gap-2 uppercase tracking-[0.1em] mt-2">
+                    <h3 className="text-lg font-bold text-slate-900 tracking-tight leading-none">{rider.name}</h3>
+                    <p className="text-[10px] font-bold text-slate-400 flex items-center gap-1.5 uppercase tracking-wider mt-1.5">
                       <Phone className="h-3 w-3 text-slate-300" /> {rider.phone}
                     </p>
                   </div>
@@ -274,34 +267,34 @@ export default function RidersPage() {
                 <Switch
                   checked={rider.is_active}
                   onCheckedChange={() => handleToggleStatus(rider.id, rider.is_active)}
-                  className="data-[state=checked]:bg-brand-teal"
+                  className="data-[state=checked]:bg-brand-teal scale-75"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                 <div className="bg-slate-50/50 p-5 rounded-3xl flex flex-col items-center justify-center border border-slate-100/50">
-                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5 opacity-60">Deliveries</span>
-                    <span className="text-2xl font-black text-slate-900 tabular-nums">{rider.total_deliveries || 0}</span>
+              <div className="grid grid-cols-2 gap-3">
+                 <div className="bg-slate-50 p-4 rounded-xl flex flex-col items-center justify-center border border-slate-100">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1 opacity-60">Deliveries</span>
+                    <span className="text-xl font-bold text-slate-900 tabular-nums">{rider.total_deliveries || 0}</span>
                  </div>
-                 <div className="bg-slate-50/50 p-5 rounded-3xl flex flex-col items-center justify-center border border-slate-100/50">
-                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5 opacity-60">Operational Status</span>
-                    <Badge variant={rider.is_active ? "success" : "neutral"} className="px-3 py-0.5 h-6 font-black text-[9px] uppercase tracking-tighter rounded-full">
-                       {rider.is_active ? "Ready" : "Offline"}
+                 <div className="bg-slate-50 p-4 rounded-xl flex flex-col items-center justify-center border border-slate-100">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1 opacity-60">Status</span>
+                    <Badge variant={rider.is_active ? "success" : "neutral"} className="px-3 py-0.5 h-5 font-bold text-[9px] uppercase tracking-tighter rounded-full">
+                       {rider.is_active ? "Active" : "Offline"}
                     </Badge>
                  </div>
               </div>
 
-              <div className="flex items-center gap-3 mt-2">
-                 <Button variant="ghost" className="flex-1 h-12 rounded-2xl font-black text-xs uppercase tracking-widest text-slate-400 hover:text-brand-indigo hover:bg-slate-50 transition-all gap-2">
-                    Unit Intelligence <ChevronRight className="h-4 w-4" />
+              <div className="flex items-center gap-2 mt-2">
+                 <Button variant="ghost" className="flex-1 h-10 rounded-xl font-bold text-[10px] uppercase tracking-wider text-slate-400 hover:text-brand-indigo hover:bg-slate-50 transition-all gap-1.5">
+                    View Details <ChevronRight className="h-3 w-3" />
                  </Button>
                  <Button 
                   variant="ghost" 
                   size="icon" 
                   onClick={() => handleDelete(rider.id)}
-                  className="h-12 w-12 rounded-2xl text-rose-50 hover:text-rose-600 hover:bg-rose-50 transition-all"
+                  className="h-10 w-10 rounded-xl text-slate-300 hover:text-rose-600 hover:bg-rose-50 transition-all"
                  >
-                   <Trash2 className="h-5 w-5" />
+                   <Trash2 className="h-4 w-4" />
                  </Button>
               </div>
               
@@ -316,24 +309,22 @@ export default function RidersPage() {
       )}
 
       {/* Compliance / Security Section */}
-      <div className="bg-slate-900 p-8 rounded-[3rem] border border-slate-800 shadow-xl flex flex-col md:flex-row items-center justify-between gap-8 mt-4 overflow-hidden relative group">
-         <div className="absolute top-0 right-0 w-64 h-64 bg-brand-indigo/10 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-brand-indigo/20 transition-all duration-1000" />
-         
-         <div className="flex items-center gap-6 relative z-10">
-           <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 shadow-inner">
-              <AlertCircle className="h-6 w-6 text-brand-indigo" />
-           </div>
-           <div className="space-y-1">
-              <h4 className="text-xs font-black text-white uppercase tracking-widest">Fleet Operations Protocol</h4>
-              <p className="text-xs font-medium text-slate-400 leading-relaxed max-w-xl">
-                Unauthorized personnel assignment may lead to account revocation. All courier interactions are strictly monitored for partner compliance and security integrity.
-              </p>
-           </div>
+      <div className="bg-slate-900 p-8 rounded-3xl border border-slate-800 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 mt-4">
+         <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+               <AlertCircle className="h-5 w-5 text-brand-indigo" />
+            </div>
+            <div className="space-y-1">
+               <h4 className="text-[10px] font-bold text-white uppercase tracking-wider">Rules for Riders</h4>
+               <p className="text-[11px] font-medium text-slate-400 leading-relaxed max-w-xl">
+                 Only authorized riders should deliver orders. All interactions are monitored for safety and compliance.
+               </p>
+            </div>
          </div>
 
-         <div className="flex gap-4 relative z-10">
-           <Button variant="ghost" className="text-[10px] font-black text-white/40 uppercase tracking-widest hover:text-white hover:bg-white/5 px-6 rounded-xl">Review Guidelines</Button>
-           <Button className="bg-brand-indigo text-white hover:bg-brand-indigo/90 text-[10px] font-black uppercase tracking-widest px-8 rounded-xl h-11">Download SLA</Button>
+         <div className="flex gap-3">
+           <Button variant="ghost" className="text-[10px] font-bold text-white/50 uppercase tracking-wider hover:text-white hover:bg-white/5 px-4 rounded-lg h-9">Rules</Button>
+           <Button className="bg-brand-indigo text-white hover:bg-brand-indigo/90 text-[10px] font-bold uppercase tracking-wider px-6 rounded-lg h-9">Get SLA</Button>
          </div>
       </div>
     </div>
