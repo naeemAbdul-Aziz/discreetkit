@@ -11,7 +11,9 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Pill, CalendarClock, Phone, User, ShieldCheck } from "lucide-react";
+import { format } from "date-fns";
 import {
   Dialog,
   DialogContent,
@@ -24,7 +26,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { logRefill } from "@/lib/pharmacy-actions";
 import { Label } from "@/components/ui/label";
-import { dashboardTable, pharmacyRefillsCols, actions as actionStyles } from "@/components/ui/table-layout";
 import { usePharmacy } from "@/components/dashboard/pharmacy-context";
 import { verifyRefillToken } from "@/lib/hub-actions";
 import { cn } from "@/lib/utils";
@@ -83,58 +84,71 @@ export function PharmacyRefillsTable({
   };
 
   return (
-    <div className={dashboardTable.container}>
-      <Table className={dashboardTable.table}>
-        <TableHeader>
-          <TableRow>
-            <TableHead className={pharmacyRefillsCols.patientHead}>Patient / Contact</TableHead>
-            {isHub && <TableHead className="w-[150px]">Hospital Code</TableHead>}
-            <TableHead className={pharmacyRefillsCols.productHead}>Product</TableHead>
-            <TableHead className={pharmacyRefillsCols.nextDueHead}>Next Due</TableHead>
-            <TableHead className={pharmacyRefillsCols.statusHead}>Status</TableHead>
-            <TableHead className={pharmacyRefillsCols.actionsHead}>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {subscriptions.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={5} className="h-24 text-center">
-                No active subscriptions assigned.
-              </TableCell>
-            </TableRow>
-          ) : (
-            subscriptions.map((sub) => {
-              const address = sub.delivery_address || {};
-              const contactName = address.fullName || sub.user_name || "Anonymous";
-              const contactDetail = address.phone || sub.user_email || sub.subscription_code;
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Medication Refills</h1>
+          <p className="text-slate-500 font-medium text-sm mt-1">Manage recurring prescriptions for your patients.</p>
+        </div>
+      </div>
 
-              return (
-                <TableRow key={sub.id}>
-                  <TableCell className={pharmacyRefillsCols.patientCell}>
-                    <div className="flex flex-col">
-                      <span className="font-medium flex items-center gap-2 truncate">
-                        <User className="h-3 w-3 text-muted-foreground" /> {contactName}
-                      </span>
-                      <span className="text-xs text-muted-foreground flex items-center gap-2 truncate">
-                        <Phone className="h-3 w-3" /> {contactDetail}
-                      </span>
-                      <span className="text-[10px] text-gray-400 font-mono mt-1">
-                        {sub.subscription_code}
-                      </span>
-                    </div>
-                  </TableCell>
-                  {isHub && (
-                    <TableCell>
-                      <div className="flex flex-col gap-1">
-                        <span className="font-mono text-xs font-bold text-primary">
-                          {sub.hospital_refill_code || "N/A"}
-                        </span>
-                        {sub.prescription_verified ? (
-                          <Badge variant="outline" className="text-[9px] h-4 bg-green-50 text-green-700 border-green-200">Verified</Badge>
-                        ) : (
-                          <Badge variant="outline" className="text-[9px] h-4 bg-orange-50 text-orange-700 border-orange-200">Pending Auth</Badge>
-                        )}
+      <div className="hidden md:block overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+        <Table>
+          <TableHeader className="bg-slate-50">
+            <TableRow className="hover:bg-transparent border-slate-100">
+              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-500 py-4">Patient</TableHead>
+              {isHub && <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Hospital Code</TableHead>}
+              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Product</TableHead>
+              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Next Refill</TableHead>
+              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Status</TableHead>
+              <TableHead className="text-right text-[10px] font-bold uppercase tracking-wider text-slate-500">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {subscriptions.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={isHub ? 6 : 5} className="h-48 text-center text-slate-400 font-medium">
+                  No active refills found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              subscriptions.map((sub) => {
+                const address = sub.delivery_address || {};
+                const contactName = address.fullName || sub.user_name || "Anonymous";
+                const contactDetail = address.phone || sub.user_email || sub.subscription_code;
+
+                return (
+                  <TableRow key={sub.id} className="hover:bg-slate-50/50 transition-colors border-slate-50">
+                    <TableCell className="py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="h-9 w-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500">
+                          <User className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-slate-900">{contactName}</p>
+                          <p className="text-[10px] font-medium text-slate-400">{contactDetail}</p>
+                        </div>
                       </div>
+                    </TableCell>
+                    {isHub && (
+                      <TableCell>
+                        <code className="text-[10px] font-bold px-2 py-1 bg-slate-100 rounded text-slate-600">
+                          {sub.hospital_refill_code || "N/A"}
+                        </code>
+                      </TableCell>
+                    )}
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Pill className="h-3.5 w-3.5 text-slate-400" />
+                        <span className="text-sm font-bold text-slate-700">{sub.product_name}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2 text-slate-600">
+                        <CalendarClock className="h-3.5 w-3.5" />
+                        <span className="text-sm font-medium">
+                          {sub.next_delivery_date ? format(new Date(sub.next_delivery_date), 'MMM d, yyyy') : 'TBD'}
+                        </span>
                     </TableCell>
                   )}
                   <TableCell className={pharmacyRefillsCols.productCell}>

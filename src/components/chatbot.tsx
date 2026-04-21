@@ -45,7 +45,7 @@ const FormattedMessage = ({ text }: { text: string }) => {
   );
 };
 
-export function Chatbot() {
+export function Chatbot({ hideClose = false }: { hideClose?: boolean }) {
   const router = useRouter();
   const [history, setHistory] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -110,16 +110,18 @@ export function Chatbot() {
   return (
     <div className="vk-safe flex flex-col bg-background">
       {/* Minimal close button — Everlywell style */}
-      <div className="flex justify-end px-4 pt-4 pb-2 absolute top-0 right-0 z-30">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-          aria-label="Close"
-        >
-          <X className="h-4 w-4" />
-        </button>
-      </div>
+      {!hideClose && (
+        <div className="flex justify-end px-4 pt-4 pb-2 absolute top-0 right-0 z-30">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Close"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
 
       <div className="flex-1 overflow-hidden relative">
             <ScrollArea className="h-full" ref={scrollAreaRef}>

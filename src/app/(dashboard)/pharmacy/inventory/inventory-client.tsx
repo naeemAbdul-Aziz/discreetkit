@@ -127,29 +127,15 @@ const ProductGrid = ({
               </div>
             )}
 
-            {/* Availability Toggle - Floating overlay on desktop */}
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
-               <div className="bg-white rounded-2xl p-4 shadow-2xl flex flex-col items-center gap-3 w-full scale-90 group-hover:scale-100 transition-transform">
-                  <div className="flex items-center gap-3 bg-slate-50 px-3 py-2 rounded-xl w-full justify-between border border-slate-100">
-                     <span className="text-[11px] font-bold text-slate-500 capitalize">In Stock</span>
-                     <Switch
-                        checked={product.is_available}
-                        onCheckedChange={() => onToggle(product.id, product.is_available)}
-                        disabled={loadingMap[product.id]}
-                        className="data-[state=checked]:bg-brand-teal"
-                      />
-                  </div>
-                  {product.is_available && (
-                     <div className="w-full space-y-1.5">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1">Inventory Qty</label>
-                        <Input 
-                          type="number" 
-                          className="h-10 text-center font-mono font-black text-lg border-slate-200 focus:ring-brand-teal"
-                          defaultValue={product.custom_stock}
-                          onBlur={(e) => onStockUpdate(product.id, e.target.value)}
-                        />
-                     </div>
-                  )}
+            {/* Availability Toggle - Always visible for ease of use */}
+            <div className="absolute top-2 right-2 flex flex-col gap-2">
+               <div className="bg-white/90 backdrop-blur-sm p-1.5 rounded-xl shadow-sm border border-slate-200">
+                  <Switch
+                    checked={product.is_available}
+                    onCheckedChange={() => onToggle(product.id, product.is_available)}
+                    disabled={loadingMap[product.id]}
+                    className="data-[state=checked]:bg-brand-teal scale-75"
+                  />
                </div>
             </div>
           </div>
@@ -157,23 +143,35 @@ const ProductGrid = ({
           {/* Content Section */}
           <div className="p-4 flex flex-col flex-1">
             <div className="mb-auto">
-              <p className="text-[10px] font-black uppercase tracking-widest text-brand-teal mb-1">{product.category || "General"}</p>
-              <h3 className="text-sm font-bold text-slate-800 line-clamp-2 leading-tight mb-2 group-hover:text-brand-teal transition-colors" title={product.name}>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-brand-teal mb-1">{product.category || "General"}</p>
+              <h3 className="text-sm font-bold text-slate-800 line-clamp-2 leading-tight mb-2" title={product.name}>
                 {product.name}
               </h3>
             </div>
 
-            <div className="flex items-center justify-between mt-4">
-               <div className="text-lg font-black text-slate-900 tabular-nums">
+            <div className="flex items-center justify-between mt-3 mb-4">
+               <div className="text-lg font-bold text-slate-900 tabular-nums">
                  ₵{(product.custom_price || product.price_ghs).toFixed(2)}
                </div>
                {isLowStock && (
-                  <Badge variant="warning" className="animate-pulse bg-amber-50 text-amber-700 border-amber-200 text-[10px] font-black tracking-tighter py-0 px-2 h-5">LOW STOCK</Badge>
+                  <Badge variant="warning" className="bg-amber-50 text-amber-700 border-amber-200 text-[10px] font-bold tracking-tight py-0 px-2 h-5">LOW STOCK</Badge>
                )}
                {isOutOfStock && (
-                  <Badge variant="neutral" className="bg-slate-100 text-slate-400 border-slate-200 text-[10px] font-black tracking-tighter py-0 px-2 h-5">SOLDOUT</Badge>
+                  <Badge variant="neutral" className="bg-slate-100 text-slate-400 border-slate-200 text-[10px] font-bold tracking-tight py-0 px-2 h-5">SOLD OUT</Badge>
                )}
             </div>
+
+            {product.is_available && (
+               <div className="flex items-center gap-2 bg-slate-50 p-1.5 rounded-xl border border-slate-100">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider pl-1 shrink-0">Qty:</span>
+                  <Input 
+                    type="number" 
+                    className="h-8 bg-transparent border-none text-right font-bold text-slate-900 focus-visible:ring-0 px-1"
+                    defaultValue={product.custom_stock}
+                    onBlur={(e) => onStockUpdate(product.id, e.target.value)}
+                  />
+               </div>
+            )}
           </div>
         </Card>
       );
@@ -243,11 +241,11 @@ export default function InventoryClient({
   }
 
   return (
-    <div className="max-w-7xl mx-auto py-6 px-4 space-y-8 animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+    <div className="max-w-7xl mx-auto py-6 px-4 space-y-6 animate-in fade-in duration-500">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-           <h1 className="text-3xl font-black tracking-tight text-slate-900">Product Inventory</h1>
-           <p className="text-slate-500 font-medium mt-1">Real-time stock management and global catalog integration.</p>
+           <h1 className="text-2xl font-bold tracking-tight text-slate-900">Inventory</h1>
+           <p className="text-slate-500 font-medium text-sm mt-1">Manage your stock and products here.</p>
         </div>
 
         <div className="flex items-center gap-3 w-full md:w-auto">
@@ -263,33 +261,30 @@ export default function InventoryClient({
           </div>
 
           <Button 
-            className="h-12 px-6 rounded-xl bg-brand-indigo hover:bg-brand-indigo-dark font-black text-sm gap-2 shrink-0 shadow-lg shadow-brand-indigo/20 transition-all active:scale-95"
+            className="h-11 px-6 rounded-xl bg-brand-indigo hover:bg-brand-indigo/90 font-bold text-sm gap-2 shrink-0 shadow-sm transition-all"
             onClick={() => setIsRequestOpen(true)}
           >
-            <Plus className="h-5 w-5" />
-            <span className="hidden sm:inline">Add New Product</span>
+            <Plus className="h-4 w-4" />
+            <span className="hidden sm:inline">Request Product</span>
           </Button>
         </div>
       </div>
 
       <Tabs defaultValue="catalog" className="space-y-8">
-        <TabsList className="bg-slate-100/50 p-1.5 rounded-2xl h-14 border border-slate-100">
-          <TabsTrigger value="catalog" className="rounded-xl px-8 h-full gap-2 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-brand-teal">
-            <LayoutGrid className="h-4 w-4" />
-            Live Catalog
+        <TabsList className="bg-slate-100 p-1 rounded-xl h-12 border border-slate-100 w-full md:w-auto">
+          <TabsTrigger value="catalog" className="rounded-lg px-6 h-full gap-2 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">
+            In Stock
           </TabsTrigger>
-          <TabsTrigger value="low-stock" className="rounded-xl px-8 h-full gap-2 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-amber-600">
-            <TrendingDown className="h-4 w-4" />
+          <TabsTrigger value="low-stock" className="rounded-lg px-6 h-full gap-2 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">
             Low Stock
             {lowStockProducts.length > 0 && (
-              <Badge className="ml-1 px-1.5 py-0 rounded-lg bg-amber-100 text-amber-700 border-none font-black text-[10px]">{lowStockProducts.length}</Badge>
+              <Badge className="ml-1 px-1.5 py-0 rounded-lg bg-amber-100 text-amber-700 border-none font-bold text-[10px]">{lowStockProducts.length}</Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="requests" className="rounded-xl px-8 h-full gap-2 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-brand-indigo">
-            <History className="h-4 w-4" />
-            Product Requests
+          <TabsTrigger value="requests" className="rounded-lg px-6 h-full gap-2 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">
+            Requests
             {requests.filter((r) => r.status === "pending").length > 0 && (
-              <Badge className="ml-1 px-1.5 py-0 rounded-lg bg-brand-indigo/10 text-brand-indigo border-none font-black text-[10px]">
+              <Badge className="ml-1 px-1.5 py-0 rounded-lg bg-brand-indigo/10 text-brand-indigo border-none font-bold text-[10px]">
                 {requests.filter((r) => r.status === "pending").length}
               </Badge>
             )}
@@ -429,10 +424,10 @@ function ProductRequestModal({ open, onOpenChange, isMobile, toast }: any) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md p-8 rounded-3xl border-none shadow-2xl">
+      <DialogContent className="sm:max-w-md p-8 rounded-2xl border-none shadow-2xl">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-black tracking-tight">Add New Product</DialogTitle>
-          <DialogDescription className="font-medium text-slate-500">Request a medication or health product to be added to our catalog.</DialogDescription>
+          <DialogTitle className="text-xl font-bold tracking-tight">Add a product</DialogTitle>
+          <DialogDescription className="font-medium text-slate-500 text-sm">Ask us to add a product to our list.</DialogDescription>
         </DialogHeader>
         <div className="mt-6">{Content}</div>
       </DialogContent>
