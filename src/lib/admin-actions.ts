@@ -1687,7 +1687,7 @@ export async function deleteCategory(id: number) {
 }
 // --- Product Requests ---
 
-export async function getProductRequests() {
+export async function fetchProductRequests() {
     const supabase = await createSupabaseServerClient();
     const { data: requests, error } = await supabase
         .from('product_requests')
