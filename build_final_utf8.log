@@ -1,0 +1,102 @@
+﻿
+> nextn@0.1.0 build
+> next build
+
+Γû▓ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local, .env
+- Experiments (use with caution):
+  ┬╖ serverActions
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 26.7s
+  Skipping validation of types
+  Collecting page data using 11 workers ...
+  Generating static pages using 11 workers (0/42) ...
+  Generating static pages using 11 workers (10/42) 
+  Generating static pages using 11 workers (20/42) 
+  Generating static pages using 11 workers (31/42) 
+Γ£ô Generating static pages using 11 workers (42/42) in 6.8s
+  Finalizing page optimization ...
+
+Route (app)
+Γöî ╞Æ /
+Γö£ Γùï /_not-found
+Γö£ Γùï /access
+Γö£ ╞Æ /admin
+Γö£ ╞Æ /admin/analytics
+Γö£ ╞Æ /admin/categories
+Γö£ ╞Æ /admin/customers
+Γö£ ╞Æ /admin/operations
+Γö£ ╞Æ /admin/orders
+Γö£ ╞Æ /admin/partners
+Γö£ ╞Æ /admin/partners/[id]
+Γö£ ╞Æ /admin/partners/[id]/inventory
+Γö£ ╞Æ /admin/products
+Γö£ ╞Æ /admin/refills
+Γö£ Γùï /admin/settings
+Γö£ ╞Æ /api/admin/customers
+Γö£ ╞Æ /api/admin/dashboard
+Γö£ ╞Æ /api/admin/orders
+Γö£ ╞Æ /api/admin/orders/[id]
+Γö£ ╞Æ /api/admin/orders/[id]/pharmacy/accept
+Γö£ ╞Æ /api/admin/orders/[id]/pharmacy/decline
+Γö£ ╞Æ /api/admin/orders/[id]/reassign
+Γö£ ╞Æ /api/admin/pharmacies/[id]/products
+Γö£ ╞Æ /api/admin/pharmacies/[id]/products/[productId]
+Γö£ ╞Æ /api/admin/pharmacies/[id]/products/bulk-assign
+Γö£ ╞Æ /api/admin/pharmacies/notify
+Γö£ ╞Æ /api/admin/products
+Γö£ ╞Æ /api/admin/realtime/customers
+Γö£ ╞Æ /api/admin/realtime/orders
+Γö£ ╞Æ /api/admin/realtime/products
+Γö£ ╞Æ /api/cron/check-escalations
+Γö£ ╞Æ /api/cron/process-refills
+Γö£ ╞Æ /api/cron/release-reservations
+Γö£ ╞Æ /api/cron/test-admin-sms
+Γö£ ╞Æ /api/csp-report
+Γö£ ╞Æ /api/orders/[id]/messages
+Γö£ ╞Æ /api/payment/verify
+Γö£ ╞Æ /api/payments/reconcile
+Γö£ ╞Æ /api/pharmacy/dashboard
+Γö£ ╞Æ /api/pharmacy/debug
+Γö£ ╞Æ /api/pharmacy/orders/[id]
+Γö£ ╞Æ /api/pharmacy/realtime
+Γö£ ╞Æ /api/webhooks/paystack
+Γö£ ╞Æ /api/whatsapp
+Γö£ Γùï /cart
+Γö£ Γùï /chat
+Γö£ Γùï /login
+Γö£ Γùï /order
+Γö£ Γùï /order/success
+Γö£ Γùï /partner-care
+Γö£ Γùï /pharmacy/dashboard
+Γö£ ╞Æ /pharmacy/inventory
+Γö£ ╞Æ /pharmacy/refills
+Γö£ Γùï /pharmacy/riders
+Γö£ Γùï /pharmacy/settings
+Γö£ Γùï /pharmacy/verification
+Γö£ Γùï /privacy
+Γö£ Γùï /products
+Γö£ ╞Æ /products/[id]
+Γö£ ╞Æ /products/condoms
+Γö£ ╞Æ /products/emergency-contraceptives
+Γö£ ╞Æ /products/lubricants
+Γö£ ╞Æ /products/male-enhancement
+Γö£ ╞Æ /products/medication-refills
+Γö£ ╞Æ /products/test-kits
+Γö£ ╞Æ /products/value-bundles
+Γö£ ╞Æ /refills/dashboard
+Γö£ Γùï /refills/enroll
+Γö£ Γùï /robots.txt
+Γö£ Γùï /sitemap.xml
+Γö£ Γùï /terms
+Γö£ Γùï /track
+Γöö Γùï /unauthorized
+
+
+╞Æ Proxy (Middleware)
+
+Γùï  (Static)   prerendered as static content
+╞Æ  (Dynamic)  server-rendered on demand
+
+
