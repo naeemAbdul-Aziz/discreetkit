@@ -30,7 +30,7 @@ const toBase64 = (str: string) =>
     ? Buffer.from(str).toString("base64")
     : window.btoa(str);
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product, priority = false }: { product: Product, priority?: boolean }) {
   const { addItem, getItemQuantity } = useCart();
   const [isMounted, setIsMounted] = useState(false);
   const [added, setAdded] = useState(false);
@@ -88,6 +88,7 @@ export function ProductCard({ product }: { product: Product }) {
                     isOutOfStock && "grayscale opacity-40",
                   )}
                   sizes="88px"
+                  priority={priority}
                   placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(88, 88))}`}
                 />
               )}
