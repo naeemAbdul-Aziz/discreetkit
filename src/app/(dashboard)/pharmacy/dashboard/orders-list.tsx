@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -222,11 +223,8 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
     // New assignment - needs accept/decline
     if (status === "received" && ackStatus === "pending") {
       return (
-        <Badge variant="info" className="gap-1 bg-sky-50/40 text-sky-600 border-sky-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
-          <span className="relative flex h-1.5 w-1.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-sky-500"></span>
-          </span>
+        <Badge className="gap-1.5 bg-sky-100 text-sky-700 border-sky-200 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none">
+          <div className="h-1.5 w-1.5 rounded-full bg-sky-500" />
           Queueing: Inbound
         </Badge>
       );
@@ -235,7 +233,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
     // Just accepted - preparing order
     if (status === "processing" && ackStatus === "accepted") {
       return (
-        <Badge variant="secondary" className="gap-1 bg-indigo-50/40 text-indigo-600 border-indigo-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
+        <Badge className="gap-1.5 bg-indigo-100 text-indigo-700 border-indigo-200 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none">
           <Package className="h-3 w-3" />
           Internal Prep
         </Badge>
@@ -245,40 +243,34 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
     const variants: Record<
       string,
       {
-        variant: any;
         label: string;
         icon?: any;
         className?: string;
       }
     > = {
       received: { 
-        variant: "info", 
         label: "New Inbound", 
-        className: "bg-sky-50/40 text-sky-600 border-sky-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5" 
+        className: "bg-sky-100 text-sky-700 border-sky-200 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none" 
       },
       processing: { 
-        variant: "secondary", 
         label: "Internal Prep", 
-        className: "bg-indigo-50/40 text-indigo-600 border-indigo-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5" 
+        className: "bg-indigo-100 text-indigo-700 border-indigo-200 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none" 
       },
       out_for_delivery: { 
-        variant: "warning", 
         label: "Outbound Ops", 
-        className: "bg-amber-50/40 text-amber-600 border-amber-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5" 
+        className: "bg-amber-100 text-amber-700 border-amber-200 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none" 
       },
       completed: { 
-        variant: "success", 
         label: "Dispatch Done", 
-        className: "bg-emerald-50/40 text-emerald-600 border-emerald-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5" 
+        className: "bg-emerald-100 text-emerald-700 border-emerald-200 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none" 
       },
       cancelled: { 
-        variant: "destructive", 
         label: "Aborted", 
-        className: "bg-rose-50/40 text-rose-600 border-rose-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5" 
+        className: "bg-rose-100 text-rose-700 border-rose-200 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none" 
       },
     };
-    const config = variants[status] || { variant: "secondary", label: status, className: "font-bold uppercase text-[9px] tracking-widest border-slate-100 text-slate-400" };
-    return <Badge variant={config.variant} className={config.className}>{config.label}</Badge>;
+    const config = variants[status] || { label: status, className: "font-bold uppercase text-[9px] tracking-widest border-slate-200 bg-slate-100 text-slate-500 shadow-none" };
+    return <Badge className={config.className}>{config.label}</Badge>;
   };
 
   if (!orders || orders.length === 0) {
@@ -290,160 +282,187 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
     );
   }
 
-  // Filter out declined or optimistically hidden orders from the list
   const activeOrders = orders.filter(
     (o) => o.pharmacy_ack_status !== "declined" && !hiddenOrderIds.has(o.id),
   );
 
-  if (activeOrders.length === 0) {
+  const queueOrders = activeOrders.filter(o => o.status === "received" && o.pharmacy_ack_status === "pending");
+  const processingOrders = activeOrders.filter(o => o.status === "processing");
+  const inTransitOrders = activeOrders.filter(o => o.status === "out_for_delivery");
+  const completedOrders = activeOrders.filter(o => o.status === "completed");
+
+  const OrderCard = ({ order }: { order: Order }) => {
+    const acceptLoading = loading?.id === order.id && loading?.action === "accept";
+    const declineLoading = loading?.id === order.id && loading?.action === "decline";
+
+    const items = typeof order.items === "string" ? JSON.parse(order.items) : order.items;
+    const itemCount = Array.isArray(items) ? items.length : 0;
+
+    const isLate = () => {
+      if (order.status !== "processing") return false;
+      const created = new Date(order.created_at).getTime();
+      const now = new Date().getTime();
+      return (now - created) / (1000 * 60) > 20;
+    };
+
+    const late = isLate();
+    const isCompleted = order.status === "completed";
+
     return (
-      <div className="text-center py-12 text-muted-foreground">
-        <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
-        <p>No active orders</p>
-      </div>
+      <Card
+        className={cn(
+          "p-5 shadow-sm transition-all group border-slate-100 cursor-pointer hover:border-slate-300 hover:shadow-md bg-white rounded-2xl",
+          isCompleted && "bg-emerald-50/20 border-emerald-100",
+          late && "border-rose-200 bg-rose-50/20 shadow-sm"
+        )}
+        onClick={() => handleViewDetails(order)}
+      >
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div className="flex-1 space-y-4">
+            <div className="flex items-center gap-2">
+              <span className="font-mono font-black text-slate-900 tracking-tighter text-lg">
+                {order.code}
+              </span>
+              {getStatusBadge(order.status, order.pharmacy_ack_status)}
+              {late && (
+                <Badge className="bg-rose-600 text-white border-none px-1.5 py-0 text-[9px] font-black tracking-widest uppercase shadow-none">URGENT</Badge>
+              )}
+            </div>
+            
+            <div className="text-[13px] font-medium text-slate-500 space-y-1.5 pl-4 border-l-2 border-slate-100">
+              <p className="flex items-center gap-2">
+                <MapPin className="h-3.5 w-3.5 text-slate-400" />
+                {order.delivery_area || "Not specified"}
+              </p>
+              <p className="flex items-center gap-2 font-bold text-slate-800">
+                <GanttChartSquare className="h-3.5 w-3.5 text-slate-400" />
+                {itemCount} Items • ₵{Number(order.total_price_ghs || 0).toFixed(2)}
+              </p>
+              <p className="text-[11px] flex items-center gap-2 opacity-60">
+                <Clock className="h-3.5 w-3.5" />
+                Received {new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {new Date(order.created_at).toLocaleDateString()}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
+            {order.status === "received" && order.pharmacy_ack_status === "pending" ? (
+              <>
+                <Button
+                  size="lg"
+                  className="h-12 px-8 bg-brand-teal hover:bg-brand-teal-dark font-black text-sm gap-2 shadow-sm shadow-brand-teal/10"
+                  onClick={(e) => { e.stopPropagation(); handleAccept(order.id); }}
+                  disabled={acceptLoading}
+                >
+                  {acceptLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
+                  Accept Order
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="h-12 px-5 border-rose-100 text-rose-600 hover:bg-rose-50 font-bold text-sm gap-2"
+                  onClick={(e) => { e.stopPropagation(); handleDeclineClick(order.id); }}
+                  disabled={declineLoading}
+                >
+                  <XCircle className="h-4 w-4" />
+                  Decline
+                </Button>
+              </>
+            ) : order.status === "processing" ? (
+              <Button
+                size="lg"
+                className="h-12 px-10 bg-brand-teal hover:bg-brand-teal-dark font-black text-sm gap-2 shadow-sm shadow-brand-teal/10"
+                onClick={(e) => { e.stopPropagation(); handleMarkOutForDelivery(order.id); }}
+              >
+                <Truck className="h-5 w-5" />
+                Dispatch Order
+              </Button>
+            ) : order.status === "out_for_delivery" ? (
+              <Button
+                size="lg"
+                className="h-12 px-10 bg-emerald-600 hover:bg-emerald-700 font-black text-sm gap-2 shadow-sm shadow-emerald-600/10"
+                onClick={(e) => { e.stopPropagation(); handleMarkCompleted(order.id); }}
+              >
+                <CheckCircle className="h-5 w-5" />
+                Confirm Delivery
+              </Button>
+            ) : (
+              <Button
+                size="lg"
+                variant="ghost"
+                className="h-12 px-8 text-slate-400 font-bold text-sm gap-2"
+                disabled
+              >
+                <CheckCircle className="h-5 w-5" />
+                Completed
+              </Button>
+            )}
+            
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={(e) => handleOpenChat(e, order.id)}
+              className="h-12 w-12 text-slate-400 hover:text-brand-indigo rounded-xl bg-slate-50/50 hover:bg-brand-indigo/5"
+            >
+              <MessageSquare className="h-5 w-5" />
+            </Button>
+
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={(e) => { e.stopPropagation(); handleViewDetails(order); }}
+              className="h-12 w-12 text-slate-400 hover:text-slate-900 rounded-xl"
+            >
+              <Eye className="h-5 w-5" />
+            </Button>
+          </div>
+        </div>
+      </Card>
     );
-  }
+  };
 
   return (
     <>
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold mb-4">Recent Orders</h3>
-        {activeOrders.map((order) => {
-          const acceptLoading =
-            loading?.id === order.id && loading?.action === "accept";
-          const declineLoading =
-            loading?.id === order.id && loading?.action === "decline";
+      <Tabs defaultValue="all" className="w-full space-y-6">
+        <div className="flex items-center justify-between">
+          <TabsList className="bg-slate-100/50 p-1 rounded-xl h-12 border border-slate-100">
+            <TabsTrigger value="all" className="rounded-lg px-4 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">All</TabsTrigger>
+            <TabsTrigger value="queue" className="rounded-lg px-4 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              Queue {queueOrders.length > 0 && <Badge className="ml-1.5 h-4 min-w-[1rem] px-1 bg-brand-teal text-white border-none text-[9px]">{queueOrders.length}</Badge>}
+            </TabsTrigger>
+            <TabsTrigger value="processing" className="rounded-lg px-4 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              Preparing {processingOrders.length > 0 && <Badge className="ml-1.5 h-4 min-w-[1rem] px-1 bg-indigo-600 text-white border-none text-[9px]">{processingOrders.length}</Badge>}
+            </TabsTrigger>
+            <TabsTrigger value="transit" className="rounded-lg px-4 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">Transit</TabsTrigger>
+            <TabsTrigger value="completed" className="rounded-lg px-4 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">History</TabsTrigger>
+          </TabsList>
+        </div>
 
-          const items =
-            typeof order.items === "string"
-              ? JSON.parse(order.items)
-              : order.items;
-          const itemCount = Array.isArray(items) ? items.length : 0;
+        <TabsContent value="all" className="space-y-4 animate-in fade-in-50 duration-300">
+          {activeOrders.map(order => <OrderCard key={order.id} order={order} />)}
+          {activeOrders.length === 0 && <div className="text-center py-12 text-slate-400 font-medium">No orders found</div>}
+        </TabsContent>
 
-            const isLate = () => {
-              if (order.status !== "processing") return false;
-              const created = new Date(order.created_at).getTime();
-              const now = new Date().getTime();
-              return (now - created) / (1000 * 60) > 20;
-            };
+        <TabsContent value="queue" className="space-y-4 animate-in fade-in-50 duration-300">
+          {queueOrders.map(order => <OrderCard key={order.id} order={order} />)}
+          {queueOrders.length === 0 && <div className="text-center py-12 text-slate-400 font-medium">Queue is empty</div>}
+        </TabsContent>
 
-            const late = isLate();
-            const isCompleted = order.status === "completed";
+        <TabsContent value="processing" className="space-y-4 animate-in fade-in-50 duration-300">
+          {processingOrders.map(order => <OrderCard key={order.id} order={order} />)}
+          {processingOrders.length === 0 && <div className="text-center py-12 text-slate-400 font-medium">No orders in preparation</div>}
+        </TabsContent>
 
-            return (
-              <Card
-                key={order.id}
-                className={cn(
-                  "p-5 shadow-none transition-all group border-slate-200 cursor-pointer hover:border-slate-300 hover:shadow-md",
-                  isCompleted && "border-emerald-100 bg-emerald-50/30",
-                  late && "animate-urgent border-rose-500 shadow-rose-100 bg-rose-50/10"
-                )}
-                onClick={() => handleViewDetails(order)}
-              >
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-                <div className="flex-1 space-y-4">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono font-black text-slate-900 tracking-tighter text-lg">
-                      {order.code}
-                    </span>
-                    {getStatusBadge(order.status, order.pharmacy_ack_status)}
-                    {late && (
-                      <Badge variant="destructive" className="animate-pulse px-1.5 py-0 text-[9px] font-black tracking-widest uppercase">URGENT</Badge>
-                    )}
-                  </div>
-                  
-                  <div className="text-[13px] font-medium text-slate-500 space-y-1.5 pl-4 border-l-2 border-slate-100">
-                    <p className="flex items-center gap-2">
-                      <MapPin className="h-3.5 w-3.5 text-slate-400" />
-                      {order.delivery_area || "Not specified"}
-                    </p>
-                    <p className="flex items-center gap-2 font-bold text-slate-800">
-                      <GanttChartSquare className="h-3.5 w-3.5 text-slate-400" />
-                      {itemCount} Items • ₵{Number(order.total_price_ghs || 0).toFixed(2)}
-                    </p>
-                    <p className="text-[11px] flex items-center gap-2 opacity-60">
-                      <Clock className="h-3.5 w-3.5" />
-                      Received {new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {new Date(order.created_at).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
+        <TabsContent value="transit" className="space-y-4 animate-in fade-in-50 duration-300">
+          {inTransitOrders.map(order => <OrderCard key={order.id} order={order} />)}
+          {inTransitOrders.length === 0 && <div className="text-center py-12 text-slate-400 font-medium">No orders in transit</div>}
+        </TabsContent>
 
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
-                  {order.status === "received" && order.pharmacy_ack_status === "pending" ? (
-                    <>
-                      <Button
-                        size="lg"
-                        className="h-12 px-8 bg-brand-teal hover:bg-brand-teal-dark font-black text-sm gap-2 shadow-sm shadow-brand-teal/20"
-                        onClick={(e) => { e.stopPropagation(); handleAccept(order.id); }}
-                        disabled={acceptLoading}
-                      >
-                        {acceptLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
-                        Accept Order
-                      </Button>
-                      <Button
-                        size="lg"
-                        variant="outline"
-                        className="h-12 px-5 border-rose-100 text-rose-600 hover:bg-rose-50 font-bold text-sm gap-2"
-                        onClick={(e) => { e.stopPropagation(); handleDeclineClick(order.id); }}
-                        disabled={declineLoading}
-                      >
-                        <XCircle className="h-4 w-4" />
-                        Decline
-                      </Button>
-                    </>
-                  ) : order.status === "processing" ? (
-                    <Button
-                      size="lg"
-                      className="h-12 px-10 bg-brand-teal hover:bg-brand-teal-dark font-black text-sm gap-2 shadow-sm shadow-brand-teal/20"
-                      onClick={(e) => { e.stopPropagation(); handleMarkOutForDelivery(order.id); }}
-                    >
-                      <Truck className="h-5 w-5 animate-breathing" />
-                      Dispatch Order
-                    </Button>
-                  ) : order.status === "out_for_delivery" ? (
-                    <Button
-                      size="lg"
-                      className="h-12 px-10 bg-emerald-600 hover:bg-emerald-700 font-black text-sm gap-2 shadow-sm shadow-emerald-600/20"
-                      onClick={(e) => { e.stopPropagation(); handleMarkCompleted(order.id); }}
-                    >
-                      <CheckCircle className="h-5 w-5" />
-                      Confirm Delivery
-                    </Button>
-                  ) : (
-                    <Button
-                      size="lg"
-                      variant="ghost"
-                      className="h-12 px-8 text-slate-400 font-bold text-sm gap-2"
-                      disabled
-                    >
-                      <CheckCircle className="h-5 w-5" />
-                      Completed
-                    </Button>
-                  )}
-                  
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={(e) => handleOpenChat(e, order.id)}
-                    className="h-12 w-12 text-slate-400 hover:text-brand-indigo rounded-xl bg-slate-50/50 hover:bg-brand-indigo/5"
-                  >
-                    <MessageSquare className="h-5 w-5" />
-                  </Button>
-
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={(e) => { e.stopPropagation(); handleViewDetails(order); }}
-                    className="h-12 w-12 text-slate-400 hover:text-slate-900 rounded-xl"
-                  >
-                    <Eye className="h-5 w-5" />
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          );
-        })}
-      </div>
+        <TabsContent value="completed" className="space-y-4 animate-in fade-in-50 duration-300">
+          {completedOrders.map(order => <OrderCard key={order.id} order={order} />)}
+          {completedOrders.length === 0 && <div className="text-center py-12 text-slate-400 font-medium">No completed orders yet</div>}
+        </TabsContent>
+      </Tabs>
 
       <AlertDialog open={declineDialogOpen} onOpenChange={setDeclineDialogOpen}>
         <AlertDialogContent>

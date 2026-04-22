@@ -192,8 +192,8 @@ export function RefillsTable({
   const [prescriptionUrl, setPrescriptionUrl] = useState<string | null>(null);
   const [viewingPrescription, setViewingPrescription] = useState<string | null>(null);
 
-  const filteredSubs = subscriptions.filter(s => 
-    s.subscription_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const filteredSubs = (subscriptions || []).filter(s => 
+    (s.subscription_code || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
     (s.product_name || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 

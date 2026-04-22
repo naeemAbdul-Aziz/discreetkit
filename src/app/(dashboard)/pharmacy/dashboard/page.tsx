@@ -13,7 +13,7 @@ import {
   Clock,
   AlertCircle,
   Info,
-  Zap,
+  RefreshCw,
   Users,
   ShieldCheck,
   Verified,
@@ -213,7 +213,7 @@ export default function PharmacyDashboardPage() {
               <p className="text-sm font-bold text-slate-900">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
            </div>
            <Button variant="outline" size="icon" onClick={() => loadData(true)} className="h-10 w-10 rounded-xl text-slate-400 hover:text-slate-900 transition-all">
-              <Zap className="h-4 w-4" />
+              <RefreshCw className="h-4 w-4" />
            </Button>
         </div>
       </div>
