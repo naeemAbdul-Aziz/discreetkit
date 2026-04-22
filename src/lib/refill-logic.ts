@@ -21,8 +21,13 @@ export async function validateHospitalCode(code: string) {
     .eq('status', 'active');
 
   if (error) {
+    const isSchemaError = error.message.includes('column') || error.message.includes('relation');
+    const userMessage = isSchemaError 
+      ? `Database Schema Mismatch: The "hospital_refill_code" system is not yet active on this environment. Please run the 20260405000001 migration.`
+      : `Validation System Error: ${error.message}`;
+      
     logger.error('Error validating hospital code', { context: 'Refill-Logic', data: error });
-    return { valid: false, message: `Validation System Error: ${error.message}. This typically occurs if the database schema is outdated.` };
+    return { valid: false, message: userMessage };
   }
 
   if (data && data.length > 0) {

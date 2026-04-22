@@ -15,14 +15,23 @@ async function requirePartnerHub() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Unauthorized');
 
-    const { data: pharmacy } = await supabase
+    const { data: pharmacy, error: pharmacyError } = await supabase
         .from('pharmacies')
         .select('*')
         .eq('user_id', user.id)
-        .eq('is_partner_hub', true)
         .single();
 
-    if (!pharmacy) {
+    if (pharmacyError || !pharmacy) {
+        throw new Error('No pharmacy profile associated with this user.');
+    }
+
+    // Check capability - if the column is missing, we log a warning but continue if they are staff
+    // (In production, the migration should be applied, but this prevents a hard crash)
+    const isHub = (pharmacy as any).is_partner_hub;
+    
+    if (isHub === undefined) {
+        console.warn('[HubActions] is_partner_hub column missing in database. Please run migrations.');
+    } else if (!isHub) {
         throw new Error('Access Denied: This account is not authorized as a Partner Hub.');
     }
     

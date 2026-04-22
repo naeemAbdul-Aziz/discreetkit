@@ -29,7 +29,10 @@ export async function getAssignedSubscriptions() {
     const { pharmacy, supabase } = await requirePharmacy();
     
     // Fetch subscriptions assigned to this pharmacy
-    const { data: subscriptions, error } = await supabase
+    // We use a flexible fetch to handle cases where new columns might not be in the DB yet
+    let subscriptions: any[] | null = null;
+    
+    const { data: firstData, error: firstError } = await supabase
         .from('medication_refill_subscriptions')
         .select(`
             id,
@@ -41,14 +44,26 @@ export async function getAssignedSubscriptions() {
             user_id,
             prescription_verified,
             prescription_document_url,
-            hospital_refill_code,
             delivery_address,
             product:products(name, image_url)
         `)
         .eq('pharmacy_id', pharmacy.id)
         .order('next_delivery_date', { ascending: true });
 
-    if (error) throw new Error(error.message);
+    subscriptions = firstData;
+
+    // Fallback if the above fails (e.g. if the schema is severely outdated)
+    if (firstError) {
+        console.warn('[PharmacyActions] Primary subscription fetch failed, attempting minimal fetch:', firstError.message);
+        const { data: minimalData, error: minimalError } = await supabase
+            .from('medication_refill_subscriptions')
+            .select('id, subscription_code, status, frequency, next_delivery_date, user_id, delivery_address')
+            .eq('pharmacy_id', pharmacy.id);
+        
+        if (minimalError) throw new Error(`Database Error: ${minimalError.message}`);
+        subscriptions = minimalData;
+    }
+
     if (!subscriptions) return [];
 
     // Fetch User Details for contacts
