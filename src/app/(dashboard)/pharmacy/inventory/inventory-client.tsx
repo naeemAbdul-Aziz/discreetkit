@@ -97,7 +97,7 @@ const ProductGrid = ({
         <Card
           key={product.id}
           className={cn(
-            "group relative flex flex-col overflow-hidden border-slate-200 transition-all hover:shadow-xl hover:border-slate-300 bg-white rounded-2xl",
+            "group relative flex flex-col overflow-hidden border-slate-100 transition-all hover:border-slate-300 bg-white rounded-2xl shadow-sm",
             isOutOfStock && "opacity-80"
           )}
         >
@@ -154,10 +154,10 @@ const ProductGrid = ({
                  ₵{(product.custom_price || product.price_ghs).toFixed(2)}
                </div>
                {isLowStock && (
-                  <Badge variant="warning" className="bg-amber-50 text-amber-700 border-amber-200 text-[10px] font-bold tracking-tight py-0 px-2 h-5">LOW STOCK</Badge>
+                  <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-[10px] font-bold tracking-tight py-0 px-2 h-5 shadow-none">LOW STOCK</Badge>
                )}
                {isOutOfStock && (
-                  <Badge variant="neutral" className="bg-slate-100 text-slate-400 border-slate-200 text-[10px] font-bold tracking-tight py-0 px-2 h-5">SOLD OUT</Badge>
+                  <Badge className="bg-slate-100 text-slate-400 border-slate-200 text-[10px] font-bold tracking-tight py-0 px-2 h-5 shadow-none">SOLD OUT</Badge>
                )}
             </div>
 

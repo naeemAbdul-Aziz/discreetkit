@@ -1971,6 +1971,8 @@ export async function getRefillSubscriptions() {
     const supabase = await createSupabaseServerClient();
     
     // 1. Fetch Subscriptions with Joins
+    // Note: medication_refill_subscriptions has multiple FKs to pharmacies (hospital_id, pharmacy_id)
+    // so we must specify the relationship explicitly.
     const { data: subscriptions, error } = await supabase
         .from('medication_refill_subscriptions')
         .select(`
@@ -1984,12 +1986,21 @@ export async function getRefillSubscriptions() {
             prescription_verified,
             prescription_document_url,
             delivery_address,
-            product:products(name, image_url),
-            pharmacy:pharmacies(id, name)
+            product:product_id(name, image_url),
+            pharmacy:pharmacy_id(id, name)
         `)
         .order('enrolled_at', { ascending: false });
 
-    if (error) throw new Error(error.message);
+    if (error) {
+        console.warn('[AdminActions] Primary refill fetch failed, attempting fallback:', error.message);
+        const { data: fallbackData, error: fallbackError } = await supabase
+            .from('medication_refill_subscriptions')
+            .select('*')
+            .order('enrolled_at', { ascending: false });
+        
+        if (fallbackError) throw new Error(fallbackError.message);
+        return fallbackData || [];
+    }
     if (!subscriptions) return [];
 
     // 2. Fetch User Details (Emails) manually since auth.users is not joinable
@@ -2034,6 +2045,8 @@ export async function getRefillSubscriptions() {
             pharmacy: Array.isArray(s.pharmacy) ? s.pharmacy[0] : s.pharmacy,
             // Helper for table
             product_name: Array.isArray(s.product) ? s.product[0]?.name : s.product?.name,
+            // Ensure next_refill_date is available for the UI
+            next_refill_date: s.next_delivery_date
         };
     });
 }

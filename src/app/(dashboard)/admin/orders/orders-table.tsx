@@ -1003,55 +1003,40 @@ export function OrdersTable({
                           </DropdownMenu>
 
                           {order.status === "out_for_delivery" && order.courier_name && (
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <button
-                                  className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-[10px] font-bold border border-amber-100 hover:bg-amber-100 transition-all flex items-center gap-1.5"
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div
+                                  className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[9px] font-bold border border-slate-200 hover:bg-slate-200 transition-all flex items-center gap-1.5 cursor-help"
                                   onClick={(e) => e.stopPropagation()}
                                 >
-                                  <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                                  <div className="w-1.5 h-1.5 rounded-full bg-slate-400" />
                                   {order.courier_name}
-                                </button>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-64 p-0 border-none bg-white rounded-[2rem] shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
-                                <div className="p-5 bg-amber-50/50 border-b border-amber-100 flex items-center gap-4">
-                                  <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center shadow-inner">
-                                    <Truck className="h-6 w-6" />
-                                  </div>
-                                  <div>
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-amber-500">Assigned Rider</p>
-                                    <p className="text-sm font-bold text-slate-900">{order.courier_name}</p>
-                                  </div>
                                 </div>
-                                <div className="p-5 space-y-4">
-                                  <div className="flex items-center justify-between">
-                                    <div className="space-y-0.5">
-                                      <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Contact Number</p>
-                                      <p className="text-sm font-bold text-slate-700 tabular-nums">{order.courier_phone}</p>
+                              </TooltipTrigger>
+                              <TooltipContent className="bg-slate-900 text-white border-none p-4 rounded-2xl shadow-2xl" side="top">
+                                <div className="space-y-3">
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+                                      <Truck className="h-5 w-5 text-slate-300" />
                                     </div>
-                                    <Button
-                                      variant="outline"
-                                      size="icon"
-                                      className="h-9 w-9 rounded-xl border-slate-100 bg-slate-50 hover:bg-white transition-all text-indigo-600"
-                                      onClick={() => {
-                                        navigator.clipboard.writeText(order.courier_phone || "");
-                                        toast({ title: "Copied!", description: "Rider contact number saved to clipboard." });
-                                      }}
-                                    >
-                                      <Check className="h-4 w-4" />
-                                    </Button>
+                                    <div>
+                                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-0.5">Assigned Rider</p>
+                                      <p className="text-sm font-bold">{order.courier_name}</p>
+                                    </div>
                                   </div>
-                                  <Button
-                                    asChild
-                                    className="w-full h-11 rounded-xl bg-indigo-600 hover:bg-brand-indigo/90 font-bold text-xs uppercase tracking-widest gap-2 shadow-lg shadow-brand-indigo/20"
-                                  >
-                                    <a href={`tel:${order.courier_phone}`}>
-                                      Call Dispatcher
+                                  <div className="pt-2 border-t border-white/10">
+                                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Contact Number</p>
+                                    <p className="text-lg font-black tabular-nums tracking-tight">{order.courier_phone}</p>
+                                    <a 
+                                      href={`tel:${order.courier_phone}`} 
+                                      className="text-[10px] font-bold text-brand-indigo hover:text-brand-indigo/80 flex items-center gap-1 mt-2"
+                                    >
+                                      Tap to call rider
                                     </a>
-                                  </Button>
+                                  </div>
                                 </div>
-                              </PopoverContent>
-                            </Popover>
+                              </TooltipContent>
+                            </Tooltip>
                           )}
                         </div>
                       </TableCell>
