@@ -423,44 +423,110 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
 
   return (
     <>
-      <Tabs defaultValue="all" className="w-full space-y-6">
-        <div className="flex items-center justify-between">
-          <TabsList className="bg-slate-100/50 p-1 rounded-xl h-12 border border-slate-100">
-            <TabsTrigger value="all" className="rounded-lg px-4 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">All</TabsTrigger>
-            <TabsTrigger value="queue" className="rounded-lg px-4 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              Queue {queueOrders.length > 0 && <Badge className="ml-1.5 h-4 min-w-[1rem] px-1 bg-brand-teal text-white border-none text-[9px]">{queueOrders.length}</Badge>}
+      <Tabs defaultValue="incoming" className="w-full space-y-8">
+        <div className="flex items-center justify-center sm:justify-start">
+          <TabsList className="bg-slate-200/40 p-1.5 rounded-[20px] h-14 border-none gap-1 shadow-inner">
+            <TabsTrigger 
+              value="incoming" 
+              className="rounded-full px-6 h-11 font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xl data-[state=active]:shadow-slate-200/50 text-slate-500 hover:text-slate-700"
+            >
+              Incoming
+              {queueOrders.length > 0 && (
+                <span className="ml-2 h-5 min-w-[1.25rem] px-1.5 flex items-center justify-center rounded-full bg-brand-teal text-white text-[10px] font-black">
+                  {queueOrders.length}
+                </span>
+              )}
             </TabsTrigger>
-            <TabsTrigger value="processing" className="rounded-lg px-4 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              Preparing {processingOrders.length > 0 && <Badge className="ml-1.5 h-4 min-w-[1rem] px-1 bg-indigo-600 text-white border-none text-[9px]">{processingOrders.length}</Badge>}
+            <TabsTrigger 
+              value="preparing" 
+              className="rounded-full px-6 h-11 font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xl data-[state=active]:shadow-slate-200/50 text-slate-500 hover:text-slate-700"
+            >
+              Preparing
+              {processingOrders.length > 0 && (
+                <span className="ml-2 h-5 min-w-[1.25rem] px-1.5 flex items-center justify-center rounded-full bg-brand-indigo text-white text-[10px] font-black">
+                  {processingOrders.length}
+                </span>
+              )}
             </TabsTrigger>
-            <TabsTrigger value="transit" className="rounded-lg px-4 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">Transit</TabsTrigger>
-            <TabsTrigger value="completed" className="rounded-lg px-4 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">History</TabsTrigger>
+            <TabsTrigger 
+              value="outbound" 
+              className="rounded-full px-6 h-11 font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xl data-[state=active]:shadow-slate-200/50 text-slate-500 hover:text-slate-700"
+            >
+              Outbound
+            </TabsTrigger>
+            <TabsTrigger 
+              value="completed" 
+              className="rounded-full px-6 h-11 font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xl data-[state=active]:shadow-slate-200/50 text-slate-500 hover:text-slate-700"
+            >
+              Completed
+            </TabsTrigger>
+            <TabsTrigger 
+              value="all" 
+              className="rounded-full px-6 h-11 font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xl data-[state=active]:shadow-slate-200/50 text-slate-500 hover:text-slate-700"
+            >
+              All
+            </TabsTrigger>
           </TabsList>
         </div>
 
-        <TabsContent value="all" className="space-y-4 animate-in fade-in-50 duration-300">
-          {activeOrders.map(order => <OrderCard key={order.id} order={order} />)}
-          {activeOrders.length === 0 && <div className="text-center py-12 text-slate-400 font-medium">No orders found</div>}
-        </TabsContent>
-
-        <TabsContent value="queue" className="space-y-4 animate-in fade-in-50 duration-300">
+        <TabsContent value="incoming" className="space-y-4 animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
           {queueOrders.map(order => <OrderCard key={order.id} order={order} />)}
-          {queueOrders.length === 0 && <div className="text-center py-12 text-slate-400 font-medium">Queue is empty</div>}
+          {queueOrders.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-20 bg-slate-50/50 rounded-[2.5rem] border border-dashed border-slate-200">
+              <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-4">
+                <Clock className="h-8 w-8 text-slate-200" />
+              </div>
+              <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">No Incoming Requests</p>
+            </div>
+          )}
         </TabsContent>
 
-        <TabsContent value="processing" className="space-y-4 animate-in fade-in-50 duration-300">
+        <TabsContent value="preparing" className="space-y-4 animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
           {processingOrders.map(order => <OrderCard key={order.id} order={order} />)}
-          {processingOrders.length === 0 && <div className="text-center py-12 text-slate-400 font-medium">No orders in preparation</div>}
+          {processingOrders.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-20 bg-slate-50/50 rounded-[2.5rem] border border-dashed border-slate-200">
+              <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-4">
+                <Package className="h-8 w-8 text-slate-200" />
+              </div>
+              <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Nothing in Preparation</p>
+            </div>
+          )}
         </TabsContent>
 
-        <TabsContent value="transit" className="space-y-4 animate-in fade-in-50 duration-300">
+        <TabsContent value="outbound" className="space-y-4 animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
           {inTransitOrders.map(order => <OrderCard key={order.id} order={order} />)}
-          {inTransitOrders.length === 0 && <div className="text-center py-12 text-slate-400 font-medium">No orders in transit</div>}
+          {inTransitOrders.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-20 bg-slate-50/50 rounded-[2.5rem] border border-dashed border-slate-200">
+              <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-4">
+                <Truck className="h-8 w-8 text-slate-200" />
+              </div>
+              <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">No Outbound Operations</p>
+            </div>
+          )}
         </TabsContent>
 
-        <TabsContent value="completed" className="space-y-4 animate-in fade-in-50 duration-300">
+        <TabsContent value="completed" className="space-y-4 animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
           {completedOrders.map(order => <OrderCard key={order.id} order={order} />)}
-          {completedOrders.length === 0 && <div className="text-center py-12 text-slate-400 font-medium">No completed orders yet</div>}
+          {completedOrders.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-20 bg-slate-50/50 rounded-[2.5rem] border border-dashed border-slate-200">
+              <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-4">
+                <CheckCircle className="h-8 w-8 text-slate-200" />
+              </div>
+              <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">No Dispatch History</p>
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="all" className="space-y-4 animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
+          {activeOrders.map(order => <OrderCard key={order.id} order={order} />)}
+          {activeOrders.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-20 bg-slate-50/50 rounded-[2.5rem] border border-dashed border-slate-200">
+              <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-4">
+                <Info className="h-8 w-8 text-slate-200" />
+              </div>
+              <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">No Records Found</p>
+            </div>
+          )}
         </TabsContent>
       </Tabs>
 

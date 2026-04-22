@@ -259,52 +259,23 @@ export default function PharmacyDashboardPage() {
       </div>
 
       <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
-        <Card className="lg:col-span-2 p-6 rounded-2xl border-slate-100 shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="font-bold text-slate-900">Recent Orders</h3>
-            <Button variant="ghost" size="sm" onClick={() => router.push('/pharmacy/orders')} className="text-xs font-bold text-brand-teal">
-              View All
+        <div className="lg:col-span-3 space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-xl font-black text-slate-900 tracking-tight">Recent Orders</h3>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Live fulfillment queue</p>
+            </div>
+            <Button variant="ghost" size="sm" onClick={() => router.push('/pharmacy/orders')} className="text-xs font-bold text-brand-teal hover:bg-brand-teal/5 rounded-lg px-4">
+              View Database
             </Button>
           </div>
+          
           <OrdersList
             key={data._timestamp || 0}
             orders={data.recentOrders}
             onOrderUpdate={() => loadData(true)}
           />
-        </Card>
-
-        <Card className="p-6 rounded-2xl border-slate-100 shadow-sm flex flex-col">
-          <div className="flex items-center gap-2 mb-6">
-            <BarChart3 className="h-4 w-4 text-brand-teal" />
-            <h3 className="font-bold text-slate-900">Order Mix</h3>
-          </div>
-          <div className="h-[240px] w-full mt-auto">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data.statusBreakdown}>
-                <XAxis dataKey="status" hide />
-                <YAxis hide />
-                <Tooltip 
-                  cursor={{fill: 'transparent'}}
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                  labelStyle={{ fontWeight: 'bold' }}
-                />
-                <Bar dataKey="count" radius={[4, 4, 4, 4]}>
-                  {data.statusBreakdown.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={['#187f76', '#1e3a5f', '#f59e0b', '#10b981'][index % 4]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="grid grid-cols-2 gap-2 mt-6">
-            {data.statusBreakdown.map((item, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full" style={{ backgroundColor: ['#187f76', '#1e3a5f', '#f59e0b', '#10b981'][i % 4] }} />
-                <span className="text-[10px] font-bold text-slate-500 uppercase truncate">{item.status.replace('_', ' ')}</span>
-              </div>
-            ))}
-          </div>
-        </Card>
+        </div>
       </div>
     </div>
   );
