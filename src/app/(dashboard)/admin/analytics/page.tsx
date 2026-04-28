@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { getDashboardStats, getDetailedAnalytics } from "@/lib/admin-actions";
+import { getDashboardStats, getDetailedAnalytics, getOperationalLedger } from "@/lib/admin-actions";
 import AnalyticsDashboard from "./analytics-dashboard";
 import { MetricsSkeleton } from "../skeletons";
 
