@@ -79,6 +79,7 @@ export function DashboardSidebar() {
           label: isHub ? "Privacy Cockpit" : "Dashboard",
           icon: isHub ? Radar : LayoutDashboard,
         },
+        { href: "/pharmacy/ledger", label: "Ledger", icon: ClipboardCheck },
         { 
           href: "/pharmacy/refills", 
           label: isHub ? "Discreet Refills" : "Refills", 
@@ -114,6 +115,7 @@ export function DashboardSidebar() {
       const baseItems = [
         { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
         { href: "/admin/analytics", label: "Analytics", icon: BarChart },
+        { href: "/admin/operations/logs", label: "Ledger", icon: ClipboardCheck },
         { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
         { href: "/admin/products", label: "Products", icon: Package },
         { href: "/admin/categories", label: "Categories", icon: Layers },
@@ -147,6 +149,7 @@ export function DashboardSidebar() {
     const baseItems = [
       { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
       { href: "/admin/analytics", label: "Analytics", icon: BarChart },
+      { href: "/admin/operations/logs", label: "Ledger", icon: ClipboardCheck },
       { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
       { href: "/admin/products", label: "Products", icon: Package },
       { href: "/admin/categories", label: "Categories", icon: Layers },
