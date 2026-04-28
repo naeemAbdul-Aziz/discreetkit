@@ -2400,5 +2400,146 @@ export async function flagOrderIssue(orderId: number, note: string) {
     return { success: true };
 }
 
+// --- Operational Ledger ---
+
+export type LedgerCategory = 'FINANCE' | 'DISPENSATION' | 'LOGISTICS' | 'SUBSCRIPTION';
+
+export type LedgerEntry = {
+    id: string;
+    timestamp: string;
+    category: LedgerCategory;
+    type: string;
+    description: string;
+    amount?: number;
+    pharmacy_id?: number;
+    pharmacy_name?: string;
+    order_code?: string;
+    items?: any[];
+};
+
+/**
+ * Aggregates data from orders, events, and refills into a unified operational timeline.
+ * Designed for exhaustive audit trails and financial reconciliations.
+ */
+export async function getOperationalLedger(pharmacyId?: number, limit = 100) {
+    try {
+        const supabase = getSupabaseAdminClient();
+        
+        // Parallel fetching of all ledger sources
+        const ordersQuery = supabase
+            .from('orders')
+            .select('id, code, created_at, total_price_ghs, status, items, pharmacy_id, pharmacies(name)')
+            .order('created_at', { ascending: false })
+            .limit(limit);
+
+        const eventsQuery = supabase
+            .from('order_events')
+            .select('id, order_id, status, created_at, note, orders!order_id(code, pharmacy_id, pharmacies(name))')
+            .order('created_at', { ascending: false })
+            .limit(limit);
+
+        const refillsQuery = supabase
+            .from('medication_refill_subscriptions')
+            .select('id, subscription_code, enrolled_at, product_id, pharmacy_id, status, products(name), pharmacies(name)')
+            .order('enrolled_at', { ascending: false })
+            .limit(limit);
+
+        if (pharmacyId) {
+            ordersQuery.eq('pharmacy_id', pharmacyId);
+            // order_events doesn't have pharmacy_id directly, we filter in JS or use a join if supported
+            refillsQuery.eq('pharmacy_id', pharmacyId);
+        }
+
+        const [ordersRes, eventsRes, refillsRes] = await Promise.all([
+            ordersQuery,
+            eventsQuery,
+            refillsQuery
+        ]);
+
+        const ledger: LedgerEntry[] = [];
+
+        // 1. Process Financial Entries (from Orders)
+        ordersRes.data?.forEach((o: any) => {
+            const pharmName = Array.isArray(o.pharmacies) ? o.pharmacies[0]?.name : o.pharmacies?.name;
+            
+            // Payment Log
+            if (o.status !== 'pending_payment') {
+                ledger.push({
+                    id: `fin-${o.id}`,
+                    timestamp: o.created_at,
+                    category: 'FINANCE',
+                    type: 'Revenue Inbound',
+                    description: `Payment received for Order ${o.code}`,
+                    amount: o.total_price_ghs,
+                    pharmacy_id: o.pharmacy_id,
+                    pharmacy_name: pharmName,
+                    order_code: o.code
+                });
+            }
+
+            // Dispensation Log (Initial)
+            if (o.status === 'processing' || o.status === 'completed') {
+                let items: any[] = [];
+                try { items = typeof o.items === 'string' ? JSON.parse(o.items) : (o.items || []); } catch {}
+                
+                ledger.push({
+                    id: `disp-${o.id}`,
+                    timestamp: o.created_at,
+                    category: 'DISPENSATION',
+                    type: 'Medication Release',
+                    description: `Items released for fulfillment (${items.length} units)`,
+                    pharmacy_id: o.pharmacy_id,
+                    pharmacy_name: pharmName,
+                    order_code: o.code,
+                    items: items
+                });
+            }
+        });
+
+        // 2. Process Operational Events
+        eventsRes.data?.forEach((e: any) => {
+            const order = Array.isArray(e.orders) ? e.orders[0] : e.orders;
+            if (pharmacyId && order?.pharmacy_id !== pharmacyId) return;
+
+            const pharmName = Array.isArray(order?.pharmacies) ? order?.pharmacies[0]?.name : order?.pharmacies?.name;
+
+            ledger.push({
+                id: `evt-${e.id}`,
+                timestamp: e.created_at,
+                category: 'LOGISTICS',
+                type: (e.status || 'Update').replace(/_/g, ' ').toUpperCase(),
+                description: e.note || `Status transitioned to ${e.status}`,
+                pharmacy_id: order?.pharmacy_id,
+                pharmacy_name: pharmName,
+                order_code: order?.code
+            });
+        });
+
+        // 3. Process Refill/Subscription Events
+        refillsRes.data?.forEach((r: any) => {
+            const pharmName = Array.isArray(r.pharmacies) ? r.pharmacies[0]?.name : r.pharmacies?.name;
+            const productName = Array.isArray(r.products) ? r.products[0]?.name : r.products?.name;
+
+            ledger.push({
+                id: `sub-${r.id}`,
+                timestamp: r.enrolled_at,
+                category: 'SUBSCRIPTION',
+                type: 'Enrollment',
+                description: `New refill subscription for ${productName || 'Specialty Medication'}`,
+                pharmacy_id: r.pharmacy_id,
+                pharmacy_name: pharmName,
+                order_code: r.subscription_code
+            });
+        });
+
+        // Sort globally by timestamp
+        return ledger.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+    } catch (err) {
+        console.error('[Ledger] Critical Aggregate Error:', err);
+        return [];
+    }
+}
+
 
 

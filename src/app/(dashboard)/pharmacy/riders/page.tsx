@@ -194,19 +194,19 @@ export default function RidersPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-2">
         <div className="space-y-1">
            <h1 className="text-2xl font-black tracking-tight text-slate-900 uppercase">Dispatch Personnel</h1>
-           <p className="text-[10px] uppercase font-bold text-slate-400 tracking-[0.2em]">Manage your unbranded delivery runners</p>
+           <p className="text-[10px] uppercase font-bold text-slate-400 tracking-[0.2em]">Manage your unbranded delivery riders</p>
         </div>
 
         <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
           <DialogTrigger asChild>
             <Button className="h-11 px-6 rounded-xl bg-brand-indigo hover:bg-brand-indigo/90 font-bold text-sm gap-2 shadow-sm">
-              <Plus className="h-4 w-4" /> Register Runner
+              <Plus className="h-4 w-4" /> Register Rider
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-md p-8 rounded-3xl border border-slate-100 shadow-2xl">
             <DialogHeader>
-              <DialogTitle className="text-xl font-black tracking-tight">Register Runner</DialogTitle>
-              <DialogDescription className="font-medium text-slate-500 pt-1 text-xs">Add a new unbranded runner to your fulfillment team.</DialogDescription>
+              <DialogTitle className="text-xl font-black tracking-tight">Register Rider</DialogTitle>
+              <DialogDescription className="font-medium text-slate-500 pt-1 text-xs">Add a new unbranded rider to your fulfillment team.</DialogDescription>
             </DialogHeader>
             <form onSubmit={handleAddRider} className="space-y-6 pt-4">
               <div className="space-y-4">
@@ -244,9 +244,9 @@ export default function RidersPage() {
       {riders.length === 0 ? (
         <div className="flex flex-col items-center justify-center p-24 text-center bg-white rounded-[2rem] border border-slate-200 shadow-sm">
            <Truck className="h-12 w-12 text-slate-200 mb-4" />
-           <h3 className="text-lg font-black text-slate-900 tracking-tight">No runners registered</h3>
+           <h3 className="text-lg font-black text-slate-900 tracking-tight">No riders registered</h3>
            <p className="text-slate-500 max-w-sm mt-2 font-medium text-sm leading-relaxed">
-             You haven&apos;t added any personnel to your team. Register a runner to fulfill inbound requests.
+             You haven&apos;t added any personnel to your team. Register a rider to fulfill inbound requests.
            </p>
         </div>
       ) : (
@@ -320,7 +320,7 @@ export default function RidersPage() {
             <div className="space-y-1">
                <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Privacy Protocol</h4>
                <p className="text-[11px] font-medium text-slate-500 leading-relaxed max-w-xl">
-                 Runners must use 100% unbranded packaging. All deliveries are strictly confidential. Interactions are monitored for compliance.
+                 Riders must use 100% unbranded packaging. All deliveries are strictly confidential. Interactions are monitored for compliance.
                </p>
             </div>
          </div>
