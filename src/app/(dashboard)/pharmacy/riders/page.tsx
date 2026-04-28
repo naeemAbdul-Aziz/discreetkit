@@ -19,6 +19,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Plus, 
@@ -183,33 +191,33 @@ export default function RidersPage() {
 
   return (
     <div className="max-w-6xl mx-auto p-4 md:p-12 space-y-8 animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 pb-2">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-2">
         <div className="space-y-1">
-           <h1 className="text-3xl font-bold tracking-tight text-slate-900">Delivery Team</h1>
-           <p className="text-slate-500 font-medium text-sm">Manage your delivery riders here.</p>
+           <h1 className="text-2xl font-black tracking-tight text-slate-900 uppercase">Dispatch Personnel</h1>
+           <p className="text-[10px] uppercase font-bold text-slate-400 tracking-[0.2em]">Manage your unbranded delivery runners</p>
         </div>
 
         <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
           <DialogTrigger asChild>
-            <Button size="lg" className="h-11 px-8 rounded-xl bg-brand-indigo hover:bg-brand-indigo/90 font-bold text-sm gap-2 transition-all shadow-sm">
-              <Plus className="h-4 w-4" /> Add Rider
+            <Button className="h-11 px-6 rounded-xl bg-brand-indigo hover:bg-brand-indigo/90 font-bold text-sm gap-2 shadow-sm">
+              <Plus className="h-4 w-4" /> Register Runner
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-md p-8 rounded-2xl border border-slate-100 shadow-2xl">
+          <DialogContent className="sm:max-w-md p-8 rounded-3xl border border-slate-100 shadow-2xl">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-bold tracking-tight">Add a new rider</DialogTitle>
-              <DialogDescription className="font-medium text-slate-500 pt-1">Register a new rider for your delivery team.</DialogDescription>
+              <DialogTitle className="text-xl font-black tracking-tight">Register Runner</DialogTitle>
+              <DialogDescription className="font-medium text-slate-500 pt-1 text-xs">Add a new unbranded runner to your fulfillment team.</DialogDescription>
             </DialogHeader>
-            <form onSubmit={handleAddRider} className="space-y-8 pt-6">
-              <div className="space-y-6">
+            <form onSubmit={handleAddRider} className="space-y-6 pt-4">
+              <div className="space-y-4">
                 <div className="space-y-2">
                   <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 pl-1">Name</Label>
                   <Input
-                    placeholder="e.g. Kojo or Bolt Dispatch"
+                    placeholder="e.g. Kojo or Dispatch Alias"
                     value={newRider.name}
                     onChange={(e) => setNewRider({ ...newRider, name: e.target.value })}
                     required
-                    className="h-12 border-slate-200 bg-slate-50/30 rounded-xl font-bold focus:ring-brand-indigo"
+                    className="h-12 border-slate-200 bg-slate-50/50 rounded-xl font-bold focus:ring-brand-indigo"
                   />
                 </div>
                 <div className="space-y-2">
@@ -234,97 +242,87 @@ export default function RidersPage() {
       </div>
 
       {riders.length === 0 ? (
-        <div className="flex flex-col items-center justify-center p-24 text-center bg-white rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden group">
-           <div className="absolute inset-0 bg-slate-50/30 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-           <Truck className="h-16 w-16 text-slate-200 mb-6" />
-           <h3 className="text-xl font-bold text-slate-900 tracking-tight">No riders yet</h3>
-           <p className="text-slate-500 max-w-sm mt-2 font-medium leading-relaxed">
-             You haven&apos;t added any riders to your team yet. Add your first rider to start delivering orders.
+        <div className="flex flex-col items-center justify-center p-24 text-center bg-white rounded-[2rem] border border-slate-200 shadow-sm">
+           <Truck className="h-12 w-12 text-slate-200 mb-4" />
+           <h3 className="text-lg font-black text-slate-900 tracking-tight">No runners registered</h3>
+           <p className="text-slate-500 max-w-sm mt-2 font-medium text-sm leading-relaxed">
+             You haven&apos;t added any personnel to your team. Register a runner to fulfill inbound requests.
            </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {riders.map((rider) => (
-            <Card key={rider.id} className={cn(
-              "group relative overflow-hidden transition-all hover:shadow-sm bg-white border border-slate-100 rounded-2xl p-6 flex flex-col gap-6",
-              !rider.is_active && "bg-slate-50 grayscale opacity-80"
-            )}>
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-4">
-                  <div className={cn(
-                    "w-10 h-10 rounded-xl flex items-center justify-center shadow-inner transition-colors",
-                    rider.is_active ? "bg-emerald-50 text-brand-teal" : "bg-slate-200 text-slate-400"
-                  )}>
-                    <User className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-slate-900 tracking-tight leading-none">{rider.name}</h3>
-                    <p className="text-[10px] font-bold text-slate-400 flex items-center gap-1.5 uppercase tracking-wider mt-1.5">
-                      <Phone className="h-3 w-3 text-slate-300" /> {rider.phone}
-                    </p>
-                  </div>
-                </div>
-                <Switch
-                  checked={rider.is_active}
-                  onCheckedChange={() => handleToggleStatus(rider.id, rider.is_active)}
-                  className="data-[state=checked]:bg-brand-teal scale-75"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                 <div className="bg-slate-50 p-4 rounded-xl flex flex-col items-center justify-center border border-slate-100">
-                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1 opacity-60">Deliveries</span>
-                    <span className="text-xl font-bold text-slate-900 tabular-nums">{rider.total_deliveries || 0}</span>
-                 </div>
-                 <div className="bg-slate-50 p-4 rounded-xl flex flex-col items-center justify-center border border-slate-100">
-                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1 opacity-60">Status</span>
-                    <Badge variant={rider.is_active ? "success" : "neutral"} className="px-3 py-0.5 h-5 font-bold text-[9px] uppercase tracking-tighter rounded-full">
-                       {rider.is_active ? "Active" : "Offline"}
-                    </Badge>
-                 </div>
-              </div>
-
-              <div className="flex items-center gap-2 mt-2">
-                 <Button variant="ghost" className="flex-1 h-10 rounded-xl font-bold text-[10px] uppercase tracking-wider text-slate-400 hover:text-brand-indigo hover:bg-slate-50 transition-all gap-1.5">
-                    View Details <ChevronRight className="h-3 w-3" />
-                 </Button>
-                 <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={() => handleDelete(rider.id)}
-                  className="h-10 w-10 rounded-xl text-slate-300 hover:text-rose-600 hover:bg-rose-50 transition-all"
-                 >
-                   <Trash2 className="h-4 w-4" />
-                 </Button>
-              </div>
-              
-              {/* Status Indicator Bar */}
-              <div className={cn(
-                "h-2 w-full absolute bottom-0 left-0 transition-all duration-700",
-                rider.is_active ? "bg-brand-teal shadow-[0_-4px_12px_rgba(13,148,136,0.2)]" : "bg-slate-200"
-              )} />
-            </Card>
-          ))}
-        </div>
+        <Card className="border border-slate-200 shadow-sm overflow-hidden rounded-2xl">
+          <Table>
+            <TableHeader className="bg-slate-50/80">
+              <TableRow className="hover:bg-transparent border-slate-200">
+                <TableHead className="text-[11px] uppercase tracking-widest font-bold text-slate-400 py-4 pl-6">Personnel</TableHead>
+                <TableHead className="text-[11px] uppercase tracking-widest font-bold text-slate-400 py-4">Status</TableHead>
+                <TableHead className="text-[11px] uppercase tracking-widest font-bold text-slate-400 py-4">Deliveries</TableHead>
+                <TableHead className="text-right pr-6 text-[11px] uppercase tracking-widest font-bold text-slate-400 py-4">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {riders.map((rider) => (
+                <TableRow key={rider.id} className="transition-colors border-slate-100 hover:bg-slate-50/50">
+                  <TableCell className="py-4 pl-6">
+                    <div className="flex items-center gap-3">
+                      <div className={cn(
+                        "w-10 h-10 rounded-xl flex items-center justify-center shadow-inner",
+                        rider.is_active ? "bg-emerald-50 text-brand-teal" : "bg-slate-100 text-slate-400"
+                      )}>
+                        <User className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-bold text-slate-900 tracking-tight">{rider.name}</h3>
+                        <p className="text-[11px] font-bold text-slate-400 flex items-center gap-1.5 mt-0.5">
+                          {rider.phone}
+                        </p>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-4">
+                    <div className="flex items-center gap-3">
+                      <Switch
+                        checked={rider.is_active}
+                        onCheckedChange={() => handleToggleStatus(rider.id, rider.is_active)}
+                        className="data-[state=checked]:bg-brand-teal scale-75 m-0"
+                      />
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                        {rider.is_active ? 'Active' : 'Offline'}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-4">
+                    <span className="text-sm font-bold text-slate-900 tabular-nums">{rider.total_deliveries || 0}</span>
+                  </TableCell>
+                  <TableCell className="text-right pr-6 py-4">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => handleDelete(rider.id)}
+                      className="h-8 w-8 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Card>
       )}
 
       {/* Compliance / Security Section */}
-      <div className="bg-slate-900 p-8 rounded-3xl border border-slate-800 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 mt-4">
+      <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-6 mt-8">
          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
-               <AlertCircle className="h-5 w-5 text-brand-indigo" />
+            <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-sm">
+               <ShieldCheck className="h-5 w-5 text-brand-indigo" />
             </div>
             <div className="space-y-1">
-               <h4 className="text-[10px] font-bold text-white uppercase tracking-wider">Rules for Riders</h4>
-               <p className="text-[11px] font-medium text-slate-400 leading-relaxed max-w-xl">
-                 Only authorized riders should deliver orders. All interactions are monitored for safety and compliance.
+               <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Privacy Protocol</h4>
+               <p className="text-[11px] font-medium text-slate-500 leading-relaxed max-w-xl">
+                 Runners must use 100% unbranded packaging. All deliveries are strictly confidential. Interactions are monitored for compliance.
                </p>
             </div>
-         </div>
-
-         <div className="flex gap-3">
-           <Button variant="ghost" className="text-[10px] font-bold text-white/50 uppercase tracking-wider hover:text-white hover:bg-white/5 px-4 rounded-lg h-9">Rules</Button>
-           <Button className="bg-brand-indigo text-white hover:bg-brand-indigo/90 text-[10px] font-bold uppercase tracking-wider px-6 rounded-lg h-9">Get SLA</Button>
          </div>
       </div>
     </div>
