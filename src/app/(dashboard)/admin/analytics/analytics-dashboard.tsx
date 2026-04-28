@@ -11,7 +11,9 @@ import {
   Download, TrendingUp, Users, ShoppingBag, Activity,
   Clock, Package, MapPin, Loader2, ArrowUpRight,
   Shield, RefreshCw, AlertTriangle, Repeat2, Pill,
+  ClipboardList, ArrowRight,
 } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell,
@@ -65,6 +67,7 @@ interface AnalyticsDashboardProps {
     refillPaused: number;
     refillCancelled: number;
     lowStockAlerts: { product: string; pharmacy: string; stockLevel: number; reorderLevel: number }[];
+    recentLedger: any[];
   };
 }
 
@@ -341,6 +344,85 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
               </CardContent>
             </Card>
           </div>
+
+          {/* ── LIVE OPERATIONAL PULSE ────────────────────────────────────── */}
+          <Card className="border border-slate-200/80 shadow-sm bg-white overflow-hidden">
+            <CardHeader className="pb-4 border-b border-slate-50 bg-slate-50/50">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-xl bg-slate-900 flex items-center justify-center">
+                    <ClipboardList className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-[14px] font-black text-slate-900 uppercase tracking-widest">Live Operational Pulse</CardTitle>
+                    <CardDescription className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Real-time platform activity & audit logs</CardDescription>
+                  </div>
+                </div>
+                <Button 
+                  onClick={() => router.push('/admin/operations/logs')}
+                  variant="outline" 
+                  size="sm" 
+                  className="h-8 rounded-lg text-[10px] font-black uppercase tracking-widest gap-2 bg-white"
+                >
+                  Full Database
+                  <ArrowRight className="h-3 w-3" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="divide-y divide-slate-50">
+                {data.recentLedger.length > 0 ? (
+                  data.recentLedger.map((entry, i) => (
+                    <div key={entry.id} className="flex items-center justify-between p-4 hover:bg-slate-50/50 transition-colors group">
+                      <div className="flex items-center gap-4">
+                        <div className="flex flex-col items-center justify-center min-w-[50px] py-1 border-r border-slate-100 pr-4">
+                          <span className="text-[11px] font-black text-slate-900 tabular-nums">
+                            {new Date(entry.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                          <span className="text-[8px] font-black text-slate-400 uppercase">
+                            {formatDistanceToNow(new Date(entry.timestamp), { addSuffix: true }).replace('about ', '')}
+                          </span>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <Badge className={cn(
+                              "text-[8px] font-black uppercase tracking-wider px-1.5 py-0 rounded-md",
+                              entry.category === 'FINANCE' ? "bg-emerald-100 text-emerald-700 border-emerald-200" :
+                              entry.category === 'DISPENSATION' ? "bg-indigo-100 text-indigo-700 border-indigo-200" :
+                              entry.category === 'LOGISTICS' ? "bg-amber-100 text-amber-700 border-amber-200" :
+                              "bg-sky-100 text-sky-700 border-sky-200"
+                            )}>
+                              {entry.category}
+                            </Badge>
+                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">
+                              {entry.order_code}
+                            </span>
+                          </div>
+                          <p className="text-xs font-bold text-slate-700 leading-none">
+                            {entry.description}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <span className="text-[10px] font-bold text-slate-400">
+                          {entry.pharmacy_name || "Central Hub"}
+                        </span>
+                        <ArrowUpRight className="h-3 w-3 text-slate-200 group-hover:text-slate-900 transition-colors" />
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="py-20 text-center space-y-2">
+                    <Loader2 className="h-6 w-6 text-slate-200 animate-spin mx-auto" />
+                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Awaiting system pings...</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+            <div className="bg-slate-50/50 p-3 text-center border-t border-slate-50">
+               <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">Operational Ledger Synchronized • High Fidelity Audit Mode</p>
+            </div>
+          </Card>
         </TabsContent>
 
         {/* ── PUBLIC HEALTH TAB ─────────────────────────────────────────── */}

@@ -49,7 +49,6 @@ export function DeliveryDialog({
   const { toast } = useToast();
   const [riderName, setRiderName] = useState("");
   const [riderPhone, setRiderPhone] = useState("");
-  const [trackingUrl, setTrackingUrl] = useState("");
   const [riders, setRiders] = useState<any[]>([]);
   const [selectedRiderId, setSelectedRiderId] = useState<string>("manual");
   const isMobile = useMediaQuery("(max-width: 640px)");
@@ -133,7 +132,6 @@ export function DeliveryDialog({
           status: "out_for_delivery",
           courier_name: riderName,
           courier_phone: riderPhone,
-          courier_tracking_url: trackingUrl,
         }),
       });
 
@@ -205,18 +203,10 @@ export function DeliveryDialog({
           className="h-12"
         />
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="trackingUrl">Tracking Link (Optional)</Label>
-        <Input
-          id="trackingUrl"
-          placeholder="https://..."
-          value={trackingUrl}
-          onChange={(e) => setTrackingUrl(e.target.value)}
-          className="h-12"
-        />
-        <p className="text-xs text-muted-foreground">
-          If left blank, we&apos;ll auto-generate a tracking link for this
-          order.
+      <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Automatic Tracking</p>
+        <p className="text-[11px] text-slate-400 leading-relaxed">
+          A secure, internal tracking link tied to Order <span className="font-black text-slate-700">#{orderId}</span> will be auto-generated and sent to the customer via SMS.
         </p>
       </div>
 
