@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { 
     Table, 
     TableBody, 
@@ -38,6 +38,10 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
     const [searchTerm, setSearchTerm] = useState("");
     const [categoryFilter, setCategoryFilter] = useState<LedgerCategory | "ALL">("ALL");
     const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+    
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 15;
 
     const toggleRow = (id: string) => {
         const next = new Set(expandedRows);
@@ -56,6 +60,13 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
         
         return matchesSearch && matchesCategory;
     });
+
+    // Paginated Slicing
+    const totalPages = Math.ceil(filtered.length / pageSize);
+    const paginatedEntries = filtered.slice(
+        (currentPage - 1) * pageSize,
+        currentPage * pageSize
+    );
 
     const getCategoryIcon = (category: LedgerCategory) => {
         switch (category) {
@@ -93,7 +104,10 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
                     {(['ALL', 'FINANCE', 'DISPENSATION', 'LOGISTICS', 'SUBSCRIPTION'] as const).map(cat => (
                         <button
                             key={cat}
-                            onClick={() => setCategoryFilter(cat)}
+                            onClick={() => {
+                                setCategoryFilter(cat);
+                                setCurrentPage(1); // Reset on filter
+                            }}
                             className={cn(
                                 "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap",
                                 categoryFilter === cat 
@@ -123,10 +137,9 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {filtered.map((entry) => (
-                            <>
+                        {paginatedEntries.map((entry) => (
+                            <React.Fragment key={entry.id}>
                                 <TableRow 
-                                    key={entry.id} 
                                     className={cn(
                                         "group border-slate-50 transition-colors",
                                         expandedRows.has(entry.id) ? "bg-slate-50/30" : "hover:bg-slate-50/30"
@@ -234,7 +247,7 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
                                         </TableCell>
                                     </TableRow>
                                 )}
-                            </>
+                            </React.Fragment>
                         ))}
                     </TableBody>
                 </Table>
@@ -250,14 +263,49 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
                 )}
             </div>
 
-            {/* Pagination Placeholder */}
+            {/* Pagination */}
             <div className="flex items-center justify-between px-4">
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    Showing {filtered.length} entries • Exhaustive Audit Mode
+                    Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, filtered.length)} of {filtered.length} entries
                 </p>
                 <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm" disabled className="h-9 rounded-xl font-bold text-xs uppercase tracking-widest">Prev</Button>
-                    <Button variant="ghost" size="sm" disabled className="h-9 rounded-xl font-bold text-xs uppercase tracking-widest">Next</Button>
+                    <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                        className="h-9 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest border-slate-200"
+                    >
+                        Prev
+                    </Button>
+                    <div className="flex items-center gap-1">
+                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                            const pageNum = i + 1;
+                            return (
+                                <button
+                                    key={pageNum}
+                                    onClick={() => setCurrentPage(pageNum)}
+                                    className={cn(
+                                        "h-8 w-8 rounded-lg text-[10px] font-black transition-all",
+                                        currentPage === pageNum 
+                                            ? "bg-slate-900 text-white" 
+                                            : "text-slate-400 hover:bg-slate-100"
+                                    )}
+                                >
+                                    {pageNum}
+                                </button>
+                            );
+                        })}
+                    </div>
+                    <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                        disabled={currentPage === totalPages || totalPages === 0}
+                        className="h-9 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest border-slate-200"
+                    >
+                        Next
+                    </Button>
                 </div>
             </div>
         </div>

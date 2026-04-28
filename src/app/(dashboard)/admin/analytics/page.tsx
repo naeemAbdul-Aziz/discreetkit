@@ -7,10 +7,11 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function AdminAnalyticsPage() {
-  // Fire both in parallel — neither blocks the other
-  const [stats, detailed] = await Promise.all([
+  // Fire all data fetches in parallel
+  const [stats, detailed, ledger] = await Promise.all([
     getDashboardStats(),
     getDetailedAnalytics(),
+    getOperationalLedger(undefined, 10), // Fetch latest 10 for the "pulse" view
   ]);
 
   const data = {
@@ -24,7 +25,7 @@ export default async function AdminAnalyticsPage() {
     topProducts:        stats.topProducts                  ?? [],
     topPharmacies:      stats.topPharmacies                ?? [],
 
-    // Phase 1 detailed analytics
+    // Detailed analytics
     orderStatusBreakdown: detailed.orderStatusBreakdown,
     categoryBreakdown:    detailed.categoryBreakdown,
     topAreas:             detailed.topAreas,
@@ -35,6 +36,9 @@ export default async function AdminAnalyticsPage() {
     refillPaused:         detailed.refillPaused,
     refillCancelled:      detailed.refillCancelled,
     lowStockAlerts:       detailed.lowStockAlerts,
+    
+    // New Ledger Data
+    recentLedger:         ledger,
   };
 
   return (
