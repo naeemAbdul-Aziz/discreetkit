@@ -227,7 +227,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
     // New assignment - needs accept/decline
     if (status === "received" && ackStatus === "pending") {
       return (
-        <Badge className="gap-1.5 bg-sky-100 text-sky-700 border-sky-200 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none">
+        <Badge className="gap-1.5 bg-sky-100 text-sky-700 border-sky-200 hover:bg-sky-100 hover:text-sky-700 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none pointer-events-none">
           <div className="h-1.5 w-1.5 rounded-full bg-sky-500" />
           Queueing: Inbound
         </Badge>
@@ -237,7 +237,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
     // Just accepted - preparing order
     if (status === "processing" && ackStatus === "accepted") {
       return (
-        <Badge className="gap-1.5 bg-indigo-100 text-indigo-700 border-indigo-200 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none">
+        <Badge className="gap-1.5 bg-indigo-100 text-indigo-700 border-indigo-200 hover:bg-indigo-100 hover:text-indigo-700 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none pointer-events-none">
           <Package className="h-3 w-3" />
           Internal Prep
         </Badge>
@@ -254,26 +254,26 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
     > = {
       received: { 
         label: "New Inbound", 
-        className: "bg-sky-100 text-sky-700 border-sky-200 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none" 
+        className: "bg-sky-100 text-sky-700 border-sky-200 hover:bg-sky-100 hover:text-sky-700 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none pointer-events-none" 
       },
       processing: { 
         label: "Internal Prep", 
-        className: "bg-indigo-100 text-indigo-700 border-indigo-200 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none" 
+        className: "bg-indigo-100 text-indigo-700 border-indigo-200 hover:bg-indigo-100 hover:text-indigo-700 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none pointer-events-none" 
       },
       out_for_delivery: { 
         label: "Outbound", 
-        className: "bg-amber-100 text-amber-700 border-amber-200 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none" 
+        className: "bg-amber-100 text-amber-700 border-amber-200 hover:bg-amber-100 hover:text-amber-700 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none pointer-events-none" 
       },
       completed: { 
         label: "Completed", 
-        className: "bg-emerald-100 text-emerald-700 border-emerald-200 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none" 
+        className: "bg-emerald-100 text-emerald-700 border-emerald-200 hover:bg-emerald-100 hover:text-emerald-700 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none pointer-events-none" 
       },
       cancelled: { 
         label: "Aborted", 
-        className: "bg-rose-100 text-rose-700 border-rose-200 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none" 
+        className: "bg-rose-100 text-rose-700 border-rose-200 hover:bg-rose-100 hover:text-rose-700 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none pointer-events-none" 
       },
     };
-    const config = variants[status] || { label: status, className: "font-bold uppercase text-[9px] tracking-widest border-slate-200 bg-slate-100 text-slate-500 shadow-none" };
+    const config = variants[status] || { label: status, className: "font-bold uppercase text-[9px] tracking-widest border-slate-200 bg-slate-100 text-slate-500 shadow-none pointer-events-none" };
     return <Badge className={config.className}>{config.label}</Badge>;
   };
 
@@ -364,11 +364,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
 
     return (
       <Card
-        className={cn(
-          "p-5 shadow-sm transition-all group border-slate-100 cursor-pointer hover:border-slate-300 hover:shadow-md bg-white rounded-2xl",
-          isCompleted && "bg-emerald-50/20 border-emerald-100",
-          late && "border-rose-200 bg-rose-50/20 shadow-sm"
-        )}
+        className="p-5 shadow-sm border border-slate-200 bg-white rounded-2xl cursor-pointer"
         onClick={() => handleViewDetails(order)}
       >
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
@@ -379,7 +375,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
               </span>
               {(activeTab === "all" || order.status === "completed") && getStatusBadge(order.status, order.pharmacy_ack_status)}
               {late && (
-                <Badge className="bg-rose-600 text-white border-none px-1.5 py-0 text-[9px] font-black tracking-widest uppercase shadow-none">URGENT</Badge>
+                <Badge className="bg-rose-600 text-white border-none hover:bg-rose-600 px-1.5 py-0 text-[9px] font-black tracking-widest uppercase shadow-none pointer-events-none">URGENT</Badge>
               )}
             </div>
             
