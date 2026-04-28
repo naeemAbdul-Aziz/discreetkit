@@ -15,6 +15,7 @@ import {
   Loader2,
   GanttChartSquare,
   MessageSquare,
+  Info,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -59,6 +60,9 @@ interface OrdersListProps {
 
 export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
   const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState("incoming");
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 5;
   const [loading, setLoading] = useState<{
     id: number;
     action: string;
@@ -257,11 +261,11 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
         className: "bg-indigo-100 text-indigo-700 border-indigo-200 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none" 
       },
       out_for_delivery: { 
-        label: "Outbound Ops", 
+        label: "Outbound", 
         className: "bg-amber-100 text-amber-700 border-amber-200 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none" 
       },
       completed: { 
-        label: "Dispatch Done", 
+        label: "Completed", 
         className: "bg-emerald-100 text-emerald-700 border-emerald-200 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none" 
       },
       cancelled: { 
@@ -287,9 +291,59 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
   );
 
   const queueOrders = activeOrders.filter(o => o.status === "received" && o.pharmacy_ack_status === "pending");
-  const processingOrders = activeOrders.filter(o => o.status === "processing");
+  const processingOrders = activeOrders.filter(o => o.status === "processing" || (o.status === "received" && o.pharmacy_ack_status === "accepted"));
   const inTransitOrders = activeOrders.filter(o => o.status === "out_for_delivery");
   const completedOrders = activeOrders.filter(o => o.status === "completed");
+
+  const renderPaginatedList = (list: Order[], emptyMessage: string, EmptyIcon: any) => {
+    if (list.length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center py-20 bg-slate-50/50 rounded-[2.5rem] border border-dashed border-slate-200">
+          <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-4">
+            <EmptyIcon className="h-8 w-8 text-slate-200" />
+          </div>
+          <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">{emptyMessage}</p>
+        </div>
+      );
+    }
+
+    const totalPages = Math.ceil(list.length / ITEMS_PER_PAGE);
+    const paginatedList = list.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+    return (
+      <div className="space-y-4">
+        {paginatedList.map(order => <OrderCard key={order.id} order={order} />)}
+        
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between pt-4 pb-2 px-2">
+            <p className="text-xs font-medium text-slate-500">
+              Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, list.length)} of {list.length}
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="h-8 rounded-lg text-xs"
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="h-8 rounded-lg text-xs"
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   const OrderCard = ({ order }: { order: Order }) => {
     const acceptLoading = loading?.id === order.id && loading?.action === "accept";
@@ -323,7 +377,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
               <span className="font-mono font-black text-slate-900 tracking-tighter text-lg">
                 {order.code}
               </span>
-              {getStatusBadge(order.status, order.pharmacy_ack_status)}
+              {(activeTab === "all" || order.status === "completed") && getStatusBadge(order.status, order.pharmacy_ack_status)}
               {late && (
                 <Badge className="bg-rose-600 text-white border-none px-1.5 py-0 text-[9px] font-black tracking-widest uppercase shadow-none">URGENT</Badge>
               )}
@@ -423,7 +477,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
 
   return (
     <>
-      <Tabs defaultValue="incoming" className="w-full space-y-8">
+      <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); setCurrentPage(1); }} className="w-full space-y-8">
         <div className="flex items-center justify-center sm:justify-start">
           <TabsList className="bg-slate-200/40 p-1.5 rounded-[20px] h-14 border-none gap-1 shadow-inner">
             <TabsTrigger 
@@ -469,64 +523,24 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
           </TabsList>
         </div>
 
-        <TabsContent value="incoming" className="space-y-4 animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
-          {queueOrders.map(order => <OrderCard key={order.id} order={order} />)}
-          {queueOrders.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-20 bg-slate-50/50 rounded-[2.5rem] border border-dashed border-slate-200">
-              <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-4">
-                <Clock className="h-8 w-8 text-slate-200" />
-              </div>
-              <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">No Incoming Requests</p>
-            </div>
-          )}
+        <TabsContent value="incoming" className="animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
+          {renderPaginatedList(queueOrders, "No Incoming Requests", Clock)}
         </TabsContent>
 
-        <TabsContent value="preparing" className="space-y-4 animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
-          {processingOrders.map(order => <OrderCard key={order.id} order={order} />)}
-          {processingOrders.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-20 bg-slate-50/50 rounded-[2.5rem] border border-dashed border-slate-200">
-              <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-4">
-                <Package className="h-8 w-8 text-slate-200" />
-              </div>
-              <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Nothing in Preparation</p>
-            </div>
-          )}
+        <TabsContent value="preparing" className="animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
+          {renderPaginatedList(processingOrders, "Nothing in Preparation", Package)}
         </TabsContent>
 
-        <TabsContent value="outbound" className="space-y-4 animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
-          {inTransitOrders.map(order => <OrderCard key={order.id} order={order} />)}
-          {inTransitOrders.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-20 bg-slate-50/50 rounded-[2.5rem] border border-dashed border-slate-200">
-              <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-4">
-                <Truck className="h-8 w-8 text-slate-200" />
-              </div>
-              <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">No Outbound Operations</p>
-            </div>
-          )}
+        <TabsContent value="outbound" className="animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
+          {renderPaginatedList(inTransitOrders, "No Outbound Operations", Truck)}
         </TabsContent>
 
-        <TabsContent value="completed" className="space-y-4 animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
-          {completedOrders.map(order => <OrderCard key={order.id} order={order} />)}
-          {completedOrders.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-20 bg-slate-50/50 rounded-[2.5rem] border border-dashed border-slate-200">
-              <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-4">
-                <CheckCircle className="h-8 w-8 text-slate-200" />
-              </div>
-              <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">No Dispatch History</p>
-            </div>
-          )}
+        <TabsContent value="completed" className="animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
+          {renderPaginatedList(completedOrders, "No Dispatch History", CheckCircle)}
         </TabsContent>
 
-        <TabsContent value="all" className="space-y-4 animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
-          {activeOrders.map(order => <OrderCard key={order.id} order={order} />)}
-          {activeOrders.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-20 bg-slate-50/50 rounded-[2.5rem] border border-dashed border-slate-200">
-              <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-4">
-                <Info className="h-8 w-8 text-slate-200" />
-              </div>
-              <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">No Records Found</p>
-            </div>
-          )}
+        <TabsContent value="all" className="animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
+          {renderPaginatedList(activeOrders, "No Records Found", Info)}
         </TabsContent>
       </Tabs>
 
