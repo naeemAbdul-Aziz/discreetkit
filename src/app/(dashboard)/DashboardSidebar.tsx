@@ -113,15 +113,14 @@ export function DashboardSidebar() {
 
     if (subdomain === "admin") {
       const baseItems = [
-        { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-        { href: "/admin/analytics", label: "Analytics", icon: BarChart },
-        { href: "/admin/operations/logs", label: "Ledger", icon: ClipboardCheck },
-        { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
-        { href: "/admin/products", label: "Products", icon: Package },
-        { href: "/admin/categories", label: "Categories", icon: Layers },
-        { href: "/admin/partners", label: "Partners", icon: Users },
-        { href: "/admin/refills", label: "Refills", icon: Repeat },
-        { href: "/admin/settings", label: "Settings", icon: Settings },
+        { href: "/admin", label: "Control Center", icon: LayoutDashboard },
+        { href: "/admin/operations/logs", label: "Operational Ledger", icon: ClipboardCheck },
+        { href: "/admin/analytics", label: "Strategic Analytics", icon: BarChart },
+        { href: "/admin/orders", label: "Order Management", icon: ShoppingBag },
+        { href: "/admin/products", label: "Inventory & SKUs", icon: Package },
+        { href: "/admin/partners", label: "Pharmacy Units", icon: Users },
+        { href: "/admin/refills", label: "Refill Subscriptions", icon: Repeat },
+        { href: "/admin/settings", label: "System Settings", icon: Settings },
       ];
 
       // Strip prefixes if on subdomain

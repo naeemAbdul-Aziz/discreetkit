@@ -96,8 +96,11 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
                         type="text" 
                         placeholder="Search by order code, pharmacy, or event..." 
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full h-10 pl-10 pr-4 bg-slate-50 border-none rounded-xl text-sm font-medium focus:ring-2 focus:ring-brand-indigo/20 transition-all"
+                        onChange={(e) => {
+                            setSearchTerm(e.target.value);
+                            setCurrentPage(1);
+                        }}
+                        className="w-full h-10 pl-10 pr-4 bg-slate-50 border-none rounded-xl text-xs font-bold text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-brand-indigo/20 transition-all"
                     />
                 </div>
                 <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0">
@@ -126,14 +129,14 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
                 <Table>
                     <TableHeader className="bg-slate-50/50">
                         <TableRow className="hover:bg-transparent border-slate-100">
-                            <TableHead className="w-[180px] text-[10px] font-black uppercase tracking-widest text-slate-400 py-5 pl-8">Timestamp</TableHead>
-                            <TableHead className="w-[140px] text-[10px] font-black uppercase tracking-widest text-slate-400 py-5">Category</TableHead>
-                            <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400 py-5">Record Description</TableHead>
+                            <TableHead className="w-[180px] text-[9px] font-black uppercase tracking-[0.15em] text-slate-400 py-6 pl-8">Timeline Event</TableHead>
+                            <TableHead className="w-[140px] text-[9px] font-black uppercase tracking-[0.15em] text-slate-400 py-6">Classification</TableHead>
+                            <TableHead className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-400 py-6">Operation Ledger Record</TableHead>
                             {showPharmacy && (
-                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400 py-5">Pharmacy Unit</TableHead>
+                                <TableHead className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-400 py-6">Origin Unit</TableHead>
                             )}
-                            <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400 py-5">Identifier</TableHead>
-                            <TableHead className="text-right text-[10px] font-black uppercase tracking-widest text-slate-400 py-5 pr-8">Value</TableHead>
+                            <TableHead className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-400 py-6">Audit ID</TableHead>
+                            <TableHead className="text-right text-[9px] font-black uppercase tracking-[0.15em] text-slate-400 py-6 pr-8">Fiscal Value</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
