@@ -843,6 +843,28 @@ export async function getDashboardStats() {
 }
 
 /**
+ * FAANG-Level Unified Pulse
+ * Single entry point for real-time dashboard state.
+ */
+export async function getUnifiedPulse() {
+    try {
+        await requireAdmin();
+        const [metrics, ops, pulse, charts, rankings] = await Promise.all([
+            getSummaryMetrics(),
+            getOperationsStats(),
+            getPulseFeed(),
+            getChartsData(),
+            getRankingStats()
+        ]);
+
+        return { metrics, ops, pulse, charts, rankings };
+    } catch (err) {
+        console.error('[UnifiedPulse] Error:', err);
+        throw err;
+    }
+}
+
+/**
  * PHASE 1: Detailed analytics for stakeholder dashboards.
  * Additive — does not modify any existing dashboard functions.
  * Computes: status breakdown, SRH category demand, geo coverage,

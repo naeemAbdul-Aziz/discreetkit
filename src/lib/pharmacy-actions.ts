@@ -23,6 +23,63 @@ async function requirePharmacy() {
     return { user, supabase, pharmacy };
 }
 
+/**
+ * FAANG-Level Unified Pharmacy Pulse
+ * Consolidated data Pass for the pharmacy dashboard.
+ */
+export async function getPharmacyPulse() {
+    const { pharmacy, supabase } = await requirePharmacy();
+    const isHub = (pharmacy as any).is_partner_hub === true;
+
+    // Parallel fetch for speed & efficiency
+    const [ordersResult, statsResult] = await Promise.all([
+      supabase
+        .from('orders')
+        .select('id, code, status, pharmacy_ack_status, total_price_ghs, created_at, items, delivery_area')
+        .eq('pharmacy_id', pharmacy.id)
+        .order('created_at', { ascending: false })
+        .limit(20),
+      supabase
+        .from('orders')
+        .select('status, pharmacy_ack_status')
+        .eq('pharmacy_id', pharmacy.id)
+    ]);
+
+    if (ordersResult.error) throw new Error('Recent orders failed');
+    if (statsResult.error) throw new Error('Stats fetch failed');
+
+    const statsData = statsResult.data || [];
+
+    const stats = {
+      pending: statsData.filter(o => o.status === 'received' && o.pharmacy_ack_status === 'pending').length,
+      processing: statsData.filter(o => o.status === 'processing').length,
+      outForDelivery: statsData.filter(o => o.status === 'out_for_delivery').length,
+      completed: statsData.filter(o => o.status === 'completed').length,
+    };
+
+    // Hub specific analytics (if applicable)
+    let hubStats = null;
+    if (isHub) {
+        try {
+            const { getHubAnalytics } = await import("./hub-actions");
+            hubStats = await getHubAnalytics();
+        } catch (e) {
+            console.error('[PharmacyActions] Hub analytics failure:', e);
+        }
+    }
+
+    return {
+      pharmacy,
+      isHub,
+      stats,
+      hubStats,
+      recentOrders: (ordersResult.data || []).map(order => ({
+        ...order,
+        total_price_ghs: Number((order as any).total_price_ghs || 0)
+      }))
+    };
+}
+
 // --- Refill Portal Actions ---
 
 export async function getAssignedSubscriptions() {

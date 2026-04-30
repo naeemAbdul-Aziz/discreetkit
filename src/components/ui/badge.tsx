@@ -4,31 +4,34 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex items-center rounded-full border-none px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.15em] focus:outline-none transition-none",
   {
     variants: {
       variant: {
         default:
-          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
+          "bg-slate-900 text-white shadow-2xl shadow-slate-900/10",
         secondary:
-          "border-transparent bg-primary/10 text-primary hover:bg-primary/20",
+          "bg-brand-teal text-white shadow-2xl shadow-brand-teal/10",
         destructive:
-          "border-transparent bg-destructive/15 text-destructive hover:bg-destructive/25",
-        outline: "text-foreground border-border",
+          "bg-rose-500/10 text-rose-600 border border-rose-500/20",
+        outline: 
+          "border border-slate-100 bg-white text-slate-400 hover:text-slate-900",
         success:
-          "border-transparent bg-success/15 text-success hover:bg-success/25",
+          "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20",
         warning:
-          "border-transparent bg-warning/15 text-warning hover:bg-warning/25",
+          "bg-amber-500/10 text-amber-600 border border-amber-500/20",
         pending:
-          "border-transparent bg-orange-500/15 text-orange-700 hover:bg-orange-500/25 dark:bg-orange-500/20 dark:text-orange-300",
+          "bg-orange-500/10 text-orange-600 border border-orange-500/20",
         info:
-          "border-transparent bg-info/15 text-info hover:bg-info/25",
+          "bg-sky-500/10 text-sky-600 border border-sky-500/20",
         neutral:
-          "border-transparent bg-muted text-muted-foreground hover:bg-muted/80",
+          "bg-slate-50 text-slate-400 border border-slate-100",
         accent:
-          "border-transparent bg-accent text-accent-foreground hover:bg-accent/80",
+          "bg-slate-900 text-white",
+        brand:
+          "bg-brand-teal/10 text-brand-teal border border-brand-teal/20",
         icon:
-          "p-1.5 rounded-full aspect-square grid place-items-center border-transparent bg-primary/10 text-primary hover:bg-primary/20",
+          "p-2 rounded-full aspect-square grid place-items-center bg-slate-50 text-slate-400 border border-slate-100",
       },
     },
     defaultVariants: {

@@ -26,6 +26,16 @@ import {
   FlaskConical,
   Search,
   Trash2,
+  AlertTriangle,
+  History,
+  Activity,
+  ShieldAlert,
+  ArrowRight,
+  Terminal,
+  Zap,
+  Clock,
+  Shield,
+  Loader2
 } from "lucide-react";
 import {
   Dialog,
@@ -61,15 +71,15 @@ import {
 import { cn } from "@/lib/utils";
 import { format, isBefore, addDays } from "date-fns";
 
-// Masking Helper: "Kofi Mensah" -> "K. Mensah"
+// Masking Helper
 function maskName(name: string) {
-  if (!name || name === "Anonymous") return "P-ID-" + Math.random().toString(36).substring(2, 6).toUpperCase();
+  if (!name || name === "Anonymous") return "P-NODE-" + Math.random().toString(36).substring(2, 6).toUpperCase();
   const parts = name.trim().split(/\s+/);
   if (parts.length === 1) return parts[0].substring(0, 1) + "***";
   return `${parts[0][0]}. ${parts[parts.length - 1]}`;
 }
 
-// Minimalists Pharmacy Combobox
+// Pharmacy Combobox
 function PharmacyCombobox({
   subscriptionId,
   currentPharmacyId,
@@ -118,35 +128,35 @@ function PharmacyCombobox({
         <button
           disabled={loading}
           className={cn(
-            "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border border-transparent",
-            currentPharmacyName 
-              ? "bg-slate-50 text-slate-700 hover:border-slate-200" 
-              : "bg-brand-indigo/5 text-brand-indigo hover:bg-brand-indigo/10 border-dashed border-brand-indigo/20",
-            loading && "opacity-50 cursor-wait"
+            "flex items-center gap-8 px-10 py-4 rounded-full text-[11px] font-black uppercase tracking-widest border-none bg-slate-50 transition-none outline-none group/trigger shadow-sm hover:bg-slate-100",
+            currentPharmacyName && "bg-white border-slate-100 border text-slate-900"
           )}
         >
-          <Store className="h-3.5 w-3.5 shrink-0" />
-          <span className="max-w-[100px] truncate">
-            {loading ? "Syncing..." : currentPharmacyName || "Assign Partner"}
+          <Store className="h-5 w-5 shrink-0 text-slate-300 group-hover/trigger:text-brand-teal transition-none" />
+          <span className="truncate max-w-[180px]">
+            {loading ? "ROUTING..." : currentPharmacyName?.toUpperCase() || "ROUTE_MASTER_NODE"}
           </span>
-          <ChevronsUpDown className="h-3 w-3 opacity-30" />
+          <ChevronsUpDown className="ml-4 h-5 w-5 shrink-0 text-slate-200 group-hover/trigger:text-slate-900 transition-none" />
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-[280px] p-0 rounded-xl shadow-2xl border-slate-200 overflow-hidden" align="start">
-        <Command shouldFilter={false}>
-          <div className="p-2 border-b border-slate-100">
-            <CommandInput
-              placeholder="Search partner network..."
-              value={searchQuery}
-              onValueChange={setSearchQuery}
-              className="h-9 border-none focus:ring-0 text-sm"
-            />
+      <PopoverContent className="w-[420px] p-0 rounded-[40px] border-none shadow-2xl overflow-hidden bg-white transition-none z-[100]" align="start">
+        <Command shouldFilter={false} className="bg-white">
+          <div className="p-8 border-b border-slate-50 bg-slate-50/30 backdrop-blur-3xl">
+            <div className="relative group">
+                <Search className="absolute left-8 top-1/2 -translate-y-1/2 h-6 w-6 text-slate-300 group-focus-within:text-brand-teal transition-none" />
+                <CommandInput
+                  placeholder="FILTER_NODE_REGISTRY_MATRIX..."
+                  value={searchQuery}
+                  onValueChange={setSearchQuery}
+                  className="pl-18 h-16 border-none focus:ring-0 text-[12px] font-black uppercase tracking-[0.3em] bg-transparent text-slate-900"
+                />
+            </div>
           </div>
-          <CommandList className="max-h-[250px]">
-            <CommandEmpty className="py-6 text-center text-xs text-slate-400">
-              {searching ? "Probing network..." : "No matches found."}
+          <CommandList className="max-h-[440px] scrollbar-hide bg-white p-4">
+            <CommandEmpty className="py-24 text-center text-[12px] font-black uppercase tracking-[0.3em] text-slate-200 px-12 leading-relaxed">
+              {searching ? "SYNCHRONIZING_NODES..." : "MATRIX_SCAN_NOMINAL: NO MATCHING NODES DETECTED."}
             </CommandEmpty>
-            <CommandGroup className="p-1">
+            <CommandGroup>
               {pharmacies.map((pharmacy) => (
                 <CommandItem
                   key={pharmacy.id}
@@ -155,19 +165,19 @@ function PharmacyCombobox({
                     onAssign(subscriptionId, pharmacy.id, pharmacy.name);
                     setOpen(false);
                   }}
-                  className="rounded-lg px-3 py-2 text-sm flex items-center justify-between cursor-pointer"
+                  className="rounded-[32px] px-8 py-6 text-[12px] font-black uppercase tracking-widest flex items-center justify-between cursor-pointer transition-none aria-selected:bg-slate-900 aria-selected:text-white mb-2 last:mb-0 group/item"
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-6">
                     <div className={cn(
-                      "h-1.5 w-1.5 rounded-full",
-                      currentPharmacyId === pharmacy.id ? "bg-brand-indigo" : "bg-slate-200"
-                    )} />
-                    <span className="font-semibold text-slate-700">{pharmacy.name}</span>
+                        "h-12 w-12 rounded-full border-2 flex items-center justify-center transition-none",
+                        currentPharmacyId === pharmacy.id ? "bg-brand-teal/10 border-brand-teal text-brand-teal" : "bg-white border-slate-100 text-slate-100 group-hover/item:border-slate-200"
+                    )}>
+                        <Check className="h-6 w-6" />
+                    </div>
+                    <span className="truncate max-w-[220px]">{pharmacy.name.toUpperCase()}</span>
                   </div>
                   {pharmacy.recommended && (
-                    <Badge className="bg-emerald-50 text-emerald-600 border-none text-[8px] font-black h-4 px-1 uppercase tracking-tighter">
-                      Optimum
-                    </Badge>
+                    <div className="bg-emerald-500/10 text-emerald-600 rounded-full px-5 py-2 text-[10px] font-black uppercase tracking-widest border-none shadow-sm">OPTIMAL</div>
                   )}
                 </CommandItem>
               ))}
@@ -216,13 +226,13 @@ export function RefillsTable({
     try {
       const result = await assignPharmacyToSubscription(subId, pharmacyId);
       if (result.error) {
-        toast({ title: "Error", description: result.error, variant: "destructive" });
+        toast({ title: "ROUTING_ERROR", description: result.error, variant: "destructive" });
       } else {
-        toast({ title: "Partner Assigned", description: `Route successfully mapped to ${pharmacyName}` });
+        toast({ title: "NODE_ASSIGNED_SYNC", description: `Cycle successfully routed to ${pharmacyName.toUpperCase()}` });
         setSubscriptions(prev => prev.map(s => s.id === subId ? { ...s, pharmacy_id: pharmacyId, pharmacy: { name: pharmacyName } } : s));
       }
     } catch (e) {
-      toast({ title: "Network Error", description: "Failed to update partner.", variant: "destructive" });
+      toast({ title: "TERMINAL_CRITICAL", description: "Failed to finalize routing sync.", variant: "destructive" });
     } finally {
       setAssigningId(null);
     }
@@ -231,9 +241,9 @@ export function RefillsTable({
   const handleVerify = async (id: string, isValid: boolean) => {
     const result = await verifyPrescription(id, isValid);
     if (result.error) {
-      toast({ title: "Error", description: result.error, variant: "destructive" });
+      toast({ title: "VALIDATION_FAILURE", description: result.error, variant: "destructive" });
     } else {
-      toast({ title: isValid ? "Document Validated" : "Request Declined" });
+      toast({ title: isValid ? "CREDENTIAL_VALIDATED" : "REQUEST_SUSPENDED_PROTOCOL" });
       setSubscriptions(prev => prev.map(s => s.id === id ? { ...s, prescription_verified: isValid, status: isValid && s.status === "pending_verification" ? "active" : s.status } : s));
     }
   };
@@ -246,180 +256,179 @@ export function RefillsTable({
       setPrescriptionUrl(result.signedUrl);
       setViewingPrescription(path);
     } else {
-      toast({ title: "Error", description: "Storage access denied.", variant: "destructive" });
+      toast({ title: "ACCESS_DENIED", description: "Protocol storage access restricted.", variant: "destructive" });
     }
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-black tracking-tight text-slate-900">Refill Operations</h1>
-          <p className="text-sm text-slate-500 font-medium">Manage recurring subscriptions and clinical validations.</p>
-        </div>
+    <div className="space-y-16">
+      <div className="px-4">
+        <ActionBar 
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            placeholder="PROTOCOL_SEARCH: FILTER_OPERATIONAL_STREAMS..."
+            className="h-20 rounded-[32px] font-black text-[12px] uppercase tracking-[0.25em] border-none bg-slate-50/50 placeholder:text-slate-200 focus-visible:ring-0 focus-visible:bg-white focus-visible:shadow-2xl shadow-slate-900/5 transition-none"
+        />
       </div>
 
-      <ActionBar 
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        placeholder="Search by code or product..."
-      />
-
-      <Card className="border border-slate-200 shadow-sm overflow-hidden rounded-2xl">
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader className="bg-slate-50/80">
-              <TableRow className="hover:bg-transparent border-slate-200">
-                <TableHead className="w-[50px] pl-6">
-                  <Checkbox 
-                    checked={selectedIds.length === filteredSubs.length && filteredSubs.length > 0}
-                    onCheckedChange={toggleSelectAll}
-                  />
-                </TableHead>
-                <TableHead className="text-[11px] uppercase tracking-widest font-bold text-slate-400 py-4">Subscription</TableHead>
-                <TableHead className="text-[11px] uppercase tracking-widest font-bold text-slate-400 py-4">Patient (Masked)</TableHead>
-                <TableHead className="text-[11px] uppercase tracking-widest font-bold text-slate-400 py-4">Product</TableHead>
-                <TableHead className="text-[11px] uppercase tracking-widest font-bold text-slate-400 py-4">Status & Health</TableHead>
-                <TableHead className="text-[11px] uppercase tracking-widest font-bold text-slate-400 py-4">Fulfillment Partner</TableHead>
-                <TableHead className="text-right pr-6 text-[11px] uppercase tracking-widest font-bold text-slate-400 py-4">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredSubs.map((sub) => {
-                const isUrgent = sub.next_refill_date && isBefore(new Date(sub.next_refill_date), addDays(new Date(), 3));
-                
-                return (
-                  <TableRow 
-                    key={sub.id} 
-                    className={cn(
-                      "group transition-colors border-slate-100",
-                      selectedIds.includes(sub.id) ? "bg-brand-indigo/[0.02]" : "hover:bg-slate-50/50"
-                    )}
-                  >
-                    <TableCell className="pl-6">
-                      <Checkbox 
-                        checked={selectedIds.includes(sub.id)}
-                        onCheckedChange={() => toggleSelect(sub.id)}
-                      />
-                    </TableCell>
-                    <TableCell className="py-4">
-                      <div className="flex flex-col">
-                        <span className="text-xs font-black text-slate-400 tabular-nums uppercase tracking-tighter">{sub.subscription_code}</span>
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                          <Calendar className="h-3 w-3 text-slate-300" />
-                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                            {sub.next_refill_date ? format(new Date(sub.next_refill_date), "MMM d, yyyy") : "Interval Pending"}
-                          </span>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-4">
-                      <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center">
-                          <ShieldCheck className="h-4 w-4 text-slate-400" />
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-sm font-bold text-slate-900 leading-tight">{maskName(sub.user_name || sub.delivery_address?.name)}</span>
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Protected Identifier</span>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-4">
-                      <div className="flex items-center gap-2">
-                        <FlaskConical className="h-3.5 w-3.5 text-brand-indigo" />
-                        <span className="text-sm font-bold text-slate-700">{sub.product_name || "Specialty Item"}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-4">
+      <div className="overflow-hidden px-2">
+        <Table className="min-w-[1500px]">
+          <TableHeader className="bg-slate-50/30 border-b border-slate-50">
+            <TableRow className="border-none hover:bg-transparent">
+              <TableHead className="w-[120px] pl-16 py-12">
+                <Checkbox 
+                  checked={selectedIds.length === filteredSubs.length && filteredSubs.length > 0}
+                  onCheckedChange={toggleSelectAll}
+                  className="rounded-lg h-9 w-9 border-slate-200 bg-white data-[state=checked]:bg-slate-900 data-[state=checked]:border-slate-900 transition-none shadow-sm"
+                />
+              </TableHead>
+              <TableHead className="text-[11px] uppercase tracking-[0.3em] font-black text-slate-400 py-12">CYCLE_IDENTITY_MANIFEST</TableHead>
+              <TableHead className="text-[11px] uppercase tracking-[0.3em] font-black text-slate-400 py-12">NODE_IDENTITY_MASKED</TableHead>
+              <TableHead className="text-[11px] uppercase tracking-[0.3em] font-black text-slate-400 py-12">SKU_DESIGNATION_PULSE</TableHead>
+              <TableHead className="text-[11px] uppercase tracking-[0.3em] font-black text-slate-400 py-12 text-center">OPERATIONAL_STATUS</TableHead>
+              <TableHead className="text-[11px] uppercase tracking-[0.3em] font-black text-slate-400 py-12">FULFILLMENT_NODE_STATION</TableHead>
+              <TableHead className="text-right pr-16 py-12 text-[11px] uppercase tracking-[0.3em] font-black text-slate-400">CONTROL_INTERFACE</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredSubs.map((sub) => {
+              const isUrgent = sub.next_refill_date && isBefore(new Date(sub.next_refill_date), addDays(new Date(), 3));
+              
+              return (
+                <TableRow 
+                  key={sub.id} 
+                  className={cn(
+                    "border-slate-50 group transition-none",
+                    selectedIds.includes(sub.id) ? "bg-slate-50/50" : "hover:bg-slate-50/30"
+                  )}
+                >
+                  <TableCell className="pl-16 py-12">
+                    <Checkbox 
+                      checked={selectedIds.includes(sub.id)}
+                      onCheckedChange={() => toggleSelect(sub.id)}
+                      className="rounded-lg h-9 w-9 border-slate-200 bg-white data-[state=checked]:bg-slate-900 data-[state=checked]:border-slate-900 transition-none shadow-sm"
+                    />
+                  </TableCell>
+                  <TableCell className="py-12">
+                    <div className="flex flex-col gap-3">
+                      <span className="text-sm font-black text-slate-900 uppercase tracking-widest leading-none">{sub.subscription_code}</span>
                       <div className="flex items-center gap-3">
-                        <Badge 
-                          variant="outline" 
-                          className={cn(
-                            "rounded-lg font-bold px-2 py-0.5 uppercase text-[10px] tracking-tight",
-                            sub.status === "active" ? "bg-emerald-50 text-emerald-700 border-emerald-100" :
-                            sub.status === "pending_verification" ? "bg-indigo-50 text-indigo-700 border-indigo-100 animate-pulse" :
-                            "bg-slate-50 text-slate-500 border-slate-200"
-                          )}
-                        >
-                          {sub.status.replace("_", " ")}
-                        </Badge>
-                        {isUrgent && (
-                          <div className="flex items-center gap-1">
-                            <div className="h-2 w-2 rounded-full bg-rose-500 animate-ping" />
-                            <span className="text-[10px] font-black text-rose-600 uppercase">Priority</span>
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-4">
-                      <PharmacyCombobox
-                        subscriptionId={sub.id}
-                        currentPharmacyId={sub.pharmacy_id}
-                        currentPharmacyName={sub.pharmacy?.name}
-                        onAssign={handleAssignPharmacy}
-                        loading={assigningId === sub.id}
-                      />
-                    </TableCell>
-                    <TableCell className="text-right pr-6 py-4">
-                      <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        {sub.prescription_document_url && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-slate-400 hover:text-brand-indigo hover:bg-brand-indigo/5 rounded-lg"
-                            onClick={() => loadPrescription(sub.prescription_document_url!)}
-                          >
-                            <FileText className="h-3.5 w-3.5" />
-                          </Button>
-                        )}
-                        {!sub.prescription_verified && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg"
-                            onClick={() => handleVerify(sub.id, true)}
-                          >
-                            <ShieldCheck className="h-3.5 w-3.5" />
-                          </Button>
-                        )}
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-slate-400 hover:text-slate-900 rounded-lg"
-                        >
-                          <MoreVertical className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-              {filteredSubs.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={7} className="py-20 text-center">
-                    <div className="flex flex-col items-center justify-center space-y-3">
-                      <div className="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center">
-                        <Search className="h-6 w-6 text-slate-300" />
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-sm font-bold text-slate-900">No refill records found</p>
-                        <p className="text-xs text-slate-500">Filters generated 0 results. Try a broader search.</p>
+                        <Calendar className="h-4 w-4 text-slate-200" />
+                        <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest leading-none tabular-nums">
+                          {sub.next_refill_date ? format(new Date(sub.next_refill_date), "MMM dd, yyyy").toUpperCase() : "PENDING_SYNC_SIGNAL"}
+                        </span>
                       </div>
                     </div>
                   </TableCell>
+                  <TableCell className="py-12">
+                    <div className="flex items-center gap-10">
+                      <div className="h-14 w-14 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center shadow-2xl shadow-slate-900/10">
+                        <ShieldCheck className="h-7 w-7 text-brand-teal" />
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <span className="text-sm font-black text-slate-900 uppercase tracking-widest leading-none">{maskName(sub.user_name || sub.delivery_address?.name)}</span>
+                        <span className="text-[10px] font-black text-slate-200 uppercase tracking-widest leading-none">ENCRYPTED_NODE_PROFILE</span>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-12">
+                    <div className="flex items-center gap-4 px-6 py-3 rounded-full bg-slate-50 border border-slate-100 w-fit shadow-sm">
+                      <FlaskConical className="h-5 w-5 text-brand-teal" />
+                      <span className="text-[11px] font-black text-slate-600 uppercase tracking-widest leading-none">{sub.product_name?.toUpperCase() || "SPECIALTY_SKU_NODE"}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-12 text-center">
+                    <div className="flex flex-col items-center gap-4">
+                        <div className={cn(
+                            "flex items-center gap-4 px-6 py-3 rounded-full text-[10px] font-black uppercase tracking-widest border transition-none shadow-sm",
+                            sub.status === "active" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                        )}>
+                             <div className={cn("h-2 w-2 rounded-full", sub.status === "active" ? "bg-emerald-500" : "bg-amber-500")} />
+                             {sub.status.toUpperCase().replace("_", " ")}
+                        </div>
+                        {isUrgent && (
+                          <div className="flex items-center gap-3">
+                            <Activity className="h-4 w-4 text-rose-500 animate-pulse" />
+                            <span className="text-[10px] font-black text-rose-600 uppercase tracking-widest">PRIORITY_STATION_SYNC</span>
+                          </div>
+                        )}
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-12">
+                    <PharmacyCombobox
+                      subscriptionId={sub.id}
+                      currentPharmacyId={sub.pharmacy_id}
+                      currentPharmacyName={sub.pharmacy?.name}
+                      onAssign={handleAssignPharmacy}
+                      loading={assigningId === sub.id}
+                    />
+                  </TableCell>
+                  <TableCell className="text-right pr-16 py-12">
+                    <div className="flex items-center justify-end gap-6">
+                      {sub.prescription_document_url && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-16 w-16 rounded-[24px] bg-slate-50 text-slate-200 hover:text-brand-teal hover:bg-brand-teal/5 transition-none border-none shadow-sm"
+                          onClick={() => loadPrescription(sub.prescription_document_url!)}
+                        >
+                          <FileText className="h-7 w-7" />
+                        </Button>
+                      )}
+                      {!sub.prescription_verified && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-16 w-16 rounded-[24px] bg-slate-50 text-slate-200 hover:text-emerald-600 hover:bg-emerald-50 transition-none border-none shadow-sm"
+                          onClick={() => handleVerify(sub.id, true)}
+                        >
+                          <ShieldCheck className="h-7 w-7" />
+                        </Button>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-16 w-16 rounded-[24px] bg-slate-50 text-slate-200 hover:text-slate-900 transition-none border-none shadow-sm"
+                      >
+                        <MoreVertical className="h-7 w-7" />
+                      </Button>
+                    </div>
+                  </TableCell>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+              );
+            })}
+            {filteredSubs.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={7} className="py-80 text-center bg-slate-50/20 border-none transition-none">
+                  <div className="flex flex-col items-center gap-12">
+                      <div className="h-40 w-40 rounded-[48px] bg-white border border-slate-50 flex items-center justify-center shadow-2xl shadow-slate-900/10">
+                        <ShieldAlert className="h-20 w-20 text-slate-100" />
+                      </div>
+                      <div className="space-y-6">
+                        <h3 className="text-sm font-black text-slate-400 uppercase tracking-[0.4em] leading-none">MATRIX_SCAN_NOMINAL_STATE</h3>
+                        <p className="text-[11px] font-black text-slate-200 uppercase tracking-[0.3em] max-w-lg mx-auto leading-relaxed">No operational refill streams match the current protocol parameters. Synchronize operational parameters to refresh registry lifecycle feed.</p>
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        className="rounded-full h-20 px-20 font-black text-[12px] uppercase tracking-[0.25em] border-slate-100 text-slate-300 hover:bg-slate-900 hover:text-white transition-none gap-6 shadow-2xl shadow-slate-900/5"
+                        onClick={() => setSearchTerm("")}
+                      >
+                        <History className="h-6 w-6" /> RESET_OPERATIONAL_LIFECYCLE_SCAN
+                      </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
 
       <BulkActionsBar 
         selectedCount={selectedIds.length}
         onClear={() => setSelectedIds([])}
         actions={[
-          { label: "Approve Bulk", onClick: () => {}, icon: <CheckCircle className="h-4 w-4" /> },
-          { label: "Cancel Selected", onClick: () => {}, icon: <Trash2 className="h-4 w-4" />, variant: "destructive" }
+          { label: "BATCH_PROVISION_SIGNAL", onClick: () => {}, icon: <CheckCircle className="h-6 w-6" /> },
+          { label: "DECOMMISSION_CYCLE_STATION", onClick: () => {}, icon: <Trash2 className="h-6 w-6" />, variant: "destructive" }
         ]}
       />
 
@@ -427,48 +436,57 @@ export function RefillsTable({
         open={!!viewingPrescription}
         onOpenChange={(o) => !o && setViewingPrescription(null)}
       >
-        <DialogContent className="max-w-4xl rounded-2xl border-none shadow-2xl p-0 overflow-hidden">
-          <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-            <div>
-              <DialogTitle className="text-xl font-black">Clinical Document</DialogTitle>
-              <DialogDescription className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-0.5">Verification & Compliance Review</DialogDescription>
+        <DialogContent className="max-w-[1200px] h-[900px] rounded-[48px] border-none shadow-2xl p-0 overflow-hidden flex flex-col bg-white transition-none">
+          <div className="p-16 border-b border-slate-50 flex items-center justify-between bg-slate-50/30 backdrop-blur-3xl">
+            <div className="flex items-center gap-10">
+                <div className="h-20 w-20 rounded-[32px] bg-slate-900 flex items-center justify-center shadow-2xl shadow-slate-900/30">
+                    <Shield className="h-10 w-10 text-brand-teal" />
+                </div>
+                <div className="space-y-4">
+                    <DialogTitle className="text-4xl font-black text-slate-900 uppercase tracking-tighter leading-none">Clinical_Protocol_Audit</DialogTitle>
+                    <div className="flex items-center gap-6">
+                        <div className="h-2 w-12 bg-brand-teal rounded-full shadow-[0_0_12px_rgba(20,184,166,0.5)]" />
+                        <DialogDescription className="text-[12px] font-black text-slate-400 uppercase tracking-[0.4em] leading-none">Verification & node compliance review audit for operational stream.</DialogDescription>
+                    </div>
+                </div>
             </div>
             {prescriptionUrl && (
-              <Button variant="outline" size="sm" asChild className="rounded-xl font-bold gap-2 bg-white">
+              <Button variant="outline" size="sm" asChild className="rounded-full h-16 px-12 font-black text-[12px] uppercase tracking-widest gap-6 bg-white border-slate-100 shadow-sm hover:bg-slate-900 hover:text-white transition-none border-none">
                 <a href={prescriptionUrl} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="h-3.5 w-3.5" /> Full Resolution
+                  <ExternalLink className="h-6 w-6" /> HIGH_RESOLUTION_MANIFEST
                 </a>
               </Button>
             )}
           </div>
           
-          <div className="aspect-[4/3] bg-slate-900 flex items-center justify-center relative overflow-hidden">
+          <div className="flex-1 bg-slate-950 flex items-center justify-center relative overflow-hidden p-16">
             {prescriptionUrl ? (
               viewingPrescription?.toLowerCase().endsWith(".pdf") ? (
-                <iframe src={prescriptionUrl} className="w-full h-full" title="Document Viewer" />
+                <iframe src={prescriptionUrl} className="w-full h-full rounded-[40px] shadow-2xl" title="Node Asset Viewer" />
               ) : (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={prescriptionUrl} alt="Prescription" className="max-w-full max-h-full object-contain" />
+                <img src={prescriptionUrl} alt="Prescription Assets" className="max-w-full max-h-full object-contain rounded-[40px] shadow-2xl" />
               )
             ) : (
-              <div className="flex flex-col items-center gap-3">
-                <div className="h-8 w-8 border-4 border-slate-700 border-t-white rounded-full animate-spin" />
-                <span className="text-xs font-bold text-slate-500">Decrypting assets...</span>
+              <div className="flex flex-col items-center gap-8">
+                <Loader2 className="h-16 w-16 text-brand-teal animate-spin" />
+                <span className="text-[12px] font-black text-slate-500 uppercase tracking-[0.3em]">DECRYPTING_ASSETS_SYNC...</span>
               </div>
             )}
           </div>
           
-          <div className="p-6 flex items-center justify-end gap-3 bg-slate-50/30">
-            <Button variant="ghost" onClick={() => setViewingPrescription(null)} className="rounded-xl font-bold">Close Preview</Button>
+          <div className="p-16 flex items-center justify-end gap-8 bg-slate-50/30 border-t border-slate-50">
+            <Button variant="ghost" onClick={() => setViewingPrescription(null)} className="rounded-full h-20 px-16 text-[12px] font-black uppercase tracking-widest text-slate-300 hover:bg-slate-50 transition-none border-none">ABORT_PROTOCOL_REVIEW</Button>
             <Button 
                onClick={() => {
                  const currentSubId = subscriptions.find(s => s.prescription_document_url === viewingPrescription)?.id;
                  if (currentSubId) handleVerify(currentSubId, true);
                  setViewingPrescription(null);
                }}
-               className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl px-8 shadow-lg shadow-emerald-600/20"
+               className="bg-brand-teal hover:bg-brand-teal/90 text-white rounded-full h-20 px-20 font-black text-[13px] uppercase tracking-[0.3em] shadow-2xl shadow-brand-teal/40 transition-none border-none gap-8"
             >
-              Approve Document
+              CONFIRM_CLINICAL_COMPLIANCE_SIGNAL
+              <ArrowRight className="h-6 w-6" />
             </Button>
           </div>
         </DialogContent>
@@ -476,4 +494,3 @@ export function RefillsTable({
     </div>
   );
 }
-

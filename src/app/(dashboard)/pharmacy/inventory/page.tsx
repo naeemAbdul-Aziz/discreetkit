@@ -2,7 +2,7 @@ import {
   getPharmacyInventory,
   getPharmacyProductRequests,
 } from "@/lib/pharmacy-actions";
-import { Separator } from "@/components/ui/separator";
+import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import InventoryClient from "./inventory-client";
 
 export default async function PharmacyInventoryPage() {
@@ -10,24 +10,16 @@ export default async function PharmacyInventoryPage() {
   const requests = await getPharmacyProductRequests();
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">
-          Inventory Management
-        </h1>
-        <p className="text-muted-foreground">
-          Manage your product availability and stock levels.
-        </p>
-      </div>
-
-      <Separator />
-
-      {/* Pass data to client component for interactivity */}
+    <DashboardShell
+        title="Inventory Registry"
+        subtitle="Manage product availability and operational stock levels"
+        breadcrumbs={[{ label: 'PHARMACY_ROOT', href: '/pharmacy/dashboard' }, { label: 'INVENTORY_REGISTRY' }]}
+    >
       <InventoryClient
         products={products}
         pharmacyId={pharmacyId}
         requests={requests}
       />
-    </div>
+    </DashboardShell>
   );
 }
