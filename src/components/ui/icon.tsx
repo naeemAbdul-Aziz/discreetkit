@@ -19,6 +19,7 @@ export function Icon({
   grade = 0,
   opticalSize = 24,
   className,
+  style,
   ...props
 }: IconProps) {
   return (
@@ -32,6 +33,10 @@ export function Icon({
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
+        overflow: 'hidden',
+        whiteSpace: 'nowrap',
+        fontFamily: 'Material Symbols Outlined',
+        ...style
       }}
       {...props}
     >
