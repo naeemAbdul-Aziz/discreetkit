@@ -32,6 +32,10 @@ export function Icon({
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
+        overflow: 'hidden',
+        whiteSpace: 'nowrap',
+        fontFamily: 'Material Symbols Outlined',
+        ...style
       }}
       {...props}
     >

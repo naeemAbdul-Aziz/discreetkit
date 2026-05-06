@@ -124,6 +124,8 @@ export default function RootLayout({
           href="https://www.googletagmanager.com"
           crossOrigin="anonymous"
         />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
 
         {/* DNS prefetch for faster lookups */}
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
@@ -145,11 +147,11 @@ export default function RootLayout({
         {/* Tracking Scripts */}
         <TrackingScripts />
 
-        {/* Material Symbols Outlined */}
+        {/* Material Symbols Outlined - Variable Font */}
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-25..0&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-25..0&display=block"
         />
       </head>
       <body
