@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { getOperationsStats, getLiveDeliveries } from "@/lib/admin-actions";
-import OpsMetrics from "./ops-metrics";
+import OpsMetrics from "./ops-metrics-grid";
 import LiveDeliveriesTable from "./live-deliveries-table";
 import { RefreshButton } from "./refresh-button";
 import { Skeleton } from "@/components/ui/skeleton";
