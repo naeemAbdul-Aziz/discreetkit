@@ -115,6 +115,7 @@ export function DashboardSidebar() {
       const baseItems = [
         { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
         { href: "/admin/analytics", label: "Analytics", icon: BarChart },
+        { href: "/admin/operations", label: "Operations", icon: Radar },
         { href: "/admin/operations/logs", label: "Ledger", icon: ClipboardCheck },
         { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
         { href: "/admin/products", label: "Products", icon: Package },
@@ -149,6 +150,7 @@ export function DashboardSidebar() {
     const baseItems = [
       { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
       { href: "/admin/analytics", label: "Analytics", icon: BarChart },
+      { href: "/admin/operations", label: "Operations", icon: Radar },
       { href: "/admin/operations/logs", label: "Ledger", icon: ClipboardCheck },
       { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
       { href: "/admin/products", label: "Products", icon: Package },
