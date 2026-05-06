@@ -19,6 +19,7 @@ export function Icon({
   grade = 0,
   opticalSize = 24,
   className,
+  style,
   ...props
 }: IconProps) {
   return (
