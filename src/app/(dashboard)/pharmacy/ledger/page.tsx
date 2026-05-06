@@ -1,50 +1,57 @@
 import { Suspense } from "react";
 import { getOperationalLedger } from "@/lib/admin-actions";
 import { LedgerTable } from "@/components/dashboard/ledger-table";
-import { Breadcrumbs } from "@/components/ui/breadcrumbs";
-import { Loader2, Download, ShieldCheck } from "lucide-react";
+import { DashboardShell } from "@/components/dashboard/dashboard-shell";
+import { Download, ShieldCheck, Zap, History, Clock, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createSupabaseServerClient } from "@/lib/supabase";
+import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function PharmacyLedgerPage() {
     return (
-        <div className="max-w-7xl mx-auto p-4 md:p-12 space-y-8 animate-in fade-in duration-700">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="space-y-1">
-                    <h1 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 uppercase tracking-widest">
-                        Operational Ledger
-                    </h1>
-                    <p className="text-[10px] uppercase font-bold text-slate-400 tracking-[0.2em] flex items-center gap-2">
-                        <ShieldCheck className="h-3 w-3" />
-                        Confidential Audit Trail & Financial Log
-                    </p>
-                </div>
-
-                <Button className="h-12 px-6 rounded-2xl bg-brand-teal hover:bg-brand-teal/90 text-white font-black text-xs uppercase tracking-widest gap-2 shadow-xl shadow-brand-teal/20">
-                    <Download className="h-4 w-4" />
-                    Export Reconciliations
+        <DashboardShell
+            title="OPERATIONAL_ARCHIVE"
+            subtitle="Confidential audit trail & financial synchronization log"
+            breadcrumbs={[{ label: 'PHARMACY_ROOT', href: '/pharmacy/dashboard' }, { label: 'OPERATIONAL_ARCHIVE' }]}
+            headerAction={
+                <Button className="h-16 px-12 rounded-full bg-slate-900 hover:bg-slate-800 text-white font-black text-[11px] uppercase tracking-widest gap-5 shadow-2xl shadow-slate-900/20 transition-none border-none">
+                    <Download className="h-5 w-5 text-brand-teal" />
+                    EXPORT_LEDGER_DATA
                 </Button>
-            </div>
-
+            }
+        >
             <Suspense fallback={
-                <div className="flex flex-col items-center justify-center py-40 gap-4">
-                    <Loader2 className="h-10 w-10 text-brand-teal animate-spin" />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Syncing unit logs...</p>
+                <div className="flex flex-col items-center justify-center py-60 gap-10 bg-slate-50/10 rounded-3xl border border-dashed border-slate-100">
+                    <div className="flex items-center gap-6">
+                        <div className="h-3 w-3 rounded-full bg-brand-teal shadow-[0_0_12px_rgba(20,184,166,0.6)]" />
+                        <p className="text-sm font-black uppercase tracking-[0.3em] text-slate-400">SYNCHRONIZING_ARCHIVE_DATA...</p>
+                    </div>
+                    <p className="text-[11px] font-black uppercase tracking-[0.25em] text-slate-200">Reconciling historical node telemetry and fiscal logs</p>
                 </div>
             }>
                 <PharmacyLedgerLoader />
             </Suspense>
-        </div>
+        </DashboardShell>
     );
 }
 
 async function PharmacyLedgerLoader() {
     const supabase = await createSupabaseServerClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return <div className="p-20 text-center font-bold text-slate-400 uppercase tracking-widest">Unauthorized Access</div>;
+    if (!user) return (
+        <div className="flex flex-col items-center justify-center py-80 gap-12 bg-rose-50/10 rounded-3xl border border-dashed border-rose-100">
+            <div className="h-32 w-32 rounded-3xl bg-white border border-rose-100 flex items-center justify-center shadow-2xl shadow-rose-500/5">
+                <ShieldAlert className="h-16 w-16 text-rose-500" />
+            </div>
+            <div className="text-center space-y-4">
+                <p className="text-sm font-black text-rose-500 uppercase tracking-widest leading-none">PROTOCOL_FAILURE: UNAUTHORIZED</p>
+                <p className="text-[11px] font-black text-rose-200 uppercase tracking-[0.25em]">Unauthorized terminal access detected. Protocol aborted.</p>
+            </div>
+        </div>
+    );
 
     const { data: pharmacy } = await supabase
         .from('pharmacies')
@@ -52,8 +59,22 @@ async function PharmacyLedgerLoader() {
         .eq('user_id', user.id)
         .single();
 
-    if (!pharmacy) return <div className="p-20 text-center font-bold text-slate-400 uppercase tracking-widest">Pharmacy Profile Not Found</div>;
+    if (!pharmacy) return (
+        <div className="flex flex-col items-center justify-center py-80 gap-12 bg-slate-50/20 rounded-3xl border border-dashed border-slate-100">
+            <div className="h-32 w-32 rounded-3xl bg-white border border-slate-100 flex items-center justify-center shadow-2xl shadow-slate-900/5">
+                <History className="h-16 w-16 text-slate-100" />
+            </div>
+            <div className="text-center space-y-4">
+                <p className="text-sm font-black text-slate-400 uppercase tracking-widest leading-none">REGISTRY_FAILURE: NODE_MISSING</p>
+                <p className="text-[11px] font-black text-slate-200 uppercase tracking-[0.25em]">Node registry identity not found in master directory.</p>
+            </div>
+        </div>
+    );
 
     const entries = await getOperationalLedger(pharmacy.id);
-    return <LedgerTable entries={entries} showPharmacy={false} />;
+    return (
+        <div className="rounded-3xl border border-slate-100 bg-white shadow-2xl shadow-slate-900/5 overflow-hidden transition-none p-12">
+            <LedgerTable entries={entries} showPharmacy={false} hideControls />
+        </div>
+    );
 }

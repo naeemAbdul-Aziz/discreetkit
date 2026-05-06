@@ -16,6 +16,15 @@ import {
   GanttChartSquare,
   MessageSquare,
   Info,
+  ShieldCheck,
+  Terminal,
+  Zap,
+  Activity,
+  History,
+  Map,
+  Repeat,
+  ArrowRight,
+  ShieldAlert
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -62,7 +71,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("incoming");
   const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 5;
+  const ITEMS_PER_PAGE = 10;
   const [loading, setLoading] = useState<{
     id: number;
     action: string;
@@ -99,13 +108,10 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
     action: string,
     data: any = {},
   ) => {
-    // Optimistic UI: Immediately hide or update based on action
     if (action === "acknowledge") {
        setHiddenOrderIds(prev => new Set(prev).add(id));
     }
 
-    // Only set loading for specific action if it's a button click (not internal)
-    // We map 'acknowledge' -> 'accept'/'decline' based on data for better granularity
     let actionType = action;
     if (action === "acknowledge") {
       actionType =
@@ -126,7 +132,6 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
       const result = await res.json();
 
       if (!res.ok) {
-        // Rollback optimistic hide on error
         if (action === "acknowledge") {
            setHiddenOrderIds(prev => {
               const next = new Set(prev);
@@ -137,46 +142,42 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
         throw new Error(result.error || "Failed to update order");
       }
 
-      // Show specific success message based on action
       const messages: Record<string, { title: string; description: string }> = {
         accept: {
-          title: "Order Accepted",
-          description: "You can now prepare this order for delivery",
+          title: "PROTOCOL_ACCEPTED",
+          description: "Syncing fulfillment stream to active state.",
         },
         decline: {
-          title: "Order Declined",
-          description: "The order has been unassigned from your pharmacy",
+          title: "PROTOCOL_DECLINED",
+          description: "Node unassigned. Redirecting stream back to root.",
         },
         out_for_delivery: {
-          title: "Out for Delivery",
-          description: "Customer will be notified of the shipment",
+          title: "STREAM_TRANSIT",
+          description: "Logistics node provisioned and in motion.",
         },
         completed: {
-          title: "Order Completed",
-          description: "Great job! The order has been marked as delivered",
+          title: "STREAM_FINALIZED",
+          description: "Fulfillment confirmed. Logging to history.",
         },
       };
 
       const message = messages[actionType] || {
-        title: "Success",
-        description: "Order updated successfully",
+        title: "SYNC_SUCCESS",
+        description: "Node registry updated successfully.",
       };
       toast({
         title: message.title,
         description: message.description,
       });
 
-      // Trigger parent refetch
       onOrderUpdate?.();
-
-      // Clear loading immediately after parent refetch is triggered
       setLoading(null);
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Error",
+        title: "PROTOCOL_FAILURE",
         description:
-          error instanceof Error ? error.message : "Failed to update order",
+          error instanceof Error ? error.message : "Sync failure in stream update.",
       });
       setLoading(null);
     }
@@ -197,8 +198,8 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
     if (!selectedId || !declineReason.trim()) {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Please provide a reason",
+        title: "INPUT_FAILURE",
+        description: "Operational reason required for protocol rejection.",
       });
       return;
     }
@@ -224,67 +225,39 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
   };
 
   const getStatusBadge = (status: string, ackStatus?: string) => {
-    // New assignment - needs accept/decline
     if (status === "received" && ackStatus === "pending") {
       return (
-        <Badge className="gap-1.5 bg-sky-100 text-sky-700 border-sky-200 hover:bg-sky-100 hover:text-sky-700 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none pointer-events-none">
-          <div className="h-1.5 w-1.5 rounded-full bg-sky-500" />
-          Queueing: Inbound
-        </Badge>
+        <div className="flex items-center gap-3 px-5 py-2 rounded-full bg-slate-50 text-slate-400 border border-slate-100 shadow-sm">
+          <div className="h-2 w-2 rounded-full bg-slate-300" />
+          <span className="text-[10px] font-black uppercase tracking-widest">INCOMING_QUEUE</span>
+        </div>
       );
     }
 
-    // Just accepted - preparing order
     if (status === "processing" && ackStatus === "accepted") {
       return (
-        <Badge className="gap-1.5 bg-indigo-100 text-indigo-700 border-indigo-200 hover:bg-indigo-100 hover:text-indigo-700 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none pointer-events-none">
-          <Package className="h-3 w-3" />
-          Internal Prep
-        </Badge>
+        <div className="flex items-center gap-3 px-5 py-2 rounded-full bg-brand-teal/10 text-brand-teal border border-brand-teal/20 shadow-sm">
+          <Package className="h-4 w-4" />
+          <span className="text-[10px] font-black uppercase tracking-widest">STAGING_READY</span>
+        </div>
       );
     }
 
-    const variants: Record<
-      string,
-      {
-        label: string;
-        icon?: any;
-        className?: string;
-      }
-    > = {
-      received: { 
-        label: "New Inbound", 
-        className: "bg-sky-100 text-sky-700 border-sky-200 hover:bg-sky-100 hover:text-sky-700 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none pointer-events-none" 
-      },
-      processing: { 
-        label: "Internal Prep", 
-        className: "bg-indigo-100 text-indigo-700 border-indigo-200 hover:bg-indigo-100 hover:text-indigo-700 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none pointer-events-none" 
-      },
-      out_for_delivery: { 
-        label: "Outbound", 
-        className: "bg-amber-100 text-amber-700 border-amber-200 hover:bg-amber-100 hover:text-amber-700 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none pointer-events-none" 
-      },
-      completed: { 
-        label: "Completed", 
-        className: "bg-emerald-100 text-emerald-700 border-emerald-200 hover:bg-emerald-100 hover:text-emerald-700 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none pointer-events-none" 
-      },
-      cancelled: { 
-        label: "Aborted", 
-        className: "bg-rose-100 text-rose-700 border-rose-200 hover:bg-rose-100 hover:text-rose-700 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none pointer-events-none" 
-      },
+    const variants: Record<string, { label: string; color: string; icon?: any }> = {
+      received: { label: "INBOUND", color: "bg-slate-50 text-slate-400" },
+      processing: { label: "STAGING", color: "bg-brand-teal/10 text-brand-teal", icon: Package },
+      out_for_delivery: { label: "TRANSIT", color: "bg-amber-50 text-amber-600", icon: Truck },
+      completed: { label: "FINALIZED", color: "bg-emerald-50 text-emerald-600", icon: ShieldCheck },
+      cancelled: { label: "ABORTED", color: "bg-rose-50 text-rose-500", icon: XCircle },
     };
-    const config = variants[status] || { label: status, className: "font-bold uppercase text-[9px] tracking-widest border-slate-200 bg-slate-100 text-slate-500 shadow-none pointer-events-none" };
-    return <Badge className={config.className}>{config.label}</Badge>;
-  };
-
-  if (!orders || orders.length === 0) {
+    const config = variants[status] || { label: status.toUpperCase(), color: "border border-slate-100 text-slate-300" };
     return (
-      <div className="text-center py-12 text-muted-foreground">
-        <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
-        <p>No orders assigned yet</p>
+      <div className={cn("flex items-center gap-3 px-5 py-2 rounded-full shadow-sm", config.color)}>
+        {config.icon && <config.icon className="h-4 w-4" />}
+        <span className="text-[10px] font-black uppercase tracking-widest">{config.label}</span>
       </div>
     );
-  }
+  };
 
   const activeOrders = orders.filter(
     (o) => o.pharmacy_ack_status !== "declined" && !hiddenOrderIds.has(o.id),
@@ -298,11 +271,14 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
   const renderPaginatedList = (list: Order[], emptyMessage: string, EmptyIcon: any) => {
     if (list.length === 0) {
       return (
-        <div className="flex flex-col items-center justify-center py-20 bg-slate-50/50 rounded-[2.5rem] border border-dashed border-slate-200">
-          <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-4">
-            <EmptyIcon className="h-8 w-8 text-slate-200" />
+        <div className="flex flex-col items-center justify-center py-60 bg-slate-50/20 rounded-3xl border border-dashed border-slate-100">
+          <div className="h-24 w-24 rounded-3xl bg-white border border-slate-100 flex items-center justify-center shadow-2xl shadow-slate-900/5 mb-10">
+            <EmptyIcon className="h-12 w-12 text-slate-100" />
           </div>
-          <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">{emptyMessage}</p>
+          <div className="text-center space-y-4">
+            <h3 className="text-[12px] font-black text-slate-400 uppercase tracking-[0.3em] leading-none">MATRIX_SCAN_NOMINAL</h3>
+            <p className="text-[10px] font-black text-slate-200 uppercase tracking-widest leading-none">{emptyMessage.toUpperCase()}</p>
+          </div>
         </div>
       );
     }
@@ -311,32 +287,40 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
     const paginatedList = list.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
     return (
-      <div className="space-y-4">
-        {paginatedList.map(order => <OrderCard key={order.id} order={order} />)}
+      <div className="space-y-6">
+        <div className="grid gap-6">
+            {paginatedList.map(order => <OrderCard key={order.id} order={order} />)}
+        </div>
         
         {totalPages > 1 && (
-          <div className="flex items-center justify-between pt-4 pb-2 px-2">
-            <p className="text-xs font-medium text-slate-500">
-              Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, list.length)} of {list.length}
-            </p>
-            <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between pt-16 px-2">
+            <div className="flex items-center gap-6">
+                <span className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-300">FRAME_DENSITY</span>
+                <div className="h-12 px-8 rounded-full bg-slate-50 border border-slate-100 flex items-center text-[11px] font-black text-slate-900 tabular-nums shadow-sm">
+                    {Math.min(currentPage * ITEMS_PER_PAGE, list.length)} / {list.length}
+                </div>
+            </div>
+            <div className="flex items-center gap-6">
               <Button
                 variant="outline"
-                size="sm"
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="h-8 rounded-lg text-xs"
+                className="h-14 rounded-full font-black text-[11px] uppercase tracking-widest px-10 border-slate-100 text-slate-400 hover:bg-slate-900 hover:text-white transition-none shadow-sm"
               >
-                Previous
+                PREVIOUS_FRAME
               </Button>
+              <div className="flex items-center gap-4 px-8 h-14 bg-slate-50/50 rounded-2xl border border-slate-100 shadow-sm">
+                <span className="text-[12px] font-black text-slate-900">{currentPage}</span>
+                <span className="text-[10px] font-black text-slate-200">/</span>
+                <span className="text-[12px] font-black text-slate-400">{totalPages}</span>
+              </div>
               <Button
                 variant="outline"
-                size="sm"
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="h-8 rounded-lg text-xs"
+                className="h-14 rounded-full font-black text-[11px] uppercase tracking-widest px-10 border-slate-100 text-slate-400 hover:bg-slate-900 hover:text-white transition-none shadow-sm"
               >
-                Next
+                NEXT_FEED
               </Button>
             </div>
           </div>
@@ -360,111 +344,125 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
     };
 
     const late = isLate();
-    const isCompleted = order.status === "completed";
 
     return (
       <Card
-        className="p-5 shadow-sm border border-slate-200 bg-white rounded-2xl cursor-pointer"
+        className="p-12 border border-slate-100 bg-white rounded-3xl transition-none cursor-pointer group/card hover:bg-slate-50/50 shadow-2xl shadow-slate-900/5"
         onClick={() => handleViewDetails(order)}
       >
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div className="flex-1 space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="font-mono font-black text-slate-900 tracking-tighter text-lg">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-12">
+          <div className="flex-1 space-y-10">
+            <div className="flex items-center gap-6">
+              <span className="font-black text-slate-900 tracking-tighter text-3xl uppercase leading-none">
                 {order.code}
               </span>
               {(activeTab === "all" || order.status === "completed") && getStatusBadge(order.status, order.pharmacy_ack_status)}
               {late && (
-                <Badge className="bg-rose-600 text-white border-none hover:bg-rose-600 px-1.5 py-0 text-[9px] font-black tracking-widest uppercase shadow-none pointer-events-none">URGENT</Badge>
+                <div className="px-6 py-2.5 rounded-full bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest shadow-2xl shadow-rose-500/30">
+                    CRITICAL_DELAY
+                </div>
               )}
             </div>
             
-            <div className="text-[13px] font-medium text-slate-500 space-y-1.5 pl-4 border-l-2 border-slate-100">
-              <p className="flex items-center gap-2">
-                <MapPin className="h-3.5 w-3.5 text-slate-400" />
-                {order.delivery_area || "Not specified"}
-              </p>
-              <p className="flex items-center gap-2 font-bold text-slate-800">
-                <GanttChartSquare className="h-3.5 w-3.5 text-slate-400" />
-                {itemCount} Items • ₵{Number(order.total_price_ghs || 0).toFixed(2)}
-              </p>
-              <p className="text-[11px] flex items-center gap-2 opacity-60">
-                <Clock className="h-3.5 w-3.5" />
-                Received {new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {new Date(order.created_at).toLocaleDateString()}
-              </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div className="space-y-4">
+                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest leading-none">LOGISTICS_NODE</p>
+                    <div className="flex items-center gap-4">
+                        <Map className="h-5 w-5 text-slate-200" />
+                        <span className="text-base font-black text-slate-900 uppercase tracking-widest leading-none">{order.delivery_area || "UNIVERSAL_SECTOR"}</span>
+                    </div>
+                </div>
+                <div className="space-y-4">
+                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest leading-none">PAYLOAD_MATRIX</p>
+                    <div className="flex items-center gap-4">
+                        <Package className="h-5 w-5 text-slate-200" />
+                        <span className="text-base font-black text-slate-900 uppercase tracking-widest tabular-nums leading-none">{itemCount} SKUs • ₵{Number(order.total_price_ghs || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                    </div>
+                </div>
+                <div className="space-y-4">
+                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest leading-none">SYNCHRONIZED_PULSE</p>
+                    <div className="flex items-center gap-4">
+                        <Clock className="h-5 w-5 text-slate-200" />
+                        <span className="text-base font-black text-slate-400 uppercase tracking-widest tabular-nums leading-none">
+                            {new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }).toUpperCase()}
+                        </span>
+                    </div>
+                </div>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-5 shrink-0">
             {order.status === "received" && order.pharmacy_ack_status === "pending" ? (
               <>
                 <Button
                   size="lg"
-                  className="h-12 px-8 bg-brand-teal hover:bg-brand-teal-dark font-black text-sm gap-2 shadow-sm shadow-brand-teal/10"
+                  className="bg-slate-900 hover:bg-slate-800 text-white font-black text-[11px] uppercase tracking-widest gap-4 rounded-full px-12 h-16 border-none shadow-2xl shadow-slate-900/20 transition-none"
                   onClick={(e) => { e.stopPropagation(); handleAccept(order.id); }}
                   disabled={acceptLoading}
                 >
-                  {acceptLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
-                  Accept Order
+                  {acceptLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <ShieldCheck className="h-5 w-5 text-brand-teal" />}
+                  EXECUTE_PROTOCOL
                 </Button>
                 <Button
                   size="lg"
                   variant="outline"
-                  className="h-12 px-5 border-rose-100 text-rose-600 hover:bg-rose-50 font-bold text-sm gap-2"
+                  className="border-slate-100 text-slate-400 hover:bg-rose-50 hover:text-rose-500 font-black text-[11px] uppercase tracking-widest gap-4 rounded-full px-12 h-16 transition-none shadow-sm"
                   onClick={(e) => { e.stopPropagation(); handleDeclineClick(order.id); }}
                   disabled={declineLoading}
                 >
-                  <XCircle className="h-4 w-4" />
-                  Decline
+                  <XCircle className="h-5 w-5" />
+                  DECLINE
                 </Button>
               </>
             ) : order.status === "processing" ? (
               <Button
                 size="lg"
-                className="h-12 px-10 bg-brand-teal hover:bg-brand-teal-dark font-black text-sm gap-2 shadow-sm shadow-brand-teal/10"
+                className="bg-slate-900 hover:bg-slate-800 text-white font-black text-[11px] uppercase tracking-widest gap-4 rounded-full px-16 h-16 border-none shadow-2xl shadow-slate-900/20 transition-none"
                 onClick={(e) => { e.stopPropagation(); handleMarkOutForDelivery(order.id); }}
               >
-                <Truck className="h-5 w-5" />
-                Dispatch Order
+                <Truck className="h-6 w-6 text-brand-teal" />
+                DISPATCH_NODE
               </Button>
             ) : order.status === "out_for_delivery" ? (
               <Button
                 size="lg"
-                className="h-12 px-10 bg-emerald-600 hover:bg-emerald-700 font-black text-sm gap-2 shadow-sm shadow-emerald-600/10"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[11px] uppercase tracking-widest gap-4 rounded-full px-16 h-16 border-none shadow-2xl shadow-emerald-600/20 transition-none"
                 onClick={(e) => { e.stopPropagation(); handleMarkCompleted(order.id); }}
               >
-                <CheckCircle className="h-5 w-5" />
-                Confirm Delivery
+                <ShieldCheck className="h-6 w-6" />
+                FINALIZE_DELIVERY
               </Button>
             ) : (
               <Button
                 size="lg"
                 variant="ghost"
-                className="h-12 px-8 text-slate-400 font-bold text-sm gap-2"
+                className="text-slate-200 font-black text-[11px] uppercase tracking-widest gap-4 rounded-full px-12 h-16 transition-none"
                 disabled
               >
-                <CheckCircle className="h-5 w-5" />
-                Completed
+                <ShieldCheck className="h-6 w-6" />
+                FINALIZED
               </Button>
             )}
             
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={(e) => handleOpenChat(e, order.id)}
-              className="h-12 w-12 text-slate-400 hover:text-brand-indigo rounded-xl bg-slate-50/50 hover:bg-brand-indigo/5"
-            >
-              <MessageSquare className="h-5 w-5" />
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={(e) => handleOpenChat(e, order.id)}
+                className="text-slate-300 hover:text-slate-900 h-16 w-16 rounded-full bg-slate-50/50 hover:bg-white border border-slate-100 hover:border-slate-200 transition-none shadow-sm"
+              >
+                <MessageSquare className="h-6 w-6" />
+              </Button>
 
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={(e) => { e.stopPropagation(); handleViewDetails(order); }}
-              className="h-12 w-12 text-slate-400 hover:text-slate-900 rounded-xl"
-            >
-              <Eye className="h-5 w-5" />
-            </Button>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={(e) => { e.stopPropagation(); handleViewDetails(order); }}
+                className="text-slate-300 hover:text-slate-900 h-16 w-16 rounded-full bg-slate-50/50 hover:bg-white border border-slate-100 hover:border-slate-200 transition-none shadow-sm"
+              >
+                <Eye className="h-6 w-6" />
+              </Button>
+            </div>
           </div>
         </div>
       </Card>
@@ -472,100 +470,106 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
   };
 
   return (
-    <>
-      <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); setCurrentPage(1); }} className="w-full space-y-8">
-        <div className="flex items-center justify-center sm:justify-start">
-          <TabsList className="bg-slate-200/40 p-1.5 rounded-[20px] h-14 border-none gap-1 shadow-inner">
+    <div className="p-12">
+      <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); setCurrentPage(1); }} className="w-full space-y-16">
+        <div className="flex items-center justify-center lg:justify-start">
+          <TabsList className="bg-slate-50 p-2.5 rounded-full h-20 border border-slate-100 gap-3 shadow-sm">
             <TabsTrigger 
               value="incoming" 
-              className="rounded-full px-6 h-11 font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xl data-[state=active]:shadow-slate-200/50 text-slate-500 hover:text-slate-700"
+              className="rounded-full px-12 h-14 font-black text-[12px] uppercase tracking-[0.2em] data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-2xl shadow-slate-900/10 text-slate-400 transition-none"
             >
-              Incoming
+              INBOUND
               {queueOrders.length > 0 && (
-                <span className="ml-2 h-5 min-w-[1.25rem] px-1.5 flex items-center justify-center rounded-full bg-brand-teal text-white text-[10px] font-black">
+                <span className="ml-5 h-6 min-w-[1.5rem] px-2.5 flex items-center justify-center rounded-full bg-brand-teal text-white text-[10px] font-black shadow-2xl shadow-brand-teal/20">
                   {queueOrders.length}
                 </span>
               )}
             </TabsTrigger>
             <TabsTrigger 
               value="preparing" 
-              className="rounded-full px-6 h-11 font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xl data-[state=active]:shadow-slate-200/50 text-slate-500 hover:text-slate-700"
+              className="rounded-full px-12 h-14 font-black text-[12px] uppercase tracking-[0.2em] data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-2xl shadow-slate-900/10 text-slate-400 transition-none"
             >
-              Preparing
+              STAGING
               {processingOrders.length > 0 && (
-                <span className="ml-2 h-5 min-w-[1.25rem] px-1.5 flex items-center justify-center rounded-full bg-brand-indigo text-white text-[10px] font-black">
+                <span className="ml-5 h-6 min-w-[1.5rem] px-2.5 flex items-center justify-center rounded-full bg-brand-teal text-white text-[10px] font-black shadow-2xl shadow-brand-teal/20">
                   {processingOrders.length}
                 </span>
               )}
             </TabsTrigger>
             <TabsTrigger 
               value="outbound" 
-              className="rounded-full px-6 h-11 font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xl data-[state=active]:shadow-slate-200/50 text-slate-500 hover:text-slate-700"
+              className="rounded-full px-12 h-14 font-black text-[12px] uppercase tracking-[0.2em] data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-2xl shadow-slate-900/10 text-slate-400 transition-none"
             >
-              Outbound
+              TRANSIT
+              {inTransitOrders.length > 0 && (
+                <span className="ml-5 h-6 min-w-[1.5rem] px-2.5 flex items-center justify-center rounded-full bg-amber-500 text-white text-[10px] font-black shadow-2xl shadow-amber-500/20">
+                  {inTransitOrders.length}
+                </span>
+              )}
             </TabsTrigger>
             <TabsTrigger 
               value="completed" 
-              className="rounded-full px-6 h-11 font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xl data-[state=active]:shadow-slate-200/50 text-slate-500 hover:text-slate-700"
+              className="rounded-full px-12 h-14 font-black text-[12px] uppercase tracking-[0.2em] data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-2xl shadow-slate-900/10 text-slate-400 transition-none"
             >
-              Completed
-            </TabsTrigger>
-            <TabsTrigger 
-              value="all" 
-              className="rounded-full px-6 h-11 font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xl data-[state=active]:shadow-slate-200/50 text-slate-500 hover:text-slate-700"
-            >
-              All
+              ARCHIVE
             </TabsTrigger>
           </TabsList>
         </div>
 
-        <TabsContent value="incoming" className="animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
-          {renderPaginatedList(queueOrders, "No Incoming Requests", Clock)}
+        <TabsContent value="incoming" className="focus-visible:outline-none outline-none">
+          {renderPaginatedList(queueOrders, "No inbound node traffic detected.", Clock)}
         </TabsContent>
 
-        <TabsContent value="preparing" className="animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
-          {renderPaginatedList(processingOrders, "Nothing in Preparation", Package)}
+        <TabsContent value="preparing" className="focus-visible:outline-none outline-none">
+          {renderPaginatedList(processingOrders, "Preparation bench clear. All staging nodes empty.", Package)}
         </TabsContent>
 
-        <TabsContent value="outbound" className="animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
-          {renderPaginatedList(inTransitOrders, "No Outbound Operations", Truck)}
+        <TabsContent value="outbound" className="focus-visible:outline-none outline-none">
+          {renderPaginatedList(inTransitOrders, "No active logistics shipments detected.", Truck)}
         </TabsContent>
 
-        <TabsContent value="completed" className="animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
-          {renderPaginatedList(completedOrders, "No Dispatch History", CheckCircle)}
-        </TabsContent>
-
-        <TabsContent value="all" className="animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
-          {renderPaginatedList(activeOrders, "No Records Found", Info)}
+        <TabsContent value="completed" className="focus-visible:outline-none outline-none">
+          {renderPaginatedList(completedOrders, "Archive stream empty. No historical logs.", History)}
         </TabsContent>
       </Tabs>
 
       <AlertDialog open={declineDialogOpen} onOpenChange={setDeclineDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Decline Order</AlertDialogTitle>
-            <AlertDialogDescription>
-              Please provide a reason for declining this order. This will be
-              logged and the order will be unassigned from your pharmacy.
-            </AlertDialogDescription>
+        <AlertDialogContent className="rounded-3xl border-none shadow-2xl p-16 bg-white transition-none max-w-2xl">
+          <AlertDialogHeader className="space-y-10">
+            <div className="h-20 w-20 rounded-3xl bg-rose-50 flex items-center justify-center border border-rose-100 shadow-2xl shadow-rose-500/5">
+                <ShieldAlert className="h-10 w-10 text-rose-500" />
+            </div>
+            <div className="space-y-4">
+                <AlertDialogTitle className="text-4xl font-black text-slate-900 uppercase tracking-tighter leading-none">Protocol Decline</AlertDialogTitle>
+                <AlertDialogDescription className="text-[11px] font-black text-slate-400 uppercase tracking-[0.25em] leading-none">Operational rejection of fulfillment stream.</AlertDialogDescription>
+            </div>
           </AlertDialogHeader>
-          <Textarea
-            placeholder="Reason for declining (e.g., out of stock, unable to fulfill)"
-            value={declineReason}
-            onChange={(e) => setDeclineReason(e.target.value)}
-            className="min-h-[100px]"
-          />
-          <AlertDialogFooter>
+          <div className="py-12 space-y-8">
+              <p className="text-sm font-black text-slate-600 leading-relaxed uppercase tracking-tight">
+                Provide a valid operational discrepancy reason for rejecting this protocol. This action will unassign the node and log the event to root history.
+              </p>
+              <Textarea
+                placeholder="REASON_CODE (E.G. STOCK_DEPLETION_CRITICAL)"
+                value={declineReason}
+                onChange={(e) => setDeclineReason(e.target.value)}
+                className="min-h-[180px] rounded-3xl border-slate-100 bg-slate-50/50 font-black text-sm uppercase tracking-widest px-8 py-8 leading-relaxed resize-none shadow-sm"
+              />
+          </div>
+          <AlertDialogFooter className="gap-6 pt-12 border-t border-slate-50">
             <AlertDialogCancel
+              className="rounded-full h-16 px-12 font-black text-[11px] uppercase tracking-widest text-slate-400 hover:bg-slate-50 transition-none border-none shadow-sm"
               onClick={() => {
                 setDeclineReason("");
                 setSelectedId(null);
               }}
             >
-              Cancel
+              ABORT_ACTION
             </AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeclineConfirm}>
-              Confirm Decline
+            <AlertDialogAction 
+              onClick={handleDeclineConfirm}
+              className="bg-rose-600 hover:bg-rose-700 text-white rounded-full h-16 px-16 font-black text-[11px] uppercase tracking-widest shadow-2xl shadow-rose-600/20 transition-none border-none"
+            >
+              CONFIRM_DECLINE
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -593,26 +597,31 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
         onOpenChange={setDeliveryDialogOpen}
         onSuccess={() => {
           onOrderUpdate?.();
-          setDetailsSheetOpen(false); // Close details if open, to show list update or just refresh
+          setDetailsSheetOpen(false); 
         }}
       />
 
       {/* Chat Dialog */}
       <Dialog open={chatDialogOpen} onOpenChange={setChatDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] border-none bg-white p-0 overflow-hidden rounded-[2.5rem] shadow-2xl">
-          <div className="p-8 border-b border-slate-50 bg-slate-50/30">
-            <DialogHeader className="space-y-1">
-              <DialogTitle className="text-xl font-black text-slate-900 tracking-tight">Admin Support</DialogTitle>
-              <DialogDescription className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed">Direct support channel for real-time coordination.</DialogDescription>
-            </DialogHeader>
+        <DialogContent className="max-w-3xl h-[840px] border-none bg-white p-0 overflow-hidden rounded-3xl shadow-2xl transition-none">
+          <div className="p-12 border-b border-slate-50 bg-slate-50/30">
+            <div className="flex items-center gap-10">
+                <div className="h-20 w-20 rounded-3xl bg-slate-900 flex items-center justify-center shadow-2xl shadow-slate-900/10">
+                    <MessageSquare className="h-10 w-10 text-brand-teal" />
+                </div>
+                <div className="space-y-4">
+                    <DialogTitle className="text-4xl font-black text-slate-900 uppercase tracking-tighter leading-none">Admin Uplink</DialogTitle>
+                    <DialogDescription className="text-[11px] font-black text-slate-400 uppercase tracking-[0.25em] leading-none">Secure real-time coordination with root command.</DialogDescription>
+                </div>
+            </div>
           </div>
-          <div className="p-8 pb-10">
+          <div className="flex-1 overflow-hidden">
             {activeChatOrderId && (
               <OrderMessages orderId={activeChatOrderId} userRole="pharmacy" />
             )}
           </div>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 }

@@ -16,16 +16,16 @@ export interface DashboardChartsClientProps {
 
 export default function DashboardChartsClient({ data }: DashboardChartsClientProps) {
   return (
-    <div className="h-[320px] w-full">
+    <div className="h-[400px] w-full">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart
           data={data}
-          margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+          margin={{ top: 20, right: 20, left: 10, bottom: 30 }}
         >
           <defs>
-            <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.1}/>
-              <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
+            <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.15}/>
+              <stop offset="95%" stopColor="#14b8a6" stopOpacity={0}/>
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
@@ -33,30 +33,41 @@ export default function DashboardChartsClient({ data }: DashboardChartsClientPro
             dataKey="date" 
             axisLine={false} 
             tickLine={false} 
-            tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 500 }}
-            dy={10}
+            tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: '900', textAnchor: 'middle' }}
+            dy={16}
+            interval="preserveStartEnd"
           />
           <YAxis 
             axisLine={false} 
             tickLine={false} 
-            tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 500 }}
+            tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: '900' }}
+            dx={-8}
           />
           <Tooltip 
+             cursor={{ stroke: '#14b8a6', strokeWidth: 1, strokeDasharray: '4 4' }}
              contentStyle={{ 
-                borderRadius: '12px', 
-                border: '1px solid #f1f5f9', 
-                boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                borderRadius: '24px', 
+                border: 'none', 
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
                 fontSize: '11px',
-                fontWeight: 600
+                fontWeight: '900',
+                textTransform: 'uppercase',
+                letterSpacing: '0.2em',
+                padding: '20px',
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                backdropFilter: 'blur(8px)'
              }}
+             itemStyle={{ color: '#0f172a', padding: '0' }}
+             labelStyle={{ color: '#64748b', marginBottom: '10px', fontSize: '9px', letterSpacing: '0.3em' }}
           />
           <Area 
             type="monotone" 
             dataKey="revenue" 
-            stroke="#4f46e5" 
-            strokeWidth={2}
+            stroke="#14b8a6" 
+            strokeWidth={4}
             fillOpacity={1} 
-            fill="url(#colorRev)" 
+            fill="url(#colorRevenue)" 
+            isAnimationActive={false}
           />
         </AreaChart>
       </ResponsiveContainer>

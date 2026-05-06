@@ -45,3 +45,4 @@ lerna-debug.log*
 # Firebase Studio specific files
 /workspace
 /user
+tsconfig.tsbuildinfo

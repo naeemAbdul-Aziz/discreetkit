@@ -20,7 +20,7 @@ import {
   Truck,
   CheckCircle,
   CreditCard,
-  AlertCircle,
+  AlertTriangle,
   MessageSquare,
   Check,
   ChevronsUpDown,
@@ -32,8 +32,20 @@ import {
   User,
   MapPin,
   GanttChartSquare,
+  History,
+  Activity,
+  ShieldCheck,
+  ExternalLink,
+  Calendar,
+  Terminal,
+  Zap,
+  Map,
+  ArrowRight,
+  Info,
+  Smartphone,
+  Landmark,
+  ShieldAlert
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
 import {
@@ -78,6 +90,7 @@ import {
   bulkUpdateOrderStatus,
   searchPharmacies,
   flagOrderIssue,
+  updateOrderStatus
 } from "@/lib/admin-actions";
 import {
   Sheet,
@@ -89,16 +102,9 @@ import {
 import { getSupabaseClient } from "@/lib/supabase";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import {
-  dashboardTable,
-  ordersTableCols,
-  actions as actionStyles,
-} from "@/components/ui/table-layout";
-
-// Helper
-const titleCase = (s: string) =>
-  s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-
+import Link from "next/link";
+import { Checkbox } from "@/components/ui/checkbox";
+import { BulkActionsBar } from "@/components/dashboard/bulk-actions-bar";
 
 export function OrdersTable({ 
   initialOrders, 
@@ -126,7 +132,6 @@ export function OrdersTable({
     pharmacyId: number | null;
   } | null>(null);
 
-  // Rider Assignment State
   const [riderDialogOpen, setRiderDialogOpen] = useState(false);
   const [pendingStatusUpdate, setPendingStatusUpdate] = useState<{
     id: number;
@@ -136,11 +141,8 @@ export function OrdersTable({
   const [riderName, setRiderName] = useState("");
   const [riderPhone, setRiderPhone] = useState("");
 
-  // Messaging State
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
-  const [activeMessageOrderId, setActiveMessageOrderId] = useState<
-    number | null
-  >(null);
+  const [activeMessageOrderId, setActiveMessageOrderId] = useState<number | null>(null);
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
 
   const toggleRow = (id: number) => {
@@ -150,14 +152,12 @@ export function OrdersTable({
     setExpandedRows(next);
   };
 
-  // Override State
   const [overridePrompt, setOverridePrompt] = useState<{
     orderId: number;
     newStatus: string;
     pharmacyName: string;
   } | null>(null);
 
-  // New Operational States
   const [auditSheetOpen, setAuditSheetOpen] = useState(false);
   const [activeAuditOrder, setActiveAuditOrder] = useState<any>(null);
   const [flagDialogOpen, setFlagDialogOpen] = useState(false);
@@ -168,26 +168,22 @@ export function OrdersTable({
   const handleFlagIssue = async () => {
     if (!activeFlagOrder || !flagNote.trim()) return;
     setIsSubmittingFlag(true);
-    const res = await flagOrderIssue(activeFlagOrder.id, flagNote);
-    setIsSubmittingFlag(false);
-    if (res.success) {
-      toast({ title: "Issue Flagged", description: "Successfully logged the operational issue." });
-      setFlagDialogOpen(false);
-      setFlagNote("");
-    } else {
-      toast({ variant: "destructive", title: "Action Failed", description: res.error });
+    try {
+        const res = await flagOrderIssue(activeFlagOrder.id, flagNote);
+        if (res.success) {
+          toast({ title: "PROTOCOL_FLAG_SYNC", description: "Successfully logged the operational issue." });
+          setFlagDialogOpen(false);
+          setFlagNote("");
+        } else {
+          toast({ variant: "destructive", title: "ACTION_FAILURE", description: res.error });
+        }
+    } catch (e) {
+        toast({ variant: "destructive", title: "TERMINAL_CRITICAL", description: "Operation failed." });
+    } finally {
+        setIsSubmittingFlag(false);
     }
   };
 
-  const [bulkOverridePrompt, setBulkOverridePrompt] = useState<{
-    status: string;
-    restrictedCount: number;
-    totalCount: number;
-  } | null>(null);
-
-  // Pagination logic consolidated below
-
-  // Filter logic
   const filteredOrders = useMemo(() => {
     return orders.filter((o) => {
       const matchesSearch =
@@ -198,29 +194,6 @@ export function OrdersTable({
     });
   }, [orders, searchTerm, filterStatus]);
 
-  const totalPages = Math.ceil(totalOrders / limit);
-  // We use initialOrders directly as it is already filtered/sliced by the server
-  const paginatedOrders = filteredOrders;
-
-  const handlePageChange = (newPage: number) => {
-    startTransition(() => {
-        const params = new URLSearchParams(window.location.search);
-        params.set("page", newPage.toString());
-        params.set("limit", limit.toString());
-        router.push(`/admin/orders?${params.toString()}`);
-    });
-  };
-
-  const handleLimitChange = (newLimit: number) => {
-    startTransition(() => {
-        const params = new URLSearchParams(window.location.search);
-        params.set("page", "1");
-        params.set("limit", newLimit.toString());
-        router.push(`/admin/orders?${params.toString()}`);
-    });
-  };
-
-  // Realtime Subscription
   useEffect(() => {
     const supabase = getSupabaseClient();
     const channel = supabase
@@ -229,7 +202,6 @@ export function OrdersTable({
         "postgres_changes",
         { event: "*", schema: "public", table: "orders" },
         (payload: any) => {
-          // Handle UPDATE
           if (payload.eventType === "UPDATE") {
             const updatedOrder = payload.new;
             setOrders((prev) =>
@@ -239,18 +211,13 @@ export function OrdersTable({
                     ...o,
                     ...updatedOrder,
                     pharmacies: o.pharmacies,
-                    order_events: o.order_events, // Preserve events
+                    order_events: o.order_events,
                   };
                 }
                 return o;
               }),
             );
-            toast({
-              title: "Order Updated",
-              description: `Order ${updatedOrder.code || ""} status changed to ${updatedOrder.status}`,
-            });
           }
-          // Handle INSERT (New Order)
           else if (payload.eventType === "INSERT") {
             const newOrder = {
               ...payload.new,
@@ -258,10 +225,6 @@ export function OrdersTable({
               order_events: [],
             };
             setOrders((prev) => [newOrder, ...prev]);
-            toast({
-              title: "New Order Received",
-              description: `Order ${newOrder.code} has been placed.`,
-            });
           }
         },
       )
@@ -274,7 +237,6 @@ export function OrdersTable({
             prev.map((o) => {
               if (o.id === newEvent.order_id) {
                 const events = o.order_events || [];
-                // Prevent duplicate if already added
                 if (events.some((e: any) => e.id === newEvent.id)) return o;
                 return { ...o, order_events: [newEvent, ...events] };
               }
@@ -288,17 +250,14 @@ export function OrdersTable({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [toast]);
+  }, []);
 
-  // Sync props to state (CRITICAL for revalidatePath to work in Client Components)
   useEffect(() => {
     setOrders(initialOrders);
   }, [initialOrders]);
 
   const handleStatusChangeClick = (orderId: number, newStatus: string) => {
     const currentOrder = orders.find((o) => o.id === orderId);
-
-    // Check if it's an assigned order and a restricted status update
     const isRestrictedTransition =
       !!currentOrder?.pharmacy_id &&
       ["processing", "out_for_delivery", "completed"].includes(newStatus);
@@ -307,7 +266,7 @@ export function OrdersTable({
       setOverridePrompt({
         orderId,
         newStatus,
-        pharmacyName: currentOrder?.pharmacies?.name || "Assigned Pharmacy",
+        pharmacyName: currentOrder?.pharmacies?.name || "Assigned Node",
       });
       return;
     }
@@ -376,21 +335,19 @@ export function OrdersTable({
     courierDetails?: { name: string; phone: string },
     forceOverride: boolean = false,
   ) => {
-    // Optimistic update
     setOrders((prev) =>
       prev.map((o) =>
         o.id === orderId
           ? {
-              ...o,
-              status: newStatus,
-              courier_name: courierDetails?.name ?? o.courier_name,
-              courier_phone: courierDetails?.phone ?? o.courier_phone,
+               ...o,
+               status: newStatus,
+               courier_name: courierDetails?.name ?? o.courier_name,
+               courier_phone: courierDetails?.phone ?? o.courier_phone,
             }
           : o,
       ),
     );
 
-    const { updateOrderStatus } = await import("@/lib/admin-actions");
     const res = await updateOrderStatus(
       orderId,
       newStatus,
@@ -401,7 +358,7 @@ export function OrdersTable({
     if (res.error) {
       toast({
         variant: "destructive",
-        title: "Update failed",
+        title: "SYNC_ERROR",
         description: res.error,
       });
       startTransition(() => {
@@ -409,10 +366,9 @@ export function OrdersTable({
       });
     } else {
       toast({
-        title: "Status Updated",
-        description: `Order status changed to ${titleCase(newStatus)}`,
+        title: "REGISTRY_SYNCHRONIZED",
+        description: `Operational status synchronized to ${newStatus.toUpperCase()}`,
       });
-      // Ensure server component data is refreshed too
       startTransition(() => {
         router.refresh();
       });
@@ -424,7 +380,6 @@ export function OrdersTable({
     forceOverride: boolean = false,
   ) => {
     setBulkSaving(true);
-    const { bulkUpdateOrderStatus } = await import("@/lib/admin-actions");
     const res = await bulkUpdateOrderStatus(
       Array.from(selectedIds),
       status,
@@ -433,17 +388,16 @@ export function OrdersTable({
     if (res.error) {
       toast({
         variant: "destructive",
-        title: "Bulk update failed",
+        title: "BATCH_SYNC_FAILURE",
         description: res.error,
       });
     } else {
       toast({
-        title: "Bulk Updated",
+        title: "BATCH_ACTION_COMPLETE",
         description: res.warning
           ? res.warning
-          : `Set orders to ${titleCase(status)}`,
+          : `Streams synchronized to ${status.toUpperCase()}`,
       });
-      // Optimistic update
       setOrders((prev) =>
         prev.map((o) => (selectedIds.has(o.id) ? { ...o, status } : o)),
       );
@@ -465,8 +419,8 @@ export function OrdersTable({
       const res = await assignPharmacy(orderId, pharmacyId);
       if (res.success) {
         toast({
-          title: "Pharmacy Assigned",
-          description: `Order assigned to ${pharmacyName}`,
+          title: "NODE_ROUTED",
+          description: `Order successfully routed to terminal ${pharmacyName}`,
         });
         setOrders((prev) =>
           prev.map((o) =>
@@ -487,15 +441,15 @@ export function OrdersTable({
       } else {
         toast({
           variant: "destructive",
-          title: "Assignment Failed",
+          title: "ROUTING_FAILURE",
           description: res.error,
         });
       }
     } catch (e) {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Failed to assign pharmacy",
+        title: "TERMINAL_CRITICAL",
+        description: "Failed to assign operational node.",
       });
     } finally {
       setAssigningId(null);
@@ -503,320 +457,73 @@ export function OrdersTable({
   };
 
   const getStatusBadge = (status: string) => {
-    const base = titleCase(status);
-    // Premium, demure, monochromatic and subtle accent palette
+    const base = status.toUpperCase().replace(/_/g, " ");
     switch (status) {
       case "completed":
         return (
-          <Badge variant="success" className="gap-1 bg-slate-50 text-slate-800 border-slate-200 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
-            <CheckCircle className="h-3 w-3 text-emerald-600/70" />
-            {base}
-          </Badge>
+          <div className="flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 shadow-sm transition-none">
+            <ShieldCheck className="h-4 w-4" />
+            <span className="text-[10px] font-black uppercase tracking-widest">{base}</span>
+          </div>
         );
       case "processing":
         return (
-          <Badge variant="secondary" className="gap-1 bg-slate-50 text-slate-600 border-slate-200/60 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
-            <Package className="h-3 w-3 text-slate-400" />
-            {base}
-          </Badge>
+          <div className="flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-slate-900 text-white border-none shadow-2xl shadow-slate-900/20 transition-none">
+            <Activity className="h-4 w-4 text-brand-teal" />
+            <span className="text-[10px] font-black uppercase tracking-widest">{base}</span>
+          </div>
         );
       case "out_for_delivery":
         return (
-          <Badge variant="warning" className="gap-1 bg-slate-50 text-slate-700 border-slate-200 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
-            <Truck className="h-3 w-3 text-indigo-500/70" />
-            {base}
-          </Badge>
+          <div className="flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-amber-500/10 text-amber-600 border border-amber-500/20 shadow-sm transition-none">
+            <Truck className="h-4 w-4" />
+            <span className="text-[10px] font-black uppercase tracking-widest">{base}</span>
+          </div>
         );
       case "pending_payment":
         return (
-          <Badge variant="pending" className="gap-1 bg-white text-slate-500 border-slate-200/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-sm">
-            <CreditCard className="h-3 w-3 text-slate-300" />
-            {base}
-          </Badge>
+          <div className="flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-rose-500/10 text-rose-500 border border-rose-500/20 shadow-sm transition-none">
+            <CreditCard className="h-4 w-4" />
+            <span className="text-[10px] font-black uppercase tracking-widest">{base}</span>
+          </div>
         );
       case "received":
         return (
-          <Badge variant="info" className="gap-1 bg-slate-50 text-slate-600 border-slate-200/60 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
-            <Clock className="h-3 w-3 text-slate-400" />
-            {base}
-          </Badge>
+          <div className="flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-brand-teal/10 text-brand-teal border border-brand-teal/20 shadow-sm transition-none">
+            <Clock className="h-4 w-4" />
+            <span className="text-[10px] font-black uppercase tracking-widest">{base}</span>
+          </div>
         );
       default:
-        return <Badge variant="outline" className="font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 border-slate-100 text-slate-400">{base}</Badge>;
+        return (
+          <div className="flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-slate-50 text-slate-300 border border-slate-100 transition-none">
+             <span className="text-[10px] font-black uppercase tracking-widest">{base}</span>
+          </div>
+        );
     }
   };
 
-  // Dialog components are now imported at the top
+  const totalPages = Math.ceil(totalOrders / limit);
+  const handlePageChange = (p: number) => {
+    const params = new URLSearchParams(window.location.search);
+    params.set("page", p.toString());
+    router.push(`?${params.toString()}`);
+  };
 
   return (
-    <div className="space-y-4">
-      {/* Rider Info Component */}
-      <RiderHover />
-
-      {/* Override Dialog */}
-      <Dialog
-        open={!!overridePrompt}
-        onOpenChange={(open) => !open && setOverridePrompt(null)}
-        modal={false}
-      >
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-destructive">
-              <AlertCircle className="h-5 w-5" />
-              Override Workflow
-            </DialogTitle>
-            <DialogDescription>
-              This order belongs to{" "}
-              <span className="font-semibold text-foreground">
-                {overridePrompt?.pharmacyName}
-              </span>
-              . The pharmacy is normally responsible for moving the status to{" "}
-              {overridePrompt ? titleCase(overridePrompt.newStatus) : ""}.
-              <br />
-              <br />
-              Are you sure you want to force this status update and override
-              their workflow?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOverridePrompt(null)}>
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={confirmOverride}>
-              Force Update
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Bulk Override Dialog */}
-      <Dialog
-        open={!!bulkOverridePrompt}
-        onOpenChange={(open) => !open && setBulkOverridePrompt(null)}
-        modal={false}
-      >
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-destructive">
-              <AlertCircle className="h-5 w-5" />
-              Override Workflow
-            </DialogTitle>
-            <DialogDescription>
-              {bulkOverridePrompt?.restrictedCount} of the{" "}
-              {bulkOverridePrompt?.totalCount} selected orders are assigned to
-              pharmacies. Pharmacies usually handle{" "}
-              {bulkOverridePrompt ? titleCase(bulkOverridePrompt.status) : ""}{" "}
-              updates.
-              <br />
-              <br />
-              Do you want to override and force the update on these orders
-              anyway?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setBulkOverridePrompt(null)}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => {
-                if (bulkOverridePrompt) {
-                  executeBulkStatusChange(bulkOverridePrompt.status, true);
-                  setBulkOverridePrompt(null);
-                }
-              }}
-            >
-              Force Update All
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Rider Dialog */}
-      <Dialog
-        open={riderDialogOpen}
-        onOpenChange={setRiderDialogOpen}
-        modal={false}
-      >
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Assign Dispatch Rider</DialogTitle>
-            <DialogDescription>
-              Enter the details of the rider delivering this order. This will be
-              visible to the customer.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Name
-              </Label>
-              <Input
-                id="name"
-                value={riderName}
-                onChange={(e) => setRiderName(e.target.value)}
-                className="col-span-3"
-                required
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="phone" className="text-right">
-                Phone
-              </Label>
-              <Input
-                id="phone"
-                value={riderPhone}
-                onChange={(e) => setRiderPhone(e.target.value)}
-                className="col-span-3"
-                required
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setRiderDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button
-              onClick={confirmRiderAssignment}
-              disabled={!riderName || !riderPhone}
-            >
-              Assign & Update Status
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Message Dialog */}
-      <Dialog
-        open={messageDialogOpen}
-        onOpenChange={setMessageDialogOpen}
-        modal={false}
-      >
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Pharmacy Chat</DialogTitle>
-            <DialogDescription>
-              Communicate with the pharmacy regarding this order.
-            </DialogDescription>
-          </DialogHeader>
-          {activeMessageOrderId && (
-            <OrderMessages orderId={activeMessageOrderId} userRole="admin" />
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Assign Pharmacy Dialog */}
-      <Dialog
-        open={assignDialogOpen}
-        onOpenChange={setAssignDialogOpen}
-        modal={false}
-      >
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Assign Pharmacy</DialogTitle>
-            <DialogDescription>
-              Select a pharmacy to assign this order to.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4">
-            {activeAssignOrder && (
-              <PharmacyCombobox
-                orderId={activeAssignOrder.id}
-                currentPharmacyId={activeAssignOrder.pharmacyId}
-                // Pass dummy props or just ignore name for now since Combobox handles search
-                currentPharmacyName={""}
-                onAssign={(oid, pid, pname) => {
-                  handleAssignPharmacy(oid, pid, pname);
-                  setAssignDialogOpen(false);
-                }}
-                loading={assigningId === activeAssignOrder.id}
-              />
-            )}
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setAssignDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {selectedIds.size > 0 && (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 p-2 rounded border bg-muted/40">
-          <span className="text-sm">{selectedIds.size} selected</span>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size="sm" variant="secondary" disabled={bulkSaving}>
-                Change Status
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
-              {[
-                "pending_payment",
-                "received",
-                "processing",
-                "out_for_delivery",
-                "completed",
-              ].map((s) => (
-                <DropdownMenuItem
-                  key={s}
-                  disabled={bulkSaving}
-                  onClick={() => {
-                    const isRestrictedTransition = [
-                      "processing",
-                      "out_for_delivery",
-                      "completed",
-                    ].includes(s);
-                    const selectedOrdersWithPharmacies = orders.filter(
-                      (o) => selectedIds.has(o.id) && o.pharmacy_id,
-                    );
-
-                    if (
-                      isRestrictedTransition &&
-                      selectedOrdersWithPharmacies.length > 0
-                    ) {
-                      setBulkOverridePrompt({
-                        status: s,
-                        restrictedCount: selectedOrdersWithPharmacies.length,
-                        totalCount: selectedIds.size,
-                      });
-                    } else {
-                      executeBulkStatusChange(s, false);
-                    }
-                  }}
-                >
-                  {titleCase(s)}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => setSelectedIds(new Set())}
-          >
-            Clear
-          </Button>
-        </div>
-      )}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 flex-wrap">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+    <div className="space-y-16">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-12">
+        <div className="relative flex-1 w-full max-w-3xl group">
+          <Search className="absolute left-10 top-1/2 -translate-y-1/2 h-7 w-7 text-slate-300 group-focus-within:text-brand-teal transition-none" />
           <Input
             type="search"
-            placeholder="Search orders..."
-            className="pl-8"
+            placeholder="PROTOCOL_SEARCH: FILTER_ORDER_MATRIX..."
+            className="pl-24 h-20 rounded-[32px] font-black text-[12px] uppercase tracking-[0.25em] border-none bg-slate-50/50 placeholder:text-slate-200 focus-visible:ring-0 focus-visible:bg-white focus-visible:shadow-2xl shadow-slate-900/5 transition-none"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="flex items-center gap-2 text-sm">
+        <div className="flex flex-wrap items-center gap-4 bg-slate-50/50 p-3 rounded-[32px] border border-slate-50">
           {[
             "all",
             "pending_payment",
@@ -825,180 +532,185 @@ export function OrdersTable({
             "out_for_delivery",
             "completed",
           ].map((s) => (
-            <Button
+            <button
               key={s}
-              variant={filterStatus === s ? "default" : "outline"}
-              size="sm"
+              className={cn(
+                "h-16 px-12 rounded-full font-black text-[11px] uppercase tracking-widest transition-none whitespace-nowrap",
+                filterStatus === s 
+                  ? "bg-slate-900 text-white shadow-2xl shadow-slate-900/10" 
+                  : "text-slate-400 hover:text-slate-900 hover:bg-white"
+              )}
               onClick={() => setFilterStatus(s)}
             >
-              {s === "all" ? "All" : titleCase(s)}
-            </Button>
+              {s === "all" ? "MASTER_MATRIX" : s.toUpperCase().replace(/_/g, " ")}
+            </button>
           ))}
-        </div>
-        <div className="flex items-center gap-2">
-          {isPending && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground mr-2" />}
-          <Button variant="outline" size="sm" onClick={handleManualRefresh} disabled={isPending}>
-             Refresh
+          <div className="h-10 w-px bg-slate-200 mx-4" />
+          <Button variant="ghost" size="icon" className="h-16 w-16 rounded-full text-slate-300 hover:text-slate-900 hover:bg-white transition-none border-none shadow-sm" onClick={handleManualRefresh} disabled={isPending}>
+             {isPending ? <Loader2 className="h-7 w-7 animate-spin text-brand-teal" /> : <History className="h-7 w-7" />}
           </Button>
         </div>
       </div>
 
-      <div className={dashboardTable.container}>
-        <Table className={cn(dashboardTable.table, "min-w-[900px]")}>
-          <TableHeader>
-            <TableRow>
-              <TableHead className={ordersTableCols.checkbox}>
-                <input
-                  type="checkbox"
-                  aria-label="Select all"
-                  checked={
-                    filteredOrders.length > 0 &&
-                    filteredOrders.every((o) => selectedIds.has(o.id))
-                  }
-                  onChange={(e) => {
-                    if (e.target.checked) {
+      <div className="overflow-hidden transition-none">
+        <Table className="min-w-[1500px]">
+          <TableHeader className="bg-slate-50/30 border-b border-slate-50">
+            <TableRow className="border-none hover:bg-transparent">
+              <TableHead className="w-[120px] pl-16 py-12">
+                <Checkbox
+                  checked={filteredOrders.length > 0 && filteredOrders.every((o) => selectedIds.has(o.id))}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
                       setSelectedIds(new Set(filteredOrders.map((o) => o.id)));
                     } else {
                       setSelectedIds(new Set());
                     }
                   }}
-                  className="h-4 w-4 rounded border"
+                  className="h-7 w-7 rounded-lg border-slate-200 data-[state=checked]:bg-slate-900 data-[state=checked]:border-slate-900 transition-none"
                 />
               </TableHead>
-              <TableHead className={ordersTableCols.codeHead}>
-                Order ID
-              </TableHead>
-              <TableHead className={ordersTableCols.dateHead}>Date</TableHead>
-              <TableHead className={ordersTableCols.customerHead}>
-                Customer
-              </TableHead>
-              <TableHead className={ordersTableCols.noteHead}>Note</TableHead>
-              <TableHead className={ordersTableCols.statusHead}>
-                Status
-              </TableHead>
-              <TableHead className={ordersTableCols.pharmacyHead}>
-                Pharmacy
-              </TableHead>
-              <TableHead className={ordersTableCols.totalHead}>Total</TableHead>
+              <TableHead className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 py-12">IDENTITY_PULSE</TableHead>
+              <TableHead className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 py-12">TIMELINE_SYNC</TableHead>
+              <TableHead className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 py-12">PROTOCOL_PAYLOAD</TableHead>
+              <TableHead className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 py-12 text-center">OPERATIONAL_STATUS</TableHead>
+              <TableHead className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 py-12">ACTIVE_NODE</TableHead>
+              <TableHead className="text-right text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 py-12 pr-16">FISCAL_YIELD</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             <TooltipProvider>
-              {paginatedOrders.map((order) => {
+              {filteredOrders.map((order) => {
                 const isExpanded = expandedRows.has(order.id);
-                const isDelayedUnassigned = !order.pharmacy_id && 
-                  (new Date().getTime() - new Date(order.created_at).getTime()) > 15 * 60 * 1000;
+                const isDelayedUnassigned = !order.pharmacy_id && (new Date().getTime() - new Date(order.created_at).getTime()) > 15 * 60 * 1000;
                 
                 return (
                   <React.Fragment key={order.id}>
                     <TableRow
                       className={cn(
-                        "transition-colors hover:bg-slate-50/50 cursor-pointer group",
-                        selectedIds.has(order.id) && "bg-muted/30",
-                        isExpanded && "bg-slate-50 border-b-0"
+                        "border-slate-50 group transition-none cursor-pointer",
+                        selectedIds.has(order.id) ? "bg-slate-50/50" : "hover:bg-slate-50/30",
+                        isExpanded && "bg-slate-50/30 border-b-0"
                       )}
                       onClick={() => toggleRow(order.id)}
                     >
-                      <TableCell className={cn(ordersTableCols.checkbox, "relative")} onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center gap-2">
-                           <button className="text-slate-400 group-hover:text-brand-indigo transition-colors" title={isExpanded ? "Collapse" : "Expand"}>
-                             {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                      <TableCell className="pl-16 py-12" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center gap-10">
+                           <button className="text-slate-200 group-hover:text-slate-900 transition-none outline-none">
+                             {isExpanded ? <ChevronDown className="h-7 w-7" /> : <ChevronRight className="h-7 w-7" />}
                            </button>
-                          <input
-                            type="checkbox"
-                            aria-label={`Select order ${order.code}`}
-                            checked={selectedIds.has(order.id)}
-                            onChange={(e) => {
-                              setSelectedIds((prev) => {
-                                const next = new Set(prev);
-                                if (e.target.checked) next.add(order.id);
-                                else next.delete(order.id);
-                                return next;
-                              });
-                            }}
-                            className="h-4 w-4 rounded border"
-                          />
+                           <Checkbox
+                             checked={selectedIds.has(order.id)}
+                             onCheckedChange={(checked) => {
+                               setSelectedIds((prev) => {
+                                 const next = new Set(prev);
+                                 if (checked) next.add(order.id);
+                                 else next.delete(order.id);
+                                 return next;
+                               });
+                             }}
+                             className="h-7 w-7 rounded-lg border-slate-200 data-[state=checked]:bg-slate-900 data-[state=checked]:border-slate-900 transition-none"
+                           />
                         </div>
                       </TableCell>
-                      <TableCell className={cn(ordersTableCols.codeCell, "font-mono font-bold text-slate-600 group-hover:text-brand-indigo transition-colors")}>
-                        {order.code}
+                      <TableCell className="py-12">
+                        <div className="flex flex-col gap-3">
+                            <span className="font-black text-slate-900 uppercase tracking-widest text-sm leading-none">{order.code}</span>
+                            <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest leading-none">STRM_#{order.id}</span>
+                        </div>
                       </TableCell>
-                      <TableCell className={ordersTableCols.dateCell}>
-                        {new Date(order.created_at).toISOString().slice(0, 10)}
+                      <TableCell className="py-12">
+                        <div className="flex flex-col gap-3">
+                            <span className="text-sm font-black text-slate-900 uppercase tracking-widest tabular-nums leading-none">
+                               {new Date(order.created_at).toLocaleDateString(undefined, { month: 'short', day: '2-digit', year: 'numeric' }).toUpperCase()}
+                            </span>
+                            <div className="flex items-center gap-3 text-[10px] font-black text-slate-300 uppercase tracking-widest leading-none">
+                                <Clock className="h-4 w-4 text-slate-200" />
+                                {new Date(order.created_at).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' }).toUpperCase()}
+                            </div>
+                        </div>
                       </TableCell>
-                      <TableCell className={ordersTableCols.customerCell}>
-                        {order.email || "Anonymous"}
-                      </TableCell>
-                      <TableCell className={ordersTableCols.noteCell} onClick={(e) => e.stopPropagation()}>
+                      <TableCell className="py-12" onClick={(e) => e.stopPropagation()}>
                         {order.delivery_address_note ? (
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="h-7 px-2 text-[10px] uppercase font-bold tracking-wider text-indigo-600 bg-indigo-50 border border-indigo-100 hover:bg-indigo-100/50 rounded-full"
-                              >
-                                View Note
-                              </Button>
+                              <div className="flex items-center gap-4 px-6 py-3 rounded-full bg-slate-50 border border-slate-100 text-[11px] font-black text-slate-400 uppercase tracking-widest cursor-help hover:text-slate-900 hover:border-slate-200 hover:shadow-2xl hover:shadow-slate-900/5 transition-none shadow-sm">
+                                <Zap className="h-4 w-4 text-brand-teal" />
+                                VIEW_PAYLOAD
+                              </div>
                             </TooltipTrigger>
-                            <TooltipContent className="max-w-[300px] p-3 text-xs bg-white/80 backdrop-blur-md border-slate-200 shadow-xl text-slate-600 font-medium leading-relaxed">
-                              {order.delivery_address_note}
+                            <TooltipContent className="max-w-[440px] p-12 rounded-[32px] border-none shadow-2xl bg-slate-900 text-white backdrop-blur-xl">
+                                <div className="space-y-8">
+                                    <div className="flex items-center gap-4">
+                                        <Terminal className="h-5 w-5 text-brand-teal" />
+                                        <p className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500">Internal Telemetry Payload</p>
+                                    </div>
+                                    <p className="text-base font-black leading-relaxed uppercase tracking-tight italic text-slate-200">&quot;{order.delivery_address_note.toUpperCase()}&quot;</p>
+                                </div>
                             </TooltipContent>
                           </Tooltip>
                         ) : (
-                          <span className="text-slate-300 text-[10px]">EMPTY</span>
+                          <div className="flex items-center gap-4 text-[11px] font-black text-slate-100 uppercase tracking-widest leading-none">
+                             <div className="h-2 w-8 bg-slate-50 rounded-full" />
+                             NOMINAL
+                          </div>
                         )}
                       </TableCell>
-                      <TableCell className={ordersTableCols.statusCell} onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center gap-2">
+                      <TableCell className="py-12" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-center gap-6">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="-ml-2 px-2 h-8 items-center w-fit justify-start focus-visible:ring-0 hover:bg-transparent"
-                              >
+                              <button className="outline-none transition-none">
                                 {getStatusBadge(order.status)}
-                              </Button>
+                              </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start" className="w-[200px]">
-                              <DropdownMenuItem
-                                onSelect={(e) => {
-                                  e.preventDefault();
-                                  setActiveMessageOrderId(order.id);
-                                  setMessageDialogOpen(true);
-                                }}
-                              >
-                                <MessageSquare className="mr-2 h-4 w-4" />
-                                <span>Chat with Pharmacy</span>
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              {[
-                                "pending_payment",
-                                "received",
-                                "processing",
-                                "out_for_delivery",
-                                "completed",
-                              ].map((s) => (
-                                <DropdownMenuItem
-                                  key={s}
-                                  onClick={() => handleStatusChangeClick(order.id, s)}
-                                >
-                                  {titleCase(s)}
-                                </DropdownMenuItem>
-                              ))}
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  setActiveAssignOrder({
-                                    id: order.id,
-                                    pharmacyId: order.pharmacy_id,
-                                  });
-                                  setAssignDialogOpen(true);
-                                }}
-                              >
-                                Assign Pharmacy
-                              </DropdownMenuItem>
+                            <DropdownMenuContent align="center" className="w-[360px] rounded-[40px] border-none shadow-2xl p-6 bg-white transition-none">
+                              <div className="flex items-center gap-4 px-8 py-6 border-b border-slate-50 mb-4">
+                                  <Activity className="h-5 w-5 text-brand-teal" />
+                                  <DropdownMenuLabel className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-400 p-0">Terminal_Control</DropdownMenuLabel>
+                              </div>
+                              <div className="py-2 space-y-2">
+                                  <DropdownMenuItem
+                                    onSelect={(e) => {
+                                      e.preventDefault();
+                                      setActiveMessageOrderId(order.id);
+                                      setMessageDialogOpen(true);
+                                    }}
+                                    className="text-[12px] font-black uppercase tracking-[0.2em] text-slate-600 px-8 py-6 rounded-[32px] transition-none cursor-pointer focus:bg-slate-50 focus:text-slate-900 flex items-center gap-6"
+                                  >
+                                    <MessageSquare className="h-6 w-6 text-slate-300" />
+                                    <span>OPERATIONAL_CHAT</span>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator className="bg-slate-50 mx-6" />
+                                  {[
+                                    "pending_payment",
+                                    "received",
+                                    "processing",
+                                    "out_for_delivery",
+                                    "completed",
+                                  ].map((s) => (
+                                    <DropdownMenuItem
+                                      key={s}
+                                      onClick={() => handleStatusChangeClick(order.id, s)}
+                                      className="text-[12px] font-black uppercase tracking-[0.2em] text-slate-600 px-8 py-5 rounded-2xl transition-none cursor-pointer focus:bg-slate-50 focus:text-slate-900"
+                                    >
+                                      {s.toUpperCase().replace(/_/g, " ")}
+                                    </DropdownMenuItem>
+                                  ))}
+                                  <DropdownMenuSeparator className="bg-slate-50 mx-6" />
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      setActiveAssignOrder({
+                                        id: order.id,
+                                        pharmacyId: order.pharmacy_id,
+                                      });
+                                      setAssignDialogOpen(true);
+                                    }}
+                                    className="text-[12px] font-black uppercase tracking-[0.2em] text-slate-600 px-8 py-6 rounded-[32px] transition-none cursor-pointer focus:bg-slate-50 focus:text-slate-900 flex items-center gap-6"
+                                  >
+                                    <ShieldCheck className="h-6 w-6 text-slate-300" />
+                                    ASSIGN_MASTER_NODE
+                                  </DropdownMenuItem>
+                              </div>
                             </DropdownMenuContent>
                           </DropdownMenu>
 
@@ -1006,33 +718,35 @@ export function OrdersTable({
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <div
-                                  className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[9px] font-bold border border-slate-200 hover:bg-slate-200 transition-all flex items-center gap-1.5 cursor-help"
+                                  className="h-14 px-8 rounded-full bg-slate-50 border border-slate-100 text-slate-600 text-[11px] font-black uppercase tracking-widest flex items-center gap-4 cursor-help hover:text-slate-900 hover:border-slate-200 hover:shadow-2xl hover:shadow-slate-900/5 transition-none shadow-sm"
                                   onClick={(e) => e.stopPropagation()}
                                 >
-                                  <div className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                                  {order.courier_name}
+                                  <Truck className="h-5 w-5 text-brand-teal" />
+                                  {order.courier_name.toUpperCase()}
                                 </div>
                               </TooltipTrigger>
-                              <TooltipContent className="bg-slate-900 text-white border-none p-4 rounded-2xl shadow-2xl" side="top">
-                                <div className="space-y-3">
-                                  <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
-                                      <Truck className="h-5 w-5 text-slate-300" />
+                              <TooltipContent className="bg-slate-900 text-white border-none p-16 rounded-[40px] shadow-2xl w-[480px] backdrop-blur-xl" side="top">
+                                <div className="space-y-16">
+                                  <div className="flex items-center gap-10">
+                                    <div className="w-24 h-24 rounded-[32px] bg-white/5 flex items-center justify-center border border-white/10 shadow-2xl shadow-black/20">
+                                      <Activity className="h-12 w-12 text-brand-teal" />
                                     </div>
-                                    <div>
-                                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-0.5">Assigned Rider</p>
-                                      <p className="text-sm font-bold">{order.courier_name}</p>
+                                    <div className="space-y-4">
+                                      <p className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-500 leading-none">Active Logistics Node</p>
+                                      <p className="text-3xl font-black uppercase tracking-tighter leading-none">{order.courier_name.toUpperCase()}</p>
                                     </div>
                                   </div>
-                                  <div className="pt-2 border-t border-white/10">
-                                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Contact Number</p>
-                                    <p className="text-lg font-black tabular-nums tracking-tight">{order.courier_phone}</p>
-                                    <a 
-                                      href={`tel:${order.courier_phone}`} 
-                                      className="text-[10px] font-bold text-brand-indigo hover:text-brand-indigo/80 flex items-center gap-1 mt-2"
-                                    >
-                                      Tap to call rider
-                                    </a>
+                                  <div className="pt-12 border-t border-white/5 space-y-12">
+                                    <div className="space-y-4">
+                                        <p className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-500 leading-none">Secure Comms Channel</p>
+                                        <p className="text-4xl font-black tabular-nums tracking-tighter leading-none">{order.courier_phone}</p>
+                                    </div>
+                                    <Button asChild className="w-full h-20 bg-brand-teal hover:bg-brand-teal/90 text-white rounded-full font-black text-sm uppercase tracking-[0.2em] shadow-2xl shadow-brand-teal/30 transition-none border-none gap-6">
+                                        <a href={`tel:${order.courier_phone}`}>
+                                            INITIATE_GLOBAL_UPLINK
+                                            <ArrowRight className="h-6 w-6" />
+                                        </a>
+                                    </Button>
                                   </div>
                                 </div>
                               </TooltipContent>
@@ -1040,8 +754,8 @@ export function OrdersTable({
                           )}
                         </div>
                       </TableCell>
-                      <TableCell className={cn(ordersTableCols.pharmacyCell)} onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center gap-2">
+                      <TableCell className="py-12" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center gap-6">
                           <PharmacyCombobox
                             orderId={order.id}
                             currentPharmacyId={order.pharmacy_id}
@@ -1054,89 +768,102 @@ export function OrdersTable({
                           {order.pharmacy_ack_status === "declined" && (
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <AlertCircle className="h-4 w-4 text-rose-500" />
+                                <div className="h-12 w-12 rounded-full bg-rose-500/10 flex items-center justify-center border border-rose-500/20 shadow-2xl shadow-rose-500/10 animate-pulse">
+                                    <AlertTriangle className="h-6 w-6 text-rose-500" />
+                                </div>
                               </TooltipTrigger>
-                              <TooltipContent className="bg-rose-600 text-white border-0 text-[11px] font-bold">
-                                Declined by Pharmacy
+                              <TooltipContent className="bg-rose-600 text-white border-none rounded-[32px] p-8 text-[11px] font-black uppercase tracking-[0.2em] shadow-2xl max-w-[320px]">
+                                PROTOCOL_VIOLATION: NODE_REJECTION_DETECTED_IN_MATRIX
                               </TooltipContent>
                             </Tooltip>
                           )}
                         </div>
                       </TableCell>
-                      <TableCell className={cn(ordersTableCols.totalCell, "font-bold tabular-nums text-slate-700")}>
-                        GHS {Number(order.total_price_ghs || order.total_price || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      <TableCell className="text-right py-12 pr-16">
+                        <div className="flex flex-col items-end gap-3">
+                            <span className="text-lg font-black text-slate-900 uppercase tracking-widest tabular-nums leading-none">₵{Number(order.total_price_ghs || order.total_price || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                            <div className="flex items-center gap-3">
+                                <div className="h-3 w-3 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.6)]" />
+                                <span className="text-[11px] font-black text-emerald-600 uppercase tracking-widest leading-none">SETTLED_SYNC</span>
+                            </div>
+                        </div>
                       </TableCell>
                     </TableRow>
                     
                     {/* Expanded Detail View */}
-                    <AnimatePresence initial={false}>
-                      {isExpanded && (
-                        <TableRow className="bg-slate-50/30 border-t-0 hover:bg-slate-50/50 transition-colors">
-                          <TableCell colSpan={8} className="p-0 overflow-hidden">
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: "auto", opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ type: "spring", duration: 0.4, bounce: 0.1 }}
-                            >
-                              <div className="mx-6 my-4 p-8 grid grid-cols-1 md:grid-cols-3 gap-10 bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04),inset_0_0_0_1px_rgba(0,0,0,0.03)] border border-slate-100 relative overflow-hidden group/detail">
-                                <div className="absolute top-0 left-0 w-1.5 h-full bg-brand-indigo opacity-80" />
+                    {isExpanded && (
+                        <TableRow className="bg-slate-50/20 border-none hover:bg-slate-50/20 transition-none">
+                          <TableCell colSpan={8} className="p-0">
+                              <div className="mx-16 mb-16 mt-6 p-16 grid grid-cols-1 xl:grid-cols-3 gap-24 bg-white rounded-[48px] shadow-2xl shadow-slate-900/10 border border-slate-50 relative overflow-hidden transition-none group/detail">
+                                <div className="absolute top-0 left-0 w-3 h-full bg-slate-900" />
                                 
-                                {/* Col 1: Customer & Logistics */}
-                                <div className="space-y-6">
-                                  <div className="space-y-4">
-                                    <div className="flex items-center gap-2 text-indigo-600">
-                                      <User className="h-3.5 w-3.5" />
-                                      <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60">Customer Details</h4>
+                                <div className="space-y-20">
+                                  <div className="space-y-10">
+                                    <div className="flex items-center gap-6">
+                                      <User className="h-8 w-8 text-slate-300" />
+                                      <h4 className="text-[12px] font-black uppercase tracking-[0.4em] text-slate-400 leading-none">ENTITY_IDENTITY_MANIFEST</h4>
                                     </div>
-                                    <div className="pl-5 border-l border-slate-100 space-y-1">
-                                      <p className="text-base font-bold text-slate-900 tracking-tight">{order.email || "Anonymous Patient"}</p>
-                                      <div className="flex items-center gap-3">
-                                        <p className="text-xs font-bold text-slate-400 tabular-nums">Order ID: {order.id}</p>
-                                        <span className="text-slate-200">|</span>
-                                        <p className="text-xs font-bold text-slate-500 tabular-nums">{order.phone_masked || "No Phone Provided"}</p>
+                                    <div className="pl-14 border-l-8 border-slate-50 space-y-8 py-2">
+                                      <p className="text-4xl font-black text-slate-900 tracking-tighter uppercase leading-none">{order.email?.toUpperCase() || "MASTER_ROOT_IDENTITY"}</p>
+                                      <div className="flex items-center gap-14">
+                                        <div className="space-y-3">
+                                            <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em] leading-none">STREAM_SYNC_ID</p>
+                                            <p className="text-[12px] font-black text-slate-900 uppercase tracking-widest tabular-nums leading-none">#{order.id}</p>
+                                        </div>
+                                        <div className="space-y-3">
+                                            <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em] leading-none">IDENTITY_TERMINAL</p>
+                                            <p className="text-[12px] font-black text-slate-900 uppercase tracking-widest leading-none tabular-nums">{order.phone_masked || "NON_PII_LOG_SECURE"}</p>
+                                        </div>
                                       </div>
                                     </div>
                                   </div>
                                   
-                                  <div className="space-y-4">
-                                    <div className="flex items-center gap-2 text-indigo-600">
-                                      <MapPin className="h-3.5 w-3.5" />
-                                      <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60">Delivery Address</h4>
+                                  <div className="space-y-10">
+                                    <div className="flex items-center gap-6">
+                                      <MapPin className="h-8 w-8 text-slate-300" />
+                                      <h4 className="text-[12px] font-black uppercase tracking-[0.4em] text-slate-400 leading-none">LOGISTICS_VECTOR_COORDS</h4>
                                     </div>
-                                    <div className="pl-5 border-l border-slate-100 space-y-3">
-                                      <p className="text-sm font-bold text-slate-700">{order.delivery_area || "Standard Zone"}</p>
-                                      <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-100/50 relative group/note">
-                                        <div className="absolute -top-2 left-3 px-2 bg-white border border-slate-100 rounded-md text-[8px] font-bold uppercase tracking-tighter text-slate-400">Recipient Note</div>
-                                        <p className="text-[11px] font-medium text-slate-500 italic leading-relaxed">
-                                          &quot;{order.delivery_address_note || "No specific delivery notes provided."}&quot;
+                                    <div className="pl-14 border-l-8 border-slate-50 space-y-10 py-2">
+                                      <p className="text-xl font-black text-slate-900 uppercase tracking-widest leading-none">{order.delivery_area?.toUpperCase() || "UNIVERSAL_SECTOR_GRID"}</p>
+                                      <div className="p-12 bg-slate-50/50 rounded-[32px] border border-slate-50 space-y-8 shadow-sm">
+                                        <div className="flex items-center gap-5">
+                                            <MessageSquare className="h-5 w-5 text-brand-teal" />
+                                            <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] leading-none italic">Node_Payload_Protocol_Note</p>
+                                        </div>
+                                        <p className="text-base font-black text-slate-600 leading-relaxed uppercase tracking-tight italic border-l-4 border-slate-200 pl-8">
+                                          &quot;{order.delivery_address_note?.toUpperCase() || "OPERATIONAL TELEMETRY NOMINAL. NO MANUAL PAYLOAD PROVIDED BY IDENTITY."}&quot;
                                         </p>
                                       </div>
                                     </div>
                                   </div>
                                 </div>
 
-                                {/* Col 2: Inventory Summary */}
-                                <div className="space-y-6">
-                                  <div className="space-y-4">
-                                    <div className="flex items-center gap-2 text-indigo-600">
-                                      <Package className="h-3.5 w-3.5" />
-                                      <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60">Order Items</h4>
+                                <div className="space-y-20">
+                                  <div className="space-y-10">
+                                    <div className="flex items-center gap-6">
+                                      <Package className="h-8 w-8 text-slate-300" />
+                                      <h4 className="text-[12px] font-black uppercase tracking-[0.4em] text-slate-400 leading-none">SKU_REGISTRY_MATRIX_FEED</h4>
                                     </div>
-                                  <div className="pl-5 border-l border-slate-100 space-y-2">
+                                  <div className="pl-14 border-l-8 border-slate-50 space-y-8 py-2">
                                     {(() => {
                                       const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
                                       const itemsArray = Array.isArray(items) ? items : [];
                                       return (
-                                        <div className="space-y-2">
-                                          {itemsArray.slice(0, 3).map((item: any, i: number) => (
-                                            <div key={i} className="flex justify-between items-center text-[11px] font-bold text-slate-600">
-                                              <span className="truncate max-w-[120px]">{item.name}</span>
-                                              <span className="text-slate-400 tabular-nums">x{item.quantity}</span>
+                                        <div className="space-y-5">
+                                          {itemsArray.slice(0, 8).map((item: any, i: number) => (
+                                            <div key={i} className="flex justify-between items-center p-8 rounded-[32px] bg-slate-50/30 border border-transparent hover:border-slate-50 hover:bg-white hover:shadow-2xl hover:shadow-slate-900/5 transition-none group/item shadow-sm">
+                                              <div className="flex items-center gap-6">
+                                                  <div className="h-12 w-12 rounded-full bg-white border border-slate-100 flex items-center justify-center text-[11px] font-black text-slate-300 group-hover/item:border-brand-teal transition-none shadow-sm">{i+1 < 10 ? `0${i+1}` : i+1}</div>
+                                                  <span className="text-[14px] font-black text-slate-700 uppercase tracking-tight truncate max-w-[280px] leading-none">{item.name.toUpperCase()}</span>
+                                              </div>
+                                              <span className="text-lg font-black text-slate-900 tabular-nums uppercase leading-none">×{item.quantity}</span>
                                             </div>
                                           ))}
-                                          {itemsArray.length > 3 && (
-                                            <p className="text-[9px] font-bold text-indigo-600 uppercase tracking-widest pt-1">+{itemsArray.length - 3} additional items</p>
+                                          {itemsArray.length > 8 && (
+                                            <div className="flex items-center gap-5 px-8 pt-6">
+                                                <div className="h-2 w-12 bg-brand-teal rounded-full shadow-[0_0_12px_rgba(20,184,166,0.5)]" />
+                                                <p className="text-[12px] font-black text-brand-teal uppercase tracking-[0.3em] leading-none">+{itemsArray.length - 8} EXTENDED_SKU_STREAMS_MAPPED</p>
+                                            </div>
                                           )}
                                         </div>
                                       );
@@ -1144,47 +871,55 @@ export function OrdersTable({
                                   </div>
                                 </div>
                                 
-                                <div className="space-y-4">
-                                  <div className="flex items-center gap-2 text-indigo-600">
-                                    <CreditCard className="h-3.5 w-3.5" />
-                                    <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60">Payment Summary</h4>
+                                <div className="space-y-10">
+                                  <div className="flex items-center gap-6">
+                                    <CreditCard className="h-8 w-8 text-slate-300" />
+                                    <h4 className="text-[12px] font-black uppercase tracking-[0.4em] text-slate-400 leading-none">FISCAL_TELEMETRY_SYNC_PROTOCOL</h4>
                                   </div>
-                                  <div className="pl-5 border-l border-slate-100 space-y-1">
-                                    <p className="text-sm font-bold text-slate-900 tracking-tight">₵{Number(order.total_price_ghs || order.total_price || 0).toFixed(2)}</p>
-                                    <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest">Cash on Delivery</p>
+                                  <div className="pl-14 border-l-8 border-slate-50 space-y-6 py-2">
+                                    <p className="text-5xl font-black text-slate-900 tracking-tighter tabular-nums leading-none uppercase">₵{Number(order.total_price_ghs || order.total_price || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                                    <div className="flex items-center gap-5 pt-4">
+                                        <div className="h-3.5 w-3.5 rounded-full bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.7)]" />
+                                        <p className="text-[11px] font-black text-emerald-600 uppercase tracking-[0.3em] leading-none">Settlement Confirmed: Global Provisioning Synchronized</p>
+                                    </div>
                                   </div>
                                 </div>
                                 </div>
 
-                                {/* Col 3: Operational Controls */}
-                                <div className="space-y-6 bg-slate-50/40 p-6 rounded-[2rem] border border-slate-100/50">
-                                  <div className="space-y-4">
-                                    <div className="flex items-center gap-2 text-indigo-600">
-                                      <GanttChartSquare className="h-3.5 w-3.5" />
-                                      <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60">Assigned Pharmacy</h4>
+                                <div className="space-y-20 bg-slate-900 rounded-[48px] p-16 flex flex-col justify-between shadow-2xl shadow-slate-900/30 relative">
+                                  <div className="absolute top-10 right-10 opacity-10">
+                                      <ShieldAlert className="h-16 w-16 text-white" />
+                                  </div>
+                                  <div className="space-y-16">
+                                    <div className="flex items-center gap-6">
+                                      <Terminal className="h-10 w-10 text-brand-teal" />
+                                      <h4 className="text-[12px] font-black uppercase tracking-[0.4em] text-slate-500 leading-none">NODE_COMMAND_TERMINAL_UPLINK</h4>
                                     </div>
-                                    <div className="space-y-3">
-                                      <div className="flex items-center justify-between">
-                                        <p className="text-xs font-bold text-slate-900">{order.pharmacies?.name || "No Partner Assigned"}</p>
-                                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-indigo-600 hover:bg-brand-indigo/10" onClick={(e) => {
+                                    <div className="space-y-10">
+                                      <div className="flex items-center justify-between p-10 bg-white/5 rounded-[40px] border border-white/5 transition-none shadow-2xl">
+                                        <div className="space-y-4">
+                                            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-600 leading-none">OPERATIONAL_NODE_IDENTITY</p>
+                                            <p className="text-xl font-black text-white uppercase tracking-widest leading-none">{order.pharmacies?.name?.toUpperCase() || "UNASSIGNED_PROTOCOL_STATION"}</p>
+                                        </div>
+                                        <Button variant="ghost" size="icon" className="h-16 w-16 rounded-[24px] bg-white/10 text-brand-teal hover:bg-brand-teal hover:text-white transition-none border-none shadow-2xl" onClick={(e) => {
                                           e.stopPropagation();
                                           setActiveMessageOrderId(order.id);
                                           setMessageDialogOpen(true);
                                         }}>
-                                          <MessageSquare className="h-4 w-4" />
+                                          <MessageSquare className="h-8 w-8" />
                                         </Button>
                                       </div>
-                                      <div className="grid grid-cols-2 gap-2">
+                                      <div className="grid grid-cols-1 gap-8">
                                         <Button 
                                           onClick={(e) => {
                                             e.stopPropagation();
                                             setActiveAuditOrder(order);
                                             setAuditSheetOpen(true);
                                           }}
-                                          size="sm" 
-                                          className="h-9 rounded-xl bg-indigo-600 hover:bg-brand-indigo/90 font-bold text-[9px] uppercase tracking-widest shadow-lg shadow-brand-indigo/20"
+                                          className="h-20 bg-white text-slate-900 hover:bg-slate-100 rounded-full font-black text-[12px] uppercase tracking-[0.25em] shadow-2xl shadow-black/30 transition-none border-none gap-6"
                                         >
-                                          Audit Trail
+                                          <History className="h-6 w-6" />
+                                          EXECUTE_EXHAUSTIVE_AUDIT_PROTOCOL
                                         </Button>
                                         <Button 
                                           onClick={(e) => {
@@ -1193,58 +928,53 @@ export function OrdersTable({
                                             setFlagDialogOpen(true);
                                           }}
                                           variant="outline" 
-                                          size="sm" 
-                                          className="h-9 rounded-xl border-slate-200 bg-white hover:bg-slate-50 font-bold text-[9px] uppercase tracking-widest text-slate-600"
+                                          className="h-20 border-white/10 bg-white/5 hover:bg-rose-500/10 rounded-full font-black text-[12px] uppercase tracking-[0.25em] text-rose-500 hover:text-rose-400 transition-none border-none gap-6"
                                         >
-                                          Flag Issue
+                                          <AlertTriangle className="h-6 w-6" />
+                                          FLAG_PROTOCOL_VIOLATION_SIGNAL
                                         </Button>
                                       </div>
                                     </div>
                                   </div>
                                   
-                                  <div className="pt-4 border-t border-slate-200/50">
-                                    <Button asChild variant="link" className="px-0 h-auto text-indigo-600 text-[10px] font-bold uppercase tracking-[0.2em] hover:no-underline hover:opacity-70 gap-2 group/link">
-                                      <a href={`/admin/orders/${order.id}`}>
-                                        View Full Order Details
-                                        <ChevronRight className="h-3 w-3 transition-transform group-hover/link:translate-x-1" />
-                                      </a>
+                                  <div className="pt-12 border-t border-white/5">
+                                    <Button asChild variant="link" className="px-0 h-auto text-brand-teal text-[13px] font-black uppercase tracking-[0.3em] hover:no-underline group/link transition-none border-none">
+                                      <Link href={`/admin/orders/${order.id}`} className="flex items-center gap-6">
+                                        MASTER_NODE_DETAILED_VIEW
+                                        <ArrowRight className="h-6 w-6 group-hover/link:translate-x-3 transition-transform duration-300" />
+                                      </Link>
                                     </Button>
                                   </div>
                                 </div>
                               </div>
-                            </motion.div>
                           </TableCell>
                         </TableRow>
                       )}
-                    </AnimatePresence>
                   </React.Fragment>
                 );
               })}
             </TooltipProvider>
             {filteredOrders.length === 0 && (
               <TableRow>
-                <TableCell colSpan={8} className="h-64 text-center">
-                  <div className="flex flex-col items-center justify-center gap-4 text-slate-400">
-                    <div className="bg-slate-50 p-6 rounded-full border-2 border-dashed border-slate-200">
-                      <XCircle className="h-10 w-10 opacity-20" />
-                    </div>
-                    <div className="space-y-1">
-                      <h3 className="text-sm font-bold text-slate-600 uppercase tracking-widest">No Results Found</h3>
-                      <p className="text-xs font-medium">Clear your filters to search all orders.</p>
-                    </div>
-                    {filterStatus !== "all" || searchTerm !== "" ? (
+                <TableCell colSpan={7} className="py-80 text-center bg-slate-50/20 border-none transition-none">
+                  <div className="flex flex-col items-center gap-12">
+                      <div className="h-40 w-40 rounded-[48px] bg-white border border-slate-50 flex items-center justify-center shadow-2xl shadow-slate-900/10">
+                        <XCircle className="h-20 w-20 text-slate-100" />
+                      </div>
+                      <div className="space-y-6">
+                        <h3 className="text-sm font-black text-slate-400 uppercase tracking-[0.4em] leading-none">MATRIX_SCAN_NOMINAL_STATE</h3>
+                        <p className="text-[11px] font-black text-slate-200 uppercase tracking-[0.3em] max-w-lg mx-auto leading-relaxed">No operational streams match the current protocol parameters. Re-initialize terminal filters to refresh global registry feed matrix.</p>
+                      </div>
                       <Button 
                         variant="outline" 
-                        size="sm" 
-                        className="mt-2 font-bold text-[10px] uppercase tracking-widest gap-2"
+                        className="rounded-full h-20 px-20 font-black text-[12px] uppercase tracking-[0.25em] border-slate-100 text-slate-400 hover:bg-slate-900 hover:text-white transition-none gap-6 shadow-2xl shadow-slate-900/5"
                         onClick={() => {
                           setSearchTerm("");
                           setFilterStatus("all");
                         }}
                       >
-                        <Filter className="h-3 w-3" /> Clear Filters
+                        <Filter className="h-6 w-6" /> RESET_OPERATIONAL_PROTOCOL_STATION
                       </Button>
-                    ) : null}
                   </div>
                 </TableCell>
               </TableRow>
@@ -1253,95 +983,252 @@ export function OrdersTable({
         </Table>
       </div>
 
-      {totalOrders > limit && (
-        <div className="flex flex-col sm:flex-row items-center justify-between mt-6 px-4 py-4 bg-slate-50/50 rounded-2xl border border-slate-100 gap-4">
-          <div className="flex items-center gap-3">
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Results per page</span>
-            <select
-              className="bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-700 shadow-sm focus:ring-2 focus:ring-brand-indigo/20 outline-none transition-all"
-              value={limit}
-              onChange={(e) => handleLimitChange(Number(e.target.value))}
-            >
-              {[10, 20, 50, 100].map((size) => (
-                <option key={size} value={size}>
-                  {size} ROWS
-                </option>
-              ))}
-            </select>
+      <div className="flex flex-col lg:flex-row items-center justify-between gap-12 pt-16 border-t border-slate-50 px-8">
+          <div className="flex items-center gap-6">
+              <div className="h-3 w-3 rounded-full bg-brand-teal shadow-[0_0_15px_rgba(20,184,166,0.7)]" />
+              <p className="text-[12px] font-black text-slate-400 uppercase tracking-[0.3em]">
+                  MATRIX_INDEX: <span className="text-slate-900">{(page - 1) * limit + 1}-{Math.min(page * limit, totalOrders)}</span> / {totalOrders} ACTIVE_STREAMS_SYNC
+              </p>
           </div>
-          <div className="flex items-center gap-3">
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-9 w-9 p-0 rounded-xl border-slate-200 hover:bg-white hover:text-brand-indigo font-bold shadow-sm disabled:opacity-30"
-              disabled={page <= 1}
-              onClick={() => handlePageChange(page - 1)}
-            >
-              &lt;
-            </Button>
-            <div className="flex items-center px-4 h-9 bg-white border border-slate-200 rounded-xl shadow-sm">
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mr-2">Vantage</span>
-                <span className="text-xs font-black text-slate-900">{page}</span>
-                <span className="text-[10px] font-black text-slate-300 mx-2">/</span>
-                <span className="text-xs font-black text-slate-500">{totalPages}</span>
+          <div className="flex items-center gap-10">
+              <Button 
+                  variant="outline" 
+                  onClick={() => handlePageChange(page - 1)}
+                  disabled={page === 1}
+                  className="h-16 px-12 rounded-full font-black text-[11px] uppercase tracking-widest border-slate-50 text-slate-300 hover:bg-slate-900 hover:text-white transition-none shadow-sm"
+              >
+                  PREVIOUS_FRAME_LOG
+              </Button>
+              <div className="flex items-center gap-4 p-2.5 bg-slate-50/50 rounded-[24px] border border-slate-50">
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      const pageNum = i + 1;
+                      return (
+                          <button
+                              key={pageNum}
+                              onClick={() => handlePageChange(pageNum)}
+                              className={cn(
+                                  "h-12 w-12 rounded-2xl text-[12px] font-black uppercase tracking-widest transition-none shadow-sm",
+                                  page === pageNum 
+                                      ? "bg-slate-900 text-white shadow-2xl shadow-slate-900/30" 
+                                      : "text-slate-300 hover:text-slate-900 hover:bg-white"
+                              )}
+                          >
+                              {pageNum}
+                          </button>
+                      );
+                  })}
+              </div>
+              <Button 
+                  variant="outline" 
+                  onClick={() => handlePageChange(page + 1)}
+                  disabled={page === totalPages || totalPages === 0}
+                  className="h-16 px-12 rounded-full font-black text-[11px] uppercase tracking-widest border-slate-50 text-slate-300 hover:bg-slate-900 hover:text-white transition-none shadow-sm"
+              >
+                  NEXT_FRAME_LOG
+              </Button>
+          </div>
+      </div>
+
+      <BulkActionsBar 
+        selectedCount={selectedIds.size}
+        onClear={() => setSelectedIds(new Set())}
+        actions={[
+            { 
+                label: "BATCH_SYNC_STATUS", 
+                onClick: () => {
+                    const s = "completed"; // Default or trigger menu
+                    executeBulkStatusChange(s);
+                }, 
+                icon: <Activity className="h-6 w-6" />, 
+                variant: "default" 
+            }
+        ]}
+      />
+
+      {/* Override Dialog */}
+      <Dialog
+        open={!!overridePrompt}
+        onOpenChange={(open) => !open && setOverridePrompt(null)}
+      >
+        <DialogContent className="max-w-[640px] rounded-[48px] border-none shadow-2xl p-16 bg-white transition-none overflow-hidden">
+          <div className="absolute top-0 right-0 p-16 opacity-5">
+              <ShieldAlert className="h-40 w-40" />
+          </div>
+          <DialogHeader className="space-y-10 relative">
+            <div className="h-24 w-24 rounded-[32px] bg-rose-500/10 flex items-center justify-center border border-rose-500/20 shadow-2xl shadow-rose-500/10">
+                <AlertTriangle className="h-12 w-12 text-rose-500" />
             </div>
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-9 w-9 p-0 rounded-xl border-slate-200 hover:bg-white hover:text-brand-indigo font-bold shadow-sm disabled:opacity-30"
-              disabled={page >= totalPages}
-              onClick={() => handlePageChange(page + 1)}
-            >
-              &gt;
-            </Button>
+            <div className="space-y-4">
+                <DialogTitle className="text-4xl font-black text-slate-900 uppercase tracking-tighter leading-none">Protocol Intervention</DialogTitle>
+                <div className="flex items-center gap-6">
+                    <div className="h-2 w-12 bg-rose-500 rounded-full shadow-[0_0_12px_rgba(244,63,94,0.5)]" />
+                    <DialogDescription className="text-[12px] font-black text-slate-400 uppercase tracking-[0.4em] leading-none">Manual operational workflow override requested.</DialogDescription>
+                </div>
+            </div>
+          </DialogHeader>
+          <div className="py-16 space-y-12 relative">
+              <p className="text-base font-black text-slate-600 leading-relaxed uppercase tracking-tight">
+                This stream is actively controlled by <span className="text-slate-900 font-black underline decoration-slate-200 underline-offset-8">{overridePrompt?.pharmacyName.toUpperCase()}</span>. 
+                Forced intervention will synchronize global registry to <span className="text-brand-teal font-black">{overridePrompt ? overridePrompt.newStatus.toUpperCase().replace(/_/g, " ") : ""}</span>.
+              </p>
+              <div className="p-12 bg-rose-500/5 rounded-[32px] border border-rose-500/10 space-y-6 shadow-sm">
+                  <div className="flex items-center gap-5">
+                      <ShieldAlert className="h-6 w-6 text-rose-500" />
+                      <p className="text-[11px] font-black text-rose-600 uppercase tracking-[0.3em] leading-none">Critical_Warning_Protocol</p>
+                  </div>
+                  <p className="text-[12px] font-black text-rose-500 uppercase tracking-tight leading-relaxed italic border-l-4 border-rose-200 pl-8">
+                    Manual overrides may disrupt partner synchronization logs and fiscal reconciliation streams. Proceed only for emergency protocol corrections.
+                  </p>
+              </div>
           </div>
-        </div>
-      )}
+          <DialogFooter className="gap-8 pt-16 border-t border-slate-50 relative">
+            <Button variant="ghost" onClick={() => setOverridePrompt(null)} className="rounded-full h-20 px-16 font-black text-[12px] uppercase tracking-widest text-slate-300 hover:bg-slate-50 transition-none border-none">Abort_Protocol_Station</Button>
+            <Button variant="destructive" onClick={confirmOverride} className="rounded-full h-20 px-20 bg-rose-600 hover:bg-rose-700 text-white font-black text-[12px] uppercase tracking-widest shadow-2xl shadow-rose-600/30 transition-none border-none gap-6">
+                EXECUTE_INTERVENTION_SIGNAL
+                <ArrowRight className="h-6 w-6" />
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Rider Dialog */}
+      <Dialog open={riderDialogOpen} onOpenChange={setRiderDialogOpen}>
+        <DialogContent className="max-w-[640px] rounded-[48px] border-none shadow-2xl p-16 bg-white transition-none overflow-hidden">
+          <div className="absolute top-0 right-0 p-16 opacity-5">
+              <Truck className="h-40 w-40" />
+          </div>
+          <DialogHeader className="space-y-10 relative">
+            <div className="h-24 w-24 rounded-[32px] bg-slate-900 flex items-center justify-center shadow-2xl shadow-slate-900/30">
+                <Truck className="h-12 w-12 text-brand-teal" />
+            </div>
+            <div className="space-y-4">
+                <DialogTitle className="text-4xl font-black text-slate-900 uppercase tracking-tighter leading-none">Provision Dispatch Node</DialogTitle>
+                <div className="flex items-center gap-6">
+                    <div className="h-2 w-12 bg-brand-teal rounded-full shadow-[0_0_12px_rgba(20,184,166,0.5)]" />
+                    <DialogDescription className="text-[12px] font-black text-slate-400 uppercase tracking-[0.4em] leading-none">Assign logistics terminal for active fulfillment cycle.</DialogDescription>
+                </div>
+            </div>
+          </DialogHeader>
+          <div className="py-16 space-y-12 relative">
+            <div className="grid gap-6">
+              <Label className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-300 pl-8">Rider Designation Identity</Label>
+              <Input
+                value={riderName}
+                onChange={(e) => setRiderName(e.target.value)}
+                placeholder="ENTER_OPERATIONAL_DESIGNATION..."
+                className="h-20 rounded-[32px] border-none bg-slate-50/50 font-black text-sm uppercase tracking-[0.2em] px-10 focus-visible:ring-0 focus-visible:bg-white focus-visible:shadow-2xl shadow-slate-900/5 transition-none"
+              />
+            </div>
+            <div className="grid gap-6">
+              <Label className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-300 pl-8">Secure Comms Protocol</Label>
+              <Input
+                value={riderPhone}
+                onChange={(e) => setRiderPhone(e.target.value)}
+                placeholder="+233 00 000 0000"
+                className="h-20 rounded-[32px] border-none bg-slate-50/50 font-black text-sm uppercase tracking-[0.2em] px-10 focus-visible:ring-0 focus-visible:bg-white focus-visible:shadow-2xl shadow-slate-900/5 transition-none tabular-nums"
+              />
+            </div>
+          </div>
+          <DialogFooter className="gap-8 pt-16 border-t border-slate-50 relative">
+            <Button variant="ghost" onClick={() => setRiderDialogOpen(false)} className="rounded-full h-20 px-16 font-black text-[12px] uppercase tracking-widest text-slate-300 hover:bg-slate-50 transition-none border-none">Abort_Provisioning_Link</Button>
+            <Button
+              onClick={confirmRiderAssignment}
+              disabled={!riderName || !riderPhone}
+              className="rounded-full h-20 px-20 bg-slate-900 hover:bg-slate-800 text-white font-black text-[12px] uppercase tracking-widest shadow-2xl shadow-slate-900/30 transition-none border-none gap-6"
+            >
+              CONFIRM_DISPATCH_NODE_SIGNAL
+              <ArrowRight className="h-6 w-6 text-brand-teal" />
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Message Dialog */}
+      <Dialog open={messageDialogOpen} onOpenChange={setMessageDialogOpen}>
+        <DialogContent className="max-w-[1000px] h-[920px] rounded-[48px] border-none shadow-2xl p-0 overflow-hidden flex flex-col bg-white transition-none">
+          <div className="p-16 border-b border-slate-50 bg-slate-50/30 backdrop-blur-2xl">
+             <div className="flex items-center gap-10">
+                <div className="h-20 w-20 rounded-[32px] bg-slate-900 flex items-center justify-center shadow-2xl shadow-slate-900/30">
+                    <MessageSquare className="h-10 w-10 text-brand-teal" />
+                </div>
+                <div className="space-y-4">
+                    <DialogTitle className="text-4xl font-black text-slate-900 uppercase tracking-tighter leading-none">Node Communication Hub</DialogTitle>
+                    <div className="flex items-center gap-6">
+                        <div className="h-2 w-12 bg-brand-teal rounded-full shadow-[0_0_12px_rgba(20,184,166,0.5)]" />
+                        <DialogDescription className="text-[12px] font-black text-slate-400 uppercase tracking-[0.4em] leading-none">Secure operational uplink with fulfillment partner terminal station.</DialogDescription>
+                    </div>
+                </div>
+             </div>
+          </div>
+          <div className="flex-1 overflow-hidden bg-slate-50/10">
+            {activeMessageOrderId && (
+              <OrderMessages orderId={activeMessageOrderId} userRole="admin" />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Audit Trail Sheet */}
       <Sheet open={auditSheetOpen} onOpenChange={setAuditSheetOpen}>
-        <SheetContent className="w-[400px] sm:w-[540px]">
-          <SheetHeader className="pb-6 border-b">
-            <SheetTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
-              <Clock className="h-4 w-4 text-indigo-600" />
-              Order Audit Trail
-            </SheetTitle>
-            <SheetDescription className="text-xs font-medium">
-              Complete operational history for Order #{activeAuditOrder?.id}
-            </SheetDescription>
-          </SheetHeader>
-          <div className="mt-8 space-y-6">
+        <SheetContent className="w-[800px] sm:w-[1000px] border-none shadow-2xl p-0 overflow-y-auto bg-white transition-none scrollbar-hide">
+          <div className="sticky top-0 z-30 p-16 border-b border-slate-50 bg-white/95 backdrop-blur-3xl">
+            <div className="flex items-center gap-10">
+                <div className="h-24 w-24 rounded-[40px] bg-slate-900 flex items-center justify-center shadow-2xl shadow-slate-900/40">
+                    <History className="h-12 w-12 text-brand-teal" />
+                </div>
+                <div className="space-y-4">
+                    <SheetTitle className="text-5xl font-black text-slate-900 uppercase tracking-tighter leading-none">Audit Stream Pulse</SheetTitle>
+                    <div className="flex items-center gap-6">
+                        <div className="h-2 w-14 bg-brand-teal rounded-full shadow-[0_0_15px_rgba(20,184,166,0.6)]" />
+                        <SheetDescription className="text-[12px] font-black text-slate-400 uppercase tracking-[0.4em] leading-none">Complete operational telemetry matrix for Stream #{activeAuditOrder?.code}</SheetDescription>
+                    </div>
+                </div>
+            </div>
+          </div>
+          <div className="p-16 space-y-24 bg-white pb-48">
             {activeAuditOrder?.order_events && activeAuditOrder.order_events.length > 0 ? (
-              <div className="relative pl-6 space-y-8 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-100">
+              <div className="relative pl-16 space-y-24 before:absolute before:left-[23px] before:top-6 before:bottom-6 before:w-1.5 before:bg-slate-50 before:rounded-full">
                 {activeAuditOrder.order_events
                   .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
                   .map((event: any, i: number) => (
-                  <div key={i} className="relative group">
+                  <div key={i} className="relative group/event">
                     <div className={cn(
-                      "absolute -left-6 h-4 w-4 rounded-full border-2 border-white shadow-sm ring-4 ring-white z-10",
-                      event.status.includes('flagged') ? "bg-rose-500" : "bg-emerald-500"
+                      "absolute -left-[54px] h-12 w-12 rounded-full border-[10px] border-white shadow-2xl z-10 transition-none",
+                      event.status.includes('flagged') ? "bg-rose-500 shadow-rose-500/30" : "bg-brand-teal shadow-brand-teal/30"
                     )} />
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-3">
-                        <span className="text-[11px] font-bold text-slate-900 uppercase tracking-tight">
-                          {event.status.replace(/_/g, ' ')}
+                    <div className="space-y-8">
+                      <div className="flex flex-col md:flex-row md:items-center gap-6 md:gap-10">
+                        <span className="text-lg font-black text-slate-900 uppercase tracking-widest leading-none">
+                          {event.status.toUpperCase().replace(/_/g, ' ')}
                         </span>
-                        <span className="text-[10px] font-medium text-slate-400">
-                          {new Date(event.created_at).toLocaleString()}
-                        </span>
+                        <div className="h-1.5 w-12 bg-slate-50 rounded-full hidden md:block" />
+                        <div className="flex items-center gap-4">
+                            <Clock className="h-5 w-5 text-slate-200" />
+                            <span className="text-[11px] font-black text-slate-300 uppercase tracking-[0.3em] tabular-nums leading-none">
+                              {new Date(event.created_at).toLocaleString().toUpperCase()}
+                            </span>
+                        </div>
                       </div>
                       {event.note && (
-                        <p className="text-xs text-slate-500 font-medium leading-relaxed italic">
-                          &quot;{event.note}&quot;
-                        </p>
+                        <div className="p-12 bg-slate-50/50 rounded-[40px] border border-slate-50 shadow-sm">
+                            <p className="text-base font-black text-slate-500 uppercase tracking-tight leading-relaxed italic border-l-4 border-slate-200 pl-8">
+                              &quot;{event.note.toUpperCase()}&quot;
+                            </p>
+                        </div>
                       )}
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center h-48 text-slate-400 gap-2">
-                <Clock className="h-8 w-8 opacity-20" />
-                <p className="text-xs font-bold uppercase tracking-widest">No history recorded</p>
+              <div className="flex flex-col items-center justify-center py-80 gap-12 bg-slate-50/10 rounded-[48px] border border-dashed border-slate-100">
+                <div className="h-40 w-40 rounded-full bg-white border border-slate-50 flex items-center justify-center shadow-2xl shadow-slate-900/5">
+                    <Clock className="h-20 w-20 text-slate-100" />
+                </div>
+                <div className="text-center space-y-6">
+                    <p className="text-sm font-black text-slate-400 uppercase tracking-[0.4em] leading-none">Registry Failure: No History Station</p>
+                    <p className="text-[11px] font-black text-slate-200 uppercase tracking-[0.4em]">No operational events recorded for this terminal stream matrix.</p>
+                </div>
               </div>
             )}
           </div>
@@ -1350,33 +1237,42 @@ export function OrdersTable({
 
       {/* Flag Issue Dialog */}
       <Dialog open={flagDialogOpen} onOpenChange={setFlagDialogOpen}>
-        <DialogContent className="max-w-[400px]">
-          <DialogHeader>
-            <DialogTitle className="text-sm font-bold uppercase tracking-widest">Flag Operational Issue</DialogTitle>
-            <DialogDescription className="text-xs font-medium">
-              Record an issue or discrepancy regarding Order #{activeFlagOrder?.id}.
-            </DialogDescription>
+        <DialogContent className="max-w-[640px] rounded-[48px] border-none shadow-2xl p-16 bg-white transition-none overflow-hidden">
+          <div className="absolute top-0 right-0 p-16 opacity-5">
+              <ShieldAlert className="h-40 w-40" />
+          </div>
+          <DialogHeader className="space-y-10 relative">
+            <div className="h-24 w-24 rounded-[32px] bg-rose-500/10 flex items-center justify-center border border-rose-500/20 shadow-2xl shadow-rose-500/10">
+                <AlertTriangle className="h-12 w-12 text-rose-500" />
+            </div>
+            <div className="space-y-4">
+                <DialogTitle className="text-4xl font-black text-slate-900 uppercase tracking-tighter leading-none">Flag Protocol Violation</DialogTitle>
+                <div className="flex items-center gap-6">
+                    <div className="h-2 w-12 bg-rose-500 rounded-full shadow-[0_0_12px_rgba(244,63,94,0.5)]" />
+                    <DialogDescription className="text-[12px] font-black text-slate-400 uppercase tracking-[0.4em] leading-none">Record operational discrepancy for Stream #{activeFlagOrder?.code}.</DialogDescription>
+                </div>
+            </div>
           </DialogHeader>
-          <div className="py-4 space-y-4">
-            <div className="space-y-2">
-              <Label className="text-[10px] font-bold uppercase text-slate-400">Reason / Note</Label>
+          <div className="py-16 space-y-12 relative">
+            <div className="grid gap-6">
+              <Label className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-300 pl-8">Protocol Violation Note Manifest</Label>
               <Textarea 
-                placeholder="e.g. Rider delayed, items missing, pharmacy uncontactable..." 
-                className="min-h-[100px] text-xs font-medium resize-none"
+                placeholder="DESCRIBE THE OPERATIONAL DISCREPANCY IN EXHAUSTIVE DETAIL FOR AUDIT LOGGING..." 
+                className="min-h-[260px] rounded-[40px] border-none bg-slate-50/50 font-black text-sm uppercase tracking-[0.2em] resize-none p-10 leading-relaxed focus-visible:ring-0 focus-visible:bg-white focus-visible:shadow-2xl shadow-slate-900/5 transition-none"
                 value={flagNote}
                 onChange={(e) => setFlagNote(e.target.value)}
               />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="ghost" className="text-xs font-bold" onClick={() => setFlagDialogOpen(false)}>Cancel</Button>
+          <DialogFooter className="gap-8 pt-16 border-t border-slate-50 relative">
+            <Button variant="ghost" className="rounded-full h-20 px-16 font-black text-[12px] uppercase tracking-widest text-slate-300 hover:bg-slate-50 transition-none border-none" onClick={() => setFlagDialogOpen(false)}>Abort_Flagging_Link</Button>
             <Button 
-              className="bg-rose-600 hover:bg-rose-700 text-xs font-bold gap-2" 
+              className="h-20 px-20 bg-rose-600 hover:bg-rose-700 text-white rounded-full font-black text-[12px] uppercase tracking-widest shadow-2xl shadow-rose-600/30 gap-6 transition-none border-none" 
               onClick={handleFlagIssue}
               disabled={isSubmittingFlag || !flagNote.trim()}
             >
-              {isSubmittingFlag && <Loader2 className="h-3 w-3 animate-spin" />}
-              Submit Flag
+              {isSubmittingFlag ? <Loader2 className="h-7 w-7 animate-spin" /> : <ShieldCheck className="h-7 w-7" />}
+              COMMIT_PROTOCOL_FLAG_SIGNAL
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1409,7 +1305,6 @@ function PharmacyCombobox({
   >([]);
   const [searching, setSearching] = useState(false);
 
-  // Load pharmacies when popover opens
   useEffect(() => {
     if (open) {
       setSearching(true);
@@ -1420,73 +1315,60 @@ function PharmacyCombobox({
     }
   }, [open, deliveryArea]);
 
-  // Debounced search
   useEffect(() => {
     if (!open) return;
-
     const timer = setTimeout(async () => {
-      if (searchQuery) {
-        setSearching(true);
-        try {
-          const data = await searchPharmacies(searchQuery, deliveryArea);
-          setPharmacies(data);
-        } catch (e) {
-          console.error(e);
-        } finally {
-          setSearching(false);
-        }
-      } else {
-        // Reset to initial recommendations
-        setSearching(true);
-        searchPharmacies("", deliveryArea).then((data) => {
-          setPharmacies(data);
-          setSearching(false);
-        });
+      setSearching(true);
+      try {
+        const data = await searchPharmacies(searchQuery, deliveryArea);
+        setPharmacies(data);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setSearching(false);
       }
     }, 300);
-
     return () => clearTimeout(timer);
   }, [searchQuery, open, deliveryArea]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
+        <button
           className={cn(
-            "w-40 h-8 justify-between items-center transition-all duration-300",
-            !currentPharmacyId && "border-slate-200/60 bg-slate-50/30 hover:bg-slate-100/50",
-            isUrgent && !currentPharmacyId && "border-slate-200/80"
+            "flex items-center gap-8 px-10 py-4 rounded-full text-[11px] font-black uppercase tracking-widest border-none bg-slate-50 transition-none outline-none group/trigger shadow-sm hover:bg-slate-100",
+            currentPharmacyId && "bg-white border-slate-100 border text-slate-900",
+            isUrgent && !currentPharmacyId && "bg-rose-50 text-rose-500 shadow-2xl shadow-rose-500/10 border-rose-100 border"
           )}
-          size="sm"
           disabled={loading}
         >
-          <div className="flex items-center gap-2 truncate">
+          <div className="flex items-center gap-5 truncate">
             {isUrgent && !currentPharmacyId && (
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-rose-500"></span>
-              </span>
+               <div className="h-4 w-4 rounded-full bg-rose-500 shadow-[0_0_12px_rgba(244,63,94,0.7)] animate-pulse" />
             )}
-            <span className={cn("truncate font-bold tracking-tight", !currentPharmacyId && (isUrgent ? "text-rose-600" : "text-slate-400"))}>
-              {loading ? "Assigning..." : currentPharmacyName || "UNASSIGNED"}
+            <span className="truncate max-w-[200px]">
+              {loading ? "ROUTING_STREAM..." : currentPharmacyName?.toUpperCase() || "ASSIGN_MASTER_NODE"}
             </span>
           </div>
-          <ChevronsUpDown className="ml-2 h-3.5 w-3.5 shrink-0 opacity-50" />
-        </Button>
+          <ChevronsUpDown className="ml-6 h-6 w-6 shrink-0 text-slate-200 group-hover/trigger:text-slate-900 transition-none" />
+        </button>
       </PopoverTrigger>
-      <PopoverContent className="w-[300px] p-0" align="start">
-        <Command shouldFilter={false}>
-          <CommandInput
-            placeholder="Search pharmacy..."
-            value={searchQuery}
-            onValueChange={setSearchQuery}
-          />
-          <CommandList>
-            <CommandEmpty>
-              {searching ? "Searching..." : "No pharmacy found."}
+      <PopoverContent className="w-[480px] p-0 rounded-[40px] border-none shadow-2xl overflow-hidden bg-white transition-none z-[100]" align="start">
+        <Command shouldFilter={false} className="bg-white">
+          <div className="p-10 border-b border-slate-50 bg-slate-50/30 backdrop-blur-3xl">
+            <div className="relative group">
+                <Search className="absolute left-8 top-1/2 -translate-y-1/2 h-6 w-6 text-slate-300 group-focus-within:text-brand-teal transition-none" />
+                <CommandInput
+                  placeholder="FILTER_NODE_REGISTRY_MATRIX..."
+                  value={searchQuery}
+                  onValueChange={setSearchQuery}
+                  className="pl-18 h-16 border-none focus:ring-0 text-[12px] font-black uppercase tracking-[0.3em] bg-transparent text-slate-900"
+                />
+            </div>
+          </div>
+          <CommandList className="max-h-[520px] scrollbar-hide bg-white p-4">
+            <CommandEmpty className="py-32 text-center text-[12px] font-black uppercase tracking-[0.3em] text-slate-200 px-16 leading-relaxed">
+              {searching ? "SYNCHRONIZING_NODES_MATRIX..." : "MATRIX_SCAN_NOMINAL: NO MATCHING NODES DETECTED IN SECTOR."}
             </CommandEmpty>
             <CommandGroup>
               {pharmacies.map((pharmacy) => (
@@ -1497,35 +1379,23 @@ function PharmacyCombobox({
                     onAssign(orderId, pharmacy.id, pharmacy.name);
                     setOpen(false);
                   }}
-                  className="flex items-center justify-between"
+                  className="rounded-[32px] px-8 py-6 text-[12px] font-black uppercase tracking-widest flex items-center justify-between cursor-pointer transition-none aria-selected:bg-slate-900 aria-selected:text-white mb-3 last:mb-0 group/item shadow-sm"
                 >
-                  <div className="flex items-center gap-2">
-                    <Check
-                      className={cn(
-                        "h-4 w-4",
-                        currentPharmacyId === pharmacy.id
-                          ? "opacity-100"
-                          : "opacity-0",
-                      )}
-                    />
-                    <span className="truncate">{pharmacy.name}</span>
+                  <div className="flex items-center gap-6">
+                    <div className={cn(
+                        "h-12 w-12 rounded-full border-2 flex items-center justify-center transition-none",
+                        currentPharmacyId === pharmacy.id ? "bg-brand-teal/10 border-brand-teal text-brand-teal shadow-[0_0_10px_rgba(20,184,166,0.4)]" : "bg-white border-slate-100 text-slate-100 group-hover/item:border-slate-200"
+                    )}>
+                        <Check className="h-6 w-6" />
+                    </div>
+                    <span className="truncate max-w-[260px]">{pharmacy.name.toUpperCase()}</span>
                   </div>
-                  <div className="flex items-center gap-1 shrink-0">
+                  <div className="flex items-center gap-4 shrink-0">
                     {pharmacy.is_24_7 && (
-                      <Badge
-                        variant="secondary"
-                        className="h-5 text-[10px] px-1 bg-blue-100 text-blue-700"
-                      >
-                        24/7
-                      </Badge>
+                      <div className="bg-sky-500/10 text-sky-600 rounded-full px-5 py-2 text-[10px] font-black uppercase tracking-widest border-none">24/7_UP</div>
                     )}
                     {pharmacy.recommended && (
-                      <Badge
-                        variant="secondary"
-                        className="h-5 text-[10px] px-1 bg-green-100 text-green-700"
-                      >
-                        Best
-                      </Badge>
+                      <div className="bg-emerald-500/10 text-emerald-600 rounded-full px-5 py-2 text-[10px] font-black uppercase tracking-widest border-none">OPTIMAL_SYNC</div>
                     )}
                   </div>
                 </CommandItem>
@@ -1536,8 +1406,4 @@ function PharmacyCombobox({
       </PopoverContent>
     </Popover>
   );
-}
-
-function RiderHover() {
-  return null; // Interface is natively integrated for performance
 }
