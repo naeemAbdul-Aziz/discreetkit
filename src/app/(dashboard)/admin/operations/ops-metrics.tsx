@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Bike, Clock, AlertTriangle, Package } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 
 export default function OpsMetrics({ stats }: { stats: any }) {
   if (!stats) return null;
@@ -11,7 +11,7 @@ export default function OpsMetrics({ stats }: { stats: any }) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Active Riders</CardTitle>
-          <Bike className="h-4 w-4 text-muted-foreground" />
+          <Icon name="directions_bike" className="text-muted-foreground" opticalSize={20} />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.activeRiders}</div>
@@ -24,7 +24,7 @@ export default function OpsMetrics({ stats }: { stats: any }) {
           <CardTitle className="text-sm font-medium">
             Out for Delivery
           </CardTitle>
-          <Package className="h-4 w-4 text-muted-foreground" />
+          <Icon name="inventory_2" className="text-muted-foreground" opticalSize={20} />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.outForDeliveryCount}</div>
@@ -35,7 +35,7 @@ export default function OpsMetrics({ stats }: { stats: any }) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Processing</CardTitle>
-          <Clock className="h-4 w-4 text-muted-foreground" />
+          <Icon name="schedule" className="text-muted-foreground" opticalSize={20} />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.processingCount}</div>
@@ -54,7 +54,7 @@ export default function OpsMetrics({ stats }: { stats: any }) {
           <CardTitle className="text-sm font-medium text-red-600">
             Attention Needed
           </CardTitle>
-          <AlertTriangle className="h-4 w-4 text-red-600" />
+          <Icon name="warning" className="text-red-600" fill={true} opticalSize={20} />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-red-700">

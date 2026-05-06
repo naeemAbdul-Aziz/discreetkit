@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { getSupabaseClient } from "@/lib/supabase";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
-import { User, Quote } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import {

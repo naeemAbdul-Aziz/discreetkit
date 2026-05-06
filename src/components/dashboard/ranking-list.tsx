@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Trophy, TrendingUp } from "lucide-react"
+import { Icon } from "@/components/ui/icon"
 import { cn } from "@/lib/utils"
 
 interface RankingItem {
@@ -40,9 +40,9 @@ export function RankingList({ title, description, items, type, className }: Rank
           <div className="space-y-1">
             <CardTitle className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400 flex items-center gap-2">
               {type === 'pharmacy' ? (
-                <Trophy className="h-3.5 w-3.5 text-amber-500/70" />
+                <Icon name="military_tech" className="text-amber-500/70" opticalSize={16} fill={true} />
               ) : (
-                <TrendingUp className="h-3.5 w-3.5 text-brand-teal/70" />
+                <Icon name="trending_up" className="text-brand-teal/70" opticalSize={16} />
               )}
               {title}
             </CardTitle>

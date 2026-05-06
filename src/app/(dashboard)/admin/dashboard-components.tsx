@@ -8,14 +8,7 @@ import {
 import { OrdersTable } from "./orders/orders-table";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { RankingList } from "@/components/dashboard/ranking-list";
-import { 
-    DollarSign, 
-    ShoppingCart, 
-    Activity, 
-    Users, 
-    TrendingUp, 
-    Package 
-} from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -37,37 +30,37 @@ export async function MetricsGrid() {
             <StatCard
                 title="Total Sales"
                 value={`₵${metrics.totalRevenue.toLocaleString()}`}
-                icon={DollarSign}
+                icon="payments"
                 description="Live revenue from all orders"
             />
             <StatCard
                 title="Total Orders"
                 value={metrics.totalOrders}
-                icon={ShoppingCart}
+                icon="shopping_cart"
                 description="Total orders recorded"
             />
             <StatCard
                 title="Active Customers"
                 value={metrics.activePatients}
-                icon={Users}
+                icon="group"
                 description="Unique patients served"
             />
             <StatCard
                 title="Processing Orders"
                 value={metrics.activeOrders}
-                icon={Activity}
+                icon="query_stats"
                 description="Orders in fulfillment"
             />
             <StatCard
                 title="Avg. Order Value"
                 value={`₵${metrics.totalOrders > 0 ? (metrics.totalRevenue / metrics.totalOrders).toFixed(0) : 0}`}
-                icon={TrendingUp}
+                icon="trending_up"
                 description="Based on current order book"
             />
             <StatCard
                 title="Avg. Wait Time"
                 value={`${metrics.fulfillmentVelocity}h`}
-                icon={Package}
+                icon="inventory_2"
                 description="Avg. fulfillment time"
             />
         </div>
@@ -131,7 +124,7 @@ export async function ActivityPulse() {
         <Card className="border border-slate-200/60 shadow-sm bg-white rounded-3xl overflow-hidden">
             <CardHeader className="p-6 pb-4 border-b border-slate-50">
                 <CardTitle className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400 flex items-center gap-2">
-                    <Activity className="h-3.5 w-3.5 text-brand-indigo/60" />
+                    <Icon name="query_stats" className="text-brand-indigo/60" opticalSize={16} />
                     Recent Activity
                 </CardTitle>
             </CardHeader>

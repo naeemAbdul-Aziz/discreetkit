@@ -1,5 +1,5 @@
 import * as React from "react";
-import { MoveRight, Lock } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { motion, HTMLMotionProps } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -86,13 +86,13 @@ export function WaitlistForm({
             <span className="animate-pulse">Locking In...</span>
           ) : (
             <span className="flex items-center justify-center gap-2">
-              Secure Delivery Spot <MoveRight className="h-4 w-4" />
+              Secure Delivery Spot <Icon name="arrow_forward" opticalSize={20} />
             </span>
           )}
         </Button>
 
         <p className="flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60 text-center px-2 mt-4">
-          <Lock className="w-3 h-3" />
+          <Icon name="lock" opticalSize={14} fill={true} />
           <span>Zero Spam. 100% Private.</span>
         </p>
       </div>

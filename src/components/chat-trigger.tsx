@@ -7,7 +7,7 @@
 
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import { MessageCircle } from 'lucide-react';
+import { Icon } from '@/components/ui/icon';
 
 export function ChatTrigger() {
   const router = useRouter();
@@ -20,7 +20,7 @@ export function ChatTrigger() {
           Pacely, our AI assistant, can help with questions about products, delivery, and privacy.
         </p>
         <Button onClick={() => router.push('/chat')} className="mt-2">
-          <MessageCircle className="mr-2 h-4 w-4" />
+          <Icon name="chat" className="mr-2 h-4 w-4" />
           Ask Pacely
         </Button>
       </div>

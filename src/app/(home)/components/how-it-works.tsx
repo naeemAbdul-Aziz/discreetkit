@@ -5,7 +5,7 @@ import { steps } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Icon } from "@/components/ui/icon";
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -83,7 +83,7 @@ export function HowItWorks() {
                       <ul className="space-y-2">
                         {step.details.map((detail, j) => (
                           <li key={j} className="flex items-start gap-2.5 text-sm text-muted-foreground">
-                            <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                            <Icon name="check_circle" className="text-primary mt-0.5 flex-shrink-0" opticalSize={20} fill={true} />
                             <span>{detail}</span>
                           </li>
                         ))}
@@ -94,7 +94,7 @@ export function HowItWorks() {
                         <Button asChild size="lg" className="w-full sm:w-auto">
                           <Link href="/partner-care">
                             Meet Our Support Partner
-                            <ArrowRight className="ml-2 h-4 w-4" />
+                            <Icon name="arrow_forward" className="ml-2" opticalSize={18} />
                           </Link>
                         </Button>
                       </div>
@@ -161,7 +161,7 @@ export function HowItWorks() {
                                 <div className="mt-2">
                                     <Button asChild className="rounded-full bg-white text-black hover:bg-white/90">
                                         <Link href="/partner-care">
-                                            Meet Our Partner <ArrowRight className="ml-2 h-4 w-4" />
+                                            Meet Our Partner <Icon name="arrow_forward" className="ml-2" opticalSize={18} />
                                         </Link>
                                     </Button>
                                 </div>

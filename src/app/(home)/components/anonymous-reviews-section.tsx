@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { MessageSquarePlus } from 'lucide-react';
+import { Icon } from "@/components/ui/icon";
 
 export function AnonymousReviewsSection() {
   return (
@@ -25,7 +25,7 @@ export function AnonymousReviewsSection() {
         <Dialog>
             <DialogTrigger asChild>
                 <Button variant="outline" className="mt-4 gap-2 rounded-full h-10 px-6">
-                    <MessageSquarePlus className="h-4 w-4" />
+                    <Icon name="add_comment" opticalSize={18} />
                     Share Your Story
                 </Button>
             </DialogTrigger>

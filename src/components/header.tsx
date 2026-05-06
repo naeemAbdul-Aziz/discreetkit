@@ -11,7 +11,7 @@ import {
   SheetClose,
   SheetDescription,
 } from "@/components/ui/sheet";
-import { Menu, ShoppingCart, X } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
@@ -66,7 +66,7 @@ function CartLink() {
       id="cart-icon"
     >
       <Link href="/cart" aria-label={`open cart with ${totalItems} items`}>
-        <ShoppingCart className="w-5 h-5" />
+        <Icon name="shopping_cart" className="w-5 h-5" />
         {totalItems > 0 && (
           <span
             className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground animate-in zoom-in"
@@ -225,7 +225,7 @@ export function Header() {
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon">
-                  <Menu className="h-6 w-6" />
+                  <Icon name="menu" className="h-6 w-6" />
                   <span className="sr-only">Toggle Menu</span>
                 </Button>
               </SheetTrigger>
@@ -251,7 +251,7 @@ export function Header() {
                       size="icon"
                       className={cn(closeButtonClasses, "h-10 w-10")}
                     >
-                      <X className="h-6 w-6" />
+                      <Icon name="close" className="h-6 w-6" />
                       <span className="sr-only">Close menu</span>
                     </Button>
                   </SheetClose>

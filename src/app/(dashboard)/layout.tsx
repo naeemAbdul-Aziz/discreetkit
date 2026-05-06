@@ -1,7 +1,7 @@
 "use client"
 
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar"
-import { Home, ShoppingBag, Package, Users, Settings, LogOut, BarChart } from "lucide-react"
+import { Icon } from "@/components/ui/icon"
 import Link from "next/link"
 import { useIsMobile } from "@/hooks/use-mobile"
 import * as React from "react"
@@ -46,21 +46,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const navItems = React.useMemo(() => {
     if (isPharmacy) {
         return [
-            { href: "/pharmacy/dashboard", label: "Dashboard", icon: Home },
-            { href: "/pharmacy/inventory", label: "Inventory", icon: Package },
-            { href: "/pharmacy/settings", label: "Settings", icon: Settings },
-            { href: "__logout__", label: "Logout", icon: LogOut },
+            { href: "/pharmacy/dashboard", label: "Dashboard", icon: "home" },
+            { href: "/pharmacy/inventory", label: "Inventory", icon: "inventory_2" },
+            { href: "/pharmacy/settings", label: "Settings", icon: "settings" },
+            { href: "__logout__", label: "Logout", icon: "logout" },
         ]
     }
     return [
-        { href: "/admin", label: "Overview", icon: Home },
-        { href: "/admin/analytics", label: "Analytics", icon: BarChart },
-        { href: "/admin/operations", label: "Operations", icon: BarChart },
-        { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
-        { href: "/admin/products", label: "Products", icon: Package },
-        { href: "/admin/categories", label: "Categories", icon: Package },
-        { href: "/admin/partners", label: "Partners", icon: Users },
-        { href: "/admin/settings", label: "Settings", icon: Settings },
+        { href: "/admin", label: "Overview", icon: "home" },
+        { href: "/admin/analytics", label: "Analytics", icon: "analytics" },
+        { href: "/admin/operations", label: "Operations", icon: "radar" },
+        { href: "/admin/orders", label: "Orders", icon: "shopping_bag" },
+        { href: "/admin/products", label: "Products", icon: "inventory_2" },
+        { href: "/admin/categories", label: "Categories", icon: "layers" },
+        { href: "/admin/partners", label: "Partners", icon: "group" },
+        { href: "/admin/settings", label: "Settings", icon: "settings" },
     ]
   }, [isPharmacy])
 
@@ -98,7 +98,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         className={`${baseClasses} ${activeClasses}`}
                         aria-label={item.label}
                       >
-                        <item.icon className="h-5 w-5 mb-1" />
+                        <Icon name={item.icon} className="mb-1" fill={isActive} weight={isActive ? 700 : 400} />
                         {item.label}
                       </button>
                     )
@@ -111,7 +111,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       className={`${baseClasses} ${activeClasses}`}
                       aria-label={item.label}
                     >
-                      <item.icon className="h-5 w-5 mb-1" />
+                      <Icon name={item.icon} className="mb-1" fill={isActive} weight={isActive ? 700 : 400} />
                       {item.label}
                     </Link>
                   )

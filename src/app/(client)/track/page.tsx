@@ -16,22 +16,7 @@ import { getOrderAction, getSubscriptionAction } from "@/lib/actions";
 import { type Order } from "@/lib/data";
 import type { OrderStatus } from "@/lib/data";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import {
-  AlertCircle,
-  Package,
-  Search,
-  Truck,
-  Server,
-  PackageCheck,
-  CreditCard,
-  MapPin,
-  ClipboardList,
-  MessageSquare,
-  Calendar,
-  CheckCircle2,
-  Clock,
-  Pill,
-} from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { BrandSpinner } from "@/components/brand-spinner";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
@@ -265,7 +250,7 @@ function Tracker() {
           )}
         >
           <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
+            <Icon name="search" className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/50" opticalSize={18} />
             <input
               value={code}
               onChange={(e) => setCode(e.target.value)}
@@ -287,7 +272,7 @@ function Tracker() {
       {error && (
         <div className="mx-4 mb-8">
           <Alert variant="destructive" className="rounded-3xl border-0 shadow-lg bg-red-50 text-red-900">
-            <AlertCircle className="h-5 w-5 text-red-600" />
+            <Icon name="error" className="text-red-600" opticalSize={20} fill={true} />
             <AlertTitle className="font-bold">Not Found</AlertTitle>
             <AlertDescription className="font-medium opacity-80">{error}</AlertDescription>
           </Alert>
@@ -298,7 +283,7 @@ function Tracker() {
         <div className="py-20 flex flex-col items-center justify-center text-muted-foreground">
           <div className="relative mb-6">
             <div className="h-16 w-16 rounded-full border-4 border-primary/10 border-t-primary animate-spin" />
-            <Search className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-6 w-6 text-primary" />
+            <Icon name="search" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-primary" opticalSize={24} />
           </div>
           <p className="font-bold tracking-tight text-lg">Searching our records...</p>
           <p className="text-sm opacity-60">Ensuring privacy and discretion</p>
@@ -392,7 +377,7 @@ function OrderTrackingView({ order }: { order: Order }) {
         <div className="bg-white rounded-[2rem] shadow-lg border-0 overflow-hidden">
           <div className="p-8 border-b border-[#f5f5f1]">
             <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 flex items-center gap-2">
-              <ClipboardList className="h-3 w-3" /> Tracking Timeline
+              <Icon name="assignment" className="text-muted-foreground/60" opticalSize={16} /> Tracking Timeline
             </h3>
           </div>
           
@@ -521,7 +506,7 @@ function OrderTrackingView({ order }: { order: Order }) {
         {/* Delivery Details */}
         <div className="bg-white rounded-[2rem] shadow-lg p-8">
           <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 mb-6 flex items-center gap-2">
-            <MapPin className="h-3 w-3" /> Destination
+            <Icon name="location_on" className="text-muted-foreground/60" opticalSize={16} /> Destination
           </h3>
           <div className="space-y-6">
             <div>
@@ -541,7 +526,7 @@ function OrderTrackingView({ order }: { order: Order }) {
           <div className="bg-primary hover:bg-primary/95 text-white rounded-[2rem] p-8 shadow-lg shadow-primary/20 transition-all active:scale-[0.98] group">
             <div className="flex items-center gap-6">
               <div className="h-14 w-14 rounded-full bg-white/10 flex items-center justify-center transition-transform group-hover:rotate-12">
-                <MessageSquare className="h-7 w-7 text-white" />
+                <Icon name="chat" className="text-white" opticalSize={28} />
               </div>
               <div>
                 <h4 className="font-semibold tracking-tight text-xl">Need Help?</h4>
@@ -554,7 +539,7 @@ function OrderTrackingView({ order }: { order: Order }) {
         {order.courierName && (
           <div className="bg-primary/5 rounded-[2rem] shadow-sm border border-primary/10 p-8">
             <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/80 mb-6 flex items-center gap-2">
-              <Truck className="h-3 w-3" /> Dispatch Rider
+              <Icon name="local_shipping" className="text-primary/60" opticalSize={16} /> Dispatch Rider
             </h3>
             <div className="space-y-6">
               <div>
@@ -575,7 +560,7 @@ function OrderTrackingView({ order }: { order: Order }) {
                 <div className="pt-4">
                   <a href={order.courierTrackingUrl} target="_blank" rel="noopener noreferrer">
                     <Button variant="outline" className="w-full h-12 rounded-xl font-bold bg-white gap-2 text-primary hover:bg-primary/5 border-primary/20 shadow-sm">
-                      <MapPin className="h-4 w-4" /> Track Live Location
+                      <Icon name="location_on" opticalSize={18} /> Track Live Location
                     </Button>
                   </a>
                 </div>
@@ -618,7 +603,7 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
         <div className="bg-white rounded-[2rem] shadow-lg border-0 overflow-hidden">
           <div className="p-8 border-b border-[#f5f5f1] flex flex-col md:flex-row md:items-center justify-between gap-4">
             <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 flex items-center gap-2">
-              <Pill className="h-3 w-3" /> Subscription Status
+              <Icon name="medication" className="text-muted-foreground/60" opticalSize={16} /> Subscription Status
             </h3>
             <Badge
               className={cn(
@@ -640,7 +625,7 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
                     className="object-contain p-4 transition-transform group-hover:scale-110"
                   />
                 ) : (
-                  <Pill className="h-10 w-10 text-muted-foreground/20" />
+                  <Icon name="medication" className="text-muted-foreground/20" opticalSize={40} />
                 )}
               </div>
               <div className="flex-1">
@@ -662,7 +647,7 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
             {daysUntilNextDelivery !== null && subscription.status === "active" && (
               <div className="mt-8 p-6 bg-primary/5 text-primary/80 rounded-[2rem] border-0 flex items-center gap-6">
                 <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                  <Calendar className="h-6 w-6 text-primary" />
+                  <Icon name="calendar_today" className="text-primary" opticalSize={24} />
                 </div>
                 <div>
                   <p className="text-[11px] font-bold uppercase tracking-widest opacity-80 mb-1">Next Delivery</p>
@@ -685,7 +670,7 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
           <div className="bg-white rounded-[2rem] shadow-lg border-0 overflow-hidden">
             <div className="p-8 border-b border-[#f5f5f1]">
               <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 flex items-center gap-2">
-                <ClipboardList className="h-3 w-3" /> Refill History
+                <Icon name="assignment" className="text-muted-foreground/60" opticalSize={16} /> Refill History
               </h3>
             </div>
             
@@ -745,9 +730,9 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
         <div className="bg-white rounded-[2rem] shadow-lg p-8">
           <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 mb-6 flex items-center gap-2">
             {subscription.prescriptionVerified ? (
-              <CheckCircle2 className="h-3 w-3 text-green-600" />
+              <Icon name="check_circle" className="text-green-600" opticalSize={16} fill={true} />
             ) : (
-              <Clock className="h-3 w-3 text-yellow-600" />
+              <Icon name="schedule" className="text-yellow-600" opticalSize={16} />
             )}
             Prescription
           </h3>
@@ -777,7 +762,7 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
         {/* MASKED Delivery Details */}
         <div className="bg-[#f5f5f1] rounded-[2rem] shadow-sm p-8">
           <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60 mb-6 flex items-center gap-2">
-            <MapPin className="h-3 w-3" /> Delivery
+            <Icon name="location_on" className="text-muted-foreground/60" opticalSize={16} /> Delivery
           </h3>
           <div className="space-y-6">
             <div>
@@ -804,7 +789,7 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
         {subscription.pharmacy && (
           <div className="bg-white rounded-[2rem] shadow-lg p-8">
             <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 mb-6 flex items-center gap-2">
-              <MapPin className="h-3 w-3" /> Pharmacy
+              <Icon name="location_on" opticalSize={14} /> Pharmacy
             </h3>
             <div className="space-y-6">
               <div>
@@ -829,7 +814,7 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
           <div className="bg-primary hover:bg-primary/95 text-white rounded-[2rem] p-8 shadow-lg shadow-primary/20 transition-all active:scale-[0.98] group">
             <div className="flex items-center gap-6">
               <div className="h-14 w-14 rounded-full bg-white/10 flex items-center justify-center transition-transform group-hover:rotate-12">
-                <MessageSquare className="h-7 w-7 text-white" />
+                <Icon name="chat" className="text-white" opticalSize={28} />
               </div>
               <div>
                 <h4 className="font-semibold tracking-tight text-xl">Need Help?</h4>
@@ -848,7 +833,7 @@ function TrackPageLoading() {
     <div className="flex h-[50dvh] items-center justify-center">
       <div className="relative">
         <div className="h-16 w-16 rounded-full border-4 border-primary/10 border-t-primary animate-spin" />
-        <Search className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-6 w-6 text-primary" />
+        <Icon name="search" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-primary" opticalSize={24} />
       </div>
     </div>
   );

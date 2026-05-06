@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input'; // Optional if we want a name field, but defaulting to anonymous
 import { useToast } from '@/hooks/use-toast';
-import { Send, Loader2 } from 'lucide-react';
+import { Icon } from "@/components/ui/icon";
 
 export function ReviewForm() {
     const [title, setTitle] = useState('');
@@ -84,13 +84,13 @@ export function ReviewForm() {
             >
                 {isSubmitting ? (
                     <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <Icon name="progress_activity" className="mr-2 animate-spin" opticalSize={18} />
                         Posting...
                     </>
                 ) : (
                     <>
                         Post Anonymously
-                        <Send className="ml-2 h-4 w-4" />
+                        <Icon name="send" className="ml-2" opticalSize={18} />
                     </>
                 )}
             </Button>

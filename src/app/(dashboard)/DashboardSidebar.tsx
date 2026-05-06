@@ -8,24 +8,6 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
-import {
-  LayoutDashboard,
-  ShoppingBag,
-  Users,
-  LogOut,
-  Package,
-  Layers,
-  BarChart,
-  Repeat,
-  Truck,
-  Fingerprint,
-  ShieldCheck,
-  ShieldAlert,
-  Zap,
-  Radar,
-  Lock,
-  Settings,
-} from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import * as React from "react";
@@ -33,11 +15,7 @@ import { getSupabaseClient } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { usePharmacy } from "@/components/dashboard/pharmacy-context";
-import { 
-  ClipboardCheck, 
-  BarChart3, 
-  HeartHandshake
-} from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 
 export function DashboardSidebar() {
   const pathname = usePathname();
@@ -77,22 +55,22 @@ export function DashboardSidebar() {
         {
           href: "/pharmacy/dashboard",
           label: isHub ? "Privacy Cockpit" : "Dashboard",
-          icon: isHub ? Radar : LayoutDashboard,
+          icon: isHub ? "radar" : "dashboard",
         },
-        { href: "/pharmacy/ledger", label: "Ledger", icon: ClipboardCheck },
+        { href: "/pharmacy/ledger", label: "Ledger", icon: "assignment_turned_in" },
         { 
           href: "/pharmacy/refills", 
           label: isHub ? "Discreet Refills" : "Refills", 
-          icon: Zap 
+          icon: "bolt" 
         },
         ...(isHub ? [
-          { href: "/pharmacy/verification", label: "Identity Queue", icon: Fingerprint },
-          { href: "/pharmacy/partner-care", label: "Security Support", icon: HeartHandshake },
+          { href: "/pharmacy/verification", label: "Identity Queue", icon: "fingerprint" },
+          { href: "/pharmacy/partner-care", label: "Security Support", icon: "volunteer_activism" },
         ] : [
-          { href: "/pharmacy/inventory", label: "Inventory", icon: Package },
-          { href: "/pharmacy/riders", label: "Riders", icon: Truck },
+          { href: "/pharmacy/inventory", label: "Inventory", icon: "inventory_2" },
+          { href: "/pharmacy/riders", label: "Riders", icon: "local_shipping" },
         ]),
-        { href: "/pharmacy/settings", label: "Settings", icon: Settings },
+        { href: "/pharmacy/settings", label: "Settings", icon: "settings" },
       ];
 
       // Strip prefixes if on subdomain
@@ -113,16 +91,16 @@ export function DashboardSidebar() {
 
     if (subdomain === "admin") {
       const baseItems = [
-        { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-        { href: "/admin/analytics", label: "Analytics", icon: BarChart },
-        { href: "/admin/operations", label: "Operations", icon: Radar },
-        { href: "/admin/operations/logs", label: "Ledger", icon: ClipboardCheck },
-        { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
-        { href: "/admin/products", label: "Products", icon: Package },
-        { href: "/admin/categories", label: "Categories", icon: Layers },
-        { href: "/admin/partners", label: "Partners", icon: Users },
-        { href: "/admin/refills", label: "Refills", icon: Repeat },
-        { href: "/admin/settings", label: "Settings", icon: Settings },
+        { href: "/admin", label: "Dashboard", icon: "dashboard" },
+        { href: "/admin/analytics", label: "Analytics", icon: "analytics" },
+        { href: "/admin/operations", label: "Operations", icon: "radar" },
+        { href: "/admin/operations/logs", label: "Ledger", icon: "assignment_turned_in" },
+        { href: "/admin/orders", label: "Orders", icon: "shopping_bag" },
+        { href: "/admin/products", label: "Products", icon: "inventory_2" },
+        { href: "/admin/categories", label: "Categories", icon: "layers" },
+        { href: "/admin/partners", label: "Partners", icon: "group" },
+        { href: "/admin/refills", label: "Refills", icon: "history_edu" },
+        { href: "/admin/settings", label: "Settings", icon: "settings" },
       ];
 
       // Strip prefixes if on subdomain
@@ -148,16 +126,16 @@ export function DashboardSidebar() {
     // So default is Admin items.
 
     const baseItems = [
-      { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-      { href: "/admin/analytics", label: "Analytics", icon: BarChart },
-      { href: "/admin/operations", label: "Operations", icon: Radar },
-      { href: "/admin/operations/logs", label: "Ledger", icon: ClipboardCheck },
-      { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
-      { href: "/admin/products", label: "Products", icon: Package },
-      { href: "/admin/categories", label: "Categories", icon: Layers },
-      { href: "/admin/partners", label: "Partners", icon: Users },
-      { href: "/admin/settings", label: "Settings", icon: Settings },
-      { href: "/admin/refills", label: "Refills", icon: Repeat },
+      { href: "/admin", label: "Dashboard", icon: "dashboard" },
+      { href: "/admin/analytics", label: "Analytics", icon: "analytics" },
+      { href: "/admin/operations", label: "Operations", icon: "radar" },
+      { href: "/admin/operations/logs", label: "Ledger", icon: "assignment_turned_in" },
+      { href: "/admin/orders", label: "Orders", icon: "shopping_bag" },
+      { href: "/admin/products", label: "Products", icon: "inventory_2" },
+      { href: "/admin/categories", label: "Categories", icon: "layers" },
+      { href: "/admin/partners", label: "Partners", icon: "group" },
+      { href: "/admin/settings", label: "Settings", icon: "settings" },
+      { href: "/admin/refills", label: "Refills", icon: "history_edu" },
     ];
 
     return baseItems;
@@ -228,12 +206,15 @@ export function DashboardSidebar() {
                       />
                     )}
 
-                    <item.icon
+                    <Icon
+                      name={item.icon}
+                      fill={isActive}
+                      weight={isActive ? 700 : 400}
                       className={cn(
-                        "h-5 w-5 shrink-0 transition-all duration-200",
+                        "transition-all duration-200",
                         isActive
-                          ? "stroke-[2.5]"
-                          : "stroke-[1.5] group-hover:stroke-[2]",
+                          ? "text-primary"
+                          : "text-zinc-400 group-hover:text-zinc-600",
                       )}
                     />
                     <span
@@ -259,7 +240,7 @@ export function DashboardSidebar() {
               className="text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors"
               size="lg"
             >
-              <LogOut className="h-5 w-5" />
+              <Icon name="logout" className="h-5 w-5" />
               <span className="duration-200 group-data-[collapsible=icon]:opacity-0">
                 Sign Out
               </span>

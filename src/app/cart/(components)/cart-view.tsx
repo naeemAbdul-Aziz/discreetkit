@@ -4,7 +4,7 @@
 import { useCart } from '@/hooks/use-cart';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Minus, Plus, Trash2, ArrowRight } from 'lucide-react';
+import { Icon } from "@/components/ui/icon";
 import { BrandSpinner } from '@/components/brand-spinner';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -127,11 +127,11 @@ export function CartView() {
                                         <div className="flex items-center">
                                             <div className="flex h-8 items-center justify-between rounded-full border border-primary/20 bg-background p-0.5 shadow-sm">
                                                 <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full text-primary" onClick={() => updateQuantity(item.id, quantity - 1)}>
-                                                    {quantity === 1 ? <Trash2 className="h-3 w-3" /> : <Minus className="h-3 w-3" />}
+                                                    {quantity === 1 ? <Icon name="delete" opticalSize={16} /> : <Icon name="remove" opticalSize={16} />}
                                                 </Button>
                                                 <span className="w-4 text-center text-xs font-bold text-foreground">{quantity}</span>
                                                 <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full text-primary" onClick={() => updateQuantity(item.id, quantity + 1)}>
-                                                    <Plus className="h-3 w-3" />
+                                                    <Icon name="add" opticalSize={16} />
                                                 </Button>
                                             </div>
                                         </div>
@@ -175,7 +175,7 @@ export function CartView() {
                         ) : (
                             <>
                                 Checkout
-                                <ArrowRight className="h-4 w-4 ml-1" />
+                                <Icon name="arrow_forward" className="ml-1" opticalSize={18} />
                             </>
                         )}
                       </Link>

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { Plus, Check } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { useCart } from "@/hooks/use-cart";
 import type { Product } from "@/lib/data";
 import { cn } from "@/lib/utils";
@@ -165,7 +165,14 @@ export function ProductCard({ product, priority = false }: { product: Product, p
                     )}
                     aria-label={isInCart ? "In cart" : "Add to cart"}
                   >
-                    {added || isInCart ? "✓ In cart" : "Add to cart"}
+                    {added || isInCart ? (
+                      <span className="flex items-center gap-1.5">
+                        <Icon name="check" opticalSize={16} weight={700} />
+                        In cart
+                      </span>
+                    ) : (
+                      "Add to cart"
+                    )}
                   </button>
                 )}
               </div>

@@ -3,10 +3,13 @@ import React, { useState } from "react";
 import { HoveredLink, Menu, MenuItem, ProductItem } from "@/components/ui/navbar-menu";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { ShoppingCart } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
+import { useCart } from "@/hooks/use-cart";
 
 export function FloatingNavbar({ className }: { className?: string }) {
   const [active, setActive] = useState<string | null>(null);
+  const { totalItems } = useCart();
+
   return (
     <div
       className={cn("fixed top-6 inset-x-0 max-w-2xl mx-auto z-50", className)}
@@ -63,8 +66,13 @@ export function FloatingNavbar({ className }: { className?: string }) {
             </MenuItem>
 
             {/* Cart Icon */}
-            <Link href="/cart" className="ml-4 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
-                <ShoppingCart className="w-5 h-5 text-slate-700 dark:text-slate-200" />
+            <Link href="/cart" className="relative p-2 rounded-full hover:bg-slate-100 transition-colors">
+               <Icon name="shopping_cart" className="text-slate-600" opticalSize={24} />
+               {totalItems > 0 && (
+                 <span className="absolute top-0 right-0 h-4 w-4 bg-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                   {totalItems}
+                 </span>
+               )}
             </Link>
         </div>
       </Menu>

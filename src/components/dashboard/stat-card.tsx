@@ -1,11 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { LucideIcon } from "lucide-react"
+import { Icon } from "@/components/ui/icon"
 import { cn } from "@/lib/utils"
 
 interface StatCardProps {
   title: string
   value: string | number
-  icon: LucideIcon
+  icon: string
   description?: string
   trend?: {
     value: number
@@ -15,7 +15,7 @@ interface StatCardProps {
   className?: string
 }
 
-export function StatCard({ title, value, icon: Icon, description, trend, className }: StatCardProps) {
+export function StatCard({ title, value, icon, description, trend, className }: StatCardProps) {
   return (
     <Card
       className={cn(
@@ -26,7 +26,7 @@ export function StatCard({ title, value, icon: Icon, description, trend, classNa
       <CardHeader className="flex flex-row items-center justify-between space-y-0 p-6 pb-2">
         <CardTitle className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400">{title}</CardTitle>
         <div className="h-9 w-9 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center transition-colors group-hover:bg-slate-100">
-          <Icon className="h-4 w-4 text-brand-indigo/70" />
+          <Icon name={icon} className="text-brand-indigo/70" opticalSize={18} />
         </div>
       </CardHeader>
       <CardContent className="p-6 pt-2">
