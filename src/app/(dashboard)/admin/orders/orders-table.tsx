@@ -508,36 +508,36 @@ export function OrdersTable({
     switch (status) {
       case "completed":
         return (
-          <Badge variant="success" className="gap-1 bg-slate-50 hover:bg-slate-50 text-slate-800 border-slate-200 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
+          <Badge variant="success" className="gap-1 bg-emerald-50/50 hover:bg-emerald-100/50 text-emerald-700 border-emerald-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
             <CheckCircle className="h-3 w-3 text-emerald-600/70" />
             {base}
           </Badge>
         );
       case "processing":
         return (
-          <Badge variant="secondary" className="gap-1 bg-slate-50 hover:bg-slate-50 text-slate-600 border-slate-200/60 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
-            <Package className="h-3 w-3 text-slate-400" />
+          <Badge variant="secondary" className="gap-1 bg-indigo-50/50 hover:bg-indigo-100/50 text-indigo-700 border-indigo-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
+            <Package className="h-3 w-3 text-indigo-400" />
             {base}
           </Badge>
         );
       case "out_for_delivery":
         return (
-          <Badge variant="warning" className="gap-1 bg-slate-50 hover:bg-slate-50 text-slate-700 border-slate-200 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
-            <Truck className="h-3 w-3 text-indigo-500/70" />
+          <Badge variant="warning" className="gap-1 bg-violet-50/50 hover:bg-violet-100/50 text-violet-700 border-violet-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
+            <Truck className="h-3 w-3 text-violet-500/70" />
             {base}
           </Badge>
         );
       case "pending_payment":
         return (
-          <Badge variant="pending" className="gap-1 bg-white hover:bg-white text-slate-500 border-slate-200/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-sm">
-            <CreditCard className="h-3 w-3 text-slate-300" />
+          <Badge variant="pending" className="gap-1 bg-rose-50/50 hover:bg-rose-100/50 text-rose-700 border-rose-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-sm">
+            <CreditCard className="h-3 w-3 text-rose-400" />
             {base}
           </Badge>
         );
       case "received":
         return (
-          <Badge variant="info" className="gap-1 bg-slate-50 hover:bg-slate-50 text-slate-600 border-slate-200/60 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
-            <Clock className="h-3 w-3 text-slate-400" />
+          <Badge variant="info" className="gap-1 bg-sky-50/50 hover:bg-sky-100/50 text-sky-700 border-sky-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
+            <Clock className="h-3 w-3 text-sky-400" />
             {base}
           </Badge>
         );

@@ -135,25 +135,25 @@ export function ProductTable({ initialProducts, categories = [] }: { initialProd
     if (stock <= 5) return { 
       label: "LOW STOCK", 
       variant: "destructive" as const, 
-      color: "bg-rose-50 text-rose-600 border-rose-200/60 shadow-none", 
+      color: "bg-rose-100/50 text-rose-700 border-rose-200/50 shadow-none", 
       icon: "⚠️" 
     };
     if (stock <= 20) return { 
       label: "LIMITED", 
       variant: "warning" as const, 
-      color: "bg-amber-50 text-amber-700 border-amber-200/60 shadow-none", 
+      color: "bg-amber-100/50 text-amber-700 border-amber-200/50 shadow-none", 
       icon: "⏳" 
     };
     if (stock >= 50) return { 
       label: "IN STOCK", 
       variant: "success" as const, 
-      color: "bg-emerald-50 text-emerald-700 border-emerald-200/60 shadow-none", 
+      color: "bg-emerald-100/50 text-emerald-700 border-emerald-200/50 shadow-none", 
       icon: "✨" 
     };
     return { 
       label: "IN STOCK", 
       variant: "success" as const, 
-      color: "bg-slate-50 text-slate-600 border-slate-200/60 shadow-none", 
+      color: "bg-sky-100/50 text-sky-700 border-sky-200/50 shadow-none", 
       icon: "✅" 
     };
   }
