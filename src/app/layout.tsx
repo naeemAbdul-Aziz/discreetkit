@@ -146,13 +146,6 @@ export default function RootLayout({
 
         {/* Tracking Scripts */}
         <TrackingScripts />
-
-        {/* Material Symbols Outlined - Variable Font */}
-        {/* eslint-disable-next-line @next/next/no-page-custom-font, @next/next/google-font-display */}
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-25..0&display=optional"
-        />
       </head>
       <body
         className={cn(
