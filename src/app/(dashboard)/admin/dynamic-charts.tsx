@@ -11,6 +11,6 @@ export const DynamicCharts = dynamic<DashboardChartsClientProps>(
     () => import("./dashboard-charts-client").then(mod => mod.default), 
     { 
         ssr: false,
-        loading: () => <div className="h-[400px] w-full bg-slate-50/50 animate-pulse rounded-[2rem]" />
+        loading: () => <div className="h-[320px] w-full bg-slate-50/50 animate-pulse rounded-[2rem]" />
     }
 );

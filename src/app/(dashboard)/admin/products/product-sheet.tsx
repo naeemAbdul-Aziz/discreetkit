@@ -24,16 +24,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { upsertProduct, moderateProductRequest } from "@/lib/admin-actions";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect, useTransition } from "react";
+import { useEffect } from "react";
+
 import { useRouter } from "next/navigation";
-import { Switch } from "@/components/ui/switch";
-import { cn } from "@/lib/utils";
-import { Package, Zap, ShieldCheck, CreditCard, Box, Image as ImageIcon, FileText, ArrowRight, Activity, Shield, Info, Loader2 } from "lucide-react";
 
 const formSchema = z.object({
   id: z.number().optional(),
-  name: z.string().min(1, "SKU Identity required"),
-  category: z.string().min(1, "Classification required"),
+  name: z.string().min(1, "Name is required"),
+  category: z.string().min(1, "Category is required"),
   price_ghs: z.coerce.number().min(0, "Price must be positive"),
   stock_level: z.coerce.number().int().min(0, "Stock must be positive"),
   image_url: z.string().url().optional().or(z.literal("")),
@@ -50,7 +48,7 @@ interface ProductSheetProps {
   onOpenChange: (open: boolean) => void;
   product?: any;
   categories?: any[];
-  requestId?: number;
+  requestId?: number; // Optional: if present, we are approving a request
 }
 
 export function ProductSheet({
@@ -62,8 +60,6 @@ export function ProductSheet({
 }: ProductSheetProps) {
   const { toast } = useToast();
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -73,12 +69,10 @@ export function ProductSheet({
       stock_level: 0,
       image_url: "",
       description: "",
-      featured: false,
-      requires_prescription: false,
-      is_student_product: false,
     },
   });
 
+  // Reset form when product changes (Edit mode vs Add mode)
   useEffect(() => {
     if (product) {
       form.reset({
@@ -94,241 +88,187 @@ export function ProductSheet({
         stock_level: 0,
         image_url: "",
         description: "",
-        featured: false,
-        requires_prescription: false,
-        is_student_product: false,
       });
     }
-  }, [product, form, open]);
+  }, [product, form]);
 
   async function onSubmit(data: FormValues) {
     try {
       let res: any;
+      // Optimistic close: If this is an edit or simple add, we can close first or concurrent
+      // But for robust error feedback, we wait for server action result, THEN close immediately.
+
       if (requestId) {
+        // Approve Request Flow
         res = await moderateProductRequest(
           requestId,
           "approved",
-          "SKU provisioned via Master Control",
+          "Product created and listed via admin panel",
           data,
         );
       } else {
+        // Standard Upsert Flow
         res = await upsertProduct(data);
       }
 
       if (res.error || res.success === false) {
         toast({
           variant: "destructive",
-          title: "REGISTRY_ERROR",
+          title: "Error",
           description: res.error || res.message,
         });
       } else {
         toast({
-          title: requestId ? "PROVISIONING_APPROVED" : "REGISTRY_SYNCHRONIZED",
+          title: "Success",
           description: requestId
-            ? "Node provisioning request successfully approved & mapped."
-            : "Global SKU parameters synchronized across master matrix.",
+            ? "Request approved and product created."
+            : product
+              ? "Product updated successfully."
+              : "Product added successfully.",
         });
         onOpenChange(false);
-        startTransition(() => {
-          router.refresh();
-        });
+        router.refresh();
       }
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "TERMINAL_CRITICAL",
-        description: "Failed to finalize SKU registry synchronization.",
+        title: "Error",
+        description: "Something went wrong.",
       });
     }
   }
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="sm:max-w-[720px] overflow-y-auto border-none shadow-2xl p-0 transition-none bg-white scrollbar-hide">
-        <div className="sticky top-0 z-30 bg-white/95 border-b border-slate-50 p-16 backdrop-blur-3xl">
-          <SheetHeader className="space-y-10">
-            <div className="h-24 w-24 rounded-[40px] bg-slate-900 flex items-center justify-center shadow-2xl shadow-slate-900/40">
-                <Package className="h-12 w-12 text-brand-teal" />
-            </div>
-            <div className="space-y-4">
-              <SheetTitle className="text-5xl font-black text-slate-900 tracking-tighter uppercase leading-none">
-                {product ? "CONFIGURE_SKU" : "PROVISION_SKU"}
-              </SheetTitle>
-              <div className="flex items-center gap-6">
-                  <div className="h-2 w-12 bg-brand-teal rounded-full shadow-[0_0_15px_rgba(20,184,166,0.6)]" />
-                  <SheetDescription className="text-[12px] font-black text-slate-400 uppercase tracking-[0.4em] leading-none">
-                    Global catalog identity, classification & operational parameter matrix
-                  </SheetDescription>
-              </div>
-            </div>
-          </SheetHeader>
-        </div>
+      <SheetContent className="sm:max-w-[540px] overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle>{product ? "Edit Product" : "Add Product"}</SheetTitle>
+          <SheetDescription>
+            {product
+              ? "Make changes to your product here."
+              : "Add a new product to your inventory."}
+          </SheetDescription>
+        </SheetHeader>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="grid gap-4 py-4"
+        >
+          <input type="hidden" {...form.register("id")} />
 
-        <div className="p-16 space-y-24 pb-48">
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-24"
-          >
-            <input type="hidden" {...form.register("id")} />
+          <div className="grid gap-2">
+            <Label htmlFor="name">Name</Label>
+            <Input id="name" {...form.register("name")} />
+            {form.formState.errors.name && (
+              <p className="text-sm text-destructive">
+                {form.formState.errors.name.message}
+              </p>
+            )}
+          </div>
 
-            {/* Master Identity */}
-            <div className="space-y-12">
-               <div className="flex items-center gap-6">
-                  <div className="h-3 w-3 rounded-full bg-slate-900" />
-                  <h4 className="text-[13px] font-black text-slate-900 uppercase tracking-[0.3em]">MASTER_IDENTITY_PROTOCOL</h4>
-               </div>
-
-               <div className="space-y-10 pl-8 border-l-4 border-slate-50">
-                 <div className="grid gap-6">
-                   <Label className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 flex items-center gap-4 pl-6">
-                      <Zap className="h-5 w-5 text-slate-200" /> SKU Designation Identity
-                   </Label>
-                   <Input {...form.register("name")} placeholder="ENTER SKU MASTER DESIGNATION..." className="h-20 rounded-[32px] border-none bg-slate-50/50 font-black text-sm uppercase tracking-[0.2em] px-10 focus-visible:ring-0 focus-visible:bg-white focus-visible:shadow-2xl shadow-slate-900/5 transition-none" />
-                 </div>
-
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                   <div className="grid gap-6">
-                     <Label className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 flex items-center gap-4 pl-6">
-                        <Box className="h-5 w-5 text-slate-200" /> Classification Matrix
-                     </Label>
-                     <Select
-                       onValueChange={(val) => form.setValue("category", val)}
-                       defaultValue={product?.category}
-                       value={form.watch("category")}
-                     >
-                       <SelectTrigger className="h-20 rounded-[32px] border-none bg-slate-50/50 font-black text-sm uppercase tracking-[0.2em] px-10 focus:ring-0 focus:bg-white shadow-sm transition-none">
-                         <SelectValue placeholder="SELECT_CATEGORY_NODE" />
-                       </SelectTrigger>
-                       <SelectContent className="rounded-[32px] border-none shadow-2xl p-4 bg-white z-[100]">
-                         {categories.map((cat) => (
-                           <SelectItem key={cat.id} value={cat.name} className="text-[11px] font-black uppercase tracking-widest text-slate-500 rounded-2xl px-6 py-4 cursor-pointer focus:bg-slate-900 focus:text-white transition-none mb-1 last:mb-0">
-                             {cat.name.toUpperCase()}
-                           </SelectItem>
-                         ))}
-                       </SelectContent>
-                     </Select>
-                   </div>
-                   <div className="grid gap-6">
-                     <Label className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 flex items-center gap-4 pl-6">
-                        <CreditCard className="h-5 w-5 text-slate-200" /> Global Yield (₵)
-                     </Label>
-                     <div className="relative group">
-                        <Input type="number" step="0.01" {...form.register("price_ghs")} placeholder="0.00" className="h-20 rounded-[32px] border-none bg-slate-50/50 font-black text-sm uppercase tracking-[0.2em] px-10 focus-visible:ring-0 focus-visible:bg-white focus-visible:shadow-2xl shadow-slate-900/5 transition-none pr-16" />
-                        <div className="absolute right-10 top-1/2 -translate-y-1/2 text-sm font-black text-slate-200 group-focus-within:text-brand-teal transition-none">₵</div>
-                     </div>
-                   </div>
-                 </div>
-
-                 <div className="grid gap-6">
-                   <Label className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 flex items-center gap-4 pl-6">
-                      <Activity className="h-5 w-5 text-slate-200" /> Master Stock Registry Pulse
-                   </Label>
-                   <Input type="number" {...form.register("stock_level")} placeholder="ENTER UNIT COUNT..." className="h-20 rounded-[32px] border-none bg-slate-50/50 font-black text-sm uppercase tracking-[0.2em] px-10 focus-visible:ring-0 focus-visible:bg-white focus-visible:shadow-2xl shadow-slate-900/5 transition-none" />
-                 </div>
-
-                 <div className="grid gap-6">
-                   <Label className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 flex items-center gap-4 pl-6">
-                      <ImageIcon className="h-5 w-5 text-slate-200" /> SKU Visualization Endpoint
-                   </Label>
-                   <Input {...form.register("image_url")} placeholder="HTTPS://IMAGE_ASSET_CDN_PROTOCOL..." className="h-20 rounded-[32px] border-none bg-slate-50/50 font-black text-sm uppercase tracking-[0.2em] px-10 focus-visible:ring-0 focus-visible:bg-white focus-visible:shadow-2xl shadow-slate-900/5 transition-none" />
-                 </div>
-
-                 <div className="grid gap-6">
-                   <Label className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 flex items-center gap-4 pl-6">
-                      <FileText className="h-5 w-5 text-slate-200" /> Technical Operational Description
-                   </Label>
-                   <Textarea {...form.register("description")} placeholder="ENTER GRANULAR SKU PARAMETERS & DATA..." className="min-h-[200px] rounded-[32px] border-none bg-slate-50/50 font-black text-sm uppercase tracking-[0.2em] p-10 focus-visible:ring-0 focus-visible:bg-white focus-visible:shadow-2xl shadow-slate-900/5 transition-none resize-none scrollbar-hide" />
-                 </div>
-               </div>
-            </div>
-
-            {/* Operational Parameters */}
-            <div className="space-y-12">
-               <div className="flex items-center gap-6">
-                  <div className="h-3 w-3 rounded-full bg-brand-teal shadow-[0_0_10px_rgba(20,184,166,0.6)]" />
-                  <h4 className="text-[13px] font-black text-slate-900 uppercase tracking-[0.3em]">OPERATIONAL_COMPLIANCE_PROTOCOL</h4>
-               </div>
-
-               <div className="pl-8 border-l-4 border-slate-50 space-y-10">
-                 <div className="bg-slate-50/30 p-12 rounded-[40px] border border-slate-50 space-y-12 transition-none shadow-sm hover:shadow-2xl hover:shadow-slate-900/5 hover:bg-white">
-                    <div className="flex items-center justify-between group">
-                       <div className="flex items-center gap-8">
-                          <div className="h-16 w-16 rounded-[24px] bg-slate-900 flex items-center justify-center shadow-2xl group-hover:scale-105 transition-transform duration-500">
-                             <Zap className="h-8 w-8 text-brand-teal" />
-                          </div>
-                          <div className="space-y-3">
-                             <Label htmlFor="featured" className="text-[12px] font-black uppercase tracking-[0.3em] text-slate-900 block cursor-pointer">Priority Global Placement</Label>
-                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] leading-none">Broadcast in featured catalog streams.</p>
-                          </div>
-                       </div>
-                       <Switch
-                         id="featured"
-                         checked={form.watch("featured")}
-                         onCheckedChange={(val) => form.setValue("featured", val)}
-                         className="h-10 w-20 data-[state=checked]:bg-slate-900 border-none transition-none shadow-sm"
-                       />
-                    </div>
-
-                    <div className="flex items-center justify-between group">
-                       <div className="flex items-center gap-8">
-                          <div className="h-16 w-16 rounded-[24px] bg-slate-900 flex items-center justify-center shadow-2xl group-hover:scale-105 transition-transform duration-500">
-                             <Shield className="h-8 w-8 text-rose-500" />
-                          </div>
-                          <div className="space-y-3">
-                             <Label htmlFor="prescription" className="text-[12px] font-black uppercase tracking-[0.3em] text-slate-900 block cursor-pointer">Restricted Node Protocol</Label>
-                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] leading-none">Requires verified clinical prescription node.</p>
-                          </div>
-                       </div>
-                       <Switch
-                         id="prescription"
-                         checked={form.watch("requires_prescription")}
-                         onCheckedChange={(val) => form.setValue("requires_prescription", val)}
-                         className="h-10 w-20 data-[state=checked]:bg-rose-500 border-none transition-none shadow-sm"
-                       />
-                    </div>
-
-                    <div className="flex items-center justify-between group">
-                       <div className="flex items-center gap-8">
-                          <div className="h-16 w-16 rounded-[24px] bg-slate-900 flex items-center justify-center shadow-2xl group-hover:scale-105 transition-transform duration-500">
-                             <Activity className="h-8 w-8 text-sky-500" />
-                          </div>
-                          <div className="space-y-3">
-                             <Label htmlFor="student" className="text-[12px] font-black uppercase tracking-[0.3em] text-slate-900 block cursor-pointer">Academic Concession Stream</Label>
-                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] leading-none">Eligible for verified student-tier liquidity.</p>
-                          </div>
-                       </div>
-                       <Switch
-                         id="student"
-                         checked={form.watch("is_student_product")}
-                         onCheckedChange={(val) => form.setValue("is_student_product", val)}
-                         className="h-10 w-20 data-[state=checked]:bg-sky-500 border-none transition-none shadow-sm"
-                       />
-                    </div>
-                 </div>
-
-                 <div className="flex items-center gap-6 pl-6">
-                    <Info className="h-5 w-5 text-brand-teal" />
-                    <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] leading-relaxed">
-                       Operational parameters impact global SKU visibility, fulfillment routing & node accessibility protocols within the master matrix.
-                    </p>
-                 </div>
-               </div>
-            </div>
-
-            <SheetFooter className="pt-24 pb-16 border-t border-slate-50">
-              <Button
-                type="submit"
-                disabled={form.formState.isSubmitting || isPending}
-                className="w-full h-24 bg-slate-900 hover:bg-slate-800 text-white rounded-full font-black text-base uppercase tracking-[0.4em] shadow-2xl shadow-slate-900/40 transition-none border-none gap-10"
+          <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="category">Category</Label>
+              <Select
+                onValueChange={(val) => form.setValue("category", val)}
+                defaultValue={product?.category}
+                value={form.watch("category")}
               >
-                {form.formState.isSubmitting || isPending
-                  ? <Loader2 className="h-8 w-8 animate-spin text-brand-teal" />
-                  : product ? "UPDATE_GLOBAL_SKU_REGISTRY" : "CONFIRM_SKU_PROVISIONING_EXECUTE"}
-                {!form.formState.isSubmitting && !isPending && <ArrowRight className="h-8 w-8 text-brand-teal" />}
-              </Button>
-            </SheetFooter>
-          </form>
-        </div>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat.id} value={cat.name}>
+                      {cat.name}
+                    </SelectItem>
+                  ))}
+                  {categories.length === 0 && (
+                    <SelectItem value="Uncategorized" disabled>
+                      No categories found
+                    </SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+              {form.formState.errors.category && (
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.category.message}
+                </p>
+              )}
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="stock">Stock Level</Label>
+              <Input
+                id="stock"
+                type="number"
+                {...form.register("stock_level")}
+              />
+            </div>
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="price">Price (GHS)</Label>
+            <Input
+              id="price"
+              type="number"
+              step="0.01"
+              {...form.register("price_ghs")}
+            />
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="image">Image URL</Label>
+            <Input
+              id="image"
+              placeholder="https://..."
+              {...form.register("image_url")}
+            />
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea id="description" {...form.register("description")} />
+          </div>
+
+          <div className="flex items-center gap-4">
+            {/* Add checkboxes for boolean flags if I update the schema later, for now just ensuring ID is there */}
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="featured"
+                className="h-4 w-4 rounded border-gray-300"
+                {...form.register("featured")}
+              />
+              <Label htmlFor="featured">Featured Product</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="prescription"
+                className="h-4 w-4 rounded border-gray-300"
+                {...form.register("requires_prescription")}
+              />
+              <Label htmlFor="prescription">Requires Prescription</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="student"
+                className="h-4 w-4 rounded border-gray-300"
+                {...form.register("is_student_product")}
+              />
+              <Label htmlFor="student">Student Discount Eligible</Label>
+            </div>
+          </div>
+
+          <SheetFooter className="pt-4">
+            <Button type="submit" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? "Saving..." : "Save changes"}
+            </Button>
+          </SheetFooter>
+        </form>
       </SheetContent>
     </Sheet>
   );
