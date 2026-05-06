@@ -10,7 +10,8 @@ import { useSSE } from "@/hooks/use-sse";
 import {
   Download, TrendingUp, Users, ShoppingBag, Activity,
   Clock, Package, MapPin, Loader2, ArrowUpRight,
-  Shield, RefreshCw, AlertTriangle, Repeat2, Pill,
+  Shield, RefreshCw, AlertTriangle, Repeat2, Pill, Network,
+  Database, History, Terminal
 } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -18,17 +19,17 @@ import {
 } from "recharts";
 import { cn } from "@/lib/utils";
 
-// ─── Colour tokens ──────────────────────────────────────────────────────────
-const CAT_COLORS = ["#4f46e5", "#0d9488", "#f59e0b", "#8b5cf6", "#64748b"];
+// ─── Standardized Colour tokens ────────────────────────────────────────────────
+const CAT_COLORS = ["#0f172a", "#14b8a6", "#64748b", "#94a3b8", "#cbd5e1"];
 
 // ─── Tooltip components ─────────────────────────────────────────────────────
 const RevenueTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-lg">
-      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">{label}</p>
-      <p className="text-[15px] font-bold text-slate-900 tabular-nums">
-        GHS {Number(payload[0]?.value ?? 0).toLocaleString()}
+    <div className="rounded-[20px] border border-slate-100 bg-white px-5 py-4 shadow-2xl shadow-slate-900/10 transition-none">
+      <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-2">{label}</p>
+      <p className="text-[18px] font-black text-slate-900 tabular-nums uppercase tracking-tighter">
+        ₵{Number(payload[0]?.value ?? 0).toLocaleString()}
       </p>
     </div>
   );
@@ -37,9 +38,9 @@ const RevenueTooltip = ({ active, payload, label }: any) => {
 const BarTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-md">
-      <p className="text-[11px] text-slate-500">{label}</p>
-      <p className="text-[13px] font-bold text-slate-900">{payload[0].value} orders</p>
+    <div className="rounded-[20px] border border-slate-100 bg-white px-4 py-3 shadow-2xl shadow-slate-900/10 transition-none">
+      <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-1">{label}</p>
+      <p className="text-[15px] font-black text-slate-900 uppercase tracking-tight">{payload[0].value} ORDERS_MAPPED</p>
     </div>
   );
 };
@@ -77,7 +78,7 @@ const EXPORT_CARDS = [
     description: "Aggregated category demand, regional order volume, and fulfillment rates. Aligned with Ghana HSSP 2022-2025 CORE indicators.",
     format: "CSV",
     badge: "MOH Ready",
-    badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    badgeColor: "bg-teal-50 text-teal-600 border-teal-100",
   },
   {
     id: "gac",
@@ -86,7 +87,7 @@ const EXPORT_CARDS = [
     description: "HIV test kit demand trends, geographic hotspots, and anonymized access frequency. UNAIDS 95-95-95 cascade proxy indicators.",
     format: "CSV",
     badge: "GAC Ready",
-    badgeColor: "bg-violet-50 text-violet-700 border-violet-200",
+    badgeColor: "bg-slate-50 text-slate-600 border-slate-100",
   },
   {
     id: "msi",
@@ -95,7 +96,7 @@ const EXPORT_CARDS = [
     description: "Contraceptive and SRH product demand with refill subscription adherence rates. Aligned with MSI evidence framework.",
     format: "CSV",
     badge: "MSI Ready",
-    badgeColor: "bg-rose-50 text-rose-700 border-rose-200",
+    badgeColor: "bg-slate-50 text-slate-600 border-slate-100",
   },
   {
     id: "pharmacy",
@@ -104,7 +105,7 @@ const EXPORT_CARDS = [
     description: "Pharmacy-level revenue, order volume, and low-stock alerts. Suitable for procurement planning and stock optimization.",
     format: "PDF",
     badge: "Partner Report",
-    badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
+    badgeColor: "bg-teal-50 text-teal-600 border-teal-100",
   },
 ] as const;
 
@@ -139,15 +140,14 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
     [data.revenueChart],
   );
 
-  // Compact peak hours — group into labelled 4-hour blocks
   const peakBlocks = useMemo(() => {
     const blocks = [
-      { label: "Midnight–4am", hours: [0,1,2,3] },
-      { label: "4–8am",        hours: [4,5,6,7] },
-      { label: "8am–Noon",     hours: [8,9,10,11] },
-      { label: "Noon–4pm",     hours: [12,13,14,15] },
-      { label: "4–8pm",        hours: [16,17,18,19] },
-      { label: "8pm–Midnight", hours: [20,21,22,23] },
+      { label: "00:00–04:00", hours: [0,1,2,3] },
+      { label: "04:00–08:00", hours: [4,5,6,7] },
+      { label: "08:00–12:00", hours: [8,9,10,11] },
+      { label: "12:00–16:00", hours: [12,13,14,15] },
+      { label: "16:00–20:00", hours: [16,17,18,19] },
+      { label: "20:00–00:00", hours: [20,21,22,23] },
     ];
     return blocks.map(b => ({
       label: b.label,
@@ -157,186 +157,211 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
 
   const handleExport = (id: string) => {
     setExporting(id);
-    setTimeout(() => setExporting(null), 2500);
+    setTimeout(() => setExporting(null), 2000);
   };
 
   // ─── UI ───────────────────────────────────────────────────────────────────
   return (
-    <div className="space-y-6">
+    <div className="space-y-12 transition-none">
 
       {/* ── KPI STRIP ──────────────────────────────────────────────────── */}
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {[
-          { label: "Total Sales",       value: `GHS ${data.totalRevenue.toLocaleString()}`, sub: "All confirmed orders",        icon: TrendingUp,  color: "text-indigo-600",  bg: "bg-indigo-50" },
-          { label: "Total Orders",      value: data.totalOrders,                            sub: "Orders recorded",             icon: ShoppingBag, color: "text-teal-600",    bg: "bg-teal-50" },
-          { label: "Customers",         value: data.totalUniqueCustomers,                   sub: `${repeatRate}% are returning`, icon: Users,       color: "text-violet-600",  bg: "bg-violet-50" },
-          { label: "Processing",        value: data.activeOrders,                           sub: "Orders in fulfillment",       icon: Activity,    color: "text-amber-600",   bg: "bg-amber-50" },
-          { label: "Avg. Order",        value: `GHS ${avgOrder}`,                           sub: "Revenue per order",           icon: Package,     color: "text-indigo-600",  bg: "bg-indigo-50" },
-          { label: "Avg. Wait Time",    value: `${data.fulfillmentVelocity}h`,             sub: "Order to delivery",           icon: Clock,       color: "text-teal-600",    bg: "bg-teal-50" },
+          { label: "Total Sales",       value: `GHS ${data.totalRevenue.toLocaleString()}`, sub: "ALL_CONFIRMED_ORDERS",        icon: TrendingUp,  color: "text-slate-900",  bg: "bg-slate-50" },
+          { label: "Total Orders",      value: data.totalOrders,                            sub: "PROTOCOL_SUCCESS_COUNT",      icon: ShoppingBag, color: "text-brand-teal", bg: "bg-teal-50/50" },
+          { label: "Customers",         value: data.totalUniqueCustomers,                   sub: `${repeatRate}%_REPEAT_RATIO`, icon: Users,       color: "text-slate-900",  bg: "bg-slate-50" },
+          { label: "Processing",        value: data.activeOrders,                           sub: "ACTIVE_FULFILLMENT",          icon: Activity,    color: "text-brand-teal", bg: "bg-teal-50/50" },
+          { label: "Avg. Order",        value: `GHS ${avgOrder}`,                           sub: "YIELD_PER_MATRIX_NODE",       icon: Package,     color: "text-slate-900",  bg: "bg-slate-50" },
+          { label: "Avg. Wait Time",    value: `${data.fulfillmentVelocity}h`,             sub: "LATENCY_NOMINAL",             icon: Clock,       color: "text-brand-teal", bg: "bg-teal-50/50" },
         ].map(({ label, value, sub, icon: Icon, color, bg }) => (
-          <Card key={label} className="border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow bg-white">
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between mb-3">
-                <div className={cn("h-8 w-8 rounded-lg flex items-center justify-center", bg)}>
-                  <Icon className={cn("h-4 w-4", color)} />
+          <Card key={label} className="border border-slate-100 shadow-2xl shadow-slate-900/5 rounded-[32px] bg-white hover:shadow-slate-900/10 transition-none overflow-hidden group">
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div className={cn("h-10 w-10 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 duration-500", bg)}>
+                  <Icon className={cn("h-5 w-5", color)} />
                 </div>
-                <ArrowUpRight className="h-3.5 w-3.5 text-slate-200" />
+                <ArrowUpRight className="h-4 w-4 text-slate-100 group-hover:text-brand-teal transition-colors" />
               </div>
-              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">{label}</p>
-              <p className="text-[20px] font-black text-slate-900 tabular-nums leading-tight">{value}</p>
-              <p className="text-[10px] text-slate-400 mt-1">{sub}</p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-1">{label}</p>
+              <p className="text-[24px] font-black text-slate-900 tabular-nums leading-none tracking-tighter">{value}</p>
+              <p className="text-[10px] font-black text-slate-200 mt-2 uppercase tracking-[0.2em]">{sub}</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
       {/* ── TABS ───────────────────────────────────────────────────────── */}
-      <Tabs defaultValue="overview" className="space-y-5">
-        <TabsList className="bg-slate-100 p-1 rounded-full h-10 w-fit gap-0.5">
+      <Tabs defaultValue="overview" className="space-y-10">
+        <TabsList className="bg-slate-50 p-2 rounded-full h-16 w-fit gap-2 border border-slate-100 shadow-sm">
           {[
             { value: "overview",  label: "Overview" },
             { value: "health",    label: "Public Health" },
             { value: "network",   label: "Pharmacy Network" },
-            { value: "hub",       label: "Data Hub", special: true },
-          ].map(({ value, label, special }) => (
+            { value: "hub",       label: "Data Hub" },
+          ].map(({ value, label }) => (
             <TabsTrigger
               key={value}
               value={value}
               className={cn(
-                "rounded-full px-5 text-xs font-semibold data-[state=active]:shadow-sm data-[state=active]:bg-white",
-                special && "data-[state=active]:bg-indigo-600 data-[state=active]:text-white",
+                "rounded-full px-8 h-12 text-[12px] font-black uppercase tracking-[0.25em] transition-none data-[state=active]:shadow-2xl data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-slate-900/40 text-slate-400 hover:text-slate-900",
               )}
             >
-              {special && <Shield className="h-3 w-3 mr-1.5 inline-block" />}
               {label}
             </TabsTrigger>
           ))}
         </TabsList>
 
         {/* ── OVERVIEW TAB ─────────────────────────────────────────────── */}
-        <TabsContent value="overview" className="space-y-6">
+        <TabsContent value="overview" className="space-y-10 focus-visible:outline-none">
           {/* Revenue chart */}
-          <Card className="border border-slate-200/80 shadow-sm bg-white">
-            <CardHeader className="pb-2">
+          <Card className="border border-slate-100 shadow-2xl shadow-slate-900/5 bg-white rounded-[40px] overflow-hidden">
+            <CardHeader className="p-8 pb-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-[13px] font-bold text-slate-700">Daily Sales — Last 30 Days</CardTitle>
-                  <CardDescription className="text-[11px] mt-0.5">Revenue across all partner pharmacies</CardDescription>
+                  <div className="flex items-center gap-6 mb-2">
+                    <div className="h-1.5 w-12 bg-brand-teal rounded-full shadow-[0_0_10px_rgba(20,184,166,0.6)]" />
+                    <CardTitle className="text-xl font-black text-slate-900 uppercase tracking-tighter">DAILY_SALES_MANIFEST</CardTitle>
+                  </div>
+                  <CardDescription className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] ml-18">Operational yield across global network matrix (Last 30 Cycles)</CardDescription>
                 </div>
-                <Badge variant="outline" className="text-[10px] border-emerald-200 text-emerald-600 bg-emerald-50/50 font-semibold">Live</Badge>
+                <div className="h-12 px-6 rounded-full bg-slate-900 text-brand-teal flex items-center text-[12px] font-black uppercase tracking-[0.3em] shadow-2xl shadow-slate-900/40">
+                  <Activity className="h-5 w-5 mr-3" />
+                  LIVE_PULSE_SYNC
+                </div>
               </div>
             </CardHeader>
-            <CardContent className="pt-0 pl-0 pb-2">
-              <div className="h-[240px]">
+            <CardContent className="p-8 pt-4 pl-0 pb-6">
+              <div className="h-[320px]">
                 {chartData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-                      <defs>
-                        <linearGradient id="gradRev" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%"  stopColor="#4f46e5" stopOpacity={0.12} />
-                          <stop offset="95%" stopColor="#4f46e5" stopOpacity={0} />
-                        </linearGradient>
-                      </defs>
-                      <XAxis dataKey="date" stroke="#cbd5e1" fontSize={10} tickLine={false} axisLine={false} minTickGap={28} />
-                      <YAxis stroke="#cbd5e1" fontSize={10} tickLine={false} axisLine={false} tickFormatter={v => `₵${v}`} width={44} />
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                      <Tooltip content={<RevenueTooltip />} cursor={{ stroke: '#94a3b8', strokeWidth: 1, strokeDasharray: '4 4' }} />
-                      <Area type="monotone" dataKey="revenue" stroke="#4f46e5" strokeWidth={2} fillOpacity={1} fill="url(#gradRev)" dot={false} activeDot={{ r: 4, strokeWidth: 0 }} connectNulls />
+                    <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 10, bottom: 0 }}>
+                      <XAxis dataKey="date" stroke="#cbd5e1" fontSize={10} tickLine={false} axisLine={false} minTickGap={28} dy={10} />
+                      <YAxis stroke="#cbd5e1" fontSize={10} tickLine={false} axisLine={false} tickFormatter={v => `₵${v}`} width={60} />
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f8fafc" />
+                      <Tooltip content={<RevenueTooltip />} cursor={{ stroke: '#14b8a6', strokeWidth: 2, strokeDasharray: '4 4' }} />
+                      <Area 
+                        type="monotone" 
+                        dataKey="revenue" 
+                        stroke="#0f172a" 
+                        strokeWidth={4} 
+                        fillOpacity={0.05} 
+                        fill="#0f172a" 
+                        dot={false} 
+                        activeDot={{ r: 6, strokeWidth: 0, fill: "#14b8a6" }} 
+                        connectNulls 
+                      />
                     </AreaChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="h-full flex items-center justify-center text-slate-400 text-xs">No sales data for this period.</div>
+                  <div className="h-full flex flex-col items-center justify-center text-slate-200 uppercase tracking-[0.3em] text-[11px] font-black">
+                    <History className="h-10 w-10 mb-4 opacity-10" />
+                    NO_HISTORICAL_STREAMS_MAPPED
+                  </div>
                 )}
               </div>
             </CardContent>
           </Card>
 
           {/* Order status donut | Category demand */}
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid gap-10 lg:grid-cols-2">
             {/* Status donut */}
-            <Card className="border border-slate-200/80 shadow-sm bg-white">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-[13px] font-bold text-slate-700">Order Status Breakdown</CardTitle>
-                <CardDescription className="text-[11px]">Current distribution across fulfillment stages</CardDescription>
+            <Card className="border border-slate-100 shadow-2xl shadow-slate-900/5 bg-white rounded-[40px]">
+              <CardHeader className="p-8 pb-4">
+                <div className="flex items-center gap-6 mb-2">
+                  <div className="h-1.5 w-12 bg-slate-900 rounded-full" />
+                  <CardTitle className="text-xl font-black text-slate-900 uppercase tracking-tighter">ORDER_STATUS_TELEMETRY</CardTitle>
+                </div>
+                <CardDescription className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] ml-18">Lifecycle distribution across fulfillment nodes</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-8 pt-4">
                 {data.orderStatusBreakdown.length > 0 ? (
-                  <div className="flex items-center gap-6">
-                    <div className="relative h-[160px] w-[160px] shrink-0">
+                  <div className="flex flex-col md:flex-row items-center gap-12">
+                    <div className="relative h-[200px] w-[200px] shrink-0">
                       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Total</span>
-                        <span className="text-2xl font-black text-slate-900">{totalStatusOrders}</span>
+                        <span className="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em]">TOTAL</span>
+                        <span className="text-4xl font-black text-slate-900 tabular-nums tracking-tighter leading-none">{totalStatusOrders}</span>
                       </div>
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
-                          <Pie data={data.orderStatusBreakdown} cx="50%" cy="50%" innerRadius={52} outerRadius={72} stroke="none" paddingAngle={2} dataKey="value">
-                            {data.orderStatusBreakdown.map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                          <Pie 
+                            data={data.orderStatusBreakdown} 
+                            cx="50%" 
+                            cy="50%" 
+                            innerRadius={70} 
+                            outerRadius={95} 
+                            stroke="none" 
+                            paddingAngle={4} 
+                            dataKey="value"
+                          >
+                            {data.orderStatusBreakdown.map((entry, i) => <Cell key={i} fill={entry.color === "#4f46e5" ? "#0f172a" : entry.color} />)}
                           </Pie>
-                          <Tooltip formatter={(v: any) => [`${v} orders`, ""]} contentStyle={{ borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 11 }} />
+                          <Tooltip contentStyle={{ borderRadius: 20, border: "none", boxShadow: "0 25px 50px -12px rgb(0 0 0 / 0.15)", textTransform: "uppercase", fontWeight: 900, fontSize: 11, letterSpacing: "0.2em" }} />
                         </PieChart>
                       </ResponsiveContainer>
                     </div>
-                    <div className="flex-1 space-y-3">
+                    <div className="flex-1 w-full space-y-4">
                       {data.orderStatusBreakdown.map((s, i) => (
-                        <div key={i} className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: s.color }} />
-                            <span className="text-[12px] font-medium text-slate-600">{s.name}</span>
+                        <div key={i} className="flex items-center justify-between p-4 rounded-[24px] bg-slate-50/50 border border-slate-50 transition-none group hover:bg-white hover:border-slate-100 hover:shadow-lg hover:shadow-slate-900/5">
+                          <div className="flex items-center gap-4">
+                            <div className="h-3 w-3 rounded-full" style={{ backgroundColor: s.color === "#4f46e5" ? "#0f172a" : s.color }} />
+                            <span className="text-[12px] font-black text-slate-900 uppercase tracking-[0.2em]">{s.name}</span>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-[12px] font-bold text-slate-800 tabular-nums">{s.value}</span>
-                            <span className="text-[10px] text-slate-400 w-8 text-right">
+                          <div className="flex items-center gap-6">
+                            <span className="text-[14px] font-black text-slate-900 tabular-nums">{s.value}</span>
+                            <div className="h-8 px-4 rounded-full bg-white border border-slate-100 flex items-center text-[10px] font-black text-slate-400 uppercase tracking-widest tabular-nums">
                               {totalStatusOrders > 0 ? Math.round((s.value / totalStatusOrders) * 100) : 0}%
-                            </span>
+                            </div>
                           </div>
                         </div>
                       ))}
                     </div>
                   </div>
                 ) : (
-                  <div className="h-40 flex items-center justify-center text-slate-400 text-xs">No order data.</div>
+                  <div className="h-40 flex items-center justify-center text-slate-200 uppercase tracking-[0.3em] text-[11px] font-black italic">NO_DATA_MAPPED</div>
                 )}
               </CardContent>
             </Card>
 
             {/* SRH category demand */}
-            <Card className="border border-slate-200/80 shadow-sm bg-white">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-[13px] font-bold text-slate-700">SRH Product Demand</CardTitle>
-                <CardDescription className="text-[11px]">Units dispensed by health category</CardDescription>
+            <Card className="border border-slate-100 shadow-2xl shadow-slate-900/5 bg-white rounded-[40px]">
+              <CardHeader className="p-8 pb-4">
+                <div className="flex items-center gap-6 mb-2">
+                  <div className="h-1.5 w-12 bg-brand-teal rounded-full" />
+                  <CardTitle className="text-xl font-black text-slate-900 uppercase tracking-tighter">SRH_CATEGORY_DEMAND</CardTitle>
+                </div>
+                <CardDescription className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] ml-18">Units dispensed by clinical classification</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-8 pt-4">
                 {data.categoryBreakdown.length > 0 ? (
-                  <div className="flex items-start gap-4">
-                    <div className="h-[160px] w-[160px] shrink-0">
+                  <div className="flex flex-col md:flex-row items-center gap-12">
+                    <div className="h-[200px] w-[200px] shrink-0">
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
-                          <Pie data={data.categoryBreakdown} cx="50%" cy="50%" innerRadius={40} outerRadius={70} stroke="none" paddingAngle={2} dataKey="value">
+                          <Pie data={data.categoryBreakdown} cx="50%" cy="50%" innerRadius={60} outerRadius={90} stroke="none" paddingAngle={4} dataKey="value">
                             {data.categoryBreakdown.map((_, i) => <Cell key={i} fill={CAT_COLORS[i % CAT_COLORS.length]} />)}
                           </Pie>
-                          <Tooltip formatter={(v: any) => [`${v} units`, ""]} contentStyle={{ borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 11 }} />
                         </PieChart>
                       </ResponsiveContainer>
                     </div>
-                    <div className="flex-1 space-y-3 pt-2">
+                    <div className="flex-1 w-full space-y-5 pt-2">
                       {data.categoryBreakdown.map((c, i) => (
-                        <div key={i}>
-                          <div className="flex justify-between text-[11px] mb-1">
-                            <span className="font-medium text-slate-600 flex items-center gap-1.5">
-                              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: CAT_COLORS[i % CAT_COLORS.length] }} />
+                        <div key={i} className="group">
+                          <div className="flex justify-between text-[11px] font-black mb-2 uppercase tracking-[0.2em]">
+                            <span className="text-slate-400 flex items-center gap-3">
+                              <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: CAT_COLORS[i % CAT_COLORS.length] }} />
                               {c.name}
                             </span>
-                            <span className="font-bold text-slate-800 tabular-nums">{c.value} units</span>
+                            <span className="text-slate-900 tabular-nums">{c.value} UNITS</span>
                           </div>
-                          <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                            <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.round((c.value / (data.categoryBreakdown[0]?.value || 1)) * 100)}%`, backgroundColor: CAT_COLORS[i % CAT_COLORS.length] }} />
+                          <div className="h-2 bg-slate-50 rounded-full overflow-hidden border border-slate-100 shadow-inner">
+                            <div className="h-full rounded-full transition-none" style={{ width: `${Math.round((c.value / (data.categoryBreakdown[0]?.value || 1)) * 100)}%`, backgroundColor: CAT_COLORS[i % CAT_COLORS.length] }} />
                           </div>
                         </div>
                       ))}
                     </div>
                   </div>
                 ) : (
-                  <div className="h-40 flex items-center justify-center text-slate-400 text-xs">No product data to classify.</div>
+                  <div className="h-40 flex items-center justify-center text-slate-200 uppercase tracking-[0.3em] text-[11px] font-black italic">NO_DATA_MAPPED</div>
                 )}
               </CardContent>
             </Card>
@@ -344,52 +369,52 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
         </TabsContent>
 
         {/* ── PUBLIC HEALTH TAB ─────────────────────────────────────────── */}
-        <TabsContent value="health" className="space-y-6">
-          {/* Geo coverage + peak hours */}
-          <div className="grid gap-6 lg:grid-cols-2">
+        <TabsContent value="health" className="space-y-10 focus-visible:outline-none">
+          <div className="grid gap-10 lg:grid-cols-2">
             {/* Geographic coverage */}
-            <Card className="border border-slate-200/80 shadow-sm bg-white">
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-3.5 w-3.5 text-teal-600" />
-                  <CardTitle className="text-[13px] font-bold text-slate-700">Delivery Coverage by Area</CardTitle>
+            <Card className="border border-slate-100 shadow-2xl shadow-slate-900/5 bg-white rounded-[40px]">
+              <CardHeader className="p-8 pb-4">
+                <div className="flex items-center gap-6 mb-2">
+                  <MapPin className="h-6 w-6 text-brand-teal" />
+                  <CardTitle className="text-xl font-black text-slate-900 uppercase tracking-tighter">DELIVERY_COVERAGE_MATRIX</CardTitle>
                 </div>
-                <CardDescription className="text-[11px]">Order volume per area — useful for identifying underserved regions</CardDescription>
+                <CardDescription className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] ml-18">Protocol volume mapped by regional terminal nodes</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-8 pt-4">
                 {data.topAreas.length > 0 ? (
-                  <div className="h-[220px]">
+                  <div className="h-[280px]">
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart layout="vertical" data={data.topAreas} margin={{ top: 0, right: 12, left: 70, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
+                      <BarChart layout="vertical" data={data.topAreas} margin={{ top: 0, right: 30, left: 80, bottom: 0 }}>
                         <XAxis type="number" fontSize={10} stroke="#cbd5e1" axisLine={false} tickLine={false} />
-                        <YAxis dataKey="name" type="category" fontSize={10} stroke="#64748b" axisLine={false} tickLine={false} width={70} />
+                        <YAxis dataKey="name" type="category" fontSize={10} stroke="#64748b" axisLine={false} tickLine={false} width={80} textAnchor="end" />
                         <Tooltip content={<BarTooltip />} cursor={{ fill: '#f8fafc' }} />
-                        <Bar dataKey="value" fill="#0d9488" radius={[0, 5, 5, 0]} barSize={18} />
+                        <Bar dataKey="value" fill="#14b8a6" radius={[0, 10, 10, 0]} barSize={24} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
                 ) : (
-                  <div className="h-40 flex items-center justify-center text-slate-400 text-xs">No delivery area data available.</div>
+                  <div className="h-40 flex items-center justify-center text-slate-200 uppercase tracking-[0.3em] text-[11px] font-black italic">NO_DATA_MAPPED</div>
                 )}
               </CardContent>
             </Card>
 
             {/* Peak ordering times */}
-            <Card className="border border-slate-200/80 shadow-sm bg-white">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-[13px] font-bold text-slate-700">When People Order</CardTitle>
-                <CardDescription className="text-[11px]">Order frequency by time of day — informs staffing and outreach timing</CardDescription>
+            <Card className="border border-slate-100 shadow-2xl shadow-slate-900/5 bg-white rounded-[40px]">
+              <CardHeader className="p-8 pb-4">
+                <div className="flex items-center gap-6 mb-2">
+                  <Clock className="h-6 w-6 text-slate-900" />
+                  <CardTitle className="text-xl font-black text-slate-900 uppercase tracking-tighter">TEMPORAL_ORDER_DENSITY</CardTitle>
+                </div>
+                <CardDescription className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] ml-18">Temporal mapping of protocol initialization frequency</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="h-[220px]">
+              <CardContent className="p-8 pt-4">
+                <div className="h-[280px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={peakBlocks} margin={{ top: 0, right: 12, left: -10, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                    <BarChart data={peakBlocks} margin={{ top: 0, right: 20, left: 0, bottom: 0 }}>
                       <XAxis dataKey="label" fontSize={9} stroke="#cbd5e1" axisLine={false} tickLine={false} />
                       <YAxis fontSize={10} stroke="#cbd5e1" axisLine={false} tickLine={false} />
                       <Tooltip content={<BarTooltip />} cursor={{ fill: '#f8fafc' }} />
-                      <Bar dataKey="orders" fill="#4f46e5" radius={[5, 5, 0, 0]} barSize={32} />
+                      <Bar dataKey="orders" fill="#0f172a" radius={[10, 10, 0, 0]} barSize={40} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -398,77 +423,80 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
           </div>
 
           {/* Refill adherence | Repeat customers */}
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid gap-10 lg:grid-cols-2">
             {/* Refill adherence */}
-            <Card className="border border-slate-200/80 shadow-sm bg-white">
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-2">
-                  <RefreshCw className="h-3.5 w-3.5 text-violet-600" />
-                  <CardTitle className="text-[13px] font-bold text-slate-700">Medication Refill Adherence</CardTitle>
+            <Card className="border border-slate-100 shadow-2xl shadow-slate-900/5 bg-white rounded-[40px]">
+              <CardHeader className="p-8 pb-4">
+                <div className="flex items-center gap-6 mb-2">
+                  <RefreshCw className="h-6 w-6 text-brand-teal" />
+                  <CardTitle className="text-xl font-black text-slate-900 uppercase tracking-tighter">MEDICATION_REFILL_ADHERENCE</CardTitle>
                 </div>
-                <CardDescription className="text-[11px]">Proxy for treatment continuity — key indicator for MOH & Marie Stopes</CardDescription>
+                <CardDescription className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] ml-18">Sustained clinical continuity proxy (Clinical Grade)</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-8 pt-4">
                 {totalRefills > 0 ? (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-3xl font-black text-slate-900">{adherenceRate}%</span>
-                      <span className="text-[11px] text-slate-400">adherence rate</span>
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between p-6 rounded-[32px] bg-slate-50/50 border border-slate-50">
+                      <span className="text-5xl font-black text-slate-900 tracking-tighter">{adherenceRate}%</span>
+                      <div className="text-right">
+                          <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] mb-1">NETWORK_ADHERENCE</p>
+                          <div className="h-1.5 w-24 bg-brand-teal rounded-full shadow-[0_0_10px_rgba(20,184,166,0.6)] ml-auto" />
+                      </div>
                     </div>
                     {[
-                      { label: "Active Subscriptions",    value: data.refillActive,    color: "#10b981" },
-                      { label: "Paused",                  value: data.refillPaused,    color: "#f59e0b" },
-                      { label: "Discontinued",            value: data.refillCancelled, color: "#f43f5e" },
+                      { label: "Active Subscriptions",    value: data.refillActive,    color: "#14b8a6" },
+                      { label: "Paused",                  value: data.refillPaused,    color: "#64748b" },
+                      { label: "Discontinued",            value: data.refillCancelled, color: "#0f172a" },
                     ].map(({ label, value, color }) => (
                       <div key={label}>
-                        <div className="flex justify-between text-[11px] mb-1">
-                          <span className="font-medium text-slate-600">{label}</span>
-                          <span className="font-bold text-slate-800">{value}</span>
+                        <div className="flex justify-between text-[11px] font-black mb-2 uppercase tracking-[0.2em]">
+                          <span className="text-slate-400">{label}</span>
+                          <span className="text-slate-900 tabular-nums">{value} STREAMS</span>
                         </div>
-                        <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                          <div className="h-full rounded-full" style={{ width: `${totalRefills > 0 ? Math.round((value / totalRefills) * 100) : 0}%`, backgroundColor: color }} />
+                        <div className="h-2 bg-slate-50 rounded-full overflow-hidden border border-slate-100 shadow-inner">
+                          <div className="h-full rounded-full transition-none" style={{ width: `${totalRefills > 0 ? Math.round((value / totalRefills) * 100) : 0}%`, backgroundColor: color }} />
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="h-32 flex items-center justify-center text-slate-400 text-xs">No refill subscription data.</div>
+                  <div className="h-32 flex items-center justify-center text-slate-200 uppercase tracking-[0.3em] text-[11px] font-black italic">NO_SUBSCRIPTION_DATA</div>
                 )}
               </CardContent>
             </Card>
 
             {/* Repeat customers */}
-            <Card className="border border-slate-200/80 shadow-sm bg-white">
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-2">
-                  <Repeat2 className="h-3.5 w-3.5 text-indigo-600" />
-                  <CardTitle className="text-[13px] font-bold text-slate-700">Customer Retention</CardTitle>
+            <Card className="border border-slate-100 shadow-2xl shadow-slate-900/5 bg-white rounded-[40px]">
+              <CardHeader className="p-8 pb-4">
+                <div className="flex items-center gap-6 mb-2">
+                  <Repeat2 className="h-6 w-6 text-slate-900" />
+                  <CardTitle className="text-xl font-black text-slate-900 uppercase tracking-tighter">RETENTION_STABILITY_INDEX</CardTitle>
                 </div>
-                <CardDescription className="text-[11px]">Proxy for sustained access to SRH care — measures program stickiness</CardDescription>
+                <CardDescription className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] ml-18">Proxy for health equity & program stickiness</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-5 pt-2">
-                  <div className="grid grid-cols-2 gap-4">
+              <CardContent className="p-8 pt-4">
+                <div className="space-y-8 pt-2">
+                  <div className="grid grid-cols-2 gap-6">
                     {[
-                      { label: "Unique Customers",   value: data.totalUniqueCustomers, color: "text-indigo-600" },
-                      { label: "Returning Customers", value: data.repeatCustomers,      color: "text-teal-600" },
+                      { label: "UNIQUE_CUSTOMERS",   value: data.totalUniqueCustomers, color: "text-slate-900" },
+                      { label: "RETURNING_NODES",    value: data.repeatCustomers,      color: "text-brand-teal" },
                     ].map(({ label, value, color }) => (
-                      <div key={label} className="p-4 rounded-xl bg-slate-50 border border-slate-100 text-center">
-                        <p className={cn("text-2xl font-black tabular-nums", color)}>{value}</p>
-                        <p className="text-[10px] text-slate-400 mt-1 font-medium">{label}</p>
+                      <div key={label} className="p-6 rounded-[32px] bg-slate-50 border border-slate-100 text-center shadow-inner">
+                        <p className={cn("text-4xl font-black tabular-nums tracking-tighter", color)}>{value}</p>
+                        <p className="text-[10px] font-black text-slate-400 mt-2 uppercase tracking-[0.2em]">{label}</p>
                       </div>
                     ))}
                   </div>
                   <div>
-                    <div className="flex justify-between text-[11px] mb-1.5">
-                      <span className="text-slate-500 font-medium">Return rate</span>
-                      <span className="font-bold text-slate-800">{repeatRate}%</span>
+                    <div className="flex justify-between text-[12px] font-black mb-3 uppercase tracking-[0.3em]">
+                      <span className="text-slate-400">NETWORK_RETURN_VELOCITY</span>
+                      <span className="text-slate-900">{repeatRate}%</span>
                     </div>
-                    <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
-                      <div className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-teal-500 transition-all duration-700" style={{ width: `${repeatRate}%` }} />
+                    <div className="h-4 bg-slate-50 rounded-full overflow-hidden border border-slate-100 shadow-inner p-1">
+                      <div className="h-full rounded-full bg-slate-900 transition-none" style={{ width: `${repeatRate}%` }} />
                     </div>
-                    <p className="text-[10px] text-slate-400 mt-2">
-                      A higher return rate indicates sustained access to SRH products — a key health equity signal.
+                    <p className="text-[10px] font-black text-slate-300 mt-4 uppercase tracking-[0.2em] leading-relaxed">
+                      Higher return velocity indicates sustained access to clinical SRH products — key equity metric.
                     </p>
                   </div>
                 </div>
@@ -478,111 +506,111 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
         </TabsContent>
 
         {/* ── PHARMACY NETWORK TAB ─────────────────────────────────────── */}
-        <TabsContent value="network" className="space-y-6">
-          {/* Partner performance */}
-          <Card className="border border-slate-200/80 shadow-sm bg-white">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-[13px] font-bold text-slate-700">Partner Pharmacy Performance</CardTitle>
-              <CardDescription className="text-[11px]">Ranked by total revenue contribution</CardDescription>
+        <TabsContent value="network" className="space-y-10 focus-visible:outline-none">
+          <Card className="border border-slate-100 shadow-2xl shadow-slate-900/5 bg-white rounded-[40px]">
+            <CardHeader className="p-8 pb-4">
+              <div className="flex items-center gap-6 mb-2">
+                <Network className="h-6 w-6 text-brand-teal" />
+                <CardTitle className="text-xl font-black text-slate-900 uppercase tracking-tighter">PARTNER_TERMINAL_YIELD</CardTitle>
+              </div>
+              <CardDescription className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] ml-18">Node ranking by cumulative fiscal contribution</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-8 pt-4">
               {data.topPharmacies.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {data.topPharmacies.map((p: any, i: number) => {
                     const maxRev = data.topPharmacies[0]?.revenue || 1;
                     const pct = Math.round((p.revenue / maxRev) * 100);
                     return (
-                      <div key={i} className="space-y-1.5">
+                      <div key={i} className="space-y-3">
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2.5">
-                            <span className="h-6 w-6 rounded-md bg-indigo-50 text-indigo-700 flex items-center justify-center text-[10px] font-black shrink-0">{i + 1}</span>
-                            <span className="text-[13px] font-semibold text-slate-800 truncate max-w-[200px]">{p.name}</span>
+                          <div className="flex items-center gap-4">
+                            <span className="h-10 w-10 rounded-2xl bg-slate-900 text-white flex items-center justify-center text-[12px] font-black shrink-0 shadow-lg shadow-slate-900/20">{i + 1}</span>
+                            <span className="text-base font-black text-slate-800 uppercase tracking-tight">{p.name}</span>
                           </div>
-                          <span className="text-[13px] font-bold text-slate-800 tabular-nums shrink-0">GHS {Number(p.revenue).toLocaleString()}</span>
+                          <span className="text-[18px] font-black text-slate-900 tabular-nums uppercase tracking-tighter">₵{Number(p.revenue).toLocaleString()}</span>
                         </div>
-                        <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                          <div className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-indigo-400 transition-all duration-700" style={{ width: `${pct}%` }} />
+                        <div className="h-2.5 bg-slate-50 rounded-full overflow-hidden border border-slate-100 shadow-inner">
+                          <div className="h-full rounded-full bg-slate-900 transition-none" style={{ width: `${pct}%` }} />
                         </div>
                       </div>
                     );
                   })}
                 </div>
               ) : (
-                <div className="text-center py-10 text-slate-400 text-xs">No pharmacy data available.</div>
+                <div className="text-center py-10 text-slate-200 uppercase tracking-[0.3em] text-[11px] font-black italic">NO_TERMINAL_DATA</div>
               )}
             </CardContent>
           </Card>
 
-          {/* Top products table + Low stock alerts */}
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Card className="border border-slate-200/80 shadow-sm bg-white">
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-2">
-                  <Pill className="h-3.5 w-3.5 text-violet-600" />
-                  <CardTitle className="text-[13px] font-bold text-slate-700">Best Selling Products</CardTitle>
+          <div className="grid gap-10 lg:grid-cols-2">
+            <Card className="border border-slate-100 shadow-2xl shadow-slate-900/5 bg-white rounded-[40px]">
+              <CardHeader className="p-8 pb-4">
+                <div className="flex items-center gap-6 mb-2">
+                  <Pill className="h-6 w-6 text-slate-900" />
+                  <CardTitle className="text-xl font-black text-slate-900 uppercase tracking-tighter">TOP_VELOCITY_SKUS</CardTitle>
                 </div>
-                <CardDescription className="text-[11px]">Most ordered items across all partner pharmacies</CardDescription>
+                <CardDescription className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] ml-18">Best selling clinical items across node matrix</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-8 pt-4">
                 {data.topProducts.length > 0 ? (
-                  <div className="space-y-1">
-                    <div className="grid grid-cols-12 gap-2 px-2 py-1.5">
-                      <span className="col-span-1 text-[9px] font-bold text-slate-400 uppercase">#</span>
-                      <span className="col-span-5 text-[9px] font-bold text-slate-400 uppercase">Product</span>
-                      <span className="col-span-3 text-[9px] font-bold text-slate-400 uppercase text-right">Units</span>
-                      <span className="col-span-3 text-[9px] font-bold text-slate-400 uppercase text-right">Revenue</span>
+                  <div className="space-y-2">
+                    <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-slate-50 rounded-2xl mb-4 border border-slate-100">
+                      <span className="col-span-1 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">#</span>
+                      <span className="col-span-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">SKU_IDENTITY</span>
+                      <span className="col-span-3 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">UNITS</span>
+                      <span className="col-span-3 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">YIELD</span>
                     </div>
                     {data.topProducts.map((p: any, i: number) => (
-                      <div key={i} className="grid grid-cols-12 gap-2 px-2 py-2.5 rounded-lg hover:bg-slate-50 transition-colors items-center">
-                        <span className="col-span-1 text-[11px] font-bold text-slate-300">{i + 1}</span>
+                      <div key={i} className="grid grid-cols-12 gap-4 px-4 py-4 rounded-[24px] hover:bg-slate-50 transition-none items-center group">
+                        <span className="col-span-1 text-[12px] font-black text-slate-300">{i + 1}</span>
                         <div className="col-span-5">
-                          <p className="text-[12px] font-semibold text-slate-800 truncate">{p.name}</p>
+                          <p className="text-[13px] font-black text-slate-900 uppercase tracking-tight truncate group-hover:text-brand-teal transition-colors">{p.name}</p>
                         </div>
                         <div className="col-span-3 text-right">
-                          <span className="text-[12px] font-bold text-slate-700 tabular-nums">{p.quantity}</span>
+                          <span className="text-[14px] font-black text-slate-700 tabular-nums">×{p.quantity}</span>
                         </div>
                         <div className="col-span-3 text-right">
-                          <span className="text-[12px] font-bold text-indigo-600 tabular-nums">GHS {Number(p.revenue || 0).toLocaleString()}</span>
+                          <span className="text-[14px] font-black text-slate-900 tabular-nums">₵{Number(p.revenue || 0).toLocaleString()}</span>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-slate-400 text-xs">No product data.</div>
+                  <div className="text-center py-8 text-slate-200 uppercase tracking-[0.3em] text-[11px] font-black italic">NO_SKU_DATA</div>
                 )}
               </CardContent>
             </Card>
 
-            {/* Low stock alerts */}
-            <Card className="border border-slate-200/80 shadow-sm bg-white">
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
-                  <CardTitle className="text-[13px] font-bold text-slate-700">Low Stock Alerts</CardTitle>
+            <Card className="border border-slate-100 shadow-2xl shadow-slate-900/5 bg-white rounded-[40px]">
+              <CardHeader className="p-8 pb-4">
+                <div className="flex items-center gap-6 mb-2">
+                  <AlertTriangle className="h-6 w-6 text-amber-500" />
+                  <CardTitle className="text-xl font-black text-slate-900 uppercase tracking-tighter">LOW_STOCK_ALERTS</CardTitle>
                 </div>
-                <CardDescription className="text-[11px]">
-                  Products at &lt; 5 units — may require restocking
-                  <span className="ml-1 text-slate-400 italic">(data may be up to 24h stale)</span>
-                </CardDescription>
+                <CardDescription className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] ml-18">Nodes reporting critical inventory depletion (&lt;5 Units)</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-8 pt-4">
                 {data.lowStockAlerts.length > 0 ? (
-                  <div className="space-y-2">
+                  <div className="space-y-4">
                     {data.lowStockAlerts.map((alert, i) => (
-                      <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-amber-50/50 border border-amber-100">
+                      <div key={i} className="flex items-center justify-between p-5 rounded-[32px] bg-amber-50/30 border border-amber-100 group transition-none">
                         <div>
-                          <p className="text-[12px] font-semibold text-slate-800">{alert.product}</p>
-                          <p className="text-[10px] text-slate-400">{alert.pharmacy}</p>
+                          <p className="text-[14px] font-black text-slate-900 uppercase tracking-tight">{alert.product}</p>
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1 flex items-center gap-2">
+                              <Terminal className="h-3 w-3" />
+                              {alert.pharmacy}
+                          </p>
                         </div>
-                        <Badge variant="outline" className="text-[10px] border-amber-200 bg-amber-50 text-amber-700 font-bold">
-                          {alert.stockLevel} left
-                        </Badge>
+                        <div className="h-10 px-5 rounded-full bg-amber-100 text-amber-700 flex items-center text-[12px] font-black uppercase tracking-[0.2em] shadow-sm">
+                          {alert.stockLevel} CRITICAL_YIELD
+                        </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="h-32 flex items-center justify-center text-slate-400 text-xs">
-                    No low-stock items detected.
+                  <div className="h-32 flex items-center justify-center text-slate-200 uppercase tracking-[0.3em] text-[11px] font-black italic">
+                    INVENTORY_NOMINAL
                   </div>
                 )}
               </CardContent>
@@ -591,16 +619,17 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
         </TabsContent>
 
         {/* ── DATA HUB TAB ─────────────────────────────────────────────── */}
-        <TabsContent value="hub" className="space-y-6">
+        <TabsContent value="hub" className="space-y-10 focus-visible:outline-none">
           {/* Disclaimer */}
-          <div className="rounded-2xl border border-indigo-100 bg-indigo-50/40 p-5">
-            <div className="flex items-start gap-3">
-              <div className="h-9 w-9 rounded-xl bg-indigo-600 flex items-center justify-center shrink-0">
-                <Shield className="h-5 w-5 text-white" />
+          <div className="rounded-[40px] border border-slate-100 bg-slate-50/50 p-8 relative overflow-hidden shadow-2xl shadow-slate-900/5">
+            <div className="absolute top-0 left-0 w-2 h-full bg-slate-900" />
+            <div className="flex items-start gap-6">
+              <div className="h-14 w-14 rounded-[24px] bg-slate-900 flex items-center justify-center shrink-0 shadow-2xl shadow-slate-900/30">
+                <Shield className="h-7 w-7 text-brand-teal" />
               </div>
               <div>
-                <h3 className="text-[14px] font-bold text-indigo-900">Anonymized Data Hub</h3>
-                <p className="text-[11px] text-indigo-700 mt-0.5 leading-relaxed max-w-2xl">
+                <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-2">ANONYMIZED_DATA_HUB</h3>
+                <p className="text-[12px] font-black text-slate-400 uppercase tracking-[0.3em] leading-relaxed max-w-4xl opacity-80">
                   All exports are stripped of personally identifiable information (PII). Patient identifiers,
                   phone numbers, and delivery addresses are removed before export. Aggregation follows
                   Ghana Data Protection Act standards and UNAIDS privacy guidelines.
@@ -611,26 +640,30 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
           </div>
 
           {/* Export cards */}
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-6 md:grid-cols-2">
             {EXPORT_CARDS.map(({ id, stakeholder, title, description, format, badge, badgeColor }) => (
-              <Card key={id} className="border border-slate-200/80 shadow-sm bg-white hover:shadow-md transition-shadow">
-                <CardContent className="p-5">
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">{stakeholder}</p>
-                  <div className="flex items-start gap-2 mb-2">
-                    <h4 className="text-[14px] font-bold text-slate-800 leading-snug">{title}</h4>
-                    <span className={cn("text-[9px] font-bold px-2 py-0.5 rounded-full border shrink-0 mt-0.5", badgeColor)}>{badge}</span>
+              <Card key={id} className="border border-slate-100 shadow-2xl shadow-slate-900/5 bg-white hover:shadow-slate-900/10 transition-none rounded-[40px] group">
+                <CardContent className="p-8">
+                  <div className="flex items-center justify-between mb-6">
+                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em]">{stakeholder}</p>
+                    <div className={cn("h-10 px-5 rounded-full flex items-center text-[11px] font-black uppercase tracking-[0.2em] border shadow-sm", badgeColor)}>
+                        {badge}
+                    </div>
                   </div>
-                  <p className="text-[11px] text-slate-500 leading-relaxed mb-4">{description}</p>
+                  <div className="flex flex-col gap-4 mb-8">
+                    <h4 className="text-2xl font-black text-slate-900 uppercase tracking-tighter leading-none group-hover:text-brand-teal transition-colors">{title}</h4>
+                    <div className="h-1.5 w-16 bg-slate-100 rounded-full group-hover:w-32 group-hover:bg-brand-teal transition-all duration-500" />
+                    <p className="text-[12px] font-black text-slate-400 uppercase tracking-[0.3em] leading-relaxed">{description}</p>
+                  </div>
                   <Button
                     variant="outline"
-                    size="sm"
                     onClick={() => handleExport(id)}
                     disabled={exporting === id}
-                    className="w-full gap-2 text-[12px] font-semibold border-slate-200 hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700 transition-colors"
+                    className="w-full h-20 rounded-full gap-8 text-[13px] font-black uppercase tracking-[0.4em] border-none bg-slate-50/50 text-slate-400 hover:bg-slate-900 hover:text-white transition-none shadow-sm group/btn"
                   >
                     {exporting === id
-                      ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Preparing…</>
-                      : <><Download className="h-3.5 w-3.5" /> Export {format}</>}
+                      ? <><Loader2 className="h-6 w-6 animate-spin text-brand-teal" /> INITIALIZING_DISPATCH…</>
+                      : <><Download className="h-6 w-6 group-hover/btn:translate-y-1 transition-transform" /> {format}_MANIFEST_DISPATCH</>}
                   </Button>
                 </CardContent>
               </Card>
@@ -638,22 +671,28 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
           </div>
 
           {/* Platform snapshot for exports */}
-          <Card className="border border-slate-200/80 shadow-sm bg-white">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-[13px] font-bold text-slate-700">What&apos;s Included in All Exports</CardTitle>
-              <CardDescription className="text-[11px]">Aggregated, anonymized figures — no individual-level data</CardDescription>
+          <Card className="border border-slate-100 shadow-2xl shadow-slate-900/5 bg-white rounded-[40px]">
+            <CardHeader className="p-8 pb-4">
+                <div className="flex items-center gap-6 mb-2">
+                  <Database className="h-6 w-6 text-slate-900" />
+                  <CardTitle className="text-xl font-black text-slate-900 uppercase tracking-tighter">GLOBAL_MANIFEST_SNAPSHOT</CardTitle>
+                </div>
+                <CardDescription className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] ml-18">Aggregated anonymized figures included in all manifest dispatches</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <CardContent className="p-8 pt-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {[
-                  { label: "Total Orders",       value: data.totalOrders },
-                  { label: "Individuals Served", value: data.totalUniqueCustomers },
-                  { label: "Revenue Generated",  value: `GHS ${data.totalRevenue.toLocaleString()}` },
-                  { label: "Refill Adherence",   value: `${adherenceRate}%` },
-                ].map(({ label, value }) => (
-                  <div key={label} className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">{label}</p>
-                    <p className="text-[20px] font-black text-slate-900 tabular-nums">{value}</p>
+                  { label: "TOTAL_ORDERS",       value: data.totalOrders, icon: ShoppingBag },
+                  { label: "INDIVIDUALS_SERVED", value: data.totalUniqueCustomers, icon: Users },
+                  { label: "YIELD_GENERATED",  value: `₵${data.totalRevenue.toLocaleString()}`, icon: TrendingUp },
+                  { label: "REFILL_ADHERENCE",   value: `${adherenceRate}%`, icon: RefreshCw },
+                ].map(({ label, value, icon: Icon }) => (
+                  <div key={label} className="p-6 rounded-[32px] bg-slate-50 border border-slate-100 shadow-inner flex flex-col items-center text-center group transition-none hover:bg-white hover:shadow-2xl hover:shadow-slate-900/5">
+                    <div className="h-12 w-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 duration-500">
+                        <Icon className="h-6 w-6 text-slate-200 group-hover:text-brand-teal transition-colors" />
+                    </div>
+                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em] mb-2">{label}</p>
+                    <p className="text-[22px] font-black text-slate-900 tabular-nums uppercase tracking-tighter">{value}</p>
                   </div>
                 ))}
               </div>
@@ -661,6 +700,37 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
           </Card>
         </TabsContent>
       </Tabs>
+      
+      {/* Footer Sync Alert */}
+      <div className="pt-12 border-t border-slate-100 flex items-center gap-8 px-4">
+        <div className="h-12 w-12 rounded-2xl bg-teal-500/10 flex items-center justify-center border border-teal-500/20 shadow-sm">
+            <ShieldCheck className="h-7 w-7 text-teal-600" />
+        </div>
+        <div>
+            <p className="text-[11px] font-black text-slate-900 uppercase tracking-[0.4em] leading-none mb-1.5">GLOBAL_ANALYTICS_PROTOCOL_SYNCHRONIZED</p>
+            <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em] leading-none">Security clearance verified. Operational telemetry stream synchronized with master network matrix.</p>
+        </div>
+      </div>
     </div>
   );
+}
+
+function ShieldCheck(props: any) {
+    return (
+        <svg
+            {...props}
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            <path d="m9 12 2 2 4-4" />
+        </svg>
+    )
 }
