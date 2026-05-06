@@ -18,6 +18,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const path = window.location.pathname
     const map: Record<string, string> = {
       "/admin": "Overview",
+      "/admin/analytics": "Analytics",
+      "/admin/operations": "Operations",
       "/admin/orders": "Orders",
       "/admin/products": "Products",
       "/admin/partners": "Partners",
@@ -53,6 +55,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return [
         { href: "/admin", label: "Overview", icon: Home },
         { href: "/admin/analytics", label: "Analytics", icon: BarChart },
+        { href: "/admin/operations", label: "Operations", icon: BarChart },
         { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
         { href: "/admin/products", label: "Products", icon: Package },
         { href: "/admin/categories", label: "Categories", icon: Package },
