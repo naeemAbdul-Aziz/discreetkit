@@ -1,169 +1,270 @@
-"use client"
-
-import * as React from "react"
-import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
-import {
-  Bell,
-  Home,
-  LineChart,
-  Package,
-  ShoppingCart,
-  Users,
-  Settings,
-  LogOut,
-  ShieldCheck,
-  LayoutDashboard,
-  Zap,
-  Globe,
-  Database,
-  Search,
-  Plus,
-  Terminal,
-  Activity,
-  History,
-  Repeat,
-  ShieldAlert,
-  Archive,
-  Truck,
-  ClipboardCheck,
-  CalendarDays
-} from "lucide-react"
-
+"use client";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarHeader,
+  SidebarFooter,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
-  SidebarSeparator,
-} from "@/components/ui/sidebar"
-import { getSupabaseClient } from "@/lib/supabase"
-import Image from 'next/image'
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-
-const adminNavLinks = [
-  { href: "/admin", icon: LayoutDashboard, label: "OVERVIEW_MATRIX" },
-  { href: "/admin/orders", icon: ShoppingCart, label: "LOGISTICS_STREAM" },
-  { href: "/admin/products", icon: Package, label: "INVENTORY_REGISTRY" },
-  { href: "/admin/partners", icon: Globe, label: "NODE_NETWORK" },
-  { href: "/admin/customers", icon: Users, label: "ENROLLEE_REGISTRY" },
-  { href: "/admin/analytics", icon: LineChart, label: "INTELLIGENCE_PULSE" },
-  { href: "/admin/settings", icon: Settings, label: "TERMINAL_CONFIG" },
-]
-
-const pharmacyNavLinks = [
-    { href: "/pharmacy/dashboard", icon: LayoutDashboard, label: "COMMAND_CENTER" },
-    { href: "/pharmacy/orders", icon: ShoppingCart, label: "FULFILLMENT_STREAM" },
-    { href: "/pharmacy/inventory", icon: Package, label: "INVENTORY_REGISTRY" },
-    { href: "/pharmacy/ledger", icon: Archive, label: "OPERATIONAL_ARCHIVE" },
-    { href: "/pharmacy/riders", icon: Truck, label: "DISPATCH_PERSONNEL" },
-    { href: "/pharmacy/verification", icon: ClipboardCheck, label: "VERIFICATION_QUEUE" },
-    { href: "/pharmacy/refills", icon: CalendarDays, label: "REFILL_MATRIX" },
-    { href: "/pharmacy/settings", icon: Settings, label: "TERMINAL_CONFIG" },
-]
+  SidebarMenuButton,
+} from "@/components/ui/sidebar";
+import {
+  LayoutDashboard,
+  ShoppingBag,
+  Users,
+  LogOut,
+  Package,
+  Layers,
+  BarChart,
+  Repeat,
+  Truck,
+  Fingerprint,
+  ShieldCheck,
+  ShieldAlert,
+  Zap,
+  Radar,
+  Lock,
+  Settings,
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import * as React from "react";
+import { getSupabaseClient } from "@/lib/supabase";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { usePharmacy } from "@/components/dashboard/pharmacy-context";
+import { 
+  ClipboardCheck, 
+  BarChart3, 
+  HeartHandshake
+} from "lucide-react";
 
 export function DashboardSidebar() {
-  const pathname = usePathname()
-  const router = useRouter()
-  const isAdmin = pathname.startsWith('/admin')
+  const pathname = usePathname();
+  const router = useRouter();
+  const { isHub, loading } = usePharmacy();
+  const [subdomain, setSubdomain] = React.useState<"admin" | "pharmacy" | null>(
+    null,
+  );
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+    if (typeof window !== "undefined") {
+      const hostname = window.location.hostname;
+      if (
+        hostname.startsWith("pharmacy.") ||
+        pathname.startsWith("/pharmacy")
+      ) {
+        setSubdomain("pharmacy");
+      } else if (hostname.startsWith("admin.")) {
+        setSubdomain("admin");
+      } else {
+        setSubdomain(null); // default
+      }
+    }
+  }, [pathname]);
+
+  const navItems = React.useMemo(() => {
+    // Prevent flash of wrong content by returning empty or skeleton if needed,
+    // but better to default to standard items if not mounted to support SEO/SSR if possible?
+    // SSR usually implies standard domain. checking subdomain on server needs headers(),
+    // but for client component "use client", we rely on client state.
+    // We'll trust the default (null) usually means standard, or initial render.
+
+    if (subdomain === "pharmacy") {
+      const basePharmacyItems = [
+        {
+          href: "/pharmacy/dashboard",
+          label: isHub ? "Privacy Cockpit" : "Dashboard",
+          icon: isHub ? Radar : LayoutDashboard,
+        },
+        { href: "/pharmacy/ledger", label: "Ledger", icon: ClipboardCheck },
+        { 
+          href: "/pharmacy/refills", 
+          label: isHub ? "Discreet Refills" : "Refills", 
+          icon: Zap 
+        },
+        ...(isHub ? [
+          { href: "/pharmacy/verification", label: "Identity Queue", icon: Fingerprint },
+          { href: "/pharmacy/partner-care", label: "Security Support", icon: HeartHandshake },
+        ] : [
+          { href: "/pharmacy/inventory", label: "Inventory", icon: Package },
+          { href: "/pharmacy/riders", label: "Riders", icon: Truck },
+        ]),
+        { href: "/pharmacy/settings", label: "Settings", icon: Settings },
+      ];
+
+      // Strip prefixes if on subdomain
+      if (
+        typeof window !== "undefined" &&
+        window.location.hostname.startsWith("pharmacy.")
+      ) {
+        return basePharmacyItems.map((item) => ({
+          ...item,
+          href:
+            item.href === "/pharmacy/dashboard"
+              ? "/"
+              : item.href.replace("/pharmacy", ""),
+        }));
+      }
+      return basePharmacyItems;
+    }
+
+    if (subdomain === "admin") {
+      const baseItems = [
+        { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+        { href: "/admin/analytics", label: "Analytics", icon: BarChart },
+        { href: "/admin/operations/logs", label: "Ledger", icon: ClipboardCheck },
+        { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
+        { href: "/admin/products", label: "Products", icon: Package },
+        { href: "/admin/categories", label: "Categories", icon: Layers },
+        { href: "/admin/partners", label: "Partners", icon: Users },
+        { href: "/admin/refills", label: "Refills", icon: Repeat },
+        { href: "/admin/settings", label: "Settings", icon: Settings },
+      ];
+
+      // Strip prefixes if on subdomain
+      if (
+        typeof window !== "undefined" &&
+        window.location.hostname.startsWith("admin.")
+      ) {
+        return baseItems.map((item) => ({
+          ...item,
+          href: item.href === "/admin" ? "/" : item.href.replace("/admin", ""),
+        }));
+      }
+
+      return baseItems;
+    }
+
+    // Default (probably client or initial server render of main site admin logic?)
+    // Actually, if subdomain is null, we assume we might be on main site admin dashboard accessing via path?
+    // The original logic defaulted to admin items if NOT pharmacy?
+    // Original:
+    // if (isPharmacy) { ... }
+    // else { const baseItems = adminItems ... }
+    // So default is Admin items.
+
+    const baseItems = [
+      { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/admin/analytics", label: "Analytics", icon: BarChart },
+      { href: "/admin/operations/logs", label: "Ledger", icon: ClipboardCheck },
+      { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
+      { href: "/admin/products", label: "Products", icon: Package },
+      { href: "/admin/categories", label: "Categories", icon: Layers },
+      { href: "/admin/partners", label: "Partners", icon: Users },
+      { href: "/admin/settings", label: "Settings", icon: Settings },
+      { href: "/admin/refills", label: "Refills", icon: Repeat },
+    ];
+
+    return baseItems;
+  }, [subdomain, isHub]);
 
   const handleSignOut = async () => {
-    const supabase = getSupabaseClient()
-    await supabase.auth.signOut()
-    router.push("/login")
-  }
+    const supabase = getSupabaseClient();
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
 
-  const navLinks = isAdmin ? adminNavLinks : pharmacyNavLinks
+  if (!isMounted)
+    return <Sidebar variant="inset" className="border-r bg-white shadow-sm" />; // Prevent hydration mismatch flicker
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-slate-50 bg-white">
-      <SidebarHeader className="p-10">
-        <Link href="/" className="flex items-center gap-6 group/logo">
-          <div className="h-12 w-12 rounded-2xl bg-slate-900 flex items-center justify-center transition-none group-hover/logo:bg-brand-teal group-data-[collapsible=icon]:h-12 group-data-[collapsible=icon]:w-12 shadow-2xl shadow-slate-900/10">
-            <Zap className="h-6 w-6 text-brand-teal transition-none group-hover/logo:text-white" />
-          </div>
-          <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-            <span className="text-[14px] font-black text-slate-900 uppercase tracking-widest leading-none">DiscreetKit</span>
-            <span className="text-[9px] font-black text-slate-300 uppercase tracking-[0.4em] mt-2.5">Master_Terminal_v4.0</span>
-          </div>
+    <Sidebar
+      variant="inset"
+      collapsible="icon"
+      className="border-r bg-white shadow-sm"
+    >
+      <SidebarHeader className="px-4 py-6 flex justify-center items-center border-b border-border/50">
+        <Link href="/" className="flex items-center group">
+          {/* DiscreetKit Wordmark */}
+          <h2 className="hidden md:block font-headline text-2xl font-black tracking-tight uppercase transition-transform group-hover:scale-105">
+            Discreet<span className="text-primary">Kit</span>.
+          </h2>
         </Link>
       </SidebarHeader>
+      <SidebarContent className="flex flex-col py-4 gap-2 px-2 lg:px-4">
+        <SidebarMenu>
+          {navItems.map((item) => {
+            const isActive =
+              item.href === "/admin" || item.href === "/"
+                ? pathname === "/admin" || pathname === "/"
+                : pathname.startsWith(item.href);
 
-      <SidebarContent className="p-6 gap-4">
-        <SidebarMenu className="gap-2">
-          {navLinks.map((item) => (
-            <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton
-                asChild
-                tooltip={item.label}
-                isActive={pathname === item.href}
-                className={cn(
-                    "h-14 rounded-2xl px-6 transition-none group/btn border-none outline-none",
-                    pathname === item.href 
-                        ? "bg-slate-900 text-white shadow-2xl shadow-slate-900/10" 
-                        : "text-slate-400 hover:bg-slate-50 hover:text-slate-900"
-                )}
-              >
-                <Link href={item.href}>
-                  <item.icon className={cn(
-                    "h-5 w-5",
-                    pathname === item.href ? "text-brand-teal" : "text-slate-300 group-hover/btn:text-slate-400"
-                  )} />
-                  <span className="group-data-[collapsible=icon]:hidden text-[10px] font-black uppercase tracking-[0.2em] ml-2">
-                    {item.label}
-                  </span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+            return (
+              <SidebarMenuItem key={item.href}>
+                <SidebarMenuButton
+                  asChild
+                  tooltip={item.label}
+                  isActive={isActive}
+                  size="lg"
+                  className={cn(
+                    "group relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors duration-200 overflow-hidden",
+                    isActive
+                      ? "text-primary"
+                      : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100/50",
+                  )}
+                >
+                  <Link
+                    href={item.href}
+                    aria-current={isActive ? "page" : undefined}
+                    className="flex items-center gap-3 w-full relative z-10"
+                  >
+                    {isActive && (
+                      <motion.div
+                        layoutId="sidebar-active-item"
+                        className="absolute inset-0 bg-primary/10 rounded-lg -z-10"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 30,
+                        }}
+                      />
+                    )}
+
+                    <item.icon
+                      className={cn(
+                        "h-5 w-5 shrink-0 transition-all duration-200",
+                        isActive
+                          ? "stroke-[2.5]"
+                          : "stroke-[1.5] group-hover:stroke-[2]",
+                      )}
+                    />
+                    <span
+                      className={cn(
+                        "hidden lg:inline-block text-sm font-medium transition-all duration-200",
+                        isActive ? "font-bold tracking-wide" : "font-medium",
+                      )}
+                    >
+                      {item.label}
+                    </span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+          })}
         </SidebarMenu>
-
-        <div className="mt-12 px-2 group-data-[collapsible=icon]:hidden">
-           <div className="flex items-center justify-between mb-6 pl-4">
-              <span className="text-[9px] font-black text-slate-300 uppercase tracking-[0.4em]">Operational_Uplinks</span>
-           </div>
-           <div className="grid gap-3">
-              <Button variant="outline" className="w-full justify-start gap-5 h-12 border-none bg-slate-50/50 rounded-2xl text-[9px] font-black text-slate-400 hover:text-brand-teal hover:bg-white hover:shadow-2xl hover:shadow-slate-900/5 transition-none px-6">
-                <Plus className="h-4 w-4" /> NEW_PROVISION
-              </Button>
-              <Button variant="outline" className="w-full justify-start gap-5 h-12 border-none bg-slate-50/50 rounded-2xl text-[9px] font-black text-slate-400 hover:text-brand-teal hover:bg-white hover:shadow-2xl hover:shadow-slate-900/5 transition-none px-6">
-                <Search className="h-4 w-4" /> AUDIT_PULSE
-              </Button>
-           </div>
-        </div>
       </SidebarContent>
-
-      <SidebarFooter className="p-10">
+      <SidebarFooter className="px-4 py-3 border-t border-border/50">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton 
+            <SidebarMenuButton
               onClick={handleSignOut}
-              className="h-14 rounded-2xl px-6 text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-none group/btn"
-              tooltip="TERMINATE_SESSION"
+              className="text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors"
+              size="lg"
             >
-              <LogOut className="h-5 w-5 text-slate-300 group-hover/btn:text-rose-500" />
-              <span className="group-data-[collapsible=icon]:hidden text-[10px] font-black uppercase tracking-[0.2em] ml-2">TERMINATE_SESSION</span>
+              <LogOut className="h-5 w-5" />
+              <span className="duration-200 group-data-[collapsible=icon]:opacity-0">
+                Sign Out
+              </span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-        
-        <div className="mt-10 group-data-[collapsible=icon]:hidden">
-            <div className="p-8 bg-slate-900 rounded-[32px] border border-slate-800 shadow-2xl relative overflow-hidden">
-               <div className="absolute top-0 right-0 w-16 h-16 bg-brand-teal/5 rounded-bl-full -mr-8 -mt-8" />
-               <div className="flex items-center gap-4 mb-4">
-                  <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)] animate-pulse" />
-                  <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">SYSTEM_NOMINAL</span>
-               </div>
-               <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.25em] leading-relaxed">
-                  Terminal node operational. Secure telemetry uplink active. Matrix synchronized.
-               </p>
-            </div>
-        </div>
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

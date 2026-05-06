@@ -11,11 +11,10 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Check, X, Loader2, Package, MapPin, Calendar, ShieldCheck, ShieldAlert, Zap, History, Terminal, ArrowRight, Activity, Map } from "lucide-react";
+import { Check, X, Loader2, Package } from "lucide-react";
 import { moderateProductRequest } from "@/lib/admin-actions";
 import { useToast } from "@/hooks/use-toast";
 import { ProductSheet } from "./product-sheet";
-import { cn } from "@/lib/utils";
 
 interface ProductRequest {
   id: number;
@@ -35,12 +34,15 @@ export function RequestsTable({
   categories?: any[];
 }) {
   const [requests, setRequests] = useState<ProductRequest[]>(initialRequests);
-  const [processing, setProcessing] = useState<number | null>(null);
+  const [processing, setProcessing] = useState<number | null>(null); // ID of request being processed
   const { toast } = useToast();
 
+  // For approval flow - reusing ProductSheet
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [requestToApprove, setRequestToApprove] = useState<ProductRequest | null>(null);
+  const [requestToApprove, setRequestToApprove] =
+    useState<ProductRequest | null>(null);
 
+  // Map request fields to product form
   const getProductFromRequest = (req: ProductRequest) => ({
     name: req.product_name,
     description: req.description,
@@ -55,144 +57,126 @@ export function RequestsTable({
     setIsSheetOpen(true);
   };
 
-  const handleReject = async (id: number) => {
-    if (!confirm("Confirm denial of this SKU provisioning request? Operational node integrity will be maintained.")) return;
-    setProcessing(id);
-    try {
-      const res = await moderateProductRequest(id, "rejected");
+  // Intercept the ProductSheet's onSubmit logic.
+  // Actually, ProductSheet calls `upsertProduct` directly.
+  // We need `approveProductRequest` which *wraps* creation + status update.
+  // Modification: ProductSheet is currently tightly coupled to `upsertProduct`.
+  // Strategy: We can keep ProductSheet as is, but we need to create the product AND update the request.
+  // If we just use ProductSheet, it creates a product but doesn't link it to the request.
+  // Better approach:
+  // 1. Create a special mode for ProductSheet? Or duplicate it? Duplication is bad.
+  // 2. OR, we call `approveProductRequest` which takes `ProductFormValues`.
+  // We can customize `ProductSheet` to accept an `onSubmit` prop override.
+  // OR, simpler for now: Just use a custom Dialog here if ProductSheet is too rigid.
+  // Let's check ProductSheet code again... it imports upsertProduct directly. Refactoring it to take an onSubmit prop is cleaner.
 
-      if (res.success) {
-        setRequests((prev) =>
-          prev.map((r) => (r.id === id ? { ...r, status: "rejected" } : r)),
-        );
-        toast({ title: "REQUEST_DENIED", description: "Node provisioning request rejected from global matrix." });
-      } else {
-        toast({
-          variant: "destructive",
-          title: "REGISTRY_ERROR",
-          description: res.error || "Failed to finalize denial sync.",
-        });
-      }
-    } catch (e) {
+  // BUT, to avoid modifying too many files, I will use a simple implementation:
+  // I will just use `approveProductRequest` which internally Creates Product.
+  // I need a form to gather the missing details (Category, Price, Image) before calling `approve`.
+  // I will reuse `ProductSheet` but I need to modify it to support a custom submit handler or "Request Mode".
+
+  // Let's modify ProductSheet slightly to accept an `onSubmitOverride`.
+
+  const handleReject = async (id: number) => {
+    if (!confirm("Reject this request?")) return;
+    setProcessing(id);
+    const res = await moderateProductRequest(id, "rejected");
+
+    if (res.success) {
+      setRequests((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, status: "rejected" } : r)),
+      );
+      toast({ title: "Rejected", description: "Request rejected." });
+    } else {
       toast({
         variant: "destructive",
-        title: "TERMINAL_CRITICAL",
-        description: "Protocol execution failed in master terminal.",
+        title: "Error",
+        description: res.error || "Failed to reject.",
       });
-    } finally {
-      setProcessing(null);
     }
+    setProcessing(null);
   };
 
   return (
-    <div className="space-y-16">
-      <div className="overflow-hidden px-2">
-        <Table className="min-w-[1200px]">
-          <TableHeader className="bg-slate-50/30 border-b border-slate-50">
-            <TableRow className="hover:bg-transparent border-none">
-              <TableHead className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 py-10 pl-16">SKU_IDENTITY_PROPOSAL</TableHead>
-              <TableHead className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 py-10">ORIGIN_NODE_STATION</TableHead>
-              <TableHead className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 py-10 text-center">SYNCHRONIZATION_STATUS</TableHead>
-              <TableHead className="hidden md:table-cell text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 py-10">TEMPORAL_REGISTRY_STAMP</TableHead>
-              <TableHead className="text-right pr-16 py-10 text-[11px] font-black uppercase tracking-[0.3em] text-slate-400">OPERATIONAL_MODERATION</TableHead>
+    <div className="space-y-4">
+      <div className="rounded-md border bg-card">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Product Name</TableHead>
+              <TableHead>Requested By</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="hidden md:table-cell">Date</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {requests.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="py-80 text-center bg-transparent border-none">
-                  <div className="flex flex-col items-center justify-center gap-12">
-                    <div className="h-40 w-40 rounded-[48px] bg-white border border-slate-50 flex items-center justify-center shadow-2xl shadow-slate-900/10">
-                        <Package className="h-20 w-20 text-slate-100" />
-                    </div>
-                    <div className="space-y-6">
-                      <h3 className="text-sm font-black text-slate-400 uppercase tracking-[0.4em] leading-none">Registry Nominal State</h3>
-                      <p className="text-[11px] font-black text-slate-200 uppercase tracking-[0.3em] max-w-lg mx-auto leading-relaxed">
-                          All node provisioning requests have been processed. Global matrix integrity maintained across all terminal sectors.
-                      </p>
-                    </div>
-                  </div>
+                <TableCell
+                  colSpan={5}
+                  className="h-24 text-center text-muted-foreground"
+                >
+                  No requests found.
                 </TableCell>
               </TableRow>
             ) : (
               requests.map((req) => (
-                <TableRow key={req.id} className="group border-slate-50 hover:bg-slate-50/30 transition-none">
-                  <TableCell className="pl-16 py-12">
-                    <div className="flex items-center gap-10">
-                        <div className="h-16 w-16 rounded-[24px] bg-slate-900 flex items-center justify-center shadow-2xl shadow-slate-900/10">
-                            <Terminal className="h-8 w-8 text-brand-teal" />
-                        </div>
-                        <div className="flex flex-col gap-3">
-                            <span className="font-black text-slate-900 uppercase tracking-tight text-base leading-none block">{req.product_name}</span>
-                            {req.description && (
-                            <span className="text-[11px] font-black text-slate-300 uppercase tracking-widest truncate max-w-[400px] leading-none">
-                                {req.description.toUpperCase()}
-                            </span>
-                            )}
-                        </div>
+                <TableRow key={req.id}>
+                  <TableCell>
+                    <div className="font-medium">{req.product_name}</div>
+                    {req.description && (
+                      <div className="text-xs text-muted-foreground truncate max-w-[200px]">
+                        {req.description}
+                      </div>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-sm">{req.pharmacyName}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {req.pharmacyLocation}
                     </div>
                   </TableCell>
-                  <TableCell className="py-12">
-                    <div className="flex flex-col gap-4">
-                        <div className="flex items-center gap-4 px-6 py-3 rounded-full bg-slate-50 border border-slate-100 w-fit shadow-sm">
-                             <Activity className="h-4 w-4 text-slate-300" />
-                             <span className="text-[11px] font-black text-slate-600 uppercase tracking-widest leading-none">{req.pharmacyName.toUpperCase()}</span>
-                        </div>
-                        <div className="flex items-center gap-4 pl-6 text-[10px] font-black text-slate-200 uppercase tracking-widest leading-none">
-                          <MapPin className="h-4 w-4 text-slate-100" />
-                          {req.pharmacyLocation.toUpperCase()}
-                        </div>
-                    </div>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        req.status === "approved"
+                          ? "success"
+                          : req.status === "rejected"
+                            ? "destructive"
+                            : "pending"
+                      }
+                      className="font-bold uppercase text-[9px] tracking-widest px-2 py-0.5"
+                    >
+                      {req.status}
+                    </Badge>
                   </TableCell>
-                  <TableCell className="py-12 text-center">
-                    <div className="flex justify-center">
-                        <div className={cn(
-                            "flex items-center gap-4 px-8 py-3.5 rounded-full shadow-sm w-fit transition-none border-none",
-                            req.status === "approved" ? "bg-emerald-500/10 text-emerald-600 shadow-emerald-500/5" : 
-                            req.status === "rejected" ? "bg-rose-500/10 text-rose-600 shadow-rose-500/5" : 
-                            "bg-amber-500/10 text-amber-600 shadow-amber-500/5"
-                        )}>
-                            <div className={cn(
-                                "h-2 w-2 rounded-full",
-                                req.status === "approved" ? "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.7)]" : 
-                                req.status === "rejected" ? "bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.7)]" : 
-                                "bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.7)]"
-                            )} />
-                            <span className="text-[11px] font-black uppercase tracking-[0.25em]">{req.status.toUpperCase()}</span>
-                        </div>
-                    </div>
+                  <TableCell className="hidden md:table-cell text-xs text-muted-foreground">
+                    {new Date(req.created_at).toLocaleDateString()}
                   </TableCell>
-                  <TableCell className="hidden md:table-cell py-12">
-                    <div className="h-12 px-8 rounded-full bg-slate-50 border border-slate-100 flex items-center gap-4 shadow-sm w-fit">
-                        <Calendar className="h-5 w-5 text-slate-200" />
-                        <span className="text-[11px] font-black text-slate-400 uppercase tracking-[0.25em] leading-none tabular-nums">
-                            {new Date(req.created_at).toLocaleDateString(undefined, { month: 'short', day: '2-digit', year: 'numeric' }).toUpperCase()}
-                        </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right pr-16 py-12">
+                  <TableCell className="text-right">
                     {req.status === "pending" && (
-                      <div className="flex justify-end gap-6">
+                      <div className="flex justify-end gap-2">
                         <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-16 w-16 rounded-[24px] bg-slate-900 text-brand-teal hover:bg-slate-800 shadow-2xl shadow-slate-900/40 transition-none border-none group"
+                          size="sm"
+                          variant="outline"
+                          className="h-8 w-8 p-0 border-green-200 hover:bg-green-50 text-green-700"
                           onClick={() => handleApproveClick(req)}
                           disabled={!!processing}
                         >
-                          <ShieldCheck className="h-8 w-8 group-hover:scale-110 transition-transform duration-300" />
+                          <Check className="h-4 w-4" />
                         </Button>
                         <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-16 w-16 rounded-[24px] bg-rose-50 text-rose-500 hover:bg-rose-100 transition-none shadow-sm border-none group"
+                          size="sm"
+                          variant="outline"
+                          className="h-8 w-8 p-0 border-red-200 hover:bg-red-50 text-red-700"
                           onClick={() => handleReject(req.id)}
                           disabled={!!processing}
                         >
                           {processing === req.id ? (
-                            <Loader2 className="h-6 w-6 animate-spin" />
+                            <Loader2 className="h-4 w-4 animate-spin" />
                           ) : (
-                            <ShieldAlert className="h-8 w-8 group-hover:scale-110 transition-transform duration-300" />
+                            <X className="h-4 w-4" />
                           )}
                         </Button>
                       </div>
@@ -205,6 +189,13 @@ export function RequestsTable({
         </Table>
       </div>
 
+      {/* 
+        We use a modified ProductSheet logic here. 
+        Since we cannot pass onSubmit easily without changing ProductSheet prop types,
+        I will create a WRAPPER or just modify ProductSheet.
+        
+        For now, let's assume we modify ProductSheet to take `onSubmitOverride`.
+      */}
       <ProductSheet
         open={isSheetOpen}
         onOpenChange={setIsSheetOpen}
@@ -212,14 +203,9 @@ export function RequestsTable({
           requestToApprove ? getProductFromRequest(requestToApprove) : undefined
         }
         categories={categories}
+        // @ts-ignore - We will add this prop next
         requestId={requestToApprove?.id}
       />
-
-      {/* Matrix Status Feed */}
-      <div className="pt-12 border-t border-slate-50 flex items-center gap-6 px-4">
-        <div className="h-2 w-12 bg-brand-teal rounded-full shadow-[0_0_12px_rgba(20,184,166,0.6)]" />
-        <p className="text-[11px] font-black text-slate-300 uppercase tracking-[0.3em]">Provisioning matrix synchronized with global SKU registry and master terminal control nodes.</p>
-      </div>
     </div>
   );
 }

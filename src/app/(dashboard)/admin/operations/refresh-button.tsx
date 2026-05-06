@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Loader2, Zap } from "lucide-react";
+import { RefreshCcw, Loader2 } from "lucide-react";
 
 export function RefreshButton() {
   const router = useRouter();
@@ -17,17 +17,18 @@ export function RefreshButton() {
 
   return (
     <Button
-      variant="default"
+      variant="outline"
+      size="sm"
       onClick={handleRefresh}
       disabled={isPending}
-      className="bg-slate-900 hover:bg-slate-800 text-white font-black text-[11px] uppercase tracking-widest px-12 rounded-full h-16 shadow-2xl shadow-slate-900/20 transition-none gap-5 border-none"
+      className="min-w-[100px]"
     >
       {isPending ? (
-        <Loader2 className="h-6 w-6 animate-spin text-brand-teal" />
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
       ) : (
-        <Zap className="h-6 w-6 text-brand-teal" />
+        <RefreshCcw className="mr-2 h-4 w-4" />
       )}
-      {isPending ? "SYNCHRONIZING_NODES..." : "SYNC_NODE_STATE"}
+      {isPending ? "Refreshing..." : "Refresh"}
     </Button>
   );
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useId, useTransition } from "react"
+import { useState, useEffect, useMemo, useId, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import {
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { MoreHorizontal, Plus, Search, Trash2, Edit, Loader2, AlertTriangle, CheckCircle2, Zap, History, Terminal, Network, ShieldCheck, ArrowRight, Activity, Filter, Package } from "lucide-react"
+import { MoreHorizontal, Plus, Search, Trash2, Edit, Loader2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import {
   DropdownMenu,
@@ -56,6 +56,7 @@ export function ProductTable({ initialProducts, categories = [] }: { initialProd
   useEffect(() => {
     const t = setTimeout(() => {
       setDebouncedSearch(searchTerm)
+      // Reset to first page when the debounced search value updates
       setPage(1)
     }, 300)
     return () => clearTimeout(t)
@@ -70,9 +71,11 @@ export function ProductTable({ initialProducts, categories = [] }: { initialProd
     p.category.toLowerCase().includes(debouncedSearch.toLowerCase())
   )
 
+  // Pagination logic
   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / pageSize))
   const paginatedProducts = filteredProducts.slice((page-1)*pageSize, page*pageSize)
 
+  // Use passed categories or fallback to unique existing ones if empty (though we should always have passed ones now)
   const categoryOptions = categories.length > 0 
     ? categories.map(c => c.name) 
     : Array.from(new Set(products.map(p => p.category).filter(Boolean)))
@@ -90,13 +93,13 @@ export function ProductTable({ initialProducts, categories = [] }: { initialProd
     markSaving(id, field, true)
     const res = await updateProductField(id, { [field]: value } as any)
     if (res.error) {
-      toast({ variant: "destructive", title: "PROTOCOL_FAILURE", description: res.error })
+      toast({ variant: "destructive", title: "Update failed", description: res.error })
       startTransition(() => {
         router.refresh()
       })
     } else {
       setProducts(prev => prev.map(p => p.id === id ? { ...p, [field]: value } : p))
-      toast({ title: "REGISTRY_SYNCHRONIZED", description: `${field.toUpperCase()} updated in global matrix.` })
+      toast({ title: "Saved", description: `${field} updated` })
       startTransition(() => {
         router.refresh()
       })
@@ -115,13 +118,13 @@ export function ProductTable({ initialProducts, categories = [] }: { initialProd
   }
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Confirm decommissioning of this SKU from the global catalog registry?")) return
+    if (!confirm("Are you sure you want to delete this product?")) return
     
     const res = await deleteProduct(id)
     if (res.error) {
-      toast({ variant: "destructive", title: "PROTOCOL_FAILURE", description: res.error })
+      toast({ variant: "destructive", title: "Error", description: res.error })
     } else {
-      toast({ title: "SKU_DECOMMISSIONED", description: "Global product removed from active registry." })
+      toast({ title: "Deleted", description: "Product removed." })
       startTransition(() => {
         router.refresh()
       })
@@ -129,147 +132,135 @@ export function ProductTable({ initialProducts, categories = [] }: { initialProd
   }
 
   const getStockInfo = (stock: number) => {
-    if (stock <= 5) return { label: "CRITICAL_LEVEL", variant: "destructive" as const, color: "bg-rose-500/10 text-rose-600 border-rose-500/20", icon: <AlertTriangle className="h-4 w-4" /> };
-    if (stock <= 20) return { label: "LOW_STOCK_SYNC", variant: "warning" as const, color: "bg-amber-500/10 text-amber-600 border-amber-500/20", icon: <AlertTriangle className="h-4 w-4" /> };
-    return { label: "ACTIVE_INVENTORY", variant: "success" as const, color: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20", icon: <CheckCircle2 className="h-4 w-4" /> };
+    if (stock <= 5) return { label: "LOW STOCK", variant: "destructive" as const, color: "bg-rose-500 text-white shadow-[0_0_8px_rgba(244,63,94,0.3)]", icon: "⚠️" };
+    if (stock <= 20) return { label: "LIMITED", variant: "warning" as const, color: "bg-amber-500 text-white shadow-[0_0_8px_rgba(245,158,11,0.3)]", icon: "⏳" };
+    if (stock >= 50) return { label: "IN STOCK", variant: "success" as const, color: "bg-emerald-600 text-white shadow-[0_0_8px_rgba(5,150,105,0.3)]", icon: "✨" };
+    return { label: "IN STOCK", variant: "success" as const, color: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: "✅" };
   }
 
   return (
-    <div className="space-y-16">
-      {/* Search and Action Interface */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-12 px-2">
-        <div className="relative flex-1 max-w-2xl group">
-          <Search className="absolute left-8 top-1/2 -translate-y-1/2 h-6 w-6 text-slate-300 group-focus-within:text-brand-teal transition-none" />
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="FILTER_CATALOG_REGISTRY: SEARCH_SKU_IDENTITY..."
-            className="pl-20 h-20 rounded-[32px] font-black text-[13px] uppercase tracking-[0.3em] border-none bg-slate-50/50 shadow-sm focus-visible:ring-0 focus-visible:bg-white focus-visible:shadow-2xl shadow-slate-900/5 transition-none placeholder:text-slate-200"
+            placeholder="Search products..."
+            className="pl-8"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="flex items-center gap-8">
-          {isPending && <Loader2 className="h-6 w-6 animate-spin text-brand-teal" />}
-          <Button 
-            onClick={handleAdd} 
-            className="bg-slate-900 hover:bg-slate-800 text-white rounded-full h-20 px-16 font-black text-sm uppercase tracking-[0.3em] gap-8 shadow-2xl shadow-slate-900/40 transition-none border-none group"
-          >
-            <Plus className="h-6 w-6 text-brand-teal group-hover:rotate-90 transition-transform duration-300" />
-            PROVISION_NEW_SKU_PROTOCOL
+        <div className="flex items-center gap-2">
+          {isPending && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground mr-2" />}
+          <Button onClick={handleAdd}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Product
           </Button>
         </div>
       </div>
 
-      {/* Terminal Feed Grid */}
-      <div className="overflow-hidden">
-        <Table className="min-w-[1400px]">
-          <TableHeader className="bg-slate-50/30 border-b border-slate-50">
-            <TableRow className="hover:bg-transparent border-none">
-              <TableHead className="w-[140px] text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 py-10 pl-16">IDENTITY_IMG</TableHead>
-              <TableHead className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 py-10">SKU_DESIGNATION_IDENTITY</TableHead>
-              <TableHead className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 py-10">CLASSIFICATION_MATRIX</TableHead>
-              <TableHead className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 py-10">OPERATIONAL_STATUS</TableHead>
-              <TableHead className="text-right text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 py-10">GLOBAL_YIELD_MARKET</TableHead>
-              <TableHead className="text-right text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 py-10">REGISTRY_UNIT_COUNT</TableHead>
-              <TableHead className="w-[120px] text-right pr-16 py-10"></TableHead>
+      <div className="rounded-md border bg-card overflow-x-auto">
+        <Table className="min-w-[600px]">
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[80px] hidden md:table-cell">Image</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead className="hidden md:table-cell">Category</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Price</TableHead>
+              <TableHead className="text-right hidden md:table-cell">Stock</TableHead>
+              <TableHead className="w-[50px]"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedProducts.map((product) => {
+            {paginatedProducts.map((product, idx) => {
               const stockInfo = getStockInfo(product.stock_level)
+              // Generate stable IDs for each dropdown
               const categoryMenuId = `${dropdownMenuId}-cat-${product.id}`;
               const statusMenuId = `${dropdownMenuId}-status-${product.id}`;
               const actionsMenuId = `${dropdownMenuId}-actions-${product.id}`;
               return (
-                <TableRow key={product.id} className="group border-slate-50 hover:bg-slate-50/30 transition-none">
-                  <TableCell className="pl-16 py-10">
+                <TableRow key={product.id} className="hover:bg-slate-50/50 transition-colors">
+                  <TableCell className="hidden md:table-cell">
                     <InlineImage src={product.image_url} alt={product.name} />
                   </TableCell>
-                  <TableCell className="py-10">
-                    <div className="space-y-3">
-                        <span className="font-black text-slate-900 uppercase tracking-tight text-base leading-none block">{product.name}</span>
-                        <div className="flex items-center gap-4">
-                            <div className="h-1.5 w-8 bg-slate-100 rounded-full" />
-                            <span className="text-[10px] font-black text-slate-200 uppercase tracking-[0.2em] leading-none tabular-nums">SKU_ID_#{product.id.toString().padStart(6, '0')}</span>
-                        </div>
+                  <TableCell className="font-medium">
+                    {product.name}
+                    <div className="md:hidden text-xs text-muted-foreground mt-1">
+                      Stock: {product.stock_level}
                     </div>
                   </TableCell>
-                  <TableCell className="py-10">
+                  <TableCell className="hidden md:table-cell">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild id={categoryMenuId}>
-                        <Button variant="ghost" size="sm" className="h-12 px-8 rounded-full bg-slate-50 border border-slate-100 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:bg-white hover:text-slate-900 hover:shadow-2xl hover:shadow-slate-900/5 transition-none outline-none focus:ring-0">
-                          {product.category ? product.category.toUpperCase().replace(/_/g, ' ') : 'UNCLASSIFIED_NODE'}
-                          <Filter className="ml-4 h-3.5 w-3.5 opacity-30" />
+                        <Button variant="ghost" size="sm" className="px-2">
+                          {product.category || '—'}
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start" className="max-h-[400px] w-64 overflow-y-auto rounded-[32px] border-none shadow-2xl p-4 bg-white transition-none z-[100] scrollbar-hide">
-                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300 px-6 py-4">SELECT_CLASSIFICATION_PROTOCOL</DropdownMenuLabel>
-                        <DropdownMenuSeparator className="bg-slate-50 mx-2 mb-2" />
+                      <DropdownMenuContent align="start" className="max-h-64 overflow-y-auto" aria-labelledby={categoryMenuId}>
                         {categoryOptions.map(cat => (
-                          <DropdownMenuItem key={cat} onClick={() => handleInlineUpdate(product.id,'category',cat)} className="text-[11px] font-black uppercase tracking-widest text-slate-500 rounded-2xl px-6 py-4 cursor-pointer focus:bg-slate-900 focus:text-white transition-none mb-1 last:mb-0">
-                            {cat.toUpperCase()}
+                          <DropdownMenuItem key={cat} onClick={() => handleInlineUpdate(product.id,'category',cat)}>
+                            {cat}
                           </DropdownMenuItem>
                         ))}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
-                  <TableCell className="py-10">
+                  <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild id={statusMenuId}>
                         <Badge 
-                          variant="outline" 
-                          className={cn(
-                              "cursor-pointer gap-4 rounded-full px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.25em] shadow-sm transition-none border-none outline-none focus:ring-0", 
-                              stockInfo.color
-                          )}
+                          variant={stockInfo.variant} 
+                          className={cn("cursor-pointer font-black tracking-widest text-[9px] px-2 py-0.5 transition-all duration-300 hover:brightness-110", stockInfo.color)}
                         >
-                          {stockInfo.icon}
                           {product.status ? product.status.toUpperCase() : stockInfo.label}
                         </Badge>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start" className="rounded-[32px] border-none shadow-2xl p-4 bg-white w-64 transition-none z-[100]">
-                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300 px-6 py-4">OPERATIONAL_REGISTRY_STATUS</DropdownMenuLabel>
-                        <DropdownMenuSeparator className="bg-slate-50 mx-2 mb-2" />
+                      <DropdownMenuContent align="start" aria-labelledby={statusMenuId}>
                         {statusOptions.map(s => (
-                          <DropdownMenuItem key={s} onClick={() => handleInlineUpdate(product.id,'status',s)} className="text-[11px] font-black uppercase tracking-widest text-slate-500 rounded-2xl px-6 py-4 cursor-pointer focus:bg-slate-900 focus:text-white transition-none mb-1 last:mb-0">
+                          <DropdownMenuItem key={s} onClick={() => handleInlineUpdate(product.id,'status',s)}>
                             {(s || '').toUpperCase()}
                           </DropdownMenuItem>
                         ))}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
-                  <TableCell className="text-right py-10">
+                  <TableCell className="text-right font-bold tabular-nums text-slate-700">
                     <InlineNumber
                       value={product.price_ghs}
-                      prefix="₵"
+                      prefix="GHS"
                       saving={!!saving[product.id]?.price_ghs}
                       onCommit={(val) => handleInlineUpdate(product.id,'price_ghs',val)}
                     />
                   </TableCell>
-                  <TableCell className="text-right py-10">
-                    <InlineNumber
-                      value={product.stock_level}
-                      saving={!!saving[product.id]?.stock_level}
-                      onCommit={(val) => handleInlineUpdate(product.id,'stock_level',val)}
-                      warning={product.stock_level < 10}
-                    />
+                  <TableCell className="text-right hidden md:table-cell tabular-nums font-medium">
+                    <div className="flex items-center justify-end gap-3">
+                        <span className="text-[10px] opacity-40">{stockInfo.icon}</span>
+                        <InlineNumber
+                          value={product.stock_level}
+                          saving={!!saving[product.id]?.stock_level}
+                          onCommit={(val) => handleInlineUpdate(product.id,'stock_level',val)}
+                          warning={product.stock_level < 10}
+                        />
+                    </div>
                   </TableCell>
-                  <TableCell className="text-right pr-16 py-10">
+                  <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild id={actionsMenuId}>
-                        <Button variant="ghost" className="h-14 w-14 p-0 rounded-full text-slate-200 hover:text-slate-900 hover:bg-slate-50 transition-none border-none shadow-sm">
-                          <MoreHorizontal className="h-7 w-7" />
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="rounded-[32px] border-none shadow-2xl w-64 p-4 bg-white transition-none z-[100]">
-                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300 px-6 py-4">TERMINAL_CONTROL_STATION</DropdownMenuLabel>
-                        <DropdownMenuSeparator className="bg-slate-50 mx-2 mb-2" />
-                        <DropdownMenuItem onClick={() => handleEdit(product)} className="text-[11px] font-black uppercase tracking-widest text-slate-600 rounded-2xl px-6 py-5 cursor-pointer focus:bg-slate-50 focus:text-slate-900 transition-none gap-6 mb-1">
-                          <Edit className="h-5 w-5 text-slate-300" /> EDIT_SKU_PARAMETERS
+                      <DropdownMenuContent align="end" aria-labelledby={actionsMenuId}>
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => handleEdit(product)}>
+                          <Edit className="mr-2 h-4 w-4" /> Edit
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator className="bg-slate-50 mx-2 mb-2" />
-                        <DropdownMenuItem className="text-rose-600 text-[11px] font-black uppercase tracking-widest rounded-2xl px-6 py-5 cursor-pointer focus:bg-rose-50 transition-none gap-6" onClick={() => handleDelete(product.id)}>
-                          <Trash2 className="h-5 w-5 text-rose-400" /> DECOMMISSION_SKU_SIGNAL
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(product.id)}>
+                          <Trash2 className="mr-2 h-4 w-4" /> Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -279,25 +270,16 @@ export function ProductTable({ initialProducts, categories = [] }: { initialProd
             })}
             {filteredProducts.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="py-80 text-center bg-transparent border-none">
-                  <div className="flex flex-col items-center justify-center gap-12">
-                    <div className="h-40 w-40 rounded-[48px] bg-white border border-slate-50 flex items-center justify-center shadow-2xl shadow-slate-900/10">
-                        <Search className="h-20 w-20 text-slate-100" />
+                <TableCell colSpan={7} className="h-64 text-center">
+                  <div className="flex flex-col items-center justify-center gap-4 text-slate-400">
+                    <div className="bg-slate-50 p-6 rounded-full border-2 border-dashed border-slate-200">
+                      <Search className="h-10 w-10 opacity-20" />
                     </div>
-                    <div className="space-y-6">
-                      <h3 className="text-sm font-black text-slate-400 uppercase tracking-[0.4em] leading-none">REGISTRY_SCAN_NOMINAL</h3>
-                      <p className="text-[11px] font-black text-slate-200 uppercase tracking-[0.3em] max-w-lg mx-auto leading-relaxed">
-                          No SKU records match the current filter parameters in the global registry matrix. Synchronize search telemetry to refresh terminal.
-                      </p>
+                    <div className="space-y-1">
+                      <h3 className="text-sm font-bold text-slate-600 uppercase tracking-widest">No Products Found</h3>
+                      <p className="text-xs font-medium italic">Try a different search or add a new product to the list.</p>
                     </div>
-                    <Button 
-                        variant="outline" 
-                        className="h-16 px-16 rounded-full font-black text-[12px] uppercase tracking-widest border-none bg-slate-50/50 text-slate-300 hover:bg-slate-900 hover:text-white transition-none shadow-2xl shadow-slate-900/5 gap-6" 
-                        onClick={() => setSearchTerm("")}
-                    >
-                        <History className="h-5 w-5" />
-                        RESET_TERMINAL_FILTERS
-                    </Button>
+                    <Button variant="outline" size="sm" className="mt-2 font-bold text-[10px] uppercase tracking-widest" onClick={() => setSearchTerm("")}>Clear Search</Button>
                   </div>
                 </TableCell>
               </TableRow>
@@ -306,43 +288,26 @@ export function ProductTable({ initialProducts, categories = [] }: { initialProd
         </Table>
       </div>
 
-      {/* Frame Control Matrix */}
+      {/* Pagination Controls */}
       {filteredProducts.length > pageSize && (
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-12 px-8 pt-16 border-t border-slate-50">
-          <div className="flex items-center gap-8">
-            <span className="text-[11px] font-black text-slate-300 uppercase tracking-[0.3em]">MATRIX_DENSITY_SCALE:</span>
-            <div className="bg-slate-50/50 rounded-full px-8 py-3.5 shadow-sm border border-slate-50">
-                <select
-                className="bg-transparent border-none text-[11px] font-black uppercase tracking-widest text-slate-500 outline-none cursor-pointer"
-                value={pageSize}
-                onChange={e => { setPageSize(Number(e.target.value)); setPage(1) }}
-                >
-                {[10, 20, 50, 100].map(size => (
-                    <option key={size} value={size}>{size} STREAMS / FRAME</option>
-                ))}
-                </select>
-            </div>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-2 gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-sm">Rows per page:</span>
+            <select
+              className="border rounded px-2 py-1 text-sm"
+              value={pageSize}
+              onChange={e => { setPageSize(Number(e.target.value)); setPage(1) }}
+              title="Rows per page"
+            >
+              {[10, 20, 50, 100].map(size => (
+                <option key={size} value={size}>{size}</option>
+              ))}
+            </select>
           </div>
-          <div className="flex items-center gap-10">
-            <Button 
-                variant="outline" 
-                disabled={page === 1} 
-                onClick={() => setPage(p => Math.max(1, p-1))}
-                className="h-16 px-12 rounded-full font-black text-[11px] uppercase tracking-widest border-none bg-slate-50/50 text-slate-300 hover:bg-slate-900 hover:text-white transition-none shadow-sm"
-            >
-                PREVIOUS_FRAME
-            </Button>
-            <div className="h-14 px-8 rounded-[20px] bg-slate-900 flex items-center justify-center shadow-2xl shadow-slate-900/40">
-                <span className="text-[13px] font-black text-brand-teal uppercase tracking-[0.3em] tabular-nums">{page} / {totalPages}</span>
-            </div>
-            <Button 
-                variant="outline" 
-                disabled={page === totalPages} 
-                onClick={() => setPage(p => Math.min(totalPages, p+1))}
-                className="h-16 px-12 rounded-full font-black text-[11px] uppercase tracking-widest border-none bg-slate-50/50 text-slate-300 hover:bg-slate-900 hover:text-white transition-none shadow-sm"
-            >
-                NEXT_FRAME
-            </Button>
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="ghost" disabled={page === 1} onClick={() => setPage(p => Math.max(1, p-1))}>&lt;</Button>
+            <span className="text-sm">Page {page} of {totalPages}</span>
+            <Button size="sm" variant="ghost" disabled={page === totalPages} onClick={() => setPage(p => Math.min(totalPages, p+1))}>&gt;</Button>
           </div>
         </div>
       )}
@@ -357,6 +322,7 @@ export function ProductTable({ initialProducts, categories = [] }: { initialProd
   )
 }
 
+// Inline number edit component
 function InlineNumber({ value, onCommit, prefix, saving, warning }: { value: number; onCommit: (v:number)=>void; prefix?: string; saving?: boolean; warning?: boolean }) {
   const [draft, setDraft] = useState<string>(String(value))
   useEffect(()=>{ setDraft(String(value)) }, [value])
@@ -366,19 +332,23 @@ function InlineNumber({ value, onCommit, prefix, saving, warning }: { value: num
   }
   return (
     <div className={cn(
-      "inline-flex items-center justify-end gap-6 px-8 py-5 rounded-[24px] transition-none shadow-sm group/input",
-      warning ? "bg-rose-500/10 text-rose-600 border border-rose-500/20" : "bg-slate-50/50 hover:bg-white hover:shadow-2xl hover:shadow-slate-900/5 text-slate-900 border border-transparent hover:border-slate-100"
+      "inline-flex items-center justify-end gap-1 px-2 py-1 rounded-md transition-all duration-300",
+      warning ? "bg-rose-50 text-rose-700" : "hover:bg-slate-100"
     )}>  
-      {prefix && <span className="text-sm font-black text-slate-300 leading-none group-hover/input:text-brand-teal transition-none">{prefix}</span>}
+      {prefix && <span className="text-[10px] font-bold text-slate-400 mr-1">{prefix}</span>}
       <input
-        className="w-32 bg-transparent text-right tabular-nums border-none focus:ring-0 p-0 text-2xl font-black uppercase tracking-tighter outline-none leading-none"
+        className={cn(
+          "w-20 bg-transparent text-right tabular-nums border-none focus:ring-0 rounded p-0 text-sm outline-none transition",
+          warning && "font-bold"
+        )}
         value={draft}
         onChange={e=> setDraft(e.target.value)}
         onBlur={commit}
         onKeyDown={e=> { if(e.key==='Enter'){ (e.target as HTMLInputElement).blur(); } }}
         type="number"
+        aria-label={prefix ? `${prefix} value` : 'number value'}
       />
-      {saving ? <Loader2 className="h-5 w-5 animate-spin text-brand-teal" /> : <Zap className="h-5 w-5 text-slate-100 group-hover/input:text-brand-teal transition-none" />}
+      {saving && <Loader2 className="h-3 w-3 animate-spin text-slate-400" />}
     </div>
   )
 }
@@ -386,17 +356,17 @@ function InlineNumber({ value, onCommit, prefix, saving, warning }: { value: num
 function InlineImage({ src, alt }: { src: string | null; alt: string }) {
   const [errored, setErrored] = useState(false)
   return (
-    <div className="relative h-20 w-20 rounded-[32px] overflow-hidden bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-200 shadow-2xl transition-none group-hover:scale-105 duration-500">
+    <div className="relative group/img h-12 w-12 rounded-[4px] overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 transition-all duration-300 hover:border-slate-300 hover:shadow-md">
       {src && !errored ? (
         <Image 
           src={src} 
           alt={alt} 
           fill 
-          className="object-cover transition-none opacity-80 group-hover:opacity-100 duration-500" 
+          className="object-cover transition-transform duration-500 group-hover/img:scale-110" 
           onError={()=> setErrored(true)} 
         />
       ) : (
-        <Package className="h-10 w-10 text-slate-700" />
+        <span className="text-[10px] font-bold opacity-30">IMG</span>
       )}
     </div>
   )

@@ -5,6 +5,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -18,8 +19,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+// NOTE: Use pharmacy API route instead of admin server action
 import { useToast } from "@/hooks/use-toast";
-import { Truck, Activity, ShieldCheck, Zap, Info, Map, Repeat, ShieldAlert } from "lucide-react";
+import { Truck, Users } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -29,7 +31,6 @@ import {
 } from "@/components/ui/select";
 import { getSupabaseClient } from "@/lib/supabase";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { cn } from "@/lib/utils";
 
 interface DeliveryDialogProps {
   orderId: number | null;
@@ -48,21 +49,27 @@ export function DeliveryDialog({
   const { toast } = useToast();
   const [riderName, setRiderName] = useState("");
   const [riderPhone, setRiderPhone] = useState("");
+  const [trackingUrl, setTrackingUrl] = useState("");
   const [riders, setRiders] = useState<any[]>([]);
   const [selectedRiderId, setSelectedRiderId] = useState<string>("manual");
   const isMobile = useMediaQuery("(max-width: 640px)");
 
   useEffect(() => {
     if (isOpen) {
+      // Fetch riders when dialog opens
       const fetchRiders = async () => {
         const supabase = getSupabaseClient();
         try {
-          const { data: { user } } = await supabase.auth.getUser();
+          // Get current user
+          const {
+            data: { user },
+          } = await supabase.auth.getUser();
           if (!user) {
             setRiders([]);
             return;
           }
 
+          // Get pharmacy for this user
           const { data: pharmacy } = await supabase
             .from("pharmacies")
             .select("id")
@@ -74,6 +81,7 @@ export function DeliveryDialog({
             return;
           }
 
+          // Fetch riders for this pharmacy
           const { data, error } = await supabase
             .from("pharmacy_riders")
             .select("*")
@@ -125,6 +133,7 @@ export function DeliveryDialog({
           status: "out_for_delivery",
           courier_name: riderName,
           courier_phone: riderPhone,
+          courier_tracking_url: trackingUrl,
         }),
       });
 
@@ -132,22 +141,22 @@ export function DeliveryDialog({
 
       if (!res.ok || result.error) {
         toast({
-          title: "SYNC_FAILURE",
-          description: result.error || "Failed to update node registry.",
+          title: "Error updating order",
+          description: result.error || "Failed to update order",
           variant: "destructive",
         });
       } else {
         toast({
-          title: "PROTOCOL_DISPATCH",
-          description: "Tracking stream synchronized with logistics node.",
+          title: "Order Out for Delivery",
+          description: "Customer has been notified.",
         });
         onOpenChange(false);
-        onSuccess();
+        onSuccess(); // Trigger parent refresh or state update
       }
     } catch (error) {
       toast({
-        title: "OPERATIONAL_FAILURE",
-        description: "Unexpected terminal failure in dispatch sequence.",
+        title: "Error",
+        description: "Something went wrong.",
         variant: "destructive",
       });
     } finally {
@@ -156,80 +165,81 @@ export function DeliveryDialog({
   };
 
   const formContent = (
-    <form onSubmit={handleSubmit} className="space-y-10 pt-8">
-      <div className="space-y-4">
-        <Label className="text-[11px] font-black uppercase tracking-[0.25em] text-slate-400 pl-6">Node Selection Protocol</Label>
+    <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+      <div className="space-y-2">
+        <Label>Select Rider (Optional)</Label>
         <Select value={selectedRiderId} onValueChange={handleRiderSelect}>
-          <SelectTrigger className="h-16 rounded-2xl font-black text-[11px] uppercase tracking-widest border-slate-100 bg-slate-50/50 px-8 transition-none shadow-sm focus:ring-0">
-            <SelectValue placeholder="SELECT_REGISTERED_NODE" />
+          <SelectTrigger className="h-12">
+            <SelectValue placeholder="Select a registered rider" />
           </SelectTrigger>
-          <SelectContent className="rounded-3xl shadow-2xl border-none p-3 bg-white transition-none">
-            <SelectItem value="manual" className="text-[11px] font-black uppercase tracking-widest rounded-2xl px-6 py-4 cursor-pointer focus:bg-slate-50 transition-none">MANUAL_ENTRY</SelectItem>
+          <SelectContent>
+            <SelectItem value="manual">Enter Manually</SelectItem>
             {riders.map((r) => (
-              <SelectItem key={r.id} value={r.id.toString()} className="text-[11px] font-black uppercase tracking-widest rounded-2xl px-6 py-4 cursor-pointer focus:bg-slate-50 transition-none">
-                {r.name.toUpperCase()}
+              <SelectItem key={r.id} value={r.id.toString()}>
+                {r.name} ({r.phone})
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
 
-      <div className="space-y-8">
-          <div className="space-y-4">
-            <Label htmlFor="riderName" className="text-[11px] font-black uppercase tracking-[0.25em] text-slate-400 pl-6">Rider / Logistics Designation</Label>
-            <Input
-              id="riderName"
-              placeholder="E.G. SHAQ_EXPRESS_NODE"
-              value={riderName}
-              onChange={(e) => setRiderName(e.target.value)}
-              required
-              className="h-16 rounded-2xl font-black text-[11px] uppercase tracking-widest border-slate-100 bg-slate-50/50 px-8 transition-none shadow-sm focus-visible:ring-0"
-            />
-          </div>
-          <div className="space-y-4">
-            <Label htmlFor="riderPhone" className="text-[11px] font-black uppercase tracking-[0.25em] text-slate-400 pl-6">Secure Comms Number</Label>
-            <Input
-              id="riderPhone"
-              placeholder="024_000_0000"
-              value={riderPhone}
-              onChange={(e) => setRiderPhone(e.target.value)}
-              required
-              className="h-16 rounded-2xl font-black text-[11px] uppercase tracking-widest border-slate-100 bg-slate-50/50 px-8 transition-none tabular-nums shadow-sm focus-visible:ring-0"
-            />
-          </div>
+      <div className="space-y-2">
+        <Label htmlFor="riderName">Rider / Service Name</Label>
+        <Input
+          id="riderName"
+          placeholder="e.g. Kojo (Bolt) or ShaQ Express"
+          value={riderName}
+          onChange={(e) => setRiderName(e.target.value)}
+          required
+          className="h-12"
+        />
       </div>
-
-      <div className="bg-slate-900 p-10 rounded-3xl border border-slate-800 space-y-5 shadow-2xl transition-none relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-20 h-20 bg-brand-teal/5 rounded-bl-full -mr-10 -mt-10" />
-        <div className="flex items-center gap-4">
-            <Zap className="h-5 w-5 text-brand-teal" />
-            <p className="text-[11px] font-black text-slate-500 uppercase tracking-[0.25em] leading-none">Logistics Synchronization</p>
-        </div>
-        <p className="text-[12px] text-slate-300 leading-relaxed font-black uppercase tracking-tight">
-          A secure tracking protocol will be auto-generated for <span className="text-white">STREAM_#{orderId}</span> and dispatched via encrypted SMS uplink.
+      <div className="space-y-2">
+        <Label htmlFor="riderPhone">Rider Contact Number</Label>
+        <Input
+          id="riderPhone"
+          placeholder="024..."
+          value={riderPhone}
+          onChange={(e) => setRiderPhone(e.target.value)}
+          required
+          className="h-12"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="trackingUrl">Tracking Link (Optional)</Label>
+        <Input
+          id="trackingUrl"
+          placeholder="https://..."
+          value={trackingUrl}
+          onChange={(e) => setTrackingUrl(e.target.value)}
+          className="h-12"
+        />
+        <p className="text-xs text-muted-foreground">
+          If left blank, we&apos;ll auto-generate a tracking link for this
+          order.
         </p>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-6 pt-10 border-t border-slate-50">
+      <div className="flex flex-col sm:flex-row gap-2 pt-4">
         <Button
           type="button"
-          variant="ghost"
+          variant="outline"
           onClick={() => onOpenChange(false)}
-          className="w-full h-16 rounded-full font-black text-[11px] uppercase tracking-widest order-2 sm:order-1 text-slate-400 hover:bg-slate-50 transition-none border-none shadow-sm"
+          className="w-full sm:w-auto order-2 sm:order-1"
         >
-          Cancel_Protocol
+          Cancel
         </Button>
         <Button
           type="submit"
           disabled={loading}
-          className="bg-slate-900 hover:bg-slate-800 text-white w-full h-16 rounded-full font-black text-[11px] uppercase tracking-widest order-1 sm:order-2 shadow-2xl shadow-slate-900/30 transition-none border-none gap-5"
+          className="bg-blue-500 hover:bg-blue-600 text-white w-full sm:w-auto order-1 sm:order-2"
         >
           {loading ? (
-            "SYNCHRONIZING..."
+            "Processing..."
           ) : (
             <>
-              <ShieldCheck className="h-6 w-6 text-brand-teal" />
-              Confirm_Dispatch
+              <Truck className="mr-2 h-4 w-4" />
+              Confirm Dispatch
             </>
           )}
         </Button>
@@ -240,21 +250,16 @@ export function DeliveryDialog({
   if (isMobile) {
     return (
       <Drawer open={isOpen} onOpenChange={onOpenChange}>
-        <DrawerContent className="h-[95vh] bg-white border-none rounded-t-[40px] transition-none outline-none">
-          <div className="flex flex-col h-full w-full max-w-xl mx-auto px-12 pb-16 overflow-y-auto">
-            <div className="w-16 h-1.5 bg-slate-100 rounded-full mx-auto mt-6 mb-10" />
-            <DrawerHeader className="px-0 pt-4 text-left shrink-0 space-y-6">
-              <div className="h-20 w-20 rounded-3xl bg-slate-900 flex items-center justify-center shadow-2xl shadow-slate-900/10">
-                <Truck className="h-10 w-10 text-brand-teal" />
-              </div>
-              <div className="space-y-4">
-                <DrawerTitle className="text-4xl font-black text-slate-900 tracking-tighter uppercase leading-none">Logistics Provisioning</DrawerTitle>
-                <DrawerDescription className="text-[11px] font-black text-slate-400 uppercase tracking-[0.25em] leading-none mt-2">
-                    Map logistics node to active fulfillment stream.
-                </DrawerDescription>
-              </div>
+        <DrawerContent className="h-[90vh]">
+          <div className="flex flex-col h-full w-full max-w-sm mx-auto px-4 pb-8 overflow-y-auto">
+            <DrawerHeader className="px-0 pt-6 text-left shrink-0">
+              <DrawerTitle>Assign Dispatch Rider</DrawerTitle>
+              <DrawerDescription>
+                Enter the details of the rider picking up this package. This
+                helps track the delivery.
+              </DrawerDescription>
             </DrawerHeader>
-            <div className="flex-1 pb-6">{formContent}</div>
+            <div className="flex-1 pb-4">{formContent}</div>
           </div>
         </DrawerContent>
       </Drawer>
@@ -263,17 +268,13 @@ export function DeliveryDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[560px] rounded-[40px] border-none shadow-2xl p-16 bg-white transition-none outline-none">
-        <DialogHeader className="space-y-10">
-          <div className="h-20 w-20 rounded-3xl bg-slate-900 flex items-center justify-center shadow-2xl shadow-slate-900/10">
-            <Truck className="h-10 w-10 text-brand-teal" />
-          </div>
-          <div className="space-y-4">
-            <DialogTitle className="text-4xl font-black text-slate-900 tracking-tighter uppercase leading-none">Logistics Provisioning</DialogTitle>
-            <DialogDescription className="text-[11px] font-black text-slate-400 uppercase tracking-[0.25em] leading-none mt-2">
-                Map logistics node to active fulfillment stream.
-            </DialogDescription>
-          </div>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Assign Dispatch Rider</DialogTitle>
+          <DialogDescription>
+            Enter the details of the rider picking up this package. This helps
+            track the delivery.
+          </DialogDescription>
         </DialogHeader>
         {formContent}
       </DialogContent>

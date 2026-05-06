@@ -1,8 +1,6 @@
 "use client"
 
 import Link from "next/link"
-import { cn } from "@/lib/utils"
-import { ChevronRight } from "lucide-react"
 
 export interface BreadcrumbItem {
   label: string
@@ -11,20 +9,18 @@ export interface BreadcrumbItem {
 
 export function Breadcrumbs({ items }: { items: BreadcrumbItem[] }) {
   return (
-    <nav className="mb-12" aria-label="Breadcrumb">
-      <ol className="flex items-center gap-6">
+    <nav className="mb-4" aria-label="Breadcrumb">
+      <ol className="flex items-center gap-2 text-sm text-muted-foreground">
         {items.map((item, i) => (
-          <li key={i} className="flex items-center gap-6">
+          <li key={i} className="flex items-center gap-2">
             {item.href ? (
-              <Link href={item.href} className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-slate-900 transition-none leading-none">
+              <Link href={item.href} className="hover:underline text-primary font-medium">
                 {item.label}
               </Link>
             ) : (
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-900 leading-none">{item.label}</span>
+              <span className="font-semibold text-foreground">{item.label}</span>
             )}
-            {i < items.length - 1 && (
-                <ChevronRight className="h-3 w-3 text-slate-200" />
-            )}
+            {i < items.length - 1 && <span className="mx-1">/</span>}
           </li>
         ))}
       </ol>

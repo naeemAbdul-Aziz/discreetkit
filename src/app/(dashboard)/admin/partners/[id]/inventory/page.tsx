@@ -1,19 +1,18 @@
 import { getPharmacyProducts, getPharmacies } from "@/lib/admin-actions"
-import { DashboardShell } from "@/components/dashboard/dashboard-shell"
+import { Button } from "@/components/ui/button"
+import { ArrowLeft } from "lucide-react"
+import Link from "next/link"
 import { PharmacyInventoryManager } from "../pharmacy-inventory-manager"
 import { notFound } from "next/navigation"
-import { ShieldCheck, Package, Network, Zap } from "lucide-react"
-
-export const dynamic = "force-dynamic";
 
 interface PharmacyInventoryPageProps {
-  params: Promise<{ id: string }>
+  params: { id: string }
 }
 
-export default async function PharmacyInventoryPage(props: PharmacyInventoryPageProps) {
-  const params = await props.params;
+export default async function PharmacyInventoryPage({ params }: PharmacyInventoryPageProps) {
   const pharmacyId = parseInt(params.id)
 
+  // Get pharmacy details for the header
   const pharmacies = await getPharmacies()
   const pharmacy = pharmacies.find(p => p.id === pharmacyId)
 
@@ -24,31 +23,31 @@ export default async function PharmacyInventoryPage(props: PharmacyInventoryPage
   const products = await getPharmacyProducts(pharmacyId)
 
   return (
-    <DashboardShell
-        title="Inventory Terminal"
-        subtitle={`Real-time SKU synchronization & stock availability for ${pharmacy.name}`}
-        breadcrumbs={[
-            { label: 'Control Center', href: '/admin' },
-            { label: 'Partners', href: '/admin/partners' },
-            { label: 'Node Details', href: `/admin/partners/${pharmacyId}` },
-            { label: 'Inventory Terminal' }
-        ]}
-    >
-      <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-10">
-        <div className="flex items-center gap-4 mb-12">
-            <div className="h-10 w-10 rounded-xl bg-slate-900 flex items-center justify-center">
-                <Package className="h-5 w-5 text-white" />
-            </div>
-            <div>
-                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-900">Registry Controller</h3>
-                <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mt-1">Direct management of operational inventory states</p>
-            </div>
+    <div className="space-y-8 p-8 max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground">
+            <Link href={`/admin/partners/${pharmacyId}`}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Partner
+            </Link>
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Inventory Management</h1>
+            <p className="text-muted-foreground mt-1">
+              Manage stock and availability for <span className="font-medium text-foreground">{pharmacy.name}</span>
+            </p>
+          </div>
         </div>
+      </div>
+
+      <div className="bg-card rounded-xl border shadow-sm p-6">
         <PharmacyInventoryManager 
             pharmacyId={pharmacyId} 
             initialProducts={products}
         />
       </div>
-    </DashboardShell>
+    </div>
   )
 }

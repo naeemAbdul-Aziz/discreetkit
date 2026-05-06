@@ -1,51 +1,45 @@
 import { Suspense } from "react";
 import { getPharmacies } from "@/lib/admin-actions"
 import { PartnerTable } from "./partner-table"
-import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { Skeleton } from "@/components/ui/skeleton"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
 
 /**
- * FAANG-Level Node Network Registry
- * Simple, Clean, Professional.
+ * Pharmacy Partners Dashboard (Server-Side Streaming)
  */
 export default async function PartnersPage() {
   return (
-    <DashboardShell
-        title="NODE_NETWORK"
-        subtitle="Operational directory of pharmacy partners & fulfillment nodes across the global matrix"
-        breadcrumbs={[{ label: 'MASTER_CONTROL', href: '/admin' }, { label: 'NODE_NETWORK' }]}
-    >
+    <div className="space-y-8 animate-in fade-in duration-700">
+      <div className="flex flex-col gap-1">
+        <h2 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 uppercase tracking-widest">
+            Partner Network
+        </h2>
+        <p className="text-[10px] uppercase font-bold text-slate-400 tracking-[0.2em]">
+            Managing pharmacy partners & distributed fulfillment centers
+        </p>
+      </div>
+
       <Suspense fallback={<PartnersTableSkeleton />}>
         <PartnersLoader />
       </Suspense>
-    </DashboardShell>
+    </div>
   )
 }
 
 async function PartnersLoader() {
   const partners = await getPharmacies();
-  return (
-    <div className="rounded-[40px] border border-slate-100 bg-white shadow-2xl shadow-slate-900/5 p-12 overflow-hidden transition-none">
-        <PartnerTable initialPartners={partners} />
-    </div>
-  );
+  return <PartnerTable initialPartners={partners} />;
 }
 
 function PartnersTableSkeleton() {
   return (
-    <div className="p-16 space-y-16 bg-white rounded-[40px] border border-slate-100 shadow-2xl shadow-slate-900/5">
-      <div className="flex flex-col md:flex-row gap-10 items-center">
-          <Skeleton className="h-16 flex-1 rounded-full bg-slate-50/50" />
-          <Skeleton className="h-16 w-64 rounded-full bg-slate-50/50" />
-      </div>
-      <div className="space-y-10">
-        {[...Array(6)].map((_, i) => (
-          <Skeleton key={i} className="h-28 w-full rounded-full bg-slate-50/30" />
-        ))}
-      </div>
+    <div className="space-y-4">
+      <div className="h-10 w-full bg-slate-50 animate-pulse rounded-xl" />
+      {[1, 2, 3, 4, 5].map(i => (
+        <Skeleton key={i} className="h-20 w-full rounded-2xl" />
+      ))}
     </div>
   );
 }

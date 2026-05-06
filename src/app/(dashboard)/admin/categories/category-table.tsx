@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Edit, Plus, Trash2, Tag, ShoppingCart, MoreVertical, Search, Terminal, History, Activity, ShieldCheck, ArrowRight, Filter, AlertTriangle, Zap } from "lucide-react"
+import { Edit, Plus, Trash2, Tag, ShoppingCart, MoreVertical, Search } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent } from "@/components/ui/card"
@@ -75,13 +75,13 @@ export function CategoryTable({ initialCategories }: CategoryTableProps) {
     try {
       const res = await updateCategoryName(id, editValue)
       if (res.error) {
-        toast({ variant: "destructive", title: "PROTOCOL_FAILURE", description: res.error })
+        toast({ variant: "destructive", title: "Error", description: res.error })
       } else {
         setCategories(prev => prev.map(c => c.id === id ? { ...c, name: editValue } : c))
-        toast({ title: "REGISTRY_SYNCHRONIZED", description: "Category identity updated in master matrix." })
+        toast({ title: "Success", description: "Category updated." })
       }
     } catch (error) {
-      toast({ variant: "destructive", title: "TERMINAL_CRITICAL", description: "Failed to finalize metadata sync." })
+      toast({ variant: "destructive", title: "Error", description: "Failed to update." })
     } finally {
       setEditingId(null)
     }
@@ -93,13 +93,13 @@ export function CategoryTable({ initialCategories }: CategoryTableProps) {
     try {
       const res = await deleteCategory(id)
       if (res.error) {
-        toast({ variant: "destructive", title: "PROTOCOL_FAILURE", description: res.error })
+        toast({ variant: "destructive", title: "Error", description: res.error })
       } else {
         setCategories(prev => prev.filter(c => c.id !== id))
-        toast({ title: "SKU_CLASSIFICATION_DECOMMISSIONED", description: "Category removed from global catalog registry." })
+        toast({ title: "Success", description: "Category deleted." })
       }
     } catch (error) {
-      toast({ variant: "destructive", title: "TERMINAL_CRITICAL", description: "Failed to decommissioning node." })
+      toast({ variant: "destructive", title: "Error", description: "Failed to delete." })
     } finally {
       setDeleteId(null)
     }
@@ -116,167 +116,150 @@ export function CategoryTable({ initialCategories }: CategoryTableProps) {
     
     if (successCount > 0) {
       setCategories(prev => prev.filter(c => !selectedIds.includes(c.id)))
-      toast({ title: "BULK_DECOMMISSION_SIGNAL", description: `Successfully decommissioned ${successCount} classification nodes.` })
+      toast({ title: "Bulk Action", description: `Deleted ${successCount} categories.` })
       setSelectedIds([])
     }
   }
 
   return (
-    <div className="space-y-16">
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-12 px-2">
-        <div className="relative flex-1 max-w-2xl group">
-          <Search className="absolute left-8 top-1/2 -translate-y-1/2 h-6 w-6 text-slate-300 group-focus-within:text-brand-teal transition-none" />
-          <Input
-            type="search"
-            placeholder="FILTER_METADATA_REGISTRY: SEARCH_CLASSIFICATION_NODE..."
-            className="pl-20 h-20 rounded-[32px] font-black text-[13px] uppercase tracking-[0.3em] border-none bg-slate-50/50 shadow-sm focus-visible:ring-0 focus-visible:bg-white focus-visible:shadow-2xl shadow-slate-900/5 transition-none placeholder:text-slate-200"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-black tracking-tight text-slate-900">Categories</h1>
+          <p className="text-sm text-slate-500 font-medium">Manage and organize your product catalog.</p>
         </div>
-        <div className="flex items-center gap-8">
-          <Button 
-            onClick={() => { setSelectedCategory(null); setIsDialogOpen(true) }}
-            className="bg-slate-900 hover:bg-slate-800 text-white rounded-full h-20 px-16 font-black text-sm uppercase tracking-[0.3em] gap-8 shadow-2xl shadow-slate-900/40 transition-none border-none group"
-          >
-            <Plus className="h-6 w-6 text-brand-teal group-hover:rotate-90 transition-transform duration-300" />
-            PROVISION_NEW_CLASSIFICATION
-          </Button>
-        </div>
+        <Button 
+          onClick={() => { setSelectedCategory(null); setIsDialogOpen(true) }}
+          className="bg-brand-indigo hover:bg-brand-indigo/90 shadow-lg shadow-brand-indigo/20 rounded-xl px-6 h-11"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Add Category
+        </Button>
       </div>
 
-      <div className="overflow-hidden">
-        <Table className="min-w-[1200px]">
-          <TableHeader className="bg-slate-50/30 border-b border-slate-50">
-            <TableRow className="hover:bg-transparent border-none">
-              <TableHead className="w-[120px] pl-16 py-10">
-                <Checkbox 
-                  checked={selectedIds.length === filteredCategories.length && filteredCategories.length > 0}
-                  onCheckedChange={toggleSelectAll}
-                  className="rounded-lg h-9 w-9 border-slate-200 bg-white data-[state=checked]:bg-slate-900 data-[state=checked]:border-slate-900 transition-none shadow-sm"
-                />
-              </TableHead>
-              <TableHead className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 py-10">CLASSIFICATION_IDENTITY_LABEL</TableHead>
-              <TableHead className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 py-10">OPERATIONAL_DESCRIPTION</TableHead>
-              <TableHead className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 py-10 text-center">INVENTORY_DENSITY_SYNC</TableHead>
-              <TableHead className="text-right pr-16 py-10 text-[11px] font-black uppercase tracking-[0.3em] text-slate-400">CONTROL_STATION</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredCategories.map((category) => (
-              <TableRow 
-                key={category.id} 
-                className={cn(
-                  "group transition-none border-slate-50 hover:bg-slate-50/30",
-                  selectedIds.includes(category.id) && "bg-slate-50/50"
-                )}
-              >
-                <TableCell className="pl-16 py-12">
+      <ActionBar 
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        placeholder="Search by name..."
+      />
+
+      <Card className="border border-slate-200 shadow-sm overflow-hidden rounded-2xl">
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader className="bg-slate-50/80">
+              <TableRow className="hover:bg-transparent border-slate-200">
+                <TableHead className="w-[50px] pl-6">
                   <Checkbox 
-                    checked={selectedIds.includes(category.id)}
-                    onCheckedChange={() => toggleSelect(category.id)}
-                    className="rounded-lg h-9 w-9 border-slate-200 bg-white data-[state=checked]:bg-slate-900 data-[state=checked]:border-slate-900 transition-none shadow-sm"
+                    checked={selectedIds.length === filteredCategories.length && filteredCategories.length > 0}
+                    onCheckedChange={toggleSelectAll}
+                    aria-label="Select all"
                   />
-                </TableCell>
-                <TableCell className="py-12">
-                  {editingId === category.id ? (
-                    <div className="relative group/edit">
-                        <Terminal className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-brand-teal" />
-                        <Input 
-                            autoFocus
-                            value={editValue}
-                            onChange={(e) => setEditValue(e.target.value)}
-                            onBlur={() => handleInlineEdit(category.id)}
-                            onKeyDown={(e) => e.key === "Enter" && handleInlineEdit(category.id)}
-                            className="h-16 pl-16 pr-8 w-[320px] rounded-2xl border-none bg-white font-black text-sm uppercase tracking-[0.2em] shadow-2xl shadow-slate-900/10 focus-visible:ring-0 transition-none"
-                        />
-                    </div>
-                  ) : (
-                    <div 
-                      className="flex items-center gap-6 cursor-text group/item w-fit"
-                      onClick={() => { setEditingId(category.id); setEditValue(category.name) }}
-                    >
-                      <div className="h-14 w-14 rounded-2xl bg-slate-900 flex items-center justify-center shadow-2xl shadow-slate-900/10 group-hover/item:scale-105 transition-transform duration-300">
-                        <Tag className="h-7 w-7 text-brand-teal" />
-                      </div>
-                      <div className="space-y-2">
-                        <span className="font-black text-slate-900 uppercase tracking-tight text-base leading-none block group-hover/item:text-brand-teal transition-none">{category.name}</span>
-                        <span className="text-[10px] font-black text-slate-200 uppercase tracking-widest leading-none block">NODE_ID_#{category.id.toString().padStart(4, '0')}</span>
-                      </div>
-                    </div>
+                </TableHead>
+                <TableHead className="text-[11px] uppercase tracking-widest font-bold text-slate-400 py-4">Name</TableHead>
+                <TableHead className="text-[11px] uppercase tracking-widest font-bold text-slate-400 py-4">Description</TableHead>
+                <TableHead className="text-[11px] uppercase tracking-widest font-bold text-slate-400 py-4">Inventory</TableHead>
+                <TableHead className="text-right pr-6 text-[11px] uppercase tracking-widest font-bold text-slate-400 py-4">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredCategories.map((category) => (
+                <TableRow 
+                  key={category.id} 
+                  className={cn(
+                    "group transition-colors border-slate-100",
+                    selectedIds.includes(category.id) ? "bg-brand-indigo/[0.02]" : "hover:bg-slate-50/50"
                   )}
-                </TableCell>
-                <TableCell className="py-12">
-                  <p className="text-sm font-black text-slate-400 uppercase tracking-tight line-clamp-1 max-w-[480px] leading-relaxed" title={category.description}>
-                    {category.description?.toUpperCase() || "NO_DESCRIPTION_MAPPED_TO_NODE"}
-                  </p>
-                </TableCell>
-                <TableCell className="py-12 text-center">
-                    <div className="flex justify-center">
-                        <Link href={`/admin/products?category=${encodeURIComponent(category.name)}`}>
-                            <Badge variant="outline" className="rounded-full bg-slate-50 text-slate-600 border-none hover:bg-slate-900 hover:text-white transition-none font-black text-[10px] uppercase tracking-widest px-8 py-3.5 gap-4 shadow-sm group/badge">
-                                <ShoppingCart className="h-4 w-4 text-slate-300 group-hover/badge:text-brand-teal transition-none" />
-                                {category.productCount || 0} UNITS_MAPPED
-                            </Badge>
-                        </Link>
+                >
+                  <TableCell className="pl-6">
+                    <Checkbox 
+                      checked={selectedIds.includes(category.id)}
+                      onCheckedChange={() => toggleSelect(category.id)}
+                      aria-label={`Select ${category.name}`}
+                    />
+                  </TableCell>
+                  <TableCell className="py-4">
+                    {editingId === category.id ? (
+                      <Input 
+                        autoFocus
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                        onBlur={() => handleInlineEdit(category.id)}
+                        onKeyDown={(e) => e.key === "Enter" && handleInlineEdit(category.id)}
+                        className="h-8 max-w-[200px] text-sm font-semibold"
+                      />
+                    ) : (
+                      <div 
+                        className="flex items-center gap-2 cursor-text group/item"
+                        onClick={() => { setEditingId(category.id); setEditValue(category.name) }}
+                      >
+                        <Tag className="h-3.5 w-3.5 text-slate-300 group-hover/item:text-brand-indigo transition-colors" />
+                        <span className="font-bold text-slate-900 group-hover/item:text-brand-indigo transition-colors">{category.name}</span>
+                      </div>
+                    )}
+                  </TableCell>
+                  <TableCell className="py-4">
+                    <p className="text-sm text-slate-500 line-clamp-1 max-w-md" title={category.description}>
+                      {category.description || "-"}
+                    </p>
+                  </TableCell>
+                  <TableCell className="py-4">
+                    <Link href={`/admin/products?category=${encodeURIComponent(category.name)}`}>
+                      <Badge variant="outline" className="rounded-lg bg-slate-50 text-slate-600 border-slate-200 hover:bg-brand-indigo/5 hover:text-brand-indigo hover:border-brand-indigo/20 transition-all font-semibold px-2 py-0.5 gap-1.5 cursor-pointer">
+                        <ShoppingCart className="h-3 w-3" />
+                        {category.productCount || 0} Products
+                      </Badge>
+                    </Link>
+                  </TableCell>
+                  <TableCell className="text-right pr-6 py-4">
+                    <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-slate-400 hover:text-brand-indigo hover:bg-brand-indigo/5 rounded-lg"
+                        onClick={() => { setSelectedCategory(category); setIsDialogOpen(true) }}
+                      >
+                        <Edit className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg"
+                        onClick={() => setDeleteId(category.id)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
                     </div>
-                </TableCell>
-                <TableCell className="text-right pr-16 py-12">
-                  <div className="flex items-center justify-end gap-4 opacity-0 group-hover:opacity-100 transition-none">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-14 w-14 text-slate-200 hover:text-slate-900 hover:bg-slate-50 rounded-full transition-none border-none shadow-sm"
-                      onClick={() => { setSelectedCategory(category); setIsDialogOpen(true) }}
-                    >
-                      <Edit className="h-6 w-6" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-14 w-14 text-slate-200 hover:text-rose-600 hover:bg-rose-50 rounded-full transition-none border-none shadow-sm"
-                      onClick={() => setDeleteId(category.id)}
-                    >
-                      <Trash2 className="h-6 w-6" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-            {filteredCategories.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={5} className="py-80 text-center bg-transparent border-none">
-                  <div className="flex flex-col items-center justify-center gap-12">
-                    <div className="h-40 w-40 rounded-[48px] bg-white border border-slate-50 flex items-center justify-center shadow-2xl shadow-slate-900/10">
-                        <Search className="h-20 w-20 text-slate-100" />
+                  </TableCell>
+                </TableRow>
+              ))}
+              {filteredCategories.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={5} className="py-20 text-center">
+                    <div className="flex flex-col items-center justify-center space-y-3">
+                      <div className="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center">
+                        <Search className="h-6 w-6 text-slate-300" />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-bold text-slate-900">No categories found</p>
+                        <p className="text-xs text-slate-500">Try adjusting your search or add a new category.</p>
+                      </div>
+                      <Button variant="outline" size="sm" onClick={() => setSearchTerm("")} className="mt-2 rounded-lg">
+                        Clear Search
+                      </Button>
                     </div>
-                    <div className="space-y-6">
-                      <h3 className="text-sm font-black text-slate-400 uppercase tracking-[0.4em] leading-none">REGISTRY_SCAN_NOMINAL</h3>
-                      <p className="text-[11px] font-black text-slate-200 uppercase tracking-[0.3em] max-w-lg mx-auto leading-relaxed">
-                          No classification records match the current filter parameters. Synchronize metadata telemetry to refresh terminal nodes.
-                      </p>
-                    </div>
-                    <Button 
-                        variant="outline" 
-                        className="h-16 px-16 rounded-full font-black text-[12px] uppercase tracking-widest border-none bg-slate-50/50 text-slate-300 hover:bg-slate-900 hover:text-white transition-none shadow-2xl shadow-slate-900/5 gap-6" 
-                        onClick={() => setSearchTerm("")}
-                    >
-                        <History className="h-5 w-5" />
-                        RESET_METADATA_FILTERS
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
       <BulkActionsBar 
         selectedCount={selectedIds.length}
         onClear={() => setSelectedIds([])}
         actions={[
-          { label: "BULK_DECOMMISSION_SIGNAL", onClick: handleBulkDelete, icon: <Trash2 className="h-6 w-6" />, variant: "destructive" }
+          { label: "Delete Selected", onClick: handleBulkDelete, icon: <Trash2 className="h-4 w-4" />, variant: "destructive" }
         ]}
       />
 
@@ -287,29 +270,17 @@ export function CategoryTable({ initialCategories }: CategoryTableProps) {
       />
 
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
-        <AlertDialogContent className="rounded-[48px] border-none shadow-2xl p-0 overflow-hidden bg-white max-w-[640px] transition-none">
-          <div className="p-16 border-b border-slate-50 flex items-center gap-10 bg-slate-50/30 backdrop-blur-3xl">
-              <div className="h-20 w-20 rounded-[32px] bg-slate-900 flex items-center justify-center shadow-2xl shadow-slate-900/40">
-                  <AlertTriangle className="h-10 w-10 text-rose-500" />
-              </div>
-              <div className="space-y-4">
-                  <AlertDialogTitle className="text-4xl font-black text-slate-900 uppercase tracking-tighter leading-none">Confirm_Decommission</AlertDialogTitle>
-                  <div className="flex items-center gap-6">
-                      <div className="h-2 w-12 bg-rose-500 rounded-full shadow-[0_0_12px_rgba(244,63,94,0.6)]" />
-                      <AlertDialogDescription className="text-[12px] font-black text-slate-400 uppercase tracking-[0.4em] leading-none">High-stakes operational sequence initiated.</AlertDialogDescription>
-                  </div>
-              </div>
-          </div>
-          <div className="p-16 bg-white">
-              <p className="text-[13px] font-black text-slate-600 uppercase tracking-[0.3em] leading-relaxed">
-                  Are you sure you want to decommission this classification node? SKUs linked to this registry will remain active but may become unmapped in the global matrix. This action is irreversible.
-              </p>
-          </div>
-          <AlertDialogFooter className="p-16 pt-0 flex flex-col md:flex-row gap-8">
-            <AlertDialogCancel className="h-20 flex-1 rounded-full font-black text-[12px] uppercase tracking-[0.3em] bg-slate-50 border-none hover:bg-slate-100 transition-none text-slate-400">ABORT_SEQUENCE</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="h-20 flex-1 bg-rose-600 hover:bg-rose-700 text-white font-black text-[12px] uppercase tracking-[0.3em] rounded-full shadow-2xl shadow-rose-600/40 transition-none border-none gap-6">
-              CONFIRM_DECOMMISSION_EXECUTE
-              <ArrowRight className="h-6 w-6" />
+        <AlertDialogContent className="rounded-2xl border-none shadow-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-black">Confirm Deletion</AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-500 font-medium">
+              Are you sure you want to delete this category? Products linked to it will not be deleted but may become unorganized. This action is permanent.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2">
+            <AlertDialogCancel className="rounded-xl font-bold bg-slate-100 border-none hover:bg-slate-200">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl shadow-lg shadow-rose-600/20 px-6">
+              Delete Forever
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -317,3 +288,4 @@ export function CategoryTable({ initialCategories }: CategoryTableProps) {
     </div>
   )
 }
+

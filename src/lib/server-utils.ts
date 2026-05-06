@@ -137,7 +137,7 @@ export async function sendShippingNotificationSMS(orderId: string): Promise<void
 
         const { data: order, error } = await supabaseAdmin
             .from('orders')
-            .select('code, phone_masked, courier_name, courier_phone, courier_tracking_url')
+            .select('code, phone_masked, courier_name, courier_phone')
             .eq('id', orderId)
             .single();
 
@@ -146,9 +146,7 @@ export async function sendShippingNotificationSMS(orderId: string): Promise<void
             return;
         }
 
-        // Use stored tracking URL or fallback to internal tracking route
-        const trackingUrl = order.courier_tracking_url || `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${order.code}`;
-        
+        const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/track?code=${order.code}`;
         let shippingMessage = `Your order ${order.code} has been shipped.`;
 
         if (order.courier_name) {

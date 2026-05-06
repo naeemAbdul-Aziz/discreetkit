@@ -1,29 +1,32 @@
+
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
-import { Loader2 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-3 whitespace-nowrap text-[10px] font-black uppercase tracking-[0.15em] transition-none focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-slate-900 text-white hover:bg-slate-800 border-none shadow-2xl shadow-slate-900/10",
-        destructive: "bg-rose-600 text-white hover:bg-rose-700 border-none shadow-2xl shadow-rose-600/10",
-        outline: "border border-slate-100 bg-white text-slate-400 hover:bg-slate-900 hover:text-white hover:border-slate-900 shadow-sm",
-        secondary: "bg-brand-teal text-white hover:bg-brand-teal/90 border-none shadow-2xl shadow-brand-teal/10",
-        accent: "bg-slate-100 text-slate-900 hover:bg-slate-200 border-none",
-        ghost: "text-slate-400 hover:bg-slate-50 hover:text-slate-900 border-none",
-        link: "text-brand-teal underline-offset-8 hover:underline border-none",
+        default: "bg-primary text-primary-foreground hover:bg-[#176d63] shadow-md hover:shadow-lg transition-all duration-200",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline:
+          "border border-input bg-background hover:bg-muted hover:text-muted-foreground",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        accent:
+          "bg-accent text-accent-foreground hover:bg-accent/90",
+        ghost: "hover:bg-muted hover:text-muted-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-14 px-10 rounded-full",
-        sm: "h-10 rounded-full px-6 text-[9px]",
-        lg: "h-16 rounded-full px-12 text-[11px]",
-        xl: "h-20 rounded-full px-16 text-[12px]",
-        icon: "h-14 w-14 rounded-full",
+        default: "h-10 px-4 py-2 rounded-full",
+        sm: "h-9 rounded-full px-3",
+        lg: "h-11 rounded-full px-8",
+        icon: "h-10 w-10 rounded-full",
       },
     },
     defaultVariants: {
@@ -32,6 +35,8 @@ const buttonVariants = cva(
     },
   }
 )
+
+import { Spinner } from "@/components/ui/spinner"
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -42,6 +47,8 @@ export interface ButtonProps
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, loading = false, children, disabled, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button"
+
     if (asChild) {
       return (
         <Slot
@@ -61,13 +68,16 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={loading || disabled}
         {...props}
       >
-        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        {loading && <Spinner size="sm" className="mr-2" />}
         {children}
       </button>
     )
   }
 )
-
 Button.displayName = "Button"
 
 export { Button, buttonVariants }
+
+    
+
+

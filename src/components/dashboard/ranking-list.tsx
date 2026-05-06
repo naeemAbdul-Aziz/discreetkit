@@ -1,5 +1,6 @@
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Trophy, TrendingUp, Activity, ShieldCheck, Network, Zap, Terminal } from "lucide-react"
+import { Trophy, TrendingUp } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface RankingItem {
@@ -19,103 +20,107 @@ interface RankingListProps {
 }
 
 export function RankingList({ title, description, items, type, className }: RankingListProps) {
+  // Calculate max value for relative bar scaling
   const maxVal = Math.max(
     ...items.map((item) => {
       if (typeof item.value === 'number') return item.value;
       const numMatch = String(item.value).match(/\d+(\.\d+)?/);
       return numMatch ? parseFloat(numMatch[0]) : 0;
     }),
-    1
+    1 // fall back to 1 to avoid division by zero
   );
 
   return (
-    <div className={cn("space-y-16", className)}>
-      {title && (
-        <div className="flex items-center justify-between px-4">
-          <div className="flex items-center gap-6">
-             {type === 'pharmacy' ? (
-                <Network className="h-8 w-8 text-slate-300" />
+    <Card className={cn(
+      "border border-slate-200/50 shadow-sm transition-all duration-300 hover:shadow-md rounded-3xl overflow-hidden bg-white",
+      className
+    )}>
+      <CardHeader className="p-6 pb-4">
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <CardTitle className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400 flex items-center gap-2">
+              {type === 'pharmacy' ? (
+                <Trophy className="h-3.5 w-3.5 text-amber-500/70" />
               ) : (
-                <ShieldCheck className="h-8 w-8 text-slate-300" />
+                <TrendingUp className="h-3.5 w-3.5 text-brand-teal/70" />
               )}
-             <h4 className="text-[12px] font-black uppercase tracking-[0.4em] text-slate-900">{title}</h4>
+              {title}
+            </CardTitle>
+            {description && <CardDescription className="text-[10px] font-medium text-slate-400 pl-5.5">{description}</CardDescription>}
           </div>
-          <div className="h-10 px-8 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 text-[10px] font-black uppercase tracking-[0.3em] flex items-center shadow-sm">
-            LIVE_OPERATIONAL_TELEMETRY
-          </div>
+          <Badge variant="outline" className="bg-slate-50/50 border-slate-100 text-slate-400 text-[8px] uppercase tracking-wider font-bold px-2 py-0.5 h-5 rounded-md">
+            Live
+          </Badge>
         </div>
-      )}
-      
-      <div className="space-y-6">
-        {items.length === 0 ? (
-          <div className="py-60 text-center rounded-[40px] border border-slate-50 bg-slate-50/20">
-            <p className="text-[12px] font-black text-slate-300 uppercase tracking-[0.4em] leading-none">PROTOCOL_NOMINAL: NO_RECORDS_MAPPED</p>
-          </div>
-        ) : (
-          items.slice(0, 6).map((item, idx) => {
-            const currentVal = typeof item.value === 'number' 
-              ? item.value 
-              : parseFloat(String(item.value).match(/\d+(\.\d+)?/)?.[0] || '0');
-            const barWidth = Math.min((currentVal / maxVal) * 100, 100);
+      </CardHeader>
+      <CardContent className="px-0 pt-2">
+        <div className="space-y-1">
+          {items.length === 0 ? (
+            <p className="text-xs text-muted-foreground text-center py-8">No performance data yet.</p>
+          ) : (
+            items.slice(0, 5).map((item, idx) => {
+              const currentVal = typeof item.value === 'number' 
+                ? item.value 
+                : parseFloat(String(item.value).match(/\d+(\.\d+)?/)?.[0] || '0');
+              const barWidth = Math.min((currentVal / maxVal) * 100, 100);
 
-            return (
-              <div key={idx} className="relative group p-12 rounded-[32px] border border-transparent hover:border-slate-50 hover:bg-slate-50/30 transition-none overflow-hidden">
-                {/* Performance Visualizer */}
-                <div 
-                  className="absolute inset-y-0 left-0 bg-slate-50/50 transition-none z-0" 
-                  style={{ width: `${barWidth}%` }}
-                />
-                
-                <div className="relative flex items-center justify-between gap-12 z-10">
-                  <div className="flex items-center gap-10 min-w-0">
-                    <span className="text-[14px] font-black text-slate-200 w-12 flex-shrink-0 tabular-nums">
-                      {idx + 1 < 10 ? `0${idx + 1}` : idx + 1}
-                    </span>
-                    <div className="flex flex-col min-w-0 gap-6">
-                      <div className="flex items-center gap-8">
-                        <span className="text-base font-black text-slate-900 uppercase tracking-tight truncate leading-none" title={item.name}>
-                          {item.name}
-                        </span>
-                        {idx === 0 && (
-                          <div className="h-9 px-6 rounded-full bg-slate-900 text-white text-[10px] font-black uppercase tracking-[0.3em] flex items-center justify-center border border-slate-800 shadow-2xl shadow-slate-900/10">
-                            ALPHA_NODE
-                          </div>
-                        )}
-                        {type === 'product' && currentVal > (maxVal * 0.7) && idx > 0 && (
-                          <div className="h-9 px-6 rounded-full bg-brand-teal text-white text-[10px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-4 shadow-2xl shadow-brand-teal/10">
-                            <Zap className="h-4 w-4" />
-                            HIGH_PULSE
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-6">
-                          <Terminal className="h-5 w-5 text-slate-200" />
-                          <span className="text-[11px] font-black text-slate-300 uppercase tracking-[0.3em] leading-none">
-                            {item.subtext?.toUpperCase() || `OPERATIONAL_STATION_INDEX_${1000 + idx}`}
+              return (
+                <div key={idx} className="relative group px-6 py-2.5 transition-colors hover:bg-slate-50/50">
+                  {/* Performance Bar Background */}
+                  <div 
+                    className="absolute inset-y-0 left-0 bg-slate-100/50 transition-all duration-700" 
+                    style={{ width: `${barWidth}%` }}
+                  />
+                  <div 
+                    className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-slate-300 opacity-0 group-hover:opacity-100 transition-opacity" 
+                  />
+
+                  <div className="relative flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4 min-w-0">
+                      <span className="text-[11px] font-mono font-bold text-slate-400 w-4 grayscale hover:grayscale-0 transition-all">
+                        0{idx + 1}
+                      </span>
+                      <div className="flex flex-col min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[13px] font-bold text-brand-indigo truncate" title={item.name}>
+                            {item.name}
                           </span>
+                          {idx === 0 && (
+                            <Badge className="bg-emerald-50 text-emerald-600 border-0 text-[8px] tracking-wide font-black h-4 px-1.5 rounded-sm">
+                              TOP
+                            </Badge>
+                          )}
+                          {type === 'product' && currentVal > (maxVal * 0.7) && idx > 0 && (
+                            <Badge className="bg-slate-100 text-slate-600 border-0 text-[8px] tracking-wide font-black h-4 px-1.5 rounded-sm">
+                              VELOCITY
+                            </Badge>
+                          )}
+                        </div>
+                        {item.subtext && (
+                          <span className="text-[10px] text-slate-500 truncate mt-0.5">
+                            {item.subtext}
+                          </span>
+                        )}
                       </div>
                     </div>
-                  </div>
-                  
-                  <div className="flex flex-col items-end shrink-0 gap-4">
-                    <span className="text-xl font-black text-slate-900 tabular-nums tracking-[0.2em] uppercase leading-none">
-                      {item.value}
-                    </span>
-                    {item.meta && (
-                      <div className="flex items-center gap-4">
-                        <div className="h-1 w-6 bg-slate-100 rounded-full" />
-                        <span className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400">
-                            {item.meta.toUpperCase()}
+                    
+                    <div className="flex flex-col items-end shrink-0">
+                      <span className="text-[13px] font-bold font-mono tracking-tight text-brand-indigo tabular-nums">
+                        {item.value}
+                      </span>
+                      {item.meta && (
+                        <span className="text-[9px] font-semibold uppercase tracking-wider text-slate-400">
+                          {item.meta}
                         </span>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })
-        )}
-      </div>
-    </div>
+              );
+            })
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

@@ -1,9 +1,9 @@
 import { Suspense } from "react";
 import { getCustomers } from "@/lib/admin-actions";
-import { DashboardShell } from "@/components/dashboard/dashboard-shell";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Skeleton } from '@/components/ui/skeleton';
 import { CustomerTableClient } from "./customer-table-client";
-import { Loader2, Users } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -13,42 +13,43 @@ export const revalidate = 0;
  */
 export default async function AdminCustomersPage() {
   return (
-    <DashboardShell
-        title="ENROLLEE_REGISTRY"
-        subtitle="Strategic telemetry on user lifecycle & aggregate retention patterns across the global matrix"
-        breadcrumbs={[{ label: 'MASTER_CONTROL', href: '/admin' }, { label: 'ENROLLEE_REGISTRY' }]}
-    >
-        <Suspense fallback={<CustomerSkeleton />}>
-            <CustomerLoader />
-        </Suspense>
-    </DashboardShell>
+    <div className="space-y-8 animate-in fade-in duration-700">
+      <div className="flex flex-col gap-1">
+        <h2 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 uppercase tracking-widest">
+            Customer Directory
+        </h2>
+        <p className="text-[10px] uppercase font-bold text-slate-400 tracking-[0.2em]">
+            Strategic intelligence on user lifecycle & aggregate retention
+        </p>
+      </div>
+
+      <Card className="border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-white/50 backdrop-blur-md">
+        <CardHeader className="pb-2">
+            <CardTitle className="text-lg font-bold">Aggregate Analysis</CardTitle>
+            <CardDescription className="text-[10px] uppercase tracking-tighter">Derived from real-time order volume</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <Suspense fallback={<CustomerSkeleton />}>
+                <CustomerLoader />
+            </Suspense>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 
 async function CustomerLoader() {
   const customers = await getCustomers();
-  return (
-    <div className="rounded-[40px] border border-slate-100 bg-white shadow-2xl shadow-slate-900/5 p-12 overflow-hidden transition-none">
-        <CustomerTableClient initialCustomers={customers} />
-    </div>
-  );
+  return <CustomerTableClient initialCustomers={customers} />;
 }
 
 function CustomerSkeleton() {
   return (
-    <div className="p-16 space-y-16 bg-white rounded-[40px] border border-slate-100 shadow-2xl shadow-slate-900/5">
-      <div className="h-16 w-[480px] rounded-full bg-slate-50/50" />
-      <div className="space-y-10">
-        {[...Array(10)].map((_, i) => (
-            <Skeleton key={i} className="h-28 w-full rounded-full bg-slate-50/30" />
-        ))}
-      </div>
-      <div className="flex flex-col items-center justify-center py-20 gap-10">
-        <div className="h-20 w-20 rounded-3xl bg-slate-50/50 flex items-center justify-center">
-            <Loader2 className="h-10 w-10 text-brand-teal animate-spin" />
-        </div>
-        <p className="text-[11px] font-black uppercase tracking-[0.25em] text-slate-300">Synchronizing Identity Telemetry Protocol...</p>
-      </div>
+    <div className="space-y-3">
+      <Skeleton className="h-10 w-full rounded-xl bg-slate-50" />
+      {[...Array(6)].map((_, i) => (
+        <Skeleton key={i} className="h-16 w-full rounded-2xl bg-slate-50/50" />
+      ))}
     </div>
   );
-}
+}

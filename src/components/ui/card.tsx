@@ -1,4 +1,12 @@
+/**
+ * @file card.tsx
+ * @description a versatile card component with consistent styling for headers,
+ *              content, and footers. it now features a flat design with a
+ *              subtle shadow and border effect on hover.
+ */
+
 import * as React from "react"
+
 import { cn } from "@/lib/utils"
 
 const Card = React.forwardRef<
@@ -8,7 +16,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-xl border border-slate-100 bg-card text-card-foreground shadow-sm",
+      "rounded-3xl border bg-card text-card-foreground",
       className
     )}
     {...props}
@@ -35,7 +43,7 @@ const CardTitle = React.forwardRef<
   <h3
     ref={ref}
     className={cn(
-      "text-lg font-black leading-none tracking-tight text-slate-900 uppercase",
+      "text-2xl font-semibold leading-none tracking-tight",
       className
     )}
     {...props}
@@ -49,7 +57,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-[10px] font-black text-slate-400 uppercase tracking-widest", className)}
+    className={cn("text-sm text-muted-foreground", className)}
     {...props}
   />
 ))

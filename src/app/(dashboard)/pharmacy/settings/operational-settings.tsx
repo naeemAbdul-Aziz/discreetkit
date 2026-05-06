@@ -6,10 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, Loader2, Zap, Activity, ShieldCheck, Terminal } from "lucide-react";
+import { Clock, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 
 interface OperationalSettingsProps {
   initialIs24_7: boolean;
@@ -31,92 +30,86 @@ export default function OperationalSettings({ initialIs24_7 }: OperationalSettin
         const result = await updatePharmacyOperationalSettings(null, formData);
         if (result.success) {
             toast({ 
-                title: "SETTINGS_SYNCHRONIZED", 
-                description: checked ? "Operational node marked as 24/7." : "Operational node reverted to standard cycles." 
+                title: "Settings Updated", 
+                description: checked ? "Your store is now marked as 24/7." : "Your store is no longer marked as 24/7." 
             });
         } else {
             setIs24_7(!checked); // Revert
-            toast({ variant: "destructive", title: "PROTOCOL_FAILURE", description: result.message });
+            toast({ variant: "destructive", title: "Error", description: result.message });
         }
     } catch (e) {
         setIs24_7(!checked); // Revert
-        toast({ variant: "destructive", title: "PROTOCOL_FAILURE", description: "Failed to synchronize operational parameters." });
+        toast({ variant: "destructive", title: "Error", description: "Failed to update settings" });
     } finally {
         setLoading(false);
     }
   };
 
   return (
-    <Card className="border border-slate-100 shadow-2xl shadow-slate-900/5 overflow-hidden bg-white rounded-3xl transition-none">
-      <CardHeader className="bg-slate-50/30 border-b border-slate-50 p-10">
-        <div className="flex items-center gap-5">
-            <div className="h-12 w-12 rounded-2xl bg-slate-900 flex items-center justify-center shadow-2xl shadow-slate-900/10">
-                <Clock className="h-6 w-6 text-brand-teal" />
+    <Card className="border border-slate-200 shadow-sm overflow-hidden bg-white">
+      <CardHeader className="bg-slate-50/50 border-b border-slate-100">
+        <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-brand-teal/10 flex items-center justify-center text-brand-teal">
+                <Clock className="h-5 w-5" />
             </div>
-            <div className="space-y-1">
-                <CardTitle className="text-xl font-black text-slate-900 uppercase tracking-tighter leading-none">Operational Logic</CardTitle>
-                <CardDescription className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Configure global node availability and fulfillment protocols.</CardDescription>
+            <div>
+                <CardTitle className="text-lg font-black text-slate-900 leading-tight">Operational Logic</CardTitle>
+                <CardDescription className="text-xs font-medium text-slate-500">Configure global store availability and fulfillment rules.</CardDescription>
             </div>
         </div>
       </CardHeader>
-      <CardContent className="p-10 space-y-12">
+      <CardContent className="p-6 space-y-8">
         {/* Availability Group */}
-        <div className="space-y-6">
-            <div className="flex items-center gap-3 px-2">
-                <div className="h-2 w-2 rounded-full bg-brand-teal shadow-[0_0_8px_rgba(20,184,166,0.5)]" />
-                <h4 className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 leading-none">Node_Availability</h4>
+        <div className="space-y-4">
+            <div className="flex items-center gap-2 px-1">
+                <div className="h-1 w-1 rounded-full bg-brand-teal" />
+                <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Availability</h4>
             </div>
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between rounded-3xl border border-slate-100 p-8 bg-slate-50/20 transition-none group">
-                <div className="space-y-3">
-                    <Label className="text-base font-black text-slate-900 uppercase tracking-tight leading-none">24/7_Dispatch_Mode</Label>
-                    <p className="text-[11px] text-slate-400 font-black uppercase tracking-widest leading-relaxed max-w-xl">
+            <div className="flex flex-row items-center justify-between rounded-2xl border border-slate-100 p-5 bg-slate-50/30 transition-colors hover:border-brand-teal/20">
+                <div className="space-y-1">
+                    <Label className="text-[14px] font-bold text-slate-900">24/7 Dispatch Mode</Label>
+                    <p className="text-xs text-slate-500 font-medium leading-relaxed max-w-sm">
                         Enable this if your staff fulfills orders around the clock. 
-                        <span className="block mt-2 text-brand-teal">Node will be flagged as &quot;ACTIVE_STREAM&quot; 24/7 to consumers.</span>
+                        <span className="block mt-1 text-brand-teal font-bold decoration-brand-teal/30 underline underline-offset-2">Shows &quot;Open Now&quot; 24/7 to customers.</span>
                     </p>
                 </div>
-                <div className="mt-6 md:mt-0 flex items-center gap-5 bg-white p-3 rounded-2xl border border-slate-100 shadow-sm transition-none">
-                    {loading && <Loader2 className="h-5 w-5 animate-spin text-brand-teal" />}
+                <div className="flex items-center gap-3 bg-white p-2 rounded-xl border border-slate-100 shadow-sm">
+                    {loading && <Loader2 className="h-4 w-4 animate-spin text-brand-teal" />}
                     <Switch
                         checked={is24_7}
                         onCheckedChange={handleToggle}
                         disabled={loading}
-                        className="data-[state=checked]:bg-brand-teal scale-110 transition-none"
+                        className="data-[state=checked]:bg-brand-teal"
                     />
                 </div>
             </div>
         </div>
 
         {/* Global Fulfillment Rules */}
-        <div className="space-y-6">
-            <div className="flex items-center gap-3 px-2">
-                <div className="h-2 w-2 rounded-full bg-slate-300" />
-                <h4 className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 leading-none">Global_Routing_Rules</h4>
+        <div className="space-y-4">
+            <div className="flex items-center gap-2 px-1">
+                <div className="h-1 w-1 rounded-full bg-brand-teal" />
+                <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Global Routing Rules</h4>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="p-8 rounded-3xl border border-slate-100 space-y-4 opacity-50 grayscale cursor-not-allowed bg-slate-50/20 transition-none">
-                    <div className="flex items-center justify-between">
-                        <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Fulfillment_Buffer</Label>
-                        <div className="px-3 py-1 rounded-full bg-slate-200 text-slate-400 text-[8px] font-black uppercase tracking-widest">Enterprise_Tier</div>
-                    </div>
-                    <div className="text-lg font-black text-slate-300 uppercase tracking-tighter tabular-nums leading-none">15_MINUTES</div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 rounded-2xl border border-slate-100 space-y-2 opacity-60 grayscale cursor-not-allowed bg-slate-50/50 group">
+                    <Label className="text-xs font-bold text-slate-400 flex items-center justify-between">
+                        Fulfillment Buffer
+                        <Badge variant="outline" className="text-[9px] font-black uppercase text-slate-400">Enterprise Only</Badge>
+                    </Label>
+                    <div className="text-[13px] font-bold text-slate-300">15 Minutes</div>
                 </div>
-                <div className="p-8 rounded-3xl border border-slate-100 space-y-4 opacity-50 grayscale cursor-not-allowed bg-slate-50/20 transition-none">
-                    <div className="flex items-center justify-between">
-                        <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Operational_Currency</Label>
-                        <div className="px-3 py-1 rounded-full bg-slate-200 text-slate-400 text-[8px] font-black uppercase tracking-widest">LOCKED</div>
-                    </div>
-                    <div className="text-lg font-black text-slate-300 flex items-center gap-4 uppercase tracking-tighter leading-none">
-                        <div className="w-8 h-5 rounded-md bg-slate-200 shadow-sm" />
-                        GHANAIAN_CEDI_(GHS)
+                <div className="p-4 rounded-2xl border border-slate-100 space-y-2 opacity-60 grayscale cursor-not-allowed bg-slate-50/50">
+                    <Label className="text-xs font-bold text-slate-400 flex items-center justify-between">
+                        Operational Currency
+                        <Badge variant="outline" className="text-[9px] font-black uppercase text-slate-400">Locked</Badge>
+                    </Label>
+                    <div className="text-[13px] font-bold text-slate-300 flex items-center gap-2">
+                        <span className="w-5 h-3 rounded-sm bg-slate-200" />
+                        Ghanaian Cedi (GHS)
                     </div>
                 </div>
             </div>
-        </div>
-
-        {/* Sync Status Badge */}
-        <div className="pt-6 border-t border-slate-50 flex items-center gap-4">
-            <ShieldCheck className="h-5 w-5 text-brand-teal" />
-            <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.25em]">Root operational protocols are currently synchronized with master registry.</p>
         </div>
       </CardContent>
     </Card>
