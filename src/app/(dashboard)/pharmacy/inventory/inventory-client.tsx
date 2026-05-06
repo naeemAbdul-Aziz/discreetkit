@@ -154,10 +154,10 @@ const ProductGrid = ({
                  ₵{(product.custom_price || product.price_ghs).toFixed(2)}
                </div>
                {isLowStock && (
-                  <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-[10px] font-bold tracking-tight py-0 px-2 h-5 shadow-none">LOW STOCK</Badge>
+                  <Badge className="bg-rose-50 text-rose-600 border-rose-200/60 text-[9px] font-bold tracking-widest py-0.5 px-2 h-auto shadow-none uppercase">LOW STOCK</Badge>
                )}
                {isOutOfStock && (
-                  <Badge className="bg-slate-100 text-slate-400 border-slate-200 text-[10px] font-bold tracking-tight py-0 px-2 h-5 shadow-none">SOLD OUT</Badge>
+                  <Badge className="bg-slate-50 text-slate-400 border-slate-200/60 text-[9px] font-bold tracking-widest py-0.5 px-2 h-auto shadow-none uppercase">SOLD OUT</Badge>
                )}
             </div>
 
