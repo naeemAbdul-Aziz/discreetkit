@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpRight, Twitter, Instagram, Facebook } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { useEffect, useState } from "react";
 import { getStoreSettings } from "@/lib/admin-actions";
 
 const socialLinks = [
-  { href: "#", icon: Twitter, label: "Twitter" },
-  { href: "#", icon: Instagram, label: "Instagram" },
-  { href: "#", icon: Facebook, label: "Facebook" },
+  { href: "#", icon: "public", label: "Twitter" },
+  { href: "#", icon: "photo_camera", label: "Instagram" },
+  { href: "#", icon: "groups", label: "Facebook" },
 ];
 
 const footerNav = [
@@ -76,7 +76,7 @@ export function Footer() {
                   href={social.href}
                   className="h-9 w-9 md:h-10 md:w-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
                 >
-                  <social.icon className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                  <Icon name={social.icon} className="w-4 h-4" />
                 </Link>
               ))}
             </div>
@@ -97,7 +97,7 @@ export function Footer() {
                         className="group flex items-center text-sm md:text-base hover:text-primary transition-colors"
                       >
                         {link.label}
-                        <ArrowUpRight className="w-3 h-3 md:w-3.5 md:h-3.5 ml-1 opacity-0 -translate-y-1 translate-x-1 transition-all group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0" />
+                        <Icon name="north_east" className="w-3.5 h-3.5 ml-1 opacity-0 -translate-y-1 translate-x-1 transition-all group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0" />
                       </Link>
                     </li>
                   ))}

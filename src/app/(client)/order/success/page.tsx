@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useCart } from '@/hooks/use-cart';
 import { getOrderAction } from '@/lib/actions';
 import { type Order } from '@/lib/data';
-import { CheckCircle2, Copy, Check, AlertCircle, Truck, Home, RotateCcw, ChevronRight } from 'lucide-react';
+import { Icon } from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
 
 /* ─────────────────────────────────────────────────────────
@@ -53,8 +53,8 @@ function CodeBlock({
             aria-label="Copy code"
           >
             {copied
-              ? <Check className="h-4 w-4 text-primary" />
-              : <Copy className="h-4 w-4" />}
+              ? <Icon name="check" className="text-primary" opticalSize={18} weight={700} />
+              : <Icon name="content_copy" className="text-muted-foreground" opticalSize={18} />}
           </button>
         )}
       </div>
@@ -166,7 +166,7 @@ function SuccessContent() {
     return (
       <div className="flex flex-col items-center text-center gap-6 w-full max-w-[360px]">
         <div className="h-16 w-16 rounded-full bg-destructive/10 flex items-center justify-center">
-          <AlertCircle className="h-8 w-8 text-destructive" />
+          <Icon name="error" className="text-destructive" opticalSize={32} fill={true} />
         </div>
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-destructive">Payment Issue</h1>
@@ -186,7 +186,7 @@ function SuccessContent() {
     return (
       <div className="flex flex-col items-center text-center w-full max-w-lg mx-auto">
         <div className="h-20 w-20 rounded-full bg-yellow-500/10 flex items-center justify-center mb-6">
-          <AlertCircle className="h-10 w-10 text-yellow-500" />
+          <Icon name="warning" className="text-yellow-500" opticalSize={40} fill={true} />
         </div>
         <div className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight mb-2">Payment Pending</h1>
@@ -200,12 +200,12 @@ function SuccessContent() {
         <div className="w-full px-4 space-y-3">
           <Button asChild className="w-full h-14 rounded-full font-bold">
             <Link href={`/track?code=${code}`}>
-              <Truck className="h-5 w-5 mr-2" />
+              <Icon name="local_shipping" className="mr-2" opticalSize={20} />
               Check History
             </Link>
           </Button>
           <Button variant="outline" className="w-full h-12 rounded-full border border-border" onClick={() => window.location.reload()}>
-            <RotateCcw className="h-4 w-4 mr-2" />
+            <Icon name="refresh" className="mr-2" opticalSize={18} />
             Refresh Status
           </Button>
         </div>
@@ -221,7 +221,7 @@ function SuccessContent() {
       <div className="mb-8 relative">
         <div className="h-24 w-24 rounded-full bg-primary/5 flex items-center justify-center relative z-10">
           <div className="h-16 w-16 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
-            <Check className="h-8 w-8 text-white stroke-[3px]" />
+            <Icon name="check" className="text-white" opticalSize={32} weight={700} />
           </div>
         </div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-primary/5 rounded-full animate-pulse -z-0" />
@@ -283,13 +283,13 @@ function SuccessContent() {
       <div className="w-full px-4 space-y-4">
         <Button asChild className="w-full h-14 rounded-full font-bold shadow-md text-base">
           <Link href={`/track?code=${code}`}>
-            <Truck className="h-5 w-5 mr-2" />
+            <Icon name="local_shipping" className="mr-2" opticalSize={20} />
             Track Your Order
           </Link>
         </Button>
         <Button asChild variant="ghost" className="w-full h-12 rounded-full text-muted-foreground hover:text-foreground">
           <Link href="/">
-            <Home className="h-4 w-4 mr-2" />
+            <Icon name="home" className="mr-2" opticalSize={18} />
             Back to Home
           </Link>
         </Button>
@@ -302,7 +302,7 @@ function SuccessContent() {
             className="inline-flex items-center text-sm font-semibold text-primary hover:opacity-80 transition-opacity"
           >
             Learn about your partner care benefits
-            <ChevronRight className="h-4 w-4 ml-1" />
+            <Icon name="arrow_forward" className="ml-1" opticalSize={18} />
           </Link>
         </div>
       )}

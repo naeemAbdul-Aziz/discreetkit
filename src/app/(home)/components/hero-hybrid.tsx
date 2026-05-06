@@ -3,7 +3,7 @@ import React, { useRef } from "react";
 import { Carousel, Card } from "@/components/ui/apple-cards-carousel";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Play } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { variants } from "@/lib/motion";
@@ -65,7 +65,7 @@ export function HeroHybrid() {
               >
                 <Link href="/#products">
                   Order Anonymously
-                  <ArrowRight className="ml-2 w-4 h-4 md:w-5 md:h-5" />
+                  <Icon name="arrow_forward" className="ml-2" opticalSize={20} />
                 </Link>
               </Button>
             </motion.div>

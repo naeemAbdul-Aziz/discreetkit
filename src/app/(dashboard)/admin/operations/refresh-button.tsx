@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { Button } from "@/components/ui/button";
-import { RefreshCcw, Loader2 } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 
 export function RefreshButton() {
   const router = useRouter();
@@ -24,9 +24,9 @@ export function RefreshButton() {
       className="min-w-[100px]"
     >
       {isPending ? (
-        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        <Icon name="progress_activity" className="mr-2 animate-spin" opticalSize={18} />
       ) : (
-        <RefreshCcw className="mr-2 h-4 w-4" />
+        <Icon name="refresh" className="mr-2" opticalSize={18} />
       )}
       {isPending ? "Refreshing..." : "Refresh"}
     </Button>

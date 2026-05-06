@@ -11,7 +11,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatDistanceToNow } from "date-fns";
-import { MapPin, Phone } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import Link from "next/link";
 
 export default function LiveDeliveriesTable({ orders }: { orders: any[] }) {
@@ -45,7 +45,7 @@ export default function LiveDeliveriesTable({ orders }: { orders: any[] }) {
               <TableCell>
                 <div className="font-medium">{order.code}</div>
                 <div className="text-xs text-muted-foreground flex items-center mt-1">
-                  <MapPin className="h-3 w-3 mr-1" /> {order.delivery_area}
+                  <Icon name="location_on" className="mr-1" opticalSize={16} /> {order.delivery_area}
                 </div>
               </TableCell>
               <TableCell>
@@ -79,7 +79,7 @@ export default function LiveDeliveriesTable({ orders }: { orders: any[] }) {
                   <div>
                     <div className="font-medium">{order.courier_name}</div>
                     <div className="text-xs text-muted-foreground flex items-center">
-                      <Phone className="h-3 w-3 mr-1" /> {order.courier_phone}
+                      <Icon name="call" className="mr-1" opticalSize={16} /> {order.courier_phone}
                     </div>
                   </div>
                 ) : (

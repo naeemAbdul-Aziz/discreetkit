@@ -8,7 +8,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, ShieldCheck } from 'lucide-react';
+import { Icon } from "@/components/ui/icon";
 import { motion } from 'framer-motion';
 import { SparklesCore } from '@/components/ui/sparkles';
 
@@ -39,7 +39,7 @@ export function ClosingCta() {
             viewport={{ once: true }}
             className="mb-8 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white/90"
           >
-            <ShieldCheck className="w-4 h-4 text-white" />
+            <Icon name="verified_user" className="text-white" opticalSize={18} fill={true} />
             <span className="text-sm font-medium">100% Private & Confidential</span>
           </motion.div>
 
@@ -76,7 +76,7 @@ export function ClosingCta() {
             <Button asChild size="lg" className="h-10 md:h-12 px-6 md:px-8 text-sm md:text-base rounded-full w-full sm:w-auto bg-white text-primary hover:bg-white/90 hover:scale-105 transition-all duration-300">
               <Link href="/products">
                 Shop Essentials
-                <ArrowRight className="ml-2 w-4 h-4" />
+                <Icon name="arrow_forward" className="ml-2" opticalSize={18} />
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="h-10 md:h-12 px-6 md:px-8 text-sm md:text-base rounded-full w-full sm:w-auto border-white/30 text-white bg-white/10 hover:bg-white/20 hover:text-white backdrop-blur-sm transition-all duration-300">

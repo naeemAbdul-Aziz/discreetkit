@@ -16,18 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import {
-  ShieldCheck,
-  ArrowRight,
-  GraduationCap,
-  AlertTriangle,
-  Mail,
-  MapPin,
-  Lock,
-  Loader2,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { BrandSpinner } from "@/components/brand-spinner";
 import { useCart } from "@/hooks/use-cart";
 import { discounts, DiscountLocation } from "@/lib/data";
@@ -87,7 +76,7 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
       ) : (
         <>
           Proceed to Payment
-          <ArrowRight className="h-4 w-4 ml-1.5" />
+          <Icon name="arrow_forward" className="ml-1.5" opticalSize={18} />
         </>
       )}
     </Button>
@@ -201,7 +190,7 @@ const FieldError = ({ message }: { message?: string }) => {
   if (!message) return null;
   return (
     <p className="text-sm font-medium text-destructive mt-2 flex items-center gap-1">
-      <AlertTriangle className="h-4 w-4" />
+      <Icon name="warning" className="text-destructive" opticalSize={16} fill={true} />
       {message}
     </p>
   );
@@ -556,9 +545,9 @@ export function OrderForm() {
                     className="w-full h-12 rounded-full text-sm font-semibold bg-primary/5 text-primary hover:bg-primary/10 border-0"
                   >
                     {locationLoading ? (
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      <Icon name="progress_activity" className="animate-spin mr-2" opticalSize={18} />
                     ) : (
-                      <MapPin className="h-4 w-4 mr-2" />
+                      <Icon name="location_on" className="mr-2" opticalSize={18} />
                     )}
                     Auto-detect my campus
                   </Button>
@@ -571,7 +560,7 @@ export function OrderForm() {
                     onClick={() => setStep(2)}
                     className="w-full h-12 md:h-14 rounded-full font-bold shadow-md"
                   >
-                    Continue <ChevronRight className="h-4 w-4 ml-1" />
+                    Continue <Icon name="arrow_forward" className="ml-1" opticalSize={18} />
                   </Button>
                 </div>
               </motion.div>
@@ -606,7 +595,7 @@ export function OrderForm() {
                         className={cn(state.errors?.phone_masked && "ring-1 ring-destructive")}
                       />
                       <p className="text-[11px] text-muted-foreground/60 flex items-center gap-1.5 pt-2 ml-1">
-                        <Lock className="h-3 w-3" />
+                        <Icon name="lock" className="text-muted-foreground/40" opticalSize={14} fill={true} />
                         Masked; riders will only see a proxy number.
                       </p>
                     </div>
@@ -625,7 +614,7 @@ export function OrderForm() {
                       onClick={() => setStep(1)}
                       className="h-12 w-12 rounded-full flex-shrink-0 text-muted-foreground hover:text-foreground"
                     >
-                      <ChevronLeft className="h-4 w-4" />
+                      <Icon name="arrow_back" opticalSize={20} />
                     </Button>
                     <SubmitButton disabled={isSubmitDisabled} />
                   </div>

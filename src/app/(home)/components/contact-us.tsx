@@ -12,7 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Mail, MapPin, ArrowRight, Lightbulb } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { BrandSpinner } from "@/components/brand-spinner";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -26,12 +26,12 @@ import {
 // static contact information.
 const contactInfo = [
   {
-    icon: Mail,
+    icon: "mail",
     title: "Email",
     value: "hello@discreetkit.com",
   },
   {
-    icon: MapPin,
+    icon: "location_on",
     title: "Address",
     value: "DiscreetKit HQ - Accra, Ghana",
   },
@@ -86,7 +86,7 @@ export function ContactUs() {
               {contactInfo.map((info) => (
                 <div key={info.title} className="flex items-start gap-4">
                   <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                    <info.icon className="h-6 w-6 text-primary" />
+                    <Icon name={info.icon} className="text-primary" opticalSize={24} />
                   </div>
                   <div>
                     <h4 className="font-semibold text-foreground">
@@ -123,7 +123,7 @@ export function ContactUs() {
                         </SelectItem>
                         <SelectItem value="suggestion">
                           <span className="flex items-center gap-2">
-                            <Lightbulb className="h-4 w-4" /> Product Suggestion
+                            <Icon name="lightbulb" opticalSize={18} fill={true} /> Product Suggestion
                           </span>
                         </SelectItem>
                         <SelectItem value="partnership">
@@ -188,7 +188,7 @@ export function ContactUs() {
                         {inquiryType === "suggestion"
                           ? "Submit Suggestion"
                           : "Send Message"}
-                        <ArrowRight />
+                        <Icon name="arrow_forward" className="ml-2" opticalSize={20} />
                       </>
                     )}
                   </Button>

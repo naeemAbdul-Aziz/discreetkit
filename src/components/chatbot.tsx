@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, X } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { handleChat } from "@/lib/actions";
 import { cn } from "@/lib/utils";
 
@@ -112,14 +112,9 @@ export function Chatbot({ hideClose = false }: { hideClose?: boolean }) {
       {/* Minimal close button — Everlywell style */}
       {!hideClose && (
         <div className="flex justify-end px-4 pt-4 pb-2 absolute top-0 right-0 z-30">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="Close"
-          >
-            <X className="h-4 w-4" />
-          </button>
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:bg-muted" onClick={() => router.back()}>
+            <Icon name="close" opticalSize={18} />
+          </Button>
         </div>
       )}
 
@@ -211,7 +206,7 @@ export function Chatbot({ hideClose = false }: { hideClose?: boolean }) {
                   }}
                   className="whitespace-nowrap rounded-full border border-brand-indigo/10 bg-brand-indigo/[0.03] px-4 py-2 text-xs font-semibold text-brand-teal hover:bg-brand-indigo/10 transition-colors shadow-sm flex items-center gap-1.5"
                 >
-                  <Send className="h-3 w-3 opacity-50" />
+                  <Icon name="send" className="opacity-50" opticalSize={14} />
                   {s}
                 </button>
               ))}
@@ -247,7 +242,7 @@ export function Chatbot({ hideClose = false }: { hideClose?: boolean }) {
                   {isPending ? (
                     <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   ) : (
-                    <Send className="h-4 w-4 text-white" />
+                    <Icon name="send" className="text-white" opticalSize={20} />
                   )}
                   <span className="sr-only">Send Message</span>
                 </Button>
