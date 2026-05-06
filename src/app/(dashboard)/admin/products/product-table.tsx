@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { MoreHorizontal, Plus, Search, Trash2, Edit, Loader2, AlertTriangle, CheckCircle2, Zap, History, Terminal, Network, ShieldCheck, ArrowRight, Activity, Filter } from "lucide-react"
+import { MoreHorizontal, Plus, Search, Trash2, Edit, Loader2, AlertTriangle, CheckCircle2, Zap, History, Terminal, Network, ShieldCheck, ArrowRight, Activity, Filter, Package } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import {
   DropdownMenu,

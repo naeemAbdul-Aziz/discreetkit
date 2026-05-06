@@ -75,7 +75,7 @@ async function PharmacyDashboardContent() {
                     <>
                         <StatCard title="New Orders" value={stats.pending} icon={Package} description="Awaiting confirmation" />
                         <StatCard title="Preparing" value={stats.processing} icon={Clock} description="Being packed" />
-                        <StatCard title="Out for Delivery" value={stats.Truck || stats.outForDelivery} icon={Truck} description="In transit to patient" />
+                        <StatCard title="Out for Delivery" value={stats.outForDelivery} icon={Truck} description="In transit to patient" />
                         <StatCard title="Delivered Today" value={stats.completed} icon={ShieldCheck} description="Orders completed" />
                     </>
                 )}

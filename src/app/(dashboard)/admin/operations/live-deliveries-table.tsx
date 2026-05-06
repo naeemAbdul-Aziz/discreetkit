@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Phone, Truck, Clock, ShieldAlert, ArrowRight, Zap, Network, Activity, ShieldCheck, Terminal, Map } from "lucide-react";
+import { MapPin, Phone, Truck, Clock, ShieldAlert, ArrowRight, Zap, Network, Activity, ShieldCheck, Terminal, Map, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 

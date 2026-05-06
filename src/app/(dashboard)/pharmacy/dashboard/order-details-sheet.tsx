@@ -27,7 +27,8 @@ import {
   Zap,
   Map,
   History,
-  Repeat
+  Repeat,
+  MessageSquare
 } from "lucide-react";
 import { OrderMessages } from "@/components/order-messages";
 import { cn } from "@/lib/utils";

@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
 import { Separator } from "@/components/ui/separator"
-import { Bell, Lock, Store, Zap, ShieldCheck, Activity, Terminal, ArrowRight, Loader2, Phone, Mail, Globe, Shield, User, Trash2, Key } from "lucide-react"
+import { Bell, Lock, Store, Zap, ShieldCheck, Activity, Terminal, ArrowRight, Loader2, Phone, Mail, Globe, Shield, User, Trash2, Key, Plus } from "lucide-react"
 import { useState, useEffect, useTransition } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { getStoreSettings, updateStoreSettings, type SettingsFormValues } from "@/lib/admin-actions"
