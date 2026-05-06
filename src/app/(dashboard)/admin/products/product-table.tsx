@@ -132,10 +132,30 @@ export function ProductTable({ initialProducts, categories = [] }: { initialProd
   }
 
   const getStockInfo = (stock: number) => {
-    if (stock <= 5) return { label: "LOW STOCK", variant: "destructive" as const, color: "bg-rose-500 text-white shadow-[0_0_8px_rgba(244,63,94,0.3)]", icon: "⚠️" };
-    if (stock <= 20) return { label: "LIMITED", variant: "warning" as const, color: "bg-amber-500 text-white shadow-[0_0_8px_rgba(245,158,11,0.3)]", icon: "⏳" };
-    if (stock >= 50) return { label: "IN STOCK", variant: "success" as const, color: "bg-emerald-600 text-white shadow-[0_0_8px_rgba(5,150,105,0.3)]", icon: "✨" };
-    return { label: "IN STOCK", variant: "success" as const, color: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: "✅" };
+    if (stock <= 5) return { 
+      label: "LOW STOCK", 
+      variant: "destructive" as const, 
+      color: "bg-rose-50 text-rose-600 border-rose-200/60 shadow-none", 
+      icon: "⚠️" 
+    };
+    if (stock <= 20) return { 
+      label: "LIMITED", 
+      variant: "warning" as const, 
+      color: "bg-amber-50 text-amber-700 border-amber-200/60 shadow-none", 
+      icon: "⏳" 
+    };
+    if (stock >= 50) return { 
+      label: "IN STOCK", 
+      variant: "success" as const, 
+      color: "bg-emerald-50 text-emerald-700 border-emerald-200/60 shadow-none", 
+      icon: "✨" 
+    };
+    return { 
+      label: "IN STOCK", 
+      variant: "success" as const, 
+      color: "bg-slate-50 text-slate-600 border-slate-200/60 shadow-none", 
+      icon: "✅" 
+    };
   }
 
   return (
@@ -212,7 +232,7 @@ export function ProductTable({ initialProducts, categories = [] }: { initialProd
                       <DropdownMenuTrigger asChild id={statusMenuId}>
                         <Badge 
                           variant={stockInfo.variant} 
-                          className={cn("cursor-pointer font-black tracking-widest text-[9px] px-2 py-0.5 transition-all duration-300 hover:brightness-110", stockInfo.color)}
+                          className={cn("cursor-pointer font-bold tracking-widest text-[9px] px-2 py-0.5 transition-all duration-200 hover:bg-white hover:shadow-sm border uppercase", stockInfo.color)}
                         >
                           {product.status ? product.status.toUpperCase() : stockInfo.label}
                         </Badge>

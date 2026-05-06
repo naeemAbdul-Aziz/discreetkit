@@ -508,35 +508,35 @@ export function OrdersTable({
     switch (status) {
       case "completed":
         return (
-          <Badge variant="success" className="gap-1 bg-slate-50 text-slate-800 border-slate-200 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
+          <Badge variant="success" className="gap-1 bg-slate-50 hover:bg-slate-50 text-slate-800 border-slate-200 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
             <CheckCircle className="h-3 w-3 text-emerald-600/70" />
             {base}
           </Badge>
         );
       case "processing":
         return (
-          <Badge variant="secondary" className="gap-1 bg-slate-50 text-slate-600 border-slate-200/60 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
+          <Badge variant="secondary" className="gap-1 bg-slate-50 hover:bg-slate-50 text-slate-600 border-slate-200/60 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
             <Package className="h-3 w-3 text-slate-400" />
             {base}
           </Badge>
         );
       case "out_for_delivery":
         return (
-          <Badge variant="warning" className="gap-1 bg-slate-50 text-slate-700 border-slate-200 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
+          <Badge variant="warning" className="gap-1 bg-slate-50 hover:bg-slate-50 text-slate-700 border-slate-200 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
             <Truck className="h-3 w-3 text-indigo-500/70" />
             {base}
           </Badge>
         );
       case "pending_payment":
         return (
-          <Badge variant="pending" className="gap-1 bg-white text-slate-500 border-slate-200/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-sm">
+          <Badge variant="pending" className="gap-1 bg-white hover:bg-white text-slate-500 border-slate-200/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-sm">
             <CreditCard className="h-3 w-3 text-slate-300" />
             {base}
           </Badge>
         );
       case "received":
         return (
-          <Badge variant="info" className="gap-1 bg-slate-50 text-slate-600 border-slate-200/60 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
+          <Badge variant="info" className="gap-1 bg-slate-50 hover:bg-slate-50 text-slate-600 border-slate-200/60 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
             <Clock className="h-3 w-3 text-slate-400" />
             {base}
           </Badge>
@@ -956,12 +956,12 @@ export function OrdersTable({
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="-ml-2 px-2 h-8 items-center w-fit justify-start focus-visible:ring-0 hover:bg-transparent"
+                                className="-ml-2 px-2 h-8 items-center w-40 justify-start focus-visible:ring-0 hover:bg-transparent"
                               >
                                 {getStatusBadge(order.status)}
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start" className="w-[200px]">
+                            <DropdownMenuContent align="start" className="w-[200px]" onCloseAutoFocus={(e) => e.preventDefault()}>
                               <DropdownMenuItem
                                 onSelect={(e) => {
                                   e.preventDefault();
@@ -1517,14 +1517,6 @@ function PharmacyCombobox({
                         className="h-5 text-[10px] px-1 bg-blue-100 text-blue-700"
                       >
                         24/7
-                      </Badge>
-                    )}
-                    {pharmacy.recommended && (
-                      <Badge
-                        variant="secondary"
-                        className="h-5 text-[10px] px-1 bg-green-100 text-green-700"
-                      >
-                        Best
                       </Badge>
                     )}
                   </div>
