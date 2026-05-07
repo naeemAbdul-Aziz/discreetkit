@@ -359,3 +359,33 @@ export async function updateServiceArea(areaId: number, data: { delivery_fee?: n
 export async function toggleServiceAreaStatus(areaId: number, currentStatus: boolean) {
     return updateServiceArea(areaId, { is_active: !currentStatus });
 }
+
+export async function updatePharmacyFinancials(_prevState: any, formData: FormData) {
+    const { pharmacy, supabase } = await requirePharmacy();
+    
+    const bank_details = {
+        bank_name: formData.get('bank_name') as string,
+        account_number: formData.get('account_number') as string,
+        account_name: formData.get('bank_account_name') as string,
+        branch: formData.get('branch') as string,
+    };
+
+    const momo_details = {
+        network: formData.get('momo_network') as string,
+        number: formData.get('momo_number') as string,
+        account_name: formData.get('momo_account_name') as string,
+    };
+
+    const { error } = await supabase
+        .from('pharmacies')
+        .update({ 
+            bank_details,
+            momo_details
+        })
+        .eq('id', pharmacy.id);
+
+    if (error) return { success: false, message: error.message };
+    
+    revalidatePath('/pharmacy/settings');
+    return { success: true, message: 'Financial details updated successfully' };
+}

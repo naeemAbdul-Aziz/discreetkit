@@ -13,6 +13,7 @@ import {
     ChevronRight,
     Settings2
 } from "lucide-react";
+import FinancialSettings from "./financial-settings";
 import OperationalSettings from "./operational-settings";
 import { ServiceAreaMatrix } from "./service-area-matrix";
 import { cn } from "@/lib/utils";
@@ -21,6 +22,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 const NAV_ITEMS = [
     { id: "profile", label: "Store Profile", icon: Store },
     { id: "operational", label: "Dispatch & Zones", icon: MapPin },
+    { id: "financials", label: "Financial Details", icon: CreditCard },
     { id: "notifications", label: "Notifications", icon: Bell },
     { id: "security", label: "Security", icon: ShieldCheck },
 ];
@@ -51,20 +53,18 @@ export default function PharmacySettingsPage() {
 
     if (loading) {
         return (
-            <div className="max-w-6xl mx-auto py-8 px-4 space-y-6">
+            <div className="space-y-8">
                 <Skeleton className="h-10 w-48" />
-                <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-8">
-                    <div className="space-y-2">
-                        {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-10 w-full" />)}
-                    </div>
-                    <Skeleton className="h-[400px] w-full" />
+                <div className="flex gap-2">
+                    {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-10 w-32 rounded-full" />)}
                 </div>
+                <Skeleton className="h-[400px] w-full rounded-2xl" />
             </div>
         );
     }
 
     return (
-        <div className="max-w-6xl mx-auto py-8 px-4 space-y-8 animate-in fade-in duration-500">
+        <div className="space-y-8 animate-in fade-in duration-1000">
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-black tracking-tight text-slate-900 flex items-center gap-3">
@@ -75,32 +75,29 @@ export default function PharmacySettingsPage() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-10 items-start">
-                {/* Left Navigation */}
-                <nav className="flex flex-col gap-1 sticky top-24">
-                    {NAV_ITEMS.map((item) => (
-                        <button
-                            key={item.id}
-                            onClick={() => setActiveTab(item.id)}
-                            className={cn(
-                                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all group",
-                                activeTab === item.id 
-                                    ? "bg-brand-teal text-white shadow-md shadow-brand-teal/20" 
-                                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
-                            )}
-                        >
-                            <item.icon className={cn(
-                                "h-4 w-4",
-                                activeTab === item.id ? "text-white" : "text-slate-400 group-hover:text-slate-600"
-                            )} />
-                            {item.label}
-                            {activeTab === item.id && <ChevronRight className="ml-auto h-4 w-4 opacity-50" />}
-                        </button>
-                    ))}
-                </nav>
+            {/* Horizontal Rounded Tab Navigation */}
+            <div className="flex items-center gap-2 overflow-x-auto w-full pb-2 md:pb-0 scrollbar-hide">
+                {NAV_ITEMS.map((item) => (
+                    <button
+                        key={item.id}
+                        onClick={() => setActiveTab(item.id)}
+                        className={cn(
+                            "px-5 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all whitespace-nowrap flex items-center gap-2",
+                            activeTab === item.id 
+                                ? "bg-slate-900 text-white shadow-xl shadow-slate-200/50" 
+                                : "bg-slate-100/50 text-slate-500 hover:bg-slate-200 hover:text-slate-900"
+                        )}
+                    >
+                        <item.icon className={cn(
+                            "h-3.5 w-3.5 transition-transform",
+                            activeTab === item.id ? "text-white" : "text-slate-400 group-hover:text-slate-600"
+                        )} />
+                        {item.label}
+                    </button>
+                ))}
+            </div>
 
-                {/* Right Content Area */}
-                <div className="min-h-[500px]">
+            <div className="min-h-[500px]">
                     {activeTab === "operational" && (
                         <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
                             <OperationalSettings initialIs24_7={profile?.is_24_7 || false} />
@@ -112,6 +109,15 @@ export default function PharmacySettingsPage() {
                                 </div>
                                 <ServiceAreaMatrix initialAreas={serviceAreas} />
                             </div>
+                        </div>
+                    )}
+
+                    {activeTab === "financials" && (
+                        <div className="animate-in slide-in-from-right-4 duration-300">
+                             <FinancialSettings 
+                                initialBankDetails={profile?.bank_details} 
+                                initialMomoDetails={profile?.momo_details} 
+                             />
                         </div>
                     )}
 
@@ -138,7 +144,6 @@ export default function PharmacySettingsPage() {
                             <p className="text-slate-400 max-w-sm mt-2 font-medium">Access keys and staff role management configuration coming soon.</p>
                         </div>
                     )}
-                </div>
             </div>
         </div>
     );

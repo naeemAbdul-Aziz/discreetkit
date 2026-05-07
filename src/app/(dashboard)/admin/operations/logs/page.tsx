@@ -16,7 +16,6 @@ export default async function AdminLogsPage() {
                     <Breadcrumbs
                         items={[
                             { label: "Dashboard", href: "/admin" },
-                            { label: "Operations", href: "/admin/operations" },
                             { label: "Operational Ledger" },
                         ]}
                     />
