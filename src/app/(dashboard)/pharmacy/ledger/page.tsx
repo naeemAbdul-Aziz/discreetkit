@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { getOperationalLedger } from "@/lib/admin-actions";
 import { LedgerTable } from "@/components/dashboard/ledger-table";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
-import { Loader2, Download, ShieldCheck } from "lucide-react";
+import { Loader2, Download, ShieldCheck, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createSupabaseServerClient } from "@/lib/supabase";
 
