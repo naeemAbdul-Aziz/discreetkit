@@ -159,7 +159,7 @@ export function DashboardSidebar() {
       <SidebarHeader className="px-4 py-6 flex justify-center items-center border-b border-border/50">
         <Link href="/" className="flex items-center group">
           {/* DiscreetKit Wordmark */}
-          <h2 className="hidden md:block font-headline text-2xl font-black tracking-tight uppercase transition-transform group-hover:scale-105">
+          <h2 className="hidden md:block font-headline text-2xl font-black tracking-tighter transition-transform group-hover:scale-105">
             Discreet<span className="text-primary">Kit</span>.
           </h2>
         </Link>
@@ -219,8 +219,8 @@ export function DashboardSidebar() {
                     />
                     <span
                       className={cn(
-                        "hidden lg:inline-block text-sm font-medium transition-all duration-200",
-                        isActive ? "font-bold tracking-wide" : "font-medium",
+                        "hidden lg:inline-block text-sm transition-all duration-200",
+                        isActive ? "font-bold" : "font-medium",
                       )}
                     >
                       {item.label}

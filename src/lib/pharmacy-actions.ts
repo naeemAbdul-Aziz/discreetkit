@@ -389,3 +389,94 @@ export async function updatePharmacyFinancials(_prevState: any, formData: FormDa
     revalidatePath('/pharmacy/settings');
     return { success: true, message: 'Financial details updated successfully' };
 }
+export async function updatePharmacyProfile(data: {
+    name: string;
+    location: string;
+    contact_person: string;
+    phone_number: string;
+    email: string;
+}) {
+    try {
+        const supabase = await createSupabaseServerClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            return { error: "Unauthorized access" };
+        }
+
+        const { error } = await supabase
+            .from('pharmacies')
+            .update({
+                name: data.name,
+                location: data.location,
+                contact_person: data.contact_person,
+                phone_number: data.phone_number,
+                email: data.email,
+            })
+            .eq('user_id', user.id);
+
+        if (error) throw error;
+
+        revalidatePath('/pharmacy/settings');
+        // also revalidate admin partners if needed
+        revalidatePath('/admin/partners');
+        
+        return { success: true };
+    } catch (error: any) {
+        console.error('Error updating pharmacy profile:', error);
+        return { error: error.message || "Failed to update profile" };
+    }
+}
+
+export async function updateNotificationPreferences(preferences: {
+    sms_orders: boolean;
+    email_orders: boolean;
+    low_stock_alerts: boolean;
+    weekly_reports: boolean;
+}) {
+    try {
+        const supabase = await createSupabaseServerClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            return { error: "Unauthorized access" };
+        }
+
+        const { error } = await supabase
+            .from('pharmacies')
+            .update({
+                notification_preferences: preferences,
+            })
+            .eq('user_id', user.id);
+
+        if (error) throw error;
+
+        revalidatePath('/pharmacy/settings');
+        return { success: true };
+    } catch (error: any) {
+        console.error('Error updating notification preferences:', error);
+        return { error: error.message || "Failed to update preferences" };
+    }
+}
+
+export async function updatePharmacyPassword(newPassword: string) {
+    try {
+        const supabase = await createSupabaseServerClient();
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+        if (userError || !user) {
+            return { error: "Unauthorized access" };
+        }
+
+        const { error } = await supabase.auth.updateUser({
+            password: newPassword
+        });
+
+        if (error) throw error;
+
+        return { success: true };
+    } catch (error: any) {
+        console.error('Error updating password:', error);
+        return { error: error.message || "Failed to update password" };
+    }
+}

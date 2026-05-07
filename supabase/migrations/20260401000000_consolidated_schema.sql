@@ -130,7 +130,8 @@ CREATE TABLE public.pharmacies (
     bank_details jsonb DEFAULT '{}'::jsonb,
     momo_details jsonb DEFAULT '{}'::jsonb,
     is_active boolean DEFAULT true,
-    is_partner_hub boolean DEFAULT false
+    is_partner_hub boolean DEFAULT false,
+    notification_preferences jsonb DEFAULT '{"sms_orders": true, "email_orders": true, "low_stock_alerts": false, "weekly_reports": false}'::jsonb
 );
 
 CREATE TABLE public.pharmacy_products (
