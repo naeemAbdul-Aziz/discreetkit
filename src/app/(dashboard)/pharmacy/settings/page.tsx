@@ -10,9 +10,7 @@ import {
     Clock, 
     Bell, 
     CreditCard,
-    ChevronRight,
-    Settings2
-} from "lucide-react";
+import FinancialSettings from "./financial-settings";
 import OperationalSettings from "./operational-settings";
 import { ServiceAreaMatrix } from "./service-area-matrix";
 import { cn } from "@/lib/utils";
@@ -21,6 +19,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 const NAV_ITEMS = [
     { id: "profile", label: "Store Profile", icon: Store },
     { id: "operational", label: "Dispatch & Zones", icon: MapPin },
+    { id: "financials", label: "Financial Details", icon: CreditCard },
     { id: "notifications", label: "Notifications", icon: Bell },
     { id: "security", label: "Security", icon: ShieldCheck },
 ];
@@ -112,6 +111,15 @@ export default function PharmacySettingsPage() {
                                 </div>
                                 <ServiceAreaMatrix initialAreas={serviceAreas} />
                             </div>
+                        </div>
+                    )}
+
+                    {activeTab === "financials" && (
+                        <div className="animate-in slide-in-from-right-4 duration-300">
+                             <FinancialSettings 
+                                initialBankDetails={profile?.bank_details} 
+                                initialMomoDetails={profile?.momo_details} 
+                             />
                         </div>
                     )}
 
