@@ -1,5 +1,9 @@
-"use client";
-
+import { createSupabaseServerClient } from "@/lib/supabase";
+import { getHubAnalytics } from "@/lib/hub-actions";
+import { OrdersList } from "./orders-list";
+import { PharmacyRealtimeRefresh } from "./realtime-refresh";
+import { RefreshButton } from "./refresh-button";
+import { redirect } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -11,144 +15,33 @@ import {
   Truck,
   CheckCircle,
   Clock,
-  AlertCircle,
   Info,
-  RefreshCw,
   Users,
   ShieldCheck,
-  Verified,
   TrendingUp,
-  BarChart3
 } from "lucide-react";
-import { OrdersList } from "./orders-list";
-import { useEffect, useState, useCallback, useMemo } from "react";
-import { useRouter } from "next/navigation";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { usePharmacy } from "@/components/dashboard/pharmacy-context";
-import { getHubAnalytics } from "@/lib/hub-actions";
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, BarChart, Bar, Cell } from 'recharts';
+import Link from "next/link";
 
-type PharmacyData = {
-  pharmacy: { id: number; name: string; location: string };
-  stats: {
-    pending: number;
-    processing: number;
-    outForDelivery: number;
-    completed: number;
-  };
-  recentOrders: any[];
-  statusBreakdown: { status: string; count: number }[];
-  _timestamp?: number;
-};
+export const dynamic = "force-dynamic";
 
-import { useSSE } from "@/hooks/use-sse";
+export default async function PharmacyDashboardPage() {
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-export default function PharmacyDashboardPage() {
-  const router = useRouter();
-  const { isHub, pharmacy: hubInfo } = usePharmacy();
-  const [data, setData] = useState<PharmacyData | null>(null);
-  const [hubStats, setHubStats] = useState<{ totalEnrolled: number, adherenceRate: number } | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [dataLoaded, setDataLoaded] = useState(false);
-
-  const loadData = useCallback(
-    async (silent = false) => {
-      try {
-        if (!silent) {
-          setLoading(true);
-        }
-        setError(null);
-
-        const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("timeout")), 30000),
-        );
-
-        const fetchPromise = fetch("/api/pharmacy/dashboard", {
-          cache: "no-store",
-        });
-        const response = (await Promise.race([
-          fetchPromise,
-          timeoutPromise,
-        ])) as Response;
-
-        if (response.status === 401 || response.status === 403) {
-          router.push("/login");
-          return;
-        }
-
-        if (response.status === 404) {
-          setError("not_linked");
-          setLoading(false);
-          return;
-        }
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-
-        const json = await response.json();
-
-        if (json) {
-          setData({ ...json, _timestamp: Date.now() });
-          
-          if (isHub) {
-            const hStats = await getHubAnalytics();
-            setHubStats(hStats);
-          }
-        }
-        setDataLoaded(true);
-      } catch (err: any) {
-        console.error("[PharmacyDashboard] Error:", err);
-        if (err.message === "timeout") setError("timeout");
-        else setError("fetch_failed");
-      } finally {
-        if (!silent) {
-          setLoading(false);
-        }
-      }
-    },
-    [router, isHub],
-  );
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
-
-  useSSE(dataLoaded ? "/api/pharmacy/realtime" : "", {
-    onMessage: (event) => {
-      try {
-        const msg = JSON.parse(event.data);
-        if (msg.type === "orders") {
-          loadData(true);
-        }
-      } catch (e) {
-        console.error("SSE parse error", e);
-      }
-    },
-  });
-
-  if (loading) {
-    return (
-      <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-10">
-        <div className="space-y-4">
-          <Skeleton className="h-10 w-64 rounded-xl" />
-          <Skeleton className="h-4 w-40 rounded-lg" />
-        </div>
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-          {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-32 rounded-2xl" />
-          ))}
-        </div>
-        <Skeleton className="h-96 rounded-3xl" />
-      </div>
-    );
+  if (!user) {
+    redirect("/login");
   }
 
-  if (error === "not_linked") {
+  // 1. Get pharmacy record
+  const { data: pharmacy, error: pharmacyError } = await supabase
+    .from('pharmacies')
+    .select('id, name, location, is_partner_hub')
+    .eq('user_id', user.id)
+    .single();
+
+  if (pharmacyError || !pharmacy) {
     return (
       <div className="p-4 md:p-8 max-w-2xl mx-auto mt-20">
         <div className="text-center space-y-6 bg-slate-50 p-12 rounded-3xl border border-slate-100">
@@ -159,43 +52,56 @@ export default function PharmacyDashboardPage() {
               <h2 className="text-2xl font-bold tracking-tight text-slate-900">Account Pending</h2>
               <p className="text-slate-500 max-w-sm mx-auto font-medium">Your account is ready but hasn&apos;t been linked to a pharmacy yet.</p>
            </div>
-           <Button 
-            onClick={() => router.push("/settings")} 
-            className="h-12 px-10 rounded-xl bg-brand-teal hover:bg-brand-teal/90 font-bold"
-           >
-             Contact Support
-           </Button>
+           <Link href="/pharmacy/settings">
+             <Button className="h-12 px-10 rounded-xl bg-brand-teal hover:bg-brand-teal/90 font-bold mt-4">
+               Contact Support
+             </Button>
+           </Link>
         </div>
       </div>
     );
   }
 
-  if (error) {
-    return (
-      <div className="p-8 max-w-2xl mx-auto mt-20 text-center">
-        <Alert variant="destructive" className="rounded-2xl p-8 border-none bg-rose-50 text-rose-900 shadow-sm">
-          <AlertCircle className="h-8 w-8 mb-4 mx-auto text-rose-500" />
-          <AlertTitle className="text-xl font-bold">Connection Error</AlertTitle>
-          <AlertDescription className="font-medium text-rose-700/80 mt-2 mb-6">
-            We had trouble reaching the server. Please try refreshing.
-          </AlertDescription>
-          <Button onClick={() => loadData()} variant="outline" className="border-rose-200 text-rose-900 hover:bg-rose-100 h-12 px-8 rounded-xl font-bold">
-            Try Again
-          </Button>
-        </Alert>
-      </div>
-    );
+  const isHub = pharmacy.is_partner_hub;
+
+  // 2. Parallel fetch recent orders and status counts
+  const [ordersResult, statsResult] = await Promise.all([
+    supabase
+      .from('orders')
+      .select('id, code, status, pharmacy_ack_status, total_price_ghs, created_at, items, delivery_area')
+      .eq('pharmacy_id', pharmacy.id)
+      .order('created_at', { ascending: false })
+      .limit(20),
+    supabase
+      .from('orders')
+      .select('status, pharmacy_ack_status')
+      .eq('pharmacy_id', pharmacy.id)
+  ]);
+
+  const recentOrders = ordersResult.data || [];
+  const statsData = statsResult.data || [];
+
+  const stats = {
+    pending: statsData.filter(o => o.status === 'received' && o.pharmacy_ack_status === 'pending').length,
+    processing: statsData.filter(o => o.status === 'processing').length,
+    outForDelivery: statsData.filter(o => o.status === 'out_for_delivery').length,
+    completed: statsData.filter(o => o.status === 'completed').length,
+  };
+
+  let hubStats = null;
+  if (isHub) {
+    hubStats = await getHubAnalytics();
   }
 
-  if (!data) return null;
-
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in duration-1000">
+      <PharmacyRealtimeRefresh />
+      
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
            <div className="flex items-center gap-3 mb-1">
                <h2 className="text-2xl font-bold tracking-tight text-slate-900">
-                {data.pharmacy.name}
+                {pharmacy.name}
               </h2>
               <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full border border-emerald-100">
                  <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
@@ -203,7 +109,7 @@ export default function PharmacyDashboardPage() {
               </div>
            </div>
            <p className="text-slate-500 font-medium text-sm">
-             {data.pharmacy.location}
+             {pharmacy.location}
            </p>
         </div>
  
@@ -212,9 +118,7 @@ export default function PharmacyDashboardPage() {
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Last sync</p>
               <p className="text-sm font-bold text-slate-900">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
            </div>
-           <Button variant="outline" size="icon" onClick={() => loadData(true)} className="h-10 w-10 rounded-xl text-slate-400 hover:text-slate-900 transition-all">
-              <RefreshCw className="h-4 w-4" />
-           </Button>
+           <RefreshButton />
         </div>
       </div>
 
@@ -224,8 +128,8 @@ export default function PharmacyDashboardPage() {
             {[
               { label: "Patients Enrolled", value: hubStats?.totalEnrolled || 0, icon: Users, color: "text-emerald-600", bg: "bg-emerald-50/50", note: "Active subscriptions" },
               { label: "Adherence Rate", value: `${hubStats?.adherenceRate || 0}%`, icon: TrendingUp, color: "text-emerald-500", bg: "bg-emerald-50/50", note: "Successful refills" },
-              { label: "Identity Checks", value: data.recentOrders.filter(o => o.status === 'pending_verification').length, icon: ShieldCheck, color: "text-emerald-600", bg: "bg-emerald-50/50", note: "Waiting for verification" },
-              { label: "Total Refills", value: data.stats.completed, icon: CheckCircle, color: "text-emerald-500", bg: "bg-emerald-50/50", note: "Completed cycles" },
+              { label: "Identity Checks", value: recentOrders.filter(o => o.status === 'pending_verification').length, icon: ShieldCheck, color: "text-emerald-600", bg: "bg-emerald-50/50", note: "Waiting for verification" },
+              { label: "Total Refills", value: stats.completed, icon: CheckCircle, color: "text-emerald-500", bg: "bg-emerald-50/50", note: "Completed cycles" },
             ].map((stat, i) => (
               <Card key={i} className={cn("relative overflow-hidden border-none shadow-sm rounded-2xl p-6", stat.bg)}>
                 <div className="flex items-center justify-between mb-4">
@@ -240,10 +144,10 @@ export default function PharmacyDashboardPage() {
         ) : (
           <>
             {[
-              { label: "New Orders", value: data.stats.pending, icon: Package, color: "text-brand-teal", bg: "bg-slate-50", note: "Awaiting confirmation" },
-              { label: "Preparing", value: data.stats.processing, icon: Clock, color: "text-brand-indigo", bg: "bg-slate-50", note: "Currently being packed" },
-              { label: "Out for Delivery", value: data.stats.outForDelivery, icon: Truck, color: "text-amber-600", bg: "bg-slate-50", note: "In transit to patient" },
-              { label: "Delivered", value: data.stats.completed, icon: CheckCircle, color: "text-emerald-600", bg: "bg-slate-50", note: "Orders completed" },
+              { label: "New Orders", value: stats.pending, icon: Package, color: "text-brand-teal", bg: "bg-slate-50", note: "Awaiting confirmation" },
+              { label: "Preparing", value: stats.processing, icon: Clock, color: "text-brand-indigo", bg: "bg-slate-50", note: "Currently being packed" },
+              { label: "Out for Delivery", value: stats.outForDelivery, icon: Truck, color: "text-amber-600", bg: "bg-slate-50", note: "In transit to patient" },
+              { label: "Delivered", value: stats.completed, icon: CheckCircle, color: "text-emerald-600", bg: "bg-slate-50", note: "Orders completed" },
             ].map((stat, i) => (
               <Card key={i} className={cn("relative overflow-hidden border border-slate-100 shadow-sm rounded-2xl p-6", stat.bg)}>
                 <div className="flex items-center justify-between mb-4">
@@ -265,16 +169,14 @@ export default function PharmacyDashboardPage() {
               <h3 className="text-xl font-black text-slate-900 tracking-tight">Recent Orders</h3>
               <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Live fulfillment queue</p>
             </div>
-            <Button variant="ghost" size="sm" onClick={() => router.push('/pharmacy/orders')} className="text-xs font-bold text-brand-teal hover:bg-brand-teal/5 rounded-lg px-4">
-              View Database
-            </Button>
+            <Link href="/pharmacy/ledger">
+              <Button variant="ghost" size="sm" className="text-xs font-bold text-brand-teal hover:bg-brand-teal/5 rounded-lg px-4">
+                View Database
+              </Button>
+            </Link>
           </div>
           
-          <OrdersList
-            key={data._timestamp || 0}
-            orders={data.recentOrders}
-            onOrderUpdate={() => loadData(true)}
-          />
+          <OrdersList orders={recentOrders} />
         </div>
       </div>
     </div>

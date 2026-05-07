@@ -11,7 +11,7 @@ export const revalidate = 0;
 
 export default async function PharmacyLedgerPage() {
     return (
-        <div className="max-w-7xl mx-auto p-4 md:p-12 space-y-8 animate-in fade-in duration-700">
+        <div className="space-y-8 animate-in fade-in duration-1000">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="space-y-1">
                     <h1 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 uppercase tracking-widest">

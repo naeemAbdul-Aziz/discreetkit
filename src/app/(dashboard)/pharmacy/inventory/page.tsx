@@ -10,7 +10,7 @@ export default async function PharmacyInventoryPage() {
   const requests = await getPharmacyProductRequests();
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="space-y-8 animate-in fade-in duration-1000">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">
           Inventory Management

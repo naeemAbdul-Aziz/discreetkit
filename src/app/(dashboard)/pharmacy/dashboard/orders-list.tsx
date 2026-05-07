@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -59,6 +60,7 @@ interface OrdersListProps {
 }
 
 export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
+  const router = useRouter();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("incoming");
   const [currentPage, setCurrentPage] = useState(1);
@@ -166,8 +168,12 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
         description: message.description,
       });
 
-      // Trigger parent refetch
-      onOrderUpdate?.();
+      // Trigger parent refetch or router refresh
+      if (onOrderUpdate) {
+        onOrderUpdate();
+      } else {
+        router.refresh();
+      }
 
       // Clear loading immediately after parent refetch is triggered
       setLoading(null);
