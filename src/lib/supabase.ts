@@ -97,7 +97,7 @@ export async function createSupabaseServerClient() {
 
 // --- This is for MIDDLEWARE ---
 export function createSupabaseMiddlewareClient(request: NextRequest) {
-  // Create an unmodified response
+  // Create an initial response
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -113,48 +113,31 @@ export function createSupabaseMiddlewareClient(request: NextRequest) {
     supabaseAnonKey,
     {
       cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value;
+        getAll() {
+          return request.cookies.getAll()
         },
-        set(name: string, value: string, options: CookieOptions) {
-          // If the cookie is set, update the request and response
-          request.cookies.set({
-            name,
-            value,
-          });
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            request.cookies.set(name, value);
+          })
+          
+          // Must recreate the response to properly apply the request header modifications
           response = NextResponse.next({
             request: {
               headers: request.headers,
             },
-          });
-          response.cookies.set({
-            name,
-            value,
-            ...options,
-            ...(cookieDomain && !isLocalhost ? { domain: cookieDomain } : {}),
-            sameSite: 'lax',
-            secure: process.env.NODE_ENV === 'production'
-          });
-        },
-        remove(name: string, options: CookieOptions) {
-          // If the cookie is removed, update the request and response
-          request.cookies.set({
-            name,
-            value: '',
-          });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          });
-          response.cookies.set({
-            name,
-            value: '',
-            ...options,
-            ...(cookieDomain && !isLocalhost ? { domain: cookieDomain } : {}),
-            sameSite: 'lax',
-            secure: process.env.NODE_ENV === 'production'
-          });
+          })
+          
+          cookiesToSet.forEach(({ name, value, options }) => {
+            response.cookies.set({
+              name,
+              value,
+              ...options,
+              ...(cookieDomain && !isLocalhost ? { domain: cookieDomain } : {}),
+              sameSite: 'lax',
+              secure: process.env.NODE_ENV === 'production'
+            })
+          })
         },
       },
       cookieOptions: {

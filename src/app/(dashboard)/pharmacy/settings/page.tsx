@@ -3,28 +3,22 @@
 import { useState, useEffect } from "react";
 import { getPharmacyServiceAreas, getPharmacyProfile } from "@/lib/pharmacy-actions";
 import { Separator } from "@/components/ui/separator";
-import { 
-    Store, 
-    MapPin, 
-    ShieldCheck, 
-    Clock, 
-    Bell, 
-    CreditCard,
-    ChevronRight,
-    Settings2
-} from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import FinancialSettings from "./financial-settings";
 import OperationalSettings from "./operational-settings";
 import { ServiceAreaMatrix } from "./service-area-matrix";
+import { StoreProfileSettings } from "@/components/dashboard/store-profile-settings";
+import { NotificationSettings } from "@/components/dashboard/notification-settings";
+import { SecuritySettings } from "@/components/dashboard/security-settings";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const NAV_ITEMS = [
-    { id: "profile", label: "Store Profile", icon: Store },
-    { id: "operational", label: "Dispatch & Zones", icon: MapPin },
-    { id: "financials", label: "Financial Details", icon: CreditCard },
-    { id: "notifications", label: "Notifications", icon: Bell },
-    { id: "security", label: "Security", icon: ShieldCheck },
+    { id: "profile", label: "Store Profile", icon: "storefront" },
+    { id: "operational", label: "Dispatch & Zones", icon: "map" },
+    { id: "financials", label: "Financial Details", icon: "payments" },
+    { id: "notifications", label: "Notifications", icon: "notifications_active" },
+    { id: "security", label: "Security", icon: "verified_user" },
 ];
 
 export default function PharmacySettingsPage() {
@@ -67,9 +61,9 @@ export default function PharmacySettingsPage() {
         <div className="space-y-8 animate-in fade-in duration-1000">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-black tracking-tight text-slate-900 flex items-center gap-3">
-                        <Settings2 className="h-8 w-8 text-brand-teal" />
-                        Command Settings
+                    <h1 className="text-3xl font-black text-slate-900 flex items-center gap-3 tracking-tighter">
+                        <Icon name="settings" className="text-brand-indigo" fill opticalSize={32} />
+                        Settings
                     </h1>
                     <p className="text-slate-500 font-medium mt-1">Configure your pharmacy operational parameters and delivery network.</p>
                 </div>
@@ -82,30 +76,44 @@ export default function PharmacySettingsPage() {
                         key={item.id}
                         onClick={() => setActiveTab(item.id)}
                         className={cn(
-                            "px-5 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all whitespace-nowrap flex items-center gap-2",
+                            "px-5 py-2.5 rounded-full text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2",
                             activeTab === item.id 
                                 ? "bg-slate-900 text-white shadow-xl shadow-slate-200/50" 
                                 : "bg-slate-100/50 text-slate-500 hover:bg-slate-200 hover:text-slate-900"
                         )}
                     >
-                        <item.icon className={cn(
-                            "h-3.5 w-3.5 transition-transform",
-                            activeTab === item.id ? "text-white" : "text-slate-400 group-hover:text-slate-600"
-                        )} />
-                        {item.label}
+                        <Icon 
+                            name={item.icon} 
+                            className={cn(
+                                "transition-colors",
+                                activeTab === item.id ? "text-brand-indigo" : "text-slate-400 group-hover:text-slate-600"
+                            )} 
+                            fill={activeTab === item.id}
+                            opticalSize={20}
+                        />
+                        <span className="font-bold">{item.label}</span>
+                        {activeTab === item.id && (
+                            <Icon name="chevron_right" className="ml-auto text-brand-indigo" opticalSize={16} />
+                        )}
                     </button>
                 ))}
             </div>
 
             <div className="min-h-[500px]">
+                    {activeTab === "profile" && (
+                        <div className="animate-in slide-in-from-right-4 duration-300">
+                             <StoreProfileSettings initialProfile={profile} />
+                        </div>
+                    )}
+
                     {activeTab === "operational" && (
                         <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
                             <OperationalSettings initialIs24_7={profile?.is_24_7 || false} />
                             
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2 px-1">
-                                    <MapPin className="h-5 w-5 text-brand-teal" />
-                                    <h2 className="text-xl font-black text-slate-900">Delivery Network</h2>
+                                    <Icon name="map" className="text-brand-teal" opticalSize={24} />
+                                    <h2 className="text-xl font-black text-slate-900 tracking-tight">Delivery Network</h2>
                                 </div>
                                 <ServiceAreaMatrix initialAreas={serviceAreas} />
                             </div>
@@ -121,27 +129,15 @@ export default function PharmacySettingsPage() {
                         </div>
                     )}
 
-                    {activeTab === "profile" && (
-                        <div className="p-12 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-center animate-in fade-in duration-300">
-                            <Store className="h-12 w-12 text-slate-300 mb-4" />
-                            <h3 className="text-lg font-bold text-slate-900">Store Profile</h3>
-                            <p className="text-slate-400 max-w-sm mt-2 font-medium">Detailed pharmacy branding and public profile settings coming soon.</p>
-                        </div>
-                    )}
-
                     {activeTab === "notifications" && (
-                        <div className="p-12 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-center animate-in fade-in duration-300">
-                            <Bell className="h-12 w-12 text-slate-300 mb-4" />
-                            <h3 className="text-lg font-bold text-slate-900">Notifications</h3>
-                            <p className="text-slate-400 max-w-sm mt-2 font-medium">Webhook and SMS alert triggers configuration coming soon.</p>
+                        <div className="animate-in slide-in-from-right-4 duration-300">
+                             <NotificationSettings initialPreferences={profile?.notification_preferences} />
                         </div>
                     )}
 
                     {activeTab === "security" && (
-                        <div className="p-12 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-center animate-in fade-in duration-300">
-                            <ShieldCheck className="h-12 w-12 text-slate-300 mb-4" />
-                            <h3 className="text-lg font-bold text-slate-900">Security & Credentials</h3>
-                            <p className="text-slate-400 max-w-sm mt-2 font-medium">Access keys and staff role management configuration coming soon.</p>
+                        <div className="animate-in slide-in-from-right-4 duration-300">
+                             <SecuritySettings />
                         </div>
                     )}
             </div>

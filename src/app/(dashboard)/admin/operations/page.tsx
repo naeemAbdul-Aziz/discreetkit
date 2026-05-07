@@ -15,11 +15,11 @@ export default async function OperationsDashboard() {
     <div className="space-y-8 animate-in fade-in duration-700">
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-1">
-          <h2 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 uppercase tracking-widest leading-none">
+          <h1 className="text-2xl md:text-3xl font-black tracking-tighter text-slate-900 leading-none">
             Operations Control
-          </h2>
-          <p className="text-[10px] uppercase font-bold text-slate-400 tracking-[0.2em]">
-            Real-time logistics & escalation management intelligence
+          </h1>
+          <p className="text-sm font-medium text-slate-500">
+            Real-time logistics and escalation management intelligence
           </p>
         </div>
         <RefreshButton />
@@ -30,7 +30,7 @@ export default async function OperationsDashboard() {
       </Suspense>
 
       <div className="space-y-4">
-        <h3 className="text-sm font-black uppercase tracking-widest text-slate-900">
+        <h3 className="text-xl font-black tracking-tight text-slate-900">
           Live Logistics Stream
         </h3>
         <Suspense fallback={<TableSkeleton />}>

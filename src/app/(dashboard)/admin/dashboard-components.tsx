@@ -79,7 +79,7 @@ export async function RevenueTimeline() {
     return (
         <Card className="border border-slate-200/60 shadow-sm bg-white rounded-3xl overflow-hidden">
             <CardHeader className="p-6 pb-2">
-                <CardTitle className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400">Sales Over Time</CardTitle>
+                <CardTitle className="text-xs font-bold text-slate-400">Sales Over Time</CardTitle>
             </CardHeader>
             <CardContent className="p-6 pt-0">
                 <DynamicCharts data={chartData} />
@@ -123,7 +123,7 @@ export async function ActivityPulse() {
     return (
         <Card className="border border-slate-200/60 shadow-sm bg-white rounded-3xl overflow-hidden">
             <CardHeader className="p-6 pb-4 border-b border-slate-50">
-                <CardTitle className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400 flex items-center gap-2">
+                <CardTitle className="text-xs font-bold text-slate-400 flex items-center gap-2">
                     <Icon name="query_stats" className="text-brand-indigo/60" opticalSize={16} />
                     Recent Activity
                 </CardTitle>
@@ -148,7 +148,7 @@ export async function ActivityPulse() {
                                     </span>
                                 </div>
                                 <div className="flex items-center gap-2 mt-0.5">
-                                    <Badge variant="outline" className="text-[8px] h-4 uppercase tracking-wider font-bold border-slate-100 text-slate-500 bg-slate-50/50">
+                                    <Badge variant="outline" className="text-[9px] h-4 font-bold border-slate-100 text-slate-500 bg-slate-50/50">
                                         {(item.status || 'unknown').replace(/_/g, ' ')}
                                     </Badge>
                                     {item.note && <span className="text-[10px] text-slate-500 truncate italic">&quot;{item.note}&quot;</span>}

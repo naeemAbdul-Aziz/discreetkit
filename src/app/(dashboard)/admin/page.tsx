@@ -35,11 +35,11 @@ export default async function AdminDashboardPage({ searchParams }: PageProps) {
       <AdminRealtimeRefresh />
 
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-black tracking-tight text-slate-900 uppercase tracking-widest">
+        <h1 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900">
             Admin Dashboard
         </h1>
-        <p className="text-[10px] uppercase font-bold text-slate-400 tracking-[0.2em]">
-            Store Overview & Live Analytics
+        <p className="text-sm font-medium text-slate-500">
+            Store overview and live analytics
         </p>
       </div>
 
