@@ -12,7 +12,7 @@ const RATE_LIMITS = {
 // Renamed from middleware to proxy for Next.js 16
 export async function proxy(request: NextRequest) {
     // 1. Initialize Supabase and check auth
-    const { supabase, response } = createSupabaseMiddlewareClient(request);
+    const { supabase, context } = createSupabaseMiddlewareClient(request);
     const { data: { user } } = await supabase.auth.getUser();
 
     const url = request.nextUrl;
@@ -53,7 +53,9 @@ export async function proxy(request: NextRequest) {
             // Preserve return URL for post-login redirect
             const loginUrl = new URL('/login', process.env.NEXT_PUBLIC_SITE_URL || 'https://discreetkit.com');
             loginUrl.searchParams.set('redirect_to', url.href);
-            return NextResponse.redirect(loginUrl);
+            return NextResponse.redirect(loginUrl, {
+                headers: context.response.headers
+            });
         }
     }
 
@@ -70,11 +72,15 @@ export async function proxy(request: NextRequest) {
             // If they are a pharmacy user, redirect to pharmacy portal
             if (roles.includes('pharmacy')) {
                 const pharmacyUrl = new URL('/pharmacy/dashboard', process.env.NEXT_PUBLIC_PHARMACY_URL || 'https://pharmacy.discreetkit.com');
-                return NextResponse.redirect(pharmacyUrl);
+                return NextResponse.redirect(pharmacyUrl, {
+                    headers: context.response.headers
+                });
             }
             // Otherwise, unauthorized — redirect to main site's unauthorized page
             const unauthorizedUrl = new URL('/unauthorized', process.env.NEXT_PUBLIC_SITE_URL || 'https://discreetkit.com');
-            return NextResponse.redirect(unauthorizedUrl);
+            return NextResponse.redirect(unauthorizedUrl, {
+                headers: context.response.headers
+            });
         }
     }
     if (user && (isPharmacySubdomain || isPharmacyPath)) {
@@ -89,11 +95,15 @@ export async function proxy(request: NextRequest) {
             // If they are an admin, redirect to admin portal
             if (roles.includes('admin')) {
                 const adminUrl = new URL('/admin', process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.discreetkit.com');
-                return NextResponse.redirect(adminUrl);
+                return NextResponse.redirect(adminUrl, {
+                    headers: context.response.headers
+                });
             }
             // Otherwise, unauthorized — redirect to main site's unauthorized page
             const unauthorizedUrl = new URL('/unauthorized', process.env.NEXT_PUBLIC_SITE_URL || 'https://discreetkit.com');
-            return NextResponse.redirect(unauthorizedUrl);
+            return NextResponse.redirect(unauthorizedUrl, {
+                headers: context.response.headers
+            });
         }
     }
 
@@ -111,7 +121,9 @@ export async function proxy(request: NextRequest) {
                  url.pathname = `/admin${url.pathname}`;
              }
         }
-        return NextResponse.rewrite(url);
+        return NextResponse.rewrite(url, {
+            headers: context.response.headers
+        });
     }
     
     if (isPharmacySubdomain) {
@@ -124,18 +136,22 @@ export async function proxy(request: NextRequest) {
                 url.pathname = `/pharmacy${url.pathname}`;
             }
         }
-        return NextResponse.rewrite(url);
+        return NextResponse.rewrite(url, {
+            headers: context.response.headers
+        });
     }
 
     // 6. Rewrite access subdomain to /access path
     if (isAccessSubdomain) {
         if (url.pathname === '/') {
             url.pathname = '/access';
-            return NextResponse.rewrite(url);
+            return NextResponse.rewrite(url, {
+                headers: context.response.headers
+            });
         }
     }
 
-    return response;
+    return context.response;
 }
 
 export const config = {
