@@ -220,49 +220,60 @@ function Tracker() {
 
   return (
     <div className={cn(
-      "w-full transition-all duration-700 ease-out",
-      trackingData ? "max-w-7xl" : "max-w-lg mt-[10dvh]"
+      "w-full mx-auto transition-all duration-1000 ease-in-out flex flex-col items-center",
+      trackingData ? "max-w-6xl" : "max-w-xl pt-[8dvh]"
     )}>
       {/* Search Hub */}
       <div className={cn(
-        "text-center mb-10 transition-all duration-500",
-        trackingData ? "text-left mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6" : ""
+        "w-full text-center transition-all duration-700 flex flex-col items-center",
+        trackingData ? "mb-12" : "mb-0"
       )}>
-        <div>
+        <div className={cn(
+          "transition-all duration-700",
+          trackingData ? "mb-8" : "mb-12"
+        )}>
+          <div className="inline-flex items-center justify-center h-16 w-16 rounded-3xl bg-primary/5 mb-6 animate-in zoom-in duration-1000">
+             <Icon name="location_searching" className="text-primary" opticalSize={32} />
+          </div>
           <h1 className={cn(
-            "font-semibold tracking-tighter mb-2",
-            trackingData ? "text-3xl" : "text-4xl px-4"
+            "font-bold tracking-tight mb-4 text-slate-900 transition-all duration-700",
+            trackingData ? "text-3xl" : "text-6xl"
           )}>
-            {trackingData ? "Order Status" : "Where is your order?"}
+            {trackingData ? "Order Status" : "Track Order"}
           </h1>
-          <p className="text-muted-foreground font-medium px-4">
-            Private, discreet delivery tracking.
+          <p className={cn(
+            "text-slate-500 font-medium transition-all duration-700",
+            trackingData ? "text-base" : "text-xl max-w-md mx-auto leading-relaxed"
+          )}>
+            {trackingData 
+              ? "Real-time delivery updates for your package." 
+              : "Enter your unique tracking code below to see the status of your discreet delivery."}
           </p>
         </div>
 
         <form
           onSubmit={handleSearch}
           className={cn(
-            "flex items-center gap-2 p-2 mt-8 transition-all duration-300",
+            "flex items-center gap-3 p-3 transition-all duration-700 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] w-full",
             trackingData 
-              ? "max-w-sm w-full bg-white rounded-full shadow-sm border border-border/40" 
-              : "mx-4 bg-white rounded-[2rem] shadow-xl p-4 md:p-6"
+              ? "max-w-md bg-white rounded-full border border-slate-100" 
+              : "max-w-lg bg-white rounded-[2.5rem] md:p-4 border border-slate-100"
           )}
         >
           <div className="relative flex-1">
-            <Icon name="search" className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/50" opticalSize={18} />
+            <Icon name="search" className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" opticalSize={20} />
             <input
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              placeholder="Enter Code (e.g. A9K...)"
-              className="w-full h-12 pl-11 pr-4 bg-[#f5f5f1] border-0 rounded-full text-sm font-bold tracking-wide placeholder:font-medium focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+              placeholder="Order Code (e.g. A9K...)"
+              className="w-full h-14 pl-14 pr-4 bg-slate-50/50 border-0 rounded-full text-base font-bold tracking-wide placeholder:font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-primary/10 outline-none transition-all"
               disabled={isPending}
             />
           </div>
           <Button 
             type="submit" 
             disabled={isPending || !code}
-            className="h-12 px-8 rounded-full font-bold shadow-md transition-all active:scale-95"
+            className="h-14 px-10 rounded-full font-bold shadow-xl transition-all active:scale-95 bg-primary hover:bg-primary/95 text-white"
           >
             {isPending ? <BrandSpinner size="sm" /> : "Track"}
           </Button>
@@ -270,23 +281,33 @@ function Tracker() {
       </div>
 
       {error && (
-        <div className="mx-4 mb-8">
-          <Alert variant="destructive" className="rounded-3xl border-0 shadow-lg bg-red-50 text-red-900">
-            <Icon name="error" className="text-red-600" opticalSize={20} fill={true} />
-            <AlertTitle className="font-bold">Not Found</AlertTitle>
-            <AlertDescription className="font-medium opacity-80">{error}</AlertDescription>
+        <div className="mx-auto max-w-md mb-12">
+          <Alert variant="destructive" className="rounded-[2rem] border-0 shadow-xl bg-red-50/50 text-red-900 p-6">
+            <div className="flex items-center gap-4">
+               <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                  <Icon name="error" className="text-red-600" opticalSize={20} fill={true} />
+               </div>
+               <div>
+                  <AlertTitle className="font-bold text-lg">Order Not Found</AlertTitle>
+                  <AlertDescription className="font-medium opacity-70 leading-tight">{error}</AlertDescription>
+               </div>
+            </div>
           </Alert>
         </div>
       )}
 
       {isPending && !trackingData && (
-        <div className="py-20 flex flex-col items-center justify-center text-muted-foreground">
-          <div className="relative mb-6">
-            <div className="h-16 w-16 rounded-full border-4 border-primary/10 border-t-primary animate-spin" />
-            <Icon name="search" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-primary" opticalSize={24} />
+        <div className="py-24 w-full flex flex-col items-center justify-center text-slate-400 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <div className="relative mb-10">
+            <div className="h-24 w-24 rounded-full border-[4px] border-slate-100 border-t-primary animate-spin shadow-inner" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+               <Icon name="search" className="text-primary/40" opticalSize={32} />
+            </div>
           </div>
-          <p className="font-bold tracking-tight text-lg">Searching our records...</p>
-          <p className="text-sm opacity-60">Ensuring privacy and discretion</p>
+          <h3 className="font-bold tracking-tight text-3xl text-slate-900 mb-3">Authenticating Code</h3>
+          <p className="text-base font-medium opacity-60 max-w-xs text-center leading-relaxed">
+            Please wait while we securely retrieve your private delivery status.
+          </p>
         </div>
       )}
 
@@ -303,73 +324,74 @@ function OrderTrackingView({ order }: { order: Order }) {
   const latestEvent = [...order.events].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
   const currentStatus = statusMap[order.status] || statusMap['received'];
 
-  // Calculate dynamic ETA: 2 hours after latest event, or delivered if status is completed
   const calculateETA = () => {
     if (order.status === 'completed') return "Delivered";
     if (!latestEvent) return "Today, by 6:00 PM";
-    
     const baseDate = new Date(latestEvent.date);
-    const etaDate = new Date(baseDate.getTime() + 2 * 60 * 60 * 1000); // +2 hours
-    
-    // If ETA is in the past compared to right now, set it to 1 hour from now
+    const etaDate = new Date(baseDate.getTime() + 2 * 60 * 60 * 1000);
     const now = new Date();
     const finalDate = etaDate < now ? new Date(now.getTime() + 60 * 60 * 1000) : etaDate;
-
     return finalDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
   };
 
   const etaDisplay = calculateETA();
 
   return (
-    <div className="grid gap-8 lg:grid-cols-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+    <div className="grid gap-8 lg:grid-cols-12 animate-in fade-in slide-in-from-bottom-4 duration-1000 ease-out">
       
       {/* 1. Status Hero (Centered & Polished) */}
       <div className="lg:col-span-12">
-        <div className="bg-white rounded-[2.5rem] shadow-xl border-0 p-10 flex flex-col items-center text-center relative overflow-hidden group">
-          {/* Subtle Background Elements */}
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-          <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl opacity-50 transition-all group-hover:bg-primary/10" />
+        <div className="bg-white rounded-[3rem] shadow-2xl shadow-slate-200/50 border border-slate-100 p-12 flex flex-col items-center text-center relative overflow-hidden group">
+          {/* Decorative Elements */}
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary/5 via-primary/40 to-primary/5" />
+          <div className="absolute -top-32 -right-32 w-80 h-80 bg-primary/5 rounded-full blur-[100px] opacity-60" />
+          <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-primary/5 rounded-full blur-[100px] opacity-60" />
           
           {/* Icon Section */}
-          <div className="relative mb-8">
-            <div className="h-28 w-28 rounded-full bg-primary/5 flex items-center justify-center relative z-10 transition-transform duration-500 group-hover:scale-110">
-              <div className="h-20 w-20 rounded-full bg-primary flex items-center justify-center shadow-2xl shadow-primary/30">
-                {React.createElement(currentStatus.icon, { className: "h-10 w-10 text-white stroke-[2px]" })}
+          <div className="relative mb-10">
+            <div className="h-32 w-32 rounded-full bg-slate-50 flex items-center justify-center relative z-10 transition-all duration-700 group-hover:scale-105">
+              <div className="h-24 w-24 rounded-full bg-primary flex items-center justify-center shadow-2xl shadow-primary/40 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-tr from-black/10 to-transparent opacity-50" />
+                {React.createElement(currentStatus.icon, { className: "h-12 w-12 text-white stroke-[2px] relative z-10" })}
               </div>
             </div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-36 h-36 bg-primary/5 rounded-full animate-pulse -z-0" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-44 h-44 bg-primary/5 rounded-full animate-pulse" />
           </div>
 
           {/* Text Content */}
           <div className="max-w-2xl relative z-10">
-            <div className="flex flex-col items-center gap-3 mb-4">
-              <h2 className="text-4xl font-semibold tracking-tight text-slate-900">{currentStatus.label}</h2>
-              <Badge className="bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border-0 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest">
-                <span className="relative flex h-2 w-2 mr-1.5">
+            <div className="flex flex-col items-center gap-4 mb-6">
+              <h2 className="text-5xl font-bold tracking-tight text-slate-900">{currentStatus.label}</h2>
+              <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-full border border-emerald-100/50">
+                <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
-                Real-Time Update
-              </Badge>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-700">Live Status Updated</span>
+              </div>
             </div>
             
-            <p className="text-muted-foreground font-medium text-lg leading-relaxed mb-8">
+            <p className="text-slate-500 font-medium text-xl leading-relaxed mb-10 max-w-lg mx-auto">
               {currentStatus.description}
             </p>
 
             {order.status !== 'completed' && (
-              <div className="pt-6 border-t border-slate-50 w-full max-w-xs mx-auto">
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">
+              <div className="pt-8 border-t border-slate-100 w-full max-w-xs mx-auto flex flex-col items-center">
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 mb-3">
                   Estimated Arrival
                 </p>
-                <p className="text-2xl font-semibold tracking-tight text-slate-800">
-                  Today, by {etaDisplay}
-                </p>
+                <div className="flex items-center gap-3">
+                   <Icon name="schedule" className="text-primary/60" opticalSize={20} />
+                   <p className="text-3xl font-bold tracking-tight text-slate-800">
+                    Today, <span className="text-primary">by {etaDisplay}</span>
+                  </p>
+                </div>
               </div>
             )}
           </div>
         </div>
       </div>
+
 
       {/* LEFT COLUMN: History & Details (Span 8) */}
       <div className="lg:col-span-8 space-y-8">
@@ -830,19 +852,23 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
 
 function TrackPageLoading() {
   return (
-    <div className="flex h-[50dvh] items-center justify-center">
-      <div className="relative">
-        <div className="h-16 w-16 rounded-full border-4 border-primary/10 border-t-primary animate-spin" />
-        <Icon name="search" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-primary" opticalSize={24} />
+    <div className="flex min-h-[60vh] flex-col items-center justify-center animate-in fade-in duration-700">
+      <div className="relative mb-8">
+        <div className="h-24 w-24 rounded-full border-[3px] border-slate-100 border-t-primary animate-spin" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+           <Icon name="search" className="text-primary/40" opticalSize={32} />
+        </div>
       </div>
+      <h3 className="text-2xl font-bold tracking-tight text-slate-900 mb-2">Fetching Order Data</h3>
+      <p className="text-slate-400 font-medium">Securing your private tracking details...</p>
     </div>
   );
 }
 
 export default function TrackPage() {
   return (
-    <div className="bg-white min-h-[calc(100dvh-5rem)]">
-      <div className="container mx-auto px-4 py-8 md:py-16 overflow-x-hidden">
+    <div className="bg-background min-h-screen">
+      <div className="container mx-auto px-4 py-8 md:py-24">
         <Suspense fallback={<TrackPageLoading />}>
           <Tracker />
         </Suspense>
