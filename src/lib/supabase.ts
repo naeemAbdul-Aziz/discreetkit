@@ -23,21 +23,31 @@ function normalizeCookieDomain(rawDomain?: string | null): string | undefined {
   const trimmed = rawDomain.trim();
   if (!trimmed) return undefined;
 
-  try {
-    const normalized = new URL(trimmed).hostname.toLowerCase();
-    return normalized || undefined;
-  } catch {
-    const withoutProtocol = trimmed.replace(/^https?:\/\//i, '');
-    const hostname = withoutProtocol.split('/')[0]?.split(':')[0]?.toLowerCase();
-    return hostname || undefined;
+  if (/^https?:\/\//i.test(trimmed)) {
+    try {
+      const normalized = new URL(trimmed).hostname.toLowerCase();
+      return normalized || undefined;
+    } catch {
+      return undefined;
+    }
   }
+
+  const withoutProtocol = trimmed.replace(/^https?:\/\//i, '');
+  const hostname = withoutProtocol.split('/')[0]?.split(':')[0]?.toLowerCase();
+  return hostname || undefined;
 }
 
 function resolveCookieDomain(hostOrHostname: string): string | undefined {
+  const hostname = hostOrHostname.split(':')[0].toLowerCase();
+  const isLocalhost =
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname.endsWith('.localhost');
+  if (isLocalhost) return undefined;
+
   const envCookieDomain = normalizeCookieDomain(process.env.NEXT_PUBLIC_COOKIE_DOMAIN);
   if (envCookieDomain) return envCookieDomain;
 
-  const hostname = hostOrHostname.split(':')[0].toLowerCase();
   if (hostname === 'discreetkit.com' || hostname.endsWith('.discreetkit.com')) {
     return 'discreetkit.com';
   }
