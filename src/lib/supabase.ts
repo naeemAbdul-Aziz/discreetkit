@@ -17,6 +17,34 @@ import { logger } from './logger';
 let supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
+function normalizeCookieDomain(rawDomain?: string | null): string | undefined {
+  if (!rawDomain) return undefined;
+
+  const trimmed = rawDomain.trim();
+  if (!trimmed) return undefined;
+
+  try {
+    const normalized = new URL(trimmed).hostname.toLowerCase();
+    return normalized || undefined;
+  } catch {
+    const withoutProtocol = trimmed.replace(/^https?:\/\//i, '');
+    const hostname = withoutProtocol.split('/')[0]?.split(':')[0]?.toLowerCase();
+    return hostname || undefined;
+  }
+}
+
+function resolveCookieDomain(hostOrHostname: string): string | undefined {
+  const envCookieDomain = normalizeCookieDomain(process.env.NEXT_PUBLIC_COOKIE_DOMAIN);
+  if (envCookieDomain) return envCookieDomain;
+
+  const hostname = hostOrHostname.split(':')[0].toLowerCase();
+  if (hostname === 'discreetkit.com' || hostname.endsWith('.discreetkit.com')) {
+    return 'discreetkit.com';
+  }
+
+  return undefined;
+}
+
 // Fix for "WebSocket not available" / mixed content errors in Production
 if (process.env.NODE_ENV === 'production' && supabaseUrl && supabaseUrl.startsWith('http://')) {
   supabaseUrl = supabaseUrl.replace('http://', 'https://');
@@ -35,12 +63,11 @@ export function getSupabaseClient() {
     throw new Error('getSupabaseClient() must only be called in client components (browser environment)');
   }
   if (!supabaseInstance) {
-    const cookieDomain = process.env.NEXT_PUBLIC_COOKIE_DOMAIN;
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const cookieDomain = resolveCookieDomain(window.location.hostname);
     
     supabaseInstance = createBrowserClient(supabaseUrl, supabaseAnonKey, {
       cookieOptions: {
-        ...(cookieDomain && !isLocalhost ? { domain: cookieDomain } : {}),
+        ...(cookieDomain ? { domain: cookieDomain } : {}),
       }
     });
   }
@@ -53,8 +80,7 @@ export async function createSupabaseServerClient() {
   const cookieStore = await cookies();
   const headerStore = await headers();
   const host = headerStore.get('host') || '';
-  const isLocalhost = host.includes('localhost') || host.includes('127.0.0.1');
-  const cookieDomain = process.env.NEXT_PUBLIC_COOKIE_DOMAIN;
+  const cookieDomain = resolveCookieDomain(host);
   
   return createServerClient(
     supabaseUrl,
@@ -70,7 +96,7 @@ export async function createSupabaseServerClient() {
               name,
               value,
               ...options,
-              ...(cookieDomain && !isLocalhost ? { domain: cookieDomain } : {}),
+              ...(cookieDomain ? { domain: cookieDomain } : {}),
               sameSite: 'lax',
               secure: process.env.NODE_ENV === 'production'
             })
@@ -81,7 +107,7 @@ export async function createSupabaseServerClient() {
         },
         remove(name: string, options: CookieOptions) {
           try {
-            cookieStore.set({ name, value: '', ...options, ...(cookieDomain && !isLocalhost ? { domain: cookieDomain } : {}) })
+            cookieStore.set({ name, value: '', ...options, ...(cookieDomain ? { domain: cookieDomain } : {}) })
           } catch (error) {
             // The `delete` cookie method throws when trying to delete a cookie in a Server Action.
             // This is expected, and can be safely ignored.
@@ -89,7 +115,7 @@ export async function createSupabaseServerClient() {
         },
       },
       cookieOptions: {
-         ...(cookieDomain && !isLocalhost ? { domain: cookieDomain } : {}),
+         ...(cookieDomain ? { domain: cookieDomain } : {}),
       }
     }
   );
@@ -105,8 +131,7 @@ export function createSupabaseMiddlewareClient(request: NextRequest) {
   });
 
   const host = request.headers.get('host') || '';
-  const isLocalhost = host.includes('localhost') || host.includes('127.0.0.1');
-  const cookieDomain = process.env.NEXT_PUBLIC_COOKIE_DOMAIN;
+  const cookieDomain = resolveCookieDomain(host);
   
   const supabase = createServerClient(
     supabaseUrl,
@@ -133,7 +158,7 @@ export function createSupabaseMiddlewareClient(request: NextRequest) {
               name,
               value,
               ...options,
-              ...(cookieDomain && !isLocalhost ? { domain: cookieDomain } : {}),
+              ...(cookieDomain ? { domain: cookieDomain } : {}),
               sameSite: 'lax',
               secure: process.env.NODE_ENV === 'production'
             })
@@ -141,7 +166,7 @@ export function createSupabaseMiddlewareClient(request: NextRequest) {
         },
       },
       cookieOptions: {
-         ...(cookieDomain && !isLocalhost ? { domain: cookieDomain } : {}),
+         ...(cookieDomain ? { domain: cookieDomain } : {}),
       }
     }
   );
