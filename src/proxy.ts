@@ -16,8 +16,8 @@ function withSupabaseCookies(source: NextResponse, target: NextResponse) {
     return target;
 }
 
-// Next.js 16 Edge middleware
-export async function middleware(request: NextRequest) {
+// Next.js 16 Edge proxy
+export async function proxy(request: NextRequest) {
     // 1. Initialize Supabase and check auth
     const { supabase, response } = createSupabaseMiddlewareClient(request);
     const { data: { user } } = await supabase.auth.getUser();
