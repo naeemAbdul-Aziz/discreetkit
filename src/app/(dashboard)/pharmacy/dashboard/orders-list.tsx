@@ -5,19 +5,7 @@ import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { 
-  CheckCircle, 
-  XCircle, 
-  Truck, 
-  Package, 
-  Eye, 
-  MapPin, 
-  Clock, 
-  Loader2,
-  GanttChartSquare,
-  MessageSquare,
-  Info,
-} from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -244,7 +232,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
     if (status === "processing" && ackStatus === "accepted") {
       return (
         <Badge className="gap-1.5 bg-indigo-100 text-indigo-700 border-indigo-200 hover:bg-indigo-100 hover:text-indigo-700 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none pointer-events-none">
-          <Package className="h-3 w-3" />
+          <Icon name="inventory_2" opticalSize={12} />
           Internal Prep
         </Badge>
       );
@@ -286,7 +274,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
   if (!orders || orders.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
-        <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
+        <Icon name="inventory_2" opticalSize={48} className="mx-auto mb-4 opacity-50 text-slate-300" />
         <p>No orders assigned yet</p>
       </div>
     );
@@ -301,12 +289,12 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
   const inTransitOrders = activeOrders.filter(o => o.status === "out_for_delivery");
   const completedOrders = activeOrders.filter(o => o.status === "completed");
 
-  const renderPaginatedList = (list: Order[], emptyMessage: string, EmptyIcon: any) => {
+  const renderPaginatedList = (list: Order[], emptyMessage: string, emptyIconName: string) => {
     if (list.length === 0) {
       return (
         <div className="flex flex-col items-center justify-center py-20 bg-slate-50/50 rounded-[2.5rem] border border-dashed border-slate-200">
           <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-4">
-            <EmptyIcon className="h-8 w-8 text-slate-200" />
+            <Icon name={emptyIconName} opticalSize={32} className="text-slate-200" />
           </div>
           <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">{emptyMessage}</p>
         </div>
@@ -387,15 +375,15 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
             
             <div className="text-[13px] font-medium text-slate-500 space-y-1.5 pl-4 border-l-2 border-slate-100">
               <p className="flex items-center gap-2">
-                <MapPin className="h-3.5 w-3.5 text-slate-400" />
+                <Icon name="location_on" className="text-slate-400" opticalSize={14} />
                 {order.delivery_area || "Not specified"}
               </p>
               <p className="flex items-center gap-2 font-bold text-slate-800">
-                <GanttChartSquare className="h-3.5 w-3.5 text-slate-400" />
+                <Icon name="list_alt" className="text-slate-400" opticalSize={14} />
                 {itemCount} Items • ₵{Number(order.total_price_ghs || 0).toFixed(2)}
               </p>
               <p className="text-[11px] flex items-center gap-2 opacity-60">
-                <Clock className="h-3.5 w-3.5" />
+                <Icon name="schedule" opticalSize={14} />
                 Received {new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {new Date(order.created_at).toLocaleDateString()}
               </p>
             </div>
@@ -410,7 +398,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
                   onClick={(e) => { e.stopPropagation(); handleAccept(order.id); }}
                   disabled={acceptLoading}
                 >
-                  {acceptLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
+                  {acceptLoading ? <Icon name="progress_activity" className="animate-spin" opticalSize={16} /> : <Icon name="check_circle" opticalSize={16} fill />}
                   Accept Order
                 </Button>
                 <Button
@@ -420,7 +408,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
                   onClick={(e) => { e.stopPropagation(); handleDeclineClick(order.id); }}
                   disabled={declineLoading}
                 >
-                  <XCircle className="h-4 w-4" />
+                  <Icon name="cancel" opticalSize={16} />
                   Decline
                 </Button>
               </>
@@ -430,7 +418,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
                 className="h-12 px-10 bg-brand-teal hover:bg-brand-teal-dark font-black text-sm gap-2 shadow-sm shadow-brand-teal/10"
                 onClick={(e) => { e.stopPropagation(); handleMarkOutForDelivery(order.id); }}
               >
-                <Truck className="h-5 w-5" />
+                <Icon name="local_shipping" opticalSize={20} />
                 Dispatch Order
               </Button>
             ) : order.status === "out_for_delivery" ? (
@@ -439,7 +427,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
                 className="h-12 px-10 bg-emerald-600 hover:bg-emerald-700 font-black text-sm gap-2 shadow-sm shadow-emerald-600/10"
                 onClick={(e) => { e.stopPropagation(); handleMarkCompleted(order.id); }}
               >
-                <CheckCircle className="h-5 w-5" />
+                <Icon name="check_circle" opticalSize={20} fill />
                 Confirm Delivery
               </Button>
             ) : (
@@ -449,7 +437,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
                 className="h-12 px-8 text-slate-400 font-bold text-sm gap-2"
                 disabled
               >
-                <CheckCircle className="h-5 w-5" />
+                <Icon name="check_circle" opticalSize={20} />
                 Completed
               </Button>
             )}
@@ -460,7 +448,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
               onClick={(e) => handleOpenChat(e, order.id)}
               className="h-12 w-12 text-slate-400 hover:text-brand-indigo rounded-xl bg-slate-50/50 hover:bg-brand-indigo/5"
             >
-              <MessageSquare className="h-5 w-5" />
+              <Icon name="chat" opticalSize={20} />
             </Button>
 
             <Button
@@ -469,7 +457,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
               onClick={(e) => { e.stopPropagation(); handleViewDetails(order); }}
               className="h-12 w-12 text-slate-400 hover:text-slate-900 rounded-xl"
             >
-              <Eye className="h-5 w-5" />
+              <Icon name="visibility" opticalSize={20} />
             </Button>
           </div>
         </div>
@@ -526,23 +514,23 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
         </div>
 
         <TabsContent value="incoming" className="animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
-          {renderPaginatedList(queueOrders, "No Incoming Requests", Clock)}
+          {renderPaginatedList(queueOrders, "No Incoming Requests", "schedule")}
         </TabsContent>
 
         <TabsContent value="preparing" className="animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
-          {renderPaginatedList(processingOrders, "Nothing in Preparation", Package)}
+          {renderPaginatedList(processingOrders, "Nothing in Preparation", "inventory_2")}
         </TabsContent>
 
         <TabsContent value="outbound" className="animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
-          {renderPaginatedList(inTransitOrders, "No Outbound Operations", Truck)}
+          {renderPaginatedList(inTransitOrders, "No Outbound Operations", "local_shipping")}
         </TabsContent>
 
         <TabsContent value="completed" className="animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
-          {renderPaginatedList(completedOrders, "No Dispatch History", CheckCircle)}
+          {renderPaginatedList(completedOrders, "No Dispatch History", "check_circle")}
         </TabsContent>
 
         <TabsContent value="all" className="animate-in fade-in-50 slide-in-from-bottom-2 duration-500 focus-visible:outline-none">
-          {renderPaginatedList(activeOrders, "No Records Found", Info)}
+          {renderPaginatedList(activeOrders, "No Records Found", "info")}
         </TabsContent>
       </Tabs>
 

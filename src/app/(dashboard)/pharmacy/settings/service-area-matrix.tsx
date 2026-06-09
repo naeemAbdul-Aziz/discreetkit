@@ -12,17 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { 
-    Plus, 
-    Trash2, 
-    Edit2, 
-    Check, 
-    X, 
-    MapPin, 
-    Clock, 
-    GanttChartSquare,
-    Loader2
-} from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { 
     updateServiceArea, 
     removeServiceArea, 
@@ -141,7 +131,7 @@ export function ServiceAreaMatrix({ initialAreas }: ServiceAreaMatrixProps) {
                     onClick={() => setIsAdding(!isAdding)}
                     className="h-8 gap-2"
                 >
-                    {isAdding ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                    {isAdding ? <Icon name="close" opticalSize={16} /> : <Icon name="add" opticalSize={16} />}
                     {isAdding ? "Cancel" : "Add New Area"}
                 </Button>
             </div>
@@ -211,7 +201,7 @@ export function ServiceAreaMatrix({ initialAreas }: ServiceAreaMatrixProps) {
                                         disabled={loading === "adding"}
                                         className="bg-brand-teal hover:bg-brand-teal-dark h-8 px-4"
                                     >
-                                        {loading === "adding" ? <Loader2 className="h-4 w-4 animate-spin" /> : "Confirm"}
+                                        {loading === "adding" ? <Icon name="progress_activity" className="animate-spin" opticalSize={16} /> : "Confirm"}
                                     </Button>
                                 </TableCell>
                             </TableRow>
@@ -221,7 +211,7 @@ export function ServiceAreaMatrix({ initialAreas }: ServiceAreaMatrixProps) {
                         {areas.length === 0 && !isAdding ? (
                             <TableRow>
                                 <TableCell colSpan={5} className="h-32 text-center text-slate-400">
-                                    <MapPin className="h-8 w-8 mx-auto mb-2 opacity-20" />
+                                    <Icon name="location_on" className="h-8 w-8 mx-auto mb-2 opacity-20" opticalSize={32} />
                                     <p className="text-xs font-medium">No service areas defined.</p>
                                 </TableCell>
                             </TableRow>
@@ -238,7 +228,7 @@ export function ServiceAreaMatrix({ initialAreas }: ServiceAreaMatrixProps) {
                                                     "w-8 h-8 rounded-lg flex items-center justify-center transition-colors",
                                                     area.is_active ? "bg-slate-100 group-hover:bg-white" : "bg-slate-50 opacity-50"
                                                 )}>
-                                                    <MapPin className={cn("h-4 w-4", area.is_active ? "text-slate-600" : "text-slate-400")} />
+                                                    <Icon name="location_on" className={cn("text-sm", area.is_active ? "text-slate-600" : "text-slate-400")} opticalSize={18} />
                                                 </div>
                                                 <div>
                                                     <p className={cn("text-[13px] font-bold", !area.is_active && "text-slate-400 line-through")}>{area.area_name}</p>
@@ -276,7 +266,7 @@ export function ServiceAreaMatrix({ initialAreas }: ServiceAreaMatrixProps) {
                                                 </Select>
                                             ) : (
                                                 <div className="flex items-center gap-1.5 text-slate-500">
-                                                    <Clock className="h-3 w-3" />
+                                                    <Icon name="schedule" className="text-slate-400" opticalSize={14} />
                                                     <span className="text-[12px] font-medium">{area.max_delivery_time_hours}h max</span>
                                                 </div>
                                             )}
@@ -299,7 +289,7 @@ export function ServiceAreaMatrix({ initialAreas }: ServiceAreaMatrixProps) {
                                                             onClick={() => handleSave(area.id)}
                                                             disabled={isPending}
                                                         >
-                                                            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                                                            {isPending ? <Icon name="progress_activity" className="animate-spin" opticalSize={16} /> : <Icon name="check" opticalSize={16} />}
                                                         </Button>
                                                         <Button 
                                                             size="icon" 
@@ -308,7 +298,7 @@ export function ServiceAreaMatrix({ initialAreas }: ServiceAreaMatrixProps) {
                                                             onClick={() => setEditingId(null)}
                                                             disabled={isPending}
                                                         >
-                                                            <X className="h-4 w-4" />
+                                                            <Icon name="close" opticalSize={16} />
                                                         </Button>
                                                     </>
                                                 ) : (
@@ -319,7 +309,7 @@ export function ServiceAreaMatrix({ initialAreas }: ServiceAreaMatrixProps) {
                                                             className="h-8 w-8 text-slate-400 hover:bg-slate-100"
                                                             onClick={() => handleEdit(area)}
                                                         >
-                                                            <Edit2 className="h-4 w-4" />
+                                                            <Icon name="edit" opticalSize={16} />
                                                         </Button>
                                                         <Button 
                                                             size="icon" 
@@ -327,7 +317,7 @@ export function ServiceAreaMatrix({ initialAreas }: ServiceAreaMatrixProps) {
                                                             className="h-8 w-8 text-rose-400 hover:bg-rose-50"
                                                             onClick={() => handleDelete(area.id)}
                                                         >
-                                                            <Trash2 className="h-4 w-4" />
+                                                            <Icon name="delete" opticalSize={16} />
                                                         </Button>
                                                     </>
                                                 )}

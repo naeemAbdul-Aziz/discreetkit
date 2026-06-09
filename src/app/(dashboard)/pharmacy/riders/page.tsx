@@ -2,12 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -28,21 +23,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  Plus, 
-  Trash2, 
-  Truck, 
-  Phone, 
-  User, 
-  ChevronRight,
-  ShieldCheck,
-  AlertCircle,
-  Loader2
-} from "lucide-react";
 import { getSupabaseClient } from "@/lib/supabase";
 import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { Icon } from "@/components/ui/icon";
 
 interface Rider {
   id: number;
@@ -182,25 +166,37 @@ export default function RidersPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center p-24 gap-4">
-        <Loader2 className="h-10 w-10 text-brand-indigo animate-spin" />
-        <p className="text-xs font-black uppercase tracking-widest text-slate-400">Syncing Registry...</p>
+      <div className="space-y-6 animate-in fade-in duration-1000">
+        <div className="space-y-2">
+          <div className="h-9 w-48 bg-slate-100 rounded-lg animate-pulse" />
+          <div className="h-4 w-72 bg-slate-100 rounded animate-pulse" />
+        </div>
+        <div className="flex flex-col items-center justify-center py-32 gap-4">
+          <Icon name="progress_activity" className="text-brand-indigo animate-spin" opticalSize={40} />
+          <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Syncing Registry...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-4 md:p-12 space-y-8 animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-2">
+    <div className="space-y-8 animate-in fade-in duration-1000">
+      {/* Page Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
-           <h1 className="text-2xl font-black tracking-tight text-slate-900 uppercase">Dispatch Personnel</h1>
-           <p className="text-[10px] uppercase font-bold text-slate-400 tracking-[0.2em]">Manage your unbranded delivery riders</p>
+          <h1 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900">
+            Dispatch Personnel
+          </h1>
+          <p className="text-sm font-medium text-slate-500 flex items-center gap-2">
+            <Icon name="local_shipping" className="text-brand-teal" opticalSize={16} fill />
+            Manage your unbranded delivery riders
+          </p>
         </div>
 
         <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
           <DialogTrigger asChild>
             <Button className="h-11 px-6 rounded-xl bg-brand-indigo hover:bg-brand-indigo/90 font-bold text-sm gap-2 shadow-sm">
-              <Plus className="h-4 w-4" /> Register Rider
+              <Icon name="add" opticalSize={18} /> Register Rider
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-md p-8 rounded-3xl border border-slate-100 shadow-2xl">
@@ -243,7 +239,7 @@ export default function RidersPage() {
 
       {riders.length === 0 ? (
         <div className="flex flex-col items-center justify-center p-24 text-center bg-white rounded-[2rem] border border-slate-200 shadow-sm">
-           <Truck className="h-12 w-12 text-slate-200 mb-4" />
+           <Icon name="local_shipping" className="text-slate-200 mb-4" opticalSize={48} />
            <h3 className="text-lg font-black text-slate-900 tracking-tight">No riders registered</h3>
            <p className="text-slate-500 max-w-sm mt-2 font-medium text-sm leading-relaxed">
              You haven&apos;t added any personnel to your team. Register a rider to fulfill inbound requests.
@@ -269,7 +265,7 @@ export default function RidersPage() {
                         "w-10 h-10 rounded-xl flex items-center justify-center shadow-inner",
                         rider.is_active ? "bg-emerald-50 text-brand-teal" : "bg-slate-100 text-slate-400"
                       )}>
-                        <User className="h-4 w-4" />
+                        <Icon name="person" opticalSize={18} fill={rider.is_active} />
                       </div>
                       <div>
                         <h3 className="text-sm font-bold text-slate-900 tracking-tight">{rider.name}</h3>
@@ -301,7 +297,7 @@ export default function RidersPage() {
                       onClick={() => handleDelete(rider.id)}
                       className="h-8 w-8 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Icon name="delete" opticalSize={18} />
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -311,15 +307,15 @@ export default function RidersPage() {
         </Card>
       )}
 
-      {/* Compliance / Security Section */}
-      <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-6 mt-8">
+      {/* Privacy Compliance Section */}
+      <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6">
          <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-sm">
-               <ShieldCheck className="h-5 w-5 text-brand-indigo" />
+               <Icon name="shield" className="text-brand-indigo" opticalSize={20} fill />
             </div>
             <div className="space-y-1">
-               <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Privacy Protocol</h4>
-               <p className="text-[11px] font-medium text-slate-500 leading-relaxed max-w-xl">
+               <h4 className="text-xs font-black text-slate-900 uppercase tracking-widest">Privacy Protocol</h4>
+               <p className="text-xs font-medium text-slate-500 leading-relaxed max-w-xl">
                  Riders must use 100% unbranded packaging. All deliveries are strictly confidential. Interactions are monitored for compliance.
                </p>
             </div>

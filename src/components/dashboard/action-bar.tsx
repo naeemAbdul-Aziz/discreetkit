@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Search, Filter, ArrowUpDown, X } from "lucide-react"
+import { Icon } from "@/components/ui/icon"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import {
@@ -42,7 +42,7 @@ export function ActionBar({
   return (
     <div className={cn("flex flex-col sm:flex-row items-center gap-3 bg-white p-2 rounded-xl border border-slate-200 shadow-sm mb-6", className)}>
       <div className="relative flex-1 w-full">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+        <Icon name="search" opticalSize={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
         <Input
           placeholder={placeholder}
           value={searchTerm}
@@ -54,7 +54,7 @@ export function ActionBar({
             onClick={() => onSearchChange("")}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
           >
-            <X className="h-3.5 w-3.5" />
+            <Icon name="close" opticalSize={14} />
           </button>
         )}
       </div>
@@ -64,7 +64,7 @@ export function ActionBar({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="h-10 gap-2 border-slate-200 text-slate-600 font-medium rounded-lg px-4 hover:bg-slate-50 transition-all">
-                <Filter className="h-4 w-4" />
+                <Icon name="filter_list" opticalSize={16} />
                 <span className="hidden lg:inline">{activeFilter ? filters.find(f => f.value === activeFilter)?.label : "Filter"}</span>
               </Button>
             </DropdownMenuTrigger>
@@ -91,7 +91,7 @@ export function ActionBar({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="h-10 gap-2 border-slate-200 text-slate-600 font-medium rounded-lg px-4 hover:bg-slate-50 transition-all">
-                <ArrowUpDown className="h-4 w-4" />
+                <Icon name="swap_vert" opticalSize={16} />
                 <span className="hidden lg:inline">Sort</span>
               </Button>
             </DropdownMenuTrigger>
