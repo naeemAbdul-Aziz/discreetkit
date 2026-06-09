@@ -232,7 +232,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
     if (status === "processing" && ackStatus === "accepted") {
       return (
         <Badge className="gap-1.5 bg-indigo-100 text-indigo-700 border-indigo-200 hover:bg-indigo-100 hover:text-indigo-700 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none pointer-events-none">
-          <Package className="h-3 w-3" />
+          <Icon name="inventory_2" opticalSize={12} />
           Internal Prep
         </Badge>
       );
