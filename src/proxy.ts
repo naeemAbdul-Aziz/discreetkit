@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { createSupabaseMiddlewareClient, getUserRoles } from './lib/supabase';
+import { createSupabaseMiddlewareClient, getUserRoles } from './lib/supabase-mw';
 import { rlAllowDistributed } from "./lib/rate-limit";
 
 // Define rate limit configuration
@@ -16,7 +16,7 @@ function withSupabaseCookies(source: NextResponse, target: NextResponse) {
     return target;
 }
 
-// Renamed from middleware to proxy for Next.js 16
+// Next.js 16 Edge proxy
 export async function proxy(request: NextRequest) {
     // 1. Initialize Supabase and check auth
     const { supabase, response } = createSupabaseMiddlewareClient(request);
