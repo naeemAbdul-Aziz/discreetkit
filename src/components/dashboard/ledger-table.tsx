@@ -10,20 +10,7 @@ import {
     TableRow 
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { 
-    DollarSign, 
-    Package, 
-    Truck, 
-    Repeat, 
-    Clock, 
-    Search, 
-    Filter,
-    ArrowUpRight,
-    ArrowDownRight,
-    FileText,
-    ChevronDown,
-    ChevronUp
-} from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import type { LedgerEntry, LedgerCategory } from "@/lib/admin-actions";
@@ -59,10 +46,10 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
 
     const getCategoryIcon = (category: LedgerCategory) => {
         switch (category) {
-            case 'FINANCE': return <DollarSign className="h-3.5 w-3.5" />;
-            case 'DISPENSATION': return <Package className="h-3.5 w-3.5" />;
-            case 'LOGISTICS': return <Truck className="h-3.5 w-3.5" />;
-            case 'SUBSCRIPTION': return <Repeat className="h-3.5 w-3.5" />;
+            case 'FINANCE': return <Icon name="payments" opticalSize={14} />;
+            case 'DISPENSATION': return <Icon name="inventory_2" opticalSize={14} />;
+            case 'LOGISTICS': return <Icon name="local_shipping" opticalSize={14} />;
+            case 'SUBSCRIPTION': return <Icon name="autorenew" opticalSize={14} />;
         }
     };
 
@@ -80,7 +67,7 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
             {/* Filters Bar */}
             <div className="flex flex-col md:flex-row items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
                 <div className="relative flex-1 w-full">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Icon name="search" opticalSize={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input 
                         type="text" 
                         placeholder="Search by order code, pharmacy, or event..." 
@@ -139,7 +126,7 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
                                                 {format(new Date(entry.timestamp), "MMM dd, yyyy")}
                                             </span>
                                             <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1.5 uppercase tracking-tighter">
-                                                <Clock className="h-3 w-3" />
+                                                <Icon name="schedule" opticalSize={12} className="text-slate-400" />
                                                 {format(new Date(entry.timestamp), "HH:mm:ss")}
                                             </span>
                                         </div>
@@ -164,7 +151,7 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
                                                 </span>
                                                 {entry.items && (
                                                     <button className="text-brand-indigo hover:text-brand-indigo/80 p-0.5 transition-transform group-hover:scale-110">
-                                                        {expandedRows.has(entry.id) ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+                                                        {expandedRows.has(entry.id) ? <Icon name="expand_less" opticalSize={14} /> : <Icon name="expand_more" opticalSize={14} />}
                                                     </button>
                                                 )}
                                             </div>
@@ -180,7 +167,7 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
                                     <TableCell className="py-5">
                                         <div className="flex items-center gap-2 font-mono text-xs font-black text-slate-400 uppercase tracking-tighter">
                                             {entry.order_code || "DK-AUDIT"}
-                                            <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                            <Icon name="arrow_outward" opticalSize={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
                                         </div>
                                     </TableCell>
                                     <TableCell className="py-5 text-right pr-8">
@@ -212,7 +199,7 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
                                                             <div key={idx} className="px-4 py-3 flex items-center justify-between hover:bg-slate-50/30 transition-colors">
                                                                 <div className="flex items-center gap-3">
                                                                     <div className="h-7 w-7 rounded-lg bg-slate-100 flex items-center justify-center">
-                                                                        <FileText className="h-3.5 w-3.5 text-slate-400" />
+                                                                        <Icon name="description" opticalSize={14} className="text-slate-400" />
                                                                     </div>
                                                                     <span className="text-xs font-bold text-slate-700">{item.name}</span>
                                                                 </div>
@@ -242,7 +229,7 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
                 {filtered.length === 0 && (
                     <div className="py-32 text-center">
                         <div className="h-16 w-16 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-4">
-                            <Filter className="h-8 w-8 text-slate-200" />
+                            <Icon name="filter_list" opticalSize={32} className="text-slate-200" />
                         </div>
                         <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">No audit records match</h3>
                         <p className="text-xs text-slate-500 font-medium mt-1">Try adjusting your filters or search query.</p>

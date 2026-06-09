@@ -10,19 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import {
-  Package,
-  MapPin,
-  Calendar,
-  CheckCircle,
-  XCircle,
-  Truck,
-  ChevronLeft,
-  GanttChartSquare,
-  Clock,
-  ArrowRight,
-  Info
-} from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { OrderMessages } from "@/components/order-messages";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -57,7 +45,7 @@ export function OrderDetailsSheet({
 
   const getStatusBadge = (status: string, ackStatus?: string) => {
     if (status === "processing" && ackStatus === "accepted") {
-      return <Badge variant="success" className="gap-1.5 px-3 py-1 bg-teal-50 text-brand-teal border-teal-100 font-black uppercase text-[9px] tracking-widest rounded-md"><Package className="h-3 w-3" /> Fulfilling</Badge>;
+      return <Badge variant="success" className="gap-1.5 px-3 py-1 bg-teal-50 text-brand-teal border-teal-100 font-black uppercase text-[9px] tracking-widest rounded-md"><Icon name="inventory_2" opticalSize={12} /> Fulfilling</Badge>;
     }
     const variants: any = {
       received: { variant: "secondary", label: "Awaiting Action", color: "bg-slate-100 text-slate-600" },
@@ -70,10 +58,10 @@ export function OrderDetailsSheet({
   };
 
   const steps = [
-    { id: "received", label: "Queue", icon: Clock },
-    { id: "processing", label: "Prep", icon: Package },
-    { id: "delivery", label: "Logistics", icon: Truck },
-    { id: "completed", label: "Finalized", icon: CheckCircle },
+    { id: "received", label: "Queue", icon: "schedule" },
+    { id: "processing", label: "Prep", icon: "inventory_2" },
+    { id: "delivery", label: "Logistics", icon: "local_shipping" },
+    { id: "completed", label: "Finalized", icon: "check_circle" },
   ];
 
   const getCurrentStepIndex = () => {
@@ -92,12 +80,12 @@ export function OrderDetailsSheet({
           <SheetHeader className="space-y-6">
             <div className="flex items-center justify-between">
               <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onOpenChange(false)}
-                className="h-10 w-10 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-900 transition-all"
-              >
-                <ChevronLeft className="h-5 w-5" />
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onOpenChange(false)}
+                        className="h-10 w-10 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-slate-900 transition-all"
+                      >
+                        <Icon name="chevron_left" opticalSize={20} />
               </Button>
               {getStatusBadge(order.status, order.pharmacy_ack_status)}
             </div>
@@ -136,7 +124,7 @@ export function OrderDetailsSheet({
                           : "bg-white border-slate-50 text-slate-300"
                       )}
                     >
-                      <step.icon className="h-4 w-4" />
+                      <Icon name={step.icon as string} opticalSize={16} className="text-current" />
                     </motion.div>
                     <span className={cn(
                       "text-[9px] font-black uppercase tracking-[0.15em] transition-colors duration-500",
@@ -154,7 +142,7 @@ export function OrderDetailsSheet({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="p-6 rounded-[2rem] bg-slate-50/50 border border-slate-100/50 space-y-4 group hover:bg-white hover:shadow-xl hover:shadow-slate-200/20 transition-all">
                <div className="flex items-center gap-2 text-brand-indigo opacity-60 group-hover:opacity-100">
-                  <MapPin className="h-3.5 w-3.5" />
+                  <Icon name="location_on" opticalSize={14} />
                   <span className="text-[9px] font-black uppercase tracking-widest">Delivery Address</span>
                </div>
                <div className="space-y-2">
@@ -171,7 +159,7 @@ export function OrderDetailsSheet({
 
             <div className="p-6 rounded-[2rem] bg-slate-50/50 border border-slate-100/50 space-y-4 group hover:bg-white hover:shadow-xl hover:shadow-slate-200/20 transition-all">
                <div className="flex items-center gap-2 text-brand-indigo opacity-60 group-hover:opacity-100">
-                  <Calendar className="h-3.5 w-3.5" />
+                  <Icon name="calendar_today" opticalSize={14} />
                   <span className="text-[9px] font-black uppercase tracking-widest">Order Timeline</span>
                </div>
                <div className="space-y-1">
@@ -185,7 +173,7 @@ export function OrderDetailsSheet({
           <div className="space-y-6">
             <div className="flex items-center justify-between px-2">
                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2.5">
-                 <Package className="h-3.5 w-3.5 text-brand-indigo" /> Order Items
+                 <Icon name="inventory_2" opticalSize={14} className="text-brand-indigo" /> Order Items
                </h3>
                <span className="text-[10px] font-black bg-slate-900 text-white px-3 py-1 rounded-full uppercase tracking-tighter shadow-lg shadow-slate-900/10">
                  {itemsArray.length} Selected Items
@@ -238,7 +226,7 @@ export function OrderDetailsSheet({
           {/* Order Actions */}
           <div className="space-y-6 pb-12">
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2.5 px-2">
-               <ArrowRight className="h-3.5 w-3.5 text-brand-indigo" /> Order Actions
+               <Icon name="arrow_forward" opticalSize={14} className="text-brand-indigo" /> Order Actions
             </h3>
             <div className="grid gap-4">
               {order.status === "received" && order.pharmacy_ack_status === "pending" && (
@@ -249,7 +237,7 @@ export function OrderDetailsSheet({
                     onClick={onAccept}
                     loading={loading && loadingAction === "accept"}
                   >
-                    {!loading && <CheckCircle className="h-5 w-5" />}
+                     {!loading && <Icon name="check_circle" opticalSize={20} fill />}
                     Accept Order
                   </Button>
                   <Button
@@ -259,7 +247,7 @@ export function OrderDetailsSheet({
                     onClick={onDecline}
                     loading={loading && loadingAction === "decline"}
                   >
-                    {!loading && <XCircle className="h-4 w-4" />}
+                     {!loading && <Icon name="cancel" opticalSize={16} />}
                     Decline Order
                   </Button>
                 </div>
@@ -272,7 +260,7 @@ export function OrderDetailsSheet({
                   onClick={onMarkOutForDelivery}
                   loading={loading && loadingAction === "out_for_delivery"}
                 >
-                  {!loading && <Truck className="h-6 w-6" />}
+                   {!loading && <Icon name="local_shipping" opticalSize={24} />}
                   Ready for Delivery
                 </Button>
               )}
@@ -284,7 +272,7 @@ export function OrderDetailsSheet({
                   onClick={onMarkCompleted}
                   loading={loading && loadingAction === "completed"}
                 >
-                   {!loading && <CheckCircle className="h-6 w-6" />}
+                    {!loading && <Icon name="check_circle" opticalSize={24} fill />}
                    Mark as Delivered
                 </Button>
               )}
@@ -293,7 +281,7 @@ export function OrderDetailsSheet({
             {/* Communication Hub Integration */}
             <div className="pt-8 space-y-6 border-t border-slate-100">
                <div className="flex items-center gap-2.5 px-2">
-                  <GanttChartSquare className="h-3.5 w-3.5 text-brand-indigo" />
+                  <Icon name="list_alt" opticalSize={14} className="text-brand-indigo" />
                   <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Order Chat</h3>
                </div>
                <div className="bg-slate-50/50 rounded-[2.5rem] border border-slate-100/50 overflow-hidden">
@@ -303,7 +291,7 @@ export function OrderDetailsSheet({
             
             <div className="bg-indigo-50/50 p-6 rounded-[2rem] border border-indigo-100/50 flex items-start gap-4 transition-all hover:bg-indigo-50">
                <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center border border-indigo-100 shadow-sm shrink-0">
-                  <Info className="h-5 w-5 text-brand-indigo" />
+                  <Icon name="info" opticalSize={20} className="text-brand-indigo" fill />
                </div>
                <div className="space-y-1">
                   <p className="text-[10px] font-black uppercase tracking-widest text-indigo-900/60 block mb-1">Processing Note</p>

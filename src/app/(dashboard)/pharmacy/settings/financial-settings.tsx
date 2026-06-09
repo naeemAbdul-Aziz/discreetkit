@@ -7,10 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Landmark, Smartphone, Save, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { useEffect } from "react";
+import { Icon } from "@/components/ui/icon";
 
 interface FinancialSettingsProps {
     initialBankDetails: any;
@@ -44,7 +45,7 @@ export default function FinancialSettings({ initialBankDetails, initialMomoDetai
                     <CardHeader className="pb-4">
                         <div className="flex items-center gap-3 mb-2">
                             <div className="p-2 bg-brand-teal/10 rounded-lg">
-                                <Landmark className="h-5 w-5 text-brand-teal" />
+                                <Icon name="account_balance" className="text-brand-teal" opticalSize={20} />
                             </div>
                             <div>
                                 <CardTitle className="text-xl font-black text-slate-900">Bank Account</CardTitle>
@@ -104,7 +105,7 @@ export default function FinancialSettings({ initialBankDetails, initialMomoDetai
                     <CardHeader className="pb-4">
                         <div className="flex items-center gap-3 mb-2">
                             <div className="p-2 bg-amber-500/10 rounded-lg">
-                                <Smartphone className="h-5 w-5 text-amber-500" />
+                                <Icon name="smartphone" className="text-amber-500" opticalSize={20} />
                             </div>
                             <div>
                                 <CardTitle className="text-xl font-black text-slate-900">Mobile Money</CardTitle>
@@ -150,7 +151,7 @@ export default function FinancialSettings({ initialBankDetails, initialMomoDetai
 
                             <div className="mt-4 p-4 rounded-xl bg-slate-100 border border-slate-200 space-y-2">
                                 <div className="flex items-center gap-2 text-slate-600">
-                                    <AlertCircle className="h-4 w-4" />
+                                    <Icon name="info" className="text-slate-500" opticalSize={16} fill />
                                     <span className="text-[10px] font-black uppercase tracking-widest">Payout Note</span>
                                 </div>
                                 <p className="text-[10px] text-slate-500 font-bold leading-relaxed">
@@ -171,12 +172,12 @@ export default function FinancialSettings({ initialBankDetails, initialMomoDetai
                 >
                     {isPending ? (
                         <>
-                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <Icon name="progress_activity" className="animate-spin" opticalSize={16} />
                             Synchronizing...
                         </>
                     ) : (
                         <>
-                            <Save className="h-4 w-4" />
+                            <Icon name="save" opticalSize={16} />
                             Update Financial Profile
                         </>
                     )}

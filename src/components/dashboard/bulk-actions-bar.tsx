@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Trash2, CheckCircle2, MoreHorizontal, X, ArrowRight } from "lucide-react"
+import { Icon } from "@/components/ui/icon"
 import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
@@ -72,7 +72,7 @@ export function BulkActionsBar({
               className="ml-2 h-8 w-8 rounded-full flex items-center justify-center bg-white/10 hover:bg-white/20 transition-colors"
               title="Clear selection"
             >
-              <X className="h-4 w-4" />
+              <Icon name="close" opticalSize={16} />
             </button>
           </div>
         </motion.div>

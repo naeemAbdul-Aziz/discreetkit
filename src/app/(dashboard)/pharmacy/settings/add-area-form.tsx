@@ -4,7 +4,7 @@ import { useFormStatus } from "react-dom";
 import { addServiceArea } from "@/lib/pharmacy-actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { useToast } from "@/hooks/use-toast";
 
 import {
@@ -20,7 +20,7 @@ function SubmitButton() {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" className="w-full" disabled={pending}>
-      <Plus className="mr-2 h-4 w-4" /> {pending ? "Adding..." : "Add Area"}
+      <Icon name="add" opticalSize={16} className="mr-2" /> {pending ? "Adding..." : "Add Area"}
     </Button>
   );
 }

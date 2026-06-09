@@ -6,18 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { 
-  Search, 
-  Package, 
-  AlertTriangle, 
-  Plus, 
-  LayoutGrid, 
-  History,
-  TrendingDown,
-  Info,
-  CheckCircle2,
-  Clock
-} from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import {
   toggleProductAvailability,
   updateProductStock,
@@ -115,14 +104,14 @@ const ProductGrid = ({
               />
             ) : (
               <div className="h-full w-full flex items-center justify-center text-slate-300">
-                <Package className="h-10 w-10 opacity-30" />
+                <Icon name="inventory_2" opticalSize={40} className="opacity-30" />
               </div>
             )}
             
             {/* Prescription Badge */}
             {product.requires_prescription && (
               <div className="absolute top-2 left-2 bg-amber-50/90 backdrop-blur-sm border border-amber-200 px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm">
-                <AlertTriangle className="h-3 w-3 text-amber-600" />
+                <Icon name="warning" opticalSize={12} className="text-amber-600" />
                 <span className="text-[10px] font-black text-amber-800 uppercase tracking-tighter">Rx Required</span>
               </div>
             )}
@@ -241,16 +230,11 @@ export default function InventoryClient({
   }
 
   return (
-    <div className="max-w-7xl mx-auto py-6 px-4 space-y-6 animate-in fade-in duration-500">
+    <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-           <h1 className="text-2xl font-bold tracking-tight text-slate-900">Inventory</h1>
-           <p className="text-slate-500 font-medium text-sm mt-1">Manage your stock and products here.</p>
-        </div>
-
         <div className="flex items-center gap-3 w-full md:w-auto">
           <div className="relative flex-1 md:w-80">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Icon name="search" opticalSize={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
             <Input
               type="search"
               placeholder="Filter by name or therapeutic class..."
@@ -264,7 +248,7 @@ export default function InventoryClient({
             className="h-11 px-6 rounded-xl bg-brand-indigo hover:bg-brand-indigo/90 font-bold text-sm gap-2 shrink-0 shadow-sm transition-all"
             onClick={() => setIsRequestOpen(true)}
           >
-            <Plus className="h-4 w-4" />
+            <Icon name="add" opticalSize={16} />
             <span className="hidden sm:inline">Request Product</span>
           </Button>
         </div>
@@ -300,7 +284,7 @@ export default function InventoryClient({
           />
           {filteredProducts.length === 0 && (
             <div className="flex flex-col items-center justify-center h-96 text-center bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
-              <Package className="h-16 w-16 text-slate-200 mb-4" />
+              <Icon name="inventory_2" opticalSize={64} className="text-slate-200 mb-4" />
               <h3 className="text-xl font-bold text-slate-900">No matches found</h3>
               <p className="text-slate-400 max-w-xs mt-2 font-medium">We couldn&apos;t find any products matching &quot;{search}&quot; in your catalog.</p>
             </div>
@@ -316,7 +300,7 @@ export default function InventoryClient({
           />
            {lowStockProducts.length === 0 && (
             <div className="flex flex-col items-center justify-center h-96 text-center bg-teal-50/50 rounded-3xl border-2 border-dashed border-teal-100">
-              <CheckCircle2 className="h-16 w-16 text-emerald-200 mb-4" />
+              <Icon name="check_circle" opticalSize={64} className="text-emerald-200 mb-4" fill />
               <h3 className="text-xl font-bold text-emerald-900">Inventory Healthy</h3>
               <p className="text-emerald-600/60 max-w-xs mt-2 font-medium">All active items are currently above the critical stock threshold.</p>
             </div>
@@ -327,7 +311,7 @@ export default function InventoryClient({
             <div className="grid gap-4">
               {requests.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-64 text-center bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
-                  <History className="h-12 w-12 text-slate-200 mb-3" />
+                  <Icon name="history" opticalSize={48} className="text-slate-200 mb-3" />
                   <p className="text-slate-400 font-bold">No synchronization requests.</p>
                 </div>
               ) : (
@@ -343,14 +327,14 @@ export default function InventoryClient({
                           </div>
                           {req.description && <p className="text-sm font-medium text-slate-500 line-clamp-1">{req.description}</p>}
                           <p className="text-[10px] font-black text-slate-400 flex items-center gap-1.5 uppercase tracking-wider mt-2">
-                             <Clock className="h-3 w-3" /> Submitted {new Date(req.created_at).toLocaleDateString()}
+                             <Icon name="schedule" opticalSize={12} className="text-slate-400" /> Submitted {new Date(req.created_at).toLocaleDateString()}
                           </p>
                        </div>
                        
                        {req.admin_notes && (
                           <div className="md:max-w-md w-full bg-slate-50 p-4 rounded-xl border border-slate-100 relative group-hover:bg-brand-indigo/5 group-hover:border-brand-indigo/10 transition-colors">
                              <div className="flex items-center gap-2 mb-2">
-                                <Info className="h-3.5 w-3.5 text-brand-indigo" />
+                                <Icon name="info" opticalSize={14} className="text-brand-indigo" />
                                 <span className="text-[10px] font-black uppercase tracking-widest text-brand-indigo">Direct Response</span>
                              </div>
                              <p className="text-xs font-medium text-slate-600 leading-relaxed italic">{req.admin_notes}</p>
