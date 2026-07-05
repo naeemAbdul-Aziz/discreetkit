@@ -73,19 +73,6 @@ export function DashboardSidebar() {
         { href: "/pharmacy/settings", label: "Settings", icon: "settings" },
       ];
 
-      // Strip prefixes if on subdomain
-      if (
-        typeof window !== "undefined" &&
-        window.location.hostname.startsWith("pharmacy.")
-      ) {
-        return basePharmacyItems.map((item) => ({
-          ...item,
-          href:
-            item.href === "/pharmacy/dashboard"
-              ? "/"
-              : item.href.replace("/pharmacy", ""),
-        }));
-      }
       return basePharmacyItems;
     }
 
@@ -102,17 +89,6 @@ export function DashboardSidebar() {
         { href: "/admin/refills", label: "Refills", icon: "history_edu" },
         { href: "/admin/settings", label: "Settings", icon: "settings" },
       ];
-
-      // Strip prefixes if on subdomain
-      if (
-        typeof window !== "undefined" &&
-        window.location.hostname.startsWith("admin.")
-      ) {
-        return baseItems.map((item) => ({
-          ...item,
-          href: item.href === "/admin" ? "/" : item.href.replace("/admin", ""),
-        }));
-      }
 
       return baseItems;
     }
