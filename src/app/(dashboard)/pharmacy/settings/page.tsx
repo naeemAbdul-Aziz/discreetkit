@@ -21,28 +21,38 @@ const NAV_ITEMS = [
 ];
 
 export default function PharmacySettingsPage() {
-    const [activeTab, setActiveTab] = useState("operational");
+    const [activeTab, setActiveTab] = useState("profile");
     const [serviceAreas, setServiceAreas] = useState<any[]>([]);
     const [profile, setProfile] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        async function load() {
-            try {
-                const [areas, prof] = await Promise.all([
-                    getPharmacyServiceAreas(),
-                    getPharmacyProfile()
-                ]);
-                setServiceAreas(areas);
-                setProfile(prof);
-            } catch (e) {
-                console.error(e);
-            } finally {
-                setLoading(false);
-            }
+    async function load() {
+        try {
+            const [areas, prof] = await Promise.all([
+                getPharmacyServiceAreas(),
+                getPharmacyProfile()
+            ]);
+            setServiceAreas(areas);
+            setProfile(prof);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoading(false);
         }
+    }
+
+    useEffect(() => {
         load();
     }, []);
+
+    const refetchProfile = async () => {
+        try {
+            const prof = await getPharmacyProfile();
+            setProfile(prof);
+        } catch (e) {
+            console.error("Error refetching pharmacy profile:", e);
+        }
+    };
 
     if (loading) {
         return (
@@ -70,7 +80,7 @@ export default function PharmacySettingsPage() {
             </div>
 
             {/* Pill-style Tab Navigation */}
-            <div className="flex items-center gap-1 bg-slate-100 p-1.5 rounded-2xl overflow-x-auto scrollbar-hide">
+            <div className="flex items-center gap-1 bg-slate-100/80 p-1.5 rounded-2xl overflow-x-auto scrollbar-hide border border-slate-200/40">
                 {NAV_ITEMS.map((item) => (
                     <button
                         key={item.id}
@@ -78,7 +88,7 @@ export default function PharmacySettingsPage() {
                         className={cn(
                             "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap flex-shrink-0",
                             activeTab === item.id
-                                ? "bg-slate-900 text-white shadow-md shadow-slate-900/20"
+                                ? "bg-brand-teal text-white shadow-md shadow-brand-teal/20"
                                 : "text-slate-600 hover:text-slate-900 hover:bg-white/70"
                         )}
                     >
@@ -96,13 +106,16 @@ export default function PharmacySettingsPage() {
             <div className="pt-2">
                 {activeTab === "profile" && (
                     <div className="animate-in slide-in-from-right-4 duration-300">
-                        <StoreProfileSettings initialProfile={profile} />
+                        <StoreProfileSettings initialProfile={profile} onUpdate={refetchProfile} />
                     </div>
                 )}
 
                 {activeTab === "operational" && (
                     <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
-                        <OperationalSettings initialIs24_7={profile?.is_24_7 || false} />
+                        <OperationalSettings 
+                            initialIs24_7={profile?.is_24_7 || false} 
+                            onUpdate={refetchProfile} 
+                        />
 
                         <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
                             <div className="flex items-center gap-3 mb-6">
@@ -114,7 +127,7 @@ export default function PharmacySettingsPage() {
                                     <p className="text-xs text-slate-500">Define your dispatch radius and service fees</p>
                                 </div>
                             </div>
-                            <ServiceAreaMatrix initialAreas={serviceAreas} />
+                            <ServiceAreaMatrix initialAreas={serviceAreas} onUpdate={load} />
                         </div>
                     </div>
                 )}
@@ -124,13 +137,17 @@ export default function PharmacySettingsPage() {
                         <FinancialSettings
                             initialBankDetails={profile?.bank_details}
                             initialMomoDetails={profile?.momo_details}
+                            onUpdate={refetchProfile}
                         />
                     </div>
                 )}
 
                 {activeTab === "notifications" && (
                     <div className="animate-in slide-in-from-right-4 duration-300">
-                        <NotificationSettings initialPreferences={profile?.notification_preferences} />
+                        <NotificationSettings 
+                            initialPreferences={profile?.notification_preferences} 
+                            onUpdate={refetchProfile}
+                        />
                     </div>
                 )}
 

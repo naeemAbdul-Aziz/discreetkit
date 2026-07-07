@@ -12,9 +12,10 @@ import { Badge } from "@/components/ui/badge";
 
 interface OperationalSettingsProps {
   initialIs24_7: boolean;
+  onUpdate?: () => void;
 }
 
-export default function OperationalSettings({ initialIs24_7 }: OperationalSettingsProps) {
+export default function OperationalSettings({ initialIs24_7, onUpdate }: OperationalSettingsProps) {
   const { toast } = useToast();
   const [is24_7, setIs24_7] = useState(initialIs24_7);
   const [loading, setLoading] = useState(false);
@@ -33,6 +34,7 @@ export default function OperationalSettings({ initialIs24_7 }: OperationalSettin
                 title: "Settings Updated", 
                 description: checked ? "Your store is now marked as 24/7." : "Your store is no longer marked as 24/7." 
             });
+            onUpdate?.();
         } else {
             setIs24_7(!checked); // Revert
             toast({ variant: "destructive", title: "Error", description: result.message });
