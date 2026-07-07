@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
     Table, 
     TableBody, 
@@ -41,9 +41,10 @@ interface ServiceArea {
 
 interface ServiceAreaMatrixProps {
     initialAreas: ServiceArea[];
+    onUpdate?: () => void;
 }
 
-export function ServiceAreaMatrix({ initialAreas }: ServiceAreaMatrixProps) {
+export function ServiceAreaMatrix({ initialAreas, onUpdate }: ServiceAreaMatrixProps) {
     const { toast } = useToast();
     const [areas, setAreas] = useState(initialAreas);
     const [editingId, setEditingId] = useState<number | null>(null);
@@ -55,6 +56,11 @@ export function ServiceAreaMatrix({ initialAreas }: ServiceAreaMatrixProps) {
         maxDeliveryTime: "4"
     });
     const [loading, setLoading] = useState<number | string | null>(null);
+
+    // Keep state in sync with parent props when refetched
+    useEffect(() => {
+        setAreas(initialAreas);
+    }, [initialAreas]);
 
     const handleToggle = async (id: number, currentStatus: boolean) => {
         setLoading(id);
@@ -110,12 +116,14 @@ export function ServiceAreaMatrix({ initialAreas }: ServiceAreaMatrixProps) {
 
         const res = await addServiceArea(null, formData);
         if (res.success) {
-            // Simplistic reload since we don't have the new ID here easily from server action
-            window.location.reload(); 
+            toast({ title: "Area Added Successfully" });
+            setIsAdding(false);
+            setNewData({ areaName: "", deliveryFee: "10.00", maxDeliveryTime: "4" });
+            onUpdate?.(); // Trigger parent reload
         } else {
             toast({ variant: "destructive", title: "Error", description: res.message });
-            setLoading(null);
         }
+        setLoading(null);
     };
 
     return (

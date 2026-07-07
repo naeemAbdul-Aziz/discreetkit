@@ -10,9 +10,10 @@ import { updatePharmacyProfile } from "@/lib/pharmacy-actions";
 
 interface StoreProfileSettingsProps {
     initialProfile: any;
+    onUpdate?: () => void;
 }
 
-export function StoreProfileSettings({ initialProfile }: StoreProfileSettingsProps) {
+export function StoreProfileSettings({ initialProfile, onUpdate }: StoreProfileSettingsProps) {
     const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
@@ -46,6 +47,7 @@ export function StoreProfileSettings({ initialProfile }: StoreProfileSettingsPro
                     title: "Success",
                     description: "Store profile updated successfully."
                 });
+                onUpdate?.();
             }
         } catch (error: any) {
             toast({
@@ -134,7 +136,7 @@ export function StoreProfileSettings({ initialProfile }: StoreProfileSettingsPro
                 </div>
 
                 <div className="pt-4 flex justify-end">
-                    <Button type="submit" disabled={isLoading} className="gap-2 bg-brand-indigo hover:bg-brand-indigo/90 text-white rounded-full px-8 h-12 font-bold tracking-tight shadow-lg shadow-brand-indigo/20">
+                    <Button type="submit" disabled={isLoading} className="gap-2 bg-brand-teal hover:bg-brand-teal/90 text-white rounded-full px-8 h-12 font-bold tracking-tight shadow-lg shadow-brand-teal/20">
                         {isLoading ? (
                             <Icon name="progress_activity" className="animate-spin" opticalSize={18} />
                         ) : (

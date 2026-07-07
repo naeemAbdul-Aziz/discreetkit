@@ -10,9 +10,10 @@ import { updateNotificationPreferences } from "@/lib/pharmacy-actions";
 
 interface NotificationSettingsProps {
     initialPreferences: any;
+    onUpdate?: () => void;
 }
 
-export function NotificationSettings({ initialPreferences }: NotificationSettingsProps) {
+export function NotificationSettings({ initialPreferences, onUpdate }: NotificationSettingsProps) {
     const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(false);
     const [preferences, setPreferences] = useState({
@@ -44,6 +45,7 @@ export function NotificationSettings({ initialPreferences }: NotificationSetting
                     title: "Success",
                     description: "Notification preferences updated successfully."
                 });
+                onUpdate?.();
             }
         } catch (error: any) {
             toast({
@@ -116,7 +118,7 @@ export function NotificationSettings({ initialPreferences }: NotificationSetting
                 </div>
 
                 <div className="pt-4 flex justify-end">
-                    <Button type="submit" disabled={isLoading} className="gap-2 bg-brand-indigo hover:bg-brand-indigo/90 text-white rounded-full px-8 h-12 font-bold tracking-tight shadow-lg shadow-brand-indigo/20">
+                    <Button type="submit" disabled={isLoading} className="gap-2 bg-brand-teal hover:bg-brand-teal/90 text-white rounded-full px-8 h-12 font-bold tracking-tight shadow-lg shadow-brand-teal/20">
                         {isLoading ? (
                             <Icon name="progress_activity" className="animate-spin" opticalSize={18} />
                         ) : (
