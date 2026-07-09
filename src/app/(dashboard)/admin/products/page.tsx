@@ -25,11 +25,11 @@ export default async function ProductsPage() {
       ]} />
       
       <div className="flex flex-col gap-1">
-        <h2 className="text-2xl font-black tracking-tight text-slate-900 uppercase tracking-widest">
-            Product Inventory
+        <h2 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900">
+            Products
         </h2>
-        <p className="text-[10px] uppercase font-bold text-slate-400 tracking-[0.2em]">
-            Global catalog control & partner product requests
+        <p className="text-sm font-medium text-slate-500">
+            Manage the product catalog and partner requests.
         </p>
       </div>
 

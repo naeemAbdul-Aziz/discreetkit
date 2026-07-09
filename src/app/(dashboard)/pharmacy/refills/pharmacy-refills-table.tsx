@@ -85,12 +85,6 @@ export function PharmacyRefillsTable({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Medication Refills</h1>
-          <p className="text-slate-500 font-medium text-sm mt-1">Manage recurring prescriptions for your patients.</p>
-        </div>
-      </div>
 
       <div className="hidden md:block overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
         <Table>

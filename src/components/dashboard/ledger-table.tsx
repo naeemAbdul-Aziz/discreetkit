@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Fragment } from "react";
+import { useState, Fragment, useEffect } from "react";
 import { 
     Table, 
     TableBody, 
@@ -26,6 +26,8 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
     const [categoryFilter, setCategoryFilter] = useState<LedgerCategory | "ALL">("ALL");
     const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
+    const [currentPage, setCurrentPage] = useState(1);
+
     const toggleRow = (id: string) => {
         const next = new Set(expandedRows);
         if (next.has(id)) next.delete(id);
@@ -43,6 +45,15 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
         
         return matchesSearch && matchesCategory;
     });
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, categoryFilter]);
+
+    const itemsPerPage = 25;
+    const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const paginated = filtered.slice(startIndex, startIndex + itemsPerPage);
 
     const getCategoryIcon = (category: LedgerCategory) => {
         switch (category) {
@@ -136,7 +147,7 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {filtered.map((entry) => (
+                        {paginated.map((entry) => (
                             <Fragment key={entry.id}>
                                 <TableRow 
                                     className={cn(
@@ -276,14 +287,33 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
                 )}
             </div>
 
-            {/* Pagination Placeholder */}
+            {/* Active Pagination */}
             <div className="flex items-center justify-between px-4">
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    Showing {filtered.length} entries • Exhaustive Audit Mode
+                    Showing {filtered.length > 0 ? startIndex + 1 : 0}-{Math.min(startIndex + itemsPerPage, filtered.length)} of {filtered.length} entries
                 </p>
                 <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm" disabled className="h-9 rounded-xl font-bold text-xs uppercase tracking-widest">Prev</Button>
-                    <Button variant="ghost" size="sm" disabled className="h-9 rounded-xl font-bold text-xs uppercase tracking-widest">Next</Button>
+                    <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+                        disabled={currentPage === 1} 
+                        className="h-9 rounded-xl font-bold text-xs uppercase tracking-widest"
+                    >
+                        Prev
+                    </Button>
+                    <span className="text-xs font-bold text-slate-500 px-2">
+                        Page {currentPage} of {totalPages}
+                    </span>
+                    <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
+                        disabled={currentPage === totalPages} 
+                        className="h-9 rounded-xl font-bold text-xs uppercase tracking-widest"
+                    >
+                        Next
+                    </Button>
                 </div>
             </div>
         </div>

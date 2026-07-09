@@ -23,11 +23,11 @@ export default async function OrdersPage({ searchParams }: PageProps) {
         { label: 'Orders' }
       ]} />
       <div>
-        <h2 className="text-3xl font-bold tracking-tight uppercase tracking-widest text-slate-900">
-            Order Management Center
+        <h2 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900">
+            Orders
         </h2>
-        <p className="text-[10px] uppercase font-bold text-slate-400 tracking-[0.2em] mt-1">
-            Real-time transaction log & fulfillment management
+        <p className="text-sm font-medium text-slate-500 mt-1">
+            Manage and fulfill customer orders in real-time.
         </p>
       </div>
 
