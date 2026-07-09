@@ -255,25 +255,39 @@ export default function InventoryClient({
       </div>
 
       <Tabs defaultValue="catalog" className="space-y-8">
-        <TabsList className="bg-slate-100 p-1 rounded-xl h-12 border border-slate-100 w-full md:w-auto">
-          <TabsTrigger value="catalog" className="rounded-lg px-6 h-full gap-2 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">
-            In Stock
-          </TabsTrigger>
-          <TabsTrigger value="low-stock" className="rounded-lg px-6 h-full gap-2 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">
-            Low Stock
-            {lowStockProducts.length > 0 && (
-              <Badge className="ml-1 px-1.5 py-0 rounded-lg bg-amber-100 text-amber-700 border-none font-bold text-[10px]">{lowStockProducts.length}</Badge>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="requests" className="rounded-lg px-6 h-full gap-2 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">
-            Requests
-            {requests.filter((r) => r.status === "pending").length > 0 && (
-              <Badge className="ml-1 px-1.5 py-0 rounded-lg bg-brand-indigo/10 text-brand-indigo border-none font-bold text-[10px]">
-                {requests.filter((r) => r.status === "pending").length}
-              </Badge>
-            )}
-          </TabsTrigger>
-        </TabsList>
+        <div className="flex items-center justify-start w-full overflow-x-auto scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] p-1">
+          <TabsList className="bg-slate-100 p-1 rounded-xl h-12 border border-slate-200/30 flex items-center gap-1 w-auto min-w-max">
+            <TabsTrigger 
+              value="catalog" 
+              onClick={(e) => e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })}
+              className="rounded-lg px-6 h-10 gap-2 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm whitespace-nowrap shrink-0"
+            >
+              In Stock
+            </TabsTrigger>
+            <TabsTrigger 
+              value="low-stock" 
+              onClick={(e) => e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })}
+              className="rounded-lg px-6 h-10 gap-2 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm whitespace-nowrap shrink-0"
+            >
+              Low Stock
+              {lowStockProducts.length > 0 && (
+                <Badge className="ml-1 px-1.5 py-0 rounded-lg bg-amber-100 text-amber-700 border-none font-bold text-[10px]">{lowStockProducts.length}</Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger 
+              value="requests" 
+              onClick={(e) => e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })}
+              className="rounded-lg px-6 h-10 gap-2 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm whitespace-nowrap shrink-0"
+            >
+              Requests
+              {requests.filter((r) => r.status === "pending").length > 0 && (
+                <Badge className="ml-1 px-1.5 py-0 rounded-lg bg-brand-indigo/10 text-brand-indigo border-none font-bold text-[10px]">
+                  {requests.filter((r) => r.status === "pending").length}
+                </Badge>
+              )}
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="catalog" className="animate-in slide-in-from-bottom-4 duration-500">
           <ProductGrid 

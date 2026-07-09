@@ -5,13 +5,6 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -27,8 +20,8 @@ export function FloatingChatTrigger() {
   const pathname = usePathname();
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
-  // Hide the floating trigger when already on the dedicated chat page
-  if (pathname?.startsWith("/chat")) {
+  // Hide the floating trigger when on dedicated chat or copilot pages
+  if (pathname?.startsWith("/chat") || pathname?.endsWith("/copilot")) {
     return null;
   }
 
@@ -44,8 +37,12 @@ export function FloatingChatTrigger() {
       )}
       aria-label="Ask Pacely"
       onClick={() => {
-        if (!isDesktop && !isDashboard) {
-          router.push('/chat');
+        if (!isDesktop) {
+          if (isDashboard) {
+            router.push(isAdmin ? '/admin/copilot' : '/pharmacy/copilot');
+          } else {
+            router.push('/chat');
+          }
         }
       }}
     >
@@ -93,25 +90,7 @@ export function FloatingChatTrigger() {
             </DialogContent>
           </Dialog>
         ) : (
-          isDashboard ? (
-            <Sheet>
-              <SheetTrigger asChild>
-                {triggerButton}
-              </SheetTrigger>
-              <SheetContent className="w-full sm:w-[500px] flex flex-col p-0 bg-white border-l border-slate-100">
-                <SheetHeader className="p-5 border-b">
-                  <SheetTitle className="text-sm font-bold text-slate-900">
-                    {isAdmin ? "Admin Command" : "Pharmacy Copilot"}
-                  </SheetTitle>
-                </SheetHeader>
-                <div className="flex-1 overflow-hidden">
-                  <DashboardChatbot role={role!} />
-                </div>
-              </SheetContent>
-            </Sheet>
-          ) : (
-            triggerButton
-          )
+          triggerButton
         )}
       </motion.div>
     </AnimatePresence>

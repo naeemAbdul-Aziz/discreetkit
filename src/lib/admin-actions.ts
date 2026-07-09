@@ -2440,7 +2440,7 @@ export async function getOperationalLedger(pharmacyId?: number, limit = 100) {
 
         const refillsQuery = supabase
             .from('medication_refill_subscriptions')
-            .select('id, subscription_code, enrolled_at, product_id, pharmacy_id, status, products(name), pharmacies(name)')
+            .select('id, subscription_code, enrolled_at, product_id, pharmacy_id, status, products(name), pharmacies!medication_refill_subscriptions_pharmacy_id_fkey(name)')
             .order('enrolled_at', { ascending: false })
             .limit(limit);
 
@@ -2466,7 +2466,7 @@ export async function getOperationalLedger(pharmacyId?: number, limit = 100) {
             if (o.status !== 'pending_payment') {
                 ledger.push({
                     id: `fin-${o.id}`,
-                    timestamp: o.created_at,
+                    timestamp: o.created_at || new Date().toISOString(),
                     category: 'FINANCE',
                     type: 'Revenue Inbound',
                     description: `Payment received for Order ${o.code}`,
@@ -2484,7 +2484,7 @@ export async function getOperationalLedger(pharmacyId?: number, limit = 100) {
                 
                 ledger.push({
                     id: `disp-${o.id}`,
-                    timestamp: o.created_at,
+                    timestamp: o.created_at || new Date().toISOString(),
                     category: 'DISPENSATION',
                     type: 'Medication Release',
                     description: `Items released for fulfillment (${items.length} units)`,
@@ -2505,7 +2505,7 @@ export async function getOperationalLedger(pharmacyId?: number, limit = 100) {
 
             ledger.push({
                 id: `evt-${e.id}`,
-                timestamp: e.created_at,
+                timestamp: e.created_at || new Date().toISOString(),
                 category: 'LOGISTICS',
                 type: (e.status || 'Update').replace(/_/g, ' ').toUpperCase(),
                 description: e.note || `Status transitioned to ${e.status}`,
@@ -2522,7 +2522,7 @@ export async function getOperationalLedger(pharmacyId?: number, limit = 100) {
 
             ledger.push({
                 id: `sub-${r.id}`,
-                timestamp: r.enrolled_at,
+                timestamp: r.enrolled_at || r.created_at || new Date().toISOString(),
                 category: 'SUBSCRIPTION',
                 type: 'Enrollment',
                 description: `New refill subscription for ${productName || 'Specialty Medication'}`,
