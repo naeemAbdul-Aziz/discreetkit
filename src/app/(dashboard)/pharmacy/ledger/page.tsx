@@ -55,8 +55,8 @@ async function PharmacyLedgerLoader() {
     if (!pharmacy) return <div className="p-20 text-center font-bold text-slate-400 uppercase tracking-widest">Pharmacy Profile Not Found</div>;
 
     const entries = await getOperationalLedger(pharmacy.id);
-    const hasBank = pharmacy.bank_details && Object.values(pharmacy.bank_details).some(v => v);
-    const hasMomo = pharmacy.momo_details && Object.values(pharmacy.momo_details).some(v => v);
+    const hasBank = !!(pharmacy.bank_details?.bank_name || pharmacy.bank_details?.account_number);
+    const hasMomo = !!(pharmacy.momo_details?.number);
 
     return (
         <div className="space-y-8">
@@ -80,7 +80,7 @@ async function PharmacyLedgerLoader() {
                         <div className="flex flex-col gap-3">
                             <p className="text-xs font-bold text-rose-500">No payment method configured</p>
                             <Button asChild variant="outline" size="sm" className="h-8 font-bold rounded-full border-rose-100 text-rose-600 hover:bg-rose-50">
-                                <a href="/pharmacy/settings">Configure Now</a>
+                                <a href="/pharmacy/settings?tab=financials">Configure Now</a>
                             </Button>
                         </div>
                     )}

@@ -140,91 +140,172 @@ export function ServiceAreaMatrix({ initialAreas, onUpdate }: ServiceAreaMatrixP
                     className="h-8 gap-2"
                 >
                     {isAdding ? <Icon name="close" opticalSize={16} /> : <Icon name="add" opticalSize={16} />}
-                    {isAdding ? "Cancel" : "Add New Area"}
+                    {isAdding ? "Cancel" : "Add Zone"}
                 </Button>
             </div>
 
-            <div className="overflow-x-auto">
-                <Table>
-                    <TableHeader>
-                        <TableRow className="hover:bg-transparent border-slate-100">
-                            <TableHead className="w-[40%] text-[11px] font-bold uppercase text-slate-400 pl-6">Service Zone</TableHead>
-                            <TableHead className="text-[11px] font-bold uppercase text-slate-400">Fee (GHS)</TableHead>
-                            <TableHead className="text-[11px] font-bold uppercase text-slate-400">Max Time</TableHead>
-                            <TableHead className="text-[11px] font-bold uppercase text-slate-400">Status</TableHead>
-                            <TableHead className="text-right pr-6"></TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {/* Inline Add Row */}
-                        {isAdding && (
-                            <TableRow className="bg-brand-teal/5 border-b-2 border-brand-teal/20 animate-in fade-in slide-in-from-top-1 duration-200">
-                                <TableCell className="pl-6">
-                                    <Select 
-                                        onValueChange={(val) => setNewData({ ...newData, areaName: val })}
-                                        defaultValue={newData.areaName}
-                                    >
-                                        <SelectTrigger className="h-9 bg-white border-brand-teal/30 focus:ring-brand-teal">
-                                            <SelectValue placeholder="Where do you deliver?" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {discounts.map((area) => (
-                                                <SelectItem key={area.id} value={area.campus}>{area.campus}</SelectItem>
-                                            ))}
-                                            <SelectItem value="Other">Custom Area</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </TableCell>
-                                <TableCell>
-                                    <Input 
-                                        type="number" 
-                                        className="h-9 bg-white border-brand-teal/30 focus:ring-brand-teal"
-                                        value={newData.deliveryFee}
-                                        onChange={(e) => setNewData({ ...newData, deliveryFee: e.target.value })}
-                                    />
-                                </TableCell>
-                                <TableCell>
-                                    <Select 
-                                        onValueChange={(val) => setNewData({ ...newData, maxDeliveryTime: val })}
-                                        defaultValue={newData.maxDeliveryTime}
-                                    >
-                                        <SelectTrigger className="h-9 bg-white border-brand-teal/30 focus:ring-brand-teal">
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="2">2 Hours</SelectItem>
-                                            <SelectItem value="4">4 Hours</SelectItem>
-                                            <SelectItem value="12">12 Hours</SelectItem>
-                                            <SelectItem value="24">Same Day / 24h</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </TableCell>
-                                <TableCell>
-                                    <Badge variant="outline" className="bg-white text-brand-teal border-brand-teal/30">Auto-Active</Badge>
-                                </TableCell>
-                                <TableCell className="text-right pr-6">
-                                    <Button 
-                                        size="sm" 
-                                        onClick={handleAdd}
-                                        disabled={loading === "adding"}
-                                        className="bg-brand-teal hover:bg-brand-teal-dark h-8 px-4"
-                                    >
-                                        {loading === "adding" ? <Icon name="progress_activity" className="animate-spin" opticalSize={16} /> : "Confirm"}
-                                    </Button>
-                                </TableCell>
-                            </TableRow>
-                        )}
+            {/* Add form - shown on top for both mobile and desktop */}
+            {isAdding && (
+                <div className="p-4 border-b border-brand-teal/20 bg-brand-teal/5 animate-in fade-in slide-in-from-top-1 duration-200 space-y-3">
+                    <p className="text-[11px] font-black uppercase tracking-widest text-brand-teal">New Delivery Zone</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <Select 
+                            onValueChange={(val) => setNewData({ ...newData, areaName: val })}
+                            defaultValue={newData.areaName}
+                        >
+                            <SelectTrigger className="h-9 bg-white border-brand-teal/30 focus:ring-brand-teal">
+                                <SelectValue placeholder="Select area..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {discounts.map((area) => (
+                                    <SelectItem key={area.id} value={area.campus}>{area.campus}</SelectItem>
+                                ))}
+                                <SelectItem value="Other">Custom Area</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <Input 
+                            type="number" 
+                            placeholder="Fee (GHS)"
+                            className="h-9 bg-white border-brand-teal/30 focus:ring-brand-teal"
+                            value={newData.deliveryFee}
+                            onChange={(e) => setNewData({ ...newData, deliveryFee: e.target.value })}
+                        />
+                        <Select 
+                            onValueChange={(val) => setNewData({ ...newData, maxDeliveryTime: val })}
+                            defaultValue={newData.maxDeliveryTime}
+                        >
+                            <SelectTrigger className="h-9 bg-white border-brand-teal/30 focus:ring-brand-teal">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="2">2 Hours</SelectItem>
+                                <SelectItem value="4">4 Hours</SelectItem>
+                                <SelectItem value="12">12 Hours</SelectItem>
+                                <SelectItem value="24">Same Day / 24h</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <Button 
+                        size="sm" 
+                        onClick={handleAdd}
+                        disabled={loading === "adding"}
+                        className="bg-brand-teal hover:bg-brand-teal-dark h-9 px-6 w-full sm:w-auto"
+                    >
+                        {loading === "adding" ? <Icon name="progress_activity" className="animate-spin" opticalSize={16} /> : "Confirm Zone"}
+                    </Button>
+                </div>
+            )}
 
-                        {/* Existing Areas */}
-                        {areas.length === 0 && !isAdding ? (
-                            <TableRow>
-                                <TableCell colSpan={5} className="h-32 text-center text-slate-400">
-                                    <Icon name="location_on" className="h-8 w-8 mx-auto mb-2 opacity-20" opticalSize={32} />
-                                    <p className="text-xs font-medium">No service areas defined.</p>
-                                </TableCell>
+            {/* Empty state */}
+            {areas.length === 0 && !isAdding && (
+                <div className="h-32 flex flex-col items-center justify-center text-slate-400 gap-2">
+                    <Icon name="location_on" opticalSize={32} className="opacity-20" />
+                    <p className="text-xs font-medium">No service areas defined.</p>
+                </div>
+            )}
+
+            {/* Mobile card list (hidden on md+) */}
+            {areas.length > 0 && (
+                <div className="md:hidden divide-y divide-slate-100">
+                    {areas.map((area) => {
+                        const isEditing = editingId === area.id;
+                        const isPending = loading === area.id;
+                        return (
+                            <div key={area.id} className={cn("p-4 space-y-3", !area.is_active && "opacity-60")}>
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
+                                            <Icon name="location_on" className="text-slate-600" opticalSize={16} />
+                                        </div>
+                                        <div>
+                                            <p className={cn("text-sm font-bold", !area.is_active && "line-through text-slate-400")}>{area.area_name}</p>
+                                            <p className="text-[10px] text-slate-400 font-medium">Delivery Zone</p>
+                                        </div>
+                                    </div>
+                                    <Switch 
+                                        checked={area.is_active}
+                                        onCheckedChange={() => handleToggle(area.id, area.is_active)}
+                                        disabled={isPending}
+                                    />
+                                </div>
+                                {isEditing ? (
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div className="space-y-1">
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase">Fee (GHS)</p>
+                                            <Input 
+                                                type="number" 
+                                                className="h-9 text-sm font-bold"
+                                                value={editData.delivery_fee}
+                                                onChange={(e) => setEditData({ ...editData, delivery_fee: Number(e.target.value) })}
+                                            />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase">Max Time</p>
+                                            <Select 
+                                                onValueChange={(val) => setEditData({ ...editData, max_delivery_time_hours: Number(val) })}
+                                                defaultValue={String(area.max_delivery_time_hours)}
+                                            >
+                                                <SelectTrigger className="h-9 border-slate-200">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="2">2 Hours</SelectItem>
+                                                    <SelectItem value="4">4 Hours</SelectItem>
+                                                    <SelectItem value="12">12 Hours</SelectItem>
+                                                    <SelectItem value="24">24 Hours</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-4 text-sm text-slate-600">
+                                        <span className="font-bold tabular-nums">₵{Number(area.delivery_fee).toFixed(2)}</span>
+                                        <span className="flex items-center gap-1 text-slate-400 text-xs">
+                                            <Icon name="schedule" opticalSize={13} />
+                                            {area.max_delivery_time_hours}h max
+                                        </span>
+                                    </div>
+                                )}
+                                <div className="flex items-center gap-2">
+                                    {isEditing ? (
+                                        <>
+                                            <Button size="sm" onClick={() => handleSave(area.id)} disabled={isPending} className="h-8 flex-1 bg-brand-teal hover:bg-brand-teal-dark text-white">
+                                                {isPending ? <Icon name="progress_activity" className="animate-spin" opticalSize={14} /> : "Save"}
+                                            </Button>
+                                            <Button size="sm" variant="ghost" onClick={() => setEditingId(null)} className="h-8">Cancel</Button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Button size="sm" variant="outline" onClick={() => handleEdit(area)} className="h-8 flex-1 gap-1.5">
+                                                <Icon name="edit" opticalSize={14} /> Edit
+                                            </Button>
+                                            <Button size="sm" variant="ghost" onClick={() => handleDelete(area.id)} className="h-8 text-rose-500 hover:bg-rose-50">
+                                                <Icon name="delete" opticalSize={14} />
+                                            </Button>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+
+            {/* Desktop table (hidden on mobile) */}
+            {areas.length > 0 && (
+                <div className="hidden md:block overflow-x-auto">
+                    <Table>
+                        <TableHeader>
+                            <TableRow className="hover:bg-transparent border-slate-100">
+                                <TableHead className="w-[40%] text-[11px] font-bold uppercase text-slate-400 pl-6">Service Zone</TableHead>
+                                <TableHead className="text-[11px] font-bold uppercase text-slate-400">Fee (GHS)</TableHead>
+                                <TableHead className="text-[11px] font-bold uppercase text-slate-400">Max Time</TableHead>
+                                <TableHead className="text-[11px] font-bold uppercase text-slate-400">Status</TableHead>
+                                <TableHead className="text-right pr-6"></TableHead>
                             </TableRow>
-                        ) : (
-                            areas.map((area) => {
+                        </TableHeader>
+                        <TableBody>
+                            {areas.map((area) => {
                                 const isEditing = editingId === area.id;
                                 const isPending = loading === area.id;
 
@@ -332,12 +413,12 @@ export function ServiceAreaMatrix({ initialAreas, onUpdate }: ServiceAreaMatrixP
                                             </div>
                                         </TableCell>
                                     </TableRow>
-                                )
-                            })
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
+                                );
+                            })}
+                        </TableBody>
+                    </Table>
+                </div>
+            )}
         </div>
     );
 }

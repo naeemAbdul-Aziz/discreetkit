@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { getPharmacyServiceAreas, getPharmacyProfile } from "@/lib/pharmacy-actions";
 import { Icon } from "@/components/ui/icon";
 import FinancialSettings from "./financial-settings";
@@ -21,6 +22,7 @@ const NAV_ITEMS = [
 ];
 
 export default function PharmacySettingsPage() {
+    const searchParams = useSearchParams();
     const [activeTab, setActiveTab] = useState("profile");
     const [serviceAreas, setServiceAreas] = useState<any[]>([]);
     const [profile, setProfile] = useState<any>(null);
@@ -44,6 +46,14 @@ export default function PharmacySettingsPage() {
     useEffect(() => {
         load();
     }, []);
+
+    useEffect(() => {
+        // Auto-open a tab if ?tab= query param is present
+        const tabParam = searchParams?.get("tab");
+        if (tabParam && NAV_ITEMS.some(n => n.id === tabParam)) {
+            setActiveTab(tabParam);
+        }
+    }, [searchParams]);
 
     const refetchProfile = async () => {
         try {

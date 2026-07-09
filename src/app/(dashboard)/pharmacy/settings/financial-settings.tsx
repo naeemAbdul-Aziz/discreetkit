@@ -109,6 +109,46 @@ export default function FinancialSettings({
                 </div>
             </div>
 
+            {/* Configured Methods Summary */}
+            {(initialBankDetails?.bank_name || initialBankDetails?.account_number || initialMomoDetails?.number) && (
+                <div className="space-y-2">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Configured Methods</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {initialBankDetails?.bank_name && (
+                            <div className="flex items-center gap-3 p-3 bg-white rounded-2xl border border-slate-200/60 shadow-sm">
+                                <div className="w-9 h-9 rounded-xl bg-brand-teal/10 flex items-center justify-center shrink-0">
+                                    <Icon name="account_balance" opticalSize={18} className="text-brand-teal" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-black text-slate-900 truncate">{initialBankDetails.bank_name}</p>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">{initialBankDetails.account_number || "Account added"}</p>
+                                </div>
+                                <div className="flex items-center gap-1 bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full border border-emerald-100 shrink-0">
+                                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                                    <span className="text-[9px] font-bold">Active</span>
+                                </div>
+                            </div>
+                        )}
+                        {initialMomoDetails?.number && (
+                            <div className="flex items-center gap-3 p-3 bg-white rounded-2xl border border-slate-200/60 shadow-sm">
+                                <div className="w-9 h-9 rounded-xl bg-brand-indigo/10 flex items-center justify-center shrink-0">
+                                    <Icon name="smartphone" opticalSize={18} className="text-brand-indigo" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-black text-slate-900 truncate">{initialMomoDetails.network} MoMo</p>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">{initialMomoDetails.number}</p>
+                                </div>
+                                <div className="flex items-center gap-1 bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full border border-emerald-100 shrink-0">
+                                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                                    <span className="text-[9px] font-bold">Active</span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                    <p className="text-[10px] font-medium text-slate-400 pt-1">Update either method below and save to apply changes.</p>
+                </div>
+            )}
+
             {/* Payout Selection Segment Switcher */}
             <div className="flex p-1 bg-slate-100 rounded-xl max-w-md border border-slate-200/50">
                 <button

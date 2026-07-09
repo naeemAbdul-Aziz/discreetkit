@@ -11,7 +11,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { DashboardChatbot } from "./dashboard-chatbot";
 import { Chatbot } from "./chatbot";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
@@ -20,15 +19,16 @@ export function FloatingChatTrigger() {
   const pathname = usePathname();
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
-  // Hide the floating trigger when on dedicated chat or copilot pages
-  if (pathname?.startsWith("/chat") || pathname?.endsWith("/copilot")) {
+  // Never show the floating trigger on dashboard portals (pharmacy/admin have Pacely in sidebar)
+  // or on dedicated chat/copilot pages
+  if (
+    pathname?.startsWith("/pharmacy") ||
+    pathname?.startsWith("/admin") ||
+    pathname?.startsWith("/chat") ||
+    pathname?.endsWith("/copilot")
+  ) {
     return null;
   }
-
-  const isAdmin = pathname?.startsWith("/admin");
-  const isPharmacy = pathname?.startsWith("/pharmacy");
-  const isDashboard = isAdmin || isPharmacy;
-  const role = isAdmin ? "admin" : (isPharmacy ? "pharmacy" : undefined);
 
   const triggerButton = (
     <Button
@@ -38,11 +38,7 @@ export function FloatingChatTrigger() {
       aria-label="Ask Pacely"
       onClick={() => {
         if (!isDesktop) {
-          if (isDashboard) {
-            router.push(isAdmin ? '/admin/copilot' : '/pharmacy/copilot');
-          } else {
-            router.push('/chat');
-          }
+          router.push('/chat');
         }
       }}
     >
@@ -50,7 +46,7 @@ export function FloatingChatTrigger() {
         <img src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png" alt="Pacely" className="h-full w-full object-cover" />
       </div>
       <span className="font-semibold text-[13px] tracking-[0.05em] uppercase text-white/90">
-        {isDashboard ? "Ask Copilot" : "Ask Pacely"}
+        Ask Pacely
       </span>
     </Button>
   );
@@ -68,24 +64,14 @@ export function FloatingChatTrigger() {
             <DialogTrigger asChild>
               {triggerButton}
             </DialogTrigger>
-            <DialogContent className={cn(
-              "max-w-xl h-[640px] flex flex-col p-0 overflow-hidden bg-white rounded-3xl border border-slate-200/50 shadow-2xl",
-              !isDashboard && "max-w-lg h-[600px]"
-            )}>
+            <DialogContent className="max-w-lg h-[600px] flex flex-col p-0 overflow-hidden bg-white rounded-3xl border border-slate-200/50 shadow-2xl">
               <DialogHeader className="p-6 pb-4 border-b bg-slate-50/50 text-center sm:text-center shrink-0">
                 <DialogTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
-                  {isDashboard 
-                    ? (isAdmin ? "Admin Operations" : "Pharmacy Protocol")
-                    : "Customer Support Assistant"
-                  }
+                  Customer Support Assistant
                 </DialogTitle>
               </DialogHeader>
               <div className="flex-1 overflow-hidden relative">
-                {isDashboard ? (
-                  <DashboardChatbot role={role!} />
-                ) : (
-                  <Chatbot hideClose={true} />
-                )}
+                <Chatbot hideClose={true} />
               </div>
             </DialogContent>
           </Dialog>
