@@ -120,7 +120,7 @@ export function OrderDetailsSheet({
                       className={cn(
                         "w-10 h-10 rounded-2xl flex items-center justify-center border-4 transition-all duration-500",
                         isActive 
-                          ? "bg-brand-indigo border-indigo-50 text-white shadow-xl shadow-brand-indigo/10" 
+                          ? "bg-brand-teal border-teal-50 text-white shadow-xl shadow-brand-teal/10" 
                           : "bg-white border-slate-50 text-slate-300"
                       )}
                     >
@@ -128,7 +128,7 @@ export function OrderDetailsSheet({
                     </motion.div>
                     <span className={cn(
                       "text-[9px] font-black uppercase tracking-[0.15em] transition-colors duration-500",
-                      isActive ? "text-brand-indigo" : "text-slate-300"
+                      isActive ? "text-brand-teal" : "text-slate-300"
                     )}>
                       {step.label}
                     </span>
@@ -141,9 +141,9 @@ export function OrderDetailsSheet({
           {/* Delivery & Timeline */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="p-6 rounded-[2rem] bg-slate-50/50 border border-slate-100/50 space-y-4 group hover:bg-white hover:shadow-xl hover:shadow-slate-200/20 transition-all">
-               <div className="flex items-center gap-2 text-brand-indigo opacity-60 group-hover:opacity-100">
+               <div className="flex items-center gap-2 text-brand-teal opacity-60 group-hover:opacity-100">
                   <Icon name="location_on" opticalSize={14} />
-                  <span className="text-[9px] font-black uppercase tracking-widest">Delivery Address</span>
+                  <span className="text-xs font-bold text-slate-500">Delivery address</span>
                </div>
                <div className="space-y-2">
                   <p className="text-base font-extrabold text-slate-900 tracking-tight">{order.delivery_area}</p>
@@ -158,9 +158,9 @@ export function OrderDetailsSheet({
             </div>
 
             <div className="p-6 rounded-[2rem] bg-slate-50/50 border border-slate-100/50 space-y-4 group hover:bg-white hover:shadow-xl hover:shadow-slate-200/20 transition-all">
-               <div className="flex items-center gap-2 text-brand-indigo opacity-60 group-hover:opacity-100">
+               <div className="flex items-center gap-2 text-brand-teal opacity-60 group-hover:opacity-100">
                   <Icon name="calendar_today" opticalSize={14} />
-                  <span className="text-[9px] font-black uppercase tracking-widest">Order Timeline</span>
+                  <span className="text-xs font-bold text-slate-500">Order timeline</span>
                </div>
                <div className="space-y-1">
                   <p className="text-base font-extrabold text-slate-900 tracking-tight">{new Date(order.created_at).toLocaleDateString('en-GB')}</p>
@@ -170,10 +170,10 @@ export function OrderDetailsSheet({
           </div>
 
           {/* Order Summary Section */}
-          <div className="space-y-6">
+           <div className="space-y-6">
             <div className="flex items-center justify-between px-2">
-               <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2.5">
-                 <Icon name="inventory_2" opticalSize={14} className="text-brand-indigo" /> Order Items
+               <h3 className="text-xs font-bold text-slate-400 flex items-center gap-2.5">
+                 <Icon name="inventory_2" opticalSize={14} className="text-brand-teal" /> Order items
                </h3>
                <span className="text-[10px] font-black bg-slate-900 text-white px-3 py-1 rounded-full uppercase tracking-tighter shadow-lg shadow-slate-900/10">
                  {itemsArray.length} Selected Items
@@ -186,10 +186,10 @@ export function OrderDetailsSheet({
                     <div className="w-11 h-11 rounded-2xl bg-white border border-slate-100 flex items-center justify-center font-black text-slate-900 text-[10px] shadow-sm group-hover:scale-110 transition-transform">
                       {index + 1}
                     </div>
-                    <div>
-                      <p className="text-sm font-extrabold text-slate-900 tracking-tight">{item.name}</p>
-                      <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-1">Quantity: <span className="text-brand-indigo">{item.quantity}</span></p>
-                    </div>
+                     <div>
+                       <p className="text-sm font-extrabold text-slate-900 tracking-tight">{item.name}</p>
+                       <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-1">Quantity: <span className="text-brand-teal">{item.quantity}</span></p>
+                     </div>
                   </div>
                   <p className="text-sm font-black tabular-nums text-slate-900">₵{(Number(item.price_ghs || item.price || 0) * Number(item.quantity || 1)).toFixed(2)}</p>
                 </div>
@@ -224,16 +224,16 @@ export function OrderDetailsSheet({
           </div>
 
           {/* Order Actions */}
-          <div className="space-y-6 pb-12">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2.5 px-2">
-               <Icon name="arrow_forward" opticalSize={14} className="text-brand-indigo" /> Order Actions
+           <div className="space-y-6 pb-12">
+            <h3 className="text-xs font-bold text-slate-400 flex items-center gap-2.5 px-2">
+               <Icon name="arrow_forward" opticalSize={14} className="text-brand-teal" /> Order actions
             </h3>
             <div className="grid gap-4">
               {order.status === "received" && order.pharmacy_ack_status === "pending" && (
                 <div className="flex flex-col gap-3">
                   <Button
                     size="lg"
-                    className="h-16 bg-brand-indigo hover:bg-brand-indigo/90 font-black text-sm uppercase tracking-widest gap-3 shadow-2xl shadow-brand-indigo/20 rounded-2xl transition-all hover:scale-[1.01]"
+                    className="h-16 bg-brand-teal hover:bg-brand-teal/90 font-black text-sm uppercase tracking-widest gap-3 shadow-2xl shadow-brand-teal/20 rounded-2xl transition-all hover:scale-[1.01]"
                     onClick={onAccept}
                     loading={loading && loadingAction === "accept"}
                   >
@@ -253,10 +253,10 @@ export function OrderDetailsSheet({
                 </div>
               )}
 
-              {order.status === "processing" && (
+               {order.status === "processing" && (
                 <Button
                   size="lg"
-                  className="h-16 bg-brand-indigo hover:bg-brand-indigo/90 font-black text-sm uppercase tracking-widest gap-3 shadow-2xl shadow-brand-indigo/20 rounded-2xl transition-all hover:scale-[1.01]"
+                  className="h-16 bg-brand-teal hover:bg-brand-teal/90 font-black text-sm uppercase tracking-widest gap-3 shadow-2xl shadow-brand-teal/20 rounded-2xl transition-all hover:scale-[1.01]"
                   onClick={onMarkOutForDelivery}
                   loading={loading && loadingAction === "out_for_delivery"}
                 >
@@ -278,28 +278,28 @@ export function OrderDetailsSheet({
               )}
             </div>
 
-            {/* Communication Hub Integration */}
-            <div className="pt-8 space-y-6 border-t border-slate-100">
-               <div className="flex items-center gap-2.5 px-2">
-                  <Icon name="list_alt" opticalSize={14} className="text-brand-indigo" />
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Order Chat</h3>
-               </div>
+             {/* Communication Hub Integration */}
+             <div className="pt-8 space-y-6 border-t border-slate-100">
+                <div className="flex items-center gap-2.5 px-2">
+                   <Icon name="list_alt" opticalSize={14} className="text-brand-teal" />
+                   <h3 className="text-xs font-bold text-slate-400">Order chat</h3>
+                </div>
                <div className="bg-slate-50/50 rounded-[2.5rem] border border-slate-100/50 overflow-hidden">
                  <OrderMessages orderId={order.id} userRole="pharmacy" />
                </div>
             </div>
             
-            <div className="bg-indigo-50/50 p-6 rounded-[2rem] border border-indigo-100/50 flex items-start gap-4 transition-all hover:bg-indigo-50">
-               <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center border border-indigo-100 shadow-sm shrink-0">
-                  <Icon name="info" opticalSize={20} className="text-brand-indigo" fill />
-               </div>
-               <div className="space-y-1">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-indigo-900/60 block mb-1">Processing Note</p>
-                  <p className="text-[11px] font-semibold text-indigo-900 leading-relaxed">
-                    Status updates trigger automated notifications. Ensure all physical items are checked before updating.
-                  </p>
-               </div>
-            </div>
+             <div className="bg-slate-50 p-6 rounded-[2rem] border border-slate-200/60 flex items-start gap-4 transition-all hover:bg-slate-100/50">
+                <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center border border-slate-200 shadow-sm shrink-0">
+                   <Icon name="info" opticalSize={20} className="text-brand-teal" fill />
+                </div>
+                <div className="space-y-1">
+                   <p className="text-xs font-bold text-slate-500 block mb-1">Processing note</p>
+                   <p className="text-[11px] font-semibold text-slate-700 leading-relaxed">
+                     Status updates trigger automated notifications. Ensure all physical items are checked before updating.
+                   </p>
+                </div>
+             </div>
           </div>
         </div>
       </SheetContent>
