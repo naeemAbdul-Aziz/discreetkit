@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Fragment } from "react";
 import { 
     Table, 
     TableBody, 
@@ -62,8 +62,64 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
         }
     };
 
+    const totalFinance = entries
+        .filter(e => e.category === 'FINANCE' && e.amount)
+        .reduce((sum, e) => sum + (e.amount || 0), 0);
+    const totalDispensed = entries
+        .filter(e => e.category === 'DISPENSATION')
+        .reduce((sum, e) => sum + (e.items ? e.items.reduce((acc: number, item: any) => acc + (item.quantity || 1), 0) : 1), 0);
+    const totalLogistics = entries.filter(e => e.category === 'LOGISTICS').length;
+    const totalSubscriptions = entries.filter(e => e.category === 'SUBSCRIPTION').length;
+
     return (
         <div className="space-y-6">
+            {/* Metric Summary Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-in fade-in-50 duration-500">
+                <div className="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex items-center justify-between">
+                    <div className="space-y-1">
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Total Net Volume</span>
+                        <h4 className="text-xl font-black text-slate-900 tabular-nums">₵{totalFinance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</h4>
+                        <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-tighter">Gross Credit Inbound</p>
+                    </div>
+                    <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                        <Icon name="payments" fill />
+                    </div>
+                </div>
+
+                <div className="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex items-center justify-between">
+                    <div className="space-y-1">
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Total Dispensed</span>
+                        <h4 className="text-xl font-black text-slate-900 tabular-nums">{totalDispensed} Units</h4>
+                        <p className="text-[10px] font-bold text-brand-indigo uppercase tracking-tighter">Medications Released</p>
+                    </div>
+                    <div className="w-10 h-10 rounded-xl bg-brand-indigo/5 text-brand-indigo flex items-center justify-center">
+                        <Icon name="inventory_2" fill />
+                    </div>
+                </div>
+
+                <div className="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex items-center justify-between">
+                    <div className="space-y-1">
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Logistics Logs</span>
+                        <h4 className="text-xl font-black text-slate-900 tabular-nums">{totalLogistics} Events</h4>
+                        <p className="text-[10px] font-bold text-amber-500 uppercase tracking-tighter">Fulfillments Tracked</p>
+                    </div>
+                    <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                        <Icon name="local_shipping" fill />
+                    </div>
+                </div>
+
+                <div className="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex items-center justify-between">
+                    <div className="space-y-1">
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Active Refills</span>
+                        <h4 className="text-xl font-black text-slate-900 tabular-nums">{totalSubscriptions} Enrolled</h4>
+                        <p className="text-[10px] font-bold text-sky-500 uppercase tracking-tighter">Monthly Subscriptions</p>
+                    </div>
+                    <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+                        <Icon name="autorenew" fill />
+                    </div>
+                </div>
+            </div>
+
             {/* Filters Bar */}
             <div className="flex flex-col md:flex-row items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
                 <div className="relative flex-1 w-full">
@@ -76,7 +132,7 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
                         className="w-full h-10 pl-10 pr-4 bg-slate-50 border-none rounded-xl text-sm font-medium focus:ring-2 focus:ring-brand-indigo/20 transition-all"
                     />
                 </div>
-                <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0">
+                <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                     {(['ALL', 'FINANCE', 'DISPENSATION', 'LOGISTICS', 'SUBSCRIPTION'] as const).map(cat => (
                         <button
                             key={cat}
@@ -111,11 +167,10 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
                     </TableHeader>
                     <TableBody>
                         {filtered.map((entry) => (
-                            <>
+                            <Fragment key={entry.id}>
                                 <TableRow 
-                                    key={entry.id} 
                                     className={cn(
-                                        "group border-slate-50 transition-colors",
+                                        "group border-slate-50 transition-colors cursor-pointer",
                                         expandedRows.has(entry.id) ? "bg-slate-50/30" : "hover:bg-slate-50/30"
                                     )}
                                     onClick={() => entry.items && toggleRow(entry.id)}
@@ -123,11 +178,25 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
                                     <TableCell className="py-5 pl-8">
                                         <div className="flex flex-col gap-0.5">
                                             <span className="text-sm font-bold text-slate-900 tabular-nums">
-                                                {format(new Date(entry.timestamp), "MMM dd, yyyy")}
+                                                {(() => {
+                                                    try {
+                                                        const d = new Date(entry.timestamp);
+                                                        return isNaN(d.getTime()) ? "N/A" : format(d, "MMM dd, yyyy");
+                                                    } catch {
+                                                        return "N/A";
+                                                    }
+                                                })()}
                                             </span>
                                             <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1.5 uppercase tracking-tighter">
                                                 <Icon name="schedule" opticalSize={12} className="text-slate-400" />
-                                                {format(new Date(entry.timestamp), "HH:mm:ss")}
+                                                {(() => {
+                                                    try {
+                                                        const d = new Date(entry.timestamp);
+                                                        return isNaN(d.getTime()) ? "N/A" : format(d, "HH:mm:ss");
+                                                    } catch {
+                                                        return "N/A";
+                                                    }
+                                                })()}
                                             </span>
                                         </div>
                                     </TableCell>
@@ -221,7 +290,7 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
                                         </TableCell>
                                     </TableRow>
                                 )}
-                            </>
+                            </Fragment>
                         ))}
                     </TableBody>
                 </Table>

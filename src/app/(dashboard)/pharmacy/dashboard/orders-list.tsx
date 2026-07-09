@@ -468,11 +468,12 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
   return (
     <>
       <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); setCurrentPage(1); }} className="w-full space-y-8">
-        <div className="flex items-center justify-center sm:justify-start">
-          <TabsList className="bg-slate-200/40 p-1.5 rounded-[20px] h-14 border-none gap-1 shadow-inner">
+        <div className="flex items-center justify-start w-full overflow-x-auto scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] p-1">
+          <TabsList className="bg-slate-100 p-1 rounded-xl h-12 border border-slate-200/30 flex items-center gap-1 w-auto min-w-max">
             <TabsTrigger 
               value="incoming" 
-              className="rounded-full px-6 h-11 font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xl data-[state=active]:shadow-slate-200/50 text-slate-500 hover:text-slate-700"
+              onClick={(e) => e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })}
+              className="rounded-lg px-5 h-10 font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-slate-200/40 text-slate-500 hover:text-slate-700 whitespace-nowrap shrink-0"
             >
               Incoming
               {queueOrders.length > 0 && (
@@ -483,7 +484,8 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
             </TabsTrigger>
             <TabsTrigger 
               value="preparing" 
-              className="rounded-full px-6 h-11 font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xl data-[state=active]:shadow-slate-200/50 text-slate-500 hover:text-slate-700"
+              onClick={(e) => e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })}
+              className="rounded-lg px-5 h-10 font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-slate-200/40 text-slate-500 hover:text-slate-700 whitespace-nowrap shrink-0"
             >
               Preparing
               {processingOrders.length > 0 && (
@@ -494,19 +496,22 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
             </TabsTrigger>
             <TabsTrigger 
               value="outbound" 
-              className="rounded-full px-6 h-11 font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xl data-[state=active]:shadow-slate-200/50 text-slate-500 hover:text-slate-700"
+              onClick={(e) => e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })}
+              className="rounded-lg px-5 h-10 font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-slate-200/40 text-slate-500 hover:text-slate-700 whitespace-nowrap shrink-0"
             >
               Outbound
             </TabsTrigger>
             <TabsTrigger 
               value="completed" 
-              className="rounded-full px-6 h-11 font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xl data-[state=active]:shadow-slate-200/50 text-slate-500 hover:text-slate-700"
+              onClick={(e) => e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })}
+              className="rounded-lg px-5 h-10 font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-slate-200/40 text-slate-500 hover:text-slate-700 whitespace-nowrap shrink-0"
             >
               Completed
             </TabsTrigger>
             <TabsTrigger 
               value="all" 
-              className="rounded-full px-6 h-11 font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xl data-[state=active]:shadow-slate-200/50 text-slate-500 hover:text-slate-700"
+              onClick={(e) => e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })}
+              className="rounded-lg px-5 h-10 font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-slate-200/40 text-slate-500 hover:text-slate-700 whitespace-nowrap shrink-0"
             >
               All
             </TabsTrigger>
