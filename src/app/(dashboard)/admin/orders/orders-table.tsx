@@ -1079,30 +1079,30 @@ export function OrdersTable({
                               exit={{ height: 0, opacity: 0 }}
                               transition={{ type: "spring", duration: 0.4, bounce: 0.1 }}
                             >
-                              <div className="mx-6 my-4 p-8 grid grid-cols-1 md:grid-cols-3 gap-10 bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04),inset_0_0_0_1px_rgba(0,0,0,0.03)] border border-slate-100 relative overflow-hidden group/detail">
-                                <div className="absolute top-0 left-0 w-1.5 h-full bg-brand-indigo opacity-80" />
+                              <div className="mx-2 md:mx-6 my-2 md:my-4 p-4 md:p-8 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10 bg-white rounded-3xl md:rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04),inset_0_0_0_1px_rgba(0,0,0,0.03)] border border-slate-100 relative overflow-hidden group/detail">
+                                <div className="absolute top-0 left-0 w-1.5 h-full bg-brand-teal opacity-80" />
                                 
                                 {/* Col 1: Customer & Logistics */}
                                 <div className="space-y-6">
                                   <div className="space-y-4">
-                                    <div className="flex items-center gap-2 text-indigo-600">
+                                    <div className="flex items-center gap-2 text-brand-teal">
                                       <User className="h-3.5 w-3.5" />
-                                      <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60">Customer Details</h4>
+                                      <h4 className="text-xs font-bold text-slate-500">Customer Details</h4>
                                     </div>
                                     <div className="pl-5 border-l border-slate-100 space-y-1">
                                       <p className="text-base font-bold text-slate-900 tracking-tight">{order.email || "Anonymous Patient"}</p>
-                                      <div className="flex items-center gap-3">
+                                      <div className="flex items-center gap-3 flex-wrap">
                                         <p className="text-xs font-bold text-slate-400 tabular-nums">Order ID: {order.id}</p>
-                                        <span className="text-slate-200">|</span>
+                                        <span className="text-slate-200 hidden sm:inline">|</span>
                                         <p className="text-xs font-bold text-slate-500 tabular-nums">{order.phone_masked || "No Phone Provided"}</p>
                                       </div>
                                     </div>
                                   </div>
                                   
                                   <div className="space-y-4">
-                                    <div className="flex items-center gap-2 text-indigo-600">
+                                    <div className="flex items-center gap-2 text-brand-teal">
                                       <MapPin className="h-3.5 w-3.5" />
-                                      <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60">Delivery Address</h4>
+                                      <h4 className="text-xs font-bold text-slate-500">Delivery Address</h4>
                                     </div>
                                     <div className="pl-5 border-l border-slate-100 space-y-3">
                                       <p className="text-sm font-bold text-slate-700">{order.delivery_area || "Standard Zone"}</p>
@@ -1119,9 +1119,9 @@ export function OrdersTable({
                                 {/* Col 2: Inventory Summary */}
                                 <div className="space-y-6">
                                   <div className="space-y-4">
-                                    <div className="flex items-center gap-2 text-indigo-600">
+                                    <div className="flex items-center gap-2 text-brand-teal">
                                       <Package className="h-3.5 w-3.5" />
-                                      <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60">Order Items</h4>
+                                      <h4 className="text-xs font-bold text-slate-500">Order Items</h4>
                                     </div>
                                   <div className="pl-5 border-l border-slate-100 space-y-2">
                                     {(() => {
@@ -1136,7 +1136,7 @@ export function OrdersTable({
                                             </div>
                                           ))}
                                           {itemsArray.length > 3 && (
-                                            <p className="text-[9px] font-bold text-indigo-600 uppercase tracking-widest pt-1">+{itemsArray.length - 3} additional items</p>
+                                            <p className="text-[9px] font-bold text-brand-teal pt-1">+{itemsArray.length - 3} additional items</p>
                                           )}
                                         </div>
                                       );
@@ -1145,9 +1145,9 @@ export function OrdersTable({
                                 </div>
                                 
                                 <div className="space-y-4">
-                                  <div className="flex items-center gap-2 text-indigo-600">
+                                  <div className="flex items-center gap-2 text-brand-teal">
                                     <CreditCard className="h-3.5 w-3.5" />
-                                    <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60">Payment Summary</h4>
+                                    <h4 className="text-xs font-bold text-slate-500">Payment Summary</h4>
                                   </div>
                                   <div className="pl-5 border-l border-slate-100 space-y-1">
                                     <p className="text-sm font-bold text-slate-900 tracking-tight">₵{Number(order.total_price_ghs || order.total_price || 0).toFixed(2)}</p>
@@ -1157,16 +1157,16 @@ export function OrdersTable({
                                 </div>
 
                                 {/* Col 3: Operational Controls */}
-                                <div className="space-y-6 bg-slate-50/40 p-6 rounded-[2rem] border border-slate-100/50">
+                                <div className="space-y-6 bg-slate-50/40 p-4 md:p-6 rounded-2xl md:rounded-[2rem] border border-slate-100/50">
                                   <div className="space-y-4">
-                                    <div className="flex items-center gap-2 text-indigo-600">
+                                    <div className="flex items-center gap-2 text-brand-teal">
                                       <GanttChartSquare className="h-3.5 w-3.5" />
-                                      <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60">Assigned Pharmacy</h4>
+                                      <h4 className="text-xs font-bold text-slate-500">Assigned Pharmacy</h4>
                                     </div>
                                     <div className="space-y-3">
                                       <div className="flex items-center justify-between">
                                         <p className="text-xs font-bold text-slate-900">{order.pharmacies?.name || "No Partner Assigned"}</p>
-                                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-indigo-600 hover:bg-brand-indigo/10" onClick={(e) => {
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-brand-teal hover:bg-brand-teal/10" onClick={(e) => {
                                           e.stopPropagation();
                                           setActiveMessageOrderId(order.id);
                                           setMessageDialogOpen(true);
@@ -1182,7 +1182,7 @@ export function OrdersTable({
                                             setAuditSheetOpen(true);
                                           }}
                                           size="sm" 
-                                          className="h-9 rounded-xl bg-indigo-600 hover:bg-brand-indigo/90 font-bold text-[9px] uppercase tracking-widest shadow-lg shadow-brand-indigo/20"
+                                          className="h-9 rounded-xl bg-brand-teal hover:bg-brand-teal/90 font-bold text-[9px] uppercase tracking-widest shadow-lg shadow-brand-teal/20"
                                         >
                                           Audit Trail
                                         </Button>
@@ -1203,7 +1203,7 @@ export function OrdersTable({
                                   </div>
                                   
                                   <div className="pt-4 border-t border-slate-200/50">
-                                    <Button asChild variant="link" className="px-0 h-auto text-indigo-600 text-[10px] font-bold uppercase tracking-[0.2em] hover:no-underline hover:opacity-70 gap-2 group/link">
+                                    <Button asChild variant="link" className="px-0 h-auto text-brand-teal text-[10px] font-bold uppercase tracking-[0.2em] hover:no-underline hover:opacity-70 gap-2 group/link">
                                       <a href={`/admin/orders/${order.id}`}>
                                         View Full Order Details
                                         <ChevronRight className="h-3 w-3 transition-transform group-hover/link:translate-x-1" />
