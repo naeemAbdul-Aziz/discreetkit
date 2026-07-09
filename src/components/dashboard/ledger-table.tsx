@@ -53,13 +53,9 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
         }
     };
 
-    const getCategoryStyles = (category: LedgerCategory) => {
-        switch (category) {
-            case 'FINANCE': return "bg-emerald-50 text-emerald-700 border-emerald-100";
-            case 'DISPENSATION': return "bg-brand-indigo/5 text-brand-indigo border-brand-indigo/10";
-            case 'LOGISTICS': return "bg-amber-50 text-amber-700 border-amber-100";
-            case 'SUBSCRIPTION': return "bg-sky-50 text-sky-700 border-sky-100";
-        }
+    // Minimal palette - all categories use slate for a clean, professional look
+    const getCategoryStyles = (_category: LedgerCategory) => {
+        return "bg-slate-50 text-slate-600 border-slate-200";
     };
 
     const totalFinance = entries
@@ -73,51 +69,25 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
 
     return (
         <div className="space-y-6">
-            {/* Metric Summary Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-in fade-in-50 duration-500">
-                <div className="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex items-center justify-between">
-                    <div className="space-y-1">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Total Net Volume</span>
-                        <h4 className="text-xl font-black text-slate-900 tabular-nums">₵{totalFinance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</h4>
-                        <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-tighter">Gross Credit Inbound</p>
+            {/* Metric Summary Cards - minimal monochrome */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 animate-in fade-in-50 duration-500">
+                {[
+                    { label: "Net Volume", value: `₵${totalFinance.toLocaleString(undefined, { minimumFractionDigits: 2 })}`, sub: "Finance", icon: "payments" },
+                    { label: "Units Dispensed", value: `${totalDispensed}`, sub: "Dispensation", icon: "inventory_2" },
+                    { label: "Logistics Events", value: `${totalLogistics}`, sub: "Fulfillment", icon: "local_shipping" },
+                    { label: "Refill Enrollments", value: `${totalSubscriptions}`, sub: "Subscriptions", icon: "autorenew" },
+                ].map((card) => (
+                    <div key={card.label} className="bg-white p-4 rounded-2xl border border-slate-200/60 shadow-sm">
+                        <div className="flex items-start justify-between gap-2">
+                            <div className="space-y-1">
+                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{card.label}</p>
+                                <p className="text-lg font-black text-slate-900 tabular-nums leading-tight">{card.value}</p>
+                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">{card.sub}</p>
+                            </div>
+                            <Icon name={card.icon} opticalSize={18} className="text-slate-300 mt-0.5 shrink-0" />
+                        </div>
                     </div>
-                    <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                        <Icon name="payments" fill />
-                    </div>
-                </div>
-
-                <div className="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex items-center justify-between">
-                    <div className="space-y-1">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Total Dispensed</span>
-                        <h4 className="text-xl font-black text-slate-900 tabular-nums">{totalDispensed} Units</h4>
-                        <p className="text-[10px] font-bold text-brand-indigo uppercase tracking-tighter">Medications Released</p>
-                    </div>
-                    <div className="w-10 h-10 rounded-xl bg-brand-indigo/5 text-brand-indigo flex items-center justify-center">
-                        <Icon name="inventory_2" fill />
-                    </div>
-                </div>
-
-                <div className="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex items-center justify-between">
-                    <div className="space-y-1">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Logistics Logs</span>
-                        <h4 className="text-xl font-black text-slate-900 tabular-nums">{totalLogistics} Events</h4>
-                        <p className="text-[10px] font-bold text-amber-500 uppercase tracking-tighter">Fulfillments Tracked</p>
-                    </div>
-                    <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-                        <Icon name="local_shipping" fill />
-                    </div>
-                </div>
-
-                <div className="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex items-center justify-between">
-                    <div className="space-y-1">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Active Refills</span>
-                        <h4 className="text-xl font-black text-slate-900 tabular-nums">{totalSubscriptions} Enrolled</h4>
-                        <p className="text-[10px] font-bold text-sky-500 uppercase tracking-tighter">Monthly Subscriptions</p>
-                    </div>
-                    <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
-                        <Icon name="autorenew" fill />
-                    </div>
-                </div>
+                ))}
             </div>
 
             {/* Filters Bar */}

@@ -4,12 +4,6 @@ import { OrdersList } from "./orders-list";
 import { PharmacyRealtimeRefresh } from "./realtime-refresh";
 import { RefreshButton } from "./refresh-button";
 import { redirect } from "next/navigation";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Icon } from "@/components/ui/icon";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -113,41 +107,41 @@ export default async function PharmacyDashboardPage() {
         </div>
       </div>
 
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
         {isHub ? (
           <>
             {[
-              { label: "Patients Enrolled", value: hubStats?.totalEnrolled || 0, icon: "group", color: "text-emerald-600", bg: "bg-emerald-50/50", note: "Active subscriptions" },
-              { label: "Adherence Rate", value: `${hubStats?.adherenceRate || 0}%`, icon: "trending_up", color: "text-emerald-500", bg: "bg-emerald-50/50", note: "Successful refills" },
-              { label: "Identity Checks", value: recentOrders.filter(o => o.status === 'pending_verification').length, icon: "verified_user", color: "text-emerald-600", bg: "bg-emerald-50/50", note: "Waiting for verification" },
-              { label: "Total Refills", value: stats.completed, icon: "check_circle", color: "text-emerald-500", bg: "bg-emerald-50/50", note: "Completed cycles" },
+              { label: "Patients Enrolled", value: hubStats?.totalEnrolled || 0, icon: "group", color: "text-brand-teal", note: "Active subscriptions" },
+              { label: "Adherence Rate", value: `${hubStats?.adherenceRate || 0}%`, icon: "trending_up", color: "text-emerald-500", note: "Successful refills" },
+              { label: "Identity Checks", value: recentOrders.filter(o => o.status === 'pending_verification').length, icon: "verified_user", color: "text-brand-teal", note: "Awaiting verification" },
+              { label: "Total Refills", value: stats.completed, icon: "check_circle", color: "text-emerald-500", note: "Completed cycles" },
             ].map((stat, i) => (
-              <Card key={i} className={cn("relative overflow-hidden border-none shadow-sm rounded-2xl p-6", stat.bg)}>
-                <div className="flex items-center justify-between mb-4">
-                  <p className="text-xs font-bold text-slate-500">{stat.label}</p>
-                  <Icon name={stat.icon} className={cn("h-5 w-5", stat.color)} fill />
+              <div key={i} className="bg-white rounded-2xl border border-slate-100 p-3 md:p-5 shadow-sm">
+                <div className="flex items-center justify-between mb-2 md:mb-3">
+                  <p className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-tight">{stat.label}</p>
+                  <Icon name={stat.icon} className={cn("h-4 w-4 md:h-5 md:w-5 shrink-0", stat.color)} fill />
                 </div>
-                <div className="text-3xl font-bold text-slate-900 mb-1">{stat.value}</div>
-                <p className="text-[10px] font-medium text-slate-500">{stat.note}</p>
-              </Card>
+                <div className="text-xl md:text-3xl font-bold text-slate-900 tabular-nums">{stat.value}</div>
+                <p className="text-[9px] md:text-[10px] font-medium text-slate-400 mt-0.5 md:mt-1">{stat.note}</p>
+              </div>
             ))}
           </>
         ) : (
           <>
             {[
-              { label: "New Orders", value: stats.pending, icon: "package_2", color: "text-brand-teal", bg: "bg-slate-50", note: "Awaiting confirmation" },
-              { label: "Preparing", value: stats.processing, icon: "schedule", color: "text-brand-indigo", bg: "bg-slate-50", note: "Currently being packed" },
-              { label: "Out for Delivery", value: stats.outForDelivery, icon: "local_shipping", color: "text-amber-600", bg: "bg-slate-50", note: "In transit to patient" },
-              { label: "Delivered", value: stats.completed, icon: "check_circle", color: "text-emerald-600", bg: "bg-slate-50", note: "Orders completed" },
+              { label: "New Orders", value: stats.pending, icon: "package_2", color: "text-brand-teal", note: "Awaiting confirmation" },
+              { label: "Preparing", value: stats.processing, icon: "schedule", color: "text-brand-indigo", note: "Being packed" },
+              { label: "Out for Delivery", value: stats.outForDelivery, icon: "local_shipping", color: "text-amber-600", note: "In transit" },
+              { label: "Delivered", value: stats.completed, icon: "check_circle", color: "text-emerald-600", note: "Completed today" },
             ].map((stat, i) => (
-              <Card key={i} className={cn("relative overflow-hidden border border-slate-100 shadow-sm rounded-2xl p-6", stat.bg)}>
-                <div className="flex items-center justify-between mb-4">
-                  <p className="text-xs font-bold text-slate-500">{stat.label}</p>
-                  <Icon name={stat.icon} className={cn("h-5 w-5", stat.color)} fill />
+              <div key={i} className="bg-white rounded-2xl border border-slate-100 p-3 md:p-5 shadow-sm">
+                <div className="flex items-center justify-between mb-2 md:mb-3">
+                  <p className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-tight">{stat.label}</p>
+                  <Icon name={stat.icon} className={cn("h-4 w-4 md:h-5 md:w-5 shrink-0", stat.color)} fill />
                 </div>
-                <div className="text-3xl font-bold text-slate-900 mb-1">{stat.value}</div>
-                <p className="text-[10px] font-medium text-slate-500">{stat.note}</p>
-              </Card>
+                <div className="text-xl md:text-3xl font-bold text-slate-900 tabular-nums">{stat.value}</div>
+                <p className="text-[9px] md:text-[10px] font-medium text-slate-400 mt-0.5 md:mt-1">{stat.note}</p>
+              </div>
             ))}
           </>
         )}

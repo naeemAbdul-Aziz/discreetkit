@@ -126,53 +126,43 @@ export async function PATCH(
       }
     }));
 
-    // Log the event with customer-friendly messaging
-    const shouldInsertEvent = action === 'acknowledge' || previousStatus !== updateData.status;
-    if (shouldInsertEvent) {
-      const { createOrderEvent } = await import('@/lib/event-messages');
-      
-      if (action === 'acknowledge') {
-        const eventStatus = pharmacy_ack_status === 'accepted' ? 'pharmacy_accepted' : 'pharmacy_declined';
-        await createOrderEvent(supabase, Number(id), eventStatus, {
-          customNote: note || undefined,
-        });
-      } else if (updateData.status) {
-        await createOrderEvent(supabase, Number(id), updateData.status, {
-          riderName: updateData.courier_name,
-          riderPhone: updateData.courier_phone,
-        });
+    // Log the event with customer-friendly messaging (best-effort - never throws)
+    try {
+      const shouldInsertEvent = action === 'acknowledge' || previousStatus !== updateData.status;
+      if (shouldInsertEvent) {
+        const { createOrderEvent } = await import('@/lib/event-messages');
+        
+        if (action === 'acknowledge') {
+          const eventStatus = pharmacy_ack_status === 'accepted' ? 'pharmacy_accepted' : 'pharmacy_declined';
+          await createOrderEvent(supabase, Number(id), eventStatus, {
+            customNote: note || undefined,
+          });
+        } else if (updateData.status) {
+          await createOrderEvent(supabase, Number(id), updateData.status, {
+            riderName: updateData.courier_name,
+            riderPhone: updateData.courier_phone,
+          });
+        }
       }
+    } catch (eventErr) {
+      // Non-fatal: audit log failed but order update succeeded
+      console.warn('[Pharmacy Order API] Event logging failed (non-fatal):', eventErr);
     }
 
-    // Trigger SMS notifications if status changed
+    // Trigger SMS notifications if status changed (best-effort - never throws)
     if (previousStatus !== updateData.status) {
       try {
         if (updateData.status === 'out_for_delivery') {
-          Sentry.addBreadcrumb({
-            category: 'orders',
-            message: 'Sending shipping SMS',
-            level: 'info',
-            data: { orderId: id }
-          });
           sendShippingNotificationSMS(id).catch(err => {
-            Sentry.captureException(err, { level: 'error', extra: { orderId: id } });
             console.error('Failed to send shipping SMS:', err);
           });
         } else if (updateData.status === 'completed') {
-          Sentry.addBreadcrumb({
-            category: 'orders',
-            message: 'Sending delivery SMS',
-            level: 'info',
-            data: { orderId: id }
-          });
           sendDeliveryNotificationSMS(id).catch(err => {
-            Sentry.captureException(err, { level: 'error', extra: { orderId: id } });
             console.error('Failed to send delivery SMS:', err);
           });
         }
       } catch (smsWrapErr) {
-        // Continue even if breadcrumb/capture fails
-        console.warn('[Sentry] SMS breadcrumb/capture failed:', smsWrapErr);
+        console.warn('[Pharmacy Order API] SMS dispatch failed (non-fatal):', smsWrapErr);
       }
     }
 
