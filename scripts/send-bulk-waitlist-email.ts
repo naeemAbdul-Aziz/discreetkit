@@ -60,43 +60,20 @@ async function main() {
         return;
     }
 
-    console.log('Fetching unique customer emails from orders...');
-    const { data: orders, error } = await supabase
-        .from('orders')
-        .select('email')
-        .not('email', 'is', null);
-
-    if (error) {
-        console.error('Failed to fetch orders:', error.message);
-        process.exit(1);
-    }
-
-    if (!orders || orders.length === 0) {
-        console.log('No customer emails found in orders table.');
-        return;
-    }
-
-    // Get unique lowercase emails
-    const emailSet = new Set<string>();
-    orders.forEach(o => {
-        if (o.email && o.email.trim()) {
-            let email = o.email.trim().toLowerCase();
-            // Normalize common typos
-            email = email.replace('@gamil.com', '@gmail.com');
-            email = email.replace('@gmial.com', '@gmail.com');
-            emailSet.add(email);
-        }
-    });
-
-    // Exclude obvious placeholder/developer/system emails if needed
-    const emails = Array.from(emailSet).filter(email => {
-        // Simple sanity check
-        return email.includes('@') && 
-               !email.includes('example.com') && 
-               !email.includes('test.com') &&
-               !email.includes('@discretekit.com') &&
-               !email.includes('@discreetkit.com');
-    });
+    // Use the exact list of customer emails provided by the user (with typos fixed)
+    const emails = [
+        'naeemabdulaziz202@gmail.com',
+        'marthadarko36@gmail.com',
+        'patienceasiedua18@gmail.com',
+        'flavioahiale74@gmail.com',
+        'maamekoufie@gmail.com',
+        'otoosandra1724@gmail.com',
+        'theresaakamise044@gmail.com', // Normalized gmial.com
+        'nakyeamaah@gmail.com',
+        'akintolureayomide625@gmail.com',
+        'basedkwame@gmail.com',
+        'akplorpaulsp@gmail.com'
+    ];
 
     console.log(`Found ${emails.length} unique customer emails:`);
     emails.forEach((email, idx) => {
