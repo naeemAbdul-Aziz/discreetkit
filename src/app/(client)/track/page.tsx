@@ -337,259 +337,190 @@ function OrderTrackingView({ order }: { order: Order }) {
   const etaDisplay = calculateETA();
 
   return (
-    <div className="grid gap-8 lg:grid-cols-12 animate-in fade-in slide-in-from-bottom-4 duration-1000 ease-out">
+    <div className="w-full max-w-xl mx-auto bg-white rounded-[2rem] border border-slate-100 shadow-[0_12px_40px_rgba(0,0,0,0.02)] overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-1000 ease-out">
       
-      {/* 1. Status Hero (Centered & Polished) */}
-      <div className="lg:col-span-12">
-        <div className="bg-white rounded-[3rem] shadow-2xl shadow-slate-200/50 border border-slate-100 p-12 flex flex-col items-center text-center relative overflow-hidden group">
-          {/* Decorative Elements */}
-          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary/5 via-primary/40 to-primary/5" />
-          <div className="absolute -top-32 -right-32 w-80 h-80 bg-primary/5 rounded-full blur-[100px] opacity-60" />
-          <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-primary/5 rounded-full blur-[100px] opacity-60" />
-          
-          {/* Icon Section */}
-          <div className="relative mb-10">
-            <div className="h-32 w-32 rounded-full bg-slate-50 flex items-center justify-center relative z-10 transition-all duration-700 group-hover:scale-105">
-              <div className="h-24 w-24 rounded-full bg-primary flex items-center justify-center shadow-2xl shadow-primary/40 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-tr from-black/10 to-transparent opacity-50" />
-                {React.createElement(currentStatus.icon, { className: "h-12 w-12 text-white stroke-[2px] relative z-10" })}
-              </div>
-            </div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-44 h-44 bg-primary/5 rounded-full animate-pulse" />
-          </div>
-
-          {/* Text Content */}
-          <div className="max-w-2xl relative z-10">
-            <div className="flex flex-col items-center gap-4 mb-6">
-              <h2 className="text-5xl font-bold tracking-tight text-slate-900">{currentStatus.label}</h2>
-              <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-full border border-emerald-100/50">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-700">Live Status Updated</span>
-              </div>
-            </div>
-            
-            <p className="text-slate-500 font-medium text-xl leading-relaxed mb-10 max-w-lg mx-auto">
-              {currentStatus.description}
+      {/* Header Info Block */}
+      <div className="p-8 pb-6">
+        <div className="flex justify-between items-start">
+          <div>
+            <h2 className="text-2xl font-extrabold tracking-tight text-slate-900">Order #{order.code}</h2>
+            <p className="text-xs font-bold text-slate-400 mt-1">
+              {new Date(latestEvent ? latestEvent.date : new Date()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
             </p>
-
-            {order.status !== 'completed' && (
-              <div className="pt-8 border-t border-slate-100 w-full max-w-xs mx-auto flex flex-col items-center">
-                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 mb-3">
-                  Estimated Arrival
-                </p>
-                <div className="flex items-center gap-3">
-                   <Icon name="schedule" className="text-primary/60" opticalSize={20} />
-                   <p className="text-3xl font-bold tracking-tight text-slate-800">
-                    Today, <span className="text-primary">by {etaDisplay}</span>
-                  </p>
-                </div>
-              </div>
-            )}
+          </div>
+          <div className="flex flex-col items-end gap-1.5">
+            <Badge className={cn(
+              "text-[9px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border-0 shadow-none",
+              order.status === 'completed' ? "bg-emerald-50 text-emerald-700" :
+              order.status === 'out_for_delivery' ? "bg-amber-50 text-amber-700 animate-pulse" :
+              order.status === 'processing' ? "bg-blue-50 text-blue-700" :
+              "bg-slate-100 text-slate-700"
+            )}>
+              {currentStatus.label}
+            </Badge>
+            <span className="text-[11px] font-bold text-slate-500 tracking-tight">₵{order.total_price_ghs.toFixed(2)}</span>
           </div>
         </div>
       </div>
 
-
-      {/* LEFT COLUMN: History & Details (Span 8) */}
-      <div className="lg:col-span-8 space-y-8">
-        {/* Tracking History */}
-        <div className="bg-white rounded-[2rem] shadow-lg border-0 overflow-hidden">
-          <div className="p-8 border-b border-[#f5f5f1]">
-            <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 flex items-center gap-2">
-              <Icon name="assignment" className="text-muted-foreground/60" opticalSize={16} /> Tracking Timeline
-            </h3>
+      {/* Order Summary Section Banner */}
+      <div className="bg-slate-50/70 px-8 py-3 text-[10px] font-black uppercase tracking-wider text-slate-400 border-y border-slate-100">
+        Order Summary
+      </div>
+      <div className="p-8 space-y-6">
+        {order.items.map((item, i) => (
+          <div key={i} className="flex justify-between items-center gap-4 text-sm">
+            <div className="flex items-center gap-3.5">
+              <div className="h-11 w-11 rounded-xl bg-slate-50 flex items-center justify-center p-1.5 border border-slate-100/80 relative shrink-0">
+                {item.image_url ? (
+                  <Image src={item.image_url} alt={item.name} fill className="object-contain p-1" />
+                ) : (
+                  <DiscreetBoxIcon className="h-5 w-5 text-primary/30" />
+                )}
+              </div>
+              <div>
+                <p className="font-extrabold text-slate-800 tracking-tight leading-tight">{item.name}</p>
+                <p className="text-[10px] font-bold text-slate-400 mt-1">Quantity: {item.quantity}</p>
+              </div>
+            </div>
+            <p className="font-extrabold text-slate-900 tabular-nums">₵{(item.price_ghs * item.quantity).toFixed(2)}</p>
           </div>
-          
-          <div className="p-8">
-            <div className="relative border-l-2 border-[#f5f5f1] ml-4 space-y-12 pb-4">
-              {[...order.events]
-                .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-                .filter((event, i, self) => {
-                  const key = event.status.toLowerCase().trim();
-                  return i === self.findIndex((e) => e.status.toLowerCase().trim() === key);
-                })
-                .map((event, index) => {
-                  const isLatest = index === 0;
-                  const friendlyNote = getFriendlyNote(event.note);
+        ))}
+        
+        <div className="border-t border-dashed border-slate-200/60 my-5" />
 
-                  return (
-                    <div key={index} className="relative pl-10 group">
-                      {/* Dot */}
-                      <div className={cn(
-                        "absolute -left-[11px] top-1.5 h-5 w-5 rounded-full border-4 border-white shadow-sm transition-all duration-500",
-                        isLatest ? "bg-primary scale-125 ring-8 ring-primary/5" : "bg-[#f5f5f1]"
-                      )} />
+        <div className="space-y-2.5 text-xs font-bold text-slate-500">
+          <div className="flex justify-between">
+            <span>Subtotal</span>
+            <span className="text-slate-700 tabular-nums">₵{order.subtotal_ghs.toFixed(2)}</span>
+          </div>
+          {order.student_discount_ghs > 0 && (
+            <div className="flex justify-between text-brand-teal">
+              <span>Student Discount</span>
+              <span className="tabular-nums">-₵{order.student_discount_ghs.toFixed(2)}</span>
+            </div>
+          )}
+          <div className="flex justify-between">
+            <span>Logistics Fee</span>
+            <span className="text-slate-700 tabular-nums">{order.delivery_fee_ghs === 0 ? "FREE" : `₵${order.delivery_fee_ghs.toFixed(2)}`}</span>
+          </div>
+          <div className="flex justify-between items-baseline pt-3 text-sm text-slate-900 font-extrabold border-t border-slate-50">
+            <span>Total</span>
+            <span className="text-xl text-slate-900 tabular-nums tracking-tight">₵{order.total_price_ghs.toFixed(2)}</span>
+          </div>
+        </div>
+      </div>
 
-                      <div className={cn(
-                        "transition-all duration-500",
-                        !isLatest && "opacity-50 group-hover:opacity-100"
+      {/* Customer Section Banner */}
+      <div className="bg-slate-50/70 px-8 py-3 text-[10px] font-black uppercase tracking-wider text-slate-400 border-y border-slate-100">
+        Customer Info
+      </div>
+      <div className="p-8 flex items-center gap-4">
+        <div className="w-10 h-10 rounded-full bg-slate-50 border border-slate-200/50 flex items-center justify-center font-extrabold text-slate-600 text-sm shrink-0">
+          DP
+        </div>
+        <div>
+          <p className="text-sm font-extrabold text-slate-800 tracking-tight leading-none">Discreet Patient</p>
+          <p className="text-[11px] font-bold text-slate-400 mt-1.5">{order.deliveryArea || "Standard Delivery Zone"}</p>
+        </div>
+      </div>
+
+      {/* Timeline Section Banner */}
+      <div className="bg-slate-50/70 px-8 py-3 text-[10px] font-black uppercase tracking-wider text-slate-400 border-y border-slate-100">
+        Timeline
+      </div>
+      <div className="p-8">
+        <div className="relative border-l border-slate-100 ml-3.5 space-y-8 pb-2">
+          {[...order.events]
+            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+            .filter((event, i, self) => {
+              const key = event.status.toLowerCase().trim();
+              return i === self.findIndex((e) => e.status.toLowerCase().trim() === key);
+            })
+            .map((event, index) => {
+              const isLatest = index === 0;
+              const friendlyNote = getFriendlyNote(event.note);
+
+              return (
+                <div key={index} className="relative pl-8 group">
+                  {/* Dot */}
+                  <div className={cn(
+                    "absolute -left-[6.5px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-white shadow-sm transition-all duration-500",
+                    isLatest ? "bg-brand-teal scale-110 ring-4 ring-brand-teal/10" : "bg-slate-200"
+                  )} />
+
+                  <div className={cn(
+                    "transition-all duration-500",
+                    !isLatest && "opacity-50 group-hover:opacity-100"
+                  )}>
+                    <div className="flex justify-between items-baseline gap-4 mb-1">
+                      <h4 className={cn(
+                        "font-extrabold text-sm tracking-tight leading-none",
+                        isLatest ? "text-slate-900" : "text-slate-500"
                       )}>
-                        <div className="flex justify-between items-start gap-4 mb-2">
-                          <h4 className={cn(
-                            "font-semibold tracking-tight text-xl leading-none",
-                            isLatest ? "text-foreground" : "text-muted-foreground"
-                          )}>
-                            {getFriendlyEventTitle(event.status)}
-                          </h4>
-                          <time className="text-[11px] font-bold text-muted-foreground/60 uppercase tracking-wider whitespace-nowrap mt-1">
-                            {new Date(event.date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                          </time>
-                        </div>
-                        
-                        <p className="text-[13px] font-bold text-muted-foreground/80 mb-3">
-                          {new Date(event.date).toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" })}
-                        </p>
-
-                        {getReassuranceMessage(event.status) && (
-                          <div className={cn(
-                            "text-sm font-medium p-4 rounded-2xl border-0 max-w-lg",
-                            isLatest ? "bg-primary/5 text-primary/80" : "bg-[#f5f5f1] text-muted-foreground"
-                          )}>
-                            {getReassuranceMessage(event.status)}
-                          </div>
-                        )}
-
-                        {friendlyNote && (
-                          <div className="mt-2 text-sm text-muted-foreground/80 bg-[#f5f5f1]/50 p-3 rounded-xl italic max-w-lg">
-                            "{friendlyNote}"
-                          </div>
-                        )}
-                      </div>
+                        {getFriendlyEventTitle(event.status)}
+                      </h4>
+                      <time className="text-[10px] font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap">
+                        {new Date(event.date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                      </time>
                     </div>
-                  );
-                })}
-            </div>
-          </div>
-        </div>
+                    
+                    <p className="text-[11px] font-bold text-slate-400">
+                      {new Date(event.date).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}
+                    </p>
 
-        {/* Order Items */}
-        <div className="bg-white rounded-[2rem] shadow-lg border-0 overflow-hidden">
-          <div className="p-8 border-b border-[#f5f5f1]">
-            <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80">
-              Package Contents
-            </h3>
-          </div>
-          <div className="p-8 space-y-6">
-            {order.items.map((item, i) => (
-              <div key={i} className="flex gap-6 items-center">
-                <div className="h-20 w-20 rounded-2xl bg-[#f5f5f1] flex items-center justify-center p-2 group relative">
-                  {item.image_url ? (
-                    <Image src={item.image_url} alt={item.name} fill className="object-contain p-3 transition-transform group-hover:scale-110" />
-                  ) : (
-                    <DiscreetBoxIcon className="h-10 w-10 text-primary/30" />
-                  )}
+                    {getReassuranceMessage(event.status) && (
+                      <p className="text-xs font-medium text-slate-400 mt-1 leading-relaxed">
+                        {getReassuranceMessage(event.status)}
+                      </p>
+                    )}
+
+                    {friendlyNote && (
+                      <p className="text-xs font-medium text-slate-500 italic mt-2 bg-slate-50/60 p-3 rounded-xl border border-slate-100/50">
+                        &quot;{friendlyNote}&quot;
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <p className="font-semibold tracking-tight text-lg leading-tight mb-1">{item.name}</p>
-                  <p className="text-sm font-bold text-muted-foreground/60">Quantity: {item.quantity}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold tracking-tight text-xl">GHS {item.price_ghs.toFixed(2)}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+              );
+            })}
         </div>
       </div>
 
-      {/* RIGHT COLUMN: Summary & Delivery (Span 4) */}
-      <div className="lg:col-span-4 space-y-8">
-        {/* Payment Summary */}
-        <div className="bg-[#f5f5f1] rounded-[2rem] shadow-sm p-8">
-          <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 mb-6">
-            Order Total
-          </h3>
-          <div className="space-y-4 text-sm font-bold">
-            <div className="flex justify-between text-muted-foreground/60">
-              <span>Subtotal</span>
-              <span>GHS {order.subtotal_ghs.toFixed(2)}</span>
-            </div>
-            {order.student_discount_ghs > 0 && (
-              <div className="flex justify-between text-primary">
-                <span>Student Discount</span>
-                <span>- GHS {order.student_discount_ghs.toFixed(2)}</span>
-              </div>
-            )}
-            <div className="flex justify-between text-muted-foreground/60">
-              <span>Delivery Fee</span>
-              <span>{order.delivery_fee_ghs === 0 ? "FREE" : `GHS ${order.delivery_fee_ghs.toFixed(2)}`}</span>
-            </div>
-            <div className="h-[1px] w-full bg-border/20 my-2" />
-            <div className="flex justify-between items-baseline pt-2">
-              <span className="text-muted-foreground uppercase text-[10px] tracking-widest">Total</span>
-              <span className="text-3xl font-semibold tracking-tighter">GHS {order.total_price_ghs.toFixed(2)}</span>
-            </div>
+      {/* Dispatch Rider Section Banner */}
+      {order.courierName && (
+        <>
+          <div className="bg-slate-50/70 px-8 py-3 text-[10px] font-black uppercase tracking-wider text-slate-400 border-y border-slate-100">
+            Dispatch Rider
           </div>
-        </div>
-
-        {/* Delivery Details */}
-        <div className="bg-white rounded-[2rem] shadow-lg p-8">
-          <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 mb-6 flex items-center gap-2">
-            <Icon name="location_on" className="text-muted-foreground/60" opticalSize={16} /> Destination
-          </h3>
-          <div className="space-y-6">
-            <div>
-              <p className="font-semibold tracking-tight text-xl leading-tight mb-1">{order.deliveryArea}</p>
-              <p className="text-sm font-medium text-muted-foreground">Main Delivery Area</p>
-            </div>
-            {order.deliveryAddressNote && (
-              <div className="bg-[#f5f5f1] p-4 rounded-2xl italic text-sm text-muted-foreground font-medium">
-                "{order.deliveryAddressNote}"
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Support CTA */}
-        <Link href="https://wa.me/DISCREETKIT" target="_blank" className="block">
-          <div className="bg-primary hover:bg-primary/95 text-white rounded-[2rem] p-8 shadow-lg shadow-primary/20 transition-all active:scale-[0.98] group">
-            <div className="flex items-center gap-6">
-              <div className="h-14 w-14 rounded-full bg-white/10 flex items-center justify-center transition-transform group-hover:rotate-12">
-                <Icon name="chat" className="text-white" opticalSize={28} />
-              </div>
+          <div className="p-8 space-y-4">
+            <div className="flex justify-between items-center gap-4 flex-wrap">
               <div>
-                <h4 className="font-semibold tracking-tight text-xl">Need Help?</h4>
-                <p className="text-white/60 font-medium text-sm leading-snug">Tap to chat with us <br/>on WhatsApp 24/7.</p>
+                <p className="font-extrabold text-slate-800 tracking-tight leading-tight">{order.courierName}</p>
+                <p className="text-[11px] font-bold text-slate-400 mt-1">Phone: {order.courierPhone || "N/A"}</p>
               </div>
-            </div>
-          </div>
-        </Link>
-        {/* 6. Dispatch Info (New) */}
-        {order.courierName && (
-          <div className="bg-primary/5 rounded-[2rem] shadow-sm border border-primary/10 p-8">
-            <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/80 mb-6 flex items-center gap-2">
-              <Icon name="local_shipping" className="text-primary/60" opticalSize={16} /> Dispatch Rider
-            </h3>
-            <div className="space-y-6">
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1 text-primary">Rider Name</p>
-                <p className="font-semibold tracking-tight text-xl leading-tight text-primary">
-                  {order.courierName}
-                </p>
-              </div>
-              {order.courierPhone && (
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1 text-primary">Contact</p>
-                  <p className="font-mono font-bold tracking-widest text-lg text-primary">
-                    {order.courierPhone}
-                  </p>
-                </div>
-              )}
               {order.courierTrackingUrl && (
-                <div className="pt-4">
-                  <a href={order.courierTrackingUrl} target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" className="w-full h-12 rounded-xl font-bold bg-white gap-2 text-primary hover:bg-primary/5 border-primary/20 shadow-sm">
-                      <Icon name="location_on" opticalSize={18} /> Track Live Location
-                    </Button>
-                  </a>
-                </div>
+                <a href={order.courierTrackingUrl} target="_blank" rel="noopener noreferrer">
+                  <Button variant="outline" size="sm" className="h-10 rounded-xl font-bold bg-white text-xs text-brand-teal border-brand-teal/20 hover:bg-brand-teal/5 gap-2">
+                    <Icon name="location_on" opticalSize={16} /> Track Location
+                  </Button>
+                </a>
               )}
             </div>
           </div>
-        )}
+        </>
+      )}
+
+      {/* WhatsApp Help CTA Support Banner */}
+      <div className="p-8 bg-slate-50 border-t border-slate-100 text-center">
+        <p className="text-xs font-bold text-slate-400 mb-3.5">Need help with your delivery?</p>
+        <Link 
+          href="https://wa.me/233539384839" 
+          target="_blank" 
+          className="inline-flex items-center justify-center gap-2 px-6 h-11 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs font-bold shadow-lg shadow-emerald-600/10 transition-all active:scale-[0.98]"
+        >
+          <Icon name="chat" className="text-white" opticalSize={16} /> Chat on WhatsApp
+        </Link>
       </div>
     </div>
   );
@@ -600,250 +531,185 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
-        return "bg-green-100 text-green-700 border-green-200";
+        return "bg-green-50 text-green-700";
       case "paused":
-        return "bg-yellow-100 text-yellow-700 border-yellow-200";
+        return "bg-yellow-50 text-yellow-700";
       case "cancelled":
-        return "bg-red-100 text-red-700 border-red-200";
+        return "bg-red-50 text-red-700";
       default:
-        return "bg-[#f5f5f1] text-muted-foreground border-border/20";
+        return "bg-slate-50 text-slate-700";
     }
   };
 
   const daysUntilNextDelivery = subscription.nextDeliveryDate
-    ? Math.ceil(
-        (new Date(subscription.nextDeliveryDate).getTime() - Date.now()) /
-          (1000 * 60 * 60 * 24),
-      )
+    ? Math.ceil((new Date(subscription.nextDeliveryDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
     : null;
 
   return (
-    <div className="grid gap-8 lg:grid-cols-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-      {/* LEFT COLUMN: Status & Details */}
-      <div className="lg:col-span-8 space-y-8">
-        {/* Subscription Status Card */}
-        <div className="bg-white rounded-[2rem] shadow-lg border-0 overflow-hidden">
-          <div className="p-8 border-b border-[#f5f5f1] flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 flex items-center gap-2">
-              <Icon name="medication" className="text-muted-foreground/60" opticalSize={16} /> Subscription Status
-            </h3>
-            <Badge
-              className={cn(
-                "text-xs px-4 py-1.5 font-bold uppercase tracking-widest rounded-full border-0",
-                getStatusColor(subscription.status),
-              )}
-            >
-              {subscription.status}
-            </Badge>
+    <div className="w-full max-w-xl mx-auto bg-white rounded-[2rem] border border-slate-100 shadow-[0_12px_40px_rgba(0,0,0,0.02)] overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-1000 ease-out">
+      
+      {/* Header Info Block */}
+      <div className="p-8 pb-6">
+        <div className="flex justify-between items-start">
+          <div>
+            <h2 className="text-2xl font-extrabold tracking-tight text-slate-900">Subscription Status</h2>
+            <p className="text-xs font-bold text-slate-400 mt-1">
+              Refill service tracking
+            </p>
           </div>
-          <div className="p-8 space-y-8">
-            <div className="flex items-center gap-6">
-              <div className="h-24 w-24 rounded-[2rem] bg-[#f5f5f1] flex items-center justify-center p-3 relative group">
-                {subscription.product?.image_url ? (
-                  <Image
-                    src={subscription.product.image_url}
-                    alt={subscription.product.name}
-                    fill
-                    className="object-contain p-4 transition-transform group-hover:scale-110"
-                  />
-                ) : (
-                  <Icon name="medication" className="text-muted-foreground/20" opticalSize={40} />
-                )}
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold tracking-tight text-2xl mb-1 mt-2">
-                  {subscription.product?.name || "Medication"}
-                </h3>
-                <p className="font-bold text-muted-foreground/80">
-                  {subscription.frequency === "monthly"
-                    ? "Monthly"
-                    : "Quarterly"}{" "}
-                  Refill Service
-                </p>
-                <p className="text-[11px] font-bold text-muted-foreground/50 uppercase tracking-widest mt-2">
-                  Enrolled {new Date(subscription.enrolledAt).toLocaleDateString()}
-                </p>
-              </div>
-            </div>
+          <Badge className={cn(
+            "text-[9px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border-0 shadow-none",
+            getStatusColor(subscription.status)
+          )}>
+            {subscription.status}
+          </Badge>
+        </div>
+      </div>
 
-            {daysUntilNextDelivery !== null && subscription.status === "active" && (
-              <div className="mt-8 p-6 bg-primary/5 text-primary/80 rounded-[2rem] border-0 flex items-center gap-6">
-                <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                  <Icon name="calendar_today" className="text-primary" opticalSize={24} />
-                </div>
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-widest opacity-80 mb-1">Next Delivery</p>
-                  <p className="text-3xl font-semibold tracking-tighter text-primary leading-none">
-                    {daysUntilNextDelivery > 0
-                      ? `In ${daysUntilNextDelivery} day${daysUntilNextDelivery !== 1 ? "s" : ""}`
-                      : "Today"}
-                  </p>
-                  <p className="text-sm font-bold opacity-80 mt-2">
-                    {new Date(subscription.nextDeliveryDate).toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}
-                  </p>
-                </div>
-              </div>
+      {/* Subscription Details Section Banner */}
+      <div className="bg-slate-50/70 px-8 py-3 text-[10px] font-black uppercase tracking-wider text-slate-400 border-y border-slate-100">
+        Medication Details
+      </div>
+      <div className="p-8 space-y-6">
+        <div className="flex items-center gap-4">
+          <div className="h-14 w-14 rounded-xl bg-slate-50 flex items-center justify-center p-2 border border-slate-100/80 relative shrink-0">
+            {subscription.product?.image_url ? (
+              <Image src={subscription.product.image_url} alt={subscription.product.name} fill className="object-contain p-1" />
+            ) : (
+              <Icon name="medication" className="text-slate-300" opticalSize={24} />
             )}
+          </div>
+          <div>
+            <h3 className="font-extrabold text-slate-900 tracking-tight leading-tight">
+              {subscription.product?.name || "Medication"}
+            </h3>
+            <p className="text-[11px] font-bold text-slate-400 mt-1 uppercase tracking-wider">
+              {subscription.frequency === "monthly" ? "Monthly" : "Quarterly"} Refill
+            </p>
           </div>
         </div>
 
-        {/* Refill History */}
-        {subscription.refillHistory && subscription.refillHistory.length > 0 && (
-          <div className="bg-white rounded-[2rem] shadow-lg border-0 overflow-hidden">
-            <div className="p-8 border-b border-[#f5f5f1]">
-              <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 flex items-center gap-2">
-                <Icon name="assignment" className="text-muted-foreground/60" opticalSize={16} /> Refill History
-              </h3>
+        {daysUntilNextDelivery !== null && subscription.status === "active" && (
+          <div className="p-5 bg-teal-50/50 text-teal-800 rounded-2xl border border-teal-100/50 flex items-center gap-4">
+            <div className="h-10 w-10 rounded-xl bg-teal-50 flex items-center justify-center shrink-0">
+              <Icon name="calendar_today" className="text-brand-teal" opticalSize={18} />
             </div>
-            
-            <div className="p-8">
-              <div className="relative border-l-2 border-[#f5f5f1] ml-4 space-y-12 pb-4">
-                {subscription.refillHistory.map((refill: any, index: number) => {
-                  const isLatest = index === 0;
-                  return (
-                    <div key={index} className="relative pl-10 group">
-                      {/* Dot */}
-                      <div className={cn(
-                        "absolute -left-[11px] top-1.5 h-5 w-5 rounded-full border-4 border-white shadow-sm transition-all duration-500",
-                        isLatest ? "bg-primary scale-125 ring-8 ring-primary/5" : "bg-[#f5f5f1]"
-                      )} />
-
-                      <div className={cn(
-                        "transition-all duration-500",
-                        !isLatest && "opacity-50 group-hover:opacity-100"
-                      )}>
-                        <div className="flex justify-between items-start gap-4 mb-2">
-                          <h4 className={cn(
-                            "font-semibold tracking-tight text-xl leading-none",
-                            isLatest ? "text-foreground" : "text-muted-foreground"
-                          )}>
-                            Refill Dispensed
-                          </h4>
-                          <time className="text-[11px] font-bold text-muted-foreground/60 uppercase tracking-wider whitespace-nowrap mt-1">
-                            {new Date(refill.dispensed_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                          </time>
-                        </div>
-                        
-                        <p className="text-[13px] font-bold text-muted-foreground/80 mb-3">
-                          {new Date(refill.dispensed_at).toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" })}
-                        </p>
-
-                        {refill.notes && (
-                          <div className={cn(
-                            "text-sm font-medium p-4 rounded-2xl border-0 max-w-lg",
-                            isLatest ? "bg-primary/5 text-primary/80 italic" : "bg-[#f5f5f1] text-muted-foreground italic"
-                          )}>
-                            "{refill.notes}"
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-0.5">Next Delivery</p>
+              <p className="text-lg font-extrabold tracking-tight text-teal-900">
+                {daysUntilNextDelivery > 0 ? `In ${daysUntilNextDelivery} day${daysUntilNextDelivery !== 1 ? "s" : ""}` : "Today"}
+              </p>
+              <p className="text-[11px] font-bold opacity-75 mt-0.5">
+                {new Date(subscription.nextDeliveryDate).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}
+              </p>
             </div>
           </div>
         )}
       </div>
 
-      {/* RIGHT COLUMN: Details */}
-      <div className="lg:col-span-4 space-y-8">
-        {/* Prescription Status */}
-        <div className="bg-white rounded-[2rem] shadow-lg p-8">
-          <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 mb-6 flex items-center gap-2">
-            {subscription.prescriptionVerified ? (
-              <Icon name="check_circle" className="text-green-600" opticalSize={16} fill={true} />
-            ) : (
-              <Icon name="schedule" className="text-yellow-600" opticalSize={16} />
-            )}
-            Prescription
-          </h3>
+      {/* Prescription section */}
+      <div className="bg-slate-50/70 px-8 py-3 text-[10px] font-black uppercase tracking-wider text-slate-400 border-y border-slate-100">
+        Prescription Info
+      </div>
+      <div className="p-8">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
-            <Badge
-              className={cn(
-                "text-xs px-4 py-1.5 font-bold uppercase tracking-widest rounded-full border-0 mb-4",
-                subscription.prescriptionVerified
-                  ? "bg-green-100 text-green-700"
-                  : "bg-yellow-100 text-yellow-700",
-              )}
-            >
-              {subscription.prescriptionVerified ? "Verified" : "Pending Verif"}
-            </Badge>
-            {!subscription.prescriptionVerified ? (
-              <p className="text-sm font-medium text-muted-foreground">
-                Our pharmacists are reviewing your document.
-              </p>
-            ) : (
-              <p className="text-sm font-medium text-muted-foreground">
-                Valid prescription on file.
-              </p>
-            )}
+            <p className="font-extrabold text-slate-800 tracking-tight leading-tight">
+              {subscription.prescriptionVerified ? "Verified Prescription" : "Pending Verification"}
+            </p>
+            <p className="text-[11px] font-bold text-slate-400 mt-1">
+              {subscription.prescriptionVerified ? "Valid prescription is active and on file." : "Our pharmacy team is currently reviewing your document."}
+            </p>
           </div>
+          <Badge className={cn(
+            "text-[9px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border-0 shadow-none",
+            subscription.prescriptionVerified ? "bg-emerald-50 text-emerald-700" : "bg-yellow-50 text-yellow-700"
+          )}>
+            {subscription.prescriptionVerified ? "Verified" : "Pending"}
+          </Badge>
         </div>
+      </div>
 
-        {/* MASKED Delivery Details */}
-        <div className="bg-[#f5f5f1] rounded-[2rem] shadow-sm p-8">
-          <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60 mb-6 flex items-center gap-2">
-            <Icon name="location_on" className="text-muted-foreground/60" opticalSize={16} /> Delivery
-          </h3>
-          <div className="space-y-6">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1">Masked Location</p>
-              <p className="font-semibold tracking-tight text-xl leading-tight">
-                {subscription.deliveryAddress?.city}
-              </p>
-              {subscription.deliveryAddress?.street && (
-                <p className="text-sm font-bold text-muted-foreground/80 mt-1">
-                  {subscription.deliveryAddress.street}
-                </p>
-              )}
-            </div>
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1">Masked Phone</p>
-              <p className="font-mono font-bold tracking-widest text-lg">
-                {subscription.deliveryAddress?.phone || "N/A"}
-              </p>
-            </div>
+      {/* Delivery details section */}
+      <div className="bg-slate-50/70 px-8 py-3 text-[10px] font-black uppercase tracking-wider text-slate-400 border-y border-slate-100">
+        Delivery Destination
+      </div>
+      <div className="p-8 space-y-4">
+        <div>
+          <p className="font-extrabold text-slate-800 tracking-tight leading-tight">{subscription.deliveryAddress?.city || "Standard Zone"}</p>
+          {subscription.deliveryAddress?.street && (
+            <p className="text-[11px] font-bold text-slate-400 mt-1">{subscription.deliveryAddress.street}</p>
+          )}
+        </div>
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-0.5">Masked Contact</p>
+          <p className="font-mono font-bold tracking-widest text-sm text-slate-700">
+            {subscription.deliveryAddress?.phone || "N/A"}
+          </p>
+        </div>
+      </div>
+
+      {/* Refill History Timeline */}
+      {subscription.refillHistory && subscription.refillHistory.length > 0 && (
+        <>
+          <div className="bg-slate-50/70 px-8 py-3 text-[10px] font-black uppercase tracking-wider text-slate-400 border-y border-slate-100">
+            Refill History
           </div>
-        </div>
+          <div className="p-8">
+            <div className="relative border-l border-slate-100 ml-3.5 space-y-8 pb-2">
+              {subscription.refillHistory.map((refill: any, index: number) => {
+                const isLatest = index === 0;
+                return (
+                  <div key={index} className="relative pl-8 group">
+                    {/* Dot */}
+                    <div className={cn(
+                      "absolute -left-[6.5px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-white shadow-sm transition-all duration-500",
+                      isLatest ? "bg-brand-teal scale-110 ring-4 ring-brand-teal/10" : "bg-slate-200"
+                    )} />
 
-        {/* Assigned Pharmacy */}
-        {subscription.pharmacy && (
-          <div className="bg-white rounded-[2rem] shadow-lg p-8">
-            <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 mb-6 flex items-center gap-2">
-              <Icon name="location_on" opticalSize={14} /> Pharmacy
-            </h3>
-            <div className="space-y-6">
-              <div>
-                <p className="font-semibold tracking-tight text-xl leading-tight mb-2">
-                  {subscription.pharmacy.name}
-                </p>
-                {subscription.pharmacy.phone && (
-                  <div>
-                     <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/80 mb-1">Contact</p>
-                     <p className="font-mono font-bold tracking-widest text-lg">
-                      {subscription.pharmacy.phone}
-                    </p>
+                    <div className={cn(
+                      "transition-all duration-500",
+                      !isLatest && "opacity-50 group-hover:opacity-100"
+                    )}>
+                      <div className="flex justify-between items-baseline gap-4 mb-1">
+                        <h4 className={cn(
+                          "font-extrabold text-sm tracking-tight leading-none",
+                          isLatest ? "text-slate-900" : "text-slate-500"
+                        )}>
+                          Refill Dispensed
+                        </h4>
+                        <time className="text-[10px] font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap">
+                          {new Date(refill.dispensed_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        </time>
+                      </div>
+                      
+                      <p className="text-[11px] font-bold text-slate-400">
+                        {new Date(refill.dispensed_at).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}
+                      </p>
+
+                      {refill.notes && (
+                        <p className="text-xs font-medium text-slate-500 italic mt-2 bg-slate-50/60 p-3 rounded-xl border border-slate-100/50">
+                          &quot;{refill.notes}&quot;
+                        </p>
+                      )}
+                    </div>
                   </div>
-                )}
-              </div>
+                );
+              })}
             </div>
           </div>
-        )}
+        </>
+      )}
 
-        {/* Support CTA */}
-        <Link href="https://wa.me/DISCREETKIT" target="_blank" className="block">
-          <div className="bg-primary hover:bg-primary/95 text-white rounded-[2rem] p-8 shadow-lg shadow-primary/20 transition-all active:scale-[0.98] group">
-            <div className="flex items-center gap-6">
-              <div className="h-14 w-14 rounded-full bg-white/10 flex items-center justify-center transition-transform group-hover:rotate-12">
-                <Icon name="chat" className="text-white" opticalSize={28} />
-              </div>
-              <div>
-                <h4 className="font-semibold tracking-tight text-xl">Need Help?</h4>
-                <p className="text-white/60 font-medium text-sm leading-snug">Tap to chat with us <br/>on WhatsApp 24/7.</p>
-              </div>
-            </div>
-          </div>
+      {/* WhatsApp Help CTA Support Banner */}
+      <div className="p-8 bg-slate-50 border-t border-slate-100 text-center">
+        <p className="text-xs font-bold text-slate-400 mb-3.5">Need help with your subscription?</p>
+        <Link 
+          href="https://wa.me/233539384839" 
+          target="_blank" 
+          className="inline-flex items-center justify-center gap-2 px-6 h-11 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs font-bold shadow-lg shadow-emerald-600/10 transition-all active:scale-[0.98]"
+        >
+          <Icon name="chat" className="text-white" opticalSize={16} /> Chat on WhatsApp
         </Link>
       </div>
     </div>
