@@ -24,52 +24,56 @@ if (!resendApiKey) {
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 const resend = new Resend(resendApiKey);
 
-// Check for live flag
-const isDryRun = !process.argv.includes('--send');
+// Check for command-line arguments
+const isDryRun = !process.argv.includes('--send') && !process.argv.includes('--test');
+const testArgIndex = process.argv.indexOf('--test');
+const testRecipient = testArgIndex !== -1 ? process.argv[testArgIndex + 1] : null;
 
 async function main() {
     console.log('--------------------------------------------------');
     console.log('DISCREETKIT: Bulk Waitlist Email Broadcaster');
-    console.log(`Execution Mode: ${isDryRun ? 'DRY-RUN (Simulated)' : 'LIVE (Sending Emails)'}`);
+    if (testRecipient) {
+        console.log(`Execution Mode: TEST SEND (to ${testRecipient})`);
+    } else {
+        console.log(`Execution Mode: ${isDryRun ? 'DRY-RUN (Simulated)' : 'LIVE (Sending Emails)'}`);
+    }
     console.log('--------------------------------------------------');
 
-    console.log('Fetching unique customer emails from orders...');
-    const { data: orders, error } = await supabase
-        .from('orders')
-        .select('email')
-        .not('email', 'is', null);
+    if (testRecipient) {
+        console.log(`Sending test email to: ${testRecipient}...`);
+        try {
+            const response = await resend.emails.send({
+                from: 'DiscreetKit <hello@discreetkit.com>',
+                to: testRecipient,
+                subject: "Thank you for your support! We'll be live soon.",
+                html: getEmailTemplate(testRecipient)
+            });
 
-    if (error) {
-        console.error('Failed to fetch orders:', error.message);
-        process.exit(1);
-    }
-
-    if (!orders || orders.length === 0) {
-        console.log('No customer emails found in orders table.');
+            if (response.error) {
+                console.error(`  [FAILED] Resend error:`, response.error);
+            } else {
+                console.log(`  [SUCCESS] Test email sent successfully! ID: ${response.data?.id}`);
+            }
+        } catch (err: any) {
+            console.error(`  [FAILED] Error:`, err.message || err);
+        }
         return;
     }
 
-    // Get unique lowercase emails
-    const emailSet = new Set<string>();
-    orders.forEach(o => {
-        if (o.email && o.email.trim()) {
-            let email = o.email.trim().toLowerCase();
-            // Normalize common typos
-            email = email.replace('@gamil.com', '@gmail.com');
-            email = email.replace('@gmial.com', '@gmail.com');
-            emailSet.add(email);
-        }
-    });
-
-    // Exclude obvious placeholder/developer/system emails if needed
-    const emails = Array.from(emailSet).filter(email => {
-        // Simple sanity check
-        return email.includes('@') && 
-               !email.includes('example.com') && 
-               !email.includes('test.com') &&
-               !email.includes('@discretekit.com') &&
-               !email.includes('@discreetkit.com');
-    });
+    // Use the exact list of customer emails provided by the user (with typos fixed)
+    const emails = [
+        'naeemabdulaziz202@gmail.com',
+        'marthadarko36@gmail.com',
+        'patienceasiedua18@gmail.com',
+        'flavioahiale74@gmail.com',
+        'maamekoufie@gmail.com',
+        'otoosandra1724@gmail.com',
+        'theresaakamise044@gmail.com', // Normalized gmial.com
+        'nakyeamaah@gmail.com',
+        'akintolureayomide625@gmail.com',
+        'basedkwame@gmail.com',
+        'akplorpaulsp@gmail.com'
+    ];
 
     console.log(`Found ${emails.length} unique customer emails:`);
     emails.forEach((email, idx) => {
@@ -133,19 +137,21 @@ function getEmailTemplate(email: string) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-      body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b; margin: 0; padding: 0; background-color: #f8fafc; }
-      .container { max-width: 600px; margin: 40px auto; padding: 32px; background: #ffffff; border-radius: 24px; border: 1px solid #f1f5f9; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02); }
-      .logo { font-size: 20px; font-weight: 800; color: #0d9488; letter-spacing: -0.025em; margin-bottom: 24px; }
-      .title { font-size: 22px; font-weight: 800; color: #0f172a; tracking: -0.025em; line-height: 1.3; margin-bottom: 16px; }
-      .paragraph { font-size: 14px; font-weight: 500; color: #475569; line-height: 1.6; margin-bottom: 20px; }
-      .btn { display: inline-flex; align-items: center; justify-content: center; padding: 14px 24px; background-color: #0d9488; color: #ffffff !important; text-decoration: none; border-radius: 12px; font-size: 14px; font-weight: 700; margin-top: 16px; margin-bottom: 24px; text-align: center; }
+      body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #334155; margin: 0; padding: 0; background-color: #fafafa; -webkit-font-smoothing: antialiased; }
+      .container { max-width: 520px; margin: 40px auto; padding: 40px; background: #ffffff; border-radius: 20px; border: 1px solid #eaeaea; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.01); }
+      .logo { font-size: 24px; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 28px; }
+      .title { font-size: 22px; font-weight: 800; color: #0f172a; letter-spacing: -0.02em; line-height: 1.3; margin-bottom: 16px; }
+      .paragraph { font-size: 14px; font-weight: 500; color: #64748b; line-height: 1.65; margin-bottom: 20px; }
+      .btn { display: inline-flex; align-items: center; justify-content: center; padding: 14px 28px; background-color: #0d9488; color: #ffffff !important; text-decoration: none; border-radius: 14px; font-size: 13px; font-weight: 700; letter-spacing: -0.01em; margin-top: 16px; margin-bottom: 24px; text-align: center; box-shadow: 0 10px 20px rgba(13, 148, 136, 0.15); }
       .btn:hover { background-color: #0f766e; }
       .footer { border-top: 1px solid #f1f5f9; padding-top: 24px; margin-top: 32px; font-size: 11px; font-weight: 600; color: #94a3b8; text-transform: uppercase; tracking: 0.05em; }
     </style>
   </head>
   <body>
     <div class="container">
-      <div class="logo">DiscreetKit</div>
+      <div class="logo">
+        <span style="color: #0f172a;">Discreet</span><span style="color: #0d9488;">Kit</span><span style="color: #0d9488;">.</span>
+      </div>
       <h1 class="title">Thank you for your order! We'll be live soon.</h1>
       <p class="paragraph">
         Hello,
