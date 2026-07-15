@@ -232,18 +232,18 @@ function Tracker() {
           "transition-all duration-700",
           trackingData ? "mb-8" : "mb-12"
         )}>
-          <div className="inline-flex items-center justify-center h-16 w-16 rounded-3xl bg-primary/5 mb-6 animate-in zoom-in duration-1000">
-             <Icon name="location_searching" className="text-primary" opticalSize={32} />
+          <div className="inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-teal-50 border border-teal-100/50 mb-6 animate-in zoom-in duration-1000">
+             <DiscreetBoxIcon className="h-8 w-8 text-brand-teal" />
           </div>
           <h1 className={cn(
-            "font-bold tracking-tight mb-4 text-slate-900 transition-all duration-700",
-            trackingData ? "text-3xl" : "text-6xl"
+            "font-black tracking-tight mb-4 text-slate-900 transition-all duration-700",
+            trackingData ? "text-2xl md:text-3xl" : "text-4xl md:text-6xl"
           )}>
             {trackingData ? "Order Status" : "Track Order"}
           </h1>
           <p className={cn(
-            "text-slate-500 font-medium transition-all duration-700",
-            trackingData ? "text-base" : "text-xl max-w-md mx-auto leading-relaxed"
+            "text-slate-500 font-medium transition-all duration-700 px-4",
+            trackingData ? "text-sm md:text-base" : "text-base md:text-xl max-w-md mx-auto leading-relaxed"
           )}>
             {trackingData 
               ? "Real-time delivery updates for your package." 
@@ -254,26 +254,24 @@ function Tracker() {
         <form
           onSubmit={handleSearch}
           className={cn(
-            "flex items-center gap-3 p-3 transition-all duration-700 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] w-full",
-            trackingData 
-              ? "max-w-md bg-white rounded-full border border-slate-100" 
-              : "max-w-lg bg-white rounded-[2.5rem] md:p-4 border border-slate-100"
+            "flex items-center gap-2 p-2 transition-all duration-700 shadow-sm w-full bg-white rounded-xl border border-slate-200/60",
+            trackingData ? "max-w-md" : "max-w-lg"
           )}
         >
           <div className="relative flex-1">
-            <Icon name="search" className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" opticalSize={20} />
+            <Icon name="search" className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" opticalSize={18} />
             <input
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              placeholder="Order Code (e.g. A9K...)"
-              className="w-full h-14 pl-14 pr-4 bg-slate-50/50 border-0 rounded-full text-base font-bold tracking-wide placeholder:font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-primary/10 outline-none transition-all"
+              placeholder="Order Code (e.g. BUN-XPL-Y29)"
+              className="w-full h-12 pl-11 pr-3 bg-slate-50/50 border-0 rounded-lg text-sm font-bold tracking-wide placeholder:font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-primary/10 outline-none transition-all"
               disabled={isPending}
             />
           </div>
           <Button 
             type="submit" 
             disabled={isPending || !code}
-            className="h-14 px-10 rounded-full font-bold shadow-xl transition-all active:scale-95 bg-primary hover:bg-primary/95 text-white"
+            className="h-12 px-6 rounded-lg font-bold shadow-none transition-all active:scale-95 bg-brand-teal hover:bg-brand-teal/95 text-white"
           >
             {isPending ? <BrandSpinner size="sm" /> : "Track"}
           </Button>
@@ -337,20 +335,20 @@ function OrderTrackingView({ order }: { order: Order }) {
   const etaDisplay = calculateETA();
 
   return (
-    <div className="w-full max-w-xl mx-auto bg-white rounded-[2rem] border border-slate-100 shadow-[0_12px_40px_rgba(0,0,0,0.02)] overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-1000 ease-out">
+    <div className="w-full max-w-xl mx-auto bg-white rounded-2xl md:rounded-[2rem] border border-slate-100 shadow-[0_12px_40px_rgba(0,0,0,0.02)] overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-1000 ease-out">
       
       {/* Header Info Block */}
-      <div className="p-8 pb-6">
-        <div className="flex justify-between items-start">
-          <div>
-            <h2 className="text-2xl font-extrabold tracking-tight text-slate-900">Order #{order.code}</h2>
-            <p className="text-xs font-bold text-slate-400 mt-1">
+      <div className="p-5 md:p-8 pb-4 md:pb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+          <div className="space-y-1">
+            <h2 className="text-xl md:text-2xl font-extrabold tracking-tight text-slate-900 break-all">Order #{order.code}</h2>
+            <p className="text-xs font-bold text-slate-400">
               {new Date(latestEvent ? latestEvent.date : new Date()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
             </p>
           </div>
-          <div className="flex flex-col items-end gap-1.5">
+          <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2 pt-3 sm:pt-0 border-t border-slate-50 sm:border-t-0 w-full sm:w-auto">
             <Badge className={cn(
-              "text-[9px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border-0 shadow-none",
+              "text-[9px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border-0 shadow-none shrink-0",
               order.status === 'completed' ? "bg-emerald-50 text-emerald-700" :
               order.status === 'out_for_delivery' ? "bg-amber-50 text-amber-700 animate-pulse" :
               order.status === 'processing' ? "bg-blue-50 text-blue-700" :
@@ -358,19 +356,19 @@ function OrderTrackingView({ order }: { order: Order }) {
             )}>
               {currentStatus.label}
             </Badge>
-            <span className="text-[11px] font-bold text-slate-500 tracking-tight">₵{order.total_price_ghs.toFixed(2)}</span>
+            <span className="text-xs sm:text-[11px] font-bold text-slate-900 sm:text-slate-500 tracking-tight">₵{order.total_price_ghs.toFixed(2)}</span>
           </div>
         </div>
       </div>
 
       {/* Order Summary Section Banner */}
-      <div className="bg-slate-50/70 px-8 py-3 text-[10px] font-black uppercase tracking-wider text-slate-400 border-y border-slate-100">
+      <div className="bg-slate-50/70 px-5 md:px-8 py-3 text-[10px] font-black uppercase tracking-wider text-slate-400 border-y border-slate-100">
         Order Summary
       </div>
-      <div className="p-8 space-y-6">
+      <div className="p-5 md:p-8 space-y-6">
         {order.items.map((item, i) => (
           <div key={i} className="flex justify-between items-center gap-4 text-sm">
-            <div className="flex items-center gap-3.5">
+            <div className="flex items-center gap-3.5 min-w-0">
               <div className="h-11 w-11 rounded-xl bg-slate-50 flex items-center justify-center p-1.5 border border-slate-100/80 relative shrink-0">
                 {item.image_url ? (
                   <Image src={item.image_url} alt={item.name} fill className="object-contain p-1" />
@@ -378,12 +376,12 @@ function OrderTrackingView({ order }: { order: Order }) {
                   <DiscreetBoxIcon className="h-5 w-5 text-primary/30" />
                 )}
               </div>
-              <div>
-                <p className="font-extrabold text-slate-800 tracking-tight leading-tight">{item.name}</p>
+              <div className="min-w-0">
+                <p className="font-extrabold text-slate-800 tracking-tight leading-tight truncate">{item.name}</p>
                 <p className="text-[10px] font-bold text-slate-400 mt-1">Quantity: {item.quantity}</p>
               </div>
             </div>
-            <p className="font-extrabold text-slate-900 tabular-nums">₵{(item.price_ghs * item.quantity).toFixed(2)}</p>
+            <p className="font-extrabold text-slate-900 tabular-nums shrink-0">₵{(item.price_ghs * item.quantity).toFixed(2)}</p>
           </div>
         ))}
         
@@ -412,24 +410,24 @@ function OrderTrackingView({ order }: { order: Order }) {
       </div>
 
       {/* Customer Section Banner */}
-      <div className="bg-slate-50/70 px-8 py-3 text-[10px] font-black uppercase tracking-wider text-slate-400 border-y border-slate-100">
+      <div className="bg-slate-50/70 px-5 md:px-8 py-3 text-[10px] font-black uppercase tracking-wider text-slate-400 border-y border-slate-100">
         Customer Info
       </div>
-      <div className="p-8 flex items-center gap-4">
+      <div className="p-5 md:p-8 flex items-center gap-4">
         <div className="w-10 h-10 rounded-full bg-slate-50 border border-slate-200/50 flex items-center justify-center font-extrabold text-slate-600 text-sm shrink-0">
           DP
         </div>
-        <div>
-          <p className="text-sm font-extrabold text-slate-800 tracking-tight leading-none">Discreet Patient</p>
-          <p className="text-[11px] font-bold text-slate-400 mt-1.5">{order.deliveryArea || "Standard Delivery Zone"}</p>
+        <div className="min-w-0">
+          <p className="text-sm font-extrabold text-slate-800 tracking-tight leading-none truncate">Discreet Patient</p>
+          <p className="text-[11px] font-bold text-slate-400 mt-1.5 truncate">{order.deliveryArea || "Standard Delivery Zone"}</p>
         </div>
       </div>
 
       {/* Timeline Section Banner */}
-      <div className="bg-slate-50/70 px-8 py-3 text-[10px] font-black uppercase tracking-wider text-slate-400 border-y border-slate-100">
+      <div className="bg-slate-50/70 px-5 md:px-8 py-3 text-[10px] font-black uppercase tracking-wider text-slate-400 border-y border-slate-100">
         Timeline
       </div>
-      <div className="p-8">
+      <div className="p-5 md:p-8">
         <div className="relative border-l border-slate-100 ml-3.5 space-y-8 pb-2">
           {[...order.events]
             .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
@@ -490,18 +488,18 @@ function OrderTrackingView({ order }: { order: Order }) {
       {/* Dispatch Rider Section Banner */}
       {order.courierName && (
         <>
-          <div className="bg-slate-50/70 px-8 py-3 text-[10px] font-black uppercase tracking-wider text-slate-400 border-y border-slate-100">
+          <div className="bg-slate-50/70 px-5 md:px-8 py-3 text-[10px] font-black uppercase tracking-wider text-slate-400 border-y border-slate-100">
             Dispatch Rider
           </div>
-          <div className="p-8 space-y-4">
-            <div className="flex justify-between items-center gap-4 flex-wrap">
+          <div className="p-5 md:p-8 space-y-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
                 <p className="font-extrabold text-slate-800 tracking-tight leading-tight">{order.courierName}</p>
                 <p className="text-[11px] font-bold text-slate-400 mt-1">Phone: {order.courierPhone || "N/A"}</p>
               </div>
               {order.courierTrackingUrl && (
-                <a href={order.courierTrackingUrl} target="_blank" rel="noopener noreferrer">
-                  <Button variant="outline" size="sm" className="h-10 rounded-xl font-bold bg-white text-xs text-brand-teal border-brand-teal/20 hover:bg-brand-teal/5 gap-2">
+                <a href={order.courierTrackingUrl} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
+                  <Button variant="outline" size="sm" className="h-10 rounded-xl font-bold bg-white text-xs text-brand-teal border-brand-teal/20 hover:bg-brand-teal/5 gap-2 w-full sm:w-auto">
                     <Icon name="location_on" opticalSize={16} /> Track Location
                   </Button>
                 </a>
@@ -512,12 +510,12 @@ function OrderTrackingView({ order }: { order: Order }) {
       )}
 
       {/* WhatsApp Help CTA Support Banner */}
-      <div className="p-8 bg-slate-50 border-t border-slate-100 text-center">
+      <div className="p-5 md:p-8 bg-slate-50 border-t border-slate-100 text-center">
         <p className="text-xs font-bold text-slate-400 mb-3.5">Need help with your delivery?</p>
         <Link 
           href="https://wa.me/233539384839" 
           target="_blank" 
-          className="inline-flex items-center justify-center gap-2 px-6 h-11 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs font-bold shadow-lg shadow-emerald-600/10 transition-all active:scale-[0.98]"
+          className="inline-flex items-center justify-center gap-2 px-6 h-11 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs font-bold shadow-lg shadow-emerald-600/10 transition-all active:scale-[0.98] w-full sm:w-auto"
         >
           <Icon name="chat" className="text-white" opticalSize={16} /> Chat on WhatsApp
         </Link>
@@ -546,19 +544,19 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
     : null;
 
   return (
-    <div className="w-full max-w-xl mx-auto bg-white rounded-[2rem] border border-slate-100 shadow-[0_12px_40px_rgba(0,0,0,0.02)] overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-1000 ease-out">
+    <div className="w-full max-w-xl mx-auto bg-white rounded-2xl md:rounded-[2rem] border border-slate-100 shadow-[0_12px_40px_rgba(0,0,0,0.02)] overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-1000 ease-out">
       
       {/* Header Info Block */}
-      <div className="p-8 pb-6">
-        <div className="flex justify-between items-start">
+      <div className="p-5 md:p-8 pb-4 md:pb-6">
+        <div className="flex justify-between items-start gap-4">
           <div>
-            <h2 className="text-2xl font-extrabold tracking-tight text-slate-900">Subscription Status</h2>
+            <h2 className="text-xl md:text-2xl font-extrabold tracking-tight text-slate-900">Subscription Status</h2>
             <p className="text-xs font-bold text-slate-400 mt-1">
               Refill service tracking
             </p>
           </div>
           <Badge className={cn(
-            "text-[9px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border-0 shadow-none",
+            "text-[9px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border-0 shadow-none shrink-0",
             getStatusColor(subscription.status)
           )}>
             {subscription.status}
@@ -567,10 +565,10 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
       </div>
 
       {/* Subscription Details Section Banner */}
-      <div className="bg-slate-50/70 px-8 py-3 text-[10px] font-black uppercase tracking-wider text-slate-400 border-y border-slate-100">
+      <div className="bg-slate-50/70 px-5 md:px-8 py-3 text-[10px] font-black uppercase tracking-wider text-slate-400 border-y border-slate-100">
         Medication Details
       </div>
-      <div className="p-8 space-y-6">
+      <div className="p-5 md:p-8 space-y-6">
         <div className="flex items-center gap-4">
           <div className="h-14 w-14 rounded-xl bg-slate-50 flex items-center justify-center p-2 border border-slate-100/80 relative shrink-0">
             {subscription.product?.image_url ? (
@@ -608,21 +606,21 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
       </div>
 
       {/* Prescription section */}
-      <div className="bg-slate-50/70 px-8 py-3 text-[10px] font-black uppercase tracking-wider text-slate-400 border-y border-slate-100">
+      <div className="bg-slate-50/70 px-5 md:px-8 py-3 text-[10px] font-black uppercase tracking-wider text-slate-400 border-y border-slate-100">
         Prescription Info
       </div>
-      <div className="p-8">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <div>
+      <div className="p-5 md:p-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 w-full">
+          <div className="min-w-0">
             <p className="font-extrabold text-slate-800 tracking-tight leading-tight">
               {subscription.prescriptionVerified ? "Verified Prescription" : "Pending Verification"}
             </p>
-            <p className="text-[11px] font-bold text-slate-400 mt-1">
+            <p className="text-[11px] font-bold text-slate-400 mt-1.5 leading-relaxed">
               {subscription.prescriptionVerified ? "Valid prescription is active and on file." : "Our pharmacy team is currently reviewing your document."}
             </p>
           </div>
           <Badge className={cn(
-            "text-[9px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border-0 shadow-none",
+            "text-[9px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border-0 shadow-none shrink-0 w-fit",
             subscription.prescriptionVerified ? "bg-emerald-50 text-emerald-700" : "bg-yellow-50 text-yellow-700"
           )}>
             {subscription.prescriptionVerified ? "Verified" : "Pending"}
@@ -631,10 +629,10 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
       </div>
 
       {/* Delivery details section */}
-      <div className="bg-slate-50/70 px-8 py-3 text-[10px] font-black uppercase tracking-wider text-slate-400 border-y border-slate-100">
+      <div className="bg-slate-50/70 px-5 md:px-8 py-3 text-[10px] font-black uppercase tracking-wider text-slate-400 border-y border-slate-100">
         Delivery Destination
       </div>
-      <div className="p-8 space-y-4">
+      <div className="p-5 md:p-8 space-y-4">
         <div>
           <p className="font-extrabold text-slate-800 tracking-tight leading-tight">{subscription.deliveryAddress?.city || "Standard Zone"}</p>
           {subscription.deliveryAddress?.street && (
@@ -652,10 +650,10 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
       {/* Refill History Timeline */}
       {subscription.refillHistory && subscription.refillHistory.length > 0 && (
         <>
-          <div className="bg-slate-50/70 px-8 py-3 text-[10px] font-black uppercase tracking-wider text-slate-400 border-y border-slate-100">
+          <div className="bg-slate-50/70 px-5 md:px-8 py-3 text-[10px] font-black uppercase tracking-wider text-slate-400 border-y border-slate-100">
             Refill History
           </div>
-          <div className="p-8">
+          <div className="p-5 md:p-8">
             <div className="relative border-l border-slate-100 ml-3.5 space-y-8 pb-2">
               {subscription.refillHistory.map((refill: any, index: number) => {
                 const isLatest = index === 0;
@@ -702,12 +700,12 @@ function SubscriptionTrackingView({ subscription }: { subscription: any }) {
       )}
 
       {/* WhatsApp Help CTA Support Banner */}
-      <div className="p-8 bg-slate-50 border-t border-slate-100 text-center">
+      <div className="p-5 md:p-8 bg-slate-50 border-t border-slate-100 text-center">
         <p className="text-xs font-bold text-slate-400 mb-3.5">Need help with your subscription?</p>
         <Link 
           href="https://wa.me/233539384839" 
           target="_blank" 
-          className="inline-flex items-center justify-center gap-2 px-6 h-11 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs font-bold shadow-lg shadow-emerald-600/10 transition-all active:scale-[0.98]"
+          className="inline-flex items-center justify-center gap-2 px-6 h-11 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs font-bold shadow-lg shadow-emerald-600/10 transition-all active:scale-[0.98] w-full sm:w-auto"
         >
           <Icon name="chat" className="text-white" opticalSize={16} /> Chat on WhatsApp
         </Link>
