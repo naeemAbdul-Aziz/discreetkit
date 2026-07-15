@@ -1074,41 +1074,39 @@ export function OrdersTable({
                         <TableRow className="bg-slate-50/30 border-t-0 hover:bg-slate-50/50 transition-colors">
                           <TableCell colSpan={8} className="p-0 overflow-hidden">
                             <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: "auto", opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ type: "spring", duration: 0.4, bounce: 0.1 }}
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              transition={{ duration: 0.15 }}
                             >
-                              <div className="mx-2 md:mx-6 my-2 md:my-4 p-4 md:p-8 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10 bg-white rounded-3xl md:rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04),inset_0_0_0_1px_rgba(0,0,0,0.03)] border border-slate-100 relative overflow-hidden group/detail">
-                                <div className="absolute top-0 left-0 w-1.5 h-full bg-brand-teal opacity-80" />
-                                
+                              <div className="mx-6 my-3 p-6 grid grid-cols-1 md:grid-cols-3 gap-8 bg-slate-50/50 rounded-2xl border border-slate-200/60 relative overflow-hidden group/detail">
                                 {/* Col 1: Customer & Logistics */}
-                                <div className="space-y-6">
-                                  <div className="space-y-4">
-                                    <div className="flex items-center gap-2 text-brand-teal">
+                                <div className="space-y-5">
+                                  <div className="space-y-3">
+                                    <div className="flex items-center gap-2 text-slate-400">
                                       <User className="h-3.5 w-3.5" />
-                                      <h4 className="text-xs font-bold text-slate-500">Customer Details</h4>
+                                      <h4 className="text-[10px] font-bold uppercase tracking-wider">Customer Details</h4>
                                     </div>
-                                    <div className="pl-5 border-l border-slate-100 space-y-1">
-                                      <p className="text-base font-bold text-slate-900 tracking-tight">{order.email || "Anonymous Patient"}</p>
-                                      <div className="flex items-center gap-3 flex-wrap">
-                                        <p className="text-xs font-bold text-slate-400 tabular-nums">Order ID: {order.id}</p>
-                                        <span className="text-slate-200 hidden sm:inline">|</span>
-                                        <p className="text-xs font-bold text-slate-500 tabular-nums">{order.phone_masked || "No Phone Provided"}</p>
+                                    <div className="pl-5 border-l border-slate-200 space-y-1">
+                                      <p className="text-sm font-bold text-slate-900 tracking-tight">{order.email || "Anonymous Patient"}</p>
+                                      <div className="flex items-center gap-2 flex-wrap text-xs font-medium text-slate-400">
+                                        <p className="tabular-nums">ID: {order.id}</p>
+                                        <span>•</span>
+                                        <p className="tabular-nums">{order.phone_masked || "No Phone Provided"}</p>
                                       </div>
                                     </div>
                                   </div>
                                   
-                                  <div className="space-y-4">
-                                    <div className="flex items-center gap-2 text-brand-teal">
+                                  <div className="space-y-3">
+                                    <div className="flex items-center gap-2 text-slate-400">
                                       <MapPin className="h-3.5 w-3.5" />
-                                      <h4 className="text-xs font-bold text-slate-500">Delivery Address</h4>
+                                      <h4 className="text-[10px] font-bold uppercase tracking-wider">Delivery Address</h4>
                                     </div>
-                                    <div className="pl-5 border-l border-slate-100 space-y-3">
-                                      <p className="text-sm font-bold text-slate-700">{order.delivery_area || "Standard Zone"}</p>
-                                      <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-100/50 relative group/note">
-                                        <div className="absolute -top-2 left-3 px-2 bg-white border border-slate-100 rounded-md text-[8px] font-bold uppercase tracking-tighter text-slate-400">Recipient Note</div>
-                                        <p className="text-[11px] font-medium text-slate-500 italic leading-relaxed">
+                                    <div className="pl-5 border-l border-slate-200 space-y-3">
+                                      <p className="text-xs font-bold text-slate-700">{order.delivery_area || "Standard Zone"}</p>
+                                      <div className="p-3 bg-white rounded-xl border border-slate-200/60 relative group/note">
+                                        <div className="absolute -top-2 left-3 px-1.5 bg-white border border-slate-200/60 rounded text-[9px] font-bold uppercase tracking-wide text-slate-400">Recipient Note</div>
+                                        <p className="text-xs font-medium text-slate-500 italic leading-relaxed">
                                           &quot;{order.delivery_address_note || "No specific delivery notes provided."}&quot;
                                         </p>
                                       </div>
@@ -1117,55 +1115,55 @@ export function OrdersTable({
                                 </div>
 
                                 {/* Col 2: Inventory Summary */}
-                                <div className="space-y-6">
-                                  <div className="space-y-4">
-                                    <div className="flex items-center gap-2 text-brand-teal">
+                                <div className="space-y-5">
+                                  <div className="space-y-3">
+                                    <div className="flex items-center gap-2 text-slate-400">
                                       <Package className="h-3.5 w-3.5" />
-                                      <h4 className="text-xs font-bold text-slate-500">Order Items</h4>
+                                      <h4 className="text-[10px] font-bold uppercase tracking-wider">Order Items</h4>
                                     </div>
-                                  <div className="pl-5 border-l border-slate-100 space-y-2">
-                                    {(() => {
-                                      const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
-                                      const itemsArray = Array.isArray(items) ? items : [];
-                                      return (
-                                        <div className="space-y-2">
-                                          {itemsArray.slice(0, 3).map((item: any, i: number) => (
-                                            <div key={i} className="flex justify-between items-center text-[11px] font-bold text-slate-600">
-                                              <span className="truncate max-w-[120px]">{item.name}</span>
-                                              <span className="text-slate-400 tabular-nums">x{item.quantity}</span>
-                                            </div>
-                                          ))}
-                                          {itemsArray.length > 3 && (
-                                            <p className="text-[9px] font-bold text-brand-teal pt-1">+{itemsArray.length - 3} additional items</p>
-                                          )}
-                                        </div>
-                                      );
-                                    })()}
+                                    <div className="pl-5 border-l border-slate-200 space-y-2">
+                                      {(() => {
+                                        const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
+                                        const itemsArray = Array.isArray(items) ? items : [];
+                                        return (
+                                          <div className="space-y-1.5">
+                                            {itemsArray.slice(0, 3).map((item: any, i: number) => (
+                                              <div key={i} className="flex justify-between items-center text-xs font-bold text-slate-600">
+                                                <span className="truncate max-w-[150px]">{item.name}</span>
+                                                <span className="text-slate-400 tabular-nums">x{item.quantity}</span>
+                                              </div>
+                                            ))}
+                                            {itemsArray.length > 3 && (
+                                              <p className="text-[10px] font-bold text-brand-teal pt-1">+{itemsArray.length - 3} additional items</p>
+                                            )}
+                                          </div>
+                                        );
+                                      })()}
+                                    </div>
                                   </div>
-                                </div>
-                                
-                                <div className="space-y-4">
-                                  <div className="flex items-center gap-2 text-brand-teal">
-                                    <CreditCard className="h-3.5 w-3.5" />
-                                    <h4 className="text-xs font-bold text-slate-500">Payment Summary</h4>
+                                  
+                                  <div className="space-y-3">
+                                    <div className="flex items-center gap-2 text-slate-400">
+                                      <CreditCard className="h-3.5 w-3.5" />
+                                      <h4 className="text-[10px] font-bold uppercase tracking-wider">Payment Summary</h4>
+                                    </div>
+                                    <div className="pl-5 border-l border-slate-200 space-y-1">
+                                      <p className="text-sm font-extrabold text-slate-900 tracking-tight">₵{Number(order.total_price_ghs || order.total_price || 0).toFixed(2)}</p>
+                                      <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Cash on Delivery</p>
+                                    </div>
                                   </div>
-                                  <div className="pl-5 border-l border-slate-100 space-y-1">
-                                    <p className="text-sm font-bold text-slate-900 tracking-tight">₵{Number(order.total_price_ghs || order.total_price || 0).toFixed(2)}</p>
-                                    <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest">Cash on Delivery</p>
-                                  </div>
-                                </div>
                                 </div>
 
                                 {/* Col 3: Operational Controls */}
-                                <div className="space-y-6 bg-slate-50/40 p-4 md:p-6 rounded-2xl md:rounded-[2rem] border border-slate-100/50">
-                                  <div className="space-y-4">
-                                    <div className="flex items-center gap-2 text-brand-teal">
+                                <div className="space-y-4 bg-white p-5 rounded-xl border border-slate-200/60">
+                                  <div className="space-y-3">
+                                    <div className="flex items-center gap-2 text-slate-400">
                                       <GanttChartSquare className="h-3.5 w-3.5" />
-                                      <h4 className="text-xs font-bold text-slate-500">Assigned Pharmacy</h4>
+                                      <h4 className="text-[10px] font-bold uppercase tracking-wider">Assigned Pharmacy</h4>
                                     </div>
                                     <div className="space-y-3">
                                       <div className="flex items-center justify-between">
-                                        <p className="text-xs font-bold text-slate-900">{order.pharmacies?.name || "No Partner Assigned"}</p>
+                                        <p className="text-xs font-bold text-slate-800">{order.pharmacies?.name || "No Partner Assigned"}</p>
                                         <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-brand-teal hover:bg-brand-teal/10" onClick={(e) => {
                                           e.stopPropagation();
                                           setActiveMessageOrderId(order.id);
@@ -1182,7 +1180,7 @@ export function OrdersTable({
                                             setAuditSheetOpen(true);
                                           }}
                                           size="sm" 
-                                          className="h-9 rounded-xl bg-brand-teal hover:bg-brand-teal/90 font-bold text-[9px] uppercase tracking-widest shadow-lg shadow-brand-teal/20"
+                                          className="h-9 rounded-lg bg-brand-teal hover:bg-brand-teal/90 font-bold text-xs text-white shadow-none"
                                         >
                                           Audit Trail
                                         </Button>
@@ -1194,7 +1192,7 @@ export function OrdersTable({
                                           }}
                                           variant="outline" 
                                           size="sm" 
-                                          className="h-9 rounded-xl border-slate-200 bg-white hover:bg-slate-50 font-bold text-[9px] uppercase tracking-widest text-slate-600"
+                                          className="h-9 rounded-lg border-slate-200 bg-white hover:bg-slate-50 font-bold text-xs text-slate-600 shadow-none"
                                         >
                                           Flag Issue
                                         </Button>
@@ -1202,8 +1200,8 @@ export function OrdersTable({
                                     </div>
                                   </div>
                                   
-                                  <div className="pt-4 border-t border-slate-200/50">
-                                    <Button asChild variant="link" className="px-0 h-auto text-brand-teal text-[10px] font-bold uppercase tracking-[0.2em] hover:no-underline hover:opacity-70 gap-2 group/link">
+                                  <div className="pt-3 border-t border-slate-100">
+                                    <Button asChild variant="link" className="px-0 h-auto text-brand-teal text-xs font-bold hover:no-underline hover:opacity-75 gap-1.5 group/link">
                                       <a href={`/admin/orders/${order.id}`}>
                                         View Full Order Details
                                         <ChevronRight className="h-3 w-3 transition-transform group-hover/link:translate-x-1" />
