@@ -271,7 +271,7 @@ function Tracker() {
           <Button 
             type="submit" 
             disabled={isPending || !code}
-            className="h-12 px-6 rounded-lg font-bold shadow-none transition-all active:scale-95 bg-brand-teal hover:bg-brand-teal/95 text-white"
+            className="h-12 px-6 rounded-lg font-bold transition-all active:scale-95 bg-gradient-to-r from-[#0d635c] to-[#14877e] hover:from-[#0b524c] hover:to-[#10736b] text-white border border-[#0d635c]/10 shadow-sm"
           >
             {isPending ? <BrandSpinner size="sm" /> : "Track"}
           </Button>
