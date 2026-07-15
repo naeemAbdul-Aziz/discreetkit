@@ -33,7 +33,7 @@ export function FloatingChatTrigger() {
   const triggerButton = (
     <Button
       className={cn(
-        "h-14 rounded-full bg-brand-teal hover:bg-brand-teal/90 text-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all duration-300 hover:scale-105 active:scale-95 border border-white/20 group pl-2 pr-5 flex items-center gap-3"
+        "h-14 rounded-full bg-gradient-to-r from-[#0d635c] to-[#14877e] hover:from-[#0b524c] hover:to-[#10736b] text-white shadow-[0_8px_30px_rgba(13,99,92,0.16)] transition-all duration-300 hover:scale-105 active:scale-95 border border-white/20 group pl-2 pr-5 flex items-center gap-3"
       )}
       aria-label="Ask Pacely"
       onClick={() => {

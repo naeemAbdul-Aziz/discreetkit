@@ -68,7 +68,7 @@ export default {
         },
         brand: {
           indigo: '#1e3a5f',
-          teal: '#187f76',
+          teal: '#0d635c',
           gold: '#c48c52',
           silver: '#d7d9db',
           yellow: '#ffce07',
