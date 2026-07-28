@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { RefreshCcw, Home } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 
 export default function DashboardError({
   error,
@@ -31,11 +31,11 @@ export default function DashboardError({
 
         <div className="flex flex-wrap gap-3">
           <Button onClick={() => reset()} className="gap-2">
-            <RefreshCcw className="h-4 w-4" /> Try again
+            <Icon name="refresh" opticalSize={16} /> Try again
           </Button>
           <Button asChild variant="outline" className="gap-2">
             <Link href="/admin">
-              <Home className="h-4 w-4" /> Go to Admin Home
+              <Icon name="home" opticalSize={16} /> Go to Admin Home
             </Link>
           </Button>
         </div>

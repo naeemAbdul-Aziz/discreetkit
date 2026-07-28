@@ -5,20 +5,12 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { DashboardChatbot } from "./dashboard-chatbot";
 import { Chatbot } from "./chatbot";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
@@ -27,24 +19,25 @@ export function FloatingChatTrigger() {
   const pathname = usePathname();
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
-  // Hide the floating trigger when already on the dedicated chat page
-  if (pathname?.startsWith("/chat")) {
+  // Never show the floating trigger on dashboard portals (pharmacy/admin have Pacely in sidebar)
+  // or on dedicated chat/copilot pages
+  if (
+    pathname?.startsWith("/pharmacy") ||
+    pathname?.startsWith("/admin") ||
+    pathname?.startsWith("/chat") ||
+    pathname?.endsWith("/copilot")
+  ) {
     return null;
   }
-
-  const isAdmin = pathname?.startsWith("/admin");
-  const isPharmacy = pathname?.startsWith("/pharmacy");
-  const isDashboard = isAdmin || isPharmacy;
-  const role = isAdmin ? "admin" : (isPharmacy ? "pharmacy" : undefined);
 
   const triggerButton = (
     <Button
       className={cn(
-        "h-14 rounded-full bg-brand-teal hover:bg-brand-teal/90 text-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all duration-300 hover:scale-105 active:scale-95 border border-white/20 group pl-2 pr-5 flex items-center gap-3"
+        "h-14 rounded-full bg-gradient-to-r from-[#0d635c] to-[#14877e] hover:from-[#0b524c] hover:to-[#10736b] text-white shadow-[0_8px_30px_rgba(13,99,92,0.16)] transition-all duration-300 hover:scale-105 active:scale-95 border border-white/20 group pl-2 pr-5 flex items-center gap-3"
       )}
       aria-label="Ask Pacely"
       onClick={() => {
-        if (!isDesktop && !isDashboard) {
+        if (!isDesktop) {
           router.push('/chat');
         }
       }}
@@ -53,7 +46,7 @@ export function FloatingChatTrigger() {
         <img src="https://res.cloudinary.com/dzfa6wqb8/image/upload/v1765475269/pacely_avator_fb9b17.png" alt="Pacely" className="h-full w-full object-cover" />
       </div>
       <span className="font-semibold text-[13px] tracking-[0.05em] uppercase text-white/90">
-        {isDashboard ? "Ask Copilot" : "Ask Pacely"}
+        Ask Pacely
       </span>
     </Button>
   );
@@ -71,47 +64,19 @@ export function FloatingChatTrigger() {
             <DialogTrigger asChild>
               {triggerButton}
             </DialogTrigger>
-            <DialogContent className={cn(
-              "max-w-xl h-[640px] flex flex-col p-0 overflow-hidden bg-white rounded-3xl border border-slate-200/50 shadow-2xl",
-              !isDashboard && "max-w-lg h-[600px]"
-            )}>
+            <DialogContent className="max-w-lg h-[600px] flex flex-col p-0 overflow-hidden bg-white rounded-3xl border border-slate-200/50 shadow-2xl">
               <DialogHeader className="p-6 pb-4 border-b bg-slate-50/50 text-center sm:text-center shrink-0">
                 <DialogTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
-                  {isDashboard 
-                    ? (isAdmin ? "Admin Operations" : "Pharmacy Protocol")
-                    : "Customer Support Assistant"
-                  }
+                  Customer Support Assistant
                 </DialogTitle>
               </DialogHeader>
               <div className="flex-1 overflow-hidden relative">
-                {isDashboard ? (
-                  <DashboardChatbot role={role!} />
-                ) : (
-                  <Chatbot hideClose={true} />
-                )}
+                <Chatbot hideClose={true} />
               </div>
             </DialogContent>
           </Dialog>
         ) : (
-          isDashboard ? (
-            <Sheet>
-              <SheetTrigger asChild>
-                {triggerButton}
-              </SheetTrigger>
-              <SheetContent className="w-full sm:w-[500px] flex flex-col p-0 bg-white border-l border-slate-100">
-                <SheetHeader className="p-5 border-b">
-                  <SheetTitle className="text-sm font-bold text-slate-900">
-                    {isAdmin ? "Admin Command" : "Pharmacy Copilot"}
-                  </SheetTitle>
-                </SheetHeader>
-                <div className="flex-1 overflow-hidden">
-                  <DashboardChatbot role={role!} />
-                </div>
-              </SheetContent>
-            </Sheet>
-          ) : (
-            triggerButton
-          )
+          triggerButton
         )}
       </motion.div>
     </AnimatePresence>

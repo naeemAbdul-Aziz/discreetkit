@@ -51,8 +51,8 @@ function OrderPageLoading() {
 
 export default function OrderPage() {
   return (
-    <div className="bg-background min-h-[100dvh] vk-safe overscroll-contain vk-scroll pb-12">
-      <div className="container mx-auto max-w-lg px-4 py-6 md:py-10">
+    <div className="bg-background min-h-[calc(100dvh-4rem)] flex items-start md:items-center justify-center">
+      <div className="container mx-auto max-w-lg px-4 py-12 md:py-20">
         <Suspense fallback={<OrderPageLoading />}>
           <OrderForm />
         </Suspense>

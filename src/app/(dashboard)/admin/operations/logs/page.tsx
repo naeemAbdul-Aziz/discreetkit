@@ -19,11 +19,11 @@ export default async function AdminLogsPage() {
                             { label: "Operational Ledger" },
                         ]}
                     />
-                    <h1 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 uppercase tracking-widest mt-2">
+                    <h1 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 mt-2">
                         Operational Ledger
                     </h1>
-                    <p className="text-[10px] uppercase font-bold text-slate-400 tracking-[0.2em]">
-                        Exhaustive audit trail of all transactions, dispensations, and logistics.
+                    <p className="text-sm font-medium text-slate-500">
+                        Audit trail of all transactions, inventory updates, and deliveries.
                     </p>
                 </div>
 

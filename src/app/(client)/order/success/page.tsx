@@ -320,7 +320,7 @@ function SuccessPageLoading() {
 
 export default function OrderSuccessPage() {
   return (
-    <div className="flex min-h-[calc(100dvh-10rem)] items-center justify-center bg-background px-4 py-12">
+    <div className="flex min-h-[calc(100dvh-4rem)] items-start md:items-center justify-center bg-background px-4 py-12 md:py-20">
       <Suspense fallback={<SuccessPageLoading />}>
         <SuccessContent />
       </Suspense>

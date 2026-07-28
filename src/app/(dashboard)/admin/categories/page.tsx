@@ -19,11 +19,11 @@ export default async function CategoriesPage() {
       ]} />
       
       <div className="flex flex-col gap-1">
-        <h2 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 uppercase tracking-widest">
-            Classification Grid
+        <h2 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900">
+            Categories
         </h2>
-        <p className="text-[10px] uppercase font-bold text-slate-400 tracking-[0.2em]">
-            Strategic catalog organization & metadata control
+        <p className="text-sm font-medium text-slate-500">
+            Organize product categories and catalog structure.
         </p>
       </div>
 

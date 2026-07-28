@@ -6,15 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, Loader2 } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
 interface OperationalSettingsProps {
   initialIs24_7: boolean;
+  onUpdate?: () => void;
 }
 
-export default function OperationalSettings({ initialIs24_7 }: OperationalSettingsProps) {
+export default function OperationalSettings({ initialIs24_7, onUpdate }: OperationalSettingsProps) {
   const { toast } = useToast();
   const [is24_7, setIs24_7] = useState(initialIs24_7);
   const [loading, setLoading] = useState(false);
@@ -33,6 +34,7 @@ export default function OperationalSettings({ initialIs24_7 }: OperationalSettin
                 title: "Settings Updated", 
                 description: checked ? "Your store is now marked as 24/7." : "Your store is no longer marked as 24/7." 
             });
+            onUpdate?.();
         } else {
             setIs24_7(!checked); // Revert
             toast({ variant: "destructive", title: "Error", description: result.message });
@@ -50,7 +52,7 @@ export default function OperationalSettings({ initialIs24_7 }: OperationalSettin
       <CardHeader className="bg-slate-50/50 border-b border-slate-100">
         <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-brand-teal/10 flex items-center justify-center text-brand-teal">
-                <Clock className="h-5 w-5" />
+                <Icon name="schedule" className="text-brand-teal" opticalSize={20} />
             </div>
             <div>
                 <CardTitle className="text-lg font-black text-slate-900 leading-tight">Operational Logic</CardTitle>
@@ -74,7 +76,7 @@ export default function OperationalSettings({ initialIs24_7 }: OperationalSettin
                     </p>
                 </div>
                 <div className="flex items-center gap-3 bg-white p-2 rounded-xl border border-slate-100 shadow-sm">
-                    {loading && <Loader2 className="h-4 w-4 animate-spin text-brand-teal" />}
+                    {loading && <Icon name="progress_activity" className="animate-spin text-brand-teal" opticalSize={16} />}
                     <Switch
                         checked={is24_7}
                         onCheckedChange={handleToggle}

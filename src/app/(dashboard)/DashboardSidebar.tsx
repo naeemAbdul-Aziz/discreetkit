@@ -70,22 +70,10 @@ export function DashboardSidebar() {
           { href: "/pharmacy/inventory", label: "Inventory", icon: "inventory_2" },
           { href: "/pharmacy/riders", label: "Riders", icon: "local_shipping" },
         ]),
+        { href: "/pharmacy/copilot", label: "Pacely", icon: "auto_awesome" },
         { href: "/pharmacy/settings", label: "Settings", icon: "settings" },
       ];
 
-      // Strip prefixes if on subdomain
-      if (
-        typeof window !== "undefined" &&
-        window.location.hostname.startsWith("pharmacy.")
-      ) {
-        return basePharmacyItems.map((item) => ({
-          ...item,
-          href:
-            item.href === "/pharmacy/dashboard"
-              ? "/"
-              : item.href.replace("/pharmacy", ""),
-        }));
-      }
       return basePharmacyItems;
     }
 
@@ -100,19 +88,9 @@ export function DashboardSidebar() {
         { href: "/admin/categories", label: "Categories", icon: "layers" },
         { href: "/admin/partners", label: "Partners", icon: "group" },
         { href: "/admin/refills", label: "Refills", icon: "history_edu" },
+        { href: "/admin/copilot", label: "Pacely", icon: "auto_awesome" },
         { href: "/admin/settings", label: "Settings", icon: "settings" },
       ];
-
-      // Strip prefixes if on subdomain
-      if (
-        typeof window !== "undefined" &&
-        window.location.hostname.startsWith("admin.")
-      ) {
-        return baseItems.map((item) => ({
-          ...item,
-          href: item.href === "/admin" ? "/" : item.href.replace("/admin", ""),
-        }));
-      }
 
       return baseItems;
     }
@@ -136,6 +114,7 @@ export function DashboardSidebar() {
       { href: "/admin/partners", label: "Partners", icon: "group" },
       { href: "/admin/settings", label: "Settings", icon: "settings" },
       { href: "/admin/refills", label: "Refills", icon: "history_edu" },
+      { href: "/admin/copilot", label: "Pacely", icon: "auto_awesome" },
     ];
 
     return baseItems;

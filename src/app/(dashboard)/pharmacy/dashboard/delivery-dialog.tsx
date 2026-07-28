@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 // NOTE: Use pharmacy API route instead of admin server action
 import { useToast } from "@/hooks/use-toast";
-import { Truck, Users } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import {
   Select,
   SelectContent,
@@ -238,7 +238,7 @@ export function DeliveryDialog({
             "Processing..."
           ) : (
             <>
-              <Truck className="mr-2 h-4 w-4" />
+              <Icon name="local_shipping" opticalSize={16} className="mr-2" />
               Confirm Dispatch
             </>
           )}

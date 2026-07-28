@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient, getSupabaseAdminClient } from '@/lib/supabase'
 import { getUserRoles } from '@/lib/supabase'
+import { getRedis } from '@/lib/redis'
 
 export async function PUT(
   request: NextRequest,
@@ -26,25 +27,20 @@ export async function PUT(
     const productId = parseInt(productIdParam)
     const body = await request.json()
 
-    const {
-      stock_level,
-      reorder_level,
-      pharmacy_price_ghs,
-      is_available
-    } = body
+    const updatePayload: any = {
+      last_updated: new Date().toISOString()
+    }
+    if (body.stock_level !== undefined) updatePayload.stock_level = body.stock_level
+    if (body.reorder_level !== undefined) updatePayload.reorder_level = body.reorder_level
+    if (body.pharmacy_price_ghs !== undefined) updatePayload.pharmacy_price_ghs = body.pharmacy_price_ghs
+    if (body.is_available !== undefined) updatePayload.is_available = body.is_available
 
     const supabase = getSupabaseAdminClient()
 
     // Update pharmacy product
     const { data, error } = await supabase
       .from('pharmacy_products')
-      .update({
-        stock_level,
-        reorder_level,
-        pharmacy_price_ghs,
-        is_available,
-        last_updated: new Date().toISOString()
-      })
+      .update(updatePayload)
       .eq('pharmacy_id', pharmacyId)
       .eq('product_id', productId)
       .select()
@@ -56,6 +52,15 @@ export async function PUT(
         { error: 'Pharmacy product not found' },
         { status: 404 }
       )
+    }
+
+    // Invalidate Redis cache
+    try {
+      const redis = await getRedis()
+      await redis.del(`cache:pharmacy:${pharmacyId}:products`)
+      await redis.del(`cache:pharmacy:${pharmacyId}:analytics`)
+    } catch (cacheErr) {
+      console.error('Cache invalidation failed:', cacheErr)
     }
 
     return NextResponse.json(data[0])
@@ -100,6 +105,15 @@ export async function DELETE(
       .eq('product_id', productId)
 
     if (error) throw error
+
+    // Invalidate Redis cache
+    try {
+      const redis = await getRedis()
+      await redis.del(`cache:pharmacy:${pharmacyId}:products`)
+      await redis.del(`cache:pharmacy:${pharmacyId}:analytics`)
+    } catch (cacheErr) {
+      console.error('Cache invalidation failed:', cacheErr)
+    }
 
     return NextResponse.json({ success: true })
   } catch (error: any) {

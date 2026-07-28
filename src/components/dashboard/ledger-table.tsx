@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Fragment, useEffect } from "react";
 import { 
     Table, 
     TableBody, 
@@ -10,20 +10,7 @@ import {
     TableRow 
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { 
-    DollarSign, 
-    Package, 
-    Truck, 
-    Repeat, 
-    Clock, 
-    Search, 
-    Filter,
-    ArrowUpRight,
-    ArrowDownRight,
-    FileText,
-    ChevronDown,
-    ChevronUp
-} from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import type { LedgerEntry, LedgerCategory } from "@/lib/admin-actions";
@@ -38,6 +25,8 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
     const [searchTerm, setSearchTerm] = useState("");
     const [categoryFilter, setCategoryFilter] = useState<LedgerCategory | "ALL">("ALL");
     const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+
+    const [currentPage, setCurrentPage] = useState(1);
 
     const toggleRow = (id: string) => {
         const next = new Set(expandedRows);
@@ -57,30 +46,65 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
         return matchesSearch && matchesCategory;
     });
 
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, categoryFilter]);
+
+    const itemsPerPage = 25;
+    const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const paginated = filtered.slice(startIndex, startIndex + itemsPerPage);
+
     const getCategoryIcon = (category: LedgerCategory) => {
         switch (category) {
-            case 'FINANCE': return <DollarSign className="h-3.5 w-3.5" />;
-            case 'DISPENSATION': return <Package className="h-3.5 w-3.5" />;
-            case 'LOGISTICS': return <Truck className="h-3.5 w-3.5" />;
-            case 'SUBSCRIPTION': return <Repeat className="h-3.5 w-3.5" />;
+            case 'FINANCE': return <Icon name="payments" opticalSize={14} />;
+            case 'DISPENSATION': return <Icon name="inventory_2" opticalSize={14} />;
+            case 'LOGISTICS': return <Icon name="local_shipping" opticalSize={14} />;
+            case 'SUBSCRIPTION': return <Icon name="autorenew" opticalSize={14} />;
         }
     };
 
-    const getCategoryStyles = (category: LedgerCategory) => {
-        switch (category) {
-            case 'FINANCE': return "bg-emerald-50 text-emerald-700 border-emerald-100";
-            case 'DISPENSATION': return "bg-brand-indigo/5 text-brand-indigo border-brand-indigo/10";
-            case 'LOGISTICS': return "bg-amber-50 text-amber-700 border-amber-100";
-            case 'SUBSCRIPTION': return "bg-sky-50 text-sky-700 border-sky-100";
-        }
+    // Minimal palette - all categories use slate for a clean, professional look
+    const getCategoryStyles = (_category: LedgerCategory) => {
+        return "bg-slate-50 text-slate-600 border-slate-200";
     };
+
+    const totalFinance = entries
+        .filter(e => e.category === 'FINANCE' && e.amount)
+        .reduce((sum, e) => sum + (e.amount || 0), 0);
+    const totalDispensed = entries
+        .filter(e => e.category === 'DISPENSATION')
+        .reduce((sum, e) => sum + (e.items ? e.items.reduce((acc: number, item: any) => acc + (item.quantity || 1), 0) : 1), 0);
+    const totalLogistics = entries.filter(e => e.category === 'LOGISTICS').length;
+    const totalSubscriptions = entries.filter(e => e.category === 'SUBSCRIPTION').length;
 
     return (
         <div className="space-y-6">
+            {/* Metric Summary Cards - minimal monochrome */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 animate-in fade-in-50 duration-500">
+                {[
+                    { label: "Net Volume", value: `₵${totalFinance.toLocaleString(undefined, { minimumFractionDigits: 2 })}`, sub: "Finance", icon: "payments" },
+                    { label: "Units Dispensed", value: `${totalDispensed}`, sub: "Dispensation", icon: "inventory_2" },
+                    { label: "Logistics Events", value: `${totalLogistics}`, sub: "Fulfillment", icon: "local_shipping" },
+                    { label: "Refill Enrollments", value: `${totalSubscriptions}`, sub: "Subscriptions", icon: "autorenew" },
+                ].map((card) => (
+                    <div key={card.label} className="bg-white p-4 rounded-2xl border border-slate-200/60 shadow-sm">
+                        <div className="flex items-start justify-between gap-2">
+                            <div className="space-y-1">
+                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{card.label}</p>
+                                <p className="text-lg font-black text-slate-900 tabular-nums leading-tight">{card.value}</p>
+                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">{card.sub}</p>
+                            </div>
+                            <Icon name={card.icon} opticalSize={18} className="text-slate-300 mt-0.5 shrink-0" />
+                        </div>
+                    </div>
+                ))}
+            </div>
+
             {/* Filters Bar */}
             <div className="flex flex-col md:flex-row items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
                 <div className="relative flex-1 w-full">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Icon name="search" opticalSize={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input 
                         type="text" 
                         placeholder="Search by order code, pharmacy, or event..." 
@@ -89,7 +113,7 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
                         className="w-full h-10 pl-10 pr-4 bg-slate-50 border-none rounded-xl text-sm font-medium focus:ring-2 focus:ring-brand-indigo/20 transition-all"
                     />
                 </div>
-                <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0">
+                <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                     {(['ALL', 'FINANCE', 'DISPENSATION', 'LOGISTICS', 'SUBSCRIPTION'] as const).map(cat => (
                         <button
                             key={cat}
@@ -123,12 +147,11 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {filtered.map((entry) => (
-                            <>
+                        {paginated.map((entry) => (
+                            <Fragment key={entry.id}>
                                 <TableRow 
-                                    key={entry.id} 
                                     className={cn(
-                                        "group border-slate-50 transition-colors",
+                                        "group border-slate-50 transition-colors cursor-pointer",
                                         expandedRows.has(entry.id) ? "bg-slate-50/30" : "hover:bg-slate-50/30"
                                     )}
                                     onClick={() => entry.items && toggleRow(entry.id)}
@@ -136,11 +159,25 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
                                     <TableCell className="py-5 pl-8">
                                         <div className="flex flex-col gap-0.5">
                                             <span className="text-sm font-bold text-slate-900 tabular-nums">
-                                                {format(new Date(entry.timestamp), "MMM dd, yyyy")}
+                                                {(() => {
+                                                    try {
+                                                        const d = new Date(entry.timestamp);
+                                                        return isNaN(d.getTime()) ? "N/A" : format(d, "MMM dd, yyyy");
+                                                    } catch {
+                                                        return "N/A";
+                                                    }
+                                                })()}
                                             </span>
                                             <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1.5 uppercase tracking-tighter">
-                                                <Clock className="h-3 w-3" />
-                                                {format(new Date(entry.timestamp), "HH:mm:ss")}
+                                                <Icon name="schedule" opticalSize={12} className="text-slate-400" />
+                                                {(() => {
+                                                    try {
+                                                        const d = new Date(entry.timestamp);
+                                                        return isNaN(d.getTime()) ? "N/A" : format(d, "HH:mm:ss");
+                                                    } catch {
+                                                        return "N/A";
+                                                    }
+                                                })()}
                                             </span>
                                         </div>
                                     </TableCell>
@@ -164,7 +201,7 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
                                                 </span>
                                                 {entry.items && (
                                                     <button className="text-brand-indigo hover:text-brand-indigo/80 p-0.5 transition-transform group-hover:scale-110">
-                                                        {expandedRows.has(entry.id) ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+                                                        {expandedRows.has(entry.id) ? <Icon name="expand_less" opticalSize={14} /> : <Icon name="expand_more" opticalSize={14} />}
                                                     </button>
                                                 )}
                                             </div>
@@ -180,7 +217,7 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
                                     <TableCell className="py-5">
                                         <div className="flex items-center gap-2 font-mono text-xs font-black text-slate-400 uppercase tracking-tighter">
                                             {entry.order_code || "DK-AUDIT"}
-                                            <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                            <Icon name="arrow_outward" opticalSize={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
                                         </div>
                                     </TableCell>
                                     <TableCell className="py-5 text-right pr-8">
@@ -212,7 +249,7 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
                                                             <div key={idx} className="px-4 py-3 flex items-center justify-between hover:bg-slate-50/30 transition-colors">
                                                                 <div className="flex items-center gap-3">
                                                                     <div className="h-7 w-7 rounded-lg bg-slate-100 flex items-center justify-center">
-                                                                        <FileText className="h-3.5 w-3.5 text-slate-400" />
+                                                                        <Icon name="description" opticalSize={14} className="text-slate-400" />
                                                                     </div>
                                                                     <span className="text-xs font-bold text-slate-700">{item.name}</span>
                                                                 </div>
@@ -234,7 +271,7 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
                                         </TableCell>
                                     </TableRow>
                                 )}
-                            </>
+                            </Fragment>
                         ))}
                     </TableBody>
                 </Table>
@@ -242,7 +279,7 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
                 {filtered.length === 0 && (
                     <div className="py-32 text-center">
                         <div className="h-16 w-16 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-4">
-                            <Filter className="h-8 w-8 text-slate-200" />
+                            <Icon name="filter_list" opticalSize={32} className="text-slate-200" />
                         </div>
                         <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">No audit records match</h3>
                         <p className="text-xs text-slate-500 font-medium mt-1">Try adjusting your filters or search query.</p>
@@ -250,14 +287,33 @@ export function LedgerTable({ entries, showPharmacy = true }: LedgerTableProps) 
                 )}
             </div>
 
-            {/* Pagination Placeholder */}
+            {/* Active Pagination */}
             <div className="flex items-center justify-between px-4">
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    Showing {filtered.length} entries • Exhaustive Audit Mode
+                    Showing {filtered.length > 0 ? startIndex + 1 : 0}-{Math.min(startIndex + itemsPerPage, filtered.length)} of {filtered.length} entries
                 </p>
                 <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm" disabled className="h-9 rounded-xl font-bold text-xs uppercase tracking-widest">Prev</Button>
-                    <Button variant="ghost" size="sm" disabled className="h-9 rounded-xl font-bold text-xs uppercase tracking-widest">Next</Button>
+                    <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+                        disabled={currentPage === 1} 
+                        className="h-9 rounded-xl font-bold text-xs uppercase tracking-widest"
+                    >
+                        Prev
+                    </Button>
+                    <span className="text-xs font-bold text-slate-500 px-2">
+                        Page {currentPage} of {totalPages}
+                    </span>
+                    <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
+                        disabled={currentPage === totalPages} 
+                        className="h-9 rounded-xl font-bold text-xs uppercase tracking-widest"
+                    >
+                        Next
+                    </Button>
                 </div>
             </div>
         </div>

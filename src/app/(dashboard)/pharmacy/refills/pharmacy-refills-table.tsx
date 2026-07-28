@@ -12,7 +12,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Pill, CalendarClock, Phone, User, ShieldCheck } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { format } from "date-fns";
 import {
   Dialog,
@@ -85,12 +85,6 @@ export function PharmacyRefillsTable({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Medication Refills</h1>
-          <p className="text-slate-500 font-medium text-sm mt-1">Manage recurring prescriptions for your patients.</p>
-        </div>
-      </div>
 
       <div className="hidden md:block overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
         <Table>
@@ -122,7 +116,7 @@ export function PharmacyRefillsTable({
                     <TableCell className="py-4">
                       <div className="flex items-center gap-3">
                         <div className="h-9 w-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500">
-                          <User className="h-4 w-4" />
+                          <Icon name="person" opticalSize={16} />
                         </div>
                         <div>
                           <p className="text-sm font-bold text-slate-900">{contactName}</p>
@@ -139,7 +133,7 @@ export function PharmacyRefillsTable({
                     )}
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Pill className="h-3.5 w-3.5 text-slate-400" />
+                        <Icon name="medication" opticalSize={14} className="text-slate-400" />
                         <div>
                           <p className="text-sm font-bold text-slate-700">{sub.product_name}</p>
                           <p className="text-[10px] font-medium text-slate-400 capitalize">{sub.frequency} Refill</p>
@@ -148,7 +142,7 @@ export function PharmacyRefillsTable({
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2 text-slate-600">
-                        <CalendarClock className="h-3.5 w-3.5 text-orange-500" />
+                        <Icon name="event" opticalSize={14} className="text-orange-500" />
                         <span className="text-sm font-medium">
                           {sub.next_delivery_date ? format(new Date(sub.next_delivery_date), 'MMM d, yyyy') : 'Pending'}
                         </span>
@@ -172,7 +166,7 @@ export function PharmacyRefillsTable({
                             onClick={() => handleVerifyToken(sub.id)}
                             disabled={verifyingId === sub.id}
                           >
-                            <ShieldCheck className="h-3.5 w-3.5" />
+                            <Icon name="verified_user" opticalSize={14} />
                             <span className="truncate">{verifyingId === sub.id ? "Verifying..." : "Verify Code"}</span>
                           </Button>
                         )}
@@ -187,7 +181,7 @@ export function PharmacyRefillsTable({
                           onClick={() => setLoggingId(sub.id)}
                           disabled={sub.status !== "active"}
                         >
-                          <Pill className="h-3.5 w-3.5" />
+                          <Icon name="medication" opticalSize={14} />
                           <span className="truncate text-xs">Log Refill</span>
                         </Button>
                       </div>

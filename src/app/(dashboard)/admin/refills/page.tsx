@@ -20,11 +20,11 @@ export default async function RefillsPage() {
         ]}
       />
       <div className="flex flex-col gap-1">
-        <h2 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 uppercase tracking-widest">
-            Refill Management
+        <h2 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900">
+            Refill Subscriptions
         </h2>
-        <p className="text-[10px] uppercase font-bold text-slate-400 tracking-[0.2em]">
-            Strategic prescription verification & subscription assignment
+        <p className="text-sm font-medium text-slate-500">
+            Manage recurring prescriptions and partner assignments.
         </p>
       </div>
 

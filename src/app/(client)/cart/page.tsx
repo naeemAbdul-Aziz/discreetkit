@@ -28,7 +28,7 @@ function CartPageContents() {
     }
 
     return (
-        <div className="max-w-3xl mx-auto">
+        <div className="w-full">
             <CartView />
             <div className="mt-6 text-center text-sm text-muted-foreground">
                 <p>
@@ -51,9 +51,9 @@ function CartPageLoading() {
 
 export default function CartPage() {
     return (
-        <div className="bg-background min-h-dvh vk-safe overscroll-contain vk-scroll">
-            <div className="container mx-auto px-4 py-12 md:px-6 md:py-24">
-        <div className="mx-auto max-w-7xl">
+        <div className="bg-background min-h-[calc(100dvh-4rem)] flex items-start md:items-center justify-center">
+            <div className="container mx-auto px-4 py-12 md:py-20">
+        <div className="mx-auto max-w-lg">
             <Suspense fallback={<CartPageLoading />}>
                 <CartPageContents />
             </Suspense>

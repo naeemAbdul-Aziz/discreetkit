@@ -75,7 +75,7 @@ export function SecuritySettings() {
         <div className="space-y-6">
             <div className="flex items-center justify-between pb-4 border-b border-slate-100">
                 <div className="flex items-center gap-2">
-                    <Icon name="verified_user" className="text-emerald-500" opticalSize={24} />
+                    <Icon name="verified_user" className="text-brand-teal" opticalSize={24} />
                     <div>
                         <h2 className="text-xl font-black text-slate-900 tracking-tight">Security & Credentials</h2>
                         <p className="text-sm font-medium text-slate-500 mt-0.5">Update your password to keep your account secure.</p>
@@ -86,8 +86,8 @@ export function SecuritySettings() {
             <form onSubmit={handleSubmit} className="space-y-6 max-w-xl">
                 <div className="p-8 rounded-3xl border border-slate-100 bg-white shadow-xl shadow-slate-200/40 space-y-8">
                     <div className="flex items-center gap-4 pb-6 border-b border-slate-50">
-                         <div className="h-12 w-12 rounded-2xl bg-emerald-50 flex items-center justify-center">
-                              <Icon name="key" className="text-emerald-600" opticalSize={24} />
+                         <div className="h-12 w-12 rounded-2xl bg-brand-teal/10 flex items-center justify-center">
+                              <Icon name="key" className="text-brand-teal" opticalSize={24} />
                          </div>
                          <div>
                              <h3 className="font-black text-slate-900 tracking-tight">Change Password</h3>
@@ -126,7 +126,7 @@ export function SecuritySettings() {
                     </div>
 
                     <div className="pt-4 flex justify-end">
-                        <Button type="submit" disabled={isLoading} className="gap-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full px-8 h-12 font-bold tracking-tight shadow-lg shadow-emerald-200">
+                        <Button type="submit" disabled={isLoading} className="gap-2 bg-brand-teal hover:bg-brand-teal/90 text-white rounded-full px-8 h-12 font-bold tracking-tight shadow-lg shadow-brand-teal/20">
                             {isLoading ? (
                                 <Icon name="progress_activity" className="animate-spin" opticalSize={18} />
                             ) : (

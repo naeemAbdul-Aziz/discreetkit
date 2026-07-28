@@ -40,11 +40,11 @@ export default async function AdminAnalyticsPage() {
   return (
     <div className="space-y-8 animate-in fade-in duration-1000">
       <div className="flex flex-col gap-1">
-        <h2 className="text-2xl font-black tracking-tight text-slate-900 uppercase tracking-widest">
+        <h2 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900">
           Analytics
         </h2>
-        <p className="text-[10px] uppercase font-bold text-slate-400 tracking-[0.2em]">
-          Platform performance & health insights
+        <p className="text-sm font-medium text-slate-500">
+          Platform performance and business insights.
         </p>
       </div>
 

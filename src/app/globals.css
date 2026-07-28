@@ -27,9 +27,9 @@
 
     --border: 0 0% 92%;
     --input: 0 0% 92%;
-    --ring: 175 68% 30%;
-    --primary: 175 68% 30%;
-    --primary-rgb: 24, 129, 121;
+    --ring: 175 75% 22%;
+    --primary: 175 75% 22%;
+    --primary-rgb: 14, 98, 91;
     --primary-foreground: 0 0% 100%;
 
     /* Semantic Status Colors */
@@ -60,7 +60,7 @@
     --popover: 0 0% 4%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 175 68% 30%;
+    --primary: 175 75% 22%;
     --primary-foreground: 0 0% 98%;
 
     --secondary: 78 100% 69%;
@@ -90,7 +90,7 @@
 
     --border: 0 0% 12%;
     --input: 0 0% 12%;
-    --ring: 175 68% 30%;
+    --ring: 175 75% 22%;
   }
 }
 
