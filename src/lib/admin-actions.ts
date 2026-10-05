@@ -1007,11 +1007,10 @@ export async function getDetailedAnalytics() {
 
 export async function updateOrderStatus(id: number, status: string, courierDetails?: { name: string; phone: string; trackingUrl?: string }, forceOverride: boolean = false) {
     await requireAdmin();
-    const supabase = await createSupabaseServerClient()
     const supabaseAdmin = getSupabaseAdminClient()
 
     // Enforce Pharmacy Workflow Restriction
-    const { data: order } = await supabase.from('orders').select('pharmacy_id').eq('id', id).single();
+    const { data: order } = await supabaseAdmin.from('orders').select('pharmacy_id').eq('id', id).single();
     if (order?.pharmacy_id && ['processing', 'out_for_delivery', 'completed'].includes(status) && !forceOverride) {
         return { error: 'Status is managed by the assigned pharmacy. Use override to force update.' }
     }
@@ -1023,7 +1022,7 @@ export async function updateOrderStatus(id: number, status: string, courierDetai
         updatePayload.courier_tracking_url = courierDetails.trackingUrl
     }
 
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
         .from('orders')
         .update(updatePayload)
         .eq('id', id)
@@ -1048,7 +1047,7 @@ export async function updateOrderStatus(id: number, status: string, courierDetai
         // 2. Notify Rider (New)
         if (courierDetails?.phone) {
             // Fetch order & pharmacy details for the rider message
-            const { data: orderData } = await supabase
+            const { data: orderData } = await supabaseAdmin
                 .from('orders')
                 .select(`
                     code, 
@@ -1192,12 +1191,12 @@ export async function bulkUpdateOrderStatus(ids: number[], status: string, force
         return { error: 'Invalid status' }
     }
     if (!ids.length) return { error: 'No orders selected' }
-    const supabase = await createSupabaseServerClient()
+    const supabaseAdmin = getSupabaseAdminClient()
 
     // If not forcing override, exclude orders that have a pharmacy assigned and are restricted
     let targetIds = ids;
     if (['processing', 'out_for_delivery', 'completed'].includes(status) && !forceOverride) {
-        const { data: ordersWithPharmacies } = await supabase
+        const { data: ordersWithPharmacies } = await supabaseAdmin
             .from('orders')
             .select('id, pharmacy_id')
             .in('id', ids)
@@ -1213,7 +1212,7 @@ export async function bulkUpdateOrderStatus(ids: number[], status: string, force
         }
     }
 
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
         .from('orders')
         .update({ status })
         .in('id', targetIds)

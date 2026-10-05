@@ -97,12 +97,14 @@ export async function createSupabaseServerClient() {
 
 // --- This is for MIDDLEWARE ---
 export function createSupabaseMiddlewareClient(request: NextRequest) {
-  // Create an initial response
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
+  // Use a mutable context to ensure the latest response is always accessible
+  const context = {
+    response: NextResponse.next({
+      request: {
+        headers: request.headers,
+      },
+    })
+  };
 
   const host = request.headers.get('host') || '';
   const isLocalhost = host.includes('localhost') || host.includes('127.0.0.1');
@@ -121,15 +123,15 @@ export function createSupabaseMiddlewareClient(request: NextRequest) {
             request.cookies.set(name, value);
           })
           
-          // Must recreate the response to properly apply the request header modifications
-          response = NextResponse.next({
+          // Recreate the response and update the context
+          context.response = NextResponse.next({
             request: {
               headers: request.headers,
             },
           })
           
           cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set({
+            context.response.cookies.set({
               name,
               value,
               ...options,
@@ -146,7 +148,7 @@ export function createSupabaseMiddlewareClient(request: NextRequest) {
     }
   );
 
-  return { supabase, response };
+  return { supabase, context };
 }
 
 /**

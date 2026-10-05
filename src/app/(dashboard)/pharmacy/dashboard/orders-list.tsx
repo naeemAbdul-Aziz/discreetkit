@@ -221,9 +221,9 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
     // New assignment - needs accept/decline
     if (status === "received" && ackStatus === "pending") {
       return (
-        <Badge className="gap-1.5 bg-sky-100 text-sky-700 border-sky-200 hover:bg-sky-100 hover:text-sky-700 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none pointer-events-none">
-          <div className="h-1.5 w-1.5 rounded-full bg-sky-500" />
-          Queueing: Inbound
+        <Badge className="gap-1.5 bg-blue-50 text-blue-700 hover:bg-blue-50 border-none font-medium text-[11px] px-3 py-1 shadow-none pointer-events-none rounded-full">
+          <div className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+          Queueing
         </Badge>
       );
     }
@@ -231,8 +231,8 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
     // Just accepted - preparing order
     if (status === "processing" && ackStatus === "accepted") {
       return (
-        <Badge className="gap-1.5 bg-indigo-100 text-indigo-700 border-indigo-200 hover:bg-indigo-100 hover:text-indigo-700 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none pointer-events-none">
-          <Icon name="inventory_2" opticalSize={12} />
+        <Badge className="gap-1.5 bg-purple-50 text-purple-700 hover:bg-purple-50 border-none font-medium text-[11px] px-3 py-1 shadow-none pointer-events-none rounded-full">
+          <Icon name="inventory_2" opticalSize={14} />
           Internal Prep
         </Badge>
       );
@@ -248,26 +248,26 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
     > = {
       received: { 
         label: "New Inbound", 
-        className: "bg-sky-100 text-sky-700 border-sky-200 hover:bg-sky-100 hover:text-sky-700 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none pointer-events-none" 
+        className: "bg-blue-50 text-blue-700 border-none hover:bg-blue-50 font-medium text-[11px] px-3 py-1 shadow-none pointer-events-none rounded-full" 
       },
       processing: { 
         label: "Internal Prep", 
-        className: "bg-indigo-100 text-indigo-700 border-indigo-200 hover:bg-indigo-100 hover:text-indigo-700 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none pointer-events-none" 
+        className: "bg-purple-50 text-purple-700 border-none hover:bg-purple-50 font-medium text-[11px] px-3 py-1 shadow-none pointer-events-none rounded-full" 
       },
       out_for_delivery: { 
         label: "Outbound", 
-        className: "bg-amber-100 text-amber-700 border-amber-200 hover:bg-amber-100 hover:text-amber-700 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none pointer-events-none" 
+        className: "bg-orange-50 text-orange-700 border-none hover:bg-orange-50 font-medium text-[11px] px-3 py-1 shadow-none pointer-events-none rounded-full" 
       },
       completed: { 
         label: "Completed", 
-        className: "bg-emerald-100 text-emerald-700 border-emerald-200 hover:bg-emerald-100 hover:text-emerald-700 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none pointer-events-none" 
+        className: "bg-green-50 text-green-700 border-none hover:bg-green-50 font-medium text-[11px] px-3 py-1 shadow-none pointer-events-none rounded-full" 
       },
       cancelled: { 
         label: "Aborted", 
-        className: "bg-rose-100 text-rose-700 border-rose-200 hover:bg-rose-100 hover:text-rose-700 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-none pointer-events-none" 
+        className: "bg-red-50 text-red-700 border-none hover:bg-red-50 font-medium text-[11px] px-3 py-1 shadow-none pointer-events-none rounded-full" 
       },
     };
-    const config = variants[status] || { label: status, className: "font-bold uppercase text-[9px] tracking-widest border-slate-200 bg-slate-100 text-slate-500 shadow-none pointer-events-none" };
+    const config = variants[status] || { label: status, className: "font-medium text-[11px] px-3 py-1 border-none bg-gray-100 text-gray-600 hover:bg-gray-100 shadow-none pointer-events-none rounded-full" };
     return <Badge className={config.className}>{config.label}</Badge>;
   };
 
@@ -292,11 +292,11 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
   const renderPaginatedList = (list: Order[], emptyMessage: string, emptyIconName: string) => {
     if (list.length === 0) {
       return (
-        <div className="flex flex-col items-center justify-center py-20 bg-slate-50/50 rounded-[2.5rem] border border-dashed border-slate-200">
-          <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-4">
-            <Icon name={emptyIconName} opticalSize={32} className="text-slate-200" />
+        <div className="flex flex-col items-center justify-center py-24 bg-[#f8f9fa] rounded-[32px] border-none">
+          <div className="h-16 w-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
+            <Icon name={emptyIconName} opticalSize={32} className="text-gray-400" />
           </div>
-          <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">{emptyMessage}</p>
+          <p className="text-sm font-medium text-gray-500 tracking-tight">{emptyMessage}</p>
         </div>
       );
     }
@@ -358,53 +358,53 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
 
     return (
       <Card
-        className="p-5 shadow-sm border border-slate-200 bg-white rounded-2xl cursor-pointer"
+        className="p-6 shadow-none border-none bg-[#f8f9fa] hover:bg-[#f1f3f4] transition-colors rounded-[24px] cursor-pointer"
         onClick={() => handleViewDetails(order)}
       >
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="flex-1 space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="font-mono font-black text-slate-900 tracking-tighter text-lg">
+            <div className="flex items-center gap-3">
+              <span className="font-sans font-medium text-gray-900 tracking-tight text-xl">
                 {order.code}
               </span>
               {(activeTab === "all" || order.status === "completed") && getStatusBadge(order.status, order.pharmacy_ack_status)}
               {late && (
-                <Badge className="bg-rose-600 text-white border-none hover:bg-rose-600 px-1.5 py-0 text-[9px] font-black tracking-widest uppercase shadow-none pointer-events-none">URGENT</Badge>
+                <Badge className="bg-red-50 text-red-700 border-none hover:bg-red-50 px-2 py-0.5 text-[11px] font-medium tracking-wide shadow-none pointer-events-none rounded-full">URGENT</Badge>
               )}
             </div>
             
-            <div className="text-[13px] font-medium text-slate-500 space-y-1.5 pl-4 border-l-2 border-slate-100">
+            <div className="text-[14px] font-normal text-gray-600 space-y-2">
               <p className="flex items-center gap-2">
-                <Icon name="location_on" className="text-slate-400" opticalSize={14} />
+                <Icon name="location_on" className="text-gray-400" opticalSize={16} />
                 {order.delivery_area || "Not specified"}
               </p>
-              <p className="flex items-center gap-2 font-bold text-slate-800">
-                <Icon name="list_alt" className="text-slate-400" opticalSize={14} />
+              <p className="flex items-center gap-2 font-medium text-gray-900">
+                <Icon name="list_alt" className="text-gray-400" opticalSize={16} />
                 {itemCount} Items • ₵{Number(order.total_price_ghs || 0).toFixed(2)}
               </p>
-              <p className="text-[11px] flex items-center gap-2 opacity-60">
+              <p className="text-[12px] flex items-center gap-2 text-gray-500">
                 <Icon name="schedule" opticalSize={14} />
                 Received {new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {new Date(order.created_at).toLocaleDateString()}
               </p>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0 mt-2 md:mt-0">
             {order.status === "received" && order.pharmacy_ack_status === "pending" ? (
               <>
                 <Button
                   size="lg"
-                  className="h-12 px-8 bg-brand-teal hover:bg-brand-teal-dark font-black text-sm gap-2 shadow-sm shadow-brand-teal/10"
+                  className="h-12 px-8 rounded-full bg-[#1a1a1a] hover:bg-[#333] text-white font-medium text-sm gap-2 shadow-none"
                   onClick={(e) => { e.stopPropagation(); handleAccept(order.id); }}
                   disabled={acceptLoading}
                 >
                   {acceptLoading ? <Icon name="progress_activity" className="animate-spin" opticalSize={16} /> : <Icon name="check_circle" opticalSize={16} fill />}
-                  Accept Order
+                  Accept
                 </Button>
                 <Button
                   size="lg"
                   variant="outline"
-                  className="h-12 px-5 border-rose-100 text-rose-600 hover:bg-rose-50 font-bold text-sm gap-2"
+                  className="h-12 px-8 rounded-full border-none bg-transparent hover:bg-gray-200 text-gray-700 font-medium text-sm gap-2"
                   onClick={(e) => { e.stopPropagation(); handleDeclineClick(order.id); }}
                   disabled={declineLoading}
                 >
@@ -415,16 +415,16 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
             ) : order.status === "processing" ? (
               <Button
                 size="lg"
-                className="h-12 px-10 bg-brand-teal hover:bg-brand-teal-dark font-black text-sm gap-2 shadow-sm shadow-brand-teal/10"
+                className="h-12 px-8 rounded-full bg-[#1a1a1a] hover:bg-[#333] text-white font-medium text-sm gap-2 shadow-none"
                 onClick={(e) => { e.stopPropagation(); handleMarkOutForDelivery(order.id); }}
               >
                 <Icon name="local_shipping" opticalSize={20} />
-                Dispatch Order
+                Dispatch
               </Button>
             ) : order.status === "out_for_delivery" ? (
               <Button
                 size="lg"
-                className="h-12 px-10 bg-emerald-600 hover:bg-emerald-700 font-black text-sm gap-2 shadow-sm shadow-emerald-600/10"
+                className="h-12 px-8 rounded-full bg-green-700 hover:bg-green-800 text-white font-medium text-sm gap-2 shadow-none"
                 onClick={(e) => { e.stopPropagation(); handleMarkCompleted(order.id); }}
               >
                 <Icon name="check_circle" opticalSize={20} fill />
@@ -434,7 +434,7 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
               <Button
                 size="lg"
                 variant="ghost"
-                className="h-12 px-8 text-slate-400 font-bold text-sm gap-2"
+                className="h-12 px-8 rounded-full text-gray-500 font-medium text-sm gap-2 hover:bg-transparent"
                 disabled
               >
                 <Icon name="check_circle" opticalSize={20} />
@@ -442,23 +442,25 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
               </Button>
             )}
             
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={(e) => handleOpenChat(e, order.id)}
-              className="h-12 w-12 text-slate-400 hover:text-brand-indigo rounded-xl bg-slate-50/50 hover:bg-brand-indigo/5"
-            >
-              <Icon name="chat" opticalSize={20} />
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={(e) => { e.stopPropagation(); handleOpenChat(e, order.id); }}
+                className="h-12 w-12 rounded-full text-gray-500 hover:text-gray-900 bg-transparent hover:bg-gray-200"
+              >
+                <Icon name="chat" opticalSize={20} />
+              </Button>
 
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={(e) => { e.stopPropagation(); handleViewDetails(order); }}
-              className="h-12 w-12 text-slate-400 hover:text-slate-900 rounded-xl"
-            >
-              <Icon name="visibility" opticalSize={20} />
-            </Button>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={(e) => { e.stopPropagation(); handleViewDetails(order); }}
+                className="h-12 w-12 rounded-full text-gray-500 hover:text-gray-900 bg-transparent hover:bg-gray-200"
+              >
+                <Icon name="visibility" opticalSize={20} />
+              </Button>
+            </div>
           </div>
         </div>
       </Card>
@@ -468,16 +470,16 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
   return (
     <>
       <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); setCurrentPage(1); }} className="w-full space-y-8">
-        <div className="flex items-center justify-start w-full overflow-x-auto scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] p-1">
-          <TabsList className="bg-slate-100 p-1 rounded-xl h-12 border border-slate-200/30 flex items-center gap-1 w-auto min-w-max">
+        <div className="flex items-center justify-start w-full overflow-x-auto scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <TabsList className="bg-[#f8f9fa] p-1.5 rounded-full h-14 flex items-center gap-1 w-auto min-w-max border-none shadow-none">
             <TabsTrigger 
               value="incoming" 
               onClick={(e) => e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })}
-              className="rounded-lg px-5 h-10 font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-slate-200/40 text-slate-500 hover:text-slate-700 whitespace-nowrap shrink-0"
+              className="rounded-full px-6 h-11 font-medium text-[13px] tracking-wide transition-all data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-500 hover:text-gray-900 whitespace-nowrap shrink-0 border-none"
             >
               Incoming
               {queueOrders.length > 0 && (
-                <span className="ml-2 h-5 min-w-[1.25rem] px-1.5 flex items-center justify-center rounded-full bg-brand-teal text-white text-[10px] font-black">
+                <span className="ml-2 h-5 min-w-[1.25rem] px-1.5 flex items-center justify-center rounded-full bg-blue-100 text-blue-700 text-[11px] font-medium">
                   {queueOrders.length}
                 </span>
               )}
@@ -485,11 +487,11 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
             <TabsTrigger 
               value="preparing" 
               onClick={(e) => e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })}
-              className="rounded-lg px-5 h-10 font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-slate-200/40 text-slate-500 hover:text-slate-700 whitespace-nowrap shrink-0"
+              className="rounded-full px-6 h-11 font-medium text-[13px] tracking-wide transition-all data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-500 hover:text-gray-900 whitespace-nowrap shrink-0 border-none"
             >
               Preparing
               {processingOrders.length > 0 && (
-                <span className="ml-2 h-5 min-w-[1.25rem] px-1.5 flex items-center justify-center rounded-full bg-brand-indigo text-white text-[10px] font-black">
+                <span className="ml-2 h-5 min-w-[1.25rem] px-1.5 flex items-center justify-center rounded-full bg-purple-100 text-purple-700 text-[11px] font-medium">
                   {processingOrders.length}
                 </span>
               )}
@@ -497,21 +499,21 @@ export function OrdersList({ orders, onOrderUpdate }: OrdersListProps) {
             <TabsTrigger 
               value="outbound" 
               onClick={(e) => e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })}
-              className="rounded-lg px-5 h-10 font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-slate-200/40 text-slate-500 hover:text-slate-700 whitespace-nowrap shrink-0"
+              className="rounded-full px-6 h-11 font-medium text-[13px] tracking-wide transition-all data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-500 hover:text-gray-900 whitespace-nowrap shrink-0 border-none"
             >
               Outbound
             </TabsTrigger>
             <TabsTrigger 
               value="completed" 
               onClick={(e) => e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })}
-              className="rounded-lg px-5 h-10 font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-slate-200/40 text-slate-500 hover:text-slate-700 whitespace-nowrap shrink-0"
+              className="rounded-full px-6 h-11 font-medium text-[13px] tracking-wide transition-all data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-500 hover:text-gray-900 whitespace-nowrap shrink-0 border-none"
             >
               Completed
             </TabsTrigger>
             <TabsTrigger 
               value="all" 
               onClick={(e) => e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })}
-              className="rounded-lg px-5 h-10 font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-slate-200/40 text-slate-500 hover:text-slate-700 whitespace-nowrap shrink-0"
+              className="rounded-full px-6 h-11 font-medium text-[13px] tracking-wide transition-all data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-500 hover:text-gray-900 whitespace-nowrap shrink-0 border-none"
             >
               All
             </TabsTrigger>
