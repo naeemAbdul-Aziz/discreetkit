@@ -249,6 +249,9 @@ export function OrdersTable({
               title: "Order Updated",
               description: `Order ${updatedOrder.code || ""} status changed to ${updatedOrder.status}`,
             });
+            startTransition(() => {
+              router.refresh();
+            });
           }
           // Handle INSERT (New Order)
           else if (payload.eventType === "INSERT") {
@@ -1071,70 +1074,71 @@ export function OrdersTable({
                     {/* Expanded Detail View */}
                     <AnimatePresence initial={false}>
                       {isExpanded && (
-                        <TableRow className="bg-slate-50/30 border-t-0 hover:bg-slate-50/50 transition-colors">
+                        <TableRow className="bg-slate-50/20 border-t-0 hover:bg-slate-50/30 transition-colors">
                           <TableCell colSpan={8} className="p-0 overflow-hidden">
                             <motion.div
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              exit={{ opacity: 0 }}
-                              transition={{ duration: 0.15 }}
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.2, ease: 'easeInOut' }}
                             >
-                              <div className="mx-6 my-3 p-6 grid grid-cols-1 md:grid-cols-3 gap-8 bg-slate-50/50 rounded-2xl border border-slate-200/60 relative overflow-hidden group/detail">
+                              <div className="mx-6 my-4 p-8 grid grid-cols-1 md:grid-cols-3 gap-10 bg-white rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden group/detail">
                                 {/* Col 1: Customer & Logistics */}
-                                <div className="space-y-5">
+                                <div className="space-y-8">
                                   <div className="space-y-3">
-                                    <div className="flex items-center gap-2 text-slate-400">
-                                      <User className="h-3.5 w-3.5" />
-                                      <h4 className="text-[10px] font-bold uppercase tracking-wider">Customer Details</h4>
+                                    <div className="flex items-center gap-2 text-[#1e3a5f]/60">
+                                      <span className="material-symbols-outlined text-[18px]">person</span>
+                                      <h4 className="text-[11px] font-bold uppercase tracking-widest">Customer</h4>
                                     </div>
-                                    <div className="pl-5 border-l border-slate-200 space-y-1">
-                                      <p className="text-sm font-bold text-slate-900 tracking-tight">{order.email || "Anonymous Patient"}</p>
-                                      <div className="flex items-center gap-2 flex-wrap text-xs font-medium text-slate-400">
+                                    <div className="space-y-1">
+                                      <p className="text-base font-medium text-[#1e3a5f]">{order.email || "Anonymous Patient"}</p>
+                                      <div className="flex items-center gap-2 flex-wrap text-sm text-slate-500">
                                         <p className="tabular-nums">ID: {order.id}</p>
-                                        <span>•</span>
+                                        <span className="text-slate-300">•</span>
                                         <p className="tabular-nums">{order.phone_masked || "No Phone Provided"}</p>
                                       </div>
                                     </div>
                                   </div>
                                   
                                   <div className="space-y-3">
-                                    <div className="flex items-center gap-2 text-slate-400">
-                                      <MapPin className="h-3.5 w-3.5" />
-                                      <h4 className="text-[10px] font-bold uppercase tracking-wider">Delivery Address</h4>
+                                    <div className="flex items-center gap-2 text-[#1e3a5f]/60">
+                                      <span className="material-symbols-outlined text-[18px]">location_on</span>
+                                      <h4 className="text-[11px] font-bold uppercase tracking-widest">Delivery</h4>
                                     </div>
-                                    <div className="pl-5 border-l border-slate-200 space-y-3">
-                                      <p className="text-xs font-bold text-slate-700">{order.delivery_area || "Standard Zone"}</p>
-                                      <div className="p-3 bg-white rounded-xl border border-slate-200/60 relative group/note">
-                                        <div className="absolute -top-2 left-3 px-1.5 bg-white border border-slate-200/60 rounded text-[9px] font-bold uppercase tracking-wide text-slate-400">Recipient Note</div>
-                                        <p className="text-xs font-medium text-slate-500 italic leading-relaxed">
-                                          &quot;{order.delivery_address_note || "No specific delivery notes provided."}&quot;
-                                        </p>
-                                      </div>
+                                    <div className="space-y-2">
+                                      <p className="text-sm font-medium text-[#1e3a5f]">{order.delivery_area || "Standard Zone"}</p>
+                                      {order.delivery_address_note && (
+                                        <div className="p-4 bg-slate-50 rounded-2xl">
+                                          <p className="text-sm text-slate-600 leading-relaxed">
+                                            {order.delivery_address_note}
+                                          </p>
+                                        </div>
+                                      )}
                                     </div>
                                   </div>
                                 </div>
 
                                 {/* Col 2: Inventory Summary */}
-                                <div className="space-y-5">
+                                <div className="space-y-8">
                                   <div className="space-y-3">
-                                    <div className="flex items-center gap-2 text-slate-400">
-                                      <Package className="h-3.5 w-3.5" />
-                                      <h4 className="text-[10px] font-bold uppercase tracking-wider">Order Items</h4>
+                                    <div className="flex items-center gap-2 text-[#1e3a5f]/60">
+                                      <span className="material-symbols-outlined text-[18px]">inventory_2</span>
+                                      <h4 className="text-[11px] font-bold uppercase tracking-widest">Order Items</h4>
                                     </div>
-                                    <div className="pl-5 border-l border-slate-200 space-y-2">
+                                    <div className="space-y-3">
                                       {(() => {
                                         const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
                                         const itemsArray = Array.isArray(items) ? items : [];
                                         return (
-                                          <div className="space-y-1.5">
+                                          <div className="space-y-3">
                                             {itemsArray.slice(0, 3).map((item: any, i: number) => (
-                                              <div key={i} className="flex justify-between items-center text-xs font-bold text-slate-600">
-                                                <span className="truncate max-w-[150px]">{item.name}</span>
-                                                <span className="text-slate-400 tabular-nums">x{item.quantity}</span>
+                                              <div key={i} className="flex justify-between items-center text-sm font-medium text-[#1e3a5f]">
+                                                <span className="truncate max-w-[200px]">{item.name}</span>
+                                                <span className="text-slate-400 tabular-nums bg-slate-50 px-2 py-0.5 rounded-full text-xs">x{item.quantity}</span>
                                               </div>
                                             ))}
                                             {itemsArray.length > 3 && (
-                                              <p className="text-[10px] font-bold text-brand-teal pt-1">+{itemsArray.length - 3} additional items</p>
+                                              <p className="text-xs font-medium text-[#0d635c] pt-1">+{itemsArray.length - 3} additional items</p>
                                             )}
                                           </div>
                                         );
@@ -1143,69 +1147,60 @@ export function OrdersTable({
                                   </div>
                                   
                                   <div className="space-y-3">
-                                    <div className="flex items-center gap-2 text-slate-400">
-                                      <CreditCard className="h-3.5 w-3.5" />
-                                      <h4 className="text-[10px] font-bold uppercase tracking-wider">Payment Summary</h4>
+                                    <div className="flex items-center gap-2 text-[#1e3a5f]/60">
+                                      <span className="material-symbols-outlined text-[18px]">payments</span>
+                                      <h4 className="text-[11px] font-bold uppercase tracking-widest">Total</h4>
                                     </div>
-                                    <div className="pl-5 border-l border-slate-200 space-y-1">
-                                      <p className="text-sm font-extrabold text-slate-900 tracking-tight">₵{Number(order.total_price_ghs || order.total_price || 0).toFixed(2)}</p>
-                                      <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Cash on Delivery</p>
+                                    <div>
+                                      <p className="text-2xl font-semibold text-[#1e3a5f] tracking-tight">₵{Number(order.total_price_ghs || order.total_price || 0).toFixed(2)}</p>
                                     </div>
                                   </div>
                                 </div>
 
                                 {/* Col 3: Operational Controls */}
-                                <div className="space-y-4 bg-white p-5 rounded-xl border border-slate-200/60">
-                                  <div className="space-y-3">
-                                    <div className="flex items-center gap-2 text-slate-400">
-                                      <GanttChartSquare className="h-3.5 w-3.5" />
-                                      <h4 className="text-[10px] font-bold uppercase tracking-wider">Assigned Pharmacy</h4>
+                                <div className="space-y-6 md:pl-6 md:border-l border-slate-100 flex flex-col justify-between">
+                                  <div className="space-y-4">
+                                    <div className="flex items-center gap-2 text-[#1e3a5f]/60">
+                                      <span className="material-symbols-outlined text-[18px]">local_pharmacy</span>
+                                      <h4 className="text-[11px] font-bold uppercase tracking-widest">Pharmacy Partner</h4>
                                     </div>
-                                    <div className="space-y-3">
+                                    <div className="space-y-4">
                                       <div className="flex items-center justify-between">
-                                        <p className="text-xs font-bold text-slate-800">{order.pharmacies?.name || "No Partner Assigned"}</p>
-                                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-brand-teal hover:bg-brand-teal/10" onClick={(e) => {
+                                        <p className="text-sm font-medium text-[#1e3a5f]">{order.pharmacies?.name || "No Partner Assigned"}</p>
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-[#0d635c] hover:bg-[#0d635c]/5 transition-colors" onClick={(e) => {
                                           e.stopPropagation();
                                           setActiveMessageOrderId(order.id);
                                           setMessageDialogOpen(true);
                                         }}>
-                                          <MessageSquare className="h-4 w-4" />
-                                        </Button>
-                                      </div>
-                                      <div className="grid grid-cols-2 gap-2">
-                                        <Button 
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            setActiveAuditOrder(order);
-                                            setAuditSheetOpen(true);
-                                          }}
-                                          size="sm" 
-                                          className="h-9 rounded-lg bg-brand-teal hover:bg-brand-teal/90 font-bold text-xs text-white shadow-none"
-                                        >
-                                          Audit Trail
-                                        </Button>
-                                        <Button 
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            setActiveFlagOrder(order);
-                                            setFlagDialogOpen(true);
-                                          }}
-                                          variant="outline" 
-                                          size="sm" 
-                                          className="h-9 rounded-lg border-slate-200 bg-white hover:bg-slate-50 font-bold text-xs text-slate-600 shadow-none"
-                                        >
-                                          Flag Issue
+                                          <span className="material-symbols-outlined text-[18px]">chat_bubble</span>
                                         </Button>
                                       </div>
                                     </div>
                                   </div>
                                   
-                                  <div className="pt-3 border-t border-slate-100">
-                                    <Button asChild variant="link" className="px-0 h-auto text-brand-teal text-xs font-bold hover:no-underline hover:opacity-75 gap-1.5 group/link">
-                                      <a href={`/admin/orders/${order.id}`}>
-                                        View Full Order Details
-                                        <ChevronRight className="h-3 w-3 transition-transform group-hover/link:translate-x-1" />
-                                      </a>
+                                  <div className="flex gap-3">
+                                    <Button 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setActiveAuditOrder(order);
+                                        setAuditSheetOpen(true);
+                                      }}
+                                      className="flex-1 h-11 rounded-2xl bg-[#0d635c] hover:bg-[#0d635c]/90 font-medium text-sm text-white shadow-sm transition-all"
+                                    >
+                                      <span className="material-symbols-outlined text-[18px] mr-2">history</span>
+                                      Audit Trail
+                                    </Button>
+                                    <Button 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setActiveFlagOrder(order);
+                                        setFlagDialogOpen(true);
+                                      }}
+                                      variant="outline" 
+                                      className="flex-1 h-11 rounded-2xl border-slate-200 bg-white hover:bg-slate-50 font-medium text-sm text-[#1e3a5f] shadow-none transition-all"
+                                    >
+                                      <span className="material-symbols-outlined text-[18px] mr-2">flag</span>
+                                      Flag Issue
                                     </Button>
                                   </div>
                                 </div>

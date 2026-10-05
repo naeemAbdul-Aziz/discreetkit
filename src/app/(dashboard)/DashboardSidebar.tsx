@@ -147,9 +147,9 @@ export function DashboardSidebar() {
         <SidebarMenu>
           {navItems.map((item) => {
             const isActive =
-              item.href === "/admin" || item.href === "/"
-                ? pathname === "/admin" || pathname === "/"
-                : pathname.startsWith(item.href);
+              item.href === "/admin" || item.href === "/pharmacy" || item.href === "/"
+                ? pathname === item.href || pathname === item.href + "/" || pathname.endsWith("/dashboard") && item.href.includes("dashboard")
+                : pathname === item.href || pathname.startsWith(item.href + "/");
 
             return (
               <SidebarMenuItem key={item.href}>
