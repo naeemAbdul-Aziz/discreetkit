@@ -291,7 +291,7 @@ export function OrdersTable({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [toast]);
+  }, [toast, router]);
 
   // Sync props to state (CRITICAL for revalidatePath to work in Client Components)
   useEffect(() => {

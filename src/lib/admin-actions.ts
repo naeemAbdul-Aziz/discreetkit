@@ -1047,7 +1047,7 @@ export async function updateOrderStatus(id: number, status: string, courierDetai
         // 2. Notify Rider (New)
         if (courierDetails?.phone) {
             // Fetch order & pharmacy details for the rider message
-            const { data: orderData } = await supabase
+            const { data: orderData } = await supabaseAdmin
                 .from('orders')
                 .select(`
                     code, 
