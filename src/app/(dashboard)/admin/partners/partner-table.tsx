@@ -125,11 +125,7 @@ export function PartnerTable({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-black tracking-tight text-slate-900">Partner Network</h1>
-          <p className="text-sm text-slate-500 font-medium">Manage pharmacy partners and their operational status.</p>
-        </div>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-end gap-4">
         <Button 
           onClick={handleAdd}
           className="bg-brand-indigo hover:bg-brand-indigo/90 shadow-lg shadow-brand-indigo/20 rounded-xl px-6 h-11"
