@@ -123,11 +123,7 @@ export function CategoryTable({ initialCategories }: CategoryTableProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-black tracking-tight text-slate-900">Categories</h1>
-          <p className="text-sm text-slate-500 font-medium">Manage and organize your product catalog.</p>
-        </div>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-end gap-4">
         <Button 
           onClick={() => { setSelectedCategory(null); setIsDialogOpen(true) }}
           className="bg-brand-indigo hover:bg-brand-indigo/90 shadow-lg shadow-brand-indigo/20 rounded-xl px-6 h-11"

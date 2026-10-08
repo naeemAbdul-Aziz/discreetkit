@@ -1,7 +1,7 @@
 // Shared table layout classes to keep UI consistent across dashboards
 
 export const dashboardTable = {
-  container: "w-full rounded-[2.5rem] border border-slate-100 bg-white/70 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.02)] overflow-x-auto",
+  container: "w-full bg-white overflow-x-auto",
   table: "w-full border-separate border-spacing-0",
 };
 

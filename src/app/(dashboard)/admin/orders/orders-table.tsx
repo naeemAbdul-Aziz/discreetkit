@@ -507,45 +507,45 @@ export function OrdersTable({
 
   const getStatusBadge = (status: string) => {
     const base = titleCase(status);
-    // Premium, demure, monochromatic and subtle accent palette
+    // Premium, demure, monochromatic and subtle accent palette -> Flat Pill Crisp UI
     switch (status) {
       case "completed":
         return (
-          <Badge variant="success" className="gap-1 bg-emerald-50/50 hover:bg-emerald-100/50 text-emerald-700 border-emerald-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
-            <CheckCircle className="h-3 w-3 text-emerald-600/70" />
+          <Badge variant="success" className="gap-1 bg-emerald-100/60 text-emerald-700 border-none font-medium text-[11px] px-3 py-1 shadow-none pointer-events-none rounded-full">
+            <CheckCircle className="h-3 w-3" />
             {base}
           </Badge>
         );
       case "processing":
         return (
-          <Badge variant="secondary" className="gap-1 bg-indigo-50/50 hover:bg-indigo-100/50 text-indigo-700 border-indigo-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
-            <Package className="h-3 w-3 text-indigo-400" />
+          <Badge variant="secondary" className="gap-1 bg-indigo-100/60 text-indigo-700 border-none font-medium text-[11px] px-3 py-1 shadow-none pointer-events-none rounded-full">
+            <Package className="h-3 w-3" />
             {base}
           </Badge>
         );
       case "out_for_delivery":
         return (
-          <Badge variant="warning" className="gap-1 bg-violet-50/50 hover:bg-violet-100/50 text-violet-700 border-violet-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
-            <Truck className="h-3 w-3 text-violet-500/70" />
+          <Badge variant="warning" className="gap-1 bg-violet-100/60 text-violet-700 border-none font-medium text-[11px] px-3 py-1 shadow-none pointer-events-none rounded-full">
+            <Truck className="h-3 w-3" />
             {base}
           </Badge>
         );
       case "pending_payment":
         return (
-          <Badge variant="pending" className="gap-1 bg-rose-50/50 hover:bg-rose-100/50 text-rose-700 border-rose-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 shadow-sm">
-            <CreditCard className="h-3 w-3 text-rose-400" />
+          <Badge variant="pending" className="gap-1 bg-rose-100/60 text-rose-700 border-none font-medium text-[11px] px-3 py-1 shadow-none pointer-events-none rounded-full">
+            <CreditCard className="h-3 w-3" />
             {base}
           </Badge>
         );
       case "received":
         return (
-          <Badge variant="info" className="gap-1 bg-sky-50/50 hover:bg-sky-100/50 text-sky-700 border-sky-100/50 font-bold uppercase text-[9px] tracking-widest px-2 py-0.5">
-            <Clock className="h-3 w-3 text-sky-400" />
+          <Badge variant="info" className="gap-1 bg-sky-100/60 text-sky-700 border-none font-medium text-[11px] px-3 py-1 shadow-none pointer-events-none rounded-full">
+            <Clock className="h-3 w-3" />
             {base}
           </Badge>
         );
       default:
-        return <Badge variant="outline" className="font-bold uppercase text-[9px] tracking-widest px-2 py-0.5 border-slate-100 text-slate-400">{base}</Badge>;
+        return <Badge variant="outline" className="gap-1 bg-slate-100/60 text-slate-500 border-none font-medium text-[11px] px-3 py-1 shadow-none pointer-events-none rounded-full">{base}</Badge>;
     }
   };
 
@@ -1082,7 +1082,7 @@ export function OrdersTable({
                               exit={{ opacity: 0, height: 0 }}
                               transition={{ duration: 0.2, ease: 'easeInOut' }}
                             >
-                              <div className="mx-6 my-4 p-8 grid grid-cols-1 md:grid-cols-3 gap-10 bg-white rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden group/detail">
+                              <div className="mx-6 my-4 p-8 grid grid-cols-1 md:grid-cols-3 gap-10 bg-slate-50/50 rounded-3xl relative overflow-hidden group/detail">
                                 {/* Col 1: Customer & Logistics */}
                                 <div className="space-y-8">
                                   <div className="space-y-3">
