@@ -98,7 +98,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <SidebarInset className="flex-1 w-full flex flex-col min-w-0">
             
             {/* Mobile Top Header & Tabs Carousel */}
-            <div className="md:hidden sticky top-0 z-50 bg-white border-b border-border/50 shadow-sm flex flex-col">
+            <div className="md:hidden sticky top-0 z-50 bg-white flex flex-col">
               <div className="flex items-center justify-between px-4 py-4">
                 <Link href="/" className="flex items-center">
                   <h2 className="font-headline text-2xl font-black tracking-tighter">
@@ -133,7 +133,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     >
                       {item.label}
                       {isActive && (
-                        <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-primary rounded-t-full shadow-[0_-2px_8px_rgba(var(--primary),0.5)]" />
+                        <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-primary rounded-t-full" />
                       )}
                     </Link>
                   )
@@ -158,13 +158,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           >
                             More <Icon name="expand_more" className="h-4 w-4" />
                             {isOverflowActive && (
-                              <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-primary rounded-t-full shadow-[0_-2px_8px_rgba(var(--primary),0.5)]" />
+                              <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-primary rounded-t-full" />
                             )}
                           </div>
                         );
                       })()}
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48 bg-white border border-border/50 shadow-lg rounded-xl">
+                    <DropdownMenuContent align="end" className="w-48 bg-white border-none shadow-none rounded-xl">
                       {overflowItems.map((item) => {
                         const isActive = (item.href === "/admin" || item.href === "/pharmacy/dashboard" || item.href === "/") 
                           ? pathname === item.href 
